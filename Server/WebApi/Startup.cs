@@ -37,7 +37,6 @@ namespace WebApi
             websiteCorsBuilder.AllowAnyMethod();
             websiteCorsBuilder.AllowCredentials();
             websiteCorsBuilder.WithOrigins(Configuration["CorsOrigins:Website"]);
-            //websiteCorsBuilder.AllowAnyOrigin();  // not allowed anymore
 
             services.AddCors(opt => opt.AddPolicy("CorsPolicy", websiteCorsBuilder.Build()));
         }
