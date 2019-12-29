@@ -1,0 +1,14 @@
+// Angular Material Theme info only
+// Use styles.scss for main site styles
+
+@import '~@angular/material/theming';
+@include mat-core();
+
+// ref: https://www.materialpalette.com
+$primary: mat-palette($mat-indigo, 500);
+$accent: mat-palette($mat-light-green, 500);
+$warn: mat-palette($mat-red, 500);
+
+$theme: mat-light-theme($primary, $accent, $warn);
+
+@include angular-material-theme($theme);

@@ -1,3 +1,6 @@
+// imports
+@import '~@angular/material/theming';
+
 html,
 body {
     height: 100%;
@@ -32,4 +35,14 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .button-row>button {
     margin-left: 4px;
     margin-right: 4px;
+}
+
+.noselect {
+    cursor: default;
+}
+
+.no-wrap {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
