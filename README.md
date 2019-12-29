@@ -1,6 +1,6 @@
 # Stock.Indicators NuGet package Example
 
-This is an example use for the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular 8 website with a .NET Core 3.1 Web Api that auto generates a stock chart.  You can add and remove indicators on the fly, to the chart.
+This is a demo for use of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular 8 website with a .NET Core 3.1 Web Api that auto generates a stock chart.  You can add and remove indicators on the fly, to the chart.
 
 ## Prerequisites
 
