@@ -160,8 +160,8 @@ export class AppComponent implements OnInit {
       }
     });
 
-    this.addIndicatorMA('EMA', 50, 'darkred');
-    this.addIndicatorMA('EMA', 200, 'green');
+    this.addIndicatorEMA('EMA', 50, 'darkred');
+    this.addIndicatorEMA('EMA', 200, 'green');
   }
 
 
@@ -182,25 +182,69 @@ export class AppComponent implements OnInit {
 
   addIndicator() {
 
-    // moving average
-    if (this.pickedType.code === 'SMA' || this.pickedType.code === 'EMA') {
-      this.addIndicatorMA(this.pickedType.code, this.pickedParams.parameterOne, this.pickedParams.color);
+    // simple moving average
+    if (this.pickedType.code === 'SMA') {
+      this.addIndicatorSMA(this.pickedType.code, this.pickedParams.parameterOne, this.pickedParams.color);
+    }
+
+    // simple moving average
+    if (this.pickedType.code === 'EMA') {
+      this.addIndicatorEMA(this.pickedType.code, this.pickedParams.parameterOne, this.pickedParams.color);
     }
 
     this.cancelAdd();
   }
 
 
-  addIndicatorMA(type: string, lookbackPeriod: number, color: string) {
+  addIndicatorSMA(type: string, lookbackPeriod: number, color: string) {
 
     this.http.get(`${env.api}/${type}/${lookbackPeriod}`, this.requestHeader())
-      .subscribe((ma: MaResult[]) => {
+      .subscribe((sma: SmaResult[]) => {
 
         // componse data
         const newIndicator: ChartPoint[] = [];
 
-        ma.forEach((m: MaResult) => {
-          newIndicator.push({ x: m.date, y: m.value });
+        sma.forEach((m: SmaResult) => {
+          newIndicator.push({ x: m.date, y: m.sma });
+        });
+
+        const label = `${type.toUpperCase()} (${lookbackPeriod})`;
+
+        // compose configuration
+        const newDataset: ChartDataSets = {
+          type: 'line',
+          label: label,
+          data: newIndicator,
+          borderWidth: 1,
+          borderColor: color,
+          pointRadius: 0,
+          pointBackgroundColor: color,
+          pointBorderColor: color,
+          fill: false,
+          spanGaps: false
+        };
+
+        // add to chart
+        this.chartConfig.data.datasets.push(newDataset);
+        this.chartConfig.update();
+
+        // add to list
+        this.indicators.push(newDataset);
+
+      }, (error: HttpErrorResponse) => { console.log(error); });
+  }
+
+
+  addIndicatorEMA(type: string, lookbackPeriod: number, color: string) {
+
+    this.http.get(`${env.api}/${type}/${lookbackPeriod}`, this.requestHeader())
+      .subscribe((ema: EmaResult[]) => {
+
+        // componse data
+        const newIndicator: ChartPoint[] = [];
+
+        ema.forEach((m: EmaResult) => {
+          newIndicator.push({ x: m.date, y: m.ema });
         });
 
         const label = `${type.toUpperCase()} (${lookbackPeriod})`;
@@ -268,9 +312,14 @@ export interface Indicator {
   color: string;
 }
 
-export interface MaResult {
+export interface SmaResult {
   date: Date;
-  value: number;
+  sma: number;
+}
+
+export interface EmaResult {
+  date: Date;
+  ema: number;
 }
 
 export interface IndicatorType {
