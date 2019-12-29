@@ -1,0 +1,103 @@
+<mat-toolbar color="primary">Stock.Indicators</mat-toolbar>
+
+<div class="page-container">
+
+    <p style="text-align:center;">
+        In this example, we're using the Stock.Indicators NuGet package to generate stock indicators in the backend API.
+        Then, presenting it in a chart.
+    </p>
+
+    <div class="panes">
+
+        <!-- CHART PANE -->
+        <div class="pane-left">
+            <mat-card>
+                <div class="chart-container">
+                    <canvas #chart></canvas>
+                </div>
+            </mat-card>
+        </div>
+
+        <!-- INDICATORS PANE -->
+        <div class="pane-right">
+            <mat-toolbar color="primary">
+                <span>Indicators</span>
+                <span class="filler"></span>
+                <button mat-button mat-mini-fab color="default" (click)="pickIndicator=true" *ngIf="!pickIndicator"
+                    matTooltip="add new indicator">
+                    <mat-icon>add</mat-icon>
+                </button>
+                <button mat-button mat-mini-fab color="default" (click)="cancelAdd()" *ngIf="pickIndicator"
+                    matTooltip="cancel add">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </mat-toolbar>
+
+            <mat-list class="indicators" *ngIf="!pickIndicator">
+
+                <mat-list-item>
+                    <mat-icon mat-list-icon [style.color]="'black'">timeline</mat-icon>
+                    <span mat-line>Close price</span>
+                </mat-list-item>
+
+                <mat-list-item>
+                    <mat-icon mat-list-icon [style.color]="'lightblue'">bar_chart</mat-icon>
+                    <span mat-line>Volume</span>
+                </mat-list-item>
+
+                <mat-list-item *ngFor="let indicator of indicators">
+                    <mat-icon mat-list-icon [style.color]="indicator.borderColor">timeline</mat-icon>
+                    <span mat-line>{{ indicator.label }}</span>
+                    <span class="filler"></span>
+                    <button mat-button mat-icon-button color="default" (click)="deleteIndicator(indicator)">
+                        <mat-icon>cancel</mat-icon>
+                    </button>
+                </mat-list-item>
+            </mat-list>
+
+            <mat-action-list *ngIf="pickIndicator && !pickedType.code">
+                <button mat-list-item *ngFor="let t of indicatorTypes" (click)="pickedType=t">
+                    {{ t.name }}
+                </button>
+            </mat-action-list>
+
+
+            <!-- EDITOR -->
+            <mat-toolbar color="default" *ngIf="pickedType.name">
+                <span class="filler center">{{ pickedType.name }}</span>
+            </mat-toolbar>
+
+            <form *ngIf="pickedType.code=='SMA' || pickedType.code=='EMA'" (ngSubmit)="addIndicator()"
+                #addMovingAverageForm="ngForm" class="add-form">
+
+                <div class="form-field">
+                    <mat-form-field>
+                        <label>Lookback period</label>
+                        <input matInput autofocus [(ngModel)]="pickedParams.parameterOne" name="valueOne" required
+                            type="number" min="1">
+                        <mat-hint>required integer</mat-hint>
+                    </mat-form-field>
+                </div>
+
+                <div class="form-field" style="padding-top:25px;">
+                    <label>Line color</label>
+                    <mat-radio-group class="radio-group" [(ngModel)]="pickedParams.color" color="primary" name="color"
+                        required>
+                        <mat-radio-button class="radio-button" *ngFor="let color of colors" [value]="color">
+                            {{ color }}
+                        </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+
+                <div class="button-row center">
+                    <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
+                    <button mat-raised-button color="primary" type="submit"
+                        [disabled]="addMovingAverageForm.invalid">ADD</button>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+
+</div>
