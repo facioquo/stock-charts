@@ -1,0 +1,9 @@
+{
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 3000,
+    "search.exclude": {
+        "**/dist": true,
+        "**/node_modules": true,
+        "**/package-lock.json": true
+    }
+}

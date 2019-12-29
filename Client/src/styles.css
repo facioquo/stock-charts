@@ -1,0 +1,35 @@
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    background-color: #FAFAFA;
+
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.filler {
+    flex: 1 1 auto;
+}
+
+.center {
+    text-align: center;
+}
+
+.button-row {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.button-row>button {
+    margin-left: 4px;
+    margin-right: 4px;
+}

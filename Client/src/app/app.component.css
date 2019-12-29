@@ -1,0 +1,55 @@
+.page-container {
+    margin: 16px;
+}
+
+.panes {
+    display: table;
+    margin: auto;
+}
+
+.pane-left,
+.pane-right {
+    display: table-cell;
+    vertical-align: top;
+}
+
+.pane-left {
+    padding-right: 20px;
+}
+
+.pane-right {
+    width: 300px;
+}
+
+.chart-container {
+    display: inline-block;
+    width: 800px;
+}
+
+.indicators {
+    cursor: default;
+}
+
+.add-form {
+    padding: 0 16px;
+    text-align: center;
+}
+
+.form-field {
+    margin: auto;
+    width: 150px;
+}
+
+.form-field mat-form-field {
+    width: 150px;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+}
+
+.radio-button {
+    margin: 5px;
+}
