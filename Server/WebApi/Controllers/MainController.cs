@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using StockIndicators;
+using Skender.Stock.Indicators;
 using System.Collections.Generic;
 using WebApi.Services;
 
@@ -30,7 +30,7 @@ namespace WebApi.Controllers
         public IEnumerable<SmaResult> GetSMA([FromRoute] int lookbackPeriod)
         {
             IEnumerable<Quote> history = HistoryService.GetHistory();
-            return Indicators.GetSma(history, lookbackPeriod);
+            return Indicator.GetSma(history, lookbackPeriod);
         }
 
 
@@ -38,7 +38,7 @@ namespace WebApi.Controllers
         public IEnumerable<EmaResult> GetEMA([FromRoute] int lookbackPeriod)
         {
             IEnumerable<Quote> history = HistoryService.GetHistory();
-            return Indicators.GetEma(history, lookbackPeriod);
+            return Indicator.GetEma(history, lookbackPeriod);
         }
 
     }
