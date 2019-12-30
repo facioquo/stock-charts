@@ -15,6 +15,7 @@ If you are reporting a bug, please submit an Issue with a detailed description o
 
 - Read this first: [contributing to an open-source GitHub project](https://codeburst.io/a-step-by-step-guide-to-making-your-first-github-contribution-5302260a2940)
 - Do not comingle multiple contributions.  Please keep changes small and separate.
+- The backlog for this demo project is [here](https://dev.azure.com/skender/Stock.Indicators/_boards/board/t/Stock.Charts).
 
 ## Testing
 
