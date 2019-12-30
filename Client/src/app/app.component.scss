@@ -7,64 +7,35 @@
     }
 }
 
-// PANES
+// CONTAINERS
 
 .page-container {
     margin: 16px;
 }
 
-.panes {
-    display: table;
+.container {
+    position: relative;
     margin: auto;
-}
-
-.pane-left,
-.pane-right {
-    display: table-cell;
-    vertical-align: top;
-}
-
-.pane-left {
-    padding-right: 20px;
-}
-
-.pane-right {
-    width: 300px;
-}
-
-
-// CHART
-
-.chart-container {
-    display: inline-block;
-    width: 800px;
+    max-width: 950px;
+    text-align:center;
 }
 
 
 // INDICATORS
 
-.indicators {
-    cursor: default;
-}
-
-.add-form {
-    padding: 0 16px;
-    text-align: center;
-}
-
-.form-field {
+.select-container {
     margin: auto;
-    width: 150px;
-
-    mat-form-field {
-        width: 150px;
-    }
+    max-width: 950px;
 }
 
-.radio-group {
+mat-chip-list {
+    margin: 16px;
     display: flex;
-    flex-direction: column;
-    margin: 15px 0;
+    justify-content: center;
+}
+
+mat-radio-group {
+    margin: 16px;
 }
 
 .radio-button {

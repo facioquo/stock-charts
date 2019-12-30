@@ -6,105 +6,125 @@
     </div>
 </mat-toolbar>
 
+
 <div class="page-container">
 
-    <p class="noselect" style="text-align:center;">
-        In this example, we're using the <a href="https://www.nuget.org/packages/Skender.Stock.Indicators"
-            target="_blank" rel="noopener noreferrer">Skender.Stock.Indicators</a>
-        NuGet package to generate stock indicators in the backend API. Then, presenting it in a chart.
+    <p class="noselect center">
+        This is a demo of the <a href="https://www.nuget.org/packages/Skender.Stock.Indicators" target="_blank"
+            rel="noopener noreferrer">Skender.Stock.Indicators</a> .NET library.
+        It generates stock indicators in the server-side API, then adds to chart.
     </p>
 
-    <div class="panes">
 
-        <!-- CHART PANE -->
-        <div class="pane-left">
-            <mat-card>
-                <div class="chart-container">
-                    <canvas #chart></canvas>
-                </div>
-            </mat-card>
+    <!-- CHART -->
+    <mat-card class="container">
+        <canvas #chart></canvas>
+    </mat-card>
+
+
+    <!-- LEGEND -->
+    <div class="container" *ngIf="!pickIndicator">
+
+        <mat-chip-list *ngIf="!pickIndicator">
+
+            <mat-chip selected color="default">
+                <mat-icon mat-list-icon [style.color]="'black'">timeline</mat-icon>&nbsp;
+                <span mat-line>Close price</span>
+            </mat-chip>
+
+            <mat-chip selected color="default">
+                <mat-icon mat-list-icon [style.color]="'lightblue'">bar_chart</mat-icon>&nbsp;
+                <span mat-line>Volume</span>
+            </mat-chip>
+
+            <mat-chip *ngFor="let indicator of indicators" selected color="default"
+                (removed)="deleteIndicator(indicator)">
+                <mat-icon mat-list-icon [style.color]="indicator.borderColor">timeline</mat-icon>&nbsp;
+                <span>{{ indicator.label }}</span>
+                <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+
+            <mat-chip selected color="default" (click)="pickIndicator=true" *ngIf="!pickIndicator"
+                matTooltip="add new indicator">
+                <mat-icon>add</mat-icon>
+            </mat-chip>
+
+        </mat-chip-list>
+
+    </div>
+
+
+    <!-- PICKER -->
+    <div class="container" *ngIf="pickIndicator">
+
+        <!-- pick indicator type -->
+        <div *ngIf="!pickedType.code">
+
+            <mat-chip-list></mat-chip-list>
+            <p class="center">Pick and indicator type:</p>
+            <mat-chip-list>
+                <mat-chip color="accent" selected *ngFor="let t of indicatorTypes" (click)="pickedType=t">
+                    {{ t.name }}
+                </mat-chip>
+            </mat-chip-list>
+
         </div>
 
-        <!-- INDICATORS PANE -->
-        <div class="pane-right">
-            <mat-toolbar class="noselect" color="primary">
-                <span>Indicators</span>
-                <span class="filler"></span>
-                <button mat-button mat-mini-fab color="default" (click)="pickIndicator=true" *ngIf="!pickIndicator"
-                    matTooltip="add new indicator">
-                    <mat-icon>add</mat-icon>
-                </button>
-                <button mat-button mat-mini-fab color="default" (click)="cancelAdd()" *ngIf="pickIndicator"
-                    matTooltip="cancel add">
-                    <mat-icon>close</mat-icon>
-                </button>
-            </mat-toolbar>
+        <!-- moving averages workflow -->
+        <div *ngIf="pickedType.code=='SMA' || pickedType.code=='EMA'">
 
-            <mat-list class="indicators" *ngIf="!pickIndicator">
+            <!-- selections label -->
+            <mat-chip-list>
+                <mat-chip selected color="accent">
+                    <mat-icon mat-list-icon [style.color]="pickedParams.color">timeline</mat-icon>&nbsp;
+                    <span mat-line *ngIf="!pickedParams.parameterOne">{{ pickedType.code }}</span>
+                    <span mat-line *ngIf="pickedParams.parameterOne">
+                        {{ pickedType.code }} ({{ pickedParams.parameterOne }})
+                    </span>
+                </mat-chip>
+            </mat-chip-list>
 
-                <mat-list-item>
-                    <mat-icon mat-list-icon [style.color]="'black'">timeline</mat-icon>
-                    <span mat-line>Close price</span>
-                </mat-list-item>
+            <!-- pick parameters -->
+            <div class="select-container" *ngIf="!pickedParams.parameterOne">
 
-                <mat-list-item>
-                    <mat-icon mat-list-icon [style.color]="'lightblue'">bar_chart</mat-icon>
-                    <span mat-line>Volume</span>
-                </mat-list-item>
+                <p>Select a lookback period:</p>
 
-                <mat-list-item *ngFor="let indicator of indicators">
-                    <mat-icon mat-list-icon [style.color]="indicator.borderColor">timeline</mat-icon>
-                    <span mat-line>{{ indicator.label }}</span>
-                    <span class="filler"></span>
-                    <button mat-button mat-icon-button color="default" (click)="deleteIndicator(indicator)">
-                        <mat-icon>cancel</mat-icon>
-                    </button>
-                </mat-list-item>
-            </mat-list>
+                <!-- for SMA -->
+                <mat-radio-group color="primary" [(ngModel)]="pickedParams.parameterOne" name="color"
+                    *ngIf="pickedType.code=='SMA'">
+                    <mat-radio-button class="radio-button" *ngFor="let number of smNums" [value]="number">
+                        {{ number }}
+                    </mat-radio-button>
+                </mat-radio-group>
 
-            <mat-action-list *ngIf="pickIndicator && !pickedType.code">
-                <button mat-list-item *ngFor="let t of indicatorTypes" (click)="pickedType=t">
-                    {{ t.name }}
-                </button>
-            </mat-action-list>
+                <!-- for EMA -->
+                <mat-radio-group color="primary" [(ngModel)]="pickedParams.parameterOne" name="color"
+                    *ngIf="pickedType.code=='EMA'">
+                    <mat-radio-button class="radio-button" *ngFor="let number of lgNums" [value]="number">
+                        {{ number }}
+                    </mat-radio-button>
+                </mat-radio-group>
 
+            </div>
 
-            <!-- EDITOR -->
-            <mat-toolbar color="default" *ngIf="pickedType.name">
-                <span class="filler center">{{ pickedType.name }}</span>
-            </mat-toolbar>
+            <div class="select-container" *ngIf="pickedParams.parameterOne && !pickedParams.color">
+                <p class="center">Select a line color:</p>
+                <mat-radio-group color="primary" [(ngModel)]="pickedParams.color" name="color">
+                    <mat-radio-button class="radio-button" *ngFor="let color of colors" [value]="color">
+                        {{ color }}
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
 
-            <form *ngIf="pickedType.code=='SMA' || pickedType.code=='EMA'" (ngSubmit)="addIndicator()"
-                #addMovingAverageForm="ngForm" class="add-form">
+        </div>
 
-                <div class="form-field">
-                    <mat-form-field>
-                        <label>Lookback period</label>
-                        <input matInput autofocus [(ngModel)]="pickedParams.parameterOne" name="valueOne" required
-                            type="number" min="1">
-                        <mat-hint>required integer</mat-hint>
-                    </mat-form-field>
-                </div>
-
-                <div class="form-field" style="padding-top:25px;">
-                    <label>Line color</label>
-                    <mat-radio-group class="radio-group" [(ngModel)]="pickedParams.color" color="primary" name="color"
-                        required>
-                        <mat-radio-button class="radio-button" *ngFor="let color of colors" [value]="color">
-                            {{ color }}
-                        </mat-radio-button>
-                    </mat-radio-group>
-                </div>
-
-                <div class="button-row center">
-                    <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
-                    <button mat-raised-button color="primary" type="submit"
-                        [disabled]="addMovingAverageForm.invalid">ADD</button>
-                </div>
-
-            </form>
+        <div class="button-row center">
+            <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
+            <button mat-raised-button color="primary" (click)="addIndicator()"
+                [disabled]="!pickedParams.parameterOne || !pickedParams.color">ADD</button>
         </div>
 
     </div>
+
 
 </div>
