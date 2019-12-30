@@ -28,6 +28,8 @@ export class AppComponent implements OnInit {
   ];
 
   readonly colors: string[] = ['DeepPink', 'DarkRed', 'Orange', 'Green', 'Blue'];
+  readonly smNums: number[] = [3, 5, 10, 15, 25];
+  readonly lgNums: number[] = [15, 30, 50, 100, 200];
 
   constructor(
     private readonly http: HttpClient
@@ -135,7 +137,7 @@ export class AppComponent implements OnInit {
               display: true,
               position: 'left',
               scaleLabel: {
-                display: true,
+                display: false,
                 labelString: 'price'
               },
               ticks: {
@@ -176,7 +178,7 @@ export class AppComponent implements OnInit {
       parameterOne: undefined,
       parameterTwo: undefined,
       parameterThree: undefined,
-      color: 'orange'
+      color: undefined
     };
   }
 
