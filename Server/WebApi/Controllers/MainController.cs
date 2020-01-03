@@ -20,7 +20,7 @@ namespace WebApi.Controllers
 
 
         [HttpGet("history")]
-        public IEnumerable<Quote> GetChart()
+        public IEnumerable<Quote> GetQuotes()
         {
             return HistoryService.GetHistory();
         }
@@ -39,6 +39,15 @@ namespace WebApi.Controllers
         {
             IEnumerable<Quote> history = HistoryService.GetHistory();
             return Indicator.GetEma(history, lookbackPeriod);
+        }
+
+
+        [HttpGet("BB/{lookbackPeriod}/{standardDeviations}")]
+        public IEnumerable<BollingerBandsResult> GetBollingerBands(
+            [FromRoute] int lookbackPeriod, [FromRoute] int standardDeviations)
+        {
+            IEnumerable<Quote> history = HistoryService.GetHistory();
+            return Indicator.GetBollingerBands(history, lookbackPeriod, standardDeviations);
         }
 
     }
