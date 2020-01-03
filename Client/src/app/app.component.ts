@@ -162,8 +162,8 @@ export class AppComponent implements OnInit {
       }
     });
 
-    this.addIndicatorEMA('EMA', 50, 'darkred');
-    this.addIndicatorEMA('EMA', 200, 'green');
+    this.addIndicatorEMA('EMA', 25, 'darkred');
+    this.addIndicatorEMA('EMA', 150, 'green');
   }
 
 

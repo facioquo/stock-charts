@@ -85,12 +85,12 @@
             </mat-chip-list>
 
             <!-- pick parameters -->
-            <div class="select-container" *ngIf="!pickedParams.parameterOne">
+            <div class="select-container">
 
                 <p>Select a lookback period:</p>
 
                 <!-- for SMA -->
-                <mat-radio-group color="primary" [(ngModel)]="pickedParams.parameterOne" name="color"
+                <mat-radio-group color="primary" [(ngModel)]="pickedParams.parameterOne" name="lookbackSMA"
                     *ngIf="pickedType.code=='SMA'">
                     <mat-radio-button class="radio-button" *ngFor="let number of smNums" [value]="number">
                         {{ number }}
@@ -98,22 +98,22 @@
                 </mat-radio-group>
 
                 <!-- for EMA -->
-                <mat-radio-group color="primary" [(ngModel)]="pickedParams.parameterOne" name="color"
+                <mat-radio-group color="primary" [(ngModel)]="pickedParams.parameterOne" name="lookbackEMA"
                     *ngIf="pickedType.code=='EMA'">
                     <mat-radio-button class="radio-button" *ngFor="let number of lgNums" [value]="number">
                         {{ number }}
                     </mat-radio-button>
                 </mat-radio-group>
 
-            </div>
-
-            <div class="select-container" *ngIf="pickedParams.parameterOne && !pickedParams.color">
+                <!-- color -->
                 <p class="center">Select a line color:</p>
-                <mat-radio-group color="primary" [(ngModel)]="pickedParams.color" name="color">
+
+                <mat-radio-group color="primary" [(ngModel)]="pickedParams.color" name="colorMA">
                     <mat-radio-button class="radio-button" *ngFor="let color of colors" [value]="color">
                         {{ color }}
                     </mat-radio-button>
                 </mat-radio-group>
+
             </div>
 
         </div>
