@@ -512,6 +512,8 @@ namespace WebApi.Services
             new Quote { Date = DateTime.Parse("2017-01-05"), Open=(decimal)213.77, High=(decimal)214.06, Low=(decimal)213.02, Close=(decimal)213.89, Volume = 82961968 },
             new Quote { Date = DateTime.Parse("2017-01-04"), Open=(decimal)213.16, High=(decimal)214.22, Low=(decimal)213.15, Close=(decimal)214.06, Volume = 83348752 },
             new Quote { Date = DateTime.Parse("2017-01-03"), Open=(decimal)212.61, High=(decimal)213.35, Low=(decimal)211.52, Close=(decimal)212.8, Volume = 96708880 },
+            new Quote { Date = DateTime.Parse("2017-01-02"), Open=(decimal)212.61, High=(decimal)213.35, Low=(decimal)211.52, Close=(decimal)212.0, Volume = 76708880 },
+            new Quote { Date = DateTime.Parse("2017-01-01"), Open=(decimal)212.61, High=(decimal)213.35, Low=(decimal)211.52, Close=(decimal)211.6, Volume = 86708880 },
             };
 
             return Cleaners.PrepareHistory(h);
