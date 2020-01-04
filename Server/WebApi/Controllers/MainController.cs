@@ -44,10 +44,19 @@ namespace WebApi.Controllers
 
         [HttpGet("BB/{lookbackPeriod}/{standardDeviations}")]
         public IEnumerable<BollingerBandsResult> GetBollingerBands(
-            [FromRoute] int lookbackPeriod, [FromRoute] int standardDeviations)
+            [FromRoute] int lookbackPeriod, [FromRoute] decimal standardDeviations)
         {
             IEnumerable<Quote> history = HistoryService.GetHistory();
             return Indicator.GetBollingerBands(history, lookbackPeriod, standardDeviations);
+        }
+
+
+        [HttpGet("PSAR/{accelerationStep}/{maxAccelerationFactor}")]
+        public IEnumerable<ParabolicSarResult> GetParabolicSar(
+            [FromRoute] decimal accelerationStep, [FromRoute] decimal maxAccelerationFactor)
+        {
+            IEnumerable<Quote> history = HistoryService.GetHistory();
+            return Indicator.GetParabolicSar(history, accelerationStep, maxAccelerationFactor);
         }
 
     }

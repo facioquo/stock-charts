@@ -47,7 +47,6 @@ export class EmaResult {
 
 export class BollingerBandConfig {
     constructor(
-        public id: number,
         public label: string,
         public lookbackPeriod: number,
         public standardDeviations: number
@@ -60,5 +59,20 @@ export class BollingerBandResult {
         public sma: number,
         public upperBand: number,
         public lowerBand: number
+    ) { }
+}
+
+export class ParabolicSarConfig {
+    constructor(
+        public label: string,
+        public accelerationStep: number,
+        public maxAccelerationFactor: number
+    ) { }
+}
+
+export class ParabolicSarResult {
+    constructor(
+        public date: Date,
+        public sar: number
     ) { }
 }
