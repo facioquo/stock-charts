@@ -48,7 +48,7 @@ export class AppComponent implements OnInit {
   readonly smNums: number[] = [3, 5, 10, 15, 25];
   readonly lgNums: number[] = [15, 30, 50, 100, 200];
   readonly bbConfigs: BollingerBandConfig[] = [
-    { id: 1, label: 'BB (15,1)', lookbackPeriod: 15, standardDeviations: 1 },
+    { id: 1, label: 'BB (15,2)', lookbackPeriod: 15, standardDeviations: 2 },
     { id: 2, label: 'BB (20,2)', lookbackPeriod: 20, standardDeviations: 2 },
     { id: 3, label: 'BB (45,3)', lookbackPeriod: 45, standardDeviations: 3 }
   ];
