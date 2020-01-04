@@ -1,8 +1,24 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { env } from '../environments/environment';
-
 import { Chart, ChartPoint, ChartDataSets } from 'chart.js';
+
+import {
+  Quote,
+  IndicatorType,
+  IndicatorParameters,
+  SmaResult,
+  EmaResult,
+  BollingerBandConfig,
+  BollingerBandResult
+} from './app.models';
+import { MatRadioChange } from '@angular/material/radio';
+
+export interface Indicator {
+  label: string;
+  color: string;
+  lines: ChartDataSets[];
+}
 
 @Component({
   selector: 'app-root',
@@ -15,7 +31,7 @@ export class AppComponent implements OnInit {
   chartConfig: Chart;
 
   history: Quote[] = [];
-  indicators: ChartDataSets[] = [];
+  legend: Indicator[] = [];
 
   // add indicator
   pickIndicator = false;
@@ -24,12 +40,18 @@ export class AppComponent implements OnInit {
 
   readonly indicatorTypes: IndicatorType[] = [
     { code: 'SMA', name: 'Simple Moving Average' },
-    { code: 'EMA', name: 'Exponential Moving Average' }
+    { code: 'EMA', name: 'Exponential Moving Average' },
+    { code: 'BB', name: 'Bollinger Bands' }
   ];
 
   readonly colors: string[] = ['DeepPink', 'DarkRed', 'Orange', 'Green', 'Blue'];
   readonly smNums: number[] = [3, 5, 10, 15, 25];
   readonly lgNums: number[] = [15, 30, 50, 100, 200];
+  readonly bbConfigs: BollingerBandConfig[] = [
+    { id: 1, label: 'BB (15,1)', lookbackPeriod: 15, standardDeviations: 1 },
+    { id: 2, label: 'BB (20,2)', lookbackPeriod: 20, standardDeviations: 2 },
+    { id: 3, label: 'BB (45,3)', lookbackPeriod: 45, standardDeviations: 3 }
+  ];
 
   constructor(
     private readonly http: HttpClient
@@ -162,8 +184,8 @@ export class AppComponent implements OnInit {
       }
     });
 
-    this.addIndicatorEMA('EMA', 25, 'darkred');
-    this.addIndicatorEMA('EMA', 150, 'green');
+    this.addIndicatorEMA('EMA', { parameterOne: 25, color: 'red' });
+    this.addIndicatorEMA('EMA', { parameterOne: 150, color: 'darkGreen' });
   }
 
 
@@ -182,110 +204,220 @@ export class AppComponent implements OnInit {
     };
   }
 
+
+  pickType(t: IndicatorType) {
+    this.pickedType = t;
+
+    if (this.pickedType.code === 'BB') this.pickedParams.color = 'darkGray';
+  }
+
   addIndicator() {
 
     // simple moving average
     if (this.pickedType.code === 'SMA') {
-      this.addIndicatorSMA(this.pickedType.code, this.pickedParams.parameterOne, this.pickedParams.color);
+      this.addIndicatorSMA(this.pickedType.code, this.pickedParams);
     }
 
     // simple moving average
     if (this.pickedType.code === 'EMA') {
-      this.addIndicatorEMA(this.pickedType.code, this.pickedParams.parameterOne, this.pickedParams.color);
+      this.addIndicatorEMA(this.pickedType.code, this.pickedParams);
     }
+
+    // simple moving average
+    if (this.pickedType.code === 'BB') {
+      this.addIndicatorBB(this.pickedParams);
+    }
+
 
     this.cancelAdd();
   }
 
 
-  addIndicatorSMA(type: string, lookbackPeriod: number, color: string) {
+  addIndicatorSMA(type: string, params: IndicatorParameters) {
 
-    this.http.get(`${env.api}/${type}/${lookbackPeriod}`, this.requestHeader())
+    this.http.get(`${env.api}/${type}/${params.parameterOne}`, this.requestHeader())
       .subscribe((sma: SmaResult[]) => {
 
+        const label = `${type.toUpperCase()} (${params.parameterOne})`;
+
         // componse data
-        const newIndicator: ChartPoint[] = [];
+        const smaLine: ChartPoint[] = [];
 
         sma.forEach((m: SmaResult) => {
-          newIndicator.push({ x: m.date, y: m.sma });
+          smaLine.push({ x: m.date, y: m.sma });
         });
 
-        const label = `${type.toUpperCase()} (${lookbackPeriod})`;
-
         // compose configuration
-        const newDataset: ChartDataSets = {
+        const smaDataset: ChartDataSets = {
           type: 'line',
           label: label,
-          data: newIndicator,
+          data: smaLine,
           borderWidth: 1,
-          borderColor: color,
+          borderColor: params.color,
           pointRadius: 0,
-          pointBackgroundColor: color,
-          pointBorderColor: color,
+          pointBackgroundColor: params.color,
+          pointBorderColor: params.color,
           fill: false,
           spanGaps: false
         };
 
         // add to chart
-        this.chartConfig.data.datasets.push(newDataset);
+        this.chartConfig.data.datasets.push(smaDataset);
         this.chartConfig.update();
 
-        // add to list
-        this.indicators.push(newDataset);
+        // add to legend
+        this.legend.push({ label: label, color: params.color, lines: [smaDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
 
 
-  addIndicatorEMA(type: string, lookbackPeriod: number, color: string) {
+  addIndicatorEMA(type: string, params: IndicatorParameters) {
 
-    this.http.get(`${env.api}/${type}/${lookbackPeriod}`, this.requestHeader())
+    this.http.get(`${env.api}/${type}/${params.parameterOne}`, this.requestHeader())
       .subscribe((ema: EmaResult[]) => {
 
+        const label = `${type.toUpperCase()} (${params.parameterOne})`;
+
         // componse data
-        const newIndicator: ChartPoint[] = [];
+        const emaLine: ChartPoint[] = [];
 
         ema.forEach((m: EmaResult) => {
-          newIndicator.push({ x: m.date, y: m.ema });
+          emaLine.push({ x: m.date, y: m.ema });
         });
 
-        const label = `${type.toUpperCase()} (${lookbackPeriod})`;
-
         // compose configuration
-        const newDataset: ChartDataSets = {
+        const emaDataset: ChartDataSets = {
           type: 'line',
           label: label,
-          data: newIndicator,
+          data: emaLine,
           borderWidth: 1,
-          borderColor: color,
+          borderColor: params.color,
           pointRadius: 0,
-          pointBackgroundColor: color,
-          pointBorderColor: color,
+          pointBackgroundColor: params.color,
+          pointBorderColor: params.color,
           fill: false,
           spanGaps: false
         };
 
         // add to chart
-        this.chartConfig.data.datasets.push(newDataset);
+        this.chartConfig.data.datasets.push(emaDataset);
         this.chartConfig.update();
 
-        // add to list
-        this.indicators.push(newDataset);
+        // add to legend
+        this.legend.push({ label: label, color: params.color, lines: [emaDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
 
+
+  bbChange(event: MatRadioChange) {
+    const bb: BollingerBandConfig = event.value;
+    this.pickedParams.parameterOne = bb.lookbackPeriod;
+    this.pickedParams.parameterTwo = bb.standardDeviations;
+  }
+
+  addIndicatorBB(params: IndicatorParameters) {
+
+    // remove old to clear chart
+    this.legend.filter(x => x.label.startsWith('BB')).forEach(x => {
+      this.deleteIndicator(x);
+    });
+
+    // add new
+    this.http.get(`${env.api}/BB/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
+      .subscribe((bb: BollingerBandResult[]) => {
+
+        const label = `BB (${params.parameterOne},${params.parameterTwo})`;
+
+        // componse data
+        const smaLine: ChartPoint[] = [];
+        const upperLine: ChartPoint[] = [];
+        const lowerLine: ChartPoint[] = [];
+
+        bb.forEach((m: BollingerBandResult) => {
+          smaLine.push({ x: m.date, y: m.sma });
+          upperLine.push({ x: m.date, y: m.upperBand });
+          lowerLine.push({ x: m.date, y: m.lowerBand });
+        });
+
+        // compose configurations
+        const smaDataset: ChartDataSets = {
+          type: 'line',
+          label: label,
+          data: smaLine,
+          borderWidth: 2,
+          borderDash: [5, 2],
+          borderColor: params.color,
+          pointRadius: 0,
+          pointBackgroundColor: params.color,
+          pointBorderColor: params.color,
+          fill: false,
+          spanGaps: false
+        };
+
+        const upperDataset: ChartDataSets = {
+          type: 'line',
+          label: label,
+          data: upperLine,
+          borderWidth: 1,
+          borderDash: [5, 2],
+          borderColor: params.color,
+          pointRadius: 0,
+          pointBackgroundColor: params.color,
+          pointBorderColor: params.color,
+          fill: false,
+          spanGaps: false
+        };
+
+        const lowerDataset: ChartDataSets = {
+          type: 'line',
+          label: label,
+          data: lowerLine,
+          borderWidth: 1,
+          borderDash: [5, 2],
+          borderColor: params.color,
+          pointRadius: 0,
+          pointBackgroundColor: params.color,
+          pointBorderColor: params.color,
+          fill: false,
+          spanGaps: false
+        };
+
+        // add to chart
+        this.chartConfig.data.datasets.push(smaDataset);
+        this.chartConfig.data.datasets.push(upperDataset);
+        this.chartConfig.data.datasets.push(lowerDataset);
+        this.chartConfig.update();
+
+        // add to legend
+        this.legend.push({ label: label, color: params.color, lines: [smaDataset, upperDataset, lowerDataset] });
+
+      }, (error: HttpErrorResponse) => { console.log(error); });
+  }
+
+
+
+
+
+
+  // GENERAL OPERATIONS
 
   deleteIndicator(indicator: Indicator) {
 
-    // remove from chart
-    const idxDataset = this.chartConfig.data.datasets.indexOf(indicator, 0);
-    this.chartConfig.data.datasets.splice(idxDataset, 1);
+    console.log(this.legend);
+
+    const idxLegend = this.legend.indexOf(indicator, 0);
+
+    // remove from chart (can be multiple lines per indicator)
+    this.legend[idxLegend].lines.forEach(line => {
+      const idxDataset = this.chartConfig.data.datasets.indexOf(line, 0);
+      this.chartConfig.data.datasets.splice(idxDataset, 1);
+    });
     this.chartConfig.update();
 
     // remove from legend
-    const idxLegend = this.indicators.indexOf(indicator, 0);
-    this.indicators.splice(idxLegend, 1);
+    this.legend.splice(idxLegend, 1);
   }
 
 
@@ -297,41 +429,4 @@ export class AppComponent implements OnInit {
     return { headers: simpleHeaders };
   }
 
-}
-
-
-export interface Quote {
-  date: Date;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-}
-
-export interface Indicator {
-  label: string;
-  color: string;
-}
-
-export interface SmaResult {
-  date: Date;
-  sma: number;
-}
-
-export interface EmaResult {
-  date: Date;
-  ema: number;
-}
-
-export interface IndicatorType {
-  code: string;
-  name: string;
-}
-
-export interface IndicatorParameters {
-  parameterOne: number;
-  parameterTwo: number;
-  parameterThree: number;
-  color: string;
 }
