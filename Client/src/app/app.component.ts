@@ -146,11 +146,25 @@ export class AppComponent implements OnInit {
           xAxes: [{
             display: true,
             type: 'time',
+            distribution: 'linear',
             time: {
               unit: 'month' as Chart.TimeUnit,
               displayFormats: {
-                month: 'MMM`YY'
+                month: 'MMM'
               }
+            }
+          },
+          {
+            display: true,
+            type: 'time',
+            time: {
+              unit: 'year' as Chart.TimeUnit,
+              displayFormats: {
+                year: 'YYYY'
+              }
+            },
+            gridLines: {
+              drawOnChartArea: false, // only want the grid lines for one axis to show up
             }
           }],
           yAxes: [
