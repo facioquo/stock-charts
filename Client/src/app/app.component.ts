@@ -10,7 +10,9 @@ import {
   SmaResult,
   EmaResult,
   BollingerBandConfig,
-  BollingerBandResult
+  BollingerBandResult,
+  ParabolicSarConfig,
+  ParabolicSarResult
 } from './app.models';
 import { MatRadioChange } from '@angular/material/radio';
 
@@ -41,16 +43,22 @@ export class AppComponent implements OnInit {
   readonly indicatorTypes: IndicatorType[] = [
     { code: 'SMA', name: 'Simple Moving Average' },
     { code: 'EMA', name: 'Exponential Moving Average' },
-    { code: 'BB', name: 'Bollinger Bands' }
+    { code: 'BB', name: 'Bollinger Bands' },
+    { code: 'PSAR', name: 'Parabolic SAR' }
   ];
 
   readonly colors: string[] = ['DeepPink', 'DarkRed', 'Orange', 'Green', 'Blue'];
   readonly smNums: number[] = [3, 5, 10, 15, 25];
   readonly lgNums: number[] = [15, 30, 50, 100, 200];
   readonly bbConfigs: BollingerBandConfig[] = [
-    { id: 1, label: 'BB (15,2)', lookbackPeriod: 15, standardDeviations: 2 },
-    { id: 2, label: 'BB (20,2)', lookbackPeriod: 20, standardDeviations: 2 },
-    { id: 3, label: 'BB (45,3)', lookbackPeriod: 45, standardDeviations: 3 }
+    { label: 'BB (15,2)', lookbackPeriod: 15, standardDeviations: 2 },
+    { label: 'BB (20,2)', lookbackPeriod: 20, standardDeviations: 2 },
+    { label: 'BB (45,3)', lookbackPeriod: 45, standardDeviations: 3 }
+  ];
+  readonly psarConfigs: ParabolicSarConfig[] = [
+    { label: 'PSAR (0.01,0.15)', accelerationStep: 0.01, maxAccelerationFactor: 0.15 },
+    { label: 'PSAR (0.02,0.2)', accelerationStep: 0.02, maxAccelerationFactor: 0.2 },
+    { label: 'PSAR (0.03,0.25)', accelerationStep: 0.03, maxAccelerationFactor: 0.25 }
   ];
 
   constructor(
@@ -223,6 +231,7 @@ export class AppComponent implements OnInit {
     this.pickedType = t;
 
     if (this.pickedType.code === 'BB') this.pickedParams.color = 'darkGray';
+    if (this.pickedType.code === 'PSAR') this.pickedParams.color = 'purple';
   }
 
   addIndicator() {
@@ -237,11 +246,15 @@ export class AppComponent implements OnInit {
       this.addIndicatorEMA(this.pickedType.code, this.pickedParams);
     }
 
-    // simple moving average
+    // bollinger bands
     if (this.pickedType.code === 'BB') {
       this.addIndicatorBB(this.pickedParams);
     }
 
+    // parabolid sar
+    if (this.pickedType.code === 'PSAR') {
+      this.addIndicatorPSAR(this.pickedParams);
+    }
 
     this.cancelAdd();
   }
@@ -269,8 +282,6 @@ export class AppComponent implements OnInit {
           borderWidth: 1,
           borderColor: params.color,
           pointRadius: 0,
-          pointBackgroundColor: params.color,
-          pointBorderColor: params.color,
           fill: false,
           spanGaps: false
         };
@@ -308,8 +319,6 @@ export class AppComponent implements OnInit {
           borderWidth: 1,
           borderColor: params.color,
           pointRadius: 0,
-          pointBackgroundColor: params.color,
-          pointBorderColor: params.color,
           fill: false,
           spanGaps: false
         };
@@ -364,8 +373,6 @@ export class AppComponent implements OnInit {
           borderDash: [5, 2],
           borderColor: params.color,
           pointRadius: 0,
-          pointBackgroundColor: params.color,
-          pointBorderColor: params.color,
           fill: false,
           spanGaps: false
         };
@@ -378,8 +385,6 @@ export class AppComponent implements OnInit {
           borderDash: [5, 2],
           borderColor: params.color,
           pointRadius: 0,
-          pointBackgroundColor: params.color,
-          pointBorderColor: params.color,
           fill: false,
           spanGaps: false
         };
@@ -392,8 +397,6 @@ export class AppComponent implements OnInit {
           borderDash: [5, 2],
           borderColor: params.color,
           pointRadius: 0,
-          pointBackgroundColor: params.color,
-          pointBorderColor: params.color,
           fill: false,
           spanGaps: false
         };
@@ -411,8 +414,54 @@ export class AppComponent implements OnInit {
   }
 
 
+  psarChange(event: MatRadioChange) {
+    const psar: ParabolicSarConfig = event.value;
+    this.pickedParams.parameterOne = psar.accelerationStep;
+    this.pickedParams.parameterTwo = psar.maxAccelerationFactor;
+  }
 
+  addIndicatorPSAR(params: IndicatorParameters) {
 
+    // remove old to clear chart
+    this.legend.filter(x => x.label.startsWith('PSAR')).forEach(x => {
+      this.deleteIndicator(x);
+    });
+
+    // add new
+    this.http.get(`${env.api}/PSAR/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
+      .subscribe((psar: ParabolicSarResult[]) => {
+
+        const label = `PSAR (${params.parameterOne},${params.parameterTwo})`;
+
+        // componse data
+        const sarLine: ChartPoint[] = [];
+
+        psar.forEach((m: ParabolicSarResult) => {
+          sarLine.push({ x: m.date, y: m.sar });
+        });
+
+        // compose configurations
+        const sarDataset: ChartDataSets = {
+          type: 'line',
+          label: label,
+          data: sarLine,
+          pointRadius: 1,
+          pointBackgroundColor: params.color,
+          pointBorderColor: params.color,
+          fill: false,
+          showLine: false,
+          spanGaps: false
+        };
+
+        // add to chart
+        this.chartConfig.data.datasets.push(sarDataset);
+        this.chartConfig.update();
+
+        // add to legend
+        this.legend.push({ label: label, color: params.color, lines: [sarDataset] });
+
+      }, (error: HttpErrorResponse) => { console.log(error); });
+  }
 
 
   // GENERAL OPERATIONS
