@@ -24,8 +24,9 @@
             "tsConfig": "tsconfig.app.json",
             "aot": false,
             "assets": [
+              "src/icons",
               "src/favicon.ico",
-              "src/assets",
+              "src/browserconfig.xml",
               "src/ecoysystem.config.js"
             ],
             "styles": [
