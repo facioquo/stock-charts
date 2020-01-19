@@ -18,7 +18,7 @@
 
     <!-- CHART -->
     <mat-card class="container">
-        <canvas #chart></canvas>
+        <canvas #chartOverlay></canvas>
     </mat-card>
 
 
@@ -66,6 +66,42 @@
                     {{ t.name }}
                 </mat-chip>
             </mat-chip-list>
+
+        </div>
+
+
+        <!-- bollinger bands -->
+        <div *ngIf="pickedType.code=='BB'">
+
+            <!-- selections label -->
+            <mat-chip-list>
+                <mat-chip selected color="accent">
+                    <mat-icon mat-list-icon [style.color]="pickedParams.color">timeline</mat-icon>&nbsp;
+                    <span mat-line *ngIf="!pickedParams.parameterOne">{{ pickedType.code }}</span>
+                    <span mat-line *ngIf="pickedParams.parameterOne && pickedParams.parameterTwo">
+                        {{ pickedType.code }} ({{ pickedParams.parameterOne }},{{ pickedParams.parameterTwo }})
+                    </span>
+                </mat-chip>
+            </mat-chip-list>
+
+            <!-- pick parameters -->
+            <div class="select-container">
+
+                <p>Select a Bollinger Band variant:</p>
+
+                <mat-radio-group color="primary" (change)="bbChange($event)" name="colorBB">
+                    <mat-radio-button class="radio-button" *ngFor="let bb of bbConfigs" [value]="bb">
+                        {{ bb.label }}
+                    </mat-radio-button>
+                </mat-radio-group>
+
+            </div>
+
+            <div class="button-row center">
+                <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
+                <button mat-raised-button color="primary" (click)="addIndicator()"
+                    [disabled]="!pickedParams.parameterOne || !pickedParams.color">ADD</button>
+            </div>
 
         </div>
 
@@ -125,42 +161,6 @@
         </div>
 
 
-        <!-- bollinger bands -->
-        <div *ngIf="pickedType.code=='BB'">
-
-            <!-- selections label -->
-            <mat-chip-list>
-                <mat-chip selected color="accent">
-                    <mat-icon mat-list-icon [style.color]="pickedParams.color">timeline</mat-icon>&nbsp;
-                    <span mat-line *ngIf="!pickedParams.parameterOne">{{ pickedType.code }}</span>
-                    <span mat-line *ngIf="pickedParams.parameterOne && pickedParams.parameterTwo">
-                        {{ pickedType.code }} ({{ pickedParams.parameterOne }},{{ pickedParams.parameterTwo }})
-                    </span>
-                </mat-chip>
-            </mat-chip-list>
-
-            <!-- pick parameters -->
-            <div class="select-container">
-
-                <p>Select a Bollinger Band variant:</p>
-
-                <mat-radio-group color="primary" (change)="bbChange($event)" name="colorBB">
-                    <mat-radio-button class="radio-button" *ngFor="let bb of bbConfigs" [value]="bb">
-                        {{ bb.label }}
-                    </mat-radio-button>
-                </mat-radio-group>
-
-            </div>
-
-            <div class="button-row center">
-                <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
-                <button mat-raised-button color="primary" (click)="addIndicator()"
-                    [disabled]="!pickedParams.parameterOne || !pickedParams.color">ADD</button>
-            </div>
-
-        </div>
-
-
         <!-- parabolic sar -->
         <div *ngIf="pickedType.code=='PSAR'">
 
@@ -192,6 +192,41 @@
                 <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
                 <button mat-raised-button color="primary" (click)="addIndicator()"
                     [disabled]="!pickedParams.parameterOne || !pickedParams.color">ADD</button>
+            </div>
+
+        </div>
+
+
+        <!-- relative strength index -->
+        <div *ngIf="pickedType.code=='RSI'">
+
+            <!-- selections label -->
+            <mat-chip-list>
+                <mat-chip selected color="accent">
+                    <mat-icon mat-list-icon [style.color]="pickedParams.color">timeline</mat-icon>&nbsp;
+                    <span mat-line *ngIf="pickedParams.parameterOne">
+                        {{ pickedType.code }} ({{ pickedParams.parameterOne }})
+                    </span>
+                </mat-chip>
+            </mat-chip-list>
+
+            <!-- pick parameters -->
+            <div class="select-container">
+
+                <p>Select an RSI variant:</p>
+
+                <mat-radio-group color="primary" (change)="rsiChange($event)" name="colorRSI">
+                    <mat-radio-button class="radio-button" *ngFor="let rsi of rsiConfigs" [value]="rsi">
+                        {{ rsi.label }}
+                    </mat-radio-button>
+                </mat-radio-group>
+
+            </div>
+
+            <div class="button-row center">
+                <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
+                <button mat-raised-button color="primary" (click)="addIndicator()"
+                    [disabled]="!pickedParams.parameterOne">ADD</button>
             </div>
 
         </div>

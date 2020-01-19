@@ -2,19 +2,25 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { env } from '../environments/environment';
 import { Chart, ChartPoint, ChartDataSets } from 'chart.js';
+import { MatRadioChange } from '@angular/material/radio';
 
 import {
   Quote,
   IndicatorType,
   IndicatorParameters,
-  SmaResult,
-  EmaResult,
+
+  // configs
   BollingerBandConfig,
-  BollingerBandResult,
   ParabolicSarConfig,
-  ParabolicSarResult
+  RsiConfig,
+
+  // results
+  BollingerBandResult,
+  EmaResult,
+  ParabolicSarResult,
+  RsiResult,
+  SmaResult
 } from './app.models';
-import { MatRadioChange } from '@angular/material/radio';
 
 export interface Indicator {
   label: string;
@@ -29,8 +35,8 @@ export interface Indicator {
 })
 export class AppComponent implements OnInit {
 
-  @ViewChild('chart', { static: true }) chartRef: ElementRef;
-  chartConfig: Chart;
+  @ViewChild('chartOverlay', { static: true }) chartOverlayRef: ElementRef;
+  chartOverlayConfig: Chart;
 
   history: Quote[] = [];
   legend: Indicator[] = [];
@@ -41,15 +47,18 @@ export class AppComponent implements OnInit {
   pickedParams: IndicatorParameters;
 
   readonly indicatorTypes: IndicatorType[] = [
-    { code: 'SMA', name: 'Simple Moving Average' },
-    { code: 'EMA', name: 'Exponential Moving Average' },
     { code: 'BB', name: 'Bollinger Bands' },
-    { code: 'PSAR', name: 'Parabolic SAR' }
+    { code: 'EMA', name: 'Exponential Moving Average' },
+    { code: 'PSAR', name: 'Parabolic SAR' },
+    { code: 'SMA', name: 'Simple Moving Average' },
+    { code: 'RSI', name: 'Relative Strength Index' }
   ];
 
+  // indicator parameter values
   readonly colors: string[] = ['DeepPink', 'DarkRed', 'Orange', 'Green', 'Blue'];
   readonly smNums: number[] = [3, 5, 10, 15, 25];
   readonly lgNums: number[] = [15, 30, 50, 100, 200];
+
   readonly bbConfigs: BollingerBandConfig[] = [
     { label: 'BB (15,2)', lookbackPeriod: 15, standardDeviations: 2 },
     { label: 'BB (20,2)', lookbackPeriod: 20, standardDeviations: 2 },
@@ -60,6 +69,12 @@ export class AppComponent implements OnInit {
     { label: 'PSAR (0.02,0.2)', accelerationStep: 0.02, maxAccelerationFactor: 0.2 },
     { label: 'PSAR (0.03,0.25)', accelerationStep: 0.03, maxAccelerationFactor: 0.25 }
   ];
+  readonly rsiConfigs: RsiConfig[] = [
+    { label: 'RSI (5)', lookbackPeriod: 5 },
+    { label: 'RSI (14)', lookbackPeriod: 14 },
+    { label: 'RSI (20)', lookbackPeriod: 20 }
+  ];
+
 
   constructor(
     private readonly http: HttpClient
@@ -77,12 +92,12 @@ export class AppComponent implements OnInit {
     this.http.get(`${env.api}/history`, this.requestHeader())
       .subscribe((h: Quote[]) => {
         this.history = h;
-        this.getChart();
+        this.getOverlayChart();
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
 
 
-  getChart() {
+  getOverlayChart() {
 
     const price: ChartPoint[] = [];
     const volume: ChartPoint[] = [];
@@ -96,9 +111,9 @@ export class AppComponent implements OnInit {
 
     const volAxisSize = 15 * (sumVol / volume.length) || 0;
 
-    const myChart: HTMLCanvasElement = this.chartRef.nativeElement as HTMLCanvasElement;
+    const myChart: HTMLCanvasElement = this.chartOverlayRef.nativeElement as HTMLCanvasElement;
 
-    this.chartConfig = new Chart(myChart.getContext('2d'), {
+    this.chartOverlayConfig = new Chart(myChart.getContext('2d'), {
       type: 'bar',
       data: {
         datasets: [
@@ -236,9 +251,11 @@ export class AppComponent implements OnInit {
 
   addIndicator() {
 
-    // simple moving average
-    if (this.pickedType.code === 'SMA') {
-      this.addIndicatorSMA(this.pickedType.code, this.pickedParams);
+    // sorted alphabetically
+
+    // bollinger bands
+    if (this.pickedType.code === 'BB') {
+      this.addIndicatorBB(this.pickedParams);
     }
 
     // simple moving average
@@ -246,93 +263,25 @@ export class AppComponent implements OnInit {
       this.addIndicatorEMA(this.pickedType.code, this.pickedParams);
     }
 
-    // bollinger bands
-    if (this.pickedType.code === 'BB') {
-      this.addIndicatorBB(this.pickedParams);
-    }
-
     // parabolid sar
     if (this.pickedType.code === 'PSAR') {
       this.addIndicatorPSAR(this.pickedParams);
     }
 
+    // relative strength indicator
+    if (this.pickedType.code === 'RSI') {
+      this.addIndicatorRSI(this.pickedParams);
+    }
+
+    // simple moving average
+    if (this.pickedType.code === 'SMA') {
+      this.addIndicatorSMA(this.pickedType.code, this.pickedParams);
+    }
+
     this.cancelAdd();
   }
 
-
-  addIndicatorSMA(type: string, params: IndicatorParameters) {
-
-    this.http.get(`${env.api}/${type}/${params.parameterOne}`, this.requestHeader())
-      .subscribe((sma: SmaResult[]) => {
-
-        const label = `${type.toUpperCase()} (${params.parameterOne})`;
-
-        // componse data
-        const smaLine: ChartPoint[] = [];
-
-        sma.forEach((m: SmaResult) => {
-          smaLine.push({ x: m.date, y: m.sma });
-        });
-
-        // compose configuration
-        const smaDataset: ChartDataSets = {
-          type: 'line',
-          label: label,
-          data: smaLine,
-          borderWidth: 1,
-          borderColor: params.color,
-          pointRadius: 0,
-          fill: false,
-          spanGaps: false
-        };
-
-        // add to chart
-        this.chartConfig.data.datasets.push(smaDataset);
-        this.chartConfig.update();
-
-        // add to legend
-        this.legend.push({ label: label, color: params.color, lines: [smaDataset] });
-
-      }, (error: HttpErrorResponse) => { console.log(error); });
-  }
-
-
-  addIndicatorEMA(type: string, params: IndicatorParameters) {
-
-    this.http.get(`${env.api}/${type}/${params.parameterOne}`, this.requestHeader())
-      .subscribe((ema: EmaResult[]) => {
-
-        const label = `${type.toUpperCase()} (${params.parameterOne})`;
-
-        // componse data
-        const emaLine: ChartPoint[] = [];
-
-        ema.forEach((m: EmaResult) => {
-          emaLine.push({ x: m.date, y: m.ema });
-        });
-
-        // compose configuration
-        const emaDataset: ChartDataSets = {
-          type: 'line',
-          label: label,
-          data: emaLine,
-          borderWidth: 1,
-          borderColor: params.color,
-          pointRadius: 0,
-          fill: false,
-          spanGaps: false
-        };
-
-        // add to chart
-        this.chartConfig.data.datasets.push(emaDataset);
-        this.chartConfig.update();
-
-        // add to legend
-        this.legend.push({ label: label, color: params.color, lines: [emaDataset] });
-
-      }, (error: HttpErrorResponse) => { console.log(error); });
-  }
-
+  // INDICATORS
 
   bbChange(event: MatRadioChange) {
     const bb: BollingerBandConfig = event.value;
@@ -402,13 +351,50 @@ export class AppComponent implements OnInit {
         };
 
         // add to chart
-        this.chartConfig.data.datasets.push(smaDataset);
-        this.chartConfig.data.datasets.push(upperDataset);
-        this.chartConfig.data.datasets.push(lowerDataset);
-        this.chartConfig.update();
+        this.chartOverlayConfig.data.datasets.push(smaDataset);
+        this.chartOverlayConfig.data.datasets.push(upperDataset);
+        this.chartOverlayConfig.data.datasets.push(lowerDataset);
+        this.chartOverlayConfig.update();
 
         // add to legend
         this.legend.push({ label: label, color: params.color, lines: [smaDataset, upperDataset, lowerDataset] });
+
+      }, (error: HttpErrorResponse) => { console.log(error); });
+  }
+
+
+  addIndicatorEMA(type: string, params: IndicatorParameters) {
+
+    this.http.get(`${env.api}/${type}/${params.parameterOne}`, this.requestHeader())
+      .subscribe((ema: EmaResult[]) => {
+
+        const label = `${type.toUpperCase()} (${params.parameterOne})`;
+
+        // componse data
+        const emaLine: ChartPoint[] = [];
+
+        ema.forEach((m: EmaResult) => {
+          emaLine.push({ x: m.date, y: m.ema });
+        });
+
+        // compose configuration
+        const emaDataset: ChartDataSets = {
+          type: 'line',
+          label: label,
+          data: emaLine,
+          borderWidth: 1,
+          borderColor: params.color,
+          pointRadius: 0,
+          fill: false,
+          spanGaps: false
+        };
+
+        // add to chart
+        this.chartOverlayConfig.data.datasets.push(emaDataset);
+        this.chartOverlayConfig.update();
+
+        // add to legend
+        this.legend.push({ label: label, color: params.color, lines: [emaDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
@@ -454,11 +440,90 @@ export class AppComponent implements OnInit {
         };
 
         // add to chart
-        this.chartConfig.data.datasets.push(sarDataset);
-        this.chartConfig.update();
+        this.chartOverlayConfig.data.datasets.push(sarDataset);
+        this.chartOverlayConfig.update();
 
         // add to legend
         this.legend.push({ label: label, color: params.color, lines: [sarDataset] });
+
+      }, (error: HttpErrorResponse) => { console.log(error); });
+  }
+
+
+  rsiChange(event: MatRadioChange) {
+    const rsi: RsiConfig = event.value;
+    this.pickedParams.parameterOne = rsi.lookbackPeriod;
+  }
+
+  addIndicatorRSI(params: IndicatorParameters) {
+
+    this.http.get(`${env.api}/RSI/${params.parameterOne}`, this.requestHeader())
+      .subscribe((rsi: RsiResult[]) => {
+
+        const label = `RSI (${params.parameterOne})`;
+
+        // componse data
+        const rsiLine: ChartPoint[] = [];
+
+        rsi.forEach((m: RsiResult) => {
+          rsiLine.push({ x: m.date, y: m.rsi });
+        });
+
+        // compose configuration
+        const rsiDataset: ChartDataSets = {
+          type: 'line',
+          label: label,
+          data: rsiLine,
+          borderWidth: 1,
+          borderColor: 'black',
+          pointRadius: 0,
+          fill: false,
+          spanGaps: false
+        };
+
+        // add to chart
+        this.chartOverlayConfig.data.datasets.push(rsiDataset);
+        this.chartOverlayConfig.update();
+
+        // add to legend
+        this.legend.push({ label: label, color: params.color, lines: [rsiDataset] });
+
+      }, (error: HttpErrorResponse) => { console.log(error); });
+  }
+
+
+  addIndicatorSMA(type: string, params: IndicatorParameters) {
+
+    this.http.get(`${env.api}/${type}/${params.parameterOne}`, this.requestHeader())
+      .subscribe((sma: SmaResult[]) => {
+
+        const label = `${type.toUpperCase()} (${params.parameterOne})`;
+
+        // componse data
+        const smaLine: ChartPoint[] = [];
+
+        sma.forEach((m: SmaResult) => {
+          smaLine.push({ x: m.date, y: m.sma });
+        });
+
+        // compose configuration
+        const smaDataset: ChartDataSets = {
+          type: 'line',
+          label: label,
+          data: smaLine,
+          borderWidth: 1,
+          borderColor: params.color,
+          pointRadius: 0,
+          fill: false,
+          spanGaps: false
+        };
+
+        // add to chart
+        this.chartOverlayConfig.data.datasets.push(smaDataset);
+        this.chartOverlayConfig.update();
+
+        // add to legend
+        this.legend.push({ label: label, color: params.color, lines: [smaDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
@@ -474,10 +539,10 @@ export class AppComponent implements OnInit {
 
     // remove from chart (can be multiple lines per indicator)
     this.legend[idxLegend].lines.forEach(line => {
-      const idxDataset = this.chartConfig.data.datasets.indexOf(line, 0);
-      this.chartConfig.data.datasets.splice(idxDataset, 1);
+      const idxDataset = this.chartOverlayConfig.data.datasets.indexOf(line, 0);
+      this.chartOverlayConfig.data.datasets.splice(idxDataset, 1);
     });
-    this.chartConfig.update();
+    this.chartOverlayConfig.update();
 
     // remove from legend
     this.legend.splice(idxLegend, 1);

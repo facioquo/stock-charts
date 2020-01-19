@@ -29,36 +29,13 @@ export class IndicatorParameters {
 }
 
 
-// INDICATOR RESULTS
-
-export class SmaResult {
-    constructor(
-        public date: Date,
-        public sma: number,
-    ) { }
-}
-
-export class EmaResult {
-    constructor(
-        public date: Date,
-        public ema: number,
-    ) { }
-}
+// INDICATOR CONFIGS
 
 export class BollingerBandConfig {
     constructor(
         public label: string,
         public lookbackPeriod: number,
         public standardDeviations: number
-    ) { }
-}
-
-export class BollingerBandResult {
-    constructor(
-        public date: Date,
-        public sma: number,
-        public upperBand: number,
-        public lowerBand: number
     ) { }
 }
 
@@ -70,9 +47,49 @@ export class ParabolicSarConfig {
     ) { }
 }
 
+export class RsiConfig {
+    constructor(
+        public label: string,
+        public lookbackPeriod: number
+    ) { }
+}
+
+
+// INDICATOR RESULTS
+
+export class BollingerBandResult {
+    constructor(
+        public date: Date,
+        public sma: number,
+        public upperBand: number,
+        public lowerBand: number
+    ) { }
+}
+
+export class EmaResult {
+    constructor(
+        public date: Date,
+        public ema: number,
+    ) { }
+}
+
 export class ParabolicSarResult {
     constructor(
         public date: Date,
         public sar: number
+    ) { }
+}
+
+export class RsiResult {
+    constructor(
+        public date: Date,
+        public rsi: number,
+    ) { }
+}
+
+export class SmaResult {
+    constructor(
+        public date: Date,
+        public sma: number,
     ) { }
 }
