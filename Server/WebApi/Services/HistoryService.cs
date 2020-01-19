@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace WebApi.Services
 {
-    public class HistoryService
+    public static class HistoryService
     {
         internal static IEnumerable<Quote> GetHistory()
         {
