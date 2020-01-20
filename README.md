@@ -17,7 +17,7 @@ If you want to host yourself on your local computer and review the source code, 
 
 ### Steps
 
-1. Clone the repo
+1. [Clone the repo](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository)
 
 2. Open `\Server\Backend.sln` in Visual Studio
 
