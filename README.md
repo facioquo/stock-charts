@@ -17,11 +17,13 @@ If you want to host yourself on your local computer and review the source code, 
 
 ### Steps
 
-1. Open `\Server\Backend.sln` in Visual Studio
+1. [Clone the repo](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository)
 
-2. Select `WebApi` project and Run by either `CTRL+F5` or `CTRL+SHIFT+W`.  You can also View from right-click menus.  If you've done this successfully, a browser window will open and say "API is functioning nominally."  Leave the browser window open.
+2. Open `\Server\Backend.sln` in Visual Studio
 
-3. Open `Git Bash` window and navigate to the `\Client` folder
+3. Select `WebApi` project and Run by either `CTRL+F5` or `CTRL+SHIFT+W`.  You can also View from right-click menus.  If you've done this successfully, a browser window will open and say "API is functioning nominally."  Leave the browser window open.
+
+4. Open `Git Bash` window and navigate to the `\Client` folder
 
     ``` bash
     npm install
