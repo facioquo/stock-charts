@@ -54,7 +54,7 @@
 
 
     <!-- PICKER -->
-    <div class="container" *ngIf="pickIndicator">
+    <div class="container" *ngIf="pickIndicator" style="margin-bottom:50px;">
 
         <!-- pick indicator type -->
         <div *ngIf="!pickedType.code">
@@ -62,9 +62,15 @@
             <mat-chip-list></mat-chip-list>
             <p class="center">Pick and indicator type:</p>
             <mat-chip-list>
+
                 <mat-chip color="accent" selected *ngFor="let t of indicatorTypes" (click)="pickType(t)">
                     {{ t.name }}
                 </mat-chip>
+
+                <mat-chip selected color="warn" (click)="cancelAdd()" matTooltip="cancel add">
+                    <mat-icon>close</mat-icon>
+                </mat-chip>
+
             </mat-chip-list>
 
         </div>
