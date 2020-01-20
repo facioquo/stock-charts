@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Skender.Stock.Indicators;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using WebApi.Services;
 
 namespace WebApi.Controllers
@@ -9,6 +10,7 @@ namespace WebApi.Controllers
     [EnableCors("CorsPolicy")]
     [ApiController]
     [Route("")]
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
     public class MainController : ControllerBase
     {
 
@@ -18,7 +20,6 @@ namespace WebApi.Controllers
             return "API is functioning nominally.";
         }
 
-
         [HttpGet("history")]
         public IEnumerable<Quote> GetQuotes()
         {
@@ -26,11 +27,15 @@ namespace WebApi.Controllers
         }
 
 
-        [HttpGet("SMA/{lookbackPeriod}")]
-        public IEnumerable<SmaResult> GetSMA([FromRoute] int lookbackPeriod)
+        //////////////////////////////////////////
+        // INDICATORS (sorted alphabetically)
+
+        [HttpGet("BB/{lookbackPeriod}/{standardDeviations}")]
+        public IEnumerable<BollingerBandsResult> GetBollingerBands(
+            [FromRoute] int lookbackPeriod, [FromRoute] decimal standardDeviations)
         {
             IEnumerable<Quote> history = HistoryService.GetHistory();
-            return Indicator.GetSma(history, lookbackPeriod);
+            return Indicator.GetBollingerBands(history, lookbackPeriod, standardDeviations);
         }
 
 
@@ -42,15 +47,6 @@ namespace WebApi.Controllers
         }
 
 
-        [HttpGet("BB/{lookbackPeriod}/{standardDeviations}")]
-        public IEnumerable<BollingerBandsResult> GetBollingerBands(
-            [FromRoute] int lookbackPeriod, [FromRoute] decimal standardDeviations)
-        {
-            IEnumerable<Quote> history = HistoryService.GetHistory();
-            return Indicator.GetBollingerBands(history, lookbackPeriod, standardDeviations);
-        }
-
-
         [HttpGet("PSAR/{accelerationStep}/{maxAccelerationFactor}")]
         public IEnumerable<ParabolicSarResult> GetParabolicSar(
             [FromRoute] decimal accelerationStep, [FromRoute] decimal maxAccelerationFactor)
@@ -59,5 +55,20 @@ namespace WebApi.Controllers
             return Indicator.GetParabolicSar(history, accelerationStep, maxAccelerationFactor);
         }
 
+
+        [HttpGet("SMA/{lookbackPeriod}")]
+        public IEnumerable<SmaResult> GetSma([FromRoute] int lookbackPeriod)
+        {
+            IEnumerable<Quote> history = HistoryService.GetHistory();
+            return Indicator.GetSma(history, lookbackPeriod);
+        }
+
+
+        [HttpGet("RSI/{lookbackPeriod}")]
+        public IEnumerable<RsiResult> GetRsi([FromRoute] int lookbackPeriod)
+        {
+            IEnumerable<Quote> history = HistoryService.GetHistory();
+            return Indicator.GetRsi(history, lookbackPeriod);
+        }
     }
 }
