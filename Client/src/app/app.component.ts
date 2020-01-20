@@ -392,9 +392,6 @@ export class AppComponent implements OnInit {
 
     this.cancelAdd();
 
-    console.log('overlays', this.chartOverlayConfig.data.datasets);
-    console.log('oscillators', this.chartOscillatorConfig.data.datasets);
-
   }
 
 

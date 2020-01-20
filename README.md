@@ -1,6 +1,8 @@
 # Stock.Indicators NuGet package Demo
 
-This is a demo for use of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular 8 website with a .NET Core 3.1 Web Api that auto generates a stock chart.  You can add and remove indicators on the fly, to the chart.
+[![Build status](https://dev.azure.com/skender/Stock.Indicators/_apis/build/status/Stock.Charts)](https://dev.azure.com/skender/Stock.Indicators/_build/latest?definitionId=19)
+
+This is a demo for use of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular 8 website with a .NET Core 3.1 Web Api that auto generates a stock chart.  You can add and remove indicators on the fly, to the chart.  Only a few sample indicators are shown in this demo.  See the [Library documentation](https://github.com/DaveSkender/Stock.Indicators#readme) for more information and a full list of available indicators.
 
 DEMO: [https://stock-charts.azurewebsites.net](https://stock-charts.azurewebsites.net/) is the Azure hosted live site of this demonstration.  Please note this is hosted on a "cost effective" Azure service plan, so you can attribute slowness to this low-end host.  The package itself is quite fast.
 
