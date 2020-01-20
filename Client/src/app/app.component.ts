@@ -77,7 +77,7 @@ export class AppComponent implements OnInit {
   readonly rsiConfigs: RsiConfig[] = [
     { label: 'RSI (5)', lookbackPeriod: 5 },
     { label: 'RSI (14)', lookbackPeriod: 14 },
-    { label: 'RSI (20)', lookbackPeriod: 20 }
+    { label: 'RSI (30)', lookbackPeriod: 30 }
   ];
 
 
@@ -147,7 +147,6 @@ export class AppComponent implements OnInit {
             fill: true,
             spanGaps: true
           }
-
         ]
       },
       options: {
@@ -234,12 +233,43 @@ export class AppComponent implements OnInit {
 
   addBaseOscillatorChart() {
 
+    const topThreshold: ChartPoint[] = [];
+    const bottomThreshold: ChartPoint[] = [];
+
+    this.history.forEach((q: Quote) => {
+      topThreshold.push({ x: q.date, y: 70 });
+      bottomThreshold.push({ x: q.date, y: 30 });
+    });
+
     const myChart: HTMLCanvasElement = this.chartOscillatorRef.nativeElement as HTMLCanvasElement;
 
     this.chartOscillatorConfig = new Chart(myChart.getContext('2d'), {
       type: 'bar',
       data: {
-        datasets: []
+        datasets: [
+          {
+            type: 'line',
+            data: topThreshold,
+            yAxisID: 'yAxis',
+            borderWidth: 1,
+            borderColor: 'darkRed',
+            borderDash: [5, 2],
+            pointRadius: 0,
+            fill: false,
+            spanGaps: false
+          },
+          {
+            type: 'line',
+            data: bottomThreshold,
+            yAxisID: 'yAxis',
+            borderWidth: 1,
+            borderColor: 'darkGreen',
+            borderDash: [5, 2],
+            pointRadius: 0,
+            fill: false,
+            spanGaps: true
+          }
+        ]
       },
       options: {
 
@@ -304,7 +334,6 @@ export class AppComponent implements OnInit {
 
     this.oscillatorOn = false;
   }
-
 
 
   // EDIT INDICATORS
