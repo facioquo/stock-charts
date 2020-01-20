@@ -679,7 +679,7 @@ export class AppComponent implements OnInit {
     this.chartOscillatorConfig.update();
 
     // hide oscillator if none left
-    if (this.chartOscillatorConfig.data.datasets.length === 0) {
+    if (this.chartOscillatorConfig.data.datasets.length <= 2) {
       this.oscillatorOn = false;
     }
 
