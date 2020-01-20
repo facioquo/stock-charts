@@ -34,9 +34,9 @@ Always write a clear log message for your commits. One-line messages are fine fo
 
 After a Pull Request is reviewed, accepted, and merged to master, we may batch changes before publishing a new package version to the public NuGet repository.  Please be patient with turnaround time.
 
-## Questions?
+## Contact us
 
-Contact me through my GitHub profile (preferred) or submit an Issue with your question if it may be relevant for others.
+Contact us through the NuGet [Contact Owners](https://www.nuget.org/packages/Skender.Stock.Indicators) method (preferred) or [submit an Issue](https://github.com/DaveSkender/Stock.Charts/issues) with your question if it is publicly relevant.
 
 Thanks,
 Dave Skender
