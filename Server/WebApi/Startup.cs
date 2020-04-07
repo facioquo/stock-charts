@@ -1,18 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using WebApi.Services;
+using System.Diagnostics.CodeAnalysis;
 
 namespace WebApi
 {
@@ -31,14 +22,17 @@ namespace WebApi
             services.AddControllers();
 
             // setup CORS for website
-            CorsPolicyBuilder websiteCorsBuilder = new CorsPolicyBuilder();
-
-            websiteCorsBuilder.AllowAnyHeader();
-            websiteCorsBuilder.AllowAnyMethod();
-            websiteCorsBuilder.AllowCredentials();
-            websiteCorsBuilder.WithOrigins(Configuration["CorsOrigins:Website"]);
-
-            services.AddCors(opt => opt.AddPolicy("CorsPolicy", websiteCorsBuilder.Build()));
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                builder =>
+                {
+                    builder.AllowAnyHeader();
+                    builder.AllowAnyMethod();
+                    builder.AllowCredentials();
+                    builder.WithOrigins(Configuration["CorsOrigins:Website"]);
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,11 +43,16 @@ namespace WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseHsts();
+            }
             app.UseRouting();
             app.UseCors("CorsPolicy");
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllers()
+                  .RequireCors("CorsPolicy");  // on all controllers;
             });
         }
     }
