@@ -14,7 +14,7 @@ export class Quote {
 export class IndicatorType {
     constructor(
         public code: string,
-        public name: string,
+        public name: string
     ) { }
 }
 

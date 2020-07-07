@@ -24,6 +24,7 @@ import {
 
 export interface Indicator {
   label: string;
+  chart: string;
   color: string;
   lines: ChartDataSets[];
 }
@@ -37,14 +38,14 @@ export class AppComponent implements OnInit {
 
   @ViewChild('chartOverlay', { static: true }) chartOverlayRef: ElementRef;
   chartOverlayConfig: Chart;
-  legendOverlays: Indicator[] = [];
 
-  oscillatorOn = true;
-  @ViewChild('chartOscillator', { static: true }) chartOscillatorRef: ElementRef;
-  chartOscillatorConfig: Chart;
-  legendOscillators: Indicator[] = [];
+  @ViewChild('chartRsi', { static: true }) chartRsiRef: ElementRef;
+  chartRsiConfig: Chart;
+  chartRsiOn = true;
+  chartRsiLabel = '';
 
   history: Quote[] = [];
+  legend: Indicator[] = [];
 
   // add indicator
   pickIndicator = false;
@@ -98,7 +99,7 @@ export class AppComponent implements OnInit {
       .subscribe((h: Quote[]) => {
         this.history = h;
         this.addBaseOverlayChart();
-        this.addBaseOscillatorChart();
+        this.addBaseRsiChart();
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
 
@@ -152,34 +153,42 @@ export class AppComponent implements OnInit {
       options: {
 
         title: {
-          text: 'stock prices and indicators',
-          fontFamily: 'Roboto',
+          display: false
+        },
+        legend: {
           display: false
         },
         responsive: true,
         maintainAspectRatio: true,
         layout: {
           padding: {
-            left: 10,
-            right: 10,
+            left: 0,
+            right: 0,
             top: 10,
-            bottom: 10
+            bottom: 0
           }
-        },
-        legend: {
-          display: false,
-          position: 'bottom'
         },
         scales: {
           xAxes: [{
             display: true,
             type: 'time',
-            distribution: 'linear',
             time: {
               unit: 'month' as Chart.TimeUnit,
               displayFormats: {
                 month: 'MMM'
               }
+            },
+            ticks: {
+              padding: 0,
+              autoSkip: true,
+              autoSkipPadding: 8,
+              fontSize: 9,
+              maxRotation: 0,
+              minRotation: 0,
+            },
+            gridLines: {
+              drawOnChartArea: true,
+              tickMarkLength: 2
             }
           },
           {
@@ -191,31 +200,44 @@ export class AppComponent implements OnInit {
                 year: 'YYYY'
               }
             },
+            ticks: {
+              autoSkip: true,
+              autoSkipPadding: 8,
+              fontSize: 9,
+              maxRotation: 0,
+              minRotation: 0,
+            },
             gridLines: {
-              drawOnChartArea: false, // only want the grid lines for one axis to show up
+              drawOnChartArea: false,
+              tickMarkLength: 1
             }
+
           }],
           yAxes: [
             {
               id: 'priceAxis',
               display: true,
-              position: 'left',
+              position: 'right',
               scaleLabel: {
                 display: false,
                 labelString: 'price'
               },
               ticks: {
-                beginAtZero: false
+                autoSkip: true,
+                autoSkipPadding: 3,
+                beginAtZero: false,
+                padding: 5,
+                fontSize: 10
+              },
+              gridLines: {
+                drawOnChartArea: true,
+                drawTicks: false
               }
             },
             {
               id: 'volumeAxis',
               display: false,
-              position: 'right',
-              scaleLabel: {
-                display: true,
-                labelString: 'volume'
-              },
+              position: 'left',
               ticks: {
                 beginAtZero: true,
                 max: volAxisSize
@@ -231,7 +253,7 @@ export class AppComponent implements OnInit {
   }
 
 
-  addBaseOscillatorChart() {
+  addBaseRsiChart() {
 
     const topThreshold: ChartPoint[] = [];
     const bottomThreshold: ChartPoint[] = [];
@@ -241,9 +263,9 @@ export class AppComponent implements OnInit {
       bottomThreshold.push({ x: q.date, y: 30 });
     });
 
-    const myChart: HTMLCanvasElement = this.chartOscillatorRef.nativeElement as HTMLCanvasElement;
+    const myChart: HTMLCanvasElement = this.chartRsiRef.nativeElement as HTMLCanvasElement;
 
-    this.chartOscillatorConfig = new Chart(myChart.getContext('2d'), {
+    this.chartRsiConfig = new Chart(myChart.getContext('2d'), {
       type: 'bar',
       data: {
         datasets: [
@@ -274,34 +296,42 @@ export class AppComponent implements OnInit {
       options: {
 
         title: {
-          text: 'oscillators',
-          fontFamily: 'Roboto',
+          display: false
+        },
+        legend: {
           display: false
         },
         responsive: true,
         maintainAspectRatio: false,
         layout: {
           padding: {
-            left: 10,
-            right: 10,
-            top: 10,
-            bottom: 10
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0
           }
-        },
-        legend: {
-          display: false,
-          position: 'bottom'
         },
         scales: {
           xAxes: [{
             display: true,
             type: 'time',
-            distribution: 'linear',
             time: {
               unit: 'month' as Chart.TimeUnit,
               displayFormats: {
                 month: 'MMM'
               }
+            },
+            ticks: {
+              padding: 0,
+              autoSkip: true,
+              autoSkipPadding: 8,
+              fontSize: 9,
+              maxRotation: 0,
+              minRotation: 0,
+            },
+            gridLines: {
+              drawOnChartArea: true,
+              tickMarkLength: 2
             }
           },
           {
@@ -313,26 +343,40 @@ export class AppComponent implements OnInit {
                 year: 'YYYY'
               }
             },
+            ticks: {
+              autoSkip: true,
+              autoSkipPadding: 8,
+              fontSize: 9,
+              maxRotation: 0,
+              minRotation: 0,
+            },
             gridLines: {
-              drawOnChartArea: false, // only want the grid lines for one axis to show up
+              drawOnChartArea: false,
+              tickMarkLength: 1
             }
           }],
-          yAxes: [
-            {
-              id: 'yAxis',
-              display: true,
-              position: 'left',
-              ticks: {
-                beginAtZero: true,
-                max: 100
-              }
+          yAxes: [{
+            id: 'yAxis',
+            display: true,
+            position: 'right',
+            ticks: {
+              autoSkip: true,
+              autoSkipPadding: 5,
+              beginAtZero: true,
+              max: 100,
+              padding: 5,
+              fontSize: 10
+            },
+            gridLines: {
+              drawOnChartArea: true,
+              drawTicks: false
             }
-          ],
+          }],
         }
       }
     });
 
-    this.oscillatorOn = false;
+    this.chartRsiOn = false;
   }
 
 
@@ -381,7 +425,7 @@ export class AppComponent implements OnInit {
 
     // relative strength indicator
     if (this.pickedType.code === 'RSI') {
-      this.oscillatorOn = true;
+      this.chartRsiOn = true;
       this.addIndicatorRSI(this.pickedParams);
     }
 
@@ -406,8 +450,8 @@ export class AppComponent implements OnInit {
   addIndicatorBB(params: IndicatorParameters) {
 
     // remove old to clear chart
-    this.legendOverlays.filter(x => x.label.startsWith('BB')).forEach(x => {
-      this.deleteOverlay(x);
+    this.legend.filter(x => x.label.startsWith('BB')).forEach(x => {
+      this.deleteIndicator(x);
     });
 
     // add new
@@ -471,7 +515,7 @@ export class AppComponent implements OnInit {
         this.chartOverlayConfig.update();
 
         // add to legend
-        this.legendOverlays.push({ label: label, color: params.color, lines: [smaDataset, upperDataset, lowerDataset] });
+        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [smaDataset, upperDataset, lowerDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
@@ -508,7 +552,7 @@ export class AppComponent implements OnInit {
         this.chartOverlayConfig.update();
 
         // add to legend
-        this.legendOverlays.push({ label: label, color: params.color, lines: [emaDataset] });
+        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [emaDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
@@ -523,8 +567,8 @@ export class AppComponent implements OnInit {
   addIndicatorPSAR(params: IndicatorParameters) {
 
     // remove old to clear chart
-    this.legendOverlays.filter(x => x.label.startsWith('PSAR')).forEach(x => {
-      this.deleteOverlay(x);
+    this.legend.filter(x => x.label.startsWith('PSAR')).forEach(x => {
+      this.deleteIndicator(x);
     });
 
     // add new
@@ -558,7 +602,7 @@ export class AppComponent implements OnInit {
         this.chartOverlayConfig.update();
 
         // add to legend
-        this.legendOverlays.push({ label: label, color: params.color, lines: [sarDataset] });
+        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [sarDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
@@ -575,6 +619,7 @@ export class AppComponent implements OnInit {
       .subscribe((rsi: RsiResult[]) => {
 
         const label = `RSI (${params.parameterOne})`;
+        this.chartRsiLabel = label;
 
         // componse data
         const rsiLine: ChartPoint[] = [];
@@ -596,11 +641,11 @@ export class AppComponent implements OnInit {
         };
 
         // add to chart
-        this.chartOscillatorConfig.data.datasets.push(rsiDataset);
-        this.chartOscillatorConfig.update();
+        this.chartRsiConfig.data.datasets.push(rsiDataset);
+        this.chartRsiConfig.update();
 
         // add to legend
-        this.legendOscillators.push({ label: label, color: params.color, lines: [rsiDataset] });
+        this.legend.push({ label: label, chart: 'rsi', color: params.color, lines: [rsiDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
@@ -637,7 +682,7 @@ export class AppComponent implements OnInit {
         this.chartOverlayConfig.update();
 
         // add to legend
-        this.legendOverlays.push({ label: label, color: params.color, lines: [smaDataset] });
+        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [smaDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
@@ -645,43 +690,39 @@ export class AppComponent implements OnInit {
 
   // GENERAL OPERATIONS
 
-  deleteOverlay(indicator: Indicator) {
+  deleteIndicator(indicator: Indicator) {
 
-    const idxLegend = this.legendOverlays.indexOf(indicator, 0);
+    const idxLegend = this.legend.indexOf(indicator, 0);
 
     // remove from chart (can be multiple lines per indicator)
-    this.legendOverlays[idxLegend].lines.forEach(line => {
-      const overlayDataset = this.chartOverlayConfig.data.datasets.indexOf(line, 0);
-      this.chartOverlayConfig.data.datasets.splice(overlayDataset, 1);
+    this.legend[idxLegend].lines.forEach(line => {
+
+      // overlay
+      if (indicator.chart === 'overlay') {
+        const overlayDataset = this.chartOverlayConfig.data.datasets.indexOf(line, 0);
+        this.chartOverlayConfig.data.datasets.splice(overlayDataset, 1);
+      }
+
+      // rsi
+      if (indicator.chart === 'rsi') {
+        const rsiDataset = this.chartRsiConfig.data.datasets.indexOf(line, 0);
+        this.chartRsiConfig.data.datasets.splice(rsiDataset, 1);
+
+        // hide rsi if none left
+        if (this.chartRsiConfig.data.datasets.length <= 2) {
+          this.chartRsiOn = false;
+        }
+
+        this.chartRsiConfig.update();
+      }
     });
 
     // update charts
     this.chartOverlayConfig.update();
 
-    // remove from legend
-    this.legendOverlays.splice(idxLegend, 1);
-  }
-
-  deleteOscillator(indicator: Indicator) {
-
-    const idxLegend = this.legendOscillators.indexOf(indicator, 0);
-
-    // remove from chart (can be multiple lines per indicator)
-    this.legendOscillators[idxLegend].lines.forEach(line => {
-      const oscillatorDataset = this.chartOscillatorConfig.data.datasets.indexOf(line, 0);
-      this.chartOscillatorConfig.data.datasets.splice(oscillatorDataset, 1);
-    });
-
-    // update charts
-    this.chartOscillatorConfig.update();
-
-    // hide oscillator if none left
-    if (this.chartOscillatorConfig.data.datasets.length <= 2) {
-      this.oscillatorOn = false;
-    }
 
     // remove from legend
-    this.legendOscillators.splice(idxLegend, 1);
+    this.legend.splice(idxLegend, 1);
   }
 
 

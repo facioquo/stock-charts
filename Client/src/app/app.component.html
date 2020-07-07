@@ -16,18 +16,28 @@
     </p>
 
 
-    <!-- CHART (OVERLAY) -->
     <mat-card class="container">
-        <canvas #chartOverlay></canvas>
+
+        <!-- CHART (OVERLAY) -->
+        <div>
+            <canvas #chartOverlay></canvas>
+        </div>
+
+        <!-- CHART (RSI) -->
+        <div class="chart-label" *ngIf="chartRsiOn">Relative Strength Index - {{ chartRsiLabel }}</div>
+        <div [hidden]="!chartRsiOn">
+            <canvas #chartRsi></canvas>
+        </div>
+
     </mat-card>
 
-    <!-- LEGEND (OVERLAYS) -->
+    <!-- LEGEND -->
     <div class="container" *ngIf="!pickIndicator">
 
         <mat-chip-list *ngIf="!pickIndicator">
 
             <mat-chip selected color="default">
-                <mat-icon mat-list-icon [style.color]="'black'">timeline</mat-icon>&nbsp;
+                <mat-icon mat-list-icon [style.color]="'black'">show_chart</mat-icon>&nbsp;
                 <span mat-line>Close price</span>
             </mat-chip>
 
@@ -36,9 +46,9 @@
                 <span mat-line>Volume</span>
             </mat-chip>
 
-            <mat-chip *ngFor="let indicator of legendOverlays" selected color="default"
-                (removed)="deleteOverlay(indicator)">
-                <mat-icon mat-list-icon [style.color]="indicator.color">timeline</mat-icon>&nbsp;
+            <mat-chip *ngFor="let indicator of legend" selected color="default"
+                (removed)="deleteIndicator(indicator)">
+                <mat-icon mat-list-icon [style.color]="indicator.color">show_chart</mat-icon>&nbsp;
                 <span>{{ indicator.label }}</span>
                 <mat-icon matChipRemove>cancel</mat-icon>
             </mat-chip>
@@ -236,35 +246,6 @@
             </div>
 
         </div>
-
-    </div>
-
-
-    <!-- CHART (OSCILLATOR) -->
-    <div [hidden]="!oscillatorOn">
-        <mat-card class="container">
-            <canvas #chartOscillator></canvas>
-        </mat-card>
-    </div>
-
-    <!-- LEGEND (OSCILLATORS) -->
-    <div class="container" *ngIf="!pickIndicator && oscillatorOn">
-
-        <mat-chip-list *ngIf="!pickIndicator">
-
-            <mat-chip *ngFor="let indicator of legendOscillators" selected color="default"
-                (removed)="deleteOscillator(indicator)">
-                <mat-icon mat-list-icon [style.color]="indicator.color">timeline</mat-icon>&nbsp;
-                <span>{{ indicator.label }}</span>
-                <mat-icon matChipRemove>cancel</mat-icon>
-            </mat-chip>
-
-            <mat-chip selected color="default" (click)="pickIndicator=true" *ngIf="!pickIndicator"
-                matTooltip="add new indicator">
-                <mat-icon>add</mat-icon>
-            </mat-chip>
-
-        </mat-chip-list>
 
     </div>
 
