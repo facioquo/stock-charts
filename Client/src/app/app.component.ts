@@ -275,7 +275,6 @@ export class AppComponent implements OnInit {
             yAxisID: 'yAxis',
             borderWidth: 1,
             borderColor: 'darkRed',
-            borderDash: [5, 2],
             pointRadius: 0,
             fill: false,
             spanGaps: false
@@ -286,7 +285,6 @@ export class AppComponent implements OnInit {
             yAxisID: 'yAxis',
             borderWidth: 1,
             borderColor: 'darkGreen',
-            borderDash: [5, 2],
             pointRadius: 0,
             fill: false,
             spanGaps: true
@@ -401,7 +399,7 @@ export class AppComponent implements OnInit {
 
     if (this.pickedType.code === 'BB') this.pickedParams.color = 'darkGray';
     if (this.pickedType.code === 'PSAR') this.pickedParams.color = 'purple';
-    if (this.pickedType.code === 'RSI') this.pickedParams.color = 'black';
+    if (this.pickedType.code === 'RSI') this.pickedParams.color = 'darkBlue';
   }
 
   addIndicator() {
@@ -633,7 +631,7 @@ export class AppComponent implements OnInit {
           type: 'line',
           label: label,
           data: rsiLine,
-          borderWidth: 1,
+          borderWidth: 2,
           borderColor: params.color,
           pointRadius: 0,
           fill: false,

@@ -15,21 +15,22 @@
         It generates stock indicators in the server-side API, then adds it to the chart.
     </p>
 
-
+    <!-- CHART STACK -->
     <mat-card class="container">
 
-        <!-- CHART (OVERLAY) -->
+        <!-- overlay -->
         <div>
             <canvas #chartOverlay></canvas>
         </div>
 
-        <!-- CHART (RSI) -->
+        <!-- rsi -->
         <div class="chart-label" *ngIf="chartRsiOn">Relative Strength Index - {{ chartRsiLabel }}</div>
         <div [hidden]="!chartRsiOn">
             <canvas #chartRsi></canvas>
         </div>
 
     </mat-card>
+
 
     <!-- LEGEND -->
     <div class="container" *ngIf="!pickIndicator">
@@ -46,8 +47,7 @@
                 <span mat-line>Volume</span>
             </mat-chip>
 
-            <mat-chip *ngFor="let indicator of legend" selected color="default"
-                (removed)="deleteIndicator(indicator)">
+            <mat-chip *ngFor="let indicator of legend" selected color="default" (removed)="deleteIndicator(indicator)">
                 <mat-icon mat-list-icon [style.color]="indicator.color">show_chart</mat-icon>&nbsp;
                 <span>{{ indicator.label }}</span>
                 <mat-icon matChipRemove>cancel</mat-icon>
