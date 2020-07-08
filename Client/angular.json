@@ -34,7 +34,11 @@
               "src/styles-theme.scss",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "chart.js",
+              "chartjs-plugin-crosshair"
+           ]
           },
           "configurations": {
             "production": {

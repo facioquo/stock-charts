@@ -3,6 +3,8 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { env } from '../environments/environment';
 import { Chart, ChartPoint, ChartDataSets } from 'chart.js';
 import { MatRadioChange } from '@angular/material/radio';
+import { CrosshairOptions } from 'chartjs-plugin-crosshair';
+import 'chartjs-plugin-crosshair';
 
 import {
   Quote,
@@ -117,6 +119,7 @@ export class AppComponent implements OnInit {
     });
 
     const volAxisSize = 15 * (sumVol / volume.length) || 0;
+    const crosshairPluginOptions = this.crosshairPluginOptions();
 
     const myChart: HTMLCanvasElement = this.chartOverlayRef.nativeElement as HTMLCanvasElement;
 
@@ -157,6 +160,10 @@ export class AppComponent implements OnInit {
         },
         legend: {
           display: false
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: false
         },
         responsive: true,
         maintainAspectRatio: true,
@@ -244,6 +251,9 @@ export class AppComponent implements OnInit {
               }
             }
           ],
+        },
+        plugins: {
+          crosshair: crosshairPluginOptions
         }
       }
     });
@@ -263,6 +273,8 @@ export class AppComponent implements OnInit {
       bottomThreshold.push({ x: q.date, y: 30 });
     });
 
+    const crosshairPluginOptions = this.crosshairPluginOptions();
+
     const myChart: HTMLCanvasElement = this.chartRsiRef.nativeElement as HTMLCanvasElement;
 
     this.chartRsiConfig = new Chart(myChart.getContext('2d'), {
@@ -270,6 +282,7 @@ export class AppComponent implements OnInit {
       data: {
         datasets: [
           {
+            label: 'Overbought threshold',
             type: 'line',
             data: topThreshold,
             yAxisID: 'yAxis',
@@ -280,6 +293,7 @@ export class AppComponent implements OnInit {
             spanGaps: false
           },
           {
+            label: 'Oversold threshold',
             type: 'line',
             data: bottomThreshold,
             yAxisID: 'yAxis',
@@ -298,6 +312,10 @@ export class AppComponent implements OnInit {
         },
         legend: {
           display: false
+        },
+        tooltips: {
+          mode: 'index',
+          intersect: false
         },
         responsive: true,
         maintainAspectRatio: false,
@@ -370,6 +388,9 @@ export class AppComponent implements OnInit {
               drawTicks: false
             }
           }],
+        },
+        plugins: {
+          crosshair: crosshairPluginOptions
         }
       }
     });
@@ -732,4 +753,41 @@ export class AppComponent implements OnInit {
     return { headers: simpleHeaders };
   }
 
+  crosshairPluginOptions(): CrosshairOptions {
+
+    // ref: https://github.com/abelheinsbroek/chartjs-plugin-crosshair
+
+    const crosshairOptions: CrosshairOptions = {
+      line: {
+        color: '#F66',  // crosshair line color
+        width: 1        // crosshair line width
+      },
+      sync: {
+        enabled: true,            // enable trace line syncing with other charts
+        group: 1,                 // chart group (can be unique set of groups), all are group 1 now
+        suppressTooltips: false   // suppress tooltips when showing a synced tracer
+      },
+      zoom: {
+        enabled: false,                                     // enable zooming
+        zoomboxBackgroundColor: 'rgba(66,133,244,0.2)',     // background color of zoom box
+        zoomboxBorderColor: '#48F',                         // border color of zoom box
+        zoomButtonText: 'Reset Zoom',                       // reset zoom button text
+        zoomButtonClass: 'reset-zoom',                      // reset zoom button class
+      },
+      snap: {
+        enabled: true
+      },
+      callbacks: {
+        // tslint:disable-next-line: space-before-function-paren only-arrow-functions
+        beforeZoom: function (start, end) {                  // called before zoom, return false to prevent zoom
+          return true;
+        },
+        // tslint:disable-next-line: space-before-function-paren only-arrow-functions
+        afterZoom: function (start, end) {                   // called after zoom
+        }
+      }
+    };
+
+    return crosshairOptions;
+  }
 }
