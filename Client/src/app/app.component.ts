@@ -315,8 +315,10 @@ export class AppComponent implements OnInit {
         },
         tooltips: {
           mode: 'index',
-          intersect: false
+          intersect: false,
+          filter: (tooltipItem) => !(tooltipItem.datasetIndex <= 1)
         },
+
         responsive: true,
         maintainAspectRatio: false,
         layout: {
@@ -485,9 +487,9 @@ export class AppComponent implements OnInit {
         const lowerLine: ChartPoint[] = [];
 
         bb.forEach((m: BollingerBandResult) => {
-          smaLine.push({ x: m.date, y: m.sma });
-          upperLine.push({ x: m.date, y: m.upperBand });
-          lowerLine.push({ x: m.date, y: m.lowerBand });
+          smaLine.push({ x: m.date, y: this.toDecimals(m.sma, 3) });
+          upperLine.push({ x: m.date, y: this.toDecimals(m.upperBand, 3) });
+          lowerLine.push({ x: m.date, y: this.toDecimals(m.lowerBand, 3) });
         });
 
         // compose configurations
@@ -551,7 +553,7 @@ export class AppComponent implements OnInit {
         const emaLine: ChartPoint[] = [];
 
         ema.forEach((m: EmaResult) => {
-          emaLine.push({ x: m.date, y: m.ema });
+          emaLine.push({ x: m.date, y: this.toDecimals(m.ema, 3) });
         });
 
         // compose configuration
@@ -600,7 +602,7 @@ export class AppComponent implements OnInit {
         const sarLine: ChartPoint[] = [];
 
         psar.forEach((m: ParabolicSarResult) => {
-          sarLine.push({ x: m.date, y: m.sar });
+          sarLine.push({ x: m.date, y: this.toDecimals(m.sar, 3) });
         });
 
         // compose configurations
@@ -644,7 +646,7 @@ export class AppComponent implements OnInit {
         const rsiLine: ChartPoint[] = [];
 
         rsi.forEach((m: RsiResult) => {
-          rsiLine.push({ x: m.date, y: m.rsi });
+          rsiLine.push({ x: m.date, y: this.toDecimals(m.rsi, 3) });
         });
 
         // compose configuration
@@ -681,7 +683,7 @@ export class AppComponent implements OnInit {
         const smaLine: ChartPoint[] = [];
 
         sma.forEach((m: SmaResult) => {
-          smaLine.push({ x: m.date, y: m.sma });
+          smaLine.push({ x: m.date, y: this.toDecimals(m.sma, 3) });
         });
 
         // compose configuration
@@ -789,5 +791,10 @@ export class AppComponent implements OnInit {
     };
 
     return crosshairOptions;
+  }
+
+  toDecimals(value: number, decimalPlaces: number): number {
+    if (value === null) return null;
+    return value.toFixed(decimalPlaces) as unknown as number;
   }
 }
