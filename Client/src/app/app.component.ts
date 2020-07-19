@@ -42,8 +42,8 @@ export class AppComponent implements OnInit {
   chartOverlayConfig: Chart;
 
   @ViewChild('chartRsi', { static: true }) chartRsiRef: ElementRef;
-  chartRsiConfig: Chart;
-  chartRsiOn = true;
+  chartRsi: Chart;
+  chartRsiOn = true;  // TODO: why can't we start with this off?
   chartRsiLabel = '';
 
   history: Quote[] = [];
@@ -265,6 +265,7 @@ export class AppComponent implements OnInit {
 
   addBaseRsiChart() {
 
+    this.chartRsiOn = false;
     const topThreshold: ChartPoint[] = [];
     const bottomThreshold: ChartPoint[] = [];
 
@@ -277,7 +278,7 @@ export class AppComponent implements OnInit {
 
     const myChart: HTMLCanvasElement = this.chartRsiRef.nativeElement as HTMLCanvasElement;
 
-    this.chartRsiConfig = new Chart(myChart.getContext('2d'), {
+    this.chartRsi = new Chart(myChart.getContext('2d'), {
       type: 'bar',
       data: {
         datasets: [
@@ -290,7 +291,8 @@ export class AppComponent implements OnInit {
             borderColor: 'darkRed',
             pointRadius: 0,
             fill: false,
-            spanGaps: false
+            spanGaps: false,
+            order: 99
           },
           {
             label: 'Oversold threshold',
@@ -301,7 +303,8 @@ export class AppComponent implements OnInit {
             borderColor: 'darkGreen',
             pointRadius: 0,
             fill: false,
-            spanGaps: true
+            spanGaps: true,
+            order: 99
           }
         ]
       },
@@ -396,8 +399,6 @@ export class AppComponent implements OnInit {
         }
       }
     });
-
-    this.chartRsiOn = false;
   }
 
 
@@ -446,7 +447,6 @@ export class AppComponent implements OnInit {
 
     // relative strength indicator
     if (this.pickedType.code === 'RSI') {
-      this.chartRsiOn = true;
       this.addIndicatorRSI(this.pickedParams);
     }
 
@@ -641,6 +641,7 @@ export class AppComponent implements OnInit {
 
         const label = `RSI (${params.parameterOne})`;
         this.chartRsiLabel = label;
+        this.chartRsiOn = true;
 
         // componse data
         const rsiLine: ChartPoint[] = [];
@@ -662,8 +663,8 @@ export class AppComponent implements OnInit {
         };
 
         // add to chart
-        this.chartRsiConfig.data.datasets.push(rsiDataset);
-        this.chartRsiConfig.update();
+        this.chartRsi.data.datasets.push(rsiDataset);
+        this.chartRsi.update();
 
         // add to legend
         this.legend.push({ label: label, chart: 'rsi', color: params.color, lines: [rsiDataset] });
@@ -726,15 +727,15 @@ export class AppComponent implements OnInit {
 
       // rsi
       if (indicator.chart === 'rsi') {
-        const rsiDataset = this.chartRsiConfig.data.datasets.indexOf(line, 0);
-        this.chartRsiConfig.data.datasets.splice(rsiDataset, 1);
+        const rsiDataset = this.chartRsi.data.datasets.indexOf(line, 0);
+        this.chartRsi.data.datasets.splice(rsiDataset, 1);
 
         // hide rsi if none left
-        if (this.chartRsiConfig.data.datasets.length <= 2) {
+        if (this.chartRsi.data.datasets.length <= 2) {
           this.chartRsiOn = false;
         }
 
-        this.chartRsiConfig.update();
+        this.chartRsi.update();
       }
     });
 
