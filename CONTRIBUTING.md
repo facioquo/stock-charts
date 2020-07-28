@@ -20,17 +20,11 @@ If you are reporting a bug, please submit an Issue with a detailed description o
 ## Testing
 
 - Since this is just a simple demo project, we basically just want it to pass the build and run without errors.
-- Failed builds will result in immediate rejection of your changes.
+- Failed builds will block acceptance of your Pull Request when submitting changes.
 
 ## Submitting changes
 
 Submit a Pull Request with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)).
-
-Always write a clear log message for your commits. One-line messages are fine for small changes, but bigger changes should look like this:
-
-    $ git commit -m "A brief summary of the commit
-    > 
-    > A paragraph describing what changed and its impact."
 
 After a Pull Request is reviewed, accepted, and merged to master, we may batch changes before publishing a new package version to the public NuGet repository.  Please be patient with turnaround time.
 
