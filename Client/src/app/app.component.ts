@@ -38,6 +38,8 @@ export interface Indicator {
 })
 export class AppComponent implements OnInit {
 
+  loading = true;
+
   @ViewChild('chartOverlay', { static: true }) chartOverlayRef: ElementRef;
   chartOverlayConfig: Chart;
 
@@ -102,6 +104,7 @@ export class AppComponent implements OnInit {
         this.history = h;
         this.addBaseOverlayChart();
         this.addBaseRsiChart();
+        this.loading = false;
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
 
