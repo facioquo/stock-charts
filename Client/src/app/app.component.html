@@ -6,17 +6,8 @@
     </div>
 </mat-toolbar>
 
-<!-- loading -->
-<div *ngIf="loading">
-
-    <div style="margin-top:175px;text-align:center;font-family:Roboto,Arial,sans-serif;font-size:12px;">
-        <p><img src="../assets/spinner.gif" alt="logging in" height="25"><br>WAKING UP DEMO.  STANDBY</p>
-    </div>
-
-</div>
-
 <!-- charts -->
-<div class="page-container" *ngIf="!loading">
+<div class="page-container">
 
     <p class="noselect center">
         This is a demo of the <a href="https://www.nuget.org/packages/Skender.Stock.Indicators" target="_blank"
@@ -26,6 +17,15 @@
 
     <!-- CHART STACK -->
     <mat-card class="container">
+
+        <!-- loading -->
+        <div *ngIf="loading">
+
+            <div style="margin-top:175px;text-align:center;font-family:Roboto,Arial,sans-serif;font-size:12px;">
+                <p><img src="../assets/spinner.gif" alt="logging in" height="25"><br>WAKING UP DEMO. STANDBY</p>
+            </div>
+
+        </div>
 
         <!-- overlay -->
         <div>
@@ -42,7 +42,7 @@
 
 
     <!-- LEGEND -->
-    <div class="container" *ngIf="!pickIndicator">
+    <div class="container" *ngIf="!pickIndicator && !loading">
 
         <mat-chip-list *ngIf="!pickIndicator">
 
