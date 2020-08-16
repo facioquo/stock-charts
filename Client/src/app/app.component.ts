@@ -38,8 +38,10 @@ export interface Indicator {
 })
 export class AppComponent implements OnInit {
 
+  loading = true;
+
   @ViewChild('chartOverlay', { static: true }) chartOverlayRef: ElementRef;
-  chartOverlayConfig: Chart;
+  chartOverlay: Chart;
 
   @ViewChild('chartRsi', { static: true }) chartRsiRef: ElementRef;
   chartRsi: Chart;
@@ -99,9 +101,12 @@ export class AppComponent implements OnInit {
 
     this.http.get(`${env.api}/history`, this.requestHeader())
       .subscribe((h: Quote[]) => {
+
         this.history = h;
         this.addBaseOverlayChart();
         this.addBaseRsiChart();
+        this.loading = false;
+
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
 
@@ -113,8 +118,8 @@ export class AppComponent implements OnInit {
     let sumVol = 0;
 
     this.history.forEach((q: Quote) => {
-      price.push({ x: q.date, y: q.close });
-      volume.push({ x: q.date, y: q.volume });
+      price.push({ x: new Date(q.date), y: q.close });
+      volume.push({ x: new Date(q.date), y: q.volume });
       sumVol += q.volume;
     });
 
@@ -123,7 +128,7 @@ export class AppComponent implements OnInit {
 
     const myChart: HTMLCanvasElement = this.chartOverlayRef.nativeElement as HTMLCanvasElement;
 
-    this.chartOverlayConfig = new Chart(myChart.getContext('2d'), {
+    this.chartOverlay = new Chart(myChart.getContext('2d'), {
       type: 'bar',
       data: {
         datasets: [
@@ -270,8 +275,8 @@ export class AppComponent implements OnInit {
     const bottomThreshold: ChartPoint[] = [];
 
     this.history.forEach((q: Quote) => {
-      topThreshold.push({ x: q.date, y: 70 });
-      bottomThreshold.push({ x: q.date, y: 30 });
+      topThreshold.push({ x: new Date(q.date), y: 70 });
+      bottomThreshold.push({ x: new Date(q.date), y: 30 });
     });
 
     const crosshairPluginOptions = this.crosshairPluginOptions();
@@ -279,7 +284,7 @@ export class AppComponent implements OnInit {
     const myChart: HTMLCanvasElement = this.chartRsiRef.nativeElement as HTMLCanvasElement;
 
     this.chartRsi = new Chart(myChart.getContext('2d'), {
-      type: 'bar',
+      type: 'line',
       data: {
         datasets: [
           {
@@ -487,9 +492,9 @@ export class AppComponent implements OnInit {
         const lowerLine: ChartPoint[] = [];
 
         bb.forEach((m: BollingerBandResult) => {
-          smaLine.push({ x: m.date, y: this.toDecimals(m.sma, 3) });
-          upperLine.push({ x: m.date, y: this.toDecimals(m.upperBand, 3) });
-          lowerLine.push({ x: m.date, y: this.toDecimals(m.lowerBand, 3) });
+          smaLine.push({ x: new Date(m.date), y: this.toDecimals(m.sma, 3) });
+          upperLine.push({ x: new Date(m.date), y: this.toDecimals(m.upperBand, 3) });
+          lowerLine.push({ x: new Date(m.date), y: this.toDecimals(m.lowerBand, 3) });
         });
 
         // compose configurations
@@ -530,10 +535,10 @@ export class AppComponent implements OnInit {
         };
 
         // add to chart
-        this.chartOverlayConfig.data.datasets.push(upperDataset);
-        this.chartOverlayConfig.data.datasets.push(smaDataset);
-        this.chartOverlayConfig.data.datasets.push(lowerDataset);
-        this.chartOverlayConfig.update();
+        this.chartOverlay.data.datasets.push(upperDataset);
+        this.chartOverlay.data.datasets.push(smaDataset);
+        this.chartOverlay.data.datasets.push(lowerDataset);
+        this.chartOverlay.update();
 
         // add to legend
         this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [smaDataset, upperDataset, lowerDataset] });
@@ -553,7 +558,7 @@ export class AppComponent implements OnInit {
         const emaLine: ChartPoint[] = [];
 
         ema.forEach((m: EmaResult) => {
-          emaLine.push({ x: m.date, y: this.toDecimals(m.ema, 3) });
+          emaLine.push({ x: new Date(m.date), y: this.toDecimals(m.ema, 3) });
         });
 
         // compose configuration
@@ -569,8 +574,8 @@ export class AppComponent implements OnInit {
         };
 
         // add to chart
-        this.chartOverlayConfig.data.datasets.push(emaDataset);
-        this.chartOverlayConfig.update();
+        this.chartOverlay.data.datasets.push(emaDataset);
+        this.chartOverlay.update();
 
         // add to legend
         this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [emaDataset] });
@@ -602,7 +607,7 @@ export class AppComponent implements OnInit {
         const sarLine: ChartPoint[] = [];
 
         psar.forEach((m: ParabolicSarResult) => {
-          sarLine.push({ x: m.date, y: this.toDecimals(m.sar, 3) });
+          sarLine.push({ x: new Date(m.date), y: this.toDecimals(m.sar, 3) });
         });
 
         // compose configurations
@@ -619,8 +624,8 @@ export class AppComponent implements OnInit {
         };
 
         // add to chart
-        this.chartOverlayConfig.data.datasets.push(sarDataset);
-        this.chartOverlayConfig.update();
+        this.chartOverlay.data.datasets.push(sarDataset);
+        this.chartOverlay.update();
 
         // add to legend
         this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [sarDataset] });
@@ -647,7 +652,7 @@ export class AppComponent implements OnInit {
         const rsiLine: ChartPoint[] = [];
 
         rsi.forEach((m: RsiResult) => {
-          rsiLine.push({ x: m.date, y: this.toDecimals(m.rsi, 3) });
+          rsiLine.push({ x: new Date(m.date), y: this.toDecimals(m.rsi, 3) });
         });
 
         // compose configuration
@@ -684,7 +689,7 @@ export class AppComponent implements OnInit {
         const smaLine: ChartPoint[] = [];
 
         sma.forEach((m: SmaResult) => {
-          smaLine.push({ x: m.date, y: this.toDecimals(m.sma, 3) });
+          smaLine.push({ x: new Date(m.date), y: this.toDecimals(m.sma, 3) });
         });
 
         // compose configuration
@@ -700,8 +705,8 @@ export class AppComponent implements OnInit {
         };
 
         // add to chart
-        this.chartOverlayConfig.data.datasets.push(smaDataset);
-        this.chartOverlayConfig.update();
+        this.chartOverlay.data.datasets.push(smaDataset);
+        this.chartOverlay.update();
 
         // add to legend
         this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [smaDataset] });
@@ -721,8 +726,8 @@ export class AppComponent implements OnInit {
 
       // overlay
       if (indicator.chart === 'overlay') {
-        const overlayDataset = this.chartOverlayConfig.data.datasets.indexOf(line, 0);
-        this.chartOverlayConfig.data.datasets.splice(overlayDataset, 1);
+        const overlayDataset = this.chartOverlay.data.datasets.indexOf(line, 0);
+        this.chartOverlay.data.datasets.splice(overlayDataset, 1);
       }
 
       // rsi
@@ -740,7 +745,7 @@ export class AppComponent implements OnInit {
     });
 
     // update charts
-    this.chartOverlayConfig.update();
+    this.chartOverlay.update();
 
 
     // remove from legend

@@ -6,7 +6,7 @@
     </div>
 </mat-toolbar>
 
-
+<!-- charts -->
 <div class="page-container">
 
     <p class="noselect center">
@@ -17,6 +17,15 @@
 
     <!-- CHART STACK -->
     <mat-card class="container">
+
+        <!-- loading -->
+        <div *ngIf="loading">
+
+            <div style="margin-top:175px;text-align:center;font-family:Roboto,Arial,sans-serif;font-size:12px;">
+                <p><img src="../assets/spinner.gif" alt="logging in" height="25"><br>WAKING UP DEMO. STANDBY</p>
+            </div>
+
+        </div>
 
         <!-- overlay -->
         <div>
@@ -33,7 +42,7 @@
 
 
     <!-- LEGEND -->
-    <div class="container" *ngIf="!pickIndicator">
+    <div class="container" *ngIf="!pickIndicator && !loading">
 
         <mat-chip-list *ngIf="!pickIndicator">
 
