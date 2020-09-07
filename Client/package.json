@@ -6,7 +6,8 @@
     "start": "ng serve --open",
     "build": "ng build",
     "build.prod": "ng build --configuration=production",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "reinstall": "npm cache verify && npm install"
   },
   "private": true,
   "dependencies": {
