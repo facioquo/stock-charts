@@ -25,7 +25,7 @@ If you want to host yourself on your local computer and review the source code, 
 
     ![WebApi Properties ><](Client/src/assets/server-port.png)
 
-4. Open `Client\src\environments\environment.prod.ts` and modify the API URL if needed, then save file.
+4. Open `Client\src\environments\environment.ts` and modify the API URL if needed, then save file.
 
     ```ts
     export const env: EnvConfig = {
