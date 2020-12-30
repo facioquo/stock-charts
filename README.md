@@ -21,9 +21,20 @@ If you want to host yourself on your local computer and review the source code, 
 
 2. Open `\Server\Backend.sln` in Visual Studio
 
-3. Select `WebApi` project and Run by either `CTRL+F5` or `CTRL+SHIFT+W`.  You can also View from right-click menus.  If you've done this successfully, a browser window will open and say "API is functioning nominally."  Leave the browser window open.
+3. Select `WebApi` project and Run by either `CTRL+F5` or `CTRL+SHIFT+W`.  You can also View from right-click menus.  If you've done this successfully, a browser window will open and say "API is functioning nominally."  Leave the browser window open.  Take note of the URL in your browser, or from the Debug menu in WebApi project properties.
 
-4. Open `Git Bash` window and navigate to the `\Client` folder
+    ![WebApi Properties ><](Client/src/assets/server-port.png)
+
+4. Open `Client\src\environments\environment.prod.ts` and modify the API URL if needed, then save file.
+
+    ```ts
+    export const env: EnvConfig = {
+      production: false,
+      api: 'https://localhost:44392'
+    };
+    ```
+
+5. Open `Git Bash` window and navigate to the `\Client` folder
 
     ``` bash
     npm install
