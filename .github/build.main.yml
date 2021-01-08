@@ -1,5 +1,3 @@
-# Variable 'WebsiteUrl' is defined in the Variables tab
-
 trigger:
   branches:
     include:
@@ -21,6 +19,7 @@ jobs:
     displayName: Web API
     pool:
       vmImage: windows-2019
+
     steps:
 
       - checkout: self
