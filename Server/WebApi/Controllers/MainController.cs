@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Skender.Stock.Indicators;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using WebApi.Services;
 
 namespace WebApi.Controllers
 {
     [ApiController]
     [Route("")]
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
     public class MainController : ControllerBase
     {
 
