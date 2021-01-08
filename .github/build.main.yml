@@ -31,6 +31,7 @@ jobs:
           targetType: inline
           script: >
             Copy-Item "Server/WebApi/appsettings.Token.json" -Destination "Server/WebApi/appsettings.json" -Force
+            
             Remove-Item "Server/WebApi/appsettings.Token.json" -Force
 
       - task: replacetokens@3
