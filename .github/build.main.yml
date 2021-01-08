@@ -1,8 +1,8 @@
 trigger:
-  branches:
-    include:
-      - refs/heads/master
-  batch: True
+  - master
+
+pr:
+  - master
 
 name: $(BuildID)-$(SourceBranchName)
 
