@@ -1,0 +1,115 @@
+# Variable 'WebsiteUrl' is defined in the Variables tab
+
+trigger:
+  branches:
+    include:
+      - refs/heads/master
+  batch: True
+
+name: $(BuildID)-$(SourceBranchName)
+
+resources:
+
+  repositories:
+    - repository: self
+      type: git
+      ref: master
+
+jobs:
+
+  - job: Job_1
+    displayName: Web API
+    pool:
+      vmImage: windows-2019
+    steps:
+
+      - checkout: self
+        clean: true
+
+      - task: PowerShell@2
+        displayName: Swap config files
+        inputs:
+          targetType: inline
+          script: >
+            Copy-Item "server/WebApi/appsettings.Token.json" -Destination "Server/WebApi/appsettings.json" -Force
+            Remove-Item "Server/WebApi/appsettings.Token.json" -Force
+
+      - task: replacetokens@3
+        displayName: Update configurations
+        inputs:
+          rootDirectory: Server
+          targetFiles: '**\*appsettings.json'
+          escapeType: none
+          tokenPrefix: __
+          tokenSuffix: __
+
+      - task: UseDotNet@2
+        displayName: Use .Net SDK 5.0.x
+        continueOnError: True
+        inputs:
+          version: 5.0.x
+
+      - task: DotNetCoreCLI@2
+        displayName: dotnet restore
+        inputs:
+          command: restore
+          projects: Server\**\*.csproj
+
+      - task: DotNetCoreCLI@2
+        displayName: dotnet publish
+        inputs:
+          command: publish
+          publishWebProjects: false
+          projects: Server\**\*.csproj
+          arguments: -c Release -o $(Build.ArtifactStagingDirectory)
+
+      - task: CopyFiles@2
+        displayName: Stage artifacts
+        inputs:
+          SourceFolder: Server
+          Contents: "**/WebApi.zip"
+          TargetFolder: $(Build.ArtifactStagingDirectory)
+          CleanTargetFolder: true
+          OverWrite: true
+          flattenFolders: true
+
+      - task: PublishBuildArtifacts@1
+        displayName: Save artifacts
+
+  - job: Job_2
+    displayName: Website
+    pool:
+      vmImage: ubuntu-18.04
+
+    steps:
+      - checkout: self
+        clean: true
+
+      - task: UseNode@1
+        displayName: Use Node 12.18.x
+        inputs:
+          version: 12.18.x
+
+      - task: Npm@1
+        displayName: Install packages
+        inputs:
+          workingDir: Client
+          verbose: false
+
+      - task: Npm@1
+        displayName: Build
+        inputs:
+          command: custom
+          workingDir: Client
+          verbose: false
+          customCommand: run build.prod
+
+      - task: ArchiveFiles@2
+        displayName: Stage artifacts
+        inputs:
+          rootFolderOrFile: Client/dist/app
+          includeRootFolder: false
+          archiveFile: $(Build.ArtifactStagingDirectory)/Website.zip
+
+      - task: PublishBuildArtifacts@1
+        displayName: Save artifacts
