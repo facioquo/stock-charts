@@ -5,10 +5,12 @@ using WebApi.Services;
 
 namespace WebApi.Controllers
 {
+
     [ApiController]
     [Route("")]
     public class MainController : ControllerBase
     {
+        internal static readonly IEnumerable<Quote> history = History.Get();
 
         [HttpGet]
         public string Get()
@@ -19,7 +21,7 @@ namespace WebApi.Controllers
         [HttpGet("history")]
         public IEnumerable<Quote> GetQuotes()
         {
-            return HistoryService.GetHistory();
+            return history;
         }
 
 
@@ -30,7 +32,6 @@ namespace WebApi.Controllers
         public IEnumerable<BollingerBandsResult> GetBollingerBands(
             [FromRoute] int lookbackPeriod, [FromRoute] decimal standardDeviations)
         {
-            IEnumerable<Quote> history = HistoryService.GetHistory();
             return Indicator.GetBollingerBands(history, lookbackPeriod, standardDeviations);
         }
 
@@ -38,7 +39,6 @@ namespace WebApi.Controllers
         [HttpGet("EMA/{lookbackPeriod}")]
         public IEnumerable<EmaResult> GetEMA([FromRoute] int lookbackPeriod)
         {
-            IEnumerable<Quote> history = HistoryService.GetHistory();
             return Indicator.GetEma(history, lookbackPeriod);
         }
 
@@ -47,7 +47,6 @@ namespace WebApi.Controllers
         public IEnumerable<ParabolicSarResult> GetParabolicSar(
             [FromRoute] decimal accelerationStep, [FromRoute] decimal maxAccelerationFactor)
         {
-            IEnumerable<Quote> history = HistoryService.GetHistory();
             return Indicator.GetParabolicSar(history, accelerationStep, maxAccelerationFactor);
         }
 
@@ -55,7 +54,6 @@ namespace WebApi.Controllers
         [HttpGet("SMA/{lookbackPeriod}")]
         public IEnumerable<SmaResult> GetSma([FromRoute] int lookbackPeriod)
         {
-            IEnumerable<Quote> history = HistoryService.GetHistory();
             return Indicator.GetSma(history, lookbackPeriod);
         }
 
@@ -63,7 +61,6 @@ namespace WebApi.Controllers
         [HttpGet("RSI/{lookbackPeriod}")]
         public IEnumerable<RsiResult> GetRsi([FromRoute] int lookbackPeriod)
         {
-            IEnumerable<Quote> history = HistoryService.GetHistory();
             return Indicator.GetRsi(history, lookbackPeriod);
         }
     }

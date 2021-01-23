@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace WebApi.Services
 {
-    public static class HistoryService
+    internal static class History
     {
-        internal static IEnumerable<Quote> GetHistory()
+        internal static IEnumerable<Quote> Get()
         {
             List<Quote> h = new List<Quote> {
 
