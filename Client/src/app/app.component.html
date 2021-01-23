@@ -27,14 +27,14 @@
 
         </div>
 
-        <!-- overlay -->
+        <!-- CHART (MAIN) -->
         <div>
             <canvas #chartOverlay></canvas>
         </div>
 
-        <!-- rsi -->
-        <div class="chart-label" *ngIf="chartRsiOn && chartRsiLabel">Relative Strength Index - {{ chartRsiLabel }}</div>
-        <div [hidden]="!chartRsiOn">
+        <!-- CHART (RSI) -->
+        <div class="chart-label" *ngIf="chartRsiOn">Relative Strength Index - {{ chartRsiLabel }}</div>
+        <div class="chart-container-oscillator" [hidden]="!chartRsiOn">
             <canvas #chartRsi></canvas>
         </div>
 

@@ -39,7 +39,7 @@
             "allowedCommonJsDependencies": [
               "chart.js",
               "chartjs-plugin-crosshair"
-           ]
+            ]
           },
           "configurations": {
             "production": {

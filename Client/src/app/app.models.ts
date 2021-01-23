@@ -10,7 +10,6 @@ export class Quote {
     ) { }
 }
 
-
 export class IndicatorType {
     constructor(
         public code: string,
