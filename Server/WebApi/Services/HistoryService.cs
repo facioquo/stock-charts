@@ -1,12 +1,13 @@
 ﻿using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace WebApi.Services
 {
-    public static class HistoryService
+    internal static class History
     {
-        internal static IEnumerable<Quote> GetHistory()
+        internal static IEnumerable<Quote> Get()
         {
             List<Quote> h = new List<Quote> {
 
@@ -516,7 +517,7 @@ namespace WebApi.Services
             new Quote { Date = DateTime.Parse("2017-01-01"), Open=(decimal)212.61, High=(decimal)213.35, Low=(decimal)211.52, Close=(decimal)211.6, Volume = 86708880 },
             };
 
-            return h;
+            return h.OrderBy(x => x.Date);
         }
     }
 }

@@ -27,15 +27,22 @@
 
         </div>
 
-        <!-- overlay -->
+        <!-- CHART (MAIN) -->
         <div>
             <canvas #chartOverlay></canvas>
         </div>
 
-        <!-- rsi -->
-        <div class="chart-label" *ngIf="chartRsiOn && chartRsiLabel">Relative Strength Index - {{ chartRsiLabel }}</div>
-        <div [hidden]="!chartRsiOn">
+        <!-- CHART (RSI) -->
+        <div class="chart-label" *ngIf="chartRsiOn && chartRsiLabel">Relative Strength Index</div>
+        <div class="chart-container-oscillator" [hidden]="!chartRsiOn">
             <canvas #chartRsi></canvas>
+        </div>
+
+        <!-- CHART (STOCH) -->
+        <div class="chart-label" *ngIf="chartStochOn && chartStochLabel">Stochastic Oscillator
+        </div>
+        <div class="chart-container-oscillator" [hidden]="!chartStochOn">
+            <canvas #chartStoch></canvas>
         </div>
 
     </mat-card>
@@ -131,8 +138,8 @@
         </div>
 
 
-        <!-- moving averages workflow -->
-        <div *ngIf="pickedType.code=='SMA' || pickedType.code=='EMA'">
+        <!-- exponential moving averages -->
+        <div *ngIf="pickedType.code=='EMA'">
 
             <!-- selections label -->
             <mat-chip-list>
@@ -149,14 +156,6 @@
             <div class="select-container">
 
                 <p>Select a lookback period:</p>
-
-                <!-- for SMA -->
-                <mat-radio-group color="primary" [(ngModel)]="pickedParams.parameterOne" name="lookbackSMA"
-                    *ngIf="pickedType.code=='SMA'">
-                    <mat-radio-button class="radio-button" *ngFor="let number of smNums" [value]="number">
-                        {{ number }}
-                    </mat-radio-button>
-                </mat-radio-group>
 
                 <!-- for EMA -->
                 <mat-radio-group color="primary" [(ngModel)]="pickedParams.parameterOne" name="lookbackEMA"
@@ -252,6 +251,41 @@
                 <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
                 <button mat-raised-button color="primary" (click)="addIndicator()"
                     [disabled]="!pickedParams.parameterOne">ADD</button>
+            </div>
+
+        </div>
+
+
+        <!-- stochastic oscillator -->
+        <div *ngIf="pickedType.code=='STOCH'">
+
+            <!-- selections label -->
+            <mat-chip-list>
+                <mat-chip selected color="accent">
+                    <mat-icon mat-list-icon [style.color]="pickedParams.color">timeline</mat-icon>&nbsp;
+                    <span mat-line *ngIf="pickedParams.parameterOne">
+                        {{ pickedType.code }} ({{ pickedParams.parameterOne }},{{ pickedParams.parameterTwo }})
+                    </span>
+                </mat-chip>
+            </mat-chip-list>
+
+            <!-- pick parameters -->
+            <div class="select-container">
+
+                <p>Select an Stochastic Oscillator variant:</p>
+
+                <mat-radio-group color="primary" (change)="stochChange($event)" name="colorSTOCH">
+                    <mat-radio-button class="radio-button" *ngFor="let stoch of stochConfigs" [value]="stoch">
+                        {{ stoch.label }}
+                    </mat-radio-button>
+                </mat-radio-group>
+
+            </div>
+
+            <div class="button-row center">
+                <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
+                <button mat-raised-button color="primary" (click)="addIndicator()"
+                    [disabled]="!pickedParams.parameterOne || !pickedParams.parameterTwo">ADD</button>
             </div>
 
         </div>

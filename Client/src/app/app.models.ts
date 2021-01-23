@@ -6,10 +6,9 @@ export class Quote {
         public high: number,
         public low: number,
         public close: number,
-        public volume: number,
+        public volume: number
     ) { }
 }
-
 
 export class IndicatorType {
     constructor(
@@ -54,6 +53,14 @@ export class RsiConfig {
     ) { }
 }
 
+export class StochConfig {
+    constructor(
+        public label: string,
+        public lookbackPeriod: number,
+        public signalPeriod: number
+    ) { }
+}
+
 
 // INDICATOR RESULTS
 
@@ -69,7 +76,7 @@ export class BollingerBandResult {
 export class EmaResult {
     constructor(
         public date: Date,
-        public ema: number,
+        public ema: number
     ) { }
 }
 
@@ -83,13 +90,14 @@ export class ParabolicSarResult {
 export class RsiResult {
     constructor(
         public date: Date,
-        public rsi: number,
+        public rsi: number
     ) { }
 }
 
-export class SmaResult {
+export class StochResult {
     constructor(
         public date: Date,
-        public sma: number,
+        public oscillator: number,
+        public signal: number
     ) { }
 }

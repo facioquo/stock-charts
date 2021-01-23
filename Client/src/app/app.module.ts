@@ -15,11 +15,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSliderModule } from '@angular/material/slider';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AppComponent } from './app.component';
+import { ChartService } from './chart.service';
 
 @NgModule({
   declarations: [
@@ -44,11 +44,12 @@ import { AppComponent } from './app.component';
     MatListModule,
     MatRadioModule,
     MatSelectModule,
-    MatSliderModule,
     MatToolbarModule,
     MatTooltipModule
   ],
-  providers: [],
+  providers: [
+    ChartService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

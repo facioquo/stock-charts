@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { env } from '../environments/environment';
-import { Chart, ChartPoint, ChartDataSets } from 'chart.js';
 import { MatRadioChange } from '@angular/material/radio';
-import { CrosshairOptions } from 'chartjs-plugin-crosshair';
-import 'chartjs-plugin-crosshair';
+import { env } from '../environments/environment';
+
+import { Chart, ChartPoint, ChartDataSets } from 'chart.js';
+import { ChartService } from './chart.service';
 
 import {
   Quote,
@@ -15,13 +15,15 @@ import {
   BollingerBandConfig,
   ParabolicSarConfig,
   RsiConfig,
+  StochConfig,
 
   // results
   BollingerBandResult,
   EmaResult,
   ParabolicSarResult,
   RsiResult,
-  SmaResult
+  StochResult
+
 } from './app.models';
 
 export interface Indicator {
@@ -45,8 +47,13 @@ export class AppComponent implements OnInit {
 
   @ViewChild('chartRsi', { static: true }) chartRsiRef: ElementRef;
   chartRsi: Chart;
-  chartRsiOn = true;  // TODO: why can't we start with this off?
-  chartRsiLabel = '';
+  chartRsiLabel: string;
+  chartRsiOn = true;    // required ON due to card, likely?
+
+  @ViewChild('chartStoch', { static: true }) chartStochRef: ElementRef;
+  chartStoch: Chart;
+  chartStochLabel: string;
+  chartStochOn = true;  // required ON due to card, likely?
 
   history: Quote[] = [];
   legend: Indicator[] = [];
@@ -60,8 +67,8 @@ export class AppComponent implements OnInit {
     { code: 'BB', name: 'Bollinger Bands' },
     { code: 'EMA', name: 'Exponential Moving Average' },
     { code: 'PSAR', name: 'Parabolic SAR' },
-    { code: 'SMA', name: 'Simple Moving Average' },
-    { code: 'RSI', name: 'Relative Strength Index' }
+    { code: 'RSI', name: 'Relative Strength Index' },
+    { code: 'STOCH', name: 'Stochastic Oscillator' }
   ];
 
   // indicator parameter values
@@ -70,24 +77,30 @@ export class AppComponent implements OnInit {
   readonly lgNums: number[] = [15, 30, 50, 100, 200];
 
   readonly bbConfigs: BollingerBandConfig[] = [
-    { label: 'BB (15,2)', lookbackPeriod: 15, standardDeviations: 2 },
-    { label: 'BB (20,2)', lookbackPeriod: 20, standardDeviations: 2 },
-    { label: 'BB (45,3)', lookbackPeriod: 45, standardDeviations: 3 }
+    { label: 'BB(15,2)', lookbackPeriod: 15, standardDeviations: 2 },
+    { label: 'BB(20,2)', lookbackPeriod: 20, standardDeviations: 2 },
+    { label: 'BB(45,3)', lookbackPeriod: 45, standardDeviations: 3 }
   ];
   readonly psarConfigs: ParabolicSarConfig[] = [
-    { label: 'PSAR (0.01,0.15)', accelerationStep: 0.01, maxAccelerationFactor: 0.15 },
-    { label: 'PSAR (0.02,0.2)', accelerationStep: 0.02, maxAccelerationFactor: 0.2 },
-    { label: 'PSAR (0.03,0.25)', accelerationStep: 0.03, maxAccelerationFactor: 0.25 }
+    { label: 'PSAR(0.01,0.15)', accelerationStep: 0.01, maxAccelerationFactor: 0.15 },
+    { label: 'PSAR(0.02,0.2)', accelerationStep: 0.02, maxAccelerationFactor: 0.2 },
+    { label: 'PSAR(0.03,0.25)', accelerationStep: 0.03, maxAccelerationFactor: 0.25 }
   ];
   readonly rsiConfigs: RsiConfig[] = [
-    { label: 'RSI (5)', lookbackPeriod: 5 },
-    { label: 'RSI (14)', lookbackPeriod: 14 },
-    { label: 'RSI (30)', lookbackPeriod: 30 }
+    { label: 'RSI(5)', lookbackPeriod: 5 },
+    { label: 'RSI(14)', lookbackPeriod: 14 },
+    { label: 'RSI(30)', lookbackPeriod: 30 }
+  ];
+  readonly stochConfigs: StochConfig[] = [
+    { label: 'STOCH(9,4)', lookbackPeriod: 9, signalPeriod: 4 },
+    { label: 'STOCH(14,3)', lookbackPeriod: 14, signalPeriod: 3 },
+    { label: 'STOCH(20,5)', lookbackPeriod: 20, signalPeriod: 5 },
   ];
 
 
   constructor(
-    private readonly http: HttpClient
+    private readonly http: HttpClient,
+    private readonly cs: ChartService
   ) { }
 
 
@@ -105,6 +118,7 @@ export class AppComponent implements OnInit {
         this.history = h;
         this.addBaseOverlayChart();
         this.addBaseRsiChart();
+        this.addBaseStochChart();
         this.loading = false;
 
       }, (error: HttpErrorResponse) => { console.log(error); });
@@ -113,297 +127,201 @@ export class AppComponent implements OnInit {
 
   addBaseOverlayChart() {
 
-    const price: ChartPoint[] = [];
-    const volume: ChartPoint[] = [];
+    const myChart: HTMLCanvasElement = this.chartOverlayRef.nativeElement as HTMLCanvasElement;
+    const myConfig = this.cs.baseOverlayConfig();
+
+    const price: number[] = [];
+    const volume: number[] = [];
+    const labels: Date[] = [];
     let sumVol = 0;
 
     this.history.forEach((q: Quote) => {
-      price.push({ x: new Date(q.date), y: q.close });
-      volume.push({ x: new Date(q.date), y: q.volume });
+      price.push(q.close);
+      volume.push(q.volume);
+      labels.push(new Date(q.date));
       sumVol += q.volume;
     });
 
-    const volAxisSize = 15 * (sumVol / volume.length) || 0;
-    const crosshairPluginOptions = this.crosshairPluginOptions();
-
-    const myChart: HTMLCanvasElement = this.chartOverlayRef.nativeElement as HTMLCanvasElement;
-
-    this.chartOverlay = new Chart(myChart.getContext('2d'), {
-      type: 'bar',
-      data: {
-        datasets: [
-          {
-            type: 'line',
-            label: 'Price',
-            data: price,
-            yAxisID: 'priceAxis',
-            borderWidth: 2,
-            borderColor: 'black',
-            backgroundColor: 'black',
-            pointRadius: 0,
-            fill: false,
-            spanGaps: false
-          },
-          {
-            type: 'line',
-            label: 'Volume',
-            data: volume,
-            yAxisID: 'volumeAxis',
-            borderWidth: 2,
-            borderColor: 'lightblue',
-            backgroundColor: 'lightblue',
-            pointRadius: 0,
-            fill: true,
-            spanGaps: true
-          }
-        ]
-      },
-      options: {
-
-        title: {
-          display: false
+    // define base datasets
+    myConfig.data = {
+      datasets: [
+        {
+          type: 'line',
+          label: 'Price',
+          data: price,
+          yAxisID: 'rightAxis',
+          borderWidth: 2,
+          borderColor: 'black',
+          backgroundColor: 'black',
+          pointRadius: 0,
+          fill: false,
+          spanGaps: false,
+          order: 1
         },
-        legend: {
-          display: false
-        },
-        tooltips: {
-          mode: 'index',
-          intersect: false
-        },
-        responsive: true,
-        maintainAspectRatio: true,
-        layout: {
-          padding: {
-            left: 0,
-            right: 0,
-            top: 10,
-            bottom: 0
-          }
-        },
-        scales: {
-          xAxes: [{
-            display: true,
-            type: 'time',
-            time: {
-              unit: 'month' as Chart.TimeUnit,
-              displayFormats: {
-                month: 'MMM'
-              }
-            },
-            ticks: {
-              padding: 0,
-              autoSkip: true,
-              autoSkipPadding: 8,
-              fontSize: 9,
-              maxRotation: 0,
-              minRotation: 0,
-            },
-            gridLines: {
-              drawOnChartArea: true,
-              tickMarkLength: 2
-            }
-          },
-          {
-            display: true,
-            type: 'time',
-            time: {
-              unit: 'year' as Chart.TimeUnit,
-              displayFormats: {
-                year: 'YYYY'
-              }
-            },
-            ticks: {
-              autoSkip: true,
-              autoSkipPadding: 8,
-              fontSize: 9,
-              maxRotation: 0,
-              minRotation: 0,
-            },
-            gridLines: {
-              drawOnChartArea: false,
-              tickMarkLength: 1
-            }
-
-          }],
-          yAxes: [
-            {
-              id: 'priceAxis',
-              display: true,
-              position: 'right',
-              scaleLabel: {
-                display: false,
-                labelString: 'price'
-              },
-              ticks: {
-                autoSkip: true,
-                autoSkipPadding: 3,
-                beginAtZero: false,
-                padding: 5,
-                fontSize: 10
-              },
-              gridLines: {
-                drawOnChartArea: true,
-                drawTicks: false
-              }
-            },
-            {
-              id: 'volumeAxis',
-              display: false,
-              position: 'left',
-              ticks: {
-                beginAtZero: true,
-                max: volAxisSize
-              }
-            }
-          ],
-        },
-        plugins: {
-          crosshair: crosshairPluginOptions
+        {
+          type: 'bar',
+          label: 'Volume',
+          data: volume,
+          yAxisID: 'volumeAxis',
+          borderWidth: 2,
+          borderColor: 'lightblue',
+          backgroundColor: 'lightblue',
+          pointRadius: 0,
+          fill: true,
+          spanGaps: true,
+          order: 99
         }
-      }
-    });
+      ]
+    };
 
-    this.addIndicatorEMA('EMA', { parameterOne: 25, color: 'red' });
-    this.addIndicatorEMA('EMA', { parameterOne: 150, color: 'darkGreen' });
+    // add labels
+    myConfig.data.labels = labels;
+
+    // get size for volume axis
+    const volAxisSize = 15 * (sumVol / volume.length) || 0;
+    myConfig.options.scales.yAxes[1].ticks.max = volAxisSize;
+
+    // compose chart
+    if (this.chartOverlay) this.chartOverlay.destroy();
+    this.chartOverlay = new Chart(myChart.getContext('2d'), myConfig);
+
+    // add initial samples
+    this.addIndicatorEMA({ parameterOne: 18, color: 'darkOrange' });
+    this.addIndicatorEMA({ parameterOne: 150, color: 'darkGreen' });
   }
 
 
   addBaseRsiChart() {
 
+    // construct chart
     this.chartRsiOn = false;
-    const topThreshold: ChartPoint[] = [];
-    const bottomThreshold: ChartPoint[] = [];
+    const myChart: HTMLCanvasElement = this.chartRsiRef.nativeElement as HTMLCanvasElement;
+    const myConfig = this.cs.baseOscillatorConfig();
+
+    // reference lines
+    const topThreshold: number[] = [];
+    const bottomThreshold: number[] = [];
+    const labels: Date[] = [];
 
     this.history.forEach((q: Quote) => {
-      topThreshold.push({ x: new Date(q.date), y: 70 });
-      bottomThreshold.push({ x: new Date(q.date), y: 30 });
+      topThreshold.push(70);
+      bottomThreshold.push(30);
+      labels.push(new Date(q.date));
     });
 
-    const crosshairPluginOptions = this.crosshairPluginOptions();
-
-    const myChart: HTMLCanvasElement = this.chartRsiRef.nativeElement as HTMLCanvasElement;
-
-    this.chartRsi = new Chart(myChart.getContext('2d'), {
-      type: 'line',
-      data: {
-        datasets: [
-          {
-            label: 'Overbought threshold',
-            type: 'line',
-            data: topThreshold,
-            yAxisID: 'yAxis',
-            borderWidth: 1,
-            borderColor: 'darkRed',
-            pointRadius: 0,
-            fill: false,
-            spanGaps: false,
-            order: 99
-          },
-          {
-            label: 'Oversold threshold',
-            type: 'line',
-            data: bottomThreshold,
-            yAxisID: 'yAxis',
-            borderWidth: 1,
-            borderColor: 'darkGreen',
-            pointRadius: 0,
-            fill: false,
-            spanGaps: true,
-            order: 99
-          }
-        ]
-      },
-      options: {
-
-        title: {
-          display: false
+    myConfig.data = {
+      datasets: [
+        {
+          label: 'Overbought threshold',
+          type: 'line',
+          data: topThreshold,
+          yAxisID: 'rightAxis',
+          hideInLegendAndTooltip: true,
+          borderWidth: 1,
+          borderColor: 'darkRed',
+          backgroundColor: 'darkRed',
+          pointRadius: 0,
+          spanGaps: false,
+          fill: false,
+          order: 99
         },
-        legend: {
-          display: false
-        },
-        tooltips: {
-          mode: 'index',
-          intersect: false,
-          filter: (tooltipItem) => !(tooltipItem.datasetIndex <= 1)
-        },
-
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: {
-          padding: {
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0
-          }
-        },
-        scales: {
-          xAxes: [{
-            display: true,
-            type: 'time',
-            time: {
-              unit: 'month' as Chart.TimeUnit,
-              displayFormats: {
-                month: 'MMM'
-              }
-            },
-            ticks: {
-              padding: 0,
-              autoSkip: true,
-              autoSkipPadding: 8,
-              fontSize: 9,
-              maxRotation: 0,
-              minRotation: 0,
-            },
-            gridLines: {
-              drawOnChartArea: true,
-              tickMarkLength: 2
-            }
-          },
-          {
-            display: true,
-            type: 'time',
-            time: {
-              unit: 'year' as Chart.TimeUnit,
-              displayFormats: {
-                year: 'YYYY'
-              }
-            },
-            ticks: {
-              autoSkip: true,
-              autoSkipPadding: 8,
-              fontSize: 9,
-              maxRotation: 0,
-              minRotation: 0,
-            },
-            gridLines: {
-              drawOnChartArea: false,
-              tickMarkLength: 1
-            }
-          }],
-          yAxes: [{
-            id: 'yAxis',
-            display: true,
-            position: 'right',
-            ticks: {
-              autoSkip: true,
-              autoSkipPadding: 5,
-              beginAtZero: true,
-              max: 100,
-              padding: 5,
-              fontSize: 10
-            },
-            gridLines: {
-              drawOnChartArea: true,
-              drawTicks: false
-            }
-          }],
-        },
-        plugins: {
-          crosshair: crosshairPluginOptions
+        {
+          label: 'Oversold threshold',
+          type: 'line',
+          data: bottomThreshold,
+          yAxisID: 'rightAxis',
+          hideInLegendAndTooltip: true,
+          borderWidth: 1,
+          borderColor: 'darkGreen',
+          backgroundColor: 'darkGreen',
+          pointRadius: 0,
+          spanGaps: true,
+          fill: false,
+          order: 99
         }
-      }
+      ]
+    };
+
+    // add labels
+    myConfig.data.labels = labels;
+
+    // hide ref lines from tooltips
+    myConfig.options.tooltips.filter = (tooltipItem) => (tooltipItem.datasetIndex > 1);
+
+    // y-scale
+    myConfig.options.scales.yAxes[0].ticks.max = 100;
+
+    // compose chart
+    if (this.chartRsi) this.chartRsi.destroy();
+    this.chartRsi = new Chart(myChart.getContext('2d'), myConfig);
+  }
+
+  addBaseStochChart() {
+
+    // construct chart
+    this.chartStochOn = false;
+    const myChart: HTMLCanvasElement = this.chartStochRef.nativeElement as HTMLCanvasElement;
+    const myConfig = this.cs.baseOscillatorConfig();
+
+    // reference lines
+    const topThreshold: number[] = [];
+    const bottomThreshold: number[] = [];
+    const labels: Date[] = [];
+
+    this.history.forEach((q: Quote) => {
+      topThreshold.push(80);
+      bottomThreshold.push(20);
+      labels.push(new Date(q.date));
     });
+
+    myConfig.data = {
+      datasets: [
+        {
+          label: 'Overbought threshold',
+          type: 'line',
+          data: topThreshold,
+          yAxisID: 'rightAxis',
+          hideInLegendAndTooltip: true,
+          borderWidth: 1,
+          borderColor: 'darkRed',
+          backgroundColor: 'darkRed',
+          pointRadius: 0,
+          spanGaps: false,
+          fill: false,
+          order: 99
+        },
+        {
+          label: 'Oversold threshold',
+          type: 'line',
+          data: bottomThreshold,
+          yAxisID: 'rightAxis',
+          hideInLegendAndTooltip: true,
+          borderWidth: 1,
+          borderColor: 'darkGreen',
+          backgroundColor: 'darkGreen',
+          pointRadius: 0,
+          spanGaps: true,
+          fill: false,
+          order: 99
+        }
+      ]
+    };
+
+    // add labels
+    myConfig.data.labels = labels;
+
+    // hide ref lines from tooltips
+    myConfig.options.tooltips.filter = (tooltipItem) => (tooltipItem.datasetIndex > 1);
+
+    // y-scale
+    myConfig.options.scales.yAxes[0].ticks.max = 100;
+
+    // compose chart
+    if (this.chartStoch) this.chartStoch.destroy();
+    this.chartStoch = new Chart(myChart.getContext('2d'), myConfig);
+
+    // add initial sample
+    this.addIndicatorSTOCH({ parameterOne: 21, parameterTwo: 7, color: 'black' });
   }
 
 
@@ -428,7 +346,8 @@ export class AppComponent implements OnInit {
 
     if (this.pickedType.code === 'BB') this.pickedParams.color = 'darkGray';
     if (this.pickedType.code === 'PSAR') this.pickedParams.color = 'purple';
-    if (this.pickedType.code === 'RSI') this.pickedParams.color = 'darkBlue';
+    if (this.pickedType.code === 'RSI') this.pickedParams.color = 'black';
+    if (this.pickedType.code === 'STOCH') this.pickedParams.color = 'black';
   }
 
   addIndicator() {
@@ -440,9 +359,9 @@ export class AppComponent implements OnInit {
       this.addIndicatorBB(this.pickedParams);
     }
 
-    // simple moving average
+    // exponential moving average
     if (this.pickedType.code === 'EMA') {
-      this.addIndicatorEMA(this.pickedType.code, this.pickedParams);
+      this.addIndicatorEMA(this.pickedParams);
     }
 
     // parabolid sar
@@ -455,13 +374,12 @@ export class AppComponent implements OnInit {
       this.addIndicatorRSI(this.pickedParams);
     }
 
-    // simple moving average
-    if (this.pickedType.code === 'SMA') {
-      this.addIndicatorSMA(this.pickedType.code, this.pickedParams);
+    // stochastic oscillator
+    if (this.pickedType.code === 'STOCH') {
+      this.addIndicatorSTOCH(this.pickedParams);
     }
 
     this.cancelAdd();
-
   }
 
 
@@ -484,15 +402,15 @@ export class AppComponent implements OnInit {
     this.http.get(`${env.api}/BB/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
       .subscribe((bb: BollingerBandResult[]) => {
 
-        const label = `BB (${params.parameterOne},${params.parameterTwo})`;
+        const label = `BB(${params.parameterOne},${params.parameterTwo})`;
 
         // componse data
-        const smaLine: ChartPoint[] = [];
+        const centerLine: ChartPoint[] = [];
         const upperLine: ChartPoint[] = [];
         const lowerLine: ChartPoint[] = [];
 
         bb.forEach((m: BollingerBandResult) => {
-          smaLine.push({ x: new Date(m.date), y: this.toDecimals(m.sma, 3) });
+          centerLine.push({ x: new Date(m.date), y: this.toDecimals(m.sma, 3) });
           upperLine.push({ x: new Date(m.date), y: this.toDecimals(m.upperBand, 3) });
           lowerLine.push({ x: new Date(m.date), y: this.toDecimals(m.lowerBand, 3) });
         });
@@ -500,23 +418,25 @@ export class AppComponent implements OnInit {
         // compose configurations
         const upperDataset: ChartDataSets = {
           type: 'line',
-          label: label,
+          label: 'BB Upperband',
           data: upperLine,
           borderWidth: 1,
           borderDash: [5, 2],
           borderColor: params.color,
+          backgroundColor: params.color,
           pointRadius: 0,
           fill: false,
           spanGaps: false
         };
 
-        const smaDataset: ChartDataSets = {
+        const centerDataset: ChartDataSets = {
           type: 'line',
-          label: label,
-          data: smaLine,
+          label: 'BB Centerline',
+          data: centerLine,
           borderWidth: 2,
           borderDash: [5, 2],
           borderColor: params.color,
+          backgroundColor: params.color,
           pointRadius: 0,
           fill: false,
           spanGaps: false
@@ -524,11 +444,12 @@ export class AppComponent implements OnInit {
 
         const lowerDataset: ChartDataSets = {
           type: 'line',
-          label: label,
+          label: 'BB Lowerband',
           data: lowerLine,
           borderWidth: 1,
           borderDash: [5, 2],
           borderColor: params.color,
+          backgroundColor: params.color,
           pointRadius: 0,
           fill: false,
           spanGaps: false
@@ -536,23 +457,23 @@ export class AppComponent implements OnInit {
 
         // add to chart
         this.chartOverlay.data.datasets.push(upperDataset);
-        this.chartOverlay.data.datasets.push(smaDataset);
+        this.chartOverlay.data.datasets.push(centerDataset);
         this.chartOverlay.data.datasets.push(lowerDataset);
         this.chartOverlay.update();
 
         // add to legend
-        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [smaDataset, upperDataset, lowerDataset] });
+        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [centerDataset, upperDataset, lowerDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
 
 
-  addIndicatorEMA(type: string, params: IndicatorParameters) {
+  addIndicatorEMA(params: IndicatorParameters) {
 
-    this.http.get(`${env.api}/${type}/${params.parameterOne}`, this.requestHeader())
+    this.http.get(`${env.api}/EMA/${params.parameterOne}`, this.requestHeader())
       .subscribe((ema: EmaResult[]) => {
 
-        const label = `${type.toUpperCase()} (${params.parameterOne})`;
+        const label = `EMA(${params.parameterOne})`;
 
         // componse data
         const emaLine: ChartPoint[] = [];
@@ -566,8 +487,9 @@ export class AppComponent implements OnInit {
           type: 'line',
           label: label,
           data: emaLine,
-          borderWidth: 1,
+          borderWidth: 2,
           borderColor: params.color,
+          backgroundColor: params.color,
           pointRadius: 0,
           fill: false,
           spanGaps: false
@@ -601,7 +523,7 @@ export class AppComponent implements OnInit {
     this.http.get(`${env.api}/PSAR/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
       .subscribe((psar: ParabolicSarResult[]) => {
 
-        const label = `PSAR (${params.parameterOne},${params.parameterTwo})`;
+        const label = `PSAR(${params.parameterOne},${params.parameterTwo})`;
 
         // componse data
         const sarLine: ChartPoint[] = [];
@@ -615,7 +537,7 @@ export class AppComponent implements OnInit {
           type: 'line',
           label: label,
           data: sarLine,
-          pointRadius: 1,
+          pointRadius: 1.5,
           pointBackgroundColor: params.color,
           pointBorderColor: params.color,
           fill: false,
@@ -644,7 +566,7 @@ export class AppComponent implements OnInit {
     this.http.get(`${env.api}/RSI/${params.parameterOne}`, this.requestHeader())
       .subscribe((rsi: RsiResult[]) => {
 
-        const label = `RSI (${params.parameterOne})`;
+        const label = `RSI(${params.parameterOne})`;
         this.chartRsiLabel = label;
         this.chartRsiOn = true;
 
@@ -662,6 +584,7 @@ export class AppComponent implements OnInit {
           data: rsiLine,
           borderWidth: 2,
           borderColor: params.color,
+          backgroundColor: params.color,
           pointRadius: 0,
           fill: false,
           spanGaps: false
@@ -678,38 +601,64 @@ export class AppComponent implements OnInit {
   }
 
 
-  addIndicatorSMA(type: string, params: IndicatorParameters) {
+  stochChange(event: MatRadioChange) {
+    const stoch: StochConfig = event.value;
+    this.pickedParams.parameterOne = stoch.lookbackPeriod;
+    this.pickedParams.parameterTwo = stoch.signalPeriod;
+  }
 
-    this.http.get(`${env.api}/${type}/${params.parameterOne}`, this.requestHeader())
-      .subscribe((sma: SmaResult[]) => {
+  addIndicatorSTOCH(params: IndicatorParameters) {
 
-        const label = `${type.toUpperCase()} (${params.parameterOne})`;
+    this.http.get(`${env.api}/STOCH/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
+      .subscribe((stoch: StochResult[]) => {
+
+        const label = `STOCH(${params.parameterOne},${params.parameterTwo})`;
+        this.chartStochLabel = label;
+        this.chartStochOn = true;
 
         // componse data
-        const smaLine: ChartPoint[] = [];
+        const oscLine: ChartPoint[] = [];
+        const sigLine: ChartPoint[] = [];
 
-        sma.forEach((m: SmaResult) => {
-          smaLine.push({ x: new Date(m.date), y: this.toDecimals(m.sma, 3) });
+        stoch.forEach((m: StochResult) => {
+          oscLine.push({ x: new Date(m.date), y: this.toDecimals(m.oscillator, 3) });
+          sigLine.push({ x: new Date(m.date), y: this.toDecimals(m.signal, 3) });
         });
 
         // compose configuration
-        const smaDataset: ChartDataSets = {
+        const oscDataset: ChartDataSets = {
           type: 'line',
-          label: label,
-          data: smaLine,
-          borderWidth: 1,
+          label: label + ' Oscillator',
+          data: oscLine,
+          borderWidth: 2,
           borderColor: params.color,
+          backgroundColor: params.color,
           pointRadius: 0,
           fill: false,
-          spanGaps: false
+          spanGaps: false,
+          order: 1
+        };
+
+        const sigDataset: ChartDataSets = {
+          type: 'line',
+          label: label + ' Signal',
+          data: sigLine,
+          borderWidth: 1.5,
+          borderColor: 'red',
+          backgroundColor: 'red',
+          pointRadius: 0,
+          fill: false,
+          spanGaps: false,
+          order: 2
         };
 
         // add to chart
-        this.chartOverlay.data.datasets.push(smaDataset);
-        this.chartOverlay.update();
+        this.chartStoch.data.datasets.push(oscDataset);
+        this.chartStoch.data.datasets.push(sigDataset);
+        this.chartStoch.update();
 
         // add to legend
-        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [smaDataset] });
+        this.legend.push({ label: label, chart: 'stoch', color: params.color, lines: [oscDataset, sigDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
@@ -742,6 +691,19 @@ export class AppComponent implements OnInit {
 
         this.chartRsi.update();
       }
+
+      // stoch
+      if (indicator.chart === 'stoch') {
+        const stochDataset = this.chartStoch.data.datasets.indexOf(line, 0);
+        this.chartStoch.data.datasets.splice(stochDataset, 1);
+
+        // hide rsi if none left
+        if (this.chartStoch.data.datasets.length <= 2) {
+          this.chartStochOn = false;
+        }
+
+        this.chartStoch.update();
+      }
     });
 
     // update charts
@@ -759,44 +721,6 @@ export class AppComponent implements OnInit {
       .set('Content-Type', 'application/json');
 
     return { headers: simpleHeaders };
-  }
-
-  crosshairPluginOptions(): CrosshairOptions {
-
-    // ref: https://github.com/abelheinsbroek/chartjs-plugin-crosshair
-
-    const crosshairOptions: CrosshairOptions = {
-      line: {
-        color: '#F66',  // crosshair line color
-        width: 1        // crosshair line width
-      },
-      sync: {
-        enabled: true,            // enable trace line syncing with other charts
-        group: 1,                 // chart group (can be unique set of groups), all are group 1 now
-        suppressTooltips: false   // suppress tooltips when showing a synced tracer
-      },
-      zoom: {
-        enabled: false,                                     // enable zooming
-        zoomboxBackgroundColor: 'rgba(66,133,244,0.2)',     // background color of zoom box
-        zoomboxBorderColor: '#48F',                         // border color of zoom box
-        zoomButtonText: 'Reset Zoom',                       // reset zoom button text
-        zoomButtonClass: 'reset-zoom',                      // reset zoom button class
-      },
-      snap: {
-        enabled: true
-      },
-      callbacks: {
-        // tslint:disable-next-line: space-before-function-paren only-arrow-functions
-        beforeZoom: function (start, end) {                  // called before zoom, return false to prevent zoom
-          return true;
-        },
-        // tslint:disable-next-line: space-before-function-paren only-arrow-functions
-        afterZoom: function (start, end) {                   // called after zoom
-        }
-      }
-    };
-
-    return crosshairOptions;
   }
 
   toDecimals(value: number, decimalPlaces: number): number {
