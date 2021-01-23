@@ -5,7 +5,6 @@ import { env } from '../environments/environment';
 
 import { Chart, ChartPoint, ChartDataSets } from 'chart.js';
 import { ChartService } from './chart.service';
-import { CrosshairOptions } from 'chartjs-plugin-crosshair';
 import 'chartjs-plugin-crosshair';
 
 import {
@@ -17,13 +16,14 @@ import {
   BollingerBandConfig,
   ParabolicSarConfig,
   RsiConfig,
+  StochConfig,
 
   // results
   BollingerBandResult,
   EmaResult,
   ParabolicSarResult,
   RsiResult,
-  SmaResult
+  StochResult
 
 } from './app.models';
 
@@ -49,7 +49,12 @@ export class AppComponent implements OnInit {
   @ViewChild('chartRsi', { static: true }) chartRsiRef: ElementRef;
   chartRsi: Chart;
   chartRsiLabel: string;
-  chartRsiOn = true;  // required due to card, likely?
+  chartRsiOn = true;    // required ON due to card, likely?
+
+  @ViewChild('chartStoch', { static: true }) chartStochRef: ElementRef;
+  chartStoch: Chart;
+  chartStochLabel: string;
+  chartStochOn = true;  // required ON due to card, likely?
 
   history: Quote[] = [];
   legend: Indicator[] = [];
@@ -63,8 +68,8 @@ export class AppComponent implements OnInit {
     { code: 'BB', name: 'Bollinger Bands' },
     { code: 'EMA', name: 'Exponential Moving Average' },
     { code: 'PSAR', name: 'Parabolic SAR' },
-    { code: 'SMA', name: 'Simple Moving Average' },
-    { code: 'RSI', name: 'Relative Strength Index' }
+    { code: 'RSI', name: 'Relative Strength Index' },
+    { code: 'STOCH', name: 'Stochastic Oscillator' }
   ];
 
   // indicator parameter values
@@ -73,19 +78,23 @@ export class AppComponent implements OnInit {
   readonly lgNums: number[] = [15, 30, 50, 100, 200];
 
   readonly bbConfigs: BollingerBandConfig[] = [
-    { label: 'BB (15,2)', lookbackPeriod: 15, standardDeviations: 2 },
-    { label: 'BB (20,2)', lookbackPeriod: 20, standardDeviations: 2 },
-    { label: 'BB (45,3)', lookbackPeriod: 45, standardDeviations: 3 }
+    { label: 'BB(15,2)', lookbackPeriod: 15, standardDeviations: 2 },
+    { label: 'BB(20,2)', lookbackPeriod: 20, standardDeviations: 2 },
+    { label: 'BB(45,3)', lookbackPeriod: 45, standardDeviations: 3 }
   ];
   readonly psarConfigs: ParabolicSarConfig[] = [
-    { label: 'PSAR (0.01,0.15)', accelerationStep: 0.01, maxAccelerationFactor: 0.15 },
-    { label: 'PSAR (0.02,0.2)', accelerationStep: 0.02, maxAccelerationFactor: 0.2 },
-    { label: 'PSAR (0.03,0.25)', accelerationStep: 0.03, maxAccelerationFactor: 0.25 }
+    { label: 'PSAR(0.01,0.15)', accelerationStep: 0.01, maxAccelerationFactor: 0.15 },
+    { label: 'PSAR(0.02,0.2)', accelerationStep: 0.02, maxAccelerationFactor: 0.2 },
+    { label: 'PSAR(0.03,0.25)', accelerationStep: 0.03, maxAccelerationFactor: 0.25 }
   ];
   readonly rsiConfigs: RsiConfig[] = [
-    { label: 'RSI (5)', lookbackPeriod: 5 },
-    { label: 'RSI (14)', lookbackPeriod: 14 },
-    { label: 'RSI (30)', lookbackPeriod: 30 }
+    { label: 'RSI(5)', lookbackPeriod: 5 },
+    { label: 'RSI(14)', lookbackPeriod: 14 },
+    { label: 'RSI(30)', lookbackPeriod: 30 }
+  ];
+  readonly stochConfigs: StochConfig[] = [
+    { label: 'STOCH(9,4)', lookbackPeriod: 9, signalPeriod: 4 },
+    { label: 'STOCH(14,3)', lookbackPeriod: 14, signalPeriod: 3 },
   ];
 
 
@@ -109,6 +118,7 @@ export class AppComponent implements OnInit {
         this.history = h;
         this.addBaseOverlayChart();
         this.addBaseRsiChart();
+        this.addBaseStochChart();
         this.loading = false;
 
       }, (error: HttpErrorResponse) => { console.log(error); });
@@ -246,6 +256,71 @@ export class AppComponent implements OnInit {
     this.chartRsi = new Chart(myChart.getContext('2d'), myConfig);
   }
 
+  addBaseStochChart() {
+
+    // construct chart
+    this.chartStochOn = false;
+    const myChart: HTMLCanvasElement = this.chartStochRef.nativeElement as HTMLCanvasElement;
+    const myConfig = this.cs.baseOscillatorConfig();
+
+    // reference lines
+    const topThreshold: number[] = [];
+    const bottomThreshold: number[] = [];
+    const labels: Date[] = [];
+
+    this.history.forEach((q: Quote) => {
+      topThreshold.push(80);
+      bottomThreshold.push(20);
+      labels.push(new Date(q.date));
+    });
+
+    myConfig.data = {
+      datasets: [
+        {
+          label: 'Overbought threshold',
+          type: 'line',
+          data: topThreshold,
+          yAxisID: 'rightAxis',
+          hideInLegendAndTooltip: true,
+          borderWidth: 1,
+          borderColor: 'darkRed',
+          backgroundColor: 'darkRed',
+          pointRadius: 0,
+          spanGaps: false,
+          fill: false,
+          order: 99
+        },
+        {
+          label: 'Oversold threshold',
+          type: 'line',
+          data: bottomThreshold,
+          yAxisID: 'rightAxis',
+          hideInLegendAndTooltip: true,
+          borderWidth: 1,
+          borderColor: 'darkGreen',
+          backgroundColor: 'darkGreen',
+          pointRadius: 0,
+          spanGaps: true,
+          fill: false,
+          order: 99
+        }
+      ]
+    };
+
+    // add labels
+    myConfig.data.labels = labels;
+
+    // hide ref lines from tooltips
+    myConfig.options.tooltips.filter = (tooltipItem) => (tooltipItem.datasetIndex > 1);
+
+    // y-scale
+    myConfig.options.scales.yAxes[0].ticks.max = 100;
+
+    // compose chart
+    if (this.chartStoch) this.chartStoch.destroy();
+    this.chartStoch = new Chart(myChart.getContext('2d'), myConfig);
+  }
+
 
   // EDIT INDICATORS
 
@@ -281,7 +356,7 @@ export class AppComponent implements OnInit {
       this.addIndicatorBB(this.pickedParams);
     }
 
-    // simple moving average
+    // exponential moving average
     if (this.pickedType.code === 'EMA') {
       this.addIndicatorEMA(this.pickedType.code, this.pickedParams);
     }
@@ -296,13 +371,12 @@ export class AppComponent implements OnInit {
       this.addIndicatorRSI(this.pickedParams);
     }
 
-    // simple moving average
-    if (this.pickedType.code === 'SMA') {
-      this.addIndicatorSMA(this.pickedType.code, this.pickedParams);
+    // stochastic oscillator
+    if (this.pickedType.code === 'STOCH') {
+      this.addIndicatorSTOCH(this.pickedParams);
     }
 
     this.cancelAdd();
-
   }
 
 
@@ -325,15 +399,15 @@ export class AppComponent implements OnInit {
     this.http.get(`${env.api}/BB/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
       .subscribe((bb: BollingerBandResult[]) => {
 
-        const label = `BB (${params.parameterOne},${params.parameterTwo})`;
+        const label = `BB(${params.parameterOne},${params.parameterTwo})`;
 
         // componse data
-        const smaLine: ChartPoint[] = [];
+        const centerLine: ChartPoint[] = [];
         const upperLine: ChartPoint[] = [];
         const lowerLine: ChartPoint[] = [];
 
         bb.forEach((m: BollingerBandResult) => {
-          smaLine.push({ x: new Date(m.date), y: this.toDecimals(m.sma, 3) });
+          centerLine.push({ x: new Date(m.date), y: this.toDecimals(m.sma, 3) });
           upperLine.push({ x: new Date(m.date), y: this.toDecimals(m.upperBand, 3) });
           lowerLine.push({ x: new Date(m.date), y: this.toDecimals(m.lowerBand, 3) });
         });
@@ -352,10 +426,10 @@ export class AppComponent implements OnInit {
           spanGaps: false
         };
 
-        const smaDataset: ChartDataSets = {
+        const centerDataset: ChartDataSets = {
           type: 'line',
           label: 'BB Centerline',
-          data: smaLine,
+          data: centerLine,
           borderWidth: 2,
           borderDash: [5, 2],
           borderColor: params.color,
@@ -380,12 +454,12 @@ export class AppComponent implements OnInit {
 
         // add to chart
         this.chartOverlay.data.datasets.push(upperDataset);
-        this.chartOverlay.data.datasets.push(smaDataset);
+        this.chartOverlay.data.datasets.push(centerDataset);
         this.chartOverlay.data.datasets.push(lowerDataset);
         this.chartOverlay.update();
 
         // add to legend
-        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [smaDataset, upperDataset, lowerDataset] });
+        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [centerDataset, upperDataset, lowerDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
@@ -396,7 +470,7 @@ export class AppComponent implements OnInit {
     this.http.get(`${env.api}/${type}/${params.parameterOne}`, this.requestHeader())
       .subscribe((ema: EmaResult[]) => {
 
-        const label = `${type.toUpperCase()} (${params.parameterOne})`;
+        const label = `${type.toUpperCase()}(${params.parameterOne})`;
 
         // componse data
         const emaLine: ChartPoint[] = [];
@@ -410,7 +484,7 @@ export class AppComponent implements OnInit {
           type: 'line',
           label: label,
           data: emaLine,
-          borderWidth: 1,
+          borderWidth: 1.5,
           borderColor: params.color,
           backgroundColor: params.color,
           pointRadius: 0,
@@ -446,7 +520,7 @@ export class AppComponent implements OnInit {
     this.http.get(`${env.api}/PSAR/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
       .subscribe((psar: ParabolicSarResult[]) => {
 
-        const label = `PSAR (${params.parameterOne},${params.parameterTwo})`;
+        const label = `PSAR(${params.parameterOne},${params.parameterTwo})`;
 
         // componse data
         const sarLine: ChartPoint[] = [];
@@ -460,7 +534,7 @@ export class AppComponent implements OnInit {
           type: 'line',
           label: label,
           data: sarLine,
-          pointRadius: 1,
+          pointRadius: 1.5,
           pointBackgroundColor: params.color,
           pointBorderColor: params.color,
           fill: false,
@@ -489,7 +563,7 @@ export class AppComponent implements OnInit {
     this.http.get(`${env.api}/RSI/${params.parameterOne}`, this.requestHeader())
       .subscribe((rsi: RsiResult[]) => {
 
-        const label = `RSI (${params.parameterOne})`;
+        const label = `RSI(${params.parameterOne})`;
         this.chartRsiLabel = label;
         this.chartRsiOn = true;
 
@@ -524,39 +598,64 @@ export class AppComponent implements OnInit {
   }
 
 
-  addIndicatorSMA(type: string, params: IndicatorParameters) {
+  stochChange(event: MatRadioChange) {
+    const stoch: StochConfig = event.value;
+    this.pickedParams.parameterOne = stoch.lookbackPeriod;
+    this.pickedParams.parameterTwo = stoch.signalPeriod;
+  }
 
-    this.http.get(`${env.api}/${type}/${params.parameterOne}`, this.requestHeader())
-      .subscribe((sma: SmaResult[]) => {
+  addIndicatorSTOCH(params: IndicatorParameters) {
 
-        const label = `${type.toUpperCase()} (${params.parameterOne})`;
+    this.http.get(`${env.api}/STOCH/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
+      .subscribe((stoch: StochResult[]) => {
+
+        const label = `STOCH(${params.parameterOne},${params.parameterTwo})`;
+        this.chartStochLabel = label;
+        this.chartStochOn = true;
 
         // componse data
-        const smaLine: ChartPoint[] = [];
+        const oscLine: ChartPoint[] = [];
+        const sigLine: ChartPoint[] = [];
 
-        sma.forEach((m: SmaResult) => {
-          smaLine.push({ x: new Date(m.date), y: this.toDecimals(m.sma, 3) });
+        stoch.forEach((m: StochResult) => {
+          oscLine.push({ x: new Date(m.date), y: this.toDecimals(m.oscillator, 3) });
+          sigLine.push({ x: new Date(m.date), y: this.toDecimals(m.signal, 3) });
         });
 
         // compose configuration
-        const smaDataset: ChartDataSets = {
+        const oscDataset: ChartDataSets = {
           type: 'line',
-          label: label,
-          data: smaLine,
-          borderWidth: 1,
+          label: label + ' Oscillator',
+          data: oscLine,
+          borderWidth: 2,
           borderColor: params.color,
           backgroundColor: params.color,
           pointRadius: 0,
           fill: false,
-          spanGaps: false
+          spanGaps: false,
+          order: 1
+        };
+
+        const sigDataset: ChartDataSets = {
+          type: 'line',
+          label: label + ' Signal',
+          data: sigLine,
+          borderWidth: 1,
+          borderColor: 'red',
+          backgroundColor: 'red',
+          pointRadius: 0,
+          fill: false,
+          spanGaps: false,
+          order: 2
         };
 
         // add to chart
-        this.chartOverlay.data.datasets.push(smaDataset);
-        this.chartOverlay.update();
+        this.chartStoch.data.datasets.push(oscDataset);
+        this.chartStoch.data.datasets.push(sigDataset);
+        this.chartStoch.update();
 
         // add to legend
-        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [smaDataset] });
+        this.legend.push({ label: label, chart: 'stoch', color: params.color, lines: [oscDataset, sigDataset] });
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
@@ -589,6 +688,19 @@ export class AppComponent implements OnInit {
 
         this.chartRsi.update();
       }
+
+      // stoch
+      if (indicator.chart === 'stoch') {
+        const stochDataset = this.chartStoch.data.datasets.indexOf(line, 0);
+        this.chartStoch.data.datasets.splice(stochDataset, 1);
+
+        // hide rsi if none left
+        if (this.chartStoch.data.datasets.length <= 2) {
+          this.chartStochOn = false;
+        }
+
+        this.chartStoch.update();
+      }
     });
 
     // update charts
@@ -606,44 +718,6 @@ export class AppComponent implements OnInit {
       .set('Content-Type', 'application/json');
 
     return { headers: simpleHeaders };
-  }
-
-  crosshairPluginOptions(): CrosshairOptions {
-
-    // ref: https://github.com/abelheinsbroek/chartjs-plugin-crosshair
-
-    const crosshairOptions: CrosshairOptions = {
-      line: {
-        color: '#F66',  // crosshair line color
-        width: 1        // crosshair line width
-      },
-      sync: {
-        enabled: true,            // enable trace line syncing with other charts
-        group: 1,                 // chart group (can be unique set of groups), all are group 1 now
-        suppressTooltips: false   // suppress tooltips when showing a synced tracer
-      },
-      zoom: {
-        enabled: false,                                     // enable zooming
-        zoomboxBackgroundColor: 'rgba(66,133,244,0.2)',     // background color of zoom box
-        zoomboxBorderColor: '#48F',                         // border color of zoom box
-        zoomButtonText: 'Reset Zoom',                       // reset zoom button text
-        zoomButtonClass: 'reset-zoom',                      // reset zoom button class
-      },
-      snap: {
-        enabled: true
-      },
-      callbacks: {
-        // tslint:disable-next-line: space-before-function-paren only-arrow-functions
-        beforeZoom: function (start, end) {                  // called before zoom, return false to prevent zoom
-          return true;
-        },
-        // tslint:disable-next-line: space-before-function-paren only-arrow-functions
-        afterZoom: function (start, end) {                   // called after zoom
-        }
-      }
-    };
-
-    return crosshairOptions;
   }
 
   toDecimals(value: number, decimalPlaces: number): number {

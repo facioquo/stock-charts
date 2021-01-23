@@ -32,14 +32,14 @@ export class ChartService {
                 },
                 maintainAspectRatio: false,
                 responsive: true,
-                animation: {
-                    duration: 0
-                },
-                elements: {
-                    line: {
-                        tension: 0 // disables bezier curves
-                    }
-                },
+                // animation: {
+                //     duration: 0
+                // },
+                // elements: {
+                //     line: {
+                //         tension: 0 // disables bezier curves
+                //     }
+                // },
                 tooltips: {
                     enabled: true,
                     mode: 'index',
@@ -163,7 +163,7 @@ export class ChartService {
             sync: {
                 enabled: true,                                      // enable trace line syncing with other charts
                 group: 1,                                           // chart group (can be unique set of groups)
-                suppressTooltips: false                             // suppress tooltips when showing a synced tracer
+                suppressTooltips: true                              // suppress tooltips when showing a synced tracer
             },
             zoom: {
                 enabled: false,                                     // enable zooming

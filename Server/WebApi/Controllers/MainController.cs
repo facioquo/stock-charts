@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Skender.Stock.Indicators;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using WebApi.Services;
 
 namespace WebApi.Controllers
@@ -21,7 +23,8 @@ namespace WebApi.Controllers
         [HttpGet("history")]
         public IEnumerable<Quote> GetQuotes()
         {
-            return history;
+            return history
+                .Where(x => x.Date > DateTime.Parse("10/1/2017"));
         }
 
 
@@ -32,36 +35,45 @@ namespace WebApi.Controllers
         public IEnumerable<BollingerBandsResult> GetBollingerBands(
             [FromRoute] int lookbackPeriod, [FromRoute] decimal standardDeviations)
         {
-            return Indicator.GetBollingerBands(history, lookbackPeriod, standardDeviations);
+            return Indicator.GetBollingerBands(history, lookbackPeriod, standardDeviations)
+                .Where(x => x.Date >= DateTime.Parse("10/1/2017"));
         }
-
 
         [HttpGet("EMA/{lookbackPeriod}")]
         public IEnumerable<EmaResult> GetEMA([FromRoute] int lookbackPeriod)
         {
-            return Indicator.GetEma(history, lookbackPeriod);
+            return Indicator.GetEma(history, lookbackPeriod)
+                .Where(x => x.Date >= DateTime.Parse("10/1/2017"));
         }
-
 
         [HttpGet("PSAR/{accelerationStep}/{maxAccelerationFactor}")]
         public IEnumerable<ParabolicSarResult> GetParabolicSar(
             [FromRoute] decimal accelerationStep, [FromRoute] decimal maxAccelerationFactor)
         {
-            return Indicator.GetParabolicSar(history, accelerationStep, maxAccelerationFactor);
+            return Indicator.GetParabolicSar(history, accelerationStep, maxAccelerationFactor)
+                .Where(x => x.Date >= DateTime.Parse("10/1/2017"));
         }
-
 
         [HttpGet("SMA/{lookbackPeriod}")]
         public IEnumerable<SmaResult> GetSma([FromRoute] int lookbackPeriod)
         {
-            return Indicator.GetSma(history, lookbackPeriod);
+            return Indicator.GetSma(history, lookbackPeriod)
+                .Where(x => x.Date >= DateTime.Parse("10/1/2017"));
         }
-
 
         [HttpGet("RSI/{lookbackPeriod}")]
         public IEnumerable<RsiResult> GetRsi([FromRoute] int lookbackPeriod)
         {
-            return Indicator.GetRsi(history, lookbackPeriod);
+            return Indicator.GetRsi(history, lookbackPeriod)
+                .Where(x => x.Date >= DateTime.Parse("10/1/2017"));
+        }
+
+        [HttpGet("STOCH/{lookbackPeriod}/{signalPeriod}")]
+        public IEnumerable<StochResult> GetStoch(
+            [FromRoute] int lookbackPeriod, [FromRoute] int signalPeriod)
+        {
+            return Indicator.GetStoch(history, lookbackPeriod, signalPeriod)
+                .Where(x => x.Date >= DateTime.Parse("10/1/2017"));
         }
     }
 }
