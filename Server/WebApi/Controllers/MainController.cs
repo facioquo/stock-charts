@@ -54,13 +54,6 @@ namespace WebApi.Controllers
                 .Where(x => x.Date >= DateTime.Parse("10/1/2017"));
         }
 
-        [HttpGet("SMA/{lookbackPeriod}")]
-        public IEnumerable<SmaResult> GetSma([FromRoute] int lookbackPeriod)
-        {
-            return Indicator.GetSma(history, lookbackPeriod)
-                .Where(x => x.Date >= DateTime.Parse("10/1/2017"));
-        }
-
         [HttpGet("RSI/{lookbackPeriod}")]
         public IEnumerable<RsiResult> GetRsi([FromRoute] int lookbackPeriod)
         {

@@ -5,7 +5,6 @@ import { env } from '../environments/environment';
 
 import { Chart, ChartPoint, ChartDataSets } from 'chart.js';
 import { ChartService } from './chart.service';
-import 'chartjs-plugin-crosshair';
 
 import {
   Quote,
@@ -95,6 +94,7 @@ export class AppComponent implements OnInit {
   readonly stochConfigs: StochConfig[] = [
     { label: 'STOCH(9,4)', lookbackPeriod: 9, signalPeriod: 4 },
     { label: 'STOCH(14,3)', lookbackPeriod: 14, signalPeriod: 3 },
+    { label: 'STOCH(20,5)', lookbackPeriod: 20, signalPeriod: 5 },
   ];
 
 
@@ -186,8 +186,8 @@ export class AppComponent implements OnInit {
     this.chartOverlay = new Chart(myChart.getContext('2d'), myConfig);
 
     // add initial samples
-    this.addIndicatorEMA('EMA', { parameterOne: 25, color: 'red' });
-    this.addIndicatorEMA('EMA', { parameterOne: 150, color: 'darkGreen' });
+    this.addIndicatorEMA({ parameterOne: 18, color: 'darkOrange' });
+    this.addIndicatorEMA({ parameterOne: 150, color: 'darkGreen' });
   }
 
 
@@ -319,6 +319,9 @@ export class AppComponent implements OnInit {
     // compose chart
     if (this.chartStoch) this.chartStoch.destroy();
     this.chartStoch = new Chart(myChart.getContext('2d'), myConfig);
+
+    // add initial sample
+    this.addIndicatorSTOCH({ parameterOne: 21, parameterTwo: 7, color: 'black' });
   }
 
 
@@ -358,7 +361,7 @@ export class AppComponent implements OnInit {
 
     // exponential moving average
     if (this.pickedType.code === 'EMA') {
-      this.addIndicatorEMA(this.pickedType.code, this.pickedParams);
+      this.addIndicatorEMA(this.pickedParams);
     }
 
     // parabolid sar
@@ -465,12 +468,12 @@ export class AppComponent implements OnInit {
   }
 
 
-  addIndicatorEMA(type: string, params: IndicatorParameters) {
+  addIndicatorEMA(params: IndicatorParameters) {
 
-    this.http.get(`${env.api}/${type}/${params.parameterOne}`, this.requestHeader())
+    this.http.get(`${env.api}/EMA/${params.parameterOne}`, this.requestHeader())
       .subscribe((ema: EmaResult[]) => {
 
-        const label = `${type.toUpperCase()}(${params.parameterOne})`;
+        const label = `EMA(${params.parameterOne})`;
 
         // componse data
         const emaLine: ChartPoint[] = [];
@@ -484,7 +487,7 @@ export class AppComponent implements OnInit {
           type: 'line',
           label: label,
           data: emaLine,
-          borderWidth: 1.5,
+          borderWidth: 2,
           borderColor: params.color,
           backgroundColor: params.color,
           pointRadius: 0,
@@ -640,7 +643,7 @@ export class AppComponent implements OnInit {
           type: 'line',
           label: label + ' Signal',
           data: sigLine,
-          borderWidth: 1,
+          borderWidth: 1.5,
           borderColor: 'red',
           backgroundColor: 'red',
           pointRadius: 0,
