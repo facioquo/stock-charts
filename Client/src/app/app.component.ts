@@ -55,7 +55,8 @@ export class AppComponent implements OnInit {
   chartStochLabel: string;
   chartStochOn = true;  // required ON due to card, likely?
 
-  @ViewChild('bottom') bottomRef: ElementRef;
+  @ViewChild('chartsTop') chartRef: ElementRef;
+  @ViewChild('picker') pickerRef: ElementRef;
 
   history: Quote[] = [];
   legend: Indicator[] = [];
@@ -336,7 +337,7 @@ export class AppComponent implements OnInit {
     this.chartRsiOn = false;
     this.chartStochOn = false;
 
-    this.scrollToBottom();
+    this.scrollToBottomOfPicker();
   }
 
   cancelAdd() {
@@ -351,7 +352,10 @@ export class AppComponent implements OnInit {
       color: undefined
     };
 
-    // show oscillators
+    this.showOscillators();
+  }
+
+  showOscillators() {
     this.legend
       .filter(g => g.chart === 'rsi' || g.chart === 'stoch')
       .forEach((i: Indicator) => {
@@ -359,7 +363,6 @@ export class AppComponent implements OnInit {
         if (i.chart === 'stoch') this.chartStochOn = true;
       });
   }
-
 
   pickType(t: IndicatorType) {
 
@@ -370,10 +373,12 @@ export class AppComponent implements OnInit {
     if (this.pickedType.code === 'RSI') this.pickedParams.color = 'black';
     if (this.pickedType.code === 'STOCH') this.pickedParams.color = 'black';
 
-    this.scrollToBottom(200);
+    this.scrollToBottomOfPicker();
   }
 
   addIndicator() {
+
+    this.showOscillators();
 
     // sorted alphabetically
 
@@ -415,6 +420,8 @@ export class AppComponent implements OnInit {
   }
 
   addIndicatorBB(params: IndicatorParameters) {
+
+    this.scrollToChartTop();
 
     // remove old to clear chart
     this.legend.filter(x => x.label.startsWith('BB')).forEach(x => {
@@ -493,6 +500,8 @@ export class AppComponent implements OnInit {
 
   addIndicatorEMA(params: IndicatorParameters) {
 
+    this.scrollToChartTop();
+
     this.http.get(`${env.api}/EMA/${params.parameterOne}`, this.requestHeader())
       .subscribe((ema: EmaResult[]) => {
 
@@ -536,6 +545,8 @@ export class AppComponent implements OnInit {
   }
 
   addIndicatorPSAR(params: IndicatorParameters) {
+
+    this.scrollToChartTop();
 
     // remove old to clear chart
     this.legend.filter(x => x.label.startsWith('PSAR')).forEach(x => {
@@ -626,6 +637,11 @@ export class AppComponent implements OnInit {
         // add to legend
         this.legend.push({ label: label, chart: 'rsi', color: params.color, lines: [rsiDataset] });
 
+        // scroll to chart
+        setTimeout(() => {
+          this.chartRsiRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+        }, 200);
+
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
 
@@ -694,6 +710,11 @@ export class AppComponent implements OnInit {
 
         // add to legend
         this.legend.push({ label: label, chart: 'stoch', color: params.color, lines: [oscDataset, sigDataset] });
+
+        // scroll to chart
+        setTimeout(() => {
+          this.chartStochRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+        }, 200);
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
@@ -765,9 +786,15 @@ export class AppComponent implements OnInit {
     return value.toFixed(decimalPlaces) as unknown as number;
   }
 
-  scrollToBottom(delayMs: number = 0) {
+  scrollToChartTop() {
     setTimeout(() => {
-      this.bottomRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
-    }, delayMs);
+      this.chartRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+    }, 200);
+  }
+
+  scrollToBottomOfPicker() {
+    setTimeout(() => {
+      this.pickerRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });
+    }, 200);
   }
 }

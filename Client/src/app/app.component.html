@@ -16,6 +16,7 @@
     </p>
 
     <!-- CHART STACK -->
+    <a #chartsTop></a>
     <mat-card class="container">
 
         <!-- loading -->
@@ -79,7 +80,7 @@
 
 
     <!-- PICKER -->
-    <div class="container" *ngIf="pickIndicator" style="margin-bottom:50px;">
+    <div class="container" *ngIf="pickIndicator" style="padding-bottom:25px;" #picker>
 
         <!-- pick indicator type -->
         <div *ngIf="!pickedType.code">
@@ -291,4 +292,3 @@
     </div>
 
 </div>
-<a #bottom></a>
