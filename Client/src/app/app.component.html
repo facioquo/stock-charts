@@ -12,7 +12,7 @@
     <p class="noselect center">
         This is a demo of the <a href="https://www.nuget.org/packages/Skender.Stock.Indicators" target="_blank"
             rel="noopener noreferrer">Skender.Stock.Indicators</a> .NET library.
-        It generates stock indicators in the server-side API, then adds it to the chart.
+        It generates stock indicators in a server-side API, then adds it to the chart.
     </p>
 
     <!-- CHART STACK -->
@@ -68,7 +68,7 @@
                 <mat-icon matChipRemove>cancel</mat-icon>
             </mat-chip>
 
-            <mat-chip selected color="default" (click)="pickIndicator=true" *ngIf="!pickIndicator"
+            <mat-chip selected color="default" (click)="startAdd()" *ngIf="!pickIndicator"
                 matTooltip="add new indicator">
                 <mat-icon>add</mat-icon>
             </mat-chip>

@@ -187,7 +187,7 @@ export class AppComponent implements OnInit {
 
     // add initial samples
     this.addIndicatorEMA({ parameterOne: 18, color: 'darkOrange' });
-    this.addIndicatorEMA({ parameterOne: 150, color: 'darkGreen' });
+    this.addIndicatorEMA({ parameterOne: 150, color: 'blue' });
   }
 
 
@@ -327,6 +327,14 @@ export class AppComponent implements OnInit {
 
   // EDIT INDICATORS
 
+  startAdd() {
+    this.pickIndicator = true;
+
+    // hide oscillators
+    this.chartRsiOn = false;
+    this.chartStochOn = false;
+  }
+
   cancelAdd() {
 
     this.pickIndicator = false;
@@ -338,6 +346,14 @@ export class AppComponent implements OnInit {
       parameterThree: undefined,
       color: undefined
     };
+
+    // show oscillators
+    this.legend
+      .filter(g => g.chart === 'rsi' || g.chart === 'stoch')
+      .forEach((i: Indicator) => {
+        if (i.chart === 'rsi') this.chartRsiOn = true;
+        if (i.chart === 'stoch') this.chartStochOn = true;
+      });
   }
 
 
