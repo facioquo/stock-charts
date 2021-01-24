@@ -563,6 +563,12 @@ export class AppComponent implements OnInit {
 
   addIndicatorRSI(params: IndicatorParameters) {
 
+    // remove old indicators
+    this.legend
+      .filter(g => g.chart === 'rsi')
+      .forEach((i: Indicator) => this.deleteIndicator(i));
+
+    // fetch new indicator
     this.http.get(`${env.api}/RSI/${params.parameterOne}`, this.requestHeader())
       .subscribe((rsi: RsiResult[]) => {
 
@@ -609,6 +615,12 @@ export class AppComponent implements OnInit {
 
   addIndicatorSTOCH(params: IndicatorParameters) {
 
+    // remove old indicators
+    this.legend
+      .filter(g => g.chart === 'stoch')
+      .forEach((i: Indicator) => this.deleteIndicator(i));
+
+    // add new indicator
     this.http.get(`${env.api}/STOCH/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
       .subscribe((stoch: StochResult[]) => {
 
