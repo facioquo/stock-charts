@@ -100,18 +100,15 @@ export class AppComponent implements OnInit {
     { label: 'STOCH(20,5)', lookbackPeriod: 20, signalPeriod: 5 },
   ];
 
-
   constructor(
     private readonly http: HttpClient,
     private readonly cs: ChartService
   ) { }
 
-
   ngOnInit() {
     this.cancelAdd();
     this.getHistory();
   }
-
 
   getHistory() {
 
@@ -126,7 +123,6 @@ export class AppComponent implements OnInit {
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
-
 
   addBaseOverlayChart() {
 
@@ -192,7 +188,6 @@ export class AppComponent implements OnInit {
     this.addIndicatorEMA({ parameterOne: 18, color: 'darkOrange' });
     this.addIndicatorEMA({ parameterOne: 150, color: 'blue' });
   }
-
 
   addBaseRsiChart() {
 
@@ -497,7 +492,6 @@ export class AppComponent implements OnInit {
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
 
-
   addIndicatorEMA(params: IndicatorParameters) {
 
     this.scrollToChartTop();
@@ -536,7 +530,6 @@ export class AppComponent implements OnInit {
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
-
 
   psarChange(event: MatRadioChange) {
     const psar: ParabolicSarConfig = event.value;
@@ -588,7 +581,6 @@ export class AppComponent implements OnInit {
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
-
 
   rsiChange(event: MatRadioChange) {
     const rsi: RsiConfig = event.value;
@@ -644,7 +636,6 @@ export class AppComponent implements OnInit {
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
-
 
   stochChange(event: MatRadioChange) {
     const stoch: StochConfig = event.value;
@@ -770,7 +761,6 @@ export class AppComponent implements OnInit {
     this.legend.splice(idxLegend, 1);
   }
 
-
   requestHeader(): { headers?: HttpHeaders } {
 
     const simpleHeaders = new HttpHeaders()
@@ -778,6 +768,7 @@ export class AppComponent implements OnInit {
 
     return { headers: simpleHeaders };
   }
+
 
   // HELPER FUNCTIONS
 
