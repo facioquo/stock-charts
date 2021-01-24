@@ -55,6 +55,9 @@ export class AppComponent implements OnInit {
   chartStochLabel: string;
   chartStochOn = true;  // required ON due to card, likely?
 
+  @ViewChild('chartsTop') chartRef: ElementRef;
+  @ViewChild('picker') pickerRef: ElementRef;
+
   history: Quote[] = [];
   legend: Indicator[] = [];
 
@@ -97,18 +100,15 @@ export class AppComponent implements OnInit {
     { label: 'STOCH(20,5)', lookbackPeriod: 20, signalPeriod: 5 },
   ];
 
-
   constructor(
     private readonly http: HttpClient,
     private readonly cs: ChartService
   ) { }
 
-
   ngOnInit() {
     this.cancelAdd();
     this.getHistory();
   }
-
 
   getHistory() {
 
@@ -123,7 +123,6 @@ export class AppComponent implements OnInit {
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
-
 
   addBaseOverlayChart() {
 
@@ -187,9 +186,8 @@ export class AppComponent implements OnInit {
 
     // add initial samples
     this.addIndicatorEMA({ parameterOne: 18, color: 'darkOrange' });
-    this.addIndicatorEMA({ parameterOne: 150, color: 'darkGreen' });
+    this.addIndicatorEMA({ parameterOne: 150, color: 'blue' });
   }
-
 
   addBaseRsiChart() {
 
@@ -327,6 +325,16 @@ export class AppComponent implements OnInit {
 
   // EDIT INDICATORS
 
+  startAdd() {
+    this.pickIndicator = true;
+
+    // hide oscillators
+    this.chartRsiOn = false;
+    this.chartStochOn = false;
+
+    this.scrollToBottomOfPicker();
+  }
+
   cancelAdd() {
 
     this.pickIndicator = false;
@@ -338,19 +346,34 @@ export class AppComponent implements OnInit {
       parameterThree: undefined,
       color: undefined
     };
+
+    this.showOscillators();
   }
 
+  showOscillators() {
+    this.legend
+      .filter(g => g.chart === 'rsi' || g.chart === 'stoch')
+      .forEach((i: Indicator) => {
+        if (i.chart === 'rsi') this.chartRsiOn = true;
+        if (i.chart === 'stoch') this.chartStochOn = true;
+      });
+  }
 
   pickType(t: IndicatorType) {
+
     this.pickedType = t;
 
     if (this.pickedType.code === 'BB') this.pickedParams.color = 'darkGray';
     if (this.pickedType.code === 'PSAR') this.pickedParams.color = 'purple';
     if (this.pickedType.code === 'RSI') this.pickedParams.color = 'black';
     if (this.pickedType.code === 'STOCH') this.pickedParams.color = 'black';
+
+    this.scrollToBottomOfPicker();
   }
 
   addIndicator() {
+
+    this.showOscillators();
 
     // sorted alphabetically
 
@@ -392,6 +415,8 @@ export class AppComponent implements OnInit {
   }
 
   addIndicatorBB(params: IndicatorParameters) {
+
+    this.scrollToChartTop();
 
     // remove old to clear chart
     this.legend.filter(x => x.label.startsWith('BB')).forEach(x => {
@@ -467,8 +492,9 @@ export class AppComponent implements OnInit {
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
 
-
   addIndicatorEMA(params: IndicatorParameters) {
+
+    this.scrollToChartTop();
 
     this.http.get(`${env.api}/EMA/${params.parameterOne}`, this.requestHeader())
       .subscribe((ema: EmaResult[]) => {
@@ -505,7 +531,6 @@ export class AppComponent implements OnInit {
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
 
-
   psarChange(event: MatRadioChange) {
     const psar: ParabolicSarConfig = event.value;
     this.pickedParams.parameterOne = psar.accelerationStep;
@@ -513,6 +538,8 @@ export class AppComponent implements OnInit {
   }
 
   addIndicatorPSAR(params: IndicatorParameters) {
+
+    this.scrollToChartTop();
 
     // remove old to clear chart
     this.legend.filter(x => x.label.startsWith('PSAR')).forEach(x => {
@@ -555,7 +582,6 @@ export class AppComponent implements OnInit {
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
 
-
   rsiChange(event: MatRadioChange) {
     const rsi: RsiConfig = event.value;
     this.pickedParams.parameterOne = rsi.lookbackPeriod;
@@ -563,6 +589,12 @@ export class AppComponent implements OnInit {
 
   addIndicatorRSI(params: IndicatorParameters) {
 
+    // remove old indicators
+    this.legend
+      .filter(g => g.chart === 'rsi')
+      .forEach((i: Indicator) => this.deleteIndicator(i));
+
+    // fetch new indicator
     this.http.get(`${env.api}/RSI/${params.parameterOne}`, this.requestHeader())
       .subscribe((rsi: RsiResult[]) => {
 
@@ -597,9 +629,13 @@ export class AppComponent implements OnInit {
         // add to legend
         this.legend.push({ label: label, chart: 'rsi', color: params.color, lines: [rsiDataset] });
 
+        // scroll to chart
+        setTimeout(() => {
+          this.chartRsiRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+        }, 200);
+
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
-
 
   stochChange(event: MatRadioChange) {
     const stoch: StochConfig = event.value;
@@ -609,6 +645,12 @@ export class AppComponent implements OnInit {
 
   addIndicatorSTOCH(params: IndicatorParameters) {
 
+    // remove old indicators
+    this.legend
+      .filter(g => g.chart === 'stoch')
+      .forEach((i: Indicator) => this.deleteIndicator(i));
+
+    // add new indicator
     this.http.get(`${env.api}/STOCH/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
       .subscribe((stoch: StochResult[]) => {
 
@@ -659,6 +701,11 @@ export class AppComponent implements OnInit {
 
         // add to legend
         this.legend.push({ label: label, chart: 'stoch', color: params.color, lines: [oscDataset, sigDataset] });
+
+        // scroll to chart
+        setTimeout(() => {
+          this.chartStochRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+        }, 200);
 
       }, (error: HttpErrorResponse) => { console.log(error); });
   }
@@ -714,7 +761,6 @@ export class AppComponent implements OnInit {
     this.legend.splice(idxLegend, 1);
   }
 
-
   requestHeader(): { headers?: HttpHeaders } {
 
     const simpleHeaders = new HttpHeaders()
@@ -723,8 +769,23 @@ export class AppComponent implements OnInit {
     return { headers: simpleHeaders };
   }
 
+
+  // HELPER FUNCTIONS
+
   toDecimals(value: number, decimalPlaces: number): number {
     if (value === null) return null;
     return value.toFixed(decimalPlaces) as unknown as number;
+  }
+
+  scrollToChartTop() {
+    setTimeout(() => {
+      this.chartRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+    }, 200);
+  }
+
+  scrollToBottomOfPicker() {
+    setTimeout(() => {
+      this.pickerRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });
+    }, 200);
   }
 }

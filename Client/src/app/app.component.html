@@ -12,10 +12,11 @@
     <p class="noselect center">
         This is a demo of the <a href="https://www.nuget.org/packages/Skender.Stock.Indicators" target="_blank"
             rel="noopener noreferrer">Skender.Stock.Indicators</a> .NET library.
-        It generates stock indicators in the server-side API, then adds it to the chart.
+        It generates stock indicators in a server-side API, then adds it to the chart.
     </p>
 
     <!-- CHART STACK -->
+    <a #chartsTop></a>
     <mat-card class="container">
 
         <!-- loading -->
@@ -33,14 +34,13 @@
         </div>
 
         <!-- CHART (RSI) -->
-        <div class="chart-label" *ngIf="chartRsiOn && chartRsiLabel">Relative Strength Index</div>
+        <div class="chart-label" *ngIf="chartRsiOn && chartRsiLabel">Relative Strength Index - {{ chartRsiLabel }}</div>
         <div class="chart-container-oscillator" [hidden]="!chartRsiOn">
             <canvas #chartRsi></canvas>
         </div>
 
         <!-- CHART (STOCH) -->
-        <div class="chart-label" *ngIf="chartStochOn && chartStochLabel">Stochastic Oscillator
-        </div>
+        <div class="chart-label" *ngIf="chartStochOn && chartStochLabel">Stochastic Oscillator - {{ chartStochLabel }}</div>
         <div class="chart-container-oscillator" [hidden]="!chartStochOn">
             <canvas #chartStoch></canvas>
         </div>
@@ -69,7 +69,7 @@
                 <mat-icon matChipRemove>cancel</mat-icon>
             </mat-chip>
 
-            <mat-chip selected color="default" (click)="pickIndicator=true" *ngIf="!pickIndicator"
+            <mat-chip selected color="default" (click)="startAdd()" *ngIf="!pickIndicator"
                 matTooltip="add new indicator">
                 <mat-icon>add</mat-icon>
             </mat-chip>
@@ -80,12 +80,11 @@
 
 
     <!-- PICKER -->
-    <div class="container" *ngIf="pickIndicator" style="margin-bottom:50px;">
+    <div class="container" *ngIf="pickIndicator" style="padding-bottom:25px;" #picker>
 
         <!-- pick indicator type -->
         <div *ngIf="!pickedType.code">
 
-            <mat-chip-list></mat-chip-list>
             <p class="center">Pick and indicator type:</p>
             <mat-chip-list>
 

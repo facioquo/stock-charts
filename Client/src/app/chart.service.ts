@@ -32,14 +32,6 @@ export class ChartService {
                 },
                 maintainAspectRatio: false,
                 responsive: true,
-                // animation: {
-                //     duration: 0
-                // },
-                // elements: {
-                //     line: {
-                //         tension: 0 // disables bezier curves
-                //     }
-                // },
                 tooltips: {
                     enabled: true,
                     mode: 'index',
@@ -75,7 +67,6 @@ export class ChartService {
 
         return config;
     }
-
 
     baseOverlayConfig(): ChartConfiguration {
 
