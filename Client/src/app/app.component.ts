@@ -55,6 +55,8 @@ export class AppComponent implements OnInit {
   chartStochLabel: string;
   chartStochOn = true;  // required ON due to card, likely?
 
+  @ViewChild('bottom') bottomRef: ElementRef;
+
   history: Quote[] = [];
   legend: Indicator[] = [];
 
@@ -333,6 +335,8 @@ export class AppComponent implements OnInit {
     // hide oscillators
     this.chartRsiOn = false;
     this.chartStochOn = false;
+
+    this.scrollToBottom();
   }
 
   cancelAdd() {
@@ -358,12 +362,15 @@ export class AppComponent implements OnInit {
 
 
   pickType(t: IndicatorType) {
+
     this.pickedType = t;
 
     if (this.pickedType.code === 'BB') this.pickedParams.color = 'darkGray';
     if (this.pickedType.code === 'PSAR') this.pickedParams.color = 'purple';
     if (this.pickedType.code === 'RSI') this.pickedParams.color = 'black';
     if (this.pickedType.code === 'STOCH') this.pickedParams.color = 'black';
+
+    this.scrollToBottom(200);
   }
 
   addIndicator() {
@@ -751,8 +758,16 @@ export class AppComponent implements OnInit {
     return { headers: simpleHeaders };
   }
 
+  // HELPER FUNCTIONS
+
   toDecimals(value: number, decimalPlaces: number): number {
     if (value === null) return null;
     return value.toFixed(decimalPlaces) as unknown as number;
+  }
+
+  scrollToBottom(delayMs: number = 0) {
+    setTimeout(() => {
+      this.bottomRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' });
+    }, delayMs);
   }
 }
