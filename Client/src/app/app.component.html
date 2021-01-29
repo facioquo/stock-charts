@@ -85,7 +85,7 @@
         <!-- pick indicator type -->
         <div *ngIf="!pickedType.code">
 
-            <p class="center">Pick and indicator type:</p>
+            <p class="center">Pick an indicator type:</p>
             <mat-chip-list>
 
                 <mat-chip color="accent" selected *ngFor="let t of indicatorTypes" (click)="pickType(t)">
