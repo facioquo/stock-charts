@@ -1,7 +1,7 @@
 <mat-toolbar class="toolbar noselect" color="primary">
     <span>Stock.Charts</span>
     <span class="filler"></span>
-    <div matTooltip="GitHub Repo for this site">
+    <div matTooltip="GitHub repository for this site">
         <a href="https://github.com/DaveSkender/Stock.Charts"><span class="fa fa-github fa-2x"></span></a>
     </div>
 </mat-toolbar>
@@ -85,7 +85,7 @@
         <!-- pick indicator type -->
         <div *ngIf="!pickedType.code">
 
-            <p class="center">Pick and indicator type:</p>
+            <p class="center">Pick an indicator type:</p>
             <mat-chip-list>
 
                 <mat-chip color="accent" selected *ngFor="let t of indicatorTypes" (click)="pickType(t)">
