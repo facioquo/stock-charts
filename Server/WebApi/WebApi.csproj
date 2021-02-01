@@ -14,6 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Signals\Signals.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Update="appsettings.Token.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

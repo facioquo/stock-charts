@@ -76,8 +76,7 @@ export class AppComponent implements OnInit {
 
   // indicator parameter values
   readonly colors: string[] = ['DeepPink', 'DarkRed', 'Orange', 'Green', 'Blue'];
-  readonly smNums: number[] = [3, 5, 10, 15, 25];
-  readonly lgNums: number[] = [15, 30, 50, 100, 200];
+  readonly lgNums: number[] = [5, 15, 30, 50, 100, 200];
 
   readonly bbConfigs: BollingerBandConfig[] = [
     { label: 'BB(15,2)', lookbackPeriod: 15, standardDeviations: 2 },
