@@ -4,7 +4,7 @@ import { MatRadioChange } from '@angular/material/radio';
 import { env } from '../environments/environment';
 
 import { Chart, ChartPoint, ChartDataSets } from 'chart.js';
-import { ChartService } from './chart.service';
+import { ChartService } from './chart/chart.service';
 
 import {
   Quote,
