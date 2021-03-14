@@ -19,7 +19,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AppComponent } from './app.component';
-import { ChartService } from './chart.service';
+import { ChartService } from './chart/chart.service';
 
 @NgModule({
   declarations: [
