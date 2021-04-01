@@ -24,7 +24,7 @@
     "chart.js": "^2.9.4",
     "chartjs-plugin-crosshair": "^1.1.6",
     "font-awesome": "~4.7.0",
-    "rxjs": "~6.6.6",
+    "rxjs": "~6.6.7",
     "tslib": "^2.1.0",
     "zone.js": "~0.10.3"
   },
