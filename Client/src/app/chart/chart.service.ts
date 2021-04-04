@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ChartConfiguration, CommonAxe, ChartYAxe } from 'chart.js';
+import { ChartConfiguration, ScaleOptions } from 'chart.js';
 import { CrosshairOptions } from 'chartjs-plugin-crosshair';
 import 'chartjs-plugin-crosshair';
 
@@ -9,58 +9,65 @@ export class ChartService {
     baseConfig(): ChartConfiguration {
 
         const commonXaxes = this.commonXAxes();
-        const crosshairPluginOptions = this.crosshairPluginOptions();
+        const crosshairPlugin = this.crosshairPluginOptions();
 
         const config: ChartConfiguration = {
 
+            type: 'line',
+            data: {
+                datasets: []
+            },
             options: {
-
-                title: {
-                    fontFamily: 'Roboto',
-                    display: false
-                },
-                legend: {
-                    display: false
+                plugins: {
+                    title: {
+                        font: {
+                            family: 'Roboto'
+                        },
+                        display: false
+                    },
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false
+                    },
+                    // crosshair: crosshairPlugin
                 },
                 layout: {
                     padding: {
                         left: 10,
                         right: 10,
-                        top: 0,
+                        top: 5,
                         bottom: 0
                     }
                 },
-                maintainAspectRatio: false,
                 responsive: true,
-                tooltips: {
-                    enabled: true,
-                    mode: 'index',
-                    intersect: false
-                },
+                maintainAspectRatio: false,
+
                 scales: {
-                    xAxes: commonXaxes,
-                    yAxes: [
-                        {
-                            id: 'rightAxis',
-                            display: true,
-                            position: 'right',
-                            ticks: {
-                                autoSkip: true,
-                                autoSkipPadding: 5,
-                                beginAtZero: true,
-                                mirror: true,
-                                padding: -5,
-                                fontSize: 10
+                    xAxis: commonXaxes,
+                    yAxis: {
+                        display: true,
+                        type: 'linear',
+                        axis: 'y',
+                        position: 'right',
+                        beginAtZero: false,
+                        ticks: {
+                            // autoSkip: true,
+                            // autoSkipPadding: 5,
+                            mirror: true,
+                            padding: -5,
+                            font: {
+                                size: 10
                             },
-                            gridLines: {
-                                drawOnChartArea: true,
-                                drawTicks: false
-                            }
+                        },
+                        grid: {
+                            drawOnChartArea: true,
+                            drawTicks: false
                         }
-                    ]
-                },
-                plugins: {
-                    crosshair: crosshairPluginOptions
+                    }
                 }
             }
         };
@@ -72,40 +79,25 @@ export class ChartService {
 
         const config = this.baseConfig();
 
-        // scale y-axis
-        config.options.scales.yAxes[0].ticks.beginAtZero = false;
-
         // aspect ratio
         config.options.maintainAspectRatio = true;
 
-        // add dollar sign
-        config.options.scales.yAxes[0].ticks.callback = (value, index, values) => '$' + value;
+        // format y-axis, add dollar sign
+        config.options.scales.yAxis.ticks.callback = (value, index, values) => {
 
-        // hide y-axis end label(s)
-        config.options.scales.yAxes[0].afterTickToLabelConversion = (scaleInstance) => {
-            // set the first and last tick to null so it does not display
-            // note, ticks[0] is the last tick and ticks[length - 1] is the first
-            // scaleInstance.ticks[0] = null;
-            scaleInstance.ticks[scaleInstance.ticks.length - 1] = null;
-
-            // need to do the same thing for this similiar array which is used internally
-            // scaleInstance.ticksAsNumbers[0] = null;
-            scaleInstance.ticksAsNumbers[scaleInstance.ticksAsNumbers.length - 1] = null;
+            if (index === 0) return '';  // skip first label
+            else
+                return '$' + value;
         };
 
         // volume axis
-        const volAxis: ChartYAxe = {
-            id: 'volumeAxis',
+        config.options.scales.volumeAxis = {
             display: false,
+            type: 'linear',
+            axis: 'y',
             position: 'left',
-            ticks: {
-                display: false,
-                beginAtZero: true,
-                fontSize: 10
-            }
-        };
-
-        config.options.scales.yAxes.push(volAxis);
+            beginAtZero: true
+        } as ScaleOptions;
 
         return config;
     }
@@ -115,31 +107,40 @@ export class ChartService {
         const config = this.baseConfig();
 
         // remove x-axis
-        config.options.scales.xAxes.forEach(s => s.display = false);
+        config.options.scales.xAxis.display = false;
+
+        // format chart
+        config.options.layout.padding = {
+            left: 10,
+            right: 10,
+            top: 5,
+            bottom: 5
+        };
 
         return config;
     }
 
-    commonXAxes(): CommonAxe[] {
+    commonXAxes(): ScaleOptions {
 
-        const axes: CommonAxe[] = [{
-            id: 'first',
+        const axes: ScaleOptions = {
             display: false,
             type: 'category',
+
             ticks: {
-                display: false,  // false for stock.indicators
                 padding: 0,
                 autoSkip: true,
                 autoSkipPadding: 8,
-                fontSize: 9,
                 maxRotation: 0,
-                minRotation: 0
+                minRotation: 0,
+                font: {
+                    size: 9
+                },
             },
-            gridLines: {
+            grid: {
                 drawOnChartArea: false,
-                tickMarkLength: 2
+                tickLength: 2
             }
-        }];
+        };
 
         return axes;
     }
