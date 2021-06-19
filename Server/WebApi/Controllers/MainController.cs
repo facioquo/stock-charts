@@ -42,7 +42,7 @@ namespace WebApi.Controllers
         [HttpGet("EMA/{lookbackPeriod}")]
         public IEnumerable<EmaResult> GetEMA([FromRoute] int lookbackPeriod)
         {
-            return Indicator.GetEma(history, lookbackPeriod)
+            return history.GetEma(lookbackPeriod)
                 .Where(x => x.Date >= DateTime.Parse("10/1/2017"));
         }
 
@@ -50,14 +50,14 @@ namespace WebApi.Controllers
         public IEnumerable<ParabolicSarResult> GetParabolicSar(
             [FromRoute] decimal accelerationStep, [FromRoute] decimal maxAccelerationFactor)
         {
-            return Indicator.GetParabolicSar(history, accelerationStep, maxAccelerationFactor)
+            return history.GetParabolicSar(accelerationStep, maxAccelerationFactor)
                 .Where(x => x.Date >= DateTime.Parse("10/1/2017"));
         }
 
         [HttpGet("RSI/{lookbackPeriod}")]
         public IEnumerable<RsiResult> GetRsi([FromRoute] int lookbackPeriod)
         {
-            return Indicator.GetRsi(history, lookbackPeriod)
+            return history.GetRsi(lookbackPeriod)
                 .Where(x => x.Date >= DateTime.Parse("10/1/2017"));
         }
 
@@ -65,7 +65,7 @@ namespace WebApi.Controllers
         public IEnumerable<StochResult> GetStoch(
             [FromRoute] int lookbackPeriod, [FromRoute] int signalPeriod)
         {
-            return Indicator.GetStoch(history, lookbackPeriod, signalPeriod)
+            return history.GetStoch(lookbackPeriod, signalPeriod)
                 .Where(x => x.Date >= DateTime.Parse("10/1/2017"));
         }
     }
