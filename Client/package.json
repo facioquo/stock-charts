@@ -32,7 +32,7 @@
     "@angular-devkit/build-angular": "~12.0.5",
     "@angular/cli": "~12.0.5",
     "@angular/compiler-cli": "~12.0.5",
-    "@angular/language-service": "~12.0.5",
+    "@angular/language-service": "~12.1.1",
     "@types/chart.js": "^2.9.32",
     "@types/chartjs-plugin-crosshair": "^1.1.0",
     "@types/node": "^15.12.4",
