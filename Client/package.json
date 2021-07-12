@@ -35,7 +35,7 @@
     "@angular/language-service": "~12.1.1",
     "@types/chart.js": "^2.9.34",
     "@types/chartjs-plugin-crosshair": "^1.1.1",
-    "@types/node": "^15.14.2",
+    "@types/node": "^16.3.1",
     "codelyzer": "^6.0.2",
     "ts-node": "~10.0.0",
     "tslint": "~6.1.3",
