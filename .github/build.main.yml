@@ -1,8 +1,8 @@
 trigger:
-  - master
+  - main
 
 pr:
-  - master
+  - main
 
 name: $(BuildID)-$(SourceBranchName)
 
@@ -11,7 +11,7 @@ resources:
   repositories:
     - repository: self
       type: git
-      ref: master
+      ref: main
 
 jobs:
 
