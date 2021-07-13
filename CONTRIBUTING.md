@@ -26,7 +26,7 @@ If you are reporting a bug, please submit an Issue with a detailed description o
 
 Submit a Pull Request with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)).
 
-After a Pull Request is reviewed, accepted, and merged to master, we may batch changes before publishing a new package version to the public NuGet repository.  Please be patient with turnaround time.
+After a Pull Request is reviewed, accepted, and merged to `main`, we may batch changes before publishing a new package version to the public NuGet repository.  Please be patient with turnaround time.
 
 ## Contact us
 
