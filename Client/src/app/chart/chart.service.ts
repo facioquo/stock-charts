@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ChartConfiguration, ScaleOptions } from 'chart.js';
 import { CrosshairOptions } from 'chartjs-plugin-crosshair';
-import 'chartjs-plugin-crosshair';
-
+import 'chartjs-plugin-crosshair'; // todo: need?
 @Injectable()
 export class ChartService {
 
@@ -33,7 +32,7 @@ export class ChartService {
                         mode: 'index',
                         intersect: false
                     },
-                    // crosshair: crosshairPlugin
+                    crosshair: crosshairPlugin
                 },
                 layout: {
                     padding: {
