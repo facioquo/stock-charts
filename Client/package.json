@@ -21,7 +21,7 @@
     "@angular/platform-browser": "~12.1.4",
     "@angular/platform-browser-dynamic": "~12.1.4",
     "@angular/router": "~12.1.4",
-    "chart.js": "^2.9.4",
+    "chart.js": "^3.5.0",
     "chartjs-plugin-crosshair": "^1.1.6",
     "font-awesome": "~4.7.0",
     "rxjs": "~6.6.7",
