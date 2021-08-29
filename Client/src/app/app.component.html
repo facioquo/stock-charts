@@ -102,7 +102,7 @@
 
 
         <!-- bollinger bands -->
-        <div *ngIf="pickedType.code=='BB'">
+        <div *ngIf="pickedType.code==='BB'">
 
             <!-- selections label -->
             <mat-chip-list>
@@ -138,7 +138,7 @@
 
 
         <!-- exponential moving averages -->
-        <div *ngIf="pickedType.code=='EMA'">
+        <div *ngIf="pickedType.code==='EMA'">
 
             <!-- selections label -->
             <mat-chip-list>
@@ -158,7 +158,7 @@
 
                 <!-- for EMA -->
                 <mat-radio-group color="primary" [(ngModel)]="pickedParams.parameterOne" name="lookbackEMA"
-                    *ngIf="pickedType.code=='EMA'">
+                    *ngIf="pickedType.code==='EMA'">
                     <mat-radio-button class="radio-button" *ngFor="let number of lgNums" [value]="number">
                         {{ number }}
                     </mat-radio-button>
@@ -185,7 +185,7 @@
 
 
         <!-- parabolic sar -->
-        <div *ngIf="pickedType.code=='PSAR'">
+        <div *ngIf="pickedType.code==='PSAR'">
 
             <!-- selections label -->
             <mat-chip-list>
@@ -221,7 +221,7 @@
 
 
         <!-- relative strength index -->
-        <div *ngIf="pickedType.code=='RSI'">
+        <div *ngIf="pickedType.code==='RSI'">
 
             <!-- selections label -->
             <mat-chip-list>
@@ -256,7 +256,7 @@
 
 
         <!-- stochastic oscillator -->
-        <div *ngIf="pickedType.code=='STOCH'">
+        <div *ngIf="pickedType.code==='STOCH'">
 
             <!-- selections label -->
             <mat-chip-list>
