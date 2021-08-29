@@ -21,8 +21,8 @@
     "@angular/platform-browser": "~12.2.4",
     "@angular/platform-browser-dynamic": "~12.2.4",
     "@angular/router": "~12.2.4",
-    "chart.js": "^2.9.4",
-    "chartjs-plugin-crosshair": "^1.1.6",
+    "chart.js": "^3.5.1",
+    "chartjs-plugin-crosshair": "^1.2.0",
     "font-awesome": "~4.7.0",
     "rxjs": "^7.3.0",
     "tslib": "^2.3.1",
@@ -45,6 +45,6 @@
     "@typescript-eslint/parser": "~4.31.0",
     "eslint": "^7.26.0",
     "ts-node": "~10.2.1",
-    "typescript": "~4.3.2"
+    "typescript": "~4.3.5"
   }
 }
