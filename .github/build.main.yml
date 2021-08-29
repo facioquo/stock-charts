@@ -86,9 +86,9 @@ jobs:
         clean: true
 
       - task: UseNode@1
-        displayName: Use Node 12.18.x
+        displayName: Use Node 14.17.x
         inputs:
-          version: 12.18.x
+          version: 14.17.x
 
       - task: Npm@1
         displayName: Install packages
