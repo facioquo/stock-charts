@@ -20,7 +20,7 @@
     "@angular/material": "~12.2.3",
     "@angular/platform-browser": "~12.2.3",
     "@angular/platform-browser-dynamic": "~12.2.3",
-    "@angular/router": "~12.2.3",
+    "@angular/router": "~12.2.4",
     "chart.js": "^2.9.4",
     "chartjs-plugin-crosshair": "^1.1.6",
     "font-awesome": "~4.7.0",
