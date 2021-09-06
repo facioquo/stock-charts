@@ -9,7 +9,7 @@
     "lint": "ng lint",
     "reinstall": "npm cache verify && npm install"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular/animations": "~12.2.4",
     "@angular/cdk": "~12.2.4",
