@@ -5,6 +5,7 @@ import { env } from '../environments/environment';
 
 import { Chart, ChartPoint, ChartDataSets } from 'chart.js';
 import { ChartService } from './chart/chart.service';
+import { faGithub } from '@fortawesome/free-brands-svg-icons';
 
 import {
   Quote,
@@ -40,6 +41,7 @@ export interface Indicator {
 })
 export class AppComponent implements OnInit {
 
+  faGithub = faGithub;
   loading = true;
 
   @ViewChild('chartOverlay', { static: true }) chartOverlayRef: ElementRef;

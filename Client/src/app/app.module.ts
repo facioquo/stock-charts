@@ -20,6 +20,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AppComponent } from './app.component';
 import { ChartService } from './chart/chart.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,10 @@ import { ChartService } from './chart/chart.service';
     MatRadioModule,
     MatSelectModule,
     MatToolbarModule,
-    MatTooltipModule
+    MatTooltipModule,
+
+    // Other
+    FontAwesomeModule
   ],
   providers: [
     ChartService
