@@ -79,7 +79,7 @@ jobs:
   - job: Job_2
     displayName: Website
     pool:
-      vmImage: ubuntu-18.04
+      vmImage: ubuntu-latest
 
     steps:
       - checkout: self
