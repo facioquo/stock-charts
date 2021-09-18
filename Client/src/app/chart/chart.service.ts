@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Chart, ChartConfiguration, ScaleOptions } from 'chart.js';
 import { CrosshairPlugin, CrosshairOptions } from 'chartjs-plugin-crosshair';
-
-Chart.register(CrosshairPlugin);
+// Chart.register(CrosshairPlugin);  // FIX
 
 @Injectable()
 export class ChartService {
@@ -10,7 +9,7 @@ export class ChartService {
     baseConfig() {
 
         const commonXaxes = this.commonXAxes();
-        const crosshairOptions = this.crosshairPluginOptions
+        const crosshairPluginOptions = this.crosshairPluginOptions();
 
         const config: ChartConfiguration = {
 
@@ -31,10 +30,10 @@ export class ChartService {
                     },
                     tooltip: {
                         enabled: true,
-                        mode: 'index',
+                        mode: 'index',  // TODO: should be 'interpolate'?
                         intersect: false
                     },
-                    crosshair: crosshairOptions
+                    // crosshair: crosshairPluginOptions  // FIX: types not recognized
                 },
                 layout: {
                     padding: {
