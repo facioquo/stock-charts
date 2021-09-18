@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { MatRadioChange } from '@angular/material/radio';
 import { env } from '../environments/environment';
 
-import Chart from 'chart.js/auto';
+import Chart from 'chart.js/auto';  // import all default options
 import { ChartDataset, ScatterDataPoint } from 'chart.js';
 
 import { ChartService } from './chart/chart.service';

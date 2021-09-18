@@ -40,8 +40,6 @@
     "@angular/cli": "~12.2.6",
     "@angular/compiler-cli": "~12.2.6",
     "@angular/language-service": "~12.2.6",
-    "@types/chart.js": "^2.9.34",
-    "@types/chartjs-plugin-crosshair": "^1.1.1",
     "@types/node": "^16.9.2",
     "@typescript-eslint/eslint-plugin": "~4.31.1",
     "@typescript-eslint/parser": "~4.31.1",
