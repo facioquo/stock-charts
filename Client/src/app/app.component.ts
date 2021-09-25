@@ -3,7 +3,9 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { MatRadioChange } from '@angular/material/radio';
 import { env } from '../environments/environment';
 
-import { Chart, ChartPoint, ChartDataSets } from 'chart.js';
+import Chart from 'chart.js/auto';  // import all default options
+import { ChartDataset, ScatterDataPoint } from 'chart.js';
+
 import { ChartService } from './chart/chart.service';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 
@@ -31,7 +33,7 @@ export interface Indicator {
   label: string;
   chart: string;
   color: string;
-  lines: ChartDataSets[];
+  lines: ChartDataset[];
 }
 
 @Component({
@@ -133,13 +135,13 @@ export class AppComponent implements OnInit {
 
     const price: number[] = [];
     const volume: number[] = [];
-    const labels: Date[] = [];
+    const labels: number[] = [];
     let sumVol = 0;
 
     this.history.forEach((q: Quote) => {
       price.push(q.close);
       volume.push(q.volume);
-      labels.push(new Date(q.date));
+      labels.push(q.date.valueOf());
       sumVol += q.volume;
     });
 
@@ -150,7 +152,7 @@ export class AppComponent implements OnInit {
           type: 'line',
           label: 'Price',
           data: price,
-          yAxisID: 'rightAxis',
+          yAxisID: 'yAxis',
           borderWidth: 2,
           borderColor: 'black',
           backgroundColor: 'black',
@@ -164,12 +166,7 @@ export class AppComponent implements OnInit {
           label: 'Volume',
           data: volume,
           yAxisID: 'volumeAxis',
-          borderWidth: 2,
-          borderColor: 'lightblue',
           backgroundColor: 'lightblue',
-          pointRadius: 0,
-          fill: true,
-          spanGaps: true,
           order: 99
         }
       ]
@@ -179,8 +176,8 @@ export class AppComponent implements OnInit {
     myConfig.data.labels = labels;
 
     // get size for volume axis
-    const volAxisSize = 15 * (sumVol / volume.length) || 0;
-    myConfig.options.scales.yAxes[1].ticks.max = volAxisSize;
+    const volumeAxisSize = 15 * (sumVol / volume.length) || 0;
+    myConfig.options.scales.volumeAxis.max = volumeAxisSize;
 
     // compose chart
     if (this.chartOverlay) this.chartOverlay.destroy();
@@ -201,12 +198,12 @@ export class AppComponent implements OnInit {
     // reference lines
     const topThreshold: number[] = [];
     const bottomThreshold: number[] = [];
-    const labels: Date[] = [];
+    const labels: number[] = [];
 
     this.history.forEach((q: Quote) => {
       topThreshold.push(70);
       bottomThreshold.push(30);
-      labels.push(new Date(q.date));
+      labels.push(q.date.valueOf());
     });
 
     myConfig.data = {
@@ -215,8 +212,7 @@ export class AppComponent implements OnInit {
           label: 'Overbought threshold',
           type: 'line',
           data: topThreshold,
-          yAxisID: 'rightAxis',
-          hideInLegendAndTooltip: true,
+          yAxisID: 'yAxis',
           borderWidth: 1,
           borderColor: 'darkRed',
           backgroundColor: 'darkRed',
@@ -229,8 +225,7 @@ export class AppComponent implements OnInit {
           label: 'Oversold threshold',
           type: 'line',
           data: bottomThreshold,
-          yAxisID: 'rightAxis',
-          hideInLegendAndTooltip: true,
+          yAxisID: 'yAxis',
           borderWidth: 1,
           borderColor: 'darkGreen',
           backgroundColor: 'darkGreen',
@@ -246,10 +241,11 @@ export class AppComponent implements OnInit {
     myConfig.data.labels = labels;
 
     // hide ref lines from tooltips
-    myConfig.options.tooltips.filter = (tooltipItem) => (tooltipItem.datasetIndex > 1);
+    myConfig.options.plugins.tooltip.filter = (tooltipItem) => (tooltipItem.datasetIndex > 1);
 
     // y-scale
-    myConfig.options.scales.yAxes[0].ticks.max = 100;
+    myConfig.options.scales.yAxis.min = 0;
+    myConfig.options.scales.yAxis.max = 100;
 
     // compose chart
     if (this.chartRsi) this.chartRsi.destroy();
@@ -266,12 +262,12 @@ export class AppComponent implements OnInit {
     // reference lines
     const topThreshold: number[] = [];
     const bottomThreshold: number[] = [];
-    const labels: Date[] = [];
+    const labels: number[] = [];
 
     this.history.forEach((q: Quote) => {
       topThreshold.push(80);
       bottomThreshold.push(20);
-      labels.push(new Date(q.date));
+      labels.push(q.date.valueOf());
     });
 
     myConfig.data = {
@@ -280,8 +276,7 @@ export class AppComponent implements OnInit {
           label: 'Overbought threshold',
           type: 'line',
           data: topThreshold,
-          yAxisID: 'rightAxis',
-          hideInLegendAndTooltip: true,
+          yAxisID: 'yAxis',
           borderWidth: 1,
           borderColor: 'darkRed',
           backgroundColor: 'darkRed',
@@ -294,8 +289,7 @@ export class AppComponent implements OnInit {
           label: 'Oversold threshold',
           type: 'line',
           data: bottomThreshold,
-          yAxisID: 'rightAxis',
-          hideInLegendAndTooltip: true,
+          yAxisID: 'yAxis',
           borderWidth: 1,
           borderColor: 'darkGreen',
           backgroundColor: 'darkGreen',
@@ -311,10 +305,11 @@ export class AppComponent implements OnInit {
     myConfig.data.labels = labels;
 
     // hide ref lines from tooltips
-    myConfig.options.tooltips.filter = (tooltipItem) => (tooltipItem.datasetIndex > 1);
+    myConfig.options.plugins.tooltip.filter = (tooltipItem) => (tooltipItem.datasetIndex > 1);
 
     // y-scale
-    myConfig.options.scales.yAxes[0].ticks.max = 100;
+    myConfig.options.scales.yAxis.min = 0;
+    myConfig.options.scales.yAxis.max = 100;
 
     // compose chart
     if (this.chartStoch) this.chartStoch.destroy();
@@ -432,21 +427,22 @@ export class AppComponent implements OnInit {
         const label = `BB(${params.parameterOne},${params.parameterTwo})`;
 
         // componse data
-        const centerLine: ChartPoint[] = [];
-        const upperLine: ChartPoint[] = [];
-        const lowerLine: ChartPoint[] = [];
+        const centerLine: ScatterDataPoint[] = [];
+        const upperLine: ScatterDataPoint[] = [];
+        const lowerLine: ScatterDataPoint[] = [];
 
         bb.forEach((m: BollingerBandResult) => {
-          centerLine.push({ x: new Date(m.date), y: this.toDecimals(m.sma, 3) });
-          upperLine.push({ x: new Date(m.date), y: this.toDecimals(m.upperBand, 3) });
-          lowerLine.push({ x: new Date(m.date), y: this.toDecimals(m.lowerBand, 3) });
+          centerLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.sma, 3) });
+          upperLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.upperBand, 3) });
+          lowerLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.lowerBand, 3) });
         });
 
         // compose configurations
-        const upperDataset: ChartDataSets = {
+        const upperDataset: ChartDataset = {
           type: 'line',
           label: 'BB Upperband',
           data: upperLine,
+          yAxisID: 'yAxis',
           borderWidth: 1,
           borderDash: [5, 2],
           borderColor: params.color,
@@ -456,10 +452,11 @@ export class AppComponent implements OnInit {
           spanGaps: false
         };
 
-        const centerDataset: ChartDataSets = {
+        const centerDataset: ChartDataset = {
           type: 'line',
           label: 'BB Centerline',
           data: centerLine,
+          yAxisID: 'yAxis',
           borderWidth: 2,
           borderDash: [5, 2],
           borderColor: params.color,
@@ -469,10 +466,11 @@ export class AppComponent implements OnInit {
           spanGaps: false
         };
 
-        const lowerDataset: ChartDataSets = {
+        const lowerDataset: ChartDataset = {
           type: 'line',
           label: 'BB Lowerband',
           data: lowerLine,
+          yAxisID: 'yAxis',
           borderWidth: 1,
           borderDash: [5, 2],
           borderColor: params.color,
@@ -504,17 +502,18 @@ export class AppComponent implements OnInit {
         const label = `EMA(${params.parameterOne})`;
 
         // componse data
-        const emaLine: ChartPoint[] = [];
+        const emaLine: ScatterDataPoint[] = [];
 
         ema.forEach((m: EmaResult) => {
-          emaLine.push({ x: new Date(m.date), y: this.toDecimals(m.ema, 3) });
+          emaLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.ema, 3) });
         });
 
         // compose configuration
-        const emaDataset: ChartDataSets = {
+        const emaDataset: ChartDataset = {
           type: 'line',
           label: label,
           data: emaLine,
+          yAxisID: 'yAxis',
           borderWidth: 2,
           borderColor: params.color,
           backgroundColor: params.color,
@@ -555,17 +554,18 @@ export class AppComponent implements OnInit {
         const label = `PSAR(${params.parameterOne},${params.parameterTwo})`;
 
         // componse data
-        const sarLine: ChartPoint[] = [];
+        const sarLine: ScatterDataPoint[] = [];
 
         psar.forEach((m: ParabolicSarResult) => {
-          sarLine.push({ x: new Date(m.date), y: this.toDecimals(m.sar, 3) });
+          sarLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.sar, 3) });
         });
 
         // compose configurations
-        const sarDataset: ChartDataSets = {
+        const sarDataset: ChartDataset = {
           type: 'line',
           label: label,
           data: sarLine,
+          yAxisID: 'yAxis',
           pointRadius: 1.5,
           pointBackgroundColor: params.color,
           pointBorderColor: params.color,
@@ -605,17 +605,18 @@ export class AppComponent implements OnInit {
         this.chartRsiOn = true;
 
         // componse data
-        const rsiLine: ChartPoint[] = [];
+        const rsiLine: ScatterDataPoint[] = [];
 
         rsi.forEach((m: RsiResult) => {
-          rsiLine.push({ x: new Date(m.date), y: this.toDecimals(m.rsi, 3) });
+          rsiLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.rsi, 3) });
         });
 
         // compose configuration
-        const rsiDataset: ChartDataSets = {
+        const rsiDataset: ChartDataset = {
           type: 'line',
           label: label,
           data: rsiLine,
+          yAxisID: 'yAxis',
           borderWidth: 2,
           borderColor: params.color,
           backgroundColor: params.color,
@@ -661,19 +662,20 @@ export class AppComponent implements OnInit {
         this.chartStochOn = true;
 
         // componse data
-        const oscLine: ChartPoint[] = [];
-        const sigLine: ChartPoint[] = [];
+        const oscLine: ScatterDataPoint[] = [];
+        const sigLine: ScatterDataPoint[] = [];
 
         stoch.forEach((m: StochResult) => {
-          oscLine.push({ x: new Date(m.date), y: this.toDecimals(m.oscillator, 3) });
-          sigLine.push({ x: new Date(m.date), y: this.toDecimals(m.signal, 3) });
+          oscLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.oscillator, 3) });
+          sigLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.signal, 3) });
         });
 
         // compose configuration
-        const oscDataset: ChartDataSets = {
+        const oscDataset: ChartDataset = {
           type: 'line',
           label: label + ' Oscillator',
           data: oscLine,
+          yAxisID: 'yAxis',
           borderWidth: 2,
           borderColor: params.color,
           backgroundColor: params.color,
@@ -683,10 +685,11 @@ export class AppComponent implements OnInit {
           order: 1
         };
 
-        const sigDataset: ChartDataSets = {
+        const sigDataset: ChartDataset = {
           type: 'line',
           label: label + ' Signal',
           data: sigLine,
+          yAxisID: 'yAxis',
           borderWidth: 1.5,
           borderColor: 'red',
           backgroundColor: 'red',
