@@ -37,7 +37,7 @@
     "@angular-eslint/eslint-plugin-template": "~12.3.1",
     "@angular-eslint/schematics": "~12.3.1",
     "@angular-eslint/template-parser": "~12.3.1",
-    "@angular/cli": "~12.2.6",
+    "@angular/cli": "~12.2.7",
     "@angular/compiler-cli": "~12.2.6",
     "@angular/language-service": "~12.2.6",
     "@types/node": "^16.9.2",
