@@ -4,7 +4,8 @@ import { MatRadioChange } from '@angular/material/radio';
 import { env } from '../environments/environment';
 
 import Chart from 'chart.js/auto';  // import all default options
-import { ChartDataset, ScatterDataPoint } from 'chart.js';
+import { ChartDataset, FinancialDataPoint, ScatterDataPoint } from 'chart.js';
+import 'chartjs-chart-financial';
 
 import { ChartService } from './chart/chart.service';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
@@ -133,13 +134,19 @@ export class AppComponent implements OnInit {
     const myChart: HTMLCanvasElement = this.chartOverlayRef.nativeElement as HTMLCanvasElement;
     const myConfig = this.cs.baseOverlayConfig();
 
-    const price: number[] = [];
+    const price: FinancialDataPoint[] = [];
     const volume: number[] = [];
     const labels: number[] = [];
     let sumVol = 0;
 
     this.history.forEach((q: Quote) => {
-      price.push(q.close);
+      price.push({
+        x: q.date.valueOf(),
+        o: q.open,
+        h: q.high,
+        l: q.low,
+        c: q.close
+      });
       volume.push(q.volume);
       labels.push(q.date.valueOf());
       sumVol += q.volume;
@@ -149,16 +156,16 @@ export class AppComponent implements OnInit {
     myConfig.data = {
       datasets: [
         {
-          type: 'line',
+          type: 'candlestick',
           label: 'Price',
           data: price,
           yAxisID: 'yAxis',
-          borderWidth: 2,
-          borderColor: 'black',
-          backgroundColor: 'black',
-          pointRadius: 0,
-          fill: false,
-          spanGaps: false,
+          // borderWidth: 2,
+          // borderColor: 'black',
+          // backgroundColor: 'black',
+          // pointRadius: 0,
+          // fill: false,
+          // spanGaps: false,
           order: 1
         },
         {
