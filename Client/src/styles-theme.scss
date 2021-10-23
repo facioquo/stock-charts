@@ -6,9 +6,9 @@
 @include mat.core();
 
 // ref: https://www.materialpalette.com
-$primary: mat.define-palette(mat.$indigo-palette, 500);
-$accent: mat.define-palette(mat.$light-green-palette, 500);
-$warn: mat.define-palette(mat.$red-palette, 500);
+$primary: mat.define-palette(mat.$grey-palette, 800);
+$accent: mat.define-palette(mat.$light-green-palette, 800);
+$warn: mat.define-palette(mat.$red-palette, 900);
 
 $theme: mat.define-light-theme($primary, $accent, $warn);
 
