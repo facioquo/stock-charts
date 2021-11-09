@@ -1,4 +1,4 @@
-# Stock.Indicators NuGet package Demo
+# Stock Indicators for .NET NuGet package Demo
 
 [![Build status](https://dev.azure.com/skender/Stock.Indicators/_apis/build/status/Stock.Charts)](https://dev.azure.com/skender/Stock.Indicators/_build/latest?definitionId=23)
 
