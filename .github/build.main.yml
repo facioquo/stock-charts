@@ -34,7 +34,7 @@ jobs:
             
             Remove-Item "Server/WebApi/appsettings.Token.json" -Force
 
-      - task: replacetokens@3
+      - task: qetza.replacetokens.replacetokens-task.replacetokens@3
         displayName: Update configurations
         inputs:
           rootDirectory: Server
@@ -44,10 +44,10 @@ jobs:
           tokenSuffix: __
 
       - task: UseDotNet@2
-        displayName: Use .Net SDK 5.0.x
+        displayName: Use .Net SDK 6.0.x
         continueOnError: True
         inputs:
-          version: 5.0.x
+          version: 6.0.x
 
       - task: DotNetCoreCLI@2
         displayName: dotnet restore
