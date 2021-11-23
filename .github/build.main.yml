@@ -34,7 +34,7 @@ jobs:
             
             Remove-Item "Server/WebApi/appsettings.Token.json" -Force
 
-      - task: replacetokens@3
+      - task: qetza.replacetokens.replacetokens-task.replacetokens@3
         displayName: Update configurations
         inputs:
           rootDirectory: Server
