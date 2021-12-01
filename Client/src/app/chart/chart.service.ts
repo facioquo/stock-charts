@@ -1,7 +1,32 @@
 import { Injectable } from '@angular/core';
-import { Chart, ChartConfiguration, ScaleOptions } from 'chart.js';
-import { CrosshairPlugin, CrosshairOptions } from 'chartjs-plugin-crosshair';
-// Chart.register(CrosshairPlugin);  // FIX
+
+import {
+    Chart,
+    ChartConfiguration,
+    Interaction,
+    InteractionModeFunction,
+    InteractionOptions,
+    Plugin,
+    ScaleOptions
+} from 'chart.js';
+
+import {
+    CandlestickController,
+    CandlestickElement
+} from 'chartjs-chart-financial';
+
+import {
+    CrosshairPlugin,
+    CrosshairOptions,
+    Interpolate
+} from 'chartjs-plugin-crosshair';
+
+Chart.register(
+    CandlestickController,
+    CandlestickElement
+);
+// Chart.register(CrosshairPlugin);
+// Interaction.modes.interpolate = Interpolate;
 
 @Injectable()
 export class ChartService {
