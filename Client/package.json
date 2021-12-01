@@ -24,7 +24,7 @@
     "@fortawesome/angular-fontawesome": "^0.10.1",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-brands-svg-icons": "^5.15.4",
-    "chart.js": "^3.5.1",
+    "chart.js": "^3.6.1",
     "chartjs-plugin-crosshair": "^1.2.0",
     "rxjs": "^7.4.0",
     "tslib": "^2.3.1",
