@@ -116,15 +116,21 @@ export class AppComponent implements OnInit {
   getHistory() {
 
     this.http.get(`${env.api}/history`, this.requestHeader())
-      .subscribe((h: Quote[]) => {
+      .subscribe({
 
-        this.history = h;
-        this.addBaseOverlayChart();
-        this.addBaseRsiChart();
-        this.addBaseStochChart();
-        this.loading = false;
+        next: (h: Quote[]) => {
+          this.history = h;
+          this.addBaseOverlayChart();
+          this.addBaseRsiChart();
+          this.addBaseStochChart();
+          this.loading = false;
+        },
 
-      }, (error: HttpErrorResponse) => { console.log(error); });
+        error: (e: HttpErrorResponse) => { console.log(e); },
+
+        complete: () => { }
+      });
+
   }
 
   addBaseOverlayChart() {
@@ -424,74 +430,78 @@ export class AppComponent implements OnInit {
 
     // add new
     this.http.get(`${env.api}/BB/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
-      .subscribe((bb: BollingerBandResult[]) => {
+      .subscribe({
 
-        const label = `BB(${params.parameterOne},${params.parameterTwo})`;
+        next: (bb: BollingerBandResult[]) => {
 
-        // compose data
-        const centerLine: ScatterDataPoint[] = [];
-        const upperLine: ScatterDataPoint[] = [];
-        const lowerLine: ScatterDataPoint[] = [];
+          const label = `BB(${params.parameterOne},${params.parameterTwo})`;
 
-        bb.forEach((m: BollingerBandResult) => {
-          centerLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.sma, 3) });
-          upperLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.upperBand, 3) });
-          lowerLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.lowerBand, 3) });
-        });
+          // compose data
+          const centerLine: ScatterDataPoint[] = [];
+          const upperLine: ScatterDataPoint[] = [];
+          const lowerLine: ScatterDataPoint[] = [];
 
-        // compose configurations
-        const upperDataset: ChartDataset = {
-          type: 'line',
-          label: 'BB Upperband',
-          data: upperLine,
-          yAxisID: 'yAxis',
-          borderWidth: 1,
-          borderDash: [5, 2],
-          borderColor: params.color,
-          backgroundColor: params.color,
-          pointRadius: 0,
-          fill: false,
-          spanGaps: false
-        };
+          bb.forEach((m: BollingerBandResult) => {
+            centerLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.sma, 3) });
+            upperLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.upperBand, 3) });
+            lowerLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.lowerBand, 3) });
+          });
 
-        const centerDataset: ChartDataset = {
-          type: 'line',
-          label: 'BB Centerline',
-          data: centerLine,
-          yAxisID: 'yAxis',
-          borderWidth: 2,
-          borderDash: [5, 2],
-          borderColor: params.color,
-          backgroundColor: params.color,
-          pointRadius: 0,
-          fill: false,
-          spanGaps: false
-        };
+          // compose configurations
+          const upperDataset: ChartDataset = {
+            type: 'line',
+            label: 'BB Upperband',
+            data: upperLine,
+            yAxisID: 'yAxis',
+            borderWidth: 1,
+            borderDash: [5, 2],
+            borderColor: params.color,
+            backgroundColor: params.color,
+            pointRadius: 0,
+            fill: false,
+            spanGaps: false
+          };
 
-        const lowerDataset: ChartDataset = {
-          type: 'line',
-          label: 'BB Lowerband',
-          data: lowerLine,
-          yAxisID: 'yAxis',
-          borderWidth: 1,
-          borderDash: [5, 2],
-          borderColor: params.color,
-          backgroundColor: params.color,
-          pointRadius: 0,
-          fill: false,
-          spanGaps: false
-        };
+          const centerDataset: ChartDataset = {
+            type: 'line',
+            label: 'BB Centerline',
+            data: centerLine,
+            yAxisID: 'yAxis',
+            borderWidth: 2,
+            borderDash: [5, 2],
+            borderColor: params.color,
+            backgroundColor: params.color,
+            pointRadius: 0,
+            fill: false,
+            spanGaps: false
+          };
 
-        // add to chart
-        this.chartOverlay.data.datasets.push(upperDataset);
-        this.chartOverlay.data.datasets.push(centerDataset);
-        this.chartOverlay.data.datasets.push(lowerDataset);
-        this.chartOverlay.update();
+          const lowerDataset: ChartDataset = {
+            type: 'line',
+            label: 'BB Lowerband',
+            data: lowerLine,
+            yAxisID: 'yAxis',
+            borderWidth: 1,
+            borderDash: [5, 2],
+            borderColor: params.color,
+            backgroundColor: params.color,
+            pointRadius: 0,
+            fill: false,
+            spanGaps: false
+          };
 
-        // add to legend
-        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [centerDataset, upperDataset, lowerDataset] });
+          // add to chart
+          this.chartOverlay.data.datasets.push(upperDataset);
+          this.chartOverlay.data.datasets.push(centerDataset);
+          this.chartOverlay.data.datasets.push(lowerDataset);
+          this.chartOverlay.update();
 
-      }, (error: HttpErrorResponse) => { console.log(error); });
+          // add to legend
+          this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [centerDataset, upperDataset, lowerDataset] });
+        },
+
+        error: (e: HttpErrorResponse) => { console.log(e); }
+      });
   }
 
   addIndicatorEMA(params: IndicatorParameters) {
@@ -499,39 +509,43 @@ export class AppComponent implements OnInit {
     this.scrollToChartTop();
 
     this.http.get(`${env.api}/EMA/${params.parameterOne}`, this.requestHeader())
-      .subscribe((ema: EmaResult[]) => {
+      .subscribe({
 
-        const label = `EMA(${params.parameterOne})`;
+        next: (ema: EmaResult[]) => {
 
-        // compose data
-        const emaLine: ScatterDataPoint[] = [];
+          const label = `EMA(${params.parameterOne})`;
 
-        ema.forEach((m: EmaResult) => {
-          emaLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.ema, 3) });
-        });
+          // compose data
+          const emaLine: ScatterDataPoint[] = [];
 
-        // compose configuration
-        const emaDataset: ChartDataset = {
-          type: 'line',
-          label: label,
-          data: emaLine,
-          yAxisID: 'yAxis',
-          borderWidth: 2,
-          borderColor: params.color,
-          backgroundColor: params.color,
-          pointRadius: 0,
-          fill: false,
-          spanGaps: false
-        };
+          ema.forEach((m: EmaResult) => {
+            emaLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.ema, 3) });
+          });
 
-        // add to chart
-        this.chartOverlay.data.datasets.push(emaDataset);
-        this.chartOverlay.update();
+          // compose configuration
+          const emaDataset: ChartDataset = {
+            type: 'line',
+            label: label,
+            data: emaLine,
+            yAxisID: 'yAxis',
+            borderWidth: 2,
+            borderColor: params.color,
+            backgroundColor: params.color,
+            pointRadius: 0,
+            fill: false,
+            spanGaps: false
+          };
 
-        // add to legend
-        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [emaDataset] });
+          // add to chart
+          this.chartOverlay.data.datasets.push(emaDataset);
+          this.chartOverlay.update();
 
-      }, (error: HttpErrorResponse) => { console.log(error); });
+          // add to legend
+          this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [emaDataset] });
+        },
+
+        error: (e: HttpErrorResponse) => { console.log(e); }
+      });
   }
 
   psarChange(event: MatRadioChange) {
@@ -551,39 +565,43 @@ export class AppComponent implements OnInit {
 
     // add new
     this.http.get(`${env.api}/PSAR/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
-      .subscribe((psar: ParabolicSarResult[]) => {
+      .subscribe({
 
-        const label = `PSAR(${params.parameterOne},${params.parameterTwo})`;
+        next: (psar: ParabolicSarResult[]) => {
 
-        // compose data
-        const sarLine: ScatterDataPoint[] = [];
+          const label = `PSAR(${params.parameterOne},${params.parameterTwo})`;
 
-        psar.forEach((m: ParabolicSarResult) => {
-          sarLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.sar, 3) });
-        });
+          // compose data
+          const sarLine: ScatterDataPoint[] = [];
 
-        // compose configurations
-        const sarDataset: ChartDataset = {
-          type: 'line',
-          label: label,
-          data: sarLine,
-          yAxisID: 'yAxis',
-          pointRadius: 1.5,
-          pointBackgroundColor: params.color,
-          pointBorderColor: params.color,
-          fill: false,
-          showLine: false,
-          spanGaps: false
-        };
+          psar.forEach((m: ParabolicSarResult) => {
+            sarLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.sar, 3) });
+          });
 
-        // add to chart
-        this.chartOverlay.data.datasets.push(sarDataset);
-        this.chartOverlay.update();
+          // compose configurations
+          const sarDataset: ChartDataset = {
+            type: 'line',
+            label: label,
+            data: sarLine,
+            yAxisID: 'yAxis',
+            pointRadius: 1.5,
+            pointBackgroundColor: params.color,
+            pointBorderColor: params.color,
+            fill: false,
+            showLine: false,
+            spanGaps: false
+          };
 
-        // add to legend
-        this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [sarDataset] });
+          // add to chart
+          this.chartOverlay.data.datasets.push(sarDataset);
+          this.chartOverlay.update();
 
-      }, (error: HttpErrorResponse) => { console.log(error); });
+          // add to legend
+          this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [sarDataset] });
+        },
+
+        error: (e: HttpErrorResponse) => { console.log(e); }
+      });
   }
 
   rsiChange(event: MatRadioChange) {
@@ -600,46 +618,50 @@ export class AppComponent implements OnInit {
 
     // fetch new indicator
     this.http.get(`${env.api}/RSI/${params.parameterOne}`, this.requestHeader())
-      .subscribe((rsi: RsiResult[]) => {
+      .subscribe({
 
-        const label = `RSI(${params.parameterOne})`;
-        this.chartRsiLabel = label;
-        this.chartRsiOn = true;
+        next: (rsi: RsiResult[]) => {
 
-        // compose data
-        const rsiLine: ScatterDataPoint[] = [];
+          const label = `RSI(${params.parameterOne})`;
+          this.chartRsiLabel = label;
+          this.chartRsiOn = true;
 
-        rsi.forEach((m: RsiResult) => {
-          rsiLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.rsi, 3) });
-        });
+          // compose data
+          const rsiLine: ScatterDataPoint[] = [];
 
-        // compose configuration
-        const rsiDataset: ChartDataset = {
-          type: 'line',
-          label: label,
-          data: rsiLine,
-          yAxisID: 'yAxis',
-          borderWidth: 2,
-          borderColor: params.color,
-          backgroundColor: params.color,
-          pointRadius: 0,
-          fill: false,
-          spanGaps: false
-        };
+          rsi.forEach((m: RsiResult) => {
+            rsiLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.rsi, 3) });
+          });
 
-        // add to chart
-        this.chartRsi.data.datasets.push(rsiDataset);
-        this.chartRsi.update();
+          // compose configuration
+          const rsiDataset: ChartDataset = {
+            type: 'line',
+            label: label,
+            data: rsiLine,
+            yAxisID: 'yAxis',
+            borderWidth: 2,
+            borderColor: params.color,
+            backgroundColor: params.color,
+            pointRadius: 0,
+            fill: false,
+            spanGaps: false
+          };
 
-        // add to legend
-        this.legend.push({ label: label, chart: 'rsi', color: params.color, lines: [rsiDataset] });
+          // add to chart
+          this.chartRsi.data.datasets.push(rsiDataset);
+          this.chartRsi.update();
 
-        // scroll to chart
-        setTimeout(() => {
-          this.chartRsiRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
-        }, 200);
+          // add to legend
+          this.legend.push({ label: label, chart: 'rsi', color: params.color, lines: [rsiDataset] });
 
-      }, (error: HttpErrorResponse) => { console.log(error); });
+          // scroll to chart
+          setTimeout(() => {
+            this.chartRsiRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+          }, 200);
+        },
+
+        error: (e: HttpErrorResponse) => { console.log(e); }
+      });
   }
 
   stochChange(event: MatRadioChange) {
@@ -657,64 +679,68 @@ export class AppComponent implements OnInit {
 
     // add new indicator
     this.http.get(`${env.api}/STOCH/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
-      .subscribe((stoch: StochResult[]) => {
+      .subscribe({
 
-        const label = `STOCH(${params.parameterOne},${params.parameterTwo})`;
-        this.chartStochLabel = label;
-        this.chartStochOn = true;
+        next: (stoch: StochResult[]) => {
 
-        // compose data
-        const oscLine: ScatterDataPoint[] = [];
-        const sigLine: ScatterDataPoint[] = [];
+          const label = `STOCH(${params.parameterOne},${params.parameterTwo})`;
+          this.chartStochLabel = label;
+          this.chartStochOn = true;
 
-        stoch.forEach((m: StochResult) => {
-          oscLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.oscillator, 3) });
-          sigLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.signal, 3) });
-        });
+          // compose data
+          const oscLine: ScatterDataPoint[] = [];
+          const sigLine: ScatterDataPoint[] = [];
 
-        // compose configuration
-        const oscDataset: ChartDataset = {
-          type: 'line',
-          label: label + ' Oscillator',
-          data: oscLine,
-          yAxisID: 'yAxis',
-          borderWidth: 2,
-          borderColor: params.color,
-          backgroundColor: params.color,
-          pointRadius: 0,
-          fill: false,
-          spanGaps: false,
-          order: 1
-        };
+          stoch.forEach((m: StochResult) => {
+            oscLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.oscillator, 3) });
+            sigLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.signal, 3) });
+          });
 
-        const sigDataset: ChartDataset = {
-          type: 'line',
-          label: label + ' Signal',
-          data: sigLine,
-          yAxisID: 'yAxis',
-          borderWidth: 1.5,
-          borderColor: 'red',
-          backgroundColor: 'red',
-          pointRadius: 0,
-          fill: false,
-          spanGaps: false,
-          order: 2
-        };
+          // compose configuration
+          const oscDataset: ChartDataset = {
+            type: 'line',
+            label: label + ' Oscillator',
+            data: oscLine,
+            yAxisID: 'yAxis',
+            borderWidth: 2,
+            borderColor: params.color,
+            backgroundColor: params.color,
+            pointRadius: 0,
+            fill: false,
+            spanGaps: false,
+            order: 1
+          };
 
-        // add to chart
-        this.chartStoch.data.datasets.push(oscDataset);
-        this.chartStoch.data.datasets.push(sigDataset);
-        this.chartStoch.update();
+          const sigDataset: ChartDataset = {
+            type: 'line',
+            label: label + ' Signal',
+            data: sigLine,
+            yAxisID: 'yAxis',
+            borderWidth: 1.5,
+            borderColor: 'red',
+            backgroundColor: 'red',
+            pointRadius: 0,
+            fill: false,
+            spanGaps: false,
+            order: 2
+          };
 
-        // add to legend
-        this.legend.push({ label: label, chart: 'stoch', color: params.color, lines: [oscDataset, sigDataset] });
+          // add to chart
+          this.chartStoch.data.datasets.push(oscDataset);
+          this.chartStoch.data.datasets.push(sigDataset);
+          this.chartStoch.update();
 
-        // scroll to chart
-        setTimeout(() => {
-          this.chartStochRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
-        }, 200);
+          // add to legend
+          this.legend.push({ label: label, chart: 'stoch', color: params.color, lines: [oscDataset, sigDataset] });
 
-      }, (error: HttpErrorResponse) => { console.log(error); });
+          // scroll to chart
+          setTimeout(() => {
+            this.chartStochRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+          }, 200);
+        },
+
+        error: (e: HttpErrorResponse) => { console.log(e); }
+      });
   }
 
 
