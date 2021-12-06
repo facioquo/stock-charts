@@ -1,18 +1,19 @@
 import { Injectable } from '@angular/core';
+import 'chartjs-adapter-date-fns';
+import 'chartjs-chart-financial';
 
 import {
     Chart,
     ChartConfiguration,
     Interaction,
-    InteractionModeFunction,
-    InteractionOptions,
-    Plugin,
     ScaleOptions
 } from 'chart.js';
 
 import {
     CandlestickController,
-    CandlestickElement
+    CandlestickElement,
+    OhlcController,
+    OhlcElement
 } from 'chartjs-chart-financial';
 
 import {
@@ -21,15 +22,25 @@ import {
     Interpolate
 } from 'chartjs-plugin-crosshair';
 
-Chart.register(
-    CandlestickController,
-    CandlestickElement
-);
-// Chart.register(CrosshairPlugin);
-// Interaction.modes.interpolate = Interpolate;
+import { enUS } from 'date-fns/locale';
+import { add, parseISO } from 'date-fns';
 
 @Injectable()
 export class ChartService {
+
+    constructor() {
+        Chart.register(
+            CandlestickController,
+            OhlcController,
+            CandlestickElement,
+            OhlcElement)
+
+        // Chart.register(
+        //     CrosshairPlugin,
+        //     Interpolate);
+
+        // Interaction.modes.interpolate = Interpolate;
+    }
 
     baseConfig() {
 
@@ -103,6 +114,7 @@ export class ChartService {
     baseOverlayConfig(): ChartConfiguration {
 
         const config = this.baseConfig();
+        config.type = 'candlestick';
 
         // aspect ratio
         config.options.maintainAspectRatio = true;
@@ -149,12 +161,19 @@ export class ChartService {
 
         const axes: ScaleOptions = {
             display: false,
-            type: 'category',
-
+            type: 'timeseries',
+            time: {
+                unit: 'day'
+            },
+            adapters: {
+                date: {
+                    locale: enUS
+                },
+            },
             ticks: {
+                source: "auto",
                 padding: 0,
                 autoSkip: true,
-                autoSkipPadding: 8,
                 maxRotation: 0,
                 minRotation: 0,
                 font: {

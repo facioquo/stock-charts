@@ -3,12 +3,11 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { MatRadioChange } from '@angular/material/radio';
 import { env } from '../environments/environment';
 
+import { faGithub } from '@fortawesome/free-brands-svg-icons';
+
 import Chart from 'chart.js/auto';  // import all default options
 import { ChartDataset, FinancialDataPoint, ScatterDataPoint } from 'chart.js';
-import 'chartjs-chart-financial';
-
 import { ChartService } from './chart/chart.service';
-import { faGithub } from '@fortawesome/free-brands-svg-icons';
 
 import {
   Quote,
@@ -81,7 +80,6 @@ export class AppComponent implements OnInit {
 
   // indicator parameter values
   readonly colors: string[] = ['DeepPink', 'DarkRed', 'Orange', 'Green', 'Blue'];
-  readonly smNums: number[] = [3, 5, 10, 15, 25];
   readonly lgNums: number[] = [15, 30, 50, 100, 200];
 
   readonly bbConfigs: BollingerBandConfig[] = [
@@ -135,19 +133,22 @@ export class AppComponent implements OnInit {
     const myConfig = this.cs.baseOverlayConfig();
 
     const price: FinancialDataPoint[] = [];
-    const volume: number[] = [];
+    const volume: ScatterDataPoint[] = [];
     const labels: number[] = [];
     let sumVol = 0;
 
     this.history.forEach((q: Quote) => {
       price.push({
-        x: q.date.valueOf(),
+        x: new Date(q.date).valueOf(),
         o: q.open,
         h: q.high,
         l: q.low,
         c: q.close
       });
-      volume.push(q.volume);
+      volume.push({
+        x: new Date(q.date).valueOf(),
+        y: q.volume
+      });
       labels.push(q.date.valueOf());
       sumVol += q.volume;
     });
@@ -160,12 +161,6 @@ export class AppComponent implements OnInit {
           label: 'Price',
           data: price,
           yAxisID: 'yAxis',
-          // borderWidth: 2,
-          // borderColor: 'black',
-          // backgroundColor: 'black',
-          // pointRadius: 0,
-          // fill: false,
-          // spanGaps: false,
           order: 1
         },
         {
@@ -183,7 +178,7 @@ export class AppComponent implements OnInit {
     myConfig.data.labels = labels;
 
     // get size for volume axis
-    const volumeAxisSize = 15 * (sumVol / volume.length) || 0;
+    const volumeAxisSize = 20 * (sumVol / volume.length) || 0;
     myConfig.options.scales.volumeAxis.max = volumeAxisSize;
 
     // compose chart
@@ -433,15 +428,15 @@ export class AppComponent implements OnInit {
 
         const label = `BB(${params.parameterOne},${params.parameterTwo})`;
 
-        // componse data
+        // compose data
         const centerLine: ScatterDataPoint[] = [];
         const upperLine: ScatterDataPoint[] = [];
         const lowerLine: ScatterDataPoint[] = [];
 
         bb.forEach((m: BollingerBandResult) => {
-          centerLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.sma, 3) });
-          upperLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.upperBand, 3) });
-          lowerLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.lowerBand, 3) });
+          centerLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.sma, 3) });
+          upperLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.upperBand, 3) });
+          lowerLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.lowerBand, 3) });
         });
 
         // compose configurations
@@ -508,11 +503,11 @@ export class AppComponent implements OnInit {
 
         const label = `EMA(${params.parameterOne})`;
 
-        // componse data
+        // compose data
         const emaLine: ScatterDataPoint[] = [];
 
         ema.forEach((m: EmaResult) => {
-          emaLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.ema, 3) });
+          emaLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.ema, 3) });
         });
 
         // compose configuration
@@ -560,11 +555,11 @@ export class AppComponent implements OnInit {
 
         const label = `PSAR(${params.parameterOne},${params.parameterTwo})`;
 
-        // componse data
+        // compose data
         const sarLine: ScatterDataPoint[] = [];
 
         psar.forEach((m: ParabolicSarResult) => {
-          sarLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.sar, 3) });
+          sarLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.sar, 3) });
         });
 
         // compose configurations
@@ -611,11 +606,11 @@ export class AppComponent implements OnInit {
         this.chartRsiLabel = label;
         this.chartRsiOn = true;
 
-        // componse data
+        // compose data
         const rsiLine: ScatterDataPoint[] = [];
 
         rsi.forEach((m: RsiResult) => {
-          rsiLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.rsi, 3) });
+          rsiLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.rsi, 3) });
         });
 
         // compose configuration
@@ -668,13 +663,13 @@ export class AppComponent implements OnInit {
         this.chartStochLabel = label;
         this.chartStochOn = true;
 
-        // componse data
+        // compose data
         const oscLine: ScatterDataPoint[] = [];
         const sigLine: ScatterDataPoint[] = [];
 
         stoch.forEach((m: StochResult) => {
-          oscLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.oscillator, 3) });
-          sigLine.push({ x: m.date.valueOf(), y: this.toDecimals(m.signal, 3) });
+          oscLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.oscillator, 3) });
+          sigLine.push({ x: new Date(m.date).valueOf(), y: this.toDecimals(m.signal, 3) });
         });
 
         // compose configuration
