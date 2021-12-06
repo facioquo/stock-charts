@@ -2,7 +2,9 @@
     <span>Stock.Charts</span>
     <span class="filler"></span>
     <div matTooltip="GitHub repository for this site">
-        <a href="https://github.com/DaveSkender/Stock.Charts"><fa-icon [icon]="faGithub" size="2x"></fa-icon></a>
+        <a href="https://github.com/DaveSkender/Stock.Charts">
+            <fa-icon [icon]="faGithub" size="2x"></fa-icon>
+        </a>
     </div>
 </mat-toolbar>
 
@@ -10,8 +12,11 @@
 <div class="page-container">
 
     <p class="noselect center">
-        This is a demo of the <a href="https://daveskender.github.io/Stock.Indicators/">Stock Indicators for .NET</a> library.
-        It generates stock indicators in a server-side API, using the <a href="https://www.nuget.org/packages/Skender.Stock.Indicators">Skender.Stock.Indicators</a> NuGet package, then adds it to the chart.
+        This is a demo of the
+        <a href="https://daveskender.github.io/Stock.Indicators/">Stock Indicators for .NET</a>
+        library. It generates stock indicators in a server-side API, using the
+        <a href="https://www.nuget.org/packages/Skender.Stock.Indicators">Skender.Stock.Indicators</a>
+        NuGet package, then adds it to the chart.
     </p>
 
     <!-- CHART STACK -->
@@ -39,7 +44,8 @@
         </div>
 
         <!-- CHART (STOCH) -->
-        <div class="chart-label" *ngIf="chartStochOn && chartStochLabel">Stochastic Oscillator - {{ chartStochLabel }}</div>
+        <div class="chart-label" *ngIf="chartStochOn && chartStochLabel">Stochastic Oscillator - {{ chartStochLabel }}
+        </div>
         <div class="chart-container-oscillator" [hidden]="!chartStochOn">
             <canvas #chartStoch></canvas>
         </div>
@@ -129,7 +135,7 @@
 
             <div class="button-row center">
                 <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
-                <button mat-raised-button color="primary" (click)="addIndicator()"
+                <button mat-raised-button color="accent" (click)="addIndicator()"
                     [disabled]="!pickedParams.parameterOne || !pickedParams.color">ADD</button>
             </div>
 
@@ -176,7 +182,7 @@
 
             <div class="button-row center">
                 <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
-                <button mat-raised-button color="primary" (click)="addIndicator()"
+                <button mat-raised-button color="accent" (click)="addIndicator()"
                     [disabled]="!pickedParams.parameterOne || !pickedParams.color">ADD</button>
             </div>
 
@@ -212,7 +218,7 @@
 
             <div class="button-row center">
                 <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
-                <button mat-raised-button color="primary" (click)="addIndicator()"
+                <button mat-raised-button color="accent" (click)="addIndicator()"
                     [disabled]="!pickedParams.parameterOne || !pickedParams.color">ADD</button>
             </div>
 
@@ -247,7 +253,7 @@
 
             <div class="button-row center">
                 <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
-                <button mat-raised-button color="primary" (click)="addIndicator()"
+                <button mat-raised-button color="accent" (click)="addIndicator()"
                     [disabled]="!pickedParams.parameterOne">ADD</button>
             </div>
 
@@ -282,7 +288,7 @@
 
             <div class="button-row center">
                 <button mat-raised-button color="warn" (click)="cancelAdd()">CANCEL</button>
-                <button mat-raised-button color="primary" (click)="addIndicator()"
+                <button mat-raised-button color="accent" (click)="addIndicator()"
                     [disabled]="!pickedParams.parameterOne || !pickedParams.parameterTwo">ADD</button>
             </div>
 
