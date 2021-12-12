@@ -34,7 +34,7 @@ namespace WebApi.Controllers
 
         [HttpGet("BB/{lookbackPeriod}/{standardDeviations}")]
         public IEnumerable<BollingerBandsResult> GetBollingerBands(
-            [FromRoute] int lookbackPeriod, [FromRoute] decimal standardDeviations)
+            [FromRoute] int lookbackPeriod, [FromRoute] double standardDeviations)
         {
             return Indicator.GetBollingerBands(history, lookbackPeriod, standardDeviations)
                 .Where(x => x.Date >= dateStart);
