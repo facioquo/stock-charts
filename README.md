@@ -12,8 +12,8 @@ If you want to host yourself on your local computer and review the source code, 
 
 ### Prerequisites
 
-- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) v12.x or later
-- [Visual Studio 2019](http://visualstudio.com)
+- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) v14.x or later
+- [Visual Studio 2022](http://visualstudio.com)
 
 ### Steps
 
