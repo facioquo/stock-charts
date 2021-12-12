@@ -26,7 +26,7 @@
     "@fortawesome/free-brands-svg-icons": "^5.15.4",
     "chart.js": "^3.6.2",
     "chartjs-adapter-date-fns": "^2.0.0",
-    "chartjs-chart-financial": "^0.1.0",
+    "chartjs-chart-financial": "^0.1.1",
     "chartjs-plugin-annotation": "^1.1.0",
     "chartjs-plugin-crosshair": "^1.2.0",
     "chartjs-plugin-datalabels": "^2.0.0",
