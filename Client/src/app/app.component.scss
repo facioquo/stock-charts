@@ -1,21 +1,26 @@
-// TOOLBAR
-
-.toolbar {
-
-    a {
-        text-decoration: none;
-        color: white;
-    }
-
-    font-family: Google Sans, Roboto, Arial, Helvetica, sans-serif
-}
-
-
-// CONTAINERS
+// PAGE CONTAINERS
 
 .page-container {
     margin: 16px;
     padding-bottom: 16px;
+}
+
+.page-intro {
+    max-width: 950px;
+    text-align: center;
+    margin: auto;
+    margin-bottom: 1em;
+}
+
+.badge-container {
+    text-align: center;
+    margin-top: 0.25em;
+
+    .badge {
+        margin-top: 0.25em;
+        padding-left: 0.25em;
+        padding-right: 0.25em;
+    }
 }
 
 .container {
@@ -32,14 +37,27 @@
     font-size: 10px;
 }
 
-
-
-// INDICATORS
-
 .select-container {
     margin: auto;
     max-width: 950px;
 }
+
+// TOOLBAR
+.toolbar {
+    a {
+        text-decoration: none;
+        color: white;
+    }
+
+    font-family: Google Sans, Roboto, Arial, Helvetica, sans-serif;
+
+    .filler {
+        flex: 1 1 auto;
+        text-align: center;
+    }
+}
+
+// CONTROLS
 
 mat-chip-list {
     margin: 16px;
@@ -53,4 +71,14 @@ mat-radio-group {
 
 .radio-button {
     margin: 5px;
+}
+
+.button-row {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.button-row > button {
+    margin-left: 4px;
+    margin-right: 4px;
 }
