@@ -1,6 +1,6 @@
 <mat-toolbar class="toolbar noselect" color="primary">
-    <span>Stock.Charts</span>
-    <span class="filler"></span>
+    <div>Stock.Charts</div>
+    <div class="filler"></div>
     <div matTooltip="GitHub repository for this site">
         <a href="https://github.com/DaveSkender/Stock.Charts">
             <fa-icon [icon]="faGithub" size="2x"></fa-icon>
@@ -8,15 +8,26 @@
     </div>
 </mat-toolbar>
 
+<div class="badge-container">
+    <a class="badge" href="https://www.nuget.org/packages/Skender.Stock.Indicators">
+        <img src="https://img.shields.io/nuget/v/skender.stock.indicators?color=blue&logo=NuGet&label=NuGet" />
+    </a>
+    <a class="badge" href="https://badge.fury.io/py/stock-indicators">
+        <img src="https://img.shields.io/pypi/v/stock-indicators?color=blue&label=PyPI" />
+    </a>
+</div>
+
 <!-- charts -->
 <div class="page-container">
 
-    <p class="noselect center">
+    <p class="page-intro noselect">
         This is a demo of the
         <a href="https://daveskender.github.io/Stock.Indicators/">Stock Indicators for .NET</a>
-        library. It generates stock indicators in a server-side API, using the
+        library. It generates server-side stock indicators using the
         <a href="https://www.nuget.org/packages/Skender.Stock.Indicators">Skender.Stock.Indicators</a>
-        NuGet package, then adds it to the chart.
+        NuGet package for a <a href="https://www.chartjs.org/">Chart.js</a> financial chart.
+        A <a href="https://daveskender.github.io/Stock.Indicators/Python/">Python version</a> is also
+        available as a the PyPI <a href="https://pypi.org/project/stock-indicators/">stock-indicators</a> package.
     </p>
 
     <!-- CHART STACK -->
@@ -90,7 +101,7 @@
         <!-- pick indicator type -->
         <div *ngIf="!pickedType.code">
 
-            <p class="center">Pick an indicator type:</p>
+            <p class="center">Pick an indicator type to add:</p>
             <mat-chip-list>
 
                 <mat-chip color="accent" selected *ngFor="let t of indicatorTypes" (click)="pickType(t)">
