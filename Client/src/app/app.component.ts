@@ -160,12 +160,22 @@ export class AppComponent implements OnInit {
     });
 
     // define base datasets
+    let candleOptions = Chart.defaults.elements["candlestick"];
+
+    candleOptions.color.up = '#2c7433';
+    candleOptions.color.down = '#b33855';
+
     myConfig.data = {
       datasets: [
         {
           type: 'candlestick',
           label: 'Price',
           data: price,
+          borderColor: {
+            up: candleOptions.color.up,
+            down: candleOptions.color.down,
+            unchanged: candleOptions.color.unchanged
+          },
           yAxisID: 'yAxis',
           order: 1
         },

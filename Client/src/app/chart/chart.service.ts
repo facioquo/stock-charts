@@ -33,7 +33,7 @@ export class ChartService {
             CandlestickController,
             OhlcController,
             CandlestickElement,
-            OhlcElement)
+            OhlcElement);
 
         // Chart.register(
         //     CrosshairPlugin,
