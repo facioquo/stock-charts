@@ -110,10 +110,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.cancelAdd();
-    this.getHistory();
+    this.getQuotes();
   }
 
-  getHistory() {
+  getQuotes() {
 
     this.http.get(`${env.api}/history`, this.requestHeader())
       .subscribe({
@@ -428,8 +428,12 @@ export class AppComponent implements OnInit {
       this.deleteIndicator(x);
     });
 
+    let url = `${env.api}/BB/`;
+    url += `?lookbackPeriods=${params.parameterOne}`;
+    url += `&standardDeviations=${params.parameterTwo}`;
+
     // add new
-    this.http.get(`${env.api}/BB/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
+    this.http.get(url, this.requestHeader())
       .subscribe({
 
         next: (bb: BollingerBandResult[]) => {
@@ -508,7 +512,10 @@ export class AppComponent implements OnInit {
 
     this.scrollToChartTop();
 
-    this.http.get(`${env.api}/EMA/${params.parameterOne}`, this.requestHeader())
+    let url = `${env.api}/EMA/`;
+    url += `?lookbackPeriods=${params.parameterOne}`;
+
+    this.http.get(url, this.requestHeader())
       .subscribe({
 
         next: (ema: EmaResult[]) => {
@@ -564,7 +571,12 @@ export class AppComponent implements OnInit {
     });
 
     // add new
-    this.http.get(`${env.api}/PSAR/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
+    //{accelerationStep}/{maxAccelerationFactor}
+    let url = `${env.api}/PSAR/`;
+    url += `?accelerationStep=${params.parameterOne}`;
+    url += `&maxAccelerationFactor=${params.parameterTwo}`;
+
+    this.http.get(url, this.requestHeader())
       .subscribe({
 
         next: (psar: ParabolicSarResult[]) => {
@@ -616,8 +628,11 @@ export class AppComponent implements OnInit {
       .filter(g => g.chart === 'rsi')
       .forEach((i: Indicator) => this.deleteIndicator(i));
 
+    let url = `${env.api}/RSI/`;
+    url += `?lookbackPeriods=${params.parameterOne}`;
+
     // fetch new indicator
-    this.http.get(`${env.api}/RSI/${params.parameterOne}`, this.requestHeader())
+    this.http.get(url, this.requestHeader())
       .subscribe({
 
         next: (rsi: RsiResult[]) => {
@@ -677,8 +692,12 @@ export class AppComponent implements OnInit {
       .filter(g => g.chart === 'stoch')
       .forEach((i: Indicator) => this.deleteIndicator(i));
 
+    let url = `${env.api}/STOCH/`;
+    url += `?lookbackPeriods=${params.parameterOne}`;
+    url += `&signalPeriods=${params.parameterTwo}`;
+
     // add new indicator
-    this.http.get(`${env.api}/STOCH/${params.parameterOne}/${params.parameterTwo}`, this.requestHeader())
+    this.http.get(url, this.requestHeader())
       .subscribe({
 
         next: (stoch: StochResult[]) => {

@@ -12,7 +12,7 @@ namespace WebApi.Controllers
     [Route("")]
     public class MainController : ControllerBase
     {
-        internal static readonly IEnumerable<Quote> history = History.Get();
+        internal static readonly IEnumerable<Quote> quotes = FetchQuotes.Get();
         internal static readonly DateTime dateStart = DateTime.Parse("6/1/2018");
 
         [HttpGet]
@@ -24,7 +24,7 @@ namespace WebApi.Controllers
         [HttpGet("history")]
         public IEnumerable<Quote> GetQuotes()
         {
-            return history
+            return quotes
                 .Where(x => x.Date > dateStart);
         }
 
@@ -32,41 +32,41 @@ namespace WebApi.Controllers
         //////////////////////////////////////////
         // INDICATORS (sorted alphabetically)
 
-        [HttpGet("BB/{lookbackPeriod}/{standardDeviations}")]
+        [HttpGet("BB")]
         public IEnumerable<BollingerBandsResult> GetBollingerBands(
-            [FromRoute] int lookbackPeriod, [FromRoute] double standardDeviations)
+             int lookbackPeriods, double standardDeviations)
         {
-            return Indicator.GetBollingerBands(history, lookbackPeriod, standardDeviations)
+            return quotes.GetBollingerBands(lookbackPeriods, standardDeviations)
                 .Where(x => x.Date >= dateStart);
         }
 
-        [HttpGet("EMA/{lookbackPeriod}")]
-        public IEnumerable<EmaResult> GetEMA([FromRoute] int lookbackPeriod)
+        [HttpGet("EMA")]
+        public IEnumerable<EmaResult> GetEMA(int lookbackPeriods)
         {
-            return history.GetEma(lookbackPeriod)
+            return quotes.GetEma(lookbackPeriods)
                 .Where(x => x.Date >= dateStart);
         }
 
-        [HttpGet("PSAR/{accelerationStep}/{maxAccelerationFactor}")]
+        [HttpGet("PSAR")]
         public IEnumerable<ParabolicSarResult> GetParabolicSar(
-            [FromRoute] decimal accelerationStep, [FromRoute] decimal maxAccelerationFactor)
+             decimal accelerationStep, decimal maxAccelerationFactor)
         {
-            return history.GetParabolicSar(accelerationStep, maxAccelerationFactor)
+            return quotes.GetParabolicSar(accelerationStep, maxAccelerationFactor)
                 .Where(x => x.Date >= dateStart);
         }
 
-        [HttpGet("RSI/{lookbackPeriod}")]
-        public IEnumerable<RsiResult> GetRsi([FromRoute] int lookbackPeriod)
+        [HttpGet("RSI")]
+        public IEnumerable<RsiResult> GetRsi(int lookbackPeriods)
         {
-            return history.GetRsi(lookbackPeriod)
+            return quotes.GetRsi(lookbackPeriods)
                 .Where(x => x.Date >= dateStart);
         }
 
-        [HttpGet("STOCH/{lookbackPeriod}/{signalPeriod}")]
+        [HttpGet("STOCH")]
         public IEnumerable<StochResult> GetStoch(
-            [FromRoute] int lookbackPeriod, [FromRoute] int signalPeriod)
+             int lookbackPeriods, int signalPeriods)
         {
-            return history.GetStoch(lookbackPeriod, signalPeriod)
+            return quotes.GetStoch(lookbackPeriods, signalPeriods)
                 .Where(x => x.Date >= dateStart);
         }
     }
