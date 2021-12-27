@@ -10,7 +10,8 @@ import {
     ChartConfiguration,
     FontSpec,
     Interaction,
-    ScaleOptions
+    ScaleOptions,
+    Tick
 } from 'chart.js';
 
 // extensions
@@ -44,6 +45,8 @@ Chart.register(
 @Injectable()
 export class ChartService {
 
+    overlayYticks: Tick[] = [];
+
     baseConfig() {
 
         const commonXaxes = this.commonXAxes();
@@ -73,6 +76,7 @@ export class ChartService {
                     },
                     annotation: {
                         clip: false,
+                        drawTime: 'afterDraw',
                         annotations: []
                     },
                     // crosshair: crosshairPluginOptions  // FIX: types not recognized
@@ -125,6 +129,8 @@ export class ChartService {
 
         // format y-axis, add dollar sign
         config.options.scales.yAxis.ticks.callback = (value, index, values) => {
+
+            this.overlayYticks = values;
 
             if (index === 0) return '';  // skip first label
             else
@@ -197,7 +203,9 @@ export class ChartService {
         label: string,
         fontColor: string,
         xPos: ScaleValue,
-        yPos: ScaleValue
+        yPos: ScaleValue,
+        xAdj: number = 0,
+        yAdj: number = 0
     ): AnnotationOptions {
 
         const legendFont: FontSpec = {
@@ -219,11 +227,14 @@ export class ChartService {
             xScaleID: 'xAxis',
             yScaleID: 'yAxis',
             xValue: xPos,
-            yValue: yPos
+            yValue: yPos,
+            xAdjust: xAdj,
+            yAdjust: yAdj
         };
 
         return annotation;
     }
+
     crosshairPluginOptions(): CrosshairOptions {
 
         const crosshairOptions: CrosshairOptions = {

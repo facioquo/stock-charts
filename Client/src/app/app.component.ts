@@ -28,6 +28,7 @@ import {
   StochResult
 
 } from './app.models';
+import { AnnotationOptions, ScaleValue } from 'chartjs-plugin-annotation';
 
 export interface Indicator {
   label: string;
@@ -246,9 +247,6 @@ export class AppComponent implements OnInit {
     // compose chart
     if (this.chartRsi) this.chartRsi.destroy();
     this.chartRsi = new Chart(myChart.getContext('2d'), myConfig);
-
-    // add initial sample
-    this.addIndicatorRSI({ parameterOne: 5, color: 'black' });
   }
 
   addBaseStochChart() {
@@ -488,6 +486,7 @@ export class AppComponent implements OnInit {
 
           // add to legend
           this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [centerDataset, upperDataset, lowerDataset] });
+          this.updateOverlayAnnotations();
         },
 
         error: (e: HttpErrorResponse) => { console.log(e); }
@@ -535,6 +534,7 @@ export class AppComponent implements OnInit {
 
           // add to legend
           this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [emaDataset] });
+          this.updateOverlayAnnotations();
         },
 
         error: (e: HttpErrorResponse) => { console.log(e); }
@@ -596,6 +596,7 @@ export class AppComponent implements OnInit {
 
           // add to legend
           this.legend.push({ label: label, chart: 'overlay', color: params.color, lines: [sarDataset] });
+          this.updateOverlayAnnotations();
         },
 
         error: (e: HttpErrorResponse) => { console.log(e); }
@@ -651,14 +652,14 @@ export class AppComponent implements OnInit {
           this.chartRsi.data.datasets.push(rsiDataset);
 
           // chart legend
-          const legend = this.cs.commonAnnotation(
+          const annotation = this.cs.commonAnnotation(
             label,
             'black',
             new Date(rsi[0].date).valueOf(),
             99
           );
 
-          this.chartRsi.options.plugins.annotation.annotations = { legend };
+          this.chartRsi.options.plugins.annotation.annotations = { annotation };
           this.chartRsi.update();
 
           // base legend
@@ -743,14 +744,14 @@ export class AppComponent implements OnInit {
           this.chartStoch.data.datasets.push(sigDataset);
 
           // chart legend
-          const legend = this.cs.commonAnnotation(
+          const annotation = this.cs.commonAnnotation(
             label,
             'black',
             new Date(stoch[0].date).valueOf(),
             99
           );
 
-          this.chartStoch.options.plugins.annotation.annotations = { legend };
+          this.chartStoch.options.plugins.annotation.annotations = { legend: annotation };
           this.chartStoch.update();
 
           // base legend
@@ -768,6 +769,24 @@ export class AppComponent implements OnInit {
 
 
   // GENERAL OPERATIONS
+
+  updateOverlayAnnotations() {
+
+    const xPos: ScaleValue = new Date(this.quotes[0].date).valueOf();
+    const yPos: ScaleValue = this.cs.overlayYticks[this.cs.overlayYticks.length - 1].value;
+    let adjY: number = 2;
+
+    this.chartOverlay.options.plugins.annotation.annotations =
+      this.legend
+        .filter(x => x.chart == 'overlay')
+        .map((l, index) => {
+          let annotation: AnnotationOptions = this.cs.commonAnnotation(l.label, l.color, xPos, yPos, -3, adjY);
+          annotation.id = "note" + (index + 1).toString();
+          adjY += 12;
+          return annotation;
+        });
+    this.chartOverlay.update();
+  }
 
   deleteIndicator(indicator: Indicator) {
 
@@ -809,12 +828,9 @@ export class AppComponent implements OnInit {
       }
     });
 
-    // update charts
-    this.chartOverlay.update();
-
-
-    // remove from legend
+    // remove from legend, update
     this.legend.splice(idxLegend, 1);
+    this.updateOverlayAnnotations();
   }
 
   requestHeader(): { headers?: HttpHeaders } {
