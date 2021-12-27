@@ -51,18 +51,16 @@ export class AppComponent implements OnInit {
 
   @ViewChild('chartRsi', { static: true }) chartRsiRef: ElementRef;
   chartRsi: Chart;
-  chartRsiLabel: string;
   chartRsiOn = true;    // required ON due to card, likely?
 
   @ViewChild('chartStoch', { static: true }) chartStochRef: ElementRef;
   chartStoch: Chart;
-  chartStochLabel: string;
   chartStochOn = true;  // required ON due to card, likely?
 
   @ViewChild('chartsTop') chartRef: ElementRef;
   @ViewChild('picker') pickerRef: ElementRef;
 
-  history: Quote[] = [];
+  quotes: Quote[] = [];
   legend: Indicator[] = [];
 
   // add indicator
@@ -98,9 +96,9 @@ export class AppComponent implements OnInit {
     { label: 'RSI(30)', lookbackPeriod: 30 }
   ];
   readonly stochConfigs: StochConfig[] = [
-    { label: 'STOCH(9,4)', lookbackPeriod: 9, signalPeriod: 4 },
-    { label: 'STOCH(14,3)', lookbackPeriod: 14, signalPeriod: 3 },
-    { label: 'STOCH(20,5)', lookbackPeriod: 20, signalPeriod: 5 },
+    { label: 'STO %K(9) %D(4)', lookbackPeriod: 9, signalPeriod: 4 },
+    { label: 'STO %K(14) %D(3)', lookbackPeriod: 14, signalPeriod: 3 },
+    { label: 'STO %K(20) %D(5)', lookbackPeriod: 20, signalPeriod: 5 },
   ];
 
   constructor(
@@ -119,7 +117,7 @@ export class AppComponent implements OnInit {
       .subscribe({
 
         next: (h: Quote[]) => {
-          this.history = h;
+          this.quotes = h;
           this.addBaseOverlayChart();
           this.addBaseRsiChart();
           this.addBaseStochChart();
@@ -140,10 +138,9 @@ export class AppComponent implements OnInit {
 
     const price: FinancialDataPoint[] = [];
     const volume: ScatterDataPoint[] = [];
-    const labels: number[] = [];
     let sumVol = 0;
 
-    this.history.forEach((q: Quote) => {
+    this.quotes.forEach((q: Quote) => {
       price.push({
         x: new Date(q.date).valueOf(),
         o: q.open,
@@ -155,7 +152,6 @@ export class AppComponent implements OnInit {
         x: new Date(q.date).valueOf(),
         y: q.volume
       });
-      labels.push(q.date.valueOf());
       sumVol += q.volume;
     });
 
@@ -180,9 +176,6 @@ export class AppComponent implements OnInit {
       ]
     };
 
-    // add labels
-    myConfig.data.labels = labels;
-
     // get size for volume axis
     const volumeAxisSize = 20 * (sumVol / volume.length) || 0;
     myConfig.options.scales.volumeAxis.max = volumeAxisSize;
@@ -204,14 +197,12 @@ export class AppComponent implements OnInit {
     const myConfig = this.cs.baseOscillatorConfig();
 
     // reference lines
-    const topThreshold: number[] = [];
-    const bottomThreshold: number[] = [];
-    const labels: number[] = [];
+    const topThreshold: ScatterDataPoint[] = [];
+    const bottomThreshold: ScatterDataPoint[] = [];
 
-    this.history.forEach((q: Quote) => {
-      topThreshold.push(70);
-      bottomThreshold.push(30);
-      labels.push(q.date.valueOf());
+    this.quotes.forEach((q: Quote) => {
+      topThreshold.push({ x: new Date(q.date).valueOf(), y: 70 });
+      bottomThreshold.push({ x: new Date(q.date).valueOf(), y: 30 });
     });
 
     myConfig.data = {
@@ -225,7 +216,7 @@ export class AppComponent implements OnInit {
           borderColor: 'darkRed',
           backgroundColor: 'darkRed',
           pointRadius: 0,
-          spanGaps: false,
+          spanGaps: true,
           fill: false,
           order: 99
         },
@@ -244,9 +235,6 @@ export class AppComponent implements OnInit {
         }
       ]
     };
-
-    // add labels
-    myConfig.data.labels = labels;
 
     // hide ref lines from tooltips
     myConfig.options.plugins.tooltip.filter = (tooltipItem) => (tooltipItem.datasetIndex > 1);
@@ -258,6 +246,9 @@ export class AppComponent implements OnInit {
     // compose chart
     if (this.chartRsi) this.chartRsi.destroy();
     this.chartRsi = new Chart(myChart.getContext('2d'), myConfig);
+
+    // add initial sample
+    this.addIndicatorRSI({ parameterOne: 5, color: 'black' });
   }
 
   addBaseStochChart() {
@@ -268,14 +259,12 @@ export class AppComponent implements OnInit {
     const myConfig = this.cs.baseOscillatorConfig();
 
     // reference lines
-    const topThreshold: number[] = [];
-    const bottomThreshold: number[] = [];
-    const labels: number[] = [];
+    const topThreshold: ScatterDataPoint[] = [];
+    const bottomThreshold: ScatterDataPoint[] = [];
 
-    this.history.forEach((q: Quote) => {
-      topThreshold.push(80);
-      bottomThreshold.push(20);
-      labels.push(q.date.valueOf());
+    this.quotes.forEach((q: Quote) => {
+      topThreshold.push({ x: new Date(q.date).valueOf(), y: 80 });
+      bottomThreshold.push({ x: new Date(q.date).valueOf(), y: 20 });
     });
 
     myConfig.data = {
@@ -308,9 +297,6 @@ export class AppComponent implements OnInit {
         }
       ]
     };
-
-    // add labels
-    myConfig.data.labels = labels;
 
     // hide ref lines from tooltips
     myConfig.options.plugins.tooltip.filter = (tooltipItem) => (tooltipItem.datasetIndex > 1);
@@ -638,7 +624,6 @@ export class AppComponent implements OnInit {
         next: (rsi: RsiResult[]) => {
 
           const label = `RSI(${params.parameterOne})`;
-          this.chartRsiLabel = label;
           this.chartRsiOn = true;
 
           // compose data
@@ -664,9 +649,19 @@ export class AppComponent implements OnInit {
 
           // add to chart
           this.chartRsi.data.datasets.push(rsiDataset);
+
+          // chart legend
+          const legend = this.cs.commonAnnotation(
+            label,
+            'black',
+            new Date(rsi[0].date).valueOf(),
+            99
+          );
+
+          this.chartRsi.options.plugins.annotation.annotations = { legend };
           this.chartRsi.update();
 
-          // add to legend
+          // base legend
           this.legend.push({ label: label, chart: 'rsi', color: params.color, lines: [rsiDataset] });
 
           // scroll to chart
@@ -702,8 +697,7 @@ export class AppComponent implements OnInit {
 
         next: (stoch: StochResult[]) => {
 
-          const label = `STOCH(${params.parameterOne},${params.parameterTwo})`;
-          this.chartStochLabel = label;
+          const label = `STO %K(${params.parameterOne}) %D(${params.parameterTwo})`;
           this.chartStochOn = true;
 
           // compose data
@@ -747,9 +741,19 @@ export class AppComponent implements OnInit {
           // add to chart
           this.chartStoch.data.datasets.push(oscDataset);
           this.chartStoch.data.datasets.push(sigDataset);
+
+          // chart legend
+          const legend = this.cs.commonAnnotation(
+            label,
+            'black',
+            new Date(stoch[0].date).valueOf(),
+            99
+          );
+
+          this.chartStoch.options.plugins.annotation.annotations = { legend };
           this.chartStoch.update();
 
-          // add to legend
+          // base legend
           this.legend.push({ label: label, chart: 'stoch', color: params.color, lines: [oscDataset, sigDataset] });
 
           // scroll to chart

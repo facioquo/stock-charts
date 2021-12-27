@@ -25,7 +25,7 @@ namespace WebApi.Controllers
         public IEnumerable<Quote> GetQuotes()
         {
             return quotes
-                .Where(x => x.Date > dateStart);
+                .Where(x => x.Date >= dateStart);
         }
 
 

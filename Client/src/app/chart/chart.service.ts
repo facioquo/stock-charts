@@ -2,13 +2,18 @@ import { Injectable } from '@angular/core';
 import 'chartjs-adapter-date-fns';
 import 'chartjs-chart-financial';
 
+import { enUS } from 'date-fns/locale';
+import { add, parseISO } from 'date-fns';
+
 import {
     Chart,
     ChartConfiguration,
+    FontSpec,
     Interaction,
     ScaleOptions
 } from 'chart.js';
 
+// extensions
 import {
     CandlestickController,
     CandlestickElement,
@@ -16,31 +21,28 @@ import {
     OhlcElement
 } from 'chartjs-chart-financial';
 
+// plugins
+import annotationPlugin
+, { AnnotationOptions, AnnotationPointCoordinates, ScaleValue } from 'chartjs-plugin-annotation';
+
 import {
     CrosshairPlugin,
     CrosshairOptions,
     Interpolate
 } from 'chartjs-plugin-crosshair';
 
-import { enUS } from 'date-fns/locale';
-import { add, parseISO } from 'date-fns';
+Chart.register(
+    CandlestickController,
+    OhlcController,
+    CandlestickElement,
+    OhlcElement,
+    annotationPlugin)
+
+//Chart.register(CrosshairPlugin);
+//Interaction.modes.interpolate = Interpolate;
 
 @Injectable()
 export class ChartService {
-
-    constructor() {
-        Chart.register(
-            CandlestickController,
-            OhlcController,
-            CandlestickElement,
-            OhlcElement)
-
-        // Chart.register(
-        //     CrosshairPlugin,
-        //     Interpolate);
-
-        // Interaction.modes.interpolate = Interpolate;
-    }
 
     baseConfig() {
 
@@ -66,8 +68,12 @@ export class ChartService {
                     },
                     tooltip: {
                         enabled: true,
-                        mode: 'index',  // TODO: should be 'interpolate'?
+                        mode: 'index',  // TODO: should be 'interpolate' for crosshair?
                         intersect: false
+                    },
+                    annotation: {
+                        clip: false,
+                        annotations: []
                     },
                     // crosshair: crosshairPluginOptions  // FIX: types not recognized
                 },
@@ -91,8 +97,6 @@ export class ChartService {
                         position: 'right',
                         beginAtZero: false,
                         ticks: {
-                            // autoSkip: true,
-                            // autoSkipPadding: 5,
                             mirror: true,
                             padding: -5,
                             font: {
@@ -189,6 +193,37 @@ export class ChartService {
         return axes;
     }
 
+    commonAnnotation(
+        label: string,
+        fontColor: string,
+        xPos: ScaleValue,
+        yPos: ScaleValue
+    ): AnnotationOptions {
+
+        const legendFont: FontSpec = {
+            family: "Roboto",
+            size: 11,
+            style: "normal",
+            weight: "normal",
+            lineHeight: 1,
+        };
+
+        const annotation: AnnotationOptions = {
+            type: 'label',
+            content: [label],
+            font: legendFont,
+            color: fontColor,
+            backgroundColor: 'rgba(255,255,255,0.9)',
+            padding: 1,
+            position: 'start',
+            xScaleID: 'xAxis',
+            yScaleID: 'yAxis',
+            xValue: xPos,
+            yValue: yPos
+        };
+
+        return annotation;
+    }
     crosshairPluginOptions(): CrosshairOptions {
 
         const crosshairOptions: CrosshairOptions = {
