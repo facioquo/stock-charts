@@ -53,14 +53,14 @@ jobs:
         displayName: dotnet restore
         inputs:
           command: restore
-          projects: Server\**\*.csproj
+          projects: Server/**/*.csproj
 
       - task: DotNetCoreCLI@2
         displayName: dotnet publish
         inputs:
           command: publish
           publishWebProjects: false
-          projects: Server\**\*.csproj
+          projects: Server/**/*.csproj
           arguments: -c Release -o $(Build.ArtifactStagingDirectory)
 
       - task: CopyFiles@2
