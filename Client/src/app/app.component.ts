@@ -247,6 +247,8 @@ export class AppComponent implements OnInit {
     // compose chart
     if (this.chartRsi) this.chartRsi.destroy();
     this.chartRsi = new Chart(myChart.getContext('2d'), myConfig);
+
+    //this.addIndicatorRSI({ parameterOne: 5, color: 'black' });
   }
 
   addBaseStochChart() {

@@ -24,7 +24,8 @@ import {
 
 // plugins
 import annotationPlugin
-, { AnnotationOptions, AnnotationPointCoordinates, ScaleValue } from 'chartjs-plugin-annotation';
+, { AnnotationOptions, ScaleValue }
+    from 'chartjs-plugin-annotation';
 
 import {
     CrosshairPlugin,
@@ -109,7 +110,8 @@ export class ChartService {
                         },
                         grid: {
                             drawOnChartArea: true,
-                            drawTicks: false
+                            drawTicks: false,
+                            drawBorder: false
                         }
                     }
                 }
@@ -160,8 +162,16 @@ export class ChartService {
         config.options.layout.padding = {
             left: 10,
             right: 10,
-            top: 5,
-            bottom: 5
+            top: 10,
+            bottom: 0
+        };
+
+        // remove first and last y-axis labels
+        config.options.scales.yAxis.ticks.callback = (value, index, values) => {
+
+            if (index === 0 || index === values.length - 1) return '';
+            else
+                return value;
         };
 
         return config;
@@ -192,6 +202,7 @@ export class ChartService {
             },
             grid: {
                 drawOnChartArea: false,
+                drawBorder: false,
                 tickLength: 2
             }
         };
