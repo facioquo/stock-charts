@@ -49,14 +49,11 @@
         </div>
 
         <!-- CHART (RSI) -->
-        <div class="chart-label" *ngIf="chartRsiOn && chartRsiLabel">Relative Strength Index - {{ chartRsiLabel }}</div>
         <div class="chart-container-oscillator" [hidden]="!chartRsiOn">
             <canvas #chartRsi></canvas>
         </div>
 
         <!-- CHART (STOCH) -->
-        <div class="chart-label" *ngIf="chartStochOn && chartStochLabel">Stochastic Oscillator - {{ chartStochLabel }}
-        </div>
         <div class="chart-container-oscillator" [hidden]="!chartStochOn">
             <canvas #chartStoch></canvas>
         </div>
@@ -279,7 +276,7 @@
                 <mat-chip selected color="accent">
                     <mat-icon mat-list-icon [style.color]="pickedParams.color">timeline</mat-icon>&nbsp;
                     <span mat-line *ngIf="pickedParams.parameterOne">
-                        {{ pickedType.code }} ({{ pickedParams.parameterOne }},{{ pickedParams.parameterTwo }})
+                        STO %K({{ pickedParams.parameterOne }}) %D({{ pickedParams.parameterTwo }})
                     </span>
                 </mat-chip>
             </mat-chip-list>

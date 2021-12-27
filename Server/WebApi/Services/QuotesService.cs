@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace WebApi.Services
 {
-    internal static class History
+    internal static class FetchQuotes
     {
         internal static IEnumerable<Quote> Get()
         {
