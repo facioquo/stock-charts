@@ -2,13 +2,19 @@ import { Injectable } from '@angular/core';
 import 'chartjs-adapter-date-fns';
 import 'chartjs-chart-financial';
 
+import { enUS } from 'date-fns/locale';
+import { add, parseISO } from 'date-fns';
+
 import {
     Chart,
     ChartConfiguration,
+    FontSpec,
     Interaction,
-    ScaleOptions
+    ScaleOptions,
+    Tick
 } from 'chart.js';
 
+// extensions
 import {
     CandlestickController,
     CandlestickElement,
@@ -16,31 +22,31 @@ import {
     OhlcElement
 } from 'chartjs-chart-financial';
 
+// plugins
+import annotationPlugin
+, { AnnotationOptions, ScaleValue }
+    from 'chartjs-plugin-annotation';
+
 import {
     CrosshairPlugin,
     CrosshairOptions,
     Interpolate
 } from 'chartjs-plugin-crosshair';
 
-import { enUS } from 'date-fns/locale';
-import { add, parseISO } from 'date-fns';
+Chart.register(
+    CandlestickController,
+    OhlcController,
+    CandlestickElement,
+    OhlcElement,
+    annotationPlugin)
+
+//Chart.register(CrosshairPlugin);
+//Interaction.modes.interpolate = Interpolate;
 
 @Injectable()
 export class ChartService {
 
-    constructor() {
-        Chart.register(
-            CandlestickController,
-            OhlcController,
-            CandlestickElement,
-            OhlcElement)
-
-        // Chart.register(
-        //     CrosshairPlugin,
-        //     Interpolate);
-
-        // Interaction.modes.interpolate = Interpolate;
-    }
+    overlayYticks: Tick[] = [];
 
     baseConfig() {
 
@@ -66,8 +72,13 @@ export class ChartService {
                     },
                     tooltip: {
                         enabled: true,
-                        mode: 'index',  // TODO: should be 'interpolate'?
+                        mode: 'index',  // TODO: should be 'interpolate' for crosshair?
                         intersect: false
+                    },
+                    annotation: {
+                        clip: false,
+                        drawTime: 'afterDraw',
+                        annotations: []
                     },
                     // crosshair: crosshairPluginOptions  // FIX: types not recognized
                 },
@@ -91,8 +102,6 @@ export class ChartService {
                         position: 'right',
                         beginAtZero: false,
                         ticks: {
-                            // autoSkip: true,
-                            // autoSkipPadding: 5,
                             mirror: true,
                             padding: -5,
                             font: {
@@ -101,7 +110,8 @@ export class ChartService {
                         },
                         grid: {
                             drawOnChartArea: true,
-                            drawTicks: false
+                            drawTicks: false,
+                            drawBorder: false
                         }
                     }
                 }
@@ -121,6 +131,8 @@ export class ChartService {
 
         // format y-axis, add dollar sign
         config.options.scales.yAxis.ticks.callback = (value, index, values) => {
+
+            this.overlayYticks = values;
 
             if (index === 0) return '';  // skip first label
             else
@@ -150,8 +162,16 @@ export class ChartService {
         config.options.layout.padding = {
             left: 10,
             right: 10,
-            top: 5,
-            bottom: 5
+            top: 10,
+            bottom: 0
+        };
+
+        // remove first and last y-axis labels
+        config.options.scales.yAxis.ticks.callback = (value, index, values) => {
+
+            if (index === 0 || index === values.length - 1) return '';
+            else
+                return value;
         };
 
         return config;
@@ -182,11 +202,48 @@ export class ChartService {
             },
             grid: {
                 drawOnChartArea: false,
+                drawBorder: false,
                 tickLength: 2
             }
         };
 
         return axes;
+    }
+
+    commonAnnotation(
+        label: string,
+        fontColor: string,
+        xPos: ScaleValue,
+        yPos: ScaleValue,
+        xAdj: number = 0,
+        yAdj: number = 0
+    ): AnnotationOptions {
+
+        const legendFont: FontSpec = {
+            family: "Roboto",
+            size: 11,
+            style: "normal",
+            weight: "normal",
+            lineHeight: 1,
+        };
+
+        const annotation: AnnotationOptions = {
+            type: 'label',
+            content: [label],
+            font: legendFont,
+            color: fontColor,
+            backgroundColor: 'rgba(255,255,255,0.9)',
+            padding: 1,
+            position: 'start',
+            xScaleID: 'xAxis',
+            yScaleID: 'yAxis',
+            xValue: xPos,
+            yValue: yPos,
+            xAdjust: xAdj,
+            yAdjust: yAdj
+        };
+
+        return annotation;
     }
 
     crosshairPluginOptions(): CrosshairOptions {
