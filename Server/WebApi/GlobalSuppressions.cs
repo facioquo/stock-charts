@@ -3,4 +3,7 @@
 // Project-level suppressions either have no target or are given
 // a specific target and scoped to a namespace, type, member, etc.
 
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "Not doing localization.")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(
+    "Globalization", 
+    "CA1305:Specify IFormatProvider", 
+    Justification = "Not doing localization.")]
