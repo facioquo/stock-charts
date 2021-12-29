@@ -10,6 +10,50 @@ export class Quote {
     ) { }
 }
 
+export interface IndicatorList {
+    name: string;
+    code: string;
+    labelTemplate: string;
+    endpoint: string;
+    category: string;
+    chartType: string;
+    chartConfig: ChartConfig | null;
+    parameters: IndicatorParam[];
+    results: IndicatorResult[];
+}
+
+export interface ChartConfig {
+    minimumYAxis: number | null;
+    maximumYAxis: number | null;
+    thresholds: ChartThreshold[];
+}
+
+export interface ChartThreshold {
+    value: number;
+    color: string;
+    style: string;
+}
+
+export interface IndicatorParam {
+    displayName: string;
+    paramName: string;
+    dataType: string;
+    order: number;
+    required: boolean;
+    default: number;
+    minimum: number;
+    maximum: number;
+}
+
+export interface IndicatorResult {
+    legendTemplate: string;
+    dataName: string;
+    dataType: string;
+    defaultColor: string;
+    altChartType: null | string;
+    altChartConfig: ChartConfig | null;
+}
+
 export class IndicatorType {
     constructor(
         public code: string,

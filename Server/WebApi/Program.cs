@@ -26,13 +26,12 @@ services.AddCors(options =>
     });
 });
 
-
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
-_ = (app.Environment.IsDevelopment())
-   ? app.UseDeveloperExceptionPage()
-   : app.UseHsts();
+_ = app.Environment.IsDevelopment()
+  ? app.UseDeveloperExceptionPage()
+  : app.UseHsts();
 
 app.UseHttpsRedirection();
 app.UseRouting();
@@ -41,7 +40,7 @@ app.UseAuthentication();
 app.UseEndpoints(ep =>
 {
     _ = ep.MapControllers()
-          .RequireCors("CorsPolicy");  // on all controllers
+      .RequireCors("CorsPolicy");  // on all controllers
 });
 
 app.Run();

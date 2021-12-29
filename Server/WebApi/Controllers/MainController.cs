@@ -4,7 +4,6 @@ using WebApi.Services;
 
 namespace WebApi.Controllers;
 
-
 [ApiController]
 [Route("")]
 public class MainController : ControllerBase
@@ -19,20 +18,24 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("history")]
-    public IEnumerable<Quote> GetQuotes()
+    public IActionResult GetQuotes()
     {
-        return quotes
-            .Where(x => x.Date >= dateStart);
+        return Ok(quotes.Where(x => x.Date >= dateStart));
     }
 
+    [HttpGet("indicators")]
+    public IActionResult GetMetadata()
+    {
+        return Ok(Metadata.Indicators($"{Request.Scheme}://{Request.Host}"));
+    }
 
     //////////////////////////////////////////
     // INDICATORS (sorted alphabetically)
 
     [HttpGet("BB")]
     public IActionResult GetBollingerBands(
-         int lookbackPeriods,
-         double standardDeviations)
+         int lookbackPeriods = 20,
+         double standardDeviations = 2)
     {
         try
         {
@@ -67,8 +70,8 @@ public class MainController : ControllerBase
 
     [HttpGet("PSAR")]
     public IActionResult GetParabolicSar(
-         decimal accelerationStep,
-         decimal maxAccelerationFactor)
+         decimal accelerationStep = 0.02m,
+         decimal maxAccelerationFactor = 0.2m)
     {
         try
         {
@@ -85,7 +88,8 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("RSI")]
-    public IActionResult GetRsi(int lookbackPeriods)
+    public IActionResult GetRsi(
+        int lookbackPeriods = 14)
     {
         try
         {
@@ -101,10 +105,10 @@ public class MainController : ControllerBase
         }
     }
 
-    [HttpGet("STOCH")]
+    [HttpGet("STO")]
     public IActionResult GetStoch(
-         int lookbackPeriods,
-         int signalPeriods)
+         int lookbackPeriods = 14,
+         int signalPeriods = 3)
     {
         try
         {

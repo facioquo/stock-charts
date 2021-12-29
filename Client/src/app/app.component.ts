@@ -13,6 +13,7 @@ import {
   Quote,
   IndicatorType,
   IndicatorParameters,
+  IndicatorList,
 
   // configs
   BollingerBandConfig,
@@ -26,11 +27,10 @@ import {
   ParabolicSarResult,
   RsiResult,
   StochResult
-
 } from './app.models';
 import { AnnotationOptions, ScaleValue } from 'chartjs-plugin-annotation';
 
-export interface Indicator {
+export interface LegendItem {
   label: string;
   chart: string;
   color: string;
@@ -62,7 +62,8 @@ export class AppComponent implements OnInit {
   @ViewChild('picker') pickerRef: ElementRef;
 
   quotes: Quote[] = [];
-  legend: Indicator[] = [];
+  legend: LegendItem[] = [];
+  listing: IndicatorList;
 
   // add indicator
   pickIndicator = false;
@@ -74,7 +75,7 @@ export class AppComponent implements OnInit {
     { code: 'EMA', name: 'Exponential Moving Average' },
     { code: 'PSAR', name: 'Parabolic SAR' },
     { code: 'RSI', name: 'Relative Strength Index' },
-    { code: 'STOCH', name: 'Stochastic Oscillator' }
+    { code: 'STO', name: 'Stochastic Oscillator' }
   ];
 
   // indicator parameter values
@@ -110,6 +111,23 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.cancelAdd();
     this.getQuotes();
+    this.getIndicatorList();
+  }
+
+  getIndicatorList(){
+
+    this.http.get(`${env.api}/indicators`, this.requestHeader())
+    .subscribe({
+
+      next: (list: IndicatorList) => {
+        this.listing = list;
+      },
+
+      error: (e: HttpErrorResponse) => { console.log(e); },
+
+      complete: () => { }
+    });
+
   }
 
   getQuotes() {
@@ -310,7 +328,7 @@ export class AppComponent implements OnInit {
     this.chartStoch = new Chart(myChart.getContext('2d'), myConfig);
 
     // add initial sample
-    this.addIndicatorSTOCH({ parameterOne: 21, parameterTwo: 7, color: 'black' });
+    this.addIndicatorSTO({ parameterOne: 21, parameterTwo: 7, color: 'black' });
   }
 
 
@@ -344,7 +362,7 @@ export class AppComponent implements OnInit {
   showOscillators() {
     this.legend
       .filter(g => g.chart === 'rsi' || g.chart === 'stoch')
-      .forEach((i: Indicator) => {
+      .forEach((i: LegendItem) => {
         if (i.chart === 'rsi') this.chartRsiOn = true;
         if (i.chart === 'stoch') this.chartStochOn = true;
       });
@@ -357,7 +375,7 @@ export class AppComponent implements OnInit {
     if (this.pickedType.code === 'BB') this.pickedParams.color = 'darkGray';
     if (this.pickedType.code === 'PSAR') this.pickedParams.color = 'purple';
     if (this.pickedType.code === 'RSI') this.pickedParams.color = 'black';
-    if (this.pickedType.code === 'STOCH') this.pickedParams.color = 'black';
+    if (this.pickedType.code === 'STO') this.pickedParams.color = 'black';
 
     this.scrollToBottomOfPicker();
   }
@@ -389,8 +407,8 @@ export class AppComponent implements OnInit {
     }
 
     // stochastic oscillator
-    if (this.pickedType.code === 'STOCH') {
-      this.addIndicatorSTOCH(this.pickedParams);
+    if (this.pickedType.code === 'STO') {
+      this.addIndicatorSTO(this.pickedParams);
     }
 
     this.cancelAdd();
@@ -615,7 +633,7 @@ export class AppComponent implements OnInit {
     // remove old indicators
     this.legend
       .filter(g => g.chart === 'rsi')
-      .forEach((i: Indicator) => this.deleteIndicator(i));
+      .forEach((i: LegendItem) => this.deleteIndicator(i));
 
     let url = `${env.api}/RSI/`;
     url += `?lookbackPeriods=${params.parameterOne}`;
@@ -683,14 +701,14 @@ export class AppComponent implements OnInit {
     this.pickedParams.parameterTwo = stoch.signalPeriod;
   }
 
-  addIndicatorSTOCH(params: IndicatorParameters) {
+  addIndicatorSTO(params: IndicatorParameters) {
 
     // remove old indicators
     this.legend
       .filter(g => g.chart === 'stoch')
-      .forEach((i: Indicator) => this.deleteIndicator(i));
+      .forEach((i: LegendItem) => this.deleteIndicator(i));
 
-    let url = `${env.api}/STOCH/`;
+    let url = `${env.api}/STO/`;
     url += `?lookbackPeriods=${params.parameterOne}`;
     url += `&signalPeriods=${params.parameterTwo}`;
 
@@ -790,7 +808,7 @@ export class AppComponent implements OnInit {
     this.chartOverlay.update();
   }
 
-  deleteIndicator(indicator: Indicator) {
+  deleteIndicator(indicator: LegendItem) {
 
     const idxLegend = this.legend.indexOf(indicator, 0);
 
