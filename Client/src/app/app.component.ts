@@ -13,6 +13,7 @@ import {
   Quote, IndicatorListing, IndicatorSelection, IndicatorResult, IndicatorParam, ChartThreshold
 } from './app.models';
 import { Guid } from "guid-typescript";
+import { Observable, Subscription, of } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -21,13 +22,11 @@ import { Guid } from "guid-typescript";
 })
 export class AppComponent implements OnInit {
 
-  @ViewChild('chartsTop') chartRef: ElementRef;
+  @ViewChild('chartsTop') chartTopRef: ElementRef;
   chartOverlay: Chart;
 
   faGithub = faGithub;
   loading = true;
-
-  quotes: Quote[] = [];
   listings: IndicatorListing[];
 
   // seed charts (values from wizard, normally)
@@ -43,7 +42,7 @@ export class AppComponent implements OnInit {
         {
           label: "EMA(5)",
           dataName: "ema",
-          color: "darkRed"
+          color: "red"
         } as IndicatorResult
       ]
     } as IndicatorSelection,
@@ -84,30 +83,82 @@ export class AppComponent implements OnInit {
     private readonly cs: ChartService
   ) { }
 
+  // STARTUP OPERATIONS
+
   ngOnInit() {
     this.startup();
   }
 
-  // DATA OPERATIONS
-
   startup() {
 
-    // fetch base quote
-    this.http.get(`${env.api}/history`, this.requestHeader())
+    // compose main chart
+    this.http.get(`${env.api}/quotes`, this.requestHeader())
       .subscribe({
         next: (q: Quote[]) => {
-          this.quotes = q;
-          this.loadOverlayChart();
+          this.loadMainChart(q);
         },
         error: (e: HttpErrorResponse) => { console.log(e); }
       });
 
-    // fetch indicator list
+    // load default selections
     this.http.get(`${env.api}/indicators`, this.requestHeader())
       .subscribe({
-        next: (list: IndicatorListing[]) => {
-          this.listings = list;
-          this.loadSelections();
+        next: (listings: IndicatorListing[]) => {
+          this.listings = listings;
+          this.loadSelections(listings)
+        },
+        error: (e: HttpErrorResponse) => { console.log(e); }
+      });
+  }
+
+  // API OPERATIONS
+  updateData() {
+
+    // update selections data
+    this.selections.forEach((selection: IndicatorSelection) => {
+
+      // lookup config data
+      const listing = this.listings.find(x => x.uiid == selection.uiid);
+
+      this.getSelectionData(selection, listing)
+        .subscribe({
+          next: () => {
+            if (listing.chartType != 'overlay') {
+              selection.chart.update();
+            };
+          },
+          error: (e: HttpErrorResponse) => { console.log(e); }
+        });
+    });
+
+    // update primary data
+    this.http.get(`${env.api}/quotes`, this.requestHeader())
+      .subscribe({
+        next: (quotes: Quote[]) => {
+
+          const price: FinancialDataPoint[] = [];
+          const volume: ScatterDataPoint[] = [];
+          let sumVol = 0;
+
+          quotes.forEach((q: Quote) => {
+            price.push({
+              x: new Date(q.date).valueOf(),
+              o: q.open,
+              h: q.high,
+              l: q.low,
+              c: q.close
+            });
+            volume.push({
+              x: new Date(q.date).valueOf(),
+              y: q.volume
+            });
+            sumVol += q.volume;
+
+            // get size for volume axis
+            const volumeAxisSize = 20 * (sumVol / volume.length) || 0;
+            this.chartOverlay.options.scales.volumeAxis.max = volumeAxisSize;
+            this.chartOverlay.update();
+          });
         },
         error: (e: HttpErrorResponse) => { console.log(e); }
       });
@@ -115,7 +166,7 @@ export class AppComponent implements OnInit {
 
   // CHARTS OPERATIONS
 
-  loadOverlayChart() {
+  loadMainChart(quotes: Quote[]) {
 
     const chartConfig = this.cs.baseOverlayConfig();
 
@@ -123,7 +174,7 @@ export class AppComponent implements OnInit {
     const volume: ScatterDataPoint[] = [];
     let sumVol = 0;
 
-    this.quotes.forEach((q: Quote) => {
+    quotes.forEach((q: Quote) => {
       price.push({
         x: new Date(q.date).valueOf(),
         o: q.open,
@@ -147,7 +198,7 @@ export class AppComponent implements OnInit {
           data: price,
           yAxisID: 'yAxis',
           borderColor: '#616161',
-          order: 1
+          order: 90
         },
         {
           type: 'bar',
@@ -172,16 +223,38 @@ export class AppComponent implements OnInit {
     this.loading = false;
   }
 
-  loadSelections() {
+  loadSelections(listings: IndicatorListing[]) {
 
     // scan indicator selections
     this.selections.forEach((selection: IndicatorSelection) => {
 
       // lookup config data
-      const c = this.listings.find(x => x.uiid == selection.uiid);
+      const listing = listings.find(x => x.uiid == selection.uiid);
+
+      this.getSelectionData(selection, listing)
+        .subscribe({
+          next: (results: IndicatorResult[]) => {
+
+            // add needed charts
+            if (listing.chartType == 'overlay') {
+              this.addOverlaySelectionToChart(selection, listing);
+            }
+            else {
+              this.addNonOverlaySelectionChart(selection, listing);
+            };
+
+          },
+          error: (e: HttpErrorResponse) => { console.log(e); }
+        });
+    });
+  }
+
+  getSelectionData(selection: IndicatorSelection, listing: IndicatorListing): Observable<any> {
+
+    const obs = new Observable((observer) => {
 
       // compose url
-      let url = `${c.endpoint}?`;
+      let url = `${listing.endpoint}?`;
       selection.params.forEach((param: IndicatorParam, param_index: number) => {
         if (param_index != 0) url += "&";
         url += `${param.queryString}`;
@@ -193,7 +266,7 @@ export class AppComponent implements OnInit {
 
           next: (apidata: any[]) => {
 
-            // parse each datasets
+            // parse each dataset
             selection.results
               .forEach((result: IndicatorResult) => {
 
@@ -211,131 +284,165 @@ export class AppComponent implements OnInit {
                 });
               });
 
-            // add needed charts
-            if (c.chartType != 'overlay') {
-
-              const chartConfig = this.cs.baseOscillatorConfig();
-              const listing = this.listings.find(x => x.uiid == selection.uiid);
-
-              // initialize chart datasets
-              chartConfig.data = {
-                datasets: []
-              };
-
-              // chart configurations
-
-              // add thresholds (reference lines)
-              console.log("thresholds", listing.chartConfig?.thresholds);
-
-              listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold) => {
-
-                const lineData: ScatterDataPoint[] = [];
-
-                console.log("result0", selection.results[0]);
-
-                // compose threshold datas
-                console.log("data", selection.results[0].data);
-                selection.results[0].data.forEach((d: ScatterDataPoint) => {
-                  lineData.push({ x: d.x, y: threshold.value } as ScatterDataPoint);
-                });
-
-                const thresholdDataset: ChartDataset = {
-                  label: "threshold",
-                  type: 'line',
-                  data: lineData,
-                  yAxisID: 'yAxis',
-                  borderWidth: 1,
-                  borderColor: threshold.color,
-                  backgroundColor: threshold.color,
-                  borderDash: threshold.style == "dotted" ? [5, 2] : [],
-                  pointRadius: 0,
-                  spanGaps: true,
-                  fill: false,
-                  order: 99
-                };
-
-                console.log("threshold", thresholdDataset);
-                chartConfig.data.datasets.push(thresholdDataset);
-              });
-
-              // hide thresholds from tooltips
-              chartConfig.options.plugins.tooltip.filter = (tooltipItem) =>
-                (tooltipItem.datasetIndex > chartConfig.data.datasets.length - 1);
-
-              // y-scale
-              chartConfig.options.scales.yAxis.min = listing.chartConfig?.minimumYAxis;
-              chartConfig.options.scales.yAxis.max = listing.chartConfig?.maximumYAxis;
-
-              // add indicator data
-              selection.results.forEach(r => {
-
-                const resultConfig = listing.results.find(x => x.dataName == r.dataName);
-
-                switch (resultConfig.lineType) {
-
-                  case 'line':
-                    const lineDataset: ChartDataset = {
-                      label: r.label,
-                      type: 'line',
-                      data: r.data,
-                      yAxisID: 'yAxis',
-                      borderWidth: 1.5,
-                      borderColor: r.color,
-                      backgroundColor: r.color,
-                      pointRadius: 0,
-                      spanGaps: true,
-                      fill: false,
-                      order: 1
-                    };
-                    chartConfig.data.datasets.push(lineDataset);
-                    console.log("line", lineDataset);
-                    break;
-
-                  case 'bar':
-                    const barDataset: ChartDataset = {
-                      label: r.label,
-                      type: 'bar',
-                      data: r.data,
-                      yAxisID: 'yAxis',
-                      borderWidth: 0,
-                      borderColor: r.color,
-                      backgroundColor: r.color,
-                      order: 1
-                    };
-                    chartConfig.data.datasets.push(barDataset);
-                    console.log("line", barDataset);
-                    break;
-                }
-              });
-
-              // compose chart
-              const myCanvas = document.createElement('canvas') as HTMLCanvasElement;
-              myCanvas.id = selection.ucid;
-
-              const body = document.getElementsByTagName("body")[0];
-              body.appendChild(myCanvas);
-
-              if (selection.chart) selection.chart.destroy();
-              selection.chart = new Chart(myCanvas.getContext('2d'), chartConfig);
-            };
+            observer.next(selection.results);
           },
 
-          error: (e: HttpErrorResponse) => { console.log(e); }
+          error: (e: HttpErrorResponse) => { console.log(e); return null; }
         });
 
-      console.log("loading", selection.label, selection.results);
     });
+
+    return obs;
   }
 
+  addNonOverlaySelectionChart(selection: IndicatorSelection, listing: IndicatorListing) {
+    const chartConfig = this.cs.baseOscillatorConfig();
 
+    // initialize chart datasets
+    chartConfig.data = {
+      datasets: []
+    };
+
+    // chart configurations
+
+    // add thresholds (reference lines)
+    listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold) => {
+
+      const lineData: ScatterDataPoint[] = [];
+
+      // compose threshold data
+      selection.results[0].data.forEach((d: ScatterDataPoint) => {
+        lineData.push({ x: d.x, y: threshold.value } as ScatterDataPoint);
+      });
+
+      const thresholdDataset: ChartDataset = {
+        label: "threshold",
+        type: 'line',
+        data: lineData,
+        yAxisID: 'yAxis',
+        borderWidth: 1,
+        borderColor: threshold.color,
+        backgroundColor: threshold.color,
+        borderDash: threshold.style == "dotted" ? [5, 2] : [],
+        pointRadius: 0,
+        spanGaps: true,
+        fill: false,
+        order: 99
+      };
+
+      chartConfig.data.datasets.push(thresholdDataset);
+    });
+
+    // hide thresholds from tooltips
+    chartConfig.options.plugins.tooltip.filter = (tooltipItem) =>
+      (tooltipItem.datasetIndex > chartConfig.data.datasets.length - 1);
+
+    // y-scale
+    chartConfig.options.scales.yAxis.min = listing.chartConfig?.minimumYAxis;
+    chartConfig.options.scales.yAxis.max = listing.chartConfig?.maximumYAxis;
+
+    // add indicator data
+    selection.results.forEach(r => {
+
+      const resultConfig = listing.results.find(x => x.dataName == r.dataName);
+
+      switch (resultConfig.lineType) {
+
+        case 'line':
+          const lineDataset: ChartDataset = {
+            label: r.label,
+            type: 'line',
+            data: r.data,
+            yAxisID: 'yAxis',
+            borderWidth: 1.5,
+            borderColor: r.color,
+            backgroundColor: r.color,
+            pointRadius: 0,
+            spanGaps: true,
+            fill: false,
+            order: 1
+          };
+          chartConfig.data.datasets.push(lineDataset);
+          break;
+
+        case 'bar':
+          const barDataset: ChartDataset = {
+            label: r.label,
+            type: 'bar',
+            data: r.data,
+            yAxisID: 'yAxis',
+            borderWidth: 0,
+            borderColor: r.color,
+            backgroundColor: r.color,
+            order: 1
+          };
+          chartConfig.data.datasets.push(barDataset);
+          break;
+      }
+    });
+
+    // compose chart
+    const myCanvas = document.createElement('canvas') as HTMLCanvasElement;
+    myCanvas.id = selection.ucid;
+
+    const body = document.getElementsByTagName("body")[0];
+    body.appendChild(myCanvas);
+
+    if (selection.chart) selection.chart.destroy();
+    selection.chart = new Chart(myCanvas.getContext('2d'), chartConfig);
+  }
+
+  addOverlaySelectionToChart(selection: IndicatorSelection, listing: IndicatorListing) {
+
+    // add indicator data
+    selection.results.forEach(r => {
+
+      const resultConfig = listing.results.find(x => x.dataName == r.dataName);
+
+      switch (resultConfig.lineType) {
+
+        case 'line':
+          const lineDataset: ChartDataset = {
+            label: r.label,
+            type: 'line',
+            data: r.data,
+            yAxisID: 'yAxis',
+            borderWidth: 1.5,
+            borderColor: r.color,
+            backgroundColor: r.color,
+            pointRadius: 0,
+            spanGaps: true,
+            fill: false,
+            order: 1
+          };
+          this.chartOverlay.data.datasets.push(lineDataset);
+          break;
+
+        case 'bar':
+          const barDataset: ChartDataset = {
+            label: r.label,
+            type: 'bar',
+            data: r.data,
+            yAxisID: 'yAxis',
+            borderWidth: 0,
+            borderColor: r.color,
+            backgroundColor: r.color,
+            order: 1
+          };
+          this.chartOverlay.data.datasets.push(barDataset);
+          break;
+      };
+      this.chartOverlay.update();
+    });
+  }
 
   // GENERAL OPERATIONS
 
   updateOverlayAnnotations() {
 
-    const xPos: ScaleValue = new Date(this.quotes[0].date).valueOf();
-    const yPos: ScaleValue = this.cs.overlayYticks[this.cs.overlayYticks.length - 1].value;
-    let adjY: number = 2;
+    // const xPos: ScaleValue = new Date(this.quotes[0].date).valueOf();
+    // const yPos: ScaleValue = this.cs.overlayYticks[this.cs.overlayYticks.length - 1].value;
+    // let adjY: number = 2;
 
     // this.chartOverlay.options.plugins.annotation.annotations =
     //   this.legend
@@ -367,7 +474,7 @@ export class AppComponent implements OnInit {
 
   scrollToChartTop() {
     setTimeout(() => {
-      this.chartRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+      this.chartTopRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
     }, 200);
   }
 }

@@ -1,100 +1,79 @@
 import { Chart, ScatterDataPoint } from "chart.js";
 
-export class Quote {
-    constructor(
-        public date: Date,
-        public open: number,
-        public high: number,
-        public low: number,
-        public close: number,
-        public volume: number
-    ) { }
+export interface Quote {
+    date: Date;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    volume: number;
 }
 
-// VARIANTS
+// SELECTIONS
 
-export class IndicatorSelection {
-    constructor(
-        public ucid: string,
-        public uiid: string,
-        public label: string,
-        public params?: IndicatorParam[],
-        public results?: IndicatorResult[],
-        public chart?: Chart
-    ) { }
+export interface IndicatorSelection {
+    ucid: string,
+    uiid: string,
+    label: string,
+    params?: IndicatorParam[],
+    results?: IndicatorResult[],
+    chart?: Chart
 }
 
-export class IndicatorParam {
-    constructor(
-        public queryString: string
-    ) { }
+export interface IndicatorParam {
+    queryString: string
 }
 
-export class IndicatorResult {
-    constructor(
-        public label: string,
-        public dataName: string,
-        public color: string,
-        public data?: {
-            x:number, 
-            y:number
-        }[]
-    ) { }
+export interface IndicatorResult {
+    label?: string,
+    color: string,
+    dataName: string,
+    data: ScatterDataPoint[]
 }
 
 // LISTING
 
-export class IndicatorListing {
-    constructor(
-        public name: string,
-        public uiid: string,
-        public labelTemplate: string,
-        public endpoint: string,
-        public category: string,
-        public chartType: string,
-        public chartConfig: ChartConfig,
-        public parameters: IndicatorParamConfig[],
-        public results: IndicatorResultConfig[]
-    ) { }
+export interface IndicatorListing {
+    name: string;
+    uiid: string;
+    labelTemplate: string;
+    endpoint: string;
+    category: string;
+    chartType: string;
+    chartConfig: ChartConfig | null;
+    parameters: IndicatorParamConfig[];
+    results: IndicatorResultConfig[];
 }
 
-export class IndicatorParamConfig {
-    constructor(
-        public displayName: string,
-        public paramName: string,
-        public dataType: string,
-        public order: number,
-        public required: boolean,
-        public defaultValue: number,
-        public minimum: number,
-        public maximum: number
-    ) { }
+export interface IndicatorParamConfig {
+    displayName: string;
+    paramName: string;
+    dataType: string;
+    order: number;
+    required: boolean;
+    default: number;
+    minimum: number;
+    maximum: number;
 }
 
-export class IndicatorResultConfig {
-    constructor(
-        public legendTemplate: string,
-        public dataName: string,
-        public dataType: string,
-        public lineType: string,
-        public defaultColor: string,
-        public altChartType: string,
-        public altChartConfig: ChartConfig
-    ) { }
+export interface IndicatorResultConfig {
+    legendTemplate: string;
+    dataName: string;
+    dataType: string;
+    lineType: string;
+    defaultColor: string;
+    altChartType: null | string;
+    altChartConfig: ChartConfig | null;
 }
 
-export class ChartConfig {
-    constructor(
-        public minimumYAxis: number,
-        public maximumYAxis: number,
-        public thresholds: ChartThreshold[]
-    ) { }
+export interface ChartConfig {
+    minimumYAxis: number | null;
+    maximumYAxis: number | null;
+    thresholds: ChartThreshold[];
 }
 
-export class ChartThreshold {
-    constructor(
-        public value: number,
-        public color: string,
-        public style: string
-    ) { }
+export interface ChartThreshold {
+    value: number;
+    color: string;
+    style: string;
 }

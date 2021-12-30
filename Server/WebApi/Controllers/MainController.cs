@@ -17,7 +17,7 @@ public class MainController : ControllerBase
         return "API is functioning nominally.";
     }
 
-    [HttpGet("history")]
+    [HttpGet("quotes")]
     public IActionResult GetQuotes()
     {
         return Ok(quotes.Where(x => x.Date >= dateStart));
