@@ -13,7 +13,7 @@ import {
   Quote, IndicatorListing, IndicatorSelection, IndicatorResult, IndicatorParam, ChartThreshold
 } from './app.models';
 import { Guid } from "guid-typescript";
-import { Observable, Subscription, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -96,16 +96,16 @@ export class AppComponent implements OnInit {
       .subscribe({
         next: (q: Quote[]) => {
           this.loadMainChart(q);
-        },
-        error: (e: HttpErrorResponse) => { console.log(e); }
-      });
 
-    // load default selections
-    this.http.get(`${env.api}/indicators`, this.requestHeader())
-      .subscribe({
-        next: (listings: IndicatorListing[]) => {
-          this.listings = listings;
-          this.loadSelections(listings)
+          // load default selections
+          this.http.get(`${env.api}/indicators`, this.requestHeader())
+            .subscribe({
+              next: (listings: IndicatorListing[]) => {
+                this.listings = listings;
+                this.loadSelections(listings, q)
+              },
+              error: (e: HttpErrorResponse) => { console.log(e); }
+            });
         },
         error: (e: HttpErrorResponse) => { console.log(e); }
       });
@@ -223,7 +223,7 @@ export class AppComponent implements OnInit {
     this.loading = false;
   }
 
-  loadSelections(listings: IndicatorListing[]) {
+  loadSelections(listings: IndicatorListing[], quotes: Quote[]) {
 
     // scan indicator selections
     this.selections.forEach((selection: IndicatorSelection) => {
@@ -233,14 +233,14 @@ export class AppComponent implements OnInit {
 
       this.getSelectionData(selection, listing)
         .subscribe({
-          next: (results: IndicatorResult[]) => {
+          next: () => {
 
             // add needed charts
             if (listing.chartType == 'overlay') {
-              this.addOverlaySelectionToChart(selection, listing);
+              this.addOverlaySelectionToChart(selection, listing, quotes);
             }
             else {
-              this.addNonOverlaySelectionChart(selection, listing);
+              this.addNonOverlaySelectionChart(selection, listing, quotes);
             };
 
           },
@@ -295,7 +295,54 @@ export class AppComponent implements OnInit {
     return obs;
   }
 
-  addNonOverlaySelectionChart(selection: IndicatorSelection, listing: IndicatorListing) {
+  addOverlaySelectionToChart(selection: IndicatorSelection, listing: IndicatorListing, quotes: Quote[]) {
+
+    // add indicator data
+    selection.results.forEach(r => {
+
+      const resultConfig = listing.results.find(x => x.dataName == r.dataName);
+      r.type = (resultConfig.altChartType == null) ? listing.chartType : resultConfig.altChartType;
+      // TODO: handle mixed type
+
+      switch (resultConfig.lineType) {
+
+        case 'line':
+          const lineDataset: ChartDataset = {
+            label: r.label,
+            type: 'line',
+            data: r.data,
+            yAxisID: 'yAxis',
+            borderWidth: 1.5,
+            borderColor: r.color,
+            backgroundColor: r.color,
+            pointRadius: 0,
+            spanGaps: true,
+            fill: false,
+            order: 1
+          };
+          this.chartOverlay.data.datasets.push(lineDataset);
+          break;
+
+        case 'bar':
+          const barDataset: ChartDataset = {
+            label: r.label,
+            type: 'bar',
+            data: r.data,
+            yAxisID: 'yAxis',
+            borderWidth: 0,
+            borderColor: r.color,
+            backgroundColor: r.color,
+            order: 1
+          };
+          this.chartOverlay.data.datasets.push(barDataset);
+          break;
+      };
+
+      this.updateOverlayAnnotations(quotes);
+    });
+  }
+
+  addNonOverlaySelectionChart(selection: IndicatorSelection, listing: IndicatorListing, quotes: Quote[]) {
     const chartConfig = this.cs.baseOscillatorConfig();
 
     // initialize chart datasets
@@ -345,6 +392,8 @@ export class AppComponent implements OnInit {
     selection.results.forEach(r => {
 
       const resultConfig = listing.results.find(x => x.dataName == r.dataName);
+      r.type = (resultConfig.altChartType == null) ? listing.chartType : resultConfig.altChartType;
+      // TODO: handle mixed type
 
       switch (resultConfig.lineType) {
 
@@ -390,69 +439,35 @@ export class AppComponent implements OnInit {
 
     if (selection.chart) selection.chart.destroy();
     selection.chart = new Chart(myCanvas.getContext('2d'), chartConfig);
-  }
 
-  addOverlaySelectionToChart(selection: IndicatorSelection, listing: IndicatorListing) {
+    // annotations
+    const xPos: ScaleValue = new Date(quotes[0].date).valueOf();
+    const yPos: ScaleValue = this.cs.yAxisTicks[this.cs.yAxisTicks.length - 1].value;
+    let adjY: number = 1;
 
-    // add indicator data
-    selection.results.forEach(r => {
-
-      const resultConfig = listing.results.find(x => x.dataName == r.dataName);
-
-      switch (resultConfig.lineType) {
-
-        case 'line':
-          const lineDataset: ChartDataset = {
-            label: r.label,
-            type: 'line',
-            data: r.data,
-            yAxisID: 'yAxis',
-            borderWidth: 1.5,
-            borderColor: r.color,
-            backgroundColor: r.color,
-            pointRadius: 0,
-            spanGaps: true,
-            fill: false,
-            order: 1
-          };
-          this.chartOverlay.data.datasets.push(lineDataset);
-          break;
-
-        case 'bar':
-          const barDataset: ChartDataset = {
-            label: r.label,
-            type: 'bar',
-            data: r.data,
-            yAxisID: 'yAxis',
-            borderWidth: 0,
-            borderColor: r.color,
-            backgroundColor: r.color,
-            order: 1
-          };
-          this.chartOverlay.data.datasets.push(barDataset);
-          break;
-      };
-      this.chartOverlay.update();
-    });
+    let annotation: AnnotationOptions = this.cs.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, -3, adjY);
+    selection.chart.options.plugins.annotation.annotations = { annotation };
+    selection.chart.update();
   }
 
   // GENERAL OPERATIONS
 
-  updateOverlayAnnotations() {
+  updateOverlayAnnotations(quotes: Quote[]) {
 
-    // const xPos: ScaleValue = new Date(this.quotes[0].date).valueOf();
-    // const yPos: ScaleValue = this.cs.overlayYticks[this.cs.overlayYticks.length - 1].value;
-    // let adjY: number = 2;
+    const xPos: ScaleValue = new Date(quotes[0].date).valueOf();
+    const yPos: ScaleValue = this.cs.yAxisTicks[this.cs.yAxisTicks.length - 1].value;
+    let adjY: number = 1;
 
-    // this.chartOverlay.options.plugins.annotation.annotations =
-    //   this.legend
-    //     .filter(x => x.chart == 'overlay')
-    //     .map((l, index) => {
-    //       let annotation: AnnotationOptions = this.cs.commonAnnotation(l.label, l.color, xPos, yPos, -3, adjY);
-    //       annotation.id = "note" + (index + 1).toString();
-    //       adjY += 12;
-    //       return annotation;
-    //     });
+    this.chartOverlay.options.plugins.annotation.annotations =
+      this.selections
+        .filter(x => x.results[0].type == 'overlay')
+        .map((l, index) => {
+          console.log("type", l.results[0].type);
+          let annotation: AnnotationOptions = this.cs.commonAnnotation(l.label, l.results[0].color, xPos, yPos, -3, adjY);
+          annotation.id = "note" + (index + 1).toString();
+          adjY += 12;
+          return annotation;
+        });
     this.chartOverlay.update();
   }
 

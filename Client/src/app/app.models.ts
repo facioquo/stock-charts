@@ -28,6 +28,7 @@ export interface IndicatorResult {
     label?: string,
     color: string,
     dataName: string,
+    type: string,
     data: ScatterDataPoint[]
 }
 

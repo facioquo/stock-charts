@@ -36,7 +36,7 @@ Chart.register(
 @Injectable()
 export class ChartService {
 
-    overlayYticks: Tick[] = [];
+    yAxisTicks: Tick[] = [];
 
     baseConfig() {
 
@@ -123,7 +123,7 @@ export class ChartService {
         // format y-axis, add dollar sign
         config.options.scales.yAxis.ticks.callback = (value, index, values) => {
 
-            this.overlayYticks = values;
+            this.yAxisTicks = values;
 
             if (index === 0 || index === values.length - 1) return '';
             else
@@ -155,6 +155,8 @@ export class ChartService {
 
         // remove first and last y-axis labels
         config.options.scales.yAxis.ticks.callback = (value, index, values) => {
+
+            this.yAxisTicks = values;
 
             if (index === 0 || index === values.length - 1) return '';
             else
@@ -219,7 +221,7 @@ export class ChartService {
             content: [label],
             font: legendFont,
             color: fontColor,
-            backgroundColor: 'rgba(255,255,255,0.9)',
+            backgroundColor: 'rgba(33,33,33,0.9)',
             padding: 1,
             position: 'start',
             xScaleID: 'xAxis',
