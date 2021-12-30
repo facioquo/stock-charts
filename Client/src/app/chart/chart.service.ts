@@ -9,7 +9,6 @@ import {
     Chart,
     ChartConfiguration,
     FontSpec,
-    Interaction,
     ScaleOptions,
     Tick
 } from 'chart.js';
@@ -27,21 +26,12 @@ import annotationPlugin
 , { AnnotationOptions, ScaleValue }
     from 'chartjs-plugin-annotation';
 
-import {
-    CrosshairPlugin,
-    CrosshairOptions,
-    Interpolate
-} from 'chartjs-plugin-crosshair';
-
 Chart.register(
     CandlestickController,
     OhlcController,
     CandlestickElement,
     OhlcElement,
     annotationPlugin)
-
-//Chart.register(CrosshairPlugin);
-//Interaction.modes.interpolate = Interpolate;
 
 @Injectable()
 export class ChartService {
@@ -51,7 +41,6 @@ export class ChartService {
     baseConfig() {
 
         const commonXaxes = this.commonXAxes();
-        const crosshairPluginOptions = this.crosshairPluginOptions();
 
         const config: ChartConfiguration = {
 
@@ -62,9 +51,6 @@ export class ChartService {
             options: {
                 plugins: {
                     title: {
-                        font: {
-                            family: 'Roboto'
-                        },
                         display: false
                     },
                     legend: {
@@ -72,23 +58,17 @@ export class ChartService {
                     },
                     tooltip: {
                         enabled: true,
-                        mode: 'index',  // TODO: should be 'interpolate' for crosshair?
+                        mode: 'index',
                         intersect: false
                     },
                     annotation: {
                         clip: false,
                         drawTime: 'afterDraw',
                         annotations: []
-                    },
-                    // crosshair: crosshairPluginOptions  // FIX: types not recognized
+                    }
                 },
                 layout: {
-                    padding: {
-                        left: 10,
-                        right: 10,
-                        top: 5,
-                        bottom: 0
-                    }
+                    padding: 0
                 },
                 responsive: true,
                 maintainAspectRatio: false,
@@ -107,11 +87,21 @@ export class ChartService {
                             font: {
                                 size: 10
                             },
+                            showLabelBackdrop: true,
+                            backdropColor: '#212121',
+                            backdropPadding: 2
                         },
                         grid: {
                             drawOnChartArea: true,
                             drawTicks: false,
-                            drawBorder: false
+                            drawBorder: false,
+                            color: function (context) {
+                                if (context.tick.label === '') {
+                                    return '#212121';
+                                } else {
+                                    return '#424242';
+                                }
+                            }
                         }
                     }
                 }
@@ -128,13 +118,14 @@ export class ChartService {
 
         // aspect ratio
         config.options.maintainAspectRatio = true;
+        config.options.aspectRatio = 2;
 
         // format y-axis, add dollar sign
         config.options.scales.yAxis.ticks.callback = (value, index, values) => {
 
             this.overlayYticks = values;
 
-            if (index === 0) return '';  // skip first label
+            if (index === 0 || index === values.length - 1) return '';
             else
                 return '$' + value;
         };
@@ -155,16 +146,12 @@ export class ChartService {
 
         const config = this.baseConfig();
 
+        // aspect ratio
+        config.options.maintainAspectRatio = true;
+        config.options.aspectRatio = 7;
+
         // remove x-axis
         config.options.scales.xAxis.display = false;
-
-        // format chart
-        config.options.layout.padding = {
-            left: 10,
-            right: 10,
-            top: 10,
-            bottom: 0
-        };
 
         // remove first and last y-axis labels
         config.options.scales.yAxis.ticks.callback = (value, index, values) => {
@@ -244,39 +231,5 @@ export class ChartService {
         };
 
         return annotation;
-    }
-
-    crosshairPluginOptions(): CrosshairOptions {
-
-        const crosshairOptions: CrosshairOptions = {
-            line: {
-                color: '#F66',                                      // crosshair line color
-                width: 1                                            // crosshair line width
-            },
-            sync: {
-                enabled: true,                                      // enable trace line syncing with other charts
-                group: 1,                                           // chart group (can be unique set of groups)
-                suppressTooltips: true                              // suppress tooltips when showing a synced tracer
-            },
-            zoom: {
-                enabled: false,                                     // enable zooming
-                zoomboxBackgroundColor: 'rgba(66,133,244,0.2)',     // background color of zoom box
-                zoomboxBorderColor: '#48F',                         // border color of zoom box
-                zoomButtonText: 'Reset Zoom',                       // reset zoom button text
-                zoomButtonClass: 'reset-zoom',                      // reset zoom button class
-            },
-            snap: {
-                enabled: true
-            },
-            callbacks: {
-                beforeZoom: (start, end) => {                       // called before zoom, return false to prevent zoom
-                    return true;
-                },
-                afterZoom: (start, end) => {                        // called after zoom
-                }
-            }
-        };
-
-        return crosshairOptions;
     }
 }

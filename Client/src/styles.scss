@@ -1,5 +1,5 @@
-// imports
-@import "@angular/material/theming";
+@use "@angular/material" as mat;
+@import "styles-theme";
 
 html,
 body {
@@ -9,19 +9,11 @@ body {
 body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
-    background-color: #fafafa;
+    color: $color-primary-light;
+    background-color: $color-primary;
 
     overflow-x: hidden;
     overflow-y: scroll;
-}
-
-html,
-body {
-    height: 100%;
-}
-body {
-    margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
 .center {

@@ -3,7 +3,7 @@ namespace WebApi.Services;
 public class IndicatorList
 {
     public string Name { get; set; }
-    public string Code { get; set; }
+    public string Uiid { get; set; }
     public string LabelTemplate { get; set; }
     public string Endpoint { get; set; }
     public string Category { get; set; }
@@ -11,27 +11,28 @@ public class IndicatorList
 
     public ChartConfig ChartConfig { get; set; }
 
-    public virtual ICollection<IndicatorParam> Parameters { get; set; }
-    public virtual ICollection<IndicatorResult> Results { get; set; }
+    public virtual ICollection<IndicatorParamConfig> Parameters { get; set; }
+    public virtual ICollection<IndicatorResultConfig> Results { get; set; }
 }
 
-public class IndicatorParam
+public class IndicatorParamConfig
 {
     public string DisplayName { get; set; }
     public string ParamName { get; set; }
     public string DataType { get; set; }
     public int Order { get; set; }
     public bool Required { get; set; }
-    public double? Default { get; set; }
+    public double? DefaultValue { get; set; }
     public double Minimum { get; set; } // greater than
     public double Maximum { get; set; } // less than
 }
 
-public class IndicatorResult
+public class IndicatorResultConfig
 {
     public string LegendTemplate { get; set; }
     public string DataName { get; set; }
     public string DataType { get; set; }
+    public string LineType { get; set; }
     public string DefaultColor { get; set; }
     public string AltChartType { get; set; }
     public ChartConfig AltChartConfig { get; set; }
@@ -54,7 +55,7 @@ public class ChartThreshold
 
 public static class Metadata
 {
-    public static List<IndicatorList> Indicators(string baseUrl)
+    public static List<IndicatorList> IndicatorList(string baseUrl)
     {
         return new List<IndicatorList>()
         {
@@ -62,54 +63,54 @@ public static class Metadata
             new IndicatorList
             {
                 Name = "Bollinger Bands®",
-                Code = "BB",
+                Uiid = "BB",
                 LabelTemplate = "BB([P1],[P2])",
                 Endpoint = $"{baseUrl}/BB/",
                 Category = "price-channel",
                 ChartType = "overlay",
-                Parameters = new List<IndicatorParam>
+                Parameters = new List<IndicatorParamConfig>
                 {
-                    new IndicatorParam {
+                    new IndicatorParamConfig {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
                         DataType = "int",
                         Order = 1,
                         Required = true,
-                        Default = 20,
+                        DefaultValue = 20,
                         Minimum = 2,
                         Maximum = 250
                     },
-                    new IndicatorParam {
+                    new IndicatorParamConfig {
                         DisplayName = "Standard Deviations",
                         ParamName= "standardDeviations",
                         DataType = "number",
                         Order = 2,
                         Required = true,
-                        Default = 2,
+                        DefaultValue = 2,
                         Minimum = 0.01,
                         Maximum = 10
                     }
                 },
-                Results = new List<IndicatorResult>{
-                    new IndicatorResult {
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
                         LegendTemplate = "BB([P1],[P2]) Centerline",
                         DataName = "sma",
                         DataType = "number",
                         DefaultColor = "darkGray"
                     },
-                    new IndicatorResult {
+                    new IndicatorResultConfig {
                         LegendTemplate = "BB([P1],[P2]) Upper Band",
                         DataName = "upperBand",
                         DataType = "number",
                         DefaultColor = "darkGray"
                     },
-                    new IndicatorResult {
+                    new IndicatorResultConfig {
                         LegendTemplate = "BB([P1],[P2]) Lower Band",
                         DataName = "lowerBand",
                         DataType = "number",
                         DefaultColor = "darkGray"
                     },
-                    new IndicatorResult {
+                    new IndicatorResultConfig {
                         LegendTemplate = "BB([P1],[P2]) %B",
                         DataName = "percentB",
                         DataType = "number",
@@ -145,29 +146,30 @@ public static class Metadata
             new IndicatorList
             {
                 Name = "Exponential Moving Average",
-                Code = "EMA",
+                Uiid = "EMA",
                 LabelTemplate = "EMA([P1])",
                 Endpoint = $"{baseUrl}/EMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters = new List<IndicatorParam>
+                Parameters = new List<IndicatorParamConfig>
                 {
-                    new IndicatorParam {
+                    new IndicatorParamConfig {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
                         DataType = "int",
                         Order = 1,
                         Required = true,
-                        Default = 20,
+                        DefaultValue = 20,
                         Minimum = 1,
                         Maximum = 250
                     }
                 },
-                Results = new List<IndicatorResult>{
-                    new IndicatorResult {
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
                         LegendTemplate = "EMA([P1])",
                         DataName = "ema",
                         DataType = "number",
+                        LineType = "line",
                         DefaultColor = "black"
                     }
                 }
@@ -177,31 +179,31 @@ public static class Metadata
             new IndicatorList
             {
                 Name = "Parabolic SAR",
-                Code = "PSAR",
+                Uiid = "PSAR",
                 LabelTemplate = "PSAR([P1],[P2])",
                 Endpoint = $"{baseUrl}/PSAR/",
                 Category = "stop-and-reverse",
                 ChartType = "overlay",
 
-                Parameters = new List<IndicatorParam>
+                Parameters = new List<IndicatorParamConfig>
                 {
-                    new IndicatorParam {
+                    new IndicatorParamConfig {
                         DisplayName = "Step Size",
                         ParamName= "accelerationStep",
                         DataType = "number",
                         Order = 1,
                         Required = true,
-                        Default = 0.02,
+                        DefaultValue = 0.02,
                         Minimum = 0.000001,
                         Maximum = 2500
                     },
-                    new IndicatorParam {
+                    new IndicatorParamConfig {
                         DisplayName = "Max Factor",
                         ParamName= "maxAccelerationFactor",
                         DataType = "number",
                         Order = 2,
                         Required = true,
-                        Default = 0.2,
+                        DefaultValue = 0.2,
                         Minimum = 0.000001,
                         Maximum = 2500
                     },
@@ -215,11 +217,12 @@ public static class Metadata
                     //    Maximum = 2500
                     //}
                 },
-                Results = new List<IndicatorResult>{
-                    new IndicatorResult {
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
                         LegendTemplate = "PSAR([P1],[P2])",
                         DataName = "psar",
                         DataType = "number",
+                        LineType= "line",
                         DefaultColor = "purple"
                     }
                 }
@@ -229,7 +232,7 @@ public static class Metadata
             new IndicatorList
             {
                 Name = "Relative Strength Index",
-                Code = "RSI",
+                Uiid = "RSI",
                 LabelTemplate = "RSI([P1])",
                 Endpoint = $"{baseUrl}/RSI/",
                 Category = "oscillator",
@@ -253,24 +256,25 @@ public static class Metadata
                         }
                     }
                 },
-                Parameters = new List<IndicatorParam>
+                Parameters = new List<IndicatorParamConfig>
                 {
-                    new IndicatorParam {
+                    new IndicatorParamConfig {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
                         DataType = "int",
                         Order = 1,
                         Required = true,
-                        Default = 14,
+                        DefaultValue = 14,
                         Minimum = 1,
                         Maximum = 250
                     }
                 },
-                Results = new List<IndicatorResult>{
-                    new IndicatorResult {
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
                         LegendTemplate = "RSI([P1])",
                         DataName = "rsi",
                         DataType = "number",
+                        LineType = "line",
                         DefaultColor = "black"
                     }
                 }
@@ -280,7 +284,7 @@ public static class Metadata
             new IndicatorList
             {
                 Name = "Stochastic Oscillator",
-                Code = "STO",
+                Uiid = "STO",
                 LabelTemplate = "STO %K([P1]) %D([P2])",
                 Endpoint = $"{baseUrl}/STO/",
                 Category = "oscillator",
@@ -303,46 +307,49 @@ public static class Metadata
                         }
                     }
                 },
-                Parameters = new List<IndicatorParam>
+                Parameters = new List<IndicatorParamConfig>
                 {
-                    new IndicatorParam {
+                    new IndicatorParamConfig {
                         DisplayName = "Lookback Periods (%K)",
                         ParamName = "lookbackPeriods",
                         DataType = "int",
                         Order = 1,
                         Required = true,
-                        Default = 14,
+                        DefaultValue = 14,
                         Minimum = 1,
                         Maximum = 250
                     },
-                    new IndicatorParam {
+                    new IndicatorParamConfig {
                         DisplayName = "Signal Periods (%D)",
                         ParamName = "signalPeriods",
                         DataType = "int",
                         Order = 2,
                         Required = true,
-                        Default = 3,
+                        DefaultValue = 3,
                         Minimum = 1,
                         Maximum = 250
                     }
                 },
-                Results = new List<IndicatorResult>{
-                    new IndicatorResult {
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
                         LegendTemplate = "STO %K([P1])",
                         DataName = "k",
                         DataType = "number",
+                        LineType = "line",
                         DefaultColor = "black"
                     },
-                    new IndicatorResult {
+                    new IndicatorResultConfig {
                         LegendTemplate = "STO %D([P2])",
                         DataName = "d",
                         DataType = "number",
+                        LineType= "line",
                         DefaultColor = "red"
                     },
-                    new IndicatorResult {
+                    new IndicatorResultConfig {
                         LegendTemplate = "STO %J",
                         DataName = "j",
                         DataType = "number",
+                        LineType = "line",
                         DefaultColor = "green"
                     }
                 }

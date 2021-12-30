@@ -2,14 +2,29 @@
 // Use styles.scss for main site styles
 
 @use '@angular/material' as mat;
-@import '@angular/material/theming';
 @include mat.core();
 
 // ref: https://www.materialpalette.com
-$primary: mat.define-palette(mat.$grey-palette, 800);
-$accent: mat.define-palette(mat.$light-green-palette, 800);
-$warn: mat.define-palette(mat.$orange-palette, 800);
+$palette-primary: mat.define-palette(mat.$grey-palette, 900);
+$palette-accent: mat.define-palette(mat.$blue-gray-palette, 900);
+$palette-warn: mat.define-palette(mat.$deep-orange-palette, 900);
 
-$theme: mat.define-light-theme($primary, $accent, $warn);
+$theme: mat.define-dark-theme((
+ color: (
+   primary: $palette-primary,
+   accent: $palette-accent,
+   warn: $palette-warn,
+ )
+));
 
 @include mat.all-component-themes($theme);
+
+// standard colors
+$color-primary: mat.get-color-from-palette($palette-primary, 900);
+$color-accent: mat.get-color-from-palette($palette-accent, 900);
+$color-warn: mat.get-color-from-palette($palette-warn, 900);
+
+// ligtht colors
+$color-primary-light: mat.get-color-from-palette($palette-primary, 300);
+$color-accent-light: mat.get-color-from-palette($palette-accent, 100);
+$color-warn-light: mat.get-color-from-palette($palette-warn, 500);

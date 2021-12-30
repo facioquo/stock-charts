@@ -1,6 +1,8 @@
+@import "../styles-theme";
+
 // PAGE CONTAINERS
 
-.page-container {
+.body-container {
     margin: 16px;
     padding-bottom: 16px;
 }
@@ -14,8 +16,6 @@
 
 .badge-container {
     text-align: center;
-    margin-top: 0.25em;
-
     .badge {
         margin-top: 0.25em;
         padding-left: 0.25em;
@@ -23,35 +23,18 @@
     }
 }
 
-.container {
-    position: relative;
-    margin: auto;
-    max-width: 950px;
-    text-align: center;
-}
-
-.chart-label {
-    margin: 0;
-    padding: 5px 0 0 10px;
-    text-align: left;
-    font-size: 10px;
-}
-
-.chart-container-oscillator {
+.chart-container {
     padding: 0;
     margin: 0;
-}
-
-.select-container {
-    margin: auto;
-    max-width: 950px;
+    border-style: none;
+    border-width: 0;
 }
 
 // TOOLBAR
 .toolbar {
     a {
         text-decoration: none;
-        color: white;
+        color: $color-primary-light;
     }
 
     font-family: Google Sans, Roboto, Arial, Helvetica, sans-serif;
