@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+
 import 'chartjs-adapter-date-fns';
 import 'chartjs-chart-financial';
 
@@ -22,8 +23,7 @@ import {
 } from 'chartjs-chart-financial';
 
 // plugins
-import annotationPlugin
-, { AnnotationOptions, ScaleValue }
+import annotationPlugin, { AnnotationOptions, ScaleValue }
   from 'chartjs-plugin-annotation';
 
 Chart.register(

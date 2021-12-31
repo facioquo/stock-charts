@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { ChartComponent } from './chart.component';
 import { ChartService } from './chart.service';
+import { ApiService } from './api.service';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,8 @@ import { ChartService } from './chart.service';
     ChartComponent
   ],
   providers: [
-    ChartService
+    ChartService,
+    ApiService
   ],
   bootstrap: [ChartComponent]
 })

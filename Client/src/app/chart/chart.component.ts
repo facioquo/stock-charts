@@ -1,17 +1,17 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { env } from '../../environments/environment';
+import { HttpErrorResponse } from '@angular/common/http';
+
+import { Guid } from "guid-typescript";
 
 import Chart from 'chart.js/auto';  // import all default options
 import { ChartDataset, FinancialDataPoint, ScatterDataPoint } from 'chart.js';
 import { AnnotationOptions, ScaleValue } from 'chartjs-plugin-annotation';
-import { ChartService } from './chart.service';
 
-import {
-  Quote, IndicatorListing, IndicatorSelection, IndicatorResult, IndicatorParam, ChartThreshold
-} from './chart.models';
-import { Guid } from "guid-typescript";
-import { Observable } from 'rxjs';
+import { ChartService } from './chart.service';
+import { IndicatorSelection, IndicatorParam, IndicatorResult } from './chart.models';
+
+import { ApiService } from './api.service';
+import { Quote, IndicatorListing, ChartThreshold } from './api.models';
 
 @Component({
   selector: 'app-chart',
@@ -19,6 +19,11 @@ import { Observable } from 'rxjs';
   styleUrls: ['./chart.component.scss']
 })
 export class ChartComponent implements OnInit {
+
+  constructor(
+    private readonly cs: ChartService,
+    private readonly api: ApiService
+  ) { }
 
   @ViewChild('chartsTop') chartTopRef: ElementRef;
   chartOverlay: Chart;
@@ -75,11 +80,6 @@ export class ChartComponent implements OnInit {
     } as IndicatorSelection
   ];
 
-  constructor(
-    private readonly http: HttpClient,
-    private readonly cs: ChartService
-  ) { }
-
   // STARTUP OPERATIONS
 
   ngOnInit() {
@@ -89,13 +89,13 @@ export class ChartComponent implements OnInit {
   startup() {
 
     // compose main chart
-    this.http.get(`${env.api}/quotes`, this.requestHeader())
+    this.api.getQuotes()
       .subscribe({
         next: (q: Quote[]) => {
           this.loadMainChart(q);
 
           // load default selections
-          this.http.get(`${env.api}/indicators`, this.requestHeader())
+          this.api.getListings()
             .subscribe({
               next: (listings: IndicatorListing[]) => {
                 this.listings = listings;
@@ -117,7 +117,7 @@ export class ChartComponent implements OnInit {
       // lookup config data
       const listing = this.listings.find(x => x.uiid == selection.uiid);
 
-      this.getSelectionData(selection, listing)
+      this.api.getSelectionData(selection, listing)
         .subscribe({
           next: () => {
             if (listing.chartType != 'overlay') {
@@ -129,7 +129,7 @@ export class ChartComponent implements OnInit {
     });
 
     // update primary data
-    this.http.get(`${env.api}/quotes`, this.requestHeader())
+    this.api.getQuotes()
       .subscribe({
         next: (quotes: Quote[]) => {
 
@@ -241,7 +241,7 @@ export class ChartComponent implements OnInit {
       // lookup config data
       const listing = listings.find(x => x.uiid == selection.uiid);
 
-      this.getSelectionData(selection, listing)
+      this.api.getSelectionData(selection, listing)
         .subscribe({
           next: () => {
 
@@ -257,52 +257,6 @@ export class ChartComponent implements OnInit {
           error: (e: HttpErrorResponse) => { console.log(e); }
         });
     });
-  }
-
-  getSelectionData(selection: IndicatorSelection, listing: IndicatorListing): Observable<any> {
-
-    const obs = new Observable((observer) => {
-
-      // compose url
-      let url = `${listing.endpoint}?`;
-      selection.params.forEach((param: IndicatorParam, param_index: number) => {
-        if (param_index != 0) url += "&";
-        url += `${param.queryString}`;
-      });
-
-      // fetch data
-      this.http.get(url, this.requestHeader())
-        .subscribe({
-
-          next: (apidata: any[]) => {
-
-            // parse each dataset
-            selection.results
-              .forEach((result: IndicatorResult) => {
-
-                // initialize dataset
-                result.data = [];
-
-                // populate data
-                apidata.forEach(dt => {
-
-                  result.data
-                    .push({
-                      x: new Date(dt.date).valueOf(),
-                      y: dt[result.dataName]
-                    });
-                });
-              });
-
-            observer.next(selection.results);
-          },
-
-          error: (e: HttpErrorResponse) => { console.log(e); return null; }
-        });
-
-    });
-
-    return obs;
   }
 
   addOverlaySelectionToChart(selection: IndicatorSelection, listing: IndicatorListing, quotes: Quote[]) {
@@ -485,22 +439,9 @@ export class ChartComponent implements OnInit {
     this.chartOverlay.update();
   }
 
-  requestHeader(): { headers?: HttpHeaders } {
-
-    const simpleHeaders = new HttpHeaders()
-      .set('Content-Type', 'application/json');
-
-    return { headers: simpleHeaders };
-  }
 
 
-  // HELPER FUNCTIONS
-
-  toDecimals(value: number, decimalPlaces: number): number {
-    if (value === null) return null;
-    return value.toFixed(decimalPlaces) as unknown as number;
-  }
-
+  // HELPERS
   scrollToChartTop() {
     setTimeout(() => {
       this.chartTopRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
