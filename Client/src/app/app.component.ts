@@ -64,13 +64,13 @@ export class AppComponent implements OnInit {
     {
       ucid: `chart${Guid.create().toString().replace(/-/gi, "")}`,
       uiid: "RSI",
-      label: "RSI(14)",
+      label: "RSI(5)",
       params: [
-        { queryString: "lookbackPeriods=14" } as IndicatorParam
+        { queryString: "lookbackPeriods=5" } as IndicatorParam
       ],
       results: [
         {
-          label: "RSI(14)",
+          label: "RSI(5)",
           dataName: "rsi",
           color: "darkOrange"
         } as IndicatorResult
@@ -189,6 +189,19 @@ export class AppComponent implements OnInit {
       sumVol += q.volume;
     });
 
+    // custom border colors
+    const candleOptions = Chart.defaults.elements["candlestick"];
+
+    candleOptions.color.up = '#2c7433';
+    candleOptions.color.down = 'darkRed';
+    candleOptions.color.unchanged = '#616161';
+
+    candleOptions.borderColor = {
+      up: candleOptions.color.up,
+      down: candleOptions.color.down,
+      unchanged: candleOptions.color.unchanged
+    };
+
     // define base datasets
     chartConfig.data = {
       datasets: [
@@ -197,7 +210,7 @@ export class AppComponent implements OnInit {
           label: 'Price',
           data: price,
           yAxisID: 'yAxis',
-          borderColor: '#616161',
+          borderColor: candleOptions.borderColor,
           order: 90
         },
         {
@@ -445,7 +458,8 @@ export class AppComponent implements OnInit {
     const yPos: ScaleValue = this.cs.yAxisTicks[this.cs.yAxisTicks.length - 1].value;
     let adjY: number = 1;
 
-    let annotation: AnnotationOptions = this.cs.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, -3, adjY);
+    let annotation: AnnotationOptions =
+      this.cs.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, 2, adjY);
     selection.chart.options.plugins.annotation.annotations = { annotation };
     selection.chart.update();
   }
@@ -463,7 +477,8 @@ export class AppComponent implements OnInit {
         .filter(x => x.results[0].type == 'overlay')
         .map((l, index) => {
           console.log("type", l.results[0].type);
-          let annotation: AnnotationOptions = this.cs.commonAnnotation(l.label, l.results[0].color, xPos, yPos, -3, adjY);
+          let annotation: AnnotationOptions =
+            this.cs.commonAnnotation(l.label, l.results[0].color, xPos, yPos, 0, adjY);
           annotation.id = "note" + (index + 1).toString();
           adjY += 12;
           return annotation;

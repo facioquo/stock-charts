@@ -1,4 +1,4 @@
-import { Chart, ScatterDataPoint } from "chart.js";
+import { BarControllerDatasetOptions, Chart, ScatterDataPoint } from "chart.js";
 
 export interface Quote {
     date: Date;
@@ -77,4 +77,16 @@ export interface ChartThreshold {
     value: number;
     color: string;
     style: string;
+}
+
+
+
+// MISSING CHART.JS TYPINGS (OVERRIDES)
+// bug: https://github.com/chartjs/chartjs-chart-financial/pull/115
+type CandleDatasetOption = BarControllerDatasetOptions & {
+    borderColor: {
+        up: string,
+        down: string,
+        unchanged: string
+    };
 }

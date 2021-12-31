@@ -24,7 +24,7 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("indicators")]
-    public IActionResult GetMetadata()
+    public IActionResult GetIndicators()
     {
         return Ok(Metadata.IndicatorList($"{Request.Scheme}://{Request.Host}"));
     }

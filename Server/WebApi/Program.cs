@@ -40,7 +40,7 @@ app.UseAuthentication();
 app.UseEndpoints(ep =>
 {
     _ = ep.MapControllers()
-      .RequireCors("CorsPolicy");  // on all controllers
+          .RequireCors("CorsPolicy");  // on all controllers
 });
 
 app.Run();
