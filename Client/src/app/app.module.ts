@@ -1,11 +1,10 @@
-import { NgModule, } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -18,15 +17,18 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { AppComponent } from './app.component';
-import { ChartService } from './chart/chart.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
+import { AppComponent } from './app.component';
+import { ChartModule } from './chart/chart.module';
 
 @NgModule({
   declarations: [
     AppComponent
   ],
   imports: [
+
+    // Angular
     BrowserModule,
     BrowserAnimationsModule,
 
@@ -49,11 +51,14 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     MatTooltipModule,
 
     // Other
-    FontAwesomeModule
+    FontAwesomeModule,
+
+    // Application
+    ChartModule
   ],
-  providers: [
-    ChartService
-  ],
-  bootstrap: [AppComponent]
+  providers: [],
+  bootstrap: [
+    AppComponent
+  ]
 })
 export class AppModule { }

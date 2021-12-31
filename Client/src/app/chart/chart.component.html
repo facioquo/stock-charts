@@ -1,0 +1,18 @@
+<!-- CHART STACK -->
+<a #chartsTop></a>
+
+<!-- loading -->
+<div *ngIf="loading">
+
+  <div style="margin-top:175px;text-align:center;font-family:Roboto,Arial,sans-serif;font-size:12px;">
+    <p><img src="../assets/spinner.gif" alt="logging in" height="25"><br>WAKING UP DEMO. STANDBY</p>
+  </div>
+
+</div>
+
+<!-- CHART (MAIN) -->
+<div class="chart-container">
+  <canvas id="chartOverlay"></canvas>
+</div>
+
+<!-- CHART (OSCILLATORS) -->

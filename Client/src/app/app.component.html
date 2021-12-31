@@ -1,11 +1,11 @@
 <mat-toolbar class="toolbar noselect" color="accent">
-    <div>Stock.Charts</div>
-    <div class="filler"></div>
-    <div matTooltip="GitHub repository for this site">
-        <a href="https://github.com/DaveSkender/Stock.Charts">
-            <fa-icon [icon]="faGithub" size="2x"></fa-icon>
-        </a>
-    </div>
+  <div>Stock.Charts</div>
+  <div class="filler"></div>
+  <div matTooltip="GitHub repository for this site">
+    <a href="https://github.com/DaveSkender/Stock.Charts">
+      <fa-icon [icon]="faGithub" size="2x"></fa-icon>
+    </a>
+  </div>
 </mat-toolbar>
 
 <!-- intro -->
@@ -31,21 +31,4 @@
     </p>
 </div> -->
 
-<!-- CHART STACK -->
-<a #chartsTop></a>
-
-<!-- loading -->
-<div *ngIf="loading">
-
-    <div style="margin-top:175px;text-align:center;font-family:Roboto,Arial,sans-serif;font-size:12px;">
-        <p><img src="../assets/spinner.gif" alt="logging in" height="25"><br>WAKING UP DEMO. STANDBY</p>
-    </div>
-
-</div>
-
-<!-- CHART (MAIN) -->
-<div class="chart-container">
-    <canvas id="chartOverlay"></canvas>
-</div>
-
-<!-- CHART (OSCILLATORS) -->
+<app-chart></app-chart>
