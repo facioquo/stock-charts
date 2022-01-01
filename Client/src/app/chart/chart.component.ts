@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 
 import { Guid } from "guid-typescript";
 
@@ -12,6 +13,7 @@ import { IndicatorSelection, IndicatorParam, IndicatorResult } from './chart.mod
 
 import { ApiService } from './api.service';
 import { Quote, IndicatorListing, ChartThreshold } from './api.models';
+import { ListSheetComponent } from './listing/listing.component';
 
 @Component({
   selector: 'app-chart',
@@ -22,63 +24,17 @@ export class ChartComponent implements OnInit {
 
   constructor(
     private readonly cs: ChartService,
-    private readonly api: ApiService
+    private readonly api: ApiService,
+    private readonly bs: MatBottomSheet
   ) { }
 
   @ViewChild('chartsTop') chartTopRef: ElementRef;
   chartOverlay: Chart;
+  quotes: Quote[];
 
   loading = true;
   listings: IndicatorListing[];
-
-  // seed charts (values from wizard, normally)
-  selections: IndicatorSelection[] = [
-    {
-      ucid: `chart${Guid.create().toString().replace(/-/gi, "")}`,
-      uiid: "EMA",
-      label: "EMA(5)",
-      params: [
-        { queryString: "lookbackPeriods=5" } as IndicatorParam
-      ],
-      results: [
-        {
-          label: "EMA(5)",
-          dataName: "ema",
-          color: "red"
-        } as IndicatorResult
-      ]
-    } as IndicatorSelection,
-    {
-      ucid: `chart${Guid.create().toString().replace(/-/gi, "")}`,
-      uiid: "EMA",
-      label: "EMA(20)",
-      params: [
-        { queryString: "lookbackPeriods=20" } as IndicatorParam
-      ],
-      results: [
-        {
-          label: "EMA(20)",
-          dataName: "ema",
-          color: "darkOrange"
-        } as IndicatorResult
-      ]
-    } as IndicatorSelection,
-    {
-      ucid: `chart${Guid.create().toString().replace(/-/gi, "")}`,
-      uiid: "RSI",
-      label: "RSI(5)",
-      params: [
-        { queryString: "lookbackPeriods=5" } as IndicatorParam
-      ],
-      results: [
-        {
-          label: "RSI(5)",
-          dataName: "rsi",
-          color: "darkOrange"
-        } as IndicatorResult
-      ]
-    } as IndicatorSelection
-  ];
+  selections: IndicatorSelection[] = [];
 
   // STARTUP OPERATIONS
 
@@ -92,6 +48,7 @@ export class ChartComponent implements OnInit {
     this.api.getQuotes()
       .subscribe({
         next: (q: Quote[]) => {
+          this.quotes = q;
           this.loadMainChart(q);
 
           // load default selections
@@ -99,7 +56,7 @@ export class ChartComponent implements OnInit {
             .subscribe({
               next: (listings: IndicatorListing[]) => {
                 this.listings = listings;
-                this.loadSelections(listings, q)
+                this.loadSelections()
               },
               error: (e: HttpErrorResponse) => { console.log(e); }
             });
@@ -107,61 +64,6 @@ export class ChartComponent implements OnInit {
         error: (e: HttpErrorResponse) => { console.log(e); }
       });
   }
-
-  // API OPERATIONS
-  updateData() {
-
-    // update selections data
-    this.selections.forEach((selection: IndicatorSelection) => {
-
-      // lookup config data
-      const listing = this.listings.find(x => x.uiid == selection.uiid);
-
-      this.api.getSelectionData(selection, listing)
-        .subscribe({
-          next: () => {
-            if (listing.chartType != 'overlay') {
-              selection.chart.update();
-            };
-          },
-          error: (e: HttpErrorResponse) => { console.log(e); }
-        });
-    });
-
-    // update primary data
-    this.api.getQuotes()
-      .subscribe({
-        next: (quotes: Quote[]) => {
-
-          const price: FinancialDataPoint[] = [];
-          const volume: ScatterDataPoint[] = [];
-          let sumVol = 0;
-
-          quotes.forEach((q: Quote) => {
-            price.push({
-              x: new Date(q.date).valueOf(),
-              o: q.open,
-              h: q.high,
-              l: q.low,
-              c: q.close
-            });
-            volume.push({
-              x: new Date(q.date).valueOf(),
-              y: q.volume
-            });
-            sumVol += q.volume;
-
-            // get size for volume axis
-            const volumeAxisSize = 20 * (sumVol / volume.length) || 0;
-            this.chartOverlay.options.scales.volumeAxis.max = volumeAxisSize;
-            this.chartOverlay.update();
-          });
-        },
-        error: (e: HttpErrorResponse) => { console.log(e); }
-      });
-  }
-
-  // CHARTS OPERATIONS
 
   loadMainChart(quotes: Quote[]) {
 
@@ -233,33 +135,117 @@ export class ChartComponent implements OnInit {
     this.loading = false;
   }
 
-  loadSelections(listings: IndicatorListing[], quotes: Quote[]) {
+  loadSelections() {
 
-    // scan indicator selections
-    this.selections.forEach((selection: IndicatorSelection) => {
+    // TODO: get from cache or use defaults if none
 
-      // lookup config data
-      const listing = listings.find(x => x.uiid == selection.uiid);
+    const defaultSelections: IndicatorSelection[] = [
+      {
+        ucid: this.getChartGuid(),
+        uiid: "EMA",
+        label: "EMA(5)",
+        params: [
+          { name: "lookbackPeriods", value: 5 } as IndicatorParam
+        ],
+        results: [
+          {
+            label: "EMA(5)",
+            dataName: "ema",
+            color: "red"
+          } as IndicatorResult
+        ]
+      } as IndicatorSelection,
+      {
+        ucid: this.getChartGuid(),
+        uiid: "EMA",
+        label: "EMA(20)",
+        params: [
+          { name: "lookbackPeriods", value: 20 } as IndicatorParam
+        ],
+        results: [
+          {
+            label: "EMA(20)",
+            dataName: "ema",
+            color: "darkOrange"
+          } as IndicatorResult
+        ]
+      } as IndicatorSelection,
+      {
+        ucid: this.getChartGuid(),
+        uiid: "RSI",
+        label: "RSI(5)",
+        params: [
+          { name: "lookbackPeriods", value: 5 } as IndicatorParam
+        ],
+        results: [
+          {
+            label: "RSI(5)",
+            dataName: "rsi",
+            color: "darkOrange"
+          } as IndicatorResult
+        ]
+      } as IndicatorSelection];
 
-      this.api.getSelectionData(selection, listing)
-        .subscribe({
-          next: () => {
-
-            // add needed charts
-            if (listing.chartType == 'overlay') {
-              this.addOverlaySelectionToChart(selection, listing, quotes);
-            }
-            else {
-              this.addNonOverlaySelectionChart(selection, listing, quotes);
-            };
-
-          },
-          error: (e: HttpErrorResponse) => { console.log(e); }
-        });
+    // add indicator selections
+    defaultSelections.forEach((selection: IndicatorSelection) => {
+      this.addSelection(selection);
     });
   }
 
-  addOverlaySelectionToChart(selection: IndicatorSelection, listing: IndicatorListing, quotes: Quote[]) {
+
+  // SELECTION OPERATIONS
+  openBottomSheet(): void {
+    this.bs.open(ListSheetComponent, { data: this.listings });
+  }
+
+  addSelection(selection: IndicatorSelection) {
+
+    this.selections.push(selection);
+    // TODO: save to cache
+
+    // lookup config data
+    const listing = this.listings.find(x => x.uiid == selection.uiid);
+
+    this.api.getSelectionData(selection, listing)
+      .subscribe({
+        next: () => {
+
+          // add needed charts
+          if (listing.chartType == 'overlay') {
+            this.addOverlaySelectionToChart(selection, listing);
+          }
+          else {
+            this.addNonOverlaySelectionChart(selection, listing);
+          };
+
+        },
+        error: (e: HttpErrorResponse) => { console.log(e); }
+      });
+  }
+
+  deleteSelection(ucid: string) {
+
+    const selection = this.selections.find(x => x.ucid == ucid);
+    const listing = this.listings.find(x => x.uiid == selection.uiid);
+
+    // TODO: store full dataset in IndicatorResult so we can splice it from the Chart dataset
+    // const rsiDataset = this.chartRsi.data.datasets.indexOf(line, 0);  // keep thi
+    // this.chartRsi.data.datasets.splice(rsiDataset, 1);
+    // handle mixed types (maybe listing="mixed", then use result subtype)
+    // non-Overlay:
+    //selection.chart.destroy()
+
+    // remove from selections
+
+  }
+
+  getChartGuid(): string {
+    return `chart${Guid.create().toString().replace(/-/gi, "")}`;
+  }
+
+
+  // CHARTS OPERATIONS
+  addOverlaySelectionToChart(selection: IndicatorSelection, listing: IndicatorListing) {
 
     // add indicator data
     selection.results.forEach(r => {
@@ -302,11 +288,11 @@ export class ChartComponent implements OnInit {
           break;
       };
 
-      this.updateOverlayAnnotations(quotes);
+      this.updateOverlayAnnotations();
     });
   }
 
-  addNonOverlaySelectionChart(selection: IndicatorSelection, listing: IndicatorListing, quotes: Quote[]) {
+  addNonOverlaySelectionChart(selection: IndicatorSelection, listing: IndicatorListing) {
     const chartConfig = this.cs.baseOscillatorConfig();
 
     // initialize chart datasets
@@ -408,7 +394,7 @@ export class ChartComponent implements OnInit {
     selection.chart = new Chart(myCanvas.getContext('2d'), chartConfig);
 
     // annotations
-    const xPos: ScaleValue = new Date(quotes[0].date).valueOf();
+    const xPos: ScaleValue = new Date(this.quotes[0].date).valueOf();
     const yPos: ScaleValue = this.cs.yAxisTicks[this.cs.yAxisTicks.length - 1].value;
     let adjY: number = 1;
 
@@ -418,11 +404,65 @@ export class ChartComponent implements OnInit {
     selection.chart.update();
   }
 
-  // GENERAL OPERATIONS
 
-  updateOverlayAnnotations(quotes: Quote[]) {
+  // DATA OPERATIONS
+  updateData() {
 
-    const xPos: ScaleValue = new Date(quotes[0].date).valueOf();
+    // update selections data
+    this.selections.forEach((selection: IndicatorSelection) => {
+
+      // lookup config data
+      const listing = this.listings.find(x => x.uiid == selection.uiid);
+
+      this.api.getSelectionData(selection, listing)
+        .subscribe({
+          next: () => {
+            if (listing.chartType != 'overlay') {
+              selection.chart.update();
+            };
+          },
+          error: (e: HttpErrorResponse) => { console.log(e); }
+        });
+    });
+
+    // update primary data
+    this.api.getQuotes()
+      .subscribe({
+        next: (quotes: Quote[]) => {
+
+          const price: FinancialDataPoint[] = [];
+          const volume: ScatterDataPoint[] = [];
+          let sumVol = 0;
+
+          quotes.forEach((q: Quote) => {
+            price.push({
+              x: new Date(q.date).valueOf(),
+              o: q.open,
+              h: q.high,
+              l: q.low,
+              c: q.close
+            });
+            volume.push({
+              x: new Date(q.date).valueOf(),
+              y: q.volume
+            });
+            sumVol += q.volume;
+
+            // get size for volume axis
+            const volumeAxisSize = 20 * (sumVol / volume.length) || 0;
+            this.chartOverlay.options.scales.volumeAxis.max = volumeAxisSize;
+            this.chartOverlay.update();
+          });
+        },
+        error: (e: HttpErrorResponse) => { console.log(e); }
+      });
+  }
+
+
+  // ANNOTATION OPERATIONS
+  updateOverlayAnnotations() {
+
+    const xPos: ScaleValue = new Date(this.quotes[0].date).valueOf();
     const yPos: ScaleValue = this.cs.yAxisTicks[this.cs.yAxisTicks.length - 1].value;
     let adjY: number = 1;
 
@@ -436,9 +476,9 @@ export class ChartComponent implements OnInit {
           adjY += 12;
           return annotation;
         });
+
     this.chartOverlay.update();
   }
-
 
 
   // HELPERS

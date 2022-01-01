@@ -1,6 +1,21 @@
+@use "@angular/material" as mat;
+@import "../../styles-theme";
+
 .chart-container {
   padding: 0;
   margin: 0;
   border-style: none;
   border-width: 0;
+}
+
+.button-listing {
+  position: fixed;
+  left: 50%;
+  margin-left: -28px;
+  bottom: 15px;
+  background-color: transparent !important;
+
+  &:hover{
+    background-color: $color-accent !important;
+  }
 }

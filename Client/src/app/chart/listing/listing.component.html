@@ -1,0 +1,7 @@
+<mat-nav-list>
+
+  <a mat-list-item *ngFor="let indicator of data" (click)="openLink($event, indicator)">
+    <span mat-line>{{indicator.name}}</span>
+    <span mat-line>{{indicator.category}}</span>
+  </a>
+</mat-nav-list>

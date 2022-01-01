@@ -29,7 +29,7 @@ export class ApiService {
       let url = `${listing.endpoint}?`;
       selection.params.forEach((param: IndicatorParam, param_index: number) => {
         if (param_index != 0) url += "&";
-        url += `${param.queryString}`;
+        url += `${param.name}=${param.value}`;
       });
 
       // fetch data

@@ -12,11 +12,12 @@ export interface IndicatorSelection {
 }
 
 export interface IndicatorParam {
-  queryString: string
+  name: string,
+  value?: number
 }
 
 export interface IndicatorResult {
-  label?: string,
+  label: string,
   color: string,
   dataName: string,
   type: string,
