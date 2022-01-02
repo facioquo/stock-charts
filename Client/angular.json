@@ -30,8 +30,8 @@
               "src/ecoysystem.config.js"
             ],
             "styles": [
-              "src/styles-theme.scss",
-              "src/styles.scss"
+              "src/app/styles-theme.scss",
+              "src/app/styles.scss"
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [

@@ -3,8 +3,12 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Observable } from 'rxjs';
 import { env } from '../../environments/environment';
 
-import { IndicatorListing } from './api.models';
-import { IndicatorParam, IndicatorResult, IndicatorSelection } from './chart.models';
+import {
+  IndicatorListing,
+  IndicatorParam,
+  IndicatorResult,
+  IndicatorSelection
+} from './chart.models';
 
 @Injectable()
 export class ApiService {

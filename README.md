@@ -1,19 +1,23 @@
-# Stock Indicators for .NET NuGet package Demo
+# Stock Indicators for .NET demo
 
 [![Build status](https://dev.azure.com/skender/Stock.Indicators/_apis/build/status/Stock.Charts)](https://dev.azure.com/skender/Stock.Indicators/_build/latest?definitionId=23)
 
-This is a demo for use of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular website with a .NET Web API that auto generates a stock chart.  You can add and remove indicators on the fly, to the chart.  Only a few sample indicators are shown in this demo.  See the [Library documentation](https://daveskender.github.io/Stock.Indicators) for more information and a full list of available indicators.
+This is a demo of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular website with a [Chart.js](https://github.com/chartjs/chartjs-chart-financial) financial/candlestick stock chart, using with a .NET Web API backend to generate indicators.  The indicator library can be implemented in any .NET compatible ecosystem (it does not have to be in an API like this).  See the [library documentation](https://daveskender.github.io/Stock.Indicators) for more information and a full list of available indicators.
 
-DEMO: [https://stock-charts.azurewebsites.net](https://stock-charts.azurewebsites.net/) is the Azure hosted live site of this demonstration.  Please note this is hosted on a "cost effective" Azure service plan, so you can attribute slowness to this low-end host.  The package itself is quite fast.
+Live demo site: [https://stock-charts.azurewebsites.net :chart_with_upwards_trend:](https://stock-charts.azurewebsites.net/)
 
-If you want to host yourself on your local computer and review the source code, follow the instructions below.
+If you want to host on your local computer and review the source code, follow the instructions below.
 
-## Running the demo locally
+## Author's note
+
+This repo and charting tool is primarily intended to demonstrate the [Stock Indicators for .NET](https://github.com/DaveSkender/Stock.Indicators) library.  **It is not meant to be a fully featured charting system** and may not be an architectural model that works for your use case.  If you need a more mature charting tool, please explore all of your [charting and visualization options](https://github.com/DaveSkender/Stock.Indicators/discussions/430).
+
+## Running this demo locally
 
 ### Prerequisites
 
 - [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) v14.x or later
-- [Visual Studio 2022](http://visualstudio.com)
+- [Visual Studio](http://visualstudio.com)
 
 ### Steps
 
@@ -25,7 +29,7 @@ If you want to host yourself on your local computer and review the source code, 
 
     ![WebApi Properties ><](Client/src/assets/server-port.png)
 
-4. Open `Client\src\environments\environment.ts` and modify the API URL if needed, then save file.
+4. Open `Client\src\environments\environment.ts` and modify the API URL, if needed, then save file.
 
     ```ts
     export const env: EnvConfig = {

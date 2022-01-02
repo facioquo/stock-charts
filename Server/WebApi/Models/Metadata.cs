@@ -51,12 +51,31 @@ public class ChartThreshold
     public double Value { get; set; }
     public string Color { get; set; }
     public string Style { get; set; }
+    public ChartThresholdFill Fill { get; set; }
+}
+
+public class ChartThresholdFill
+{
+    public string Target { get; set; }
+    public string ColorAbove { get; set; }
+    public string ColorBelow { get; set; }
 }
 
 public static class Metadata
 {
     public static List<IndicatorList> IndicatorList(string baseUrl)
     {
+        string standardRed = "#DD2C00";
+        string standardOrange = "#EF6C00";
+        string standardGreen = "#2E7D32";
+        string standardBlue = "#1E88E5";
+        string standardPurple = "#8E24AA";
+        string standardGray = "#9E9E9E";
+        string darkGray = "#757575";
+
+        string thresholdRed = "#B71C1C70";
+        string thresholdGreen = "#1B5E2070";
+
         return new List<IndicatorList>()
         {
             // Bollinger Bands
@@ -96,44 +115,44 @@ public static class Metadata
                         LegendTemplate = "BB([P1],[P2]) Centerline",
                         DataName = "sma",
                         DataType = "number",
-                        DefaultColor = "darkGray"
+                        DefaultColor = darkGray
                     },
                     new IndicatorResultConfig {
                         LegendTemplate = "BB([P1],[P2]) Upper Band",
                         DataName = "upperBand",
                         DataType = "number",
-                        DefaultColor = "darkGray"
+                        DefaultColor = standardGray
                     },
                     new IndicatorResultConfig {
                         LegendTemplate = "BB([P1],[P2]) Lower Band",
                         DataName = "lowerBand",
                         DataType = "number",
-                        DefaultColor = "darkGray"
+                        DefaultColor = standardGray
                     },
                     new IndicatorResultConfig {
                         LegendTemplate = "BB([P1],[P2]) %B",
                         DataName = "percentB",
                         DataType = "number",
-                        DefaultColor = "darkOrange",
+                        DefaultColor = standardOrange,
                         AltChartType = "oscillator",
                         AltChartConfig = new ChartConfig
                         {
                             Thresholds = new List<ChartThreshold>{
                                 new ChartThreshold {
                                     Value = 1,
-                                    Color = "darkRed",
+                                    Color = thresholdRed,
                                     Style = "solid"
                                 },
                                 new ChartThreshold
                                 {
                                     Value = 0.5,
-                                    Color = "darkGray",
+                                    Color = standardGray,
                                     Style = "dotted"
                                 },
                                 new ChartThreshold
                                 {
                                     Value = 0,
-                                    Color = "darkGreen",
+                                    Color = thresholdGreen,
                                     Style = "solid"
                                 }
                             }
@@ -170,7 +189,7 @@ public static class Metadata
                         DataName = "ema",
                         DataType = "number",
                         LineType = "line",
-                        DefaultColor = "black"
+                        DefaultColor = standardBlue
                     }
                 }
             },
@@ -206,24 +225,15 @@ public static class Metadata
                         DefaultValue = 0.2,
                         Minimum = 0.000001,
                         Maximum = 2500
-                    },
-                    //new Param {
-                    //    DisplayName = "Initial Factor",
-                    //    ParamName= "initialFactor",
-                    //    Type = "number",
-                    //    Order = 3,
-                    //    Required = false,
-                    //    Minimum = 0.000001,
-                    //    Maximum = 2500
-                    //}
+                    }
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LegendTemplate = "PSAR([P1],[P2])",
-                        DataName = "psar",
+                        DataName = "sar",
                         DataType = "number",
-                        LineType= "line",
-                        DefaultColor = "purple"
+                        LineType= "dots",
+                        DefaultColor = standardPurple
                     }
                 }
             },
@@ -246,13 +256,25 @@ public static class Metadata
                     {
                         new ChartThreshold {
                             Value = 70,
-                            Color = "darkRed",
-                            Style = "solid"
+                            Color = thresholdRed,
+                            Style = "dash",
+                            Fill = new ChartThresholdFill
+                            {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = thresholdRed
+                            }
                         },
                         new ChartThreshold {
                             Value = 30,
-                            Color = "darkGreen",
-                            Style = "solid"
+                            Color = thresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartThresholdFill
+                            {
+                                Target = "+1",
+                                ColorAbove = thresholdGreen,
+                                ColorBelow = "transparent"
+                            }
                         }
                     }
                 },
@@ -275,7 +297,7 @@ public static class Metadata
                         DataName = "rsi",
                         DataType = "number",
                         LineType = "line",
-                        DefaultColor = "black"
+                        DefaultColor = standardBlue
                     }
                 }
             },
@@ -293,17 +315,27 @@ public static class Metadata
                 {
                     Thresholds = new List<ChartThreshold>
                     {
-                        new ChartThreshold
-                        {
+                        new ChartThreshold {
                             Value = 80,
-                            Color = "darkRed",
-                            Style = "solid"
+                            Color = thresholdRed,
+                            Style = "dash",
+                            Fill = new ChartThresholdFill
+                            {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = thresholdRed
+                            }
                         },
-                        new ChartThreshold
-                        {
+                        new ChartThreshold {
                             Value = 20,
-                            Color = "darkGreen",
-                            Style = "solid"
+                            Color = thresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartThresholdFill
+                            {
+                                Target = "+1",
+                                ColorAbove = thresholdGreen,
+                                ColorBelow = "transparent"
+                            }
                         }
                     }
                 },
@@ -336,21 +368,21 @@ public static class Metadata
                         DataName = "k",
                         DataType = "number",
                         LineType = "line",
-                        DefaultColor = "black"
+                        DefaultColor = standardBlue
                     },
                     new IndicatorResultConfig {
                         LegendTemplate = "STO %D([P2])",
                         DataName = "d",
                         DataType = "number",
                         LineType= "line",
-                        DefaultColor = "red"
+                        DefaultColor = standardRed
                     },
                     new IndicatorResultConfig {
                         LegendTemplate = "STO %J",
                         DataName = "j",
                         DataType = "number",
-                        LineType = "line",
-                        DefaultColor = "green"
+                        LineType = "dash",
+                        DefaultColor = standardGreen
                     }
                 }
             }

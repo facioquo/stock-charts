@@ -1,26 +1,26 @@
-@import "../styles-theme";
+@use "@angular/material" as mat;
+@import "styles";
 
 // TOOLBAR
-.toolbar {
+mat-toolbar {
+  font-family: Google Sans, Roboto, Arial, Helvetica, sans-serif;
+  color: mat.get-color-from-palette($palette-primary, 700) !important;
+  background-color: mat.get-color-from-palette($palette-primary, 900) !important;
+  padding: 0 16px;
+
   a {
     text-decoration: none;
-    color: $color-primary-light;
-  }
+    color: inherit;
 
-  font-family: Google Sans, Roboto, Arial, Helvetica, sans-serif;
+    &:hover {
+      color: mat.get-color-from-palette($palette-primary, 500) !important;
+    }
+  }
 
   .filler {
     flex: 1 1 auto;
     text-align: center;
   }
-}
-
-// PAGE CONTAINERS
-.page-intro {
-  max-width: 950px;
-  text-align: center;
-  margin: auto;
-  margin-bottom: 1em;
 }
 
 .badge-container {

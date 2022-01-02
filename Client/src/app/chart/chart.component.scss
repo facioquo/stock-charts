@@ -1,5 +1,5 @@
 @use "@angular/material" as mat;
-@import "../../styles-theme";
+@import "../styles";
 
 .chart-container {
   padding: 0;
@@ -13,9 +13,12 @@
   left: 50%;
   margin-left: -28px;
   bottom: 15px;
-  background-color: transparent !important;
+  color: mat.get-color-from-palette($palette-primary, 700) !important;
+  background-color: mat.get-color-from-palette($palette-primary, 800, 0.2) !important;
 
-  &:hover{
-    background-color: $color-accent !important;
+  &:hover {
+    color: mat.get-color-from-palette(mat.$green-palette, 900) !important;
+    background-color: mat.get-color-from-palette(mat.$green-palette, 900, 0.2) !important;
+    font-weight: bold;
   }
 }

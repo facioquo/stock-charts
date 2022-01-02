@@ -1,0 +1,41 @@
+<h1 mat-dialog-title>{{indicator.name}}</h1>
+
+<!-- form content -->
+<div mat-dialog-content>
+
+  <h2>Parameters</h2>
+  <div *ngFor="let p of selection.params; index">
+    <mat-form-field>
+      <mat-label center>{{p.name}}</mat-label>
+      <input matInput [(ngModel)]="p.value">
+      <!-- <mat-error *ngIf="param.invalid">{{getParamErrorMessage()}}</mat-error> -->
+    </mat-form-field>
+  </div>
+
+  <h2>Colors</h2>
+  <div *ngFor="let r of selection.results; index">
+    <mat-form-field>
+      <mat-label>{{r.dataName}}</mat-label>
+      <input matInput [mtxColorpicker]="customPicker" [(ngModel)]="r.color">
+      <mtx-colorpicker-toggle matSuffix [for]="customPicker"></mtx-colorpicker-toggle>
+      <mtx-colorpicker #customPicker [content]="customPickerContent"></mtx-colorpicker>
+    </mat-form-field>
+
+    <ng-template #customPickerContent>
+      <div [style.width.px]="240">
+        <color-sketch [presetColors]="presetColors" [color]="customPicker.selected"
+          (onChangeComplete)="customPicker.select(getHex8($event))">
+        </color-sketch>
+      </div>
+    </ng-template>
+  </div>
+
+</div>
+
+<!-- action pane -->
+<div mat-dialog-actions align="center">
+  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-raised-button cdkFocusInitial (click)="onSubmit()" color="accent" [mat-dialog-close]="selection">
+    Add
+  </button>
+</div>

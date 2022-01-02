@@ -5,10 +5,12 @@ import 'chartjs-chart-financial';
 
 import { enUS } from 'date-fns/locale';
 import { add, parseISO } from 'date-fns';
+import { Guid } from "guid-typescript";
 
 import {
   Chart,
   ChartConfiguration,
+  ChartDataset,
   FontSpec,
   ScaleOptions,
   Tick
@@ -26,6 +28,14 @@ import {
 import annotationPlugin, { AnnotationOptions, ScaleValue }
   from 'chartjs-plugin-annotation';
 
+// internal models
+import {
+  IndicatorListing,
+  IndicatorParam,
+  IndicatorResult,
+  IndicatorSelection
+} from './chart.models';
+
 Chart.register(
   CandlestickController,
   OhlcController,
@@ -37,6 +47,7 @@ Chart.register(
 export class ChartService {
 
   yAxisTicks: Tick[] = [];
+  listings: IndicatorListing[];
 
   baseConfig() {
 
@@ -95,6 +106,7 @@ export class ChartService {
               drawOnChartArea: true,
               drawTicks: false,
               drawBorder: false,
+              lineWidth: 0.5,
               color: function (context) {
                 if (context.tick.label === '') {
                   return '#212121';
@@ -221,7 +233,7 @@ export class ChartService {
       content: [label],
       font: legendFont,
       color: fontColor,
-      backgroundColor: 'rgba(33,33,33,0.9)',
+      backgroundColor: 'rgba(33,33,33,0.5)',
       padding: 1,
       position: 'start',
       xScaleID: 'xAxis',
@@ -234,4 +246,125 @@ export class ChartService {
 
     return annotation;
   }
+
+  defaultIndicatorSelection(uiid: string): IndicatorSelection {
+
+    const indicator = this.listings.find(x => x.uiid == uiid);
+
+    const selection: IndicatorSelection = {
+      ucid: this.getChartGuid(),
+      uiid: indicator.uiid,
+      label: indicator.labelTemplate,
+      params: [],
+      results: []
+    };
+
+    // load default parameters
+    indicator.parameters.forEach((param) => {
+
+      const p = {
+        name: param.paramName,
+        value: param.defaultValue
+      } as IndicatorParam
+
+      selection.params.push(p);
+    });
+
+    // load default results colors and containers
+    indicator.results.forEach((result) => {
+
+      const r = {
+        label: result.legendTemplate,
+        color: result.defaultColor,
+        dataName: result.dataName,
+        chartType: (result.altChartType == null) ? indicator.chartType : result.altChartType
+      } as IndicatorResult
+
+      selection.results.push(r);
+    });
+
+    return selection;
+  }
+
+  selectionTokenReplacment(selection: IndicatorSelection): IndicatorSelection {
+
+    selection.params.forEach((param, index) => {
+
+      selection.label = selection.label.replace(`[P${index + 1}]`, param.value.toString());
+
+      selection.results.forEach(r => {
+        r.label = r.label.replace(`[P${index + 1}]`, param.value.toString());
+      });
+    });
+    return selection;
+  }
+
+  configDataset(lineType: string, r: IndicatorResult, index: number) {
+
+    switch (lineType) {
+
+      case 'line':
+        const lineDataset: ChartDataset = {
+          label: r.label,
+          type: 'line',
+          data: r.data,
+          yAxisID: 'yAxis',
+          pointRadius: 0,
+          borderWidth: 2,
+          borderColor: r.color,
+          backgroundColor: r.color,
+          order: index + 1
+        };
+        return lineDataset;
+
+      case 'dash':
+        const dashDataset: ChartDataset = {
+          label: r.label,
+          type: 'line',
+          data: r.data,
+          yAxisID: 'yAxis',
+          pointRadius: 0,
+          borderWidth: 1.5,
+          borderDash: [3, 2],
+          borderColor: r.color,
+          backgroundColor: r.color,
+          order: index + 1
+        };
+        return dashDataset;
+
+      case 'dots':
+        const dotsDataset: ChartDataset = {
+          label: r.label,
+          type: 'line',
+          data: r.data,
+          yAxisID: 'yAxis',
+          pointRadius: 2,
+          pointBorderWidth: 0,
+          pointBorderColor: r.color,
+          pointBackgroundColor: r.color,
+          showLine: true,
+          order: index + 1
+        };
+        return dotsDataset;
+
+      case 'bar':
+        const barDataset: ChartDataset = {
+          label: r.label,
+          type: 'bar',
+          data: r.data,
+          yAxisID: 'yAxis',
+          borderWidth: 0,
+          borderColor: r.color,
+          backgroundColor: r.color,
+          order: index + 1
+        };
+        return barDataset;
+    }
+  }
+
+  // helper functions
+  getChartGuid(): string {
+    return `chart${Guid.create().toString().replace(/-/gi, "")}`;
+  }
+
 }

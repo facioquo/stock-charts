@@ -1,19 +1,21 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-
-import { Guid } from "guid-typescript";
-
 import Chart from 'chart.js/auto';  // import all default options
 import { ChartDataset, FinancialDataPoint, ScatterDataPoint } from 'chart.js';
 import { AnnotationOptions, ScaleValue } from 'chartjs-plugin-annotation';
 
-import { ChartService } from './chart.service';
-import { IndicatorSelection, IndicatorParam, IndicatorResult } from './chart.models';
-
 import { ApiService } from './api.service';
-import { Quote, IndicatorListing, ChartThreshold } from './api.models';
-import { ListSheetComponent } from './listing/listing.component';
+import { ChartService } from './chart.service';
+import {
+  Quote,
+  IndicatorListing,
+  ChartThreshold,
+  IndicatorSelection,
+  IndicatorResult
+} from './chart.models';
+
+import { PickListComponent } from './picker/pick-list.component';
 
 @Component({
   selector: 'app-chart',
@@ -30,10 +32,8 @@ export class ChartComponent implements OnInit {
 
   @ViewChild('chartsTop') chartTopRef: ElementRef;
   chartOverlay: Chart;
-  quotes: Quote[];
 
   loading = true;
-  listings: IndicatorListing[];
   selections: IndicatorSelection[] = [];
 
   // STARTUP OPERATIONS
@@ -48,14 +48,14 @@ export class ChartComponent implements OnInit {
     this.api.getQuotes()
       .subscribe({
         next: (q: Quote[]) => {
-          this.quotes = q;
+
           this.loadMainChart(q);
 
           // load default selections
           this.api.getListings()
             .subscribe({
               next: (listings: IndicatorListing[]) => {
-                this.listings = listings;
+                this.cs.listings = listings;
                 this.loadSelections()
               },
               error: (e: HttpErrorResponse) => { console.log(e); }
@@ -68,31 +68,11 @@ export class ChartComponent implements OnInit {
   loadMainChart(quotes: Quote[]) {
 
     const chartConfig = this.cs.baseOverlayConfig();
-
-    const price: FinancialDataPoint[] = [];
-    const volume: ScatterDataPoint[] = [];
-    let sumVol = 0;
-
-    quotes.forEach((q: Quote) => {
-      price.push({
-        x: new Date(q.date).valueOf(),
-        o: q.open,
-        h: q.high,
-        l: q.low,
-        c: q.close
-      });
-      volume.push({
-        x: new Date(q.date).valueOf(),
-        y: q.volume
-      });
-      sumVol += q.volume;
-    });
-
-    // custom border colors
     const candleOptions = Chart.defaults.elements["candlestick"];
 
-    candleOptions.color.up = '#2c7433';
-    candleOptions.color.down = 'darkRed';
+    // custom border colors
+    candleOptions.color.up = '#1B5E20';
+    candleOptions.color.down = '#B71C1C';
     candleOptions.color.unchanged = '#616161';
 
     candleOptions.borderColor = {
@@ -100,6 +80,32 @@ export class ChartComponent implements OnInit {
       down: candleOptions.color.down,
       unchanged: candleOptions.color.unchanged
     };
+
+    const price: FinancialDataPoint[] = [];
+    const volume: ScatterDataPoint[] = [];
+    const barColor: string[] = [];
+
+    let sumVol = 0;
+
+    quotes.forEach((q: Quote) => {
+
+      price.push({
+        x: new Date(q.date).valueOf(),
+        o: q.open,
+        h: q.high,
+        l: q.low,
+        c: q.close
+      });
+
+      volume.push({
+        x: new Date(q.date).valueOf(),
+        y: q.volume
+      });
+      sumVol += q.volume;
+
+      const c = (q.close >= q.open) ? '#1B5E2060' : '#B71C1C60';
+      barColor.push(c);
+    });
 
     // define base datasets
     chartConfig.data = {
@@ -117,9 +123,9 @@ export class ChartComponent implements OnInit {
           label: 'Volume',
           data: volume,
           yAxisID: 'volumeAxis',
-          backgroundColor: '#424242',
+          backgroundColor: barColor,
           borderWidth: 0,
-          order: 99
+          order: 95
         }
       ]
     };
@@ -139,63 +145,80 @@ export class ChartComponent implements OnInit {
 
     // TODO: get from cache or use defaults if none
 
-    const defaultSelections: IndicatorSelection[] = [
-      {
-        ucid: this.getChartGuid(),
-        uiid: "EMA",
-        label: "EMA(5)",
-        params: [
-          { name: "lookbackPeriods", value: 5 } as IndicatorParam
-        ],
-        results: [
-          {
-            label: "EMA(5)",
-            dataName: "ema",
-            color: "red"
-          } as IndicatorResult
-        ]
-      } as IndicatorSelection,
-      {
-        ucid: this.getChartGuid(),
-        uiid: "EMA",
-        label: "EMA(20)",
-        params: [
-          { name: "lookbackPeriods", value: 20 } as IndicatorParam
-        ],
-        results: [
-          {
-            label: "EMA(20)",
-            dataName: "ema",
-            color: "darkOrange"
-          } as IndicatorResult
-        ]
-      } as IndicatorSelection,
-      {
-        ucid: this.getChartGuid(),
-        uiid: "RSI",
-        label: "RSI(5)",
-        params: [
-          { name: "lookbackPeriods", value: 5 } as IndicatorParam
-        ],
-        results: [
-          {
-            label: "RSI(5)",
-            dataName: "rsi",
-            color: "darkOrange"
-          } as IndicatorResult
-        ]
-      } as IndicatorSelection];
+    const selectDefault2 = this.cs.defaultIndicatorSelection("EMA");
+    const selectFinal2 = this.cs.selectionTokenReplacment(selectDefault2);
+    this.addSelection(selectFinal2);
 
-    // add indicator selections
-    defaultSelections.forEach((selection: IndicatorSelection) => {
-      this.addSelection(selection);
-    });
+    const selectDefault3 = this.cs.defaultIndicatorSelection("PSAR");
+    const selectFinal3 = this.cs.selectionTokenReplacment(selectDefault3);
+    this.addSelection(selectFinal3);
+
+    const selectDefault4 = this.cs.defaultIndicatorSelection("STO");
+    const selectFinal4 = this.cs.selectionTokenReplacment(selectDefault4);
+    this.addSelection(selectFinal4);
+
+    const selectDefault5 = this.cs.defaultIndicatorSelection("RSI");
+    selectDefault5.params.find(x => x.name == "lookbackPeriods").value = 5;
+    const selectFinal5 = this.cs.selectionTokenReplacment(selectDefault5);
+    this.addSelection(selectFinal5);
+
+    // const defaultSelections: IndicatorSelection[] = [
+    //   {
+    //     ucid: this.cs.getChartGuid(),
+    //     uiid: "EMA",
+    //     label: "EMA(5)",
+    //     params: [
+    //       { name: "lookbackPeriods", value: 5 } as IndicatorParam
+    //     ],
+    //     results: [
+    //       {
+    //         label: "EMA(5)",
+    //         dataName: "ema",
+    //         color: "#EC407A"
+    //       } as IndicatorResult
+    //     ]
+    //   } as IndicatorSelection,
+    //   {
+    //     ucid: this.cs.getChartGuid(),
+    //     uiid: "EMA",
+    //     label: "EMA(20)",
+    //     params: [
+    //       { name: "lookbackPeriods", value: 20 } as IndicatorParam
+    //     ],
+    //     results: [
+    //       {
+    //         label: "EMA(20)",
+    //         dataName: "ema",
+    //         color: "#1565C0"
+    //       } as IndicatorResult
+    //     ]
+    //   } as IndicatorSelection,
+    //   {
+    //     ucid: this.cs.getChartGuid(),
+    //     uiid: "RSI",
+    //     label: "RSI(5)",
+    //     params: [
+    //       { name: "lookbackPeriods", value: 5 } as IndicatorParam
+    //     ],
+    //     results: [
+    //       {
+    //         label: "RSI(5)",
+    //         dataName: "rsi",
+    //         color: "#EF6C00"
+    //       } as IndicatorResult
+    //     ]
+    //   } as IndicatorSelection];
+
+    // // add indicator selections
+    // defaultSelections.forEach((selection: IndicatorSelection) => {
+    //   this.addSelection(selection);
+    // });
   }
 
 
   // SELECTION OPERATIONS
-  openBottomSheet(): void {
-    this.bs.open(ListSheetComponent, { data: this.listings });
+  openPickList(): void {
+    this.bs.open(PickListComponent, { data: this.cs.listings });
   }
 
   addSelection(selection: IndicatorSelection) {
@@ -204,7 +227,7 @@ export class ChartComponent implements OnInit {
     // TODO: save to cache
 
     // lookup config data
-    const listing = this.listings.find(x => x.uiid == selection.uiid);
+    const listing = this.cs.listings.find(x => x.uiid == selection.uiid);
 
     this.api.getSelectionData(selection, listing)
       .subscribe({
@@ -226,7 +249,7 @@ export class ChartComponent implements OnInit {
   deleteSelection(ucid: string) {
 
     const selection = this.selections.find(x => x.ucid == ucid);
-    const listing = this.listings.find(x => x.uiid == selection.uiid);
+    const listing = this.cs.listings.find(x => x.uiid == selection.uiid);
 
     // TODO: store full dataset in IndicatorResult so we can splice it from the Chart dataset
     // const rsiDataset = this.chartRsi.data.datasets.indexOf(line, 0);  // keep thi
@@ -239,55 +262,21 @@ export class ChartComponent implements OnInit {
 
   }
 
-  getChartGuid(): string {
-    return `chart${Guid.create().toString().replace(/-/gi, "")}`;
-  }
-
 
   // CHARTS OPERATIONS
   addOverlaySelectionToChart(selection: IndicatorSelection, listing: IndicatorListing) {
 
     // add indicator data
-    selection.results.forEach(r => {
+    selection.results.forEach((r: IndicatorResult, index: number) => {
 
       const resultConfig = listing.results.find(x => x.dataName == r.dataName);
-      r.type = (resultConfig.altChartType == null) ? listing.chartType : resultConfig.altChartType;
+
+      // TODO: this may be redundant, exept for default selections?  picker adds this already.
+      r.chartType = (resultConfig.altChartType == null) ? listing.chartType : resultConfig.altChartType;
       // TODO: handle mixed type
 
-      switch (resultConfig.lineType) {
-
-        case 'line':
-          const lineDataset: ChartDataset = {
-            label: r.label,
-            type: 'line',
-            data: r.data,
-            yAxisID: 'yAxis',
-            borderWidth: 1.5,
-            borderColor: r.color,
-            backgroundColor: r.color,
-            pointRadius: 0,
-            spanGaps: true,
-            fill: false,
-            order: 1
-          };
-          this.chartOverlay.data.datasets.push(lineDataset);
-          break;
-
-        case 'bar':
-          const barDataset: ChartDataset = {
-            label: r.label,
-            type: 'bar',
-            data: r.data,
-            yAxisID: 'yAxis',
-            borderWidth: 0,
-            borderColor: r.color,
-            backgroundColor: r.color,
-            order: 1
-          };
-          this.chartOverlay.data.datasets.push(barDataset);
-          break;
-      };
-
+      const dataset = this.cs.configDataset(resultConfig.lineType, r, index);
+      this.chartOverlay.data.datasets.push(dataset);
       this.updateOverlayAnnotations();
     });
   }
@@ -303,7 +292,9 @@ export class ChartComponent implements OnInit {
     // chart configurations
 
     // add thresholds (reference lines)
-    listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold) => {
+    const qtyThresholds = listing.chartConfig.thresholds.length;
+
+    listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold, index: number) => {
 
       const lineData: ScatterDataPoint[] = [];
 
@@ -317,23 +308,24 @@ export class ChartComponent implements OnInit {
         type: 'line',
         data: lineData,
         yAxisID: 'yAxis',
-        borderWidth: 1,
+        pointRadius: 0,
+        borderWidth: 2.5,
+        borderDash: threshold.style == "dash" ? [5, 2] : [],
         borderColor: threshold.color,
         backgroundColor: threshold.color,
-        borderDash: threshold.style == "dotted" ? [5, 2] : [],
-        pointRadius: 0,
         spanGaps: true,
-        fill: false,
-        order: 99
+        fill: {
+          target: threshold.fill.target,
+          above: threshold.fill.colorAbove,
+          below: threshold.fill.colorBelow
+        },
+        order: index + 100
       };
 
       chartConfig.data.datasets.push(thresholdDataset);
     });
 
     // hide thresholds from tooltips
-    const qtyThresholds = chartConfig.data.datasets
-      .filter(x => x.label == "threshold").length;
-
     chartConfig.options.plugins.tooltip.filter = (tooltipItem) =>
       (tooltipItem.datasetIndex > (qtyThresholds - 1));
 
@@ -342,66 +334,59 @@ export class ChartComponent implements OnInit {
     chartConfig.options.scales.yAxis.max = listing.chartConfig?.maximumYAxis;
 
     // add indicator data
-    selection.results.forEach(r => {
+    selection.results.forEach((r: IndicatorResult, index: number) => {
 
       const resultConfig = listing.results.find(x => x.dataName == r.dataName);
-      r.type = (resultConfig.altChartType == null) ? listing.chartType : resultConfig.altChartType;
+      r.chartType = (resultConfig.altChartType == null) ? listing.chartType : resultConfig.altChartType;
       // TODO: handle mixed type
 
-      switch (resultConfig.lineType) {
-
-        case 'line':
-          const lineDataset: ChartDataset = {
-            label: r.label,
-            type: 'line',
-            data: r.data,
-            yAxisID: 'yAxis',
-            borderWidth: 1.5,
-            borderColor: r.color,
-            backgroundColor: r.color,
-            pointRadius: 0,
-            spanGaps: true,
-            fill: false,
-            order: 1
-          };
-          chartConfig.data.datasets.push(lineDataset);
-          break;
-
-        case 'bar':
-          const barDataset: ChartDataset = {
-            label: r.label,
-            type: 'bar',
-            data: r.data,
-            yAxisID: 'yAxis',
-            borderWidth: 0,
-            borderColor: r.color,
-            backgroundColor: r.color,
-            order: 1
-          };
-          chartConfig.data.datasets.push(barDataset);
-          break;
-      }
+      const dataset = this.cs.configDataset(resultConfig.lineType, r, index);
+      chartConfig.data.datasets.push(dataset);
     });
 
     // compose chart
     const myCanvas = document.createElement('canvas') as HTMLCanvasElement;
     myCanvas.id = selection.ucid;
 
-    const body = document.getElementsByTagName("body")[0];
+    const body = document.getElementById("main-content");
     body.appendChild(myCanvas);
 
     if (selection.chart) selection.chart.destroy();
-    selection.chart = new Chart(myCanvas.getContext('2d'), chartConfig);
+    selection.chart = new Chart(myCanvas.getContext("2d"), chartConfig);
 
     // annotations
-    const xPos: ScaleValue = new Date(this.quotes[0].date).valueOf();
-    const yPos: ScaleValue = this.cs.yAxisTicks[this.cs.yAxisTicks.length - 1].value;
-    let adjY: number = 1;
+    const xPos: ScaleValue = selection.chart.scales["xAxis"].getMinMax(false).min;
+    const yPos: ScaleValue = selection.chart.scales["yAxis"].getMinMax(false).max;
 
-    let annotation: AnnotationOptions =
-      this.cs.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, 2, adjY);
+    const annotation: AnnotationOptions =
+      this.cs.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, 0, 0);
     selection.chart.options.plugins.annotation.annotations = { annotation };
     selection.chart.update();
+  }
+
+  updateOverlayAnnotations() {
+
+    const xPos: ScaleValue = this.chartOverlay.scales["xAxis"].getMinMax(false).min;
+    const yPos: ScaleValue = this.chartOverlay.scales["yAxis"].getMinMax(false).max;
+    let adjY: number = 0;
+
+    this.chartOverlay.options.plugins.annotation.annotations =
+      this.selections
+        .filter(x => x.results[0].chartType == 'overlay')
+        .map((selection: IndicatorSelection, index: number) => {
+          const annotation: AnnotationOptions =
+            this.cs.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, 0, adjY);
+          annotation.id = "note" + (index + 1).toString();
+          adjY += 12;
+          return annotation;
+        });
+
+    const myCanvas = document.getElementById('chartOverlay') as HTMLCanvasElement;
+    const ctx = myCanvas.getContext('2d');
+    ctx.fillStyle = "white";
+    ctx.fillText("Hello", 0, 0);
+
+    this.chartOverlay.update();
   }
 
 
@@ -412,7 +397,7 @@ export class ChartComponent implements OnInit {
     this.selections.forEach((selection: IndicatorSelection) => {
 
       // lookup config data
-      const listing = this.listings.find(x => x.uiid == selection.uiid);
+      const listing = this.cs.listings.find(x => x.uiid == selection.uiid);
 
       this.api.getSelectionData(selection, listing)
         .subscribe({
@@ -430,6 +415,7 @@ export class ChartComponent implements OnInit {
       .subscribe({
         next: (quotes: Quote[]) => {
 
+          // TODO: refactor redundant code (see load)
           const price: FinancialDataPoint[] = [];
           const volume: ScatterDataPoint[] = [];
           let sumVol = 0;
@@ -456,28 +442,6 @@ export class ChartComponent implements OnInit {
         },
         error: (e: HttpErrorResponse) => { console.log(e); }
       });
-  }
-
-
-  // ANNOTATION OPERATIONS
-  updateOverlayAnnotations() {
-
-    const xPos: ScaleValue = new Date(this.quotes[0].date).valueOf();
-    const yPos: ScaleValue = this.cs.yAxisTicks[this.cs.yAxisTicks.length - 1].value;
-    let adjY: number = 1;
-
-    this.chartOverlay.options.plugins.annotation.annotations =
-      this.selections
-        .filter(x => x.results[0].type == 'overlay')
-        .map((l, index) => {
-          let annotation: AnnotationOptions =
-            this.cs.commonAnnotation(l.label, l.results[0].color, xPos, yPos, 0, adjY);
-          annotation.id = "note" + (index + 1).toString();
-          adjY += 12;
-          return annotation;
-        });
-
-    this.chartOverlay.update();
   }
 
 
