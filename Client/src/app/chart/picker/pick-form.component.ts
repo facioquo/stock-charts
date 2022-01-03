@@ -46,14 +46,14 @@ export class PickFormComponent {
 
     // pre-populate selection
     console.log("opening", indicator.name);
-    this.selection = this.cs.defaultIndicatorSelection(indicator.uiid);
+    this.selection = this.cs.defaultSelection(indicator.uiid);
   }
 
 
   onSubmit(): void {
 
     // label token replacement
-    this.selection = this.cs.selectionTokenReplacment(this.selection);
+    this.selection = this.cs.selectionTokenReplacement(this.selection);
     this.dialogRef.close;
   }
 

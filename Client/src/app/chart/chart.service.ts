@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { ApiService } from './api.service';
 
 import 'chartjs-adapter-date-fns';
 import 'chartjs-chart-financial';
@@ -13,6 +14,7 @@ import {
   ChartDataset,
   FontSpec,
   ScaleOptions,
+  ScatterDataPoint,
   Tick
 } from 'chart.js';
 
@@ -30,35 +32,62 @@ import annotationPlugin, { AnnotationOptions, ScaleValue }
 
 // internal models
 import {
+  ChartThreshold,
   IndicatorListing,
   IndicatorParam,
+  IndicatorParamConfig,
   IndicatorResult,
+  IndicatorResultConfig,
   IndicatorSelection
 } from './chart.models';
+import { HttpErrorResponse } from '@angular/common/http';
 
 Chart.register(
   CandlestickController,
   OhlcController,
   CandlestickElement,
   OhlcElement,
-  annotationPlugin)
+  annotationPlugin);
 
 @Injectable()
 export class ChartService {
 
-  yAxisTicks: Tick[] = [];
-  listings: IndicatorListing[];
+  constructor(
+    private readonly api: ApiService
+  ) { }
 
+  yAxisTicks: Tick[] = [];
+  listings: IndicatorListing[] = [];
+  selections: IndicatorSelection[] = [];
+  chartOverlay: Chart;
+
+  // solid background plugin (for copy/paste)
   baseConfig() {
 
     const commonXaxes = this.commonXAxes();
 
+    const backgroundPlugin =
+    {
+      id: 'background',
+      beforeDraw: (chart) => {
+        const ctx = chart.canvas.getContext('2d');
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.fillStyle = '#212121';
+        ctx.fillRect(0, 0, chart.width, chart.height);
+        ctx.restore();
+      }
+    };
+
     const config: ChartConfiguration = {
 
-      type: 'line',
+      type: 'candlestick',
       data: {
         datasets: []
       },
+      plugins: [
+        backgroundPlugin
+      ],
       options: {
         plugins: {
           title: {
@@ -79,7 +108,8 @@ export class ChartService {
           }
         },
         layout: {
-          padding: 0
+          padding: 0,
+          autoPadding: false
         },
         responsive: true,
         maintainAspectRatio: false,
@@ -93,14 +123,21 @@ export class ChartService {
             position: 'right',
             beginAtZero: false,
             ticks: {
+              display: true,
               mirror: true,
               padding: -5,
               font: {
-                size: 10
+                size: 10,
+                lineHeight: 1
               },
               showLabelBackdrop: true,
               backdropColor: '#212121',
-              backdropPadding: 2
+              backdropPadding: {
+                top: 0,
+                left: 2,
+                bottom: 0,
+                right: 2
+              },
             },
             grid: {
               drawOnChartArea: true,
@@ -108,12 +145,13 @@ export class ChartService {
               drawBorder: false,
               lineWidth: 0.5,
               color: function (context) {
-                if (context.tick.label === '') {
-                  return '#212121';
+                if (context.tick.label === null) {
+                  return 'transparent';
                 } else {
                   return '#424242';
                 }
-              }
+              },
+
             }
           }
         }
@@ -128,16 +166,12 @@ export class ChartService {
     const config = this.baseConfig();
     config.type = 'candlestick';
 
-    // aspect ratio
-    config.options.maintainAspectRatio = true;
-    config.options.aspectRatio = 2;
-
     // format y-axis, add dollar sign
     config.options.scales.yAxis.ticks.callback = (value, index, values) => {
 
       this.yAxisTicks = values;
 
-      if (index === 0 || index === values.length - 1) return '';
+      if (index === 0 || index === values.length - 1) return null;
       else
         return '$' + value;
     };
@@ -158,10 +192,6 @@ export class ChartService {
 
     const config = this.baseConfig();
 
-    // aspect ratio
-    config.options.maintainAspectRatio = true;
-    config.options.aspectRatio = 7;
-
     // remove x-axis
     config.options.scales.xAxis.display = false;
 
@@ -170,7 +200,7 @@ export class ChartService {
 
       this.yAxisTicks = values;
 
-      if (index === 0 || index === values.length - 1) return '';
+      if (index === 0 || index === values.length - 1) return null;
       else
         return value;
     };
@@ -211,6 +241,218 @@ export class ChartService {
     return axes;
   }
 
+  defaultSelection(uiid: string): IndicatorSelection {
+
+    const listing = this.listings.find(x => x.uiid == uiid);
+
+    const selection: IndicatorSelection = {
+      ucid: this.getGuid("chart"),
+      uiid: listing.uiid,
+      label: listing.labelTemplate,
+      chartType: listing.chartType,
+      params: [],
+      results: []
+    };
+
+    // load default parameters
+    listing.parameters.forEach((config: IndicatorParamConfig) => {
+
+      const param = {
+        name: config.paramName,
+        value: config.defaultValue
+      } as IndicatorParam
+
+      selection.params.push(param);
+    });
+
+    // load default results colors and containers
+    listing.results.forEach((config: IndicatorResultConfig) => {
+
+      const result = {
+        label: config.labelTemplate,
+        color: config.defaultColor,
+        dataName: config.dataName,
+        displayName: config.displayName,
+        lineType: config.lineType,
+        lineWidth: config.lineWidth,
+        order: listing.order
+      } as IndicatorResult
+
+      selection.results.push(result);
+    });
+
+    return selection;
+  }
+
+  selectionTokenReplacement(selection: IndicatorSelection): IndicatorSelection {
+
+    selection.params.forEach((param, index) => {
+
+      selection.label = selection.label.replace(`[P${index + 1}]`, param.value.toString());
+
+      selection.results.forEach(r => {
+        r.label = r.label.replace(`[P${index + 1}]`, param.value.toString());
+      });
+    });
+    return selection;
+  }
+
+  addSelection(selection: IndicatorSelection) {
+
+    this.selections.push(selection);
+    // TODO: save to cache
+
+    // lookup config data
+    const listing = this.listings.find(x => x.uiid == selection.uiid);
+
+    this.api.getSelectionData(selection, listing)
+      .subscribe({
+        next: () => {
+
+          // add needed charts
+          if (selection.chartType == 'overlay') {
+            this.addSelectionToOverlayChart(selection);
+          }
+          else {
+            this.addSelectionToNewChart(selection, listing);
+          };
+
+        },
+        error: (e: HttpErrorResponse) => { console.log(e); }
+      });
+  }
+
+  deleteSelection(ucid: string) {
+
+    const selection = this.selections.find(x => x.ucid == ucid);
+    const listing = this.listings.find(x => x.uiid == selection.uiid);
+
+    // TODO: store full dataset in IndicatorResult so we can splice it from the Chart dataset
+    // const rsiDataset = this.chartRsi.data.datasets.indexOf(line, 0);  // keep thi
+    // this.chartRsi.data.datasets.splice(rsiDataset, 1);
+    // handle mixed types (maybe listing="mixed", then use result subtype)
+    // non-Overlay:
+    //selection.chart.destroy()
+
+    // remove from selections
+
+  }
+
+  // CHARTS OPERATIONS
+  addSelectionToOverlayChart(selection: IndicatorSelection) {
+
+    // add indicator data
+    selection.results.forEach((r: IndicatorResult) => {
+      this.chartOverlay.data.datasets.push(r.dataset);
+    });
+    this.updateOverlayAnnotations();
+    this.chartOverlay.update();
+  }
+
+  addSelectionToNewChart(selection: IndicatorSelection, listing: IndicatorListing) {
+    const chartConfig = this.baseOscillatorConfig();
+
+    // initialize chart datasets
+    chartConfig.data = {
+      datasets: []
+    };
+
+    // chart configurations
+
+    // add thresholds (reference lines)
+    const qtyThresholds = listing.chartConfig.thresholds.length;
+
+    listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold, index: number) => {
+
+      const lineData: ScatterDataPoint[] = [];
+
+      // compose threshold data
+      selection.results[0].dataset.data.forEach((d: ScatterDataPoint) => {
+        lineData.push({ x: d.x, y: threshold.value } as ScatterDataPoint);
+      });
+
+      const thresholdDataset: ChartDataset = {
+        label: "threshold",
+        type: 'line',
+        data: lineData,
+        yAxisID: 'yAxis',
+        pointRadius: 0,
+        borderWidth: 2.5,
+        borderDash: threshold.style == "dash" ? [5, 2] : [],
+        borderColor: threshold.color,
+        backgroundColor: threshold.color,
+        spanGaps: true,
+        fill: threshold.fill == null ? false : {
+          target: threshold.fill.target,
+          above: threshold.fill.colorAbove,
+          below: threshold.fill.colorBelow
+        },
+        order: index + 100
+      };
+
+      chartConfig.data.datasets.push(thresholdDataset);
+    });
+
+    // hide thresholds from tooltips
+    chartConfig.options.plugins.tooltip.filter = (tooltipItem) =>
+      (tooltipItem.datasetIndex > (qtyThresholds - 1));
+
+    // y-scale
+    chartConfig.options.scales.yAxis.min = listing.chartConfig?.minimumYAxis;
+    chartConfig.options.scales.yAxis.max = listing.chartConfig?.maximumYAxis;
+
+    // add indicator data
+    selection.results.forEach((r: IndicatorResult) => {
+      chartConfig.data.datasets.push(r.dataset);
+    });
+
+    // compose chart
+    const myCanvas = document.createElement('canvas') as HTMLCanvasElement;
+    myCanvas.id = selection.ucid;
+
+    const container = document.createElement('div') as HTMLDivElement;
+    container.id = `${selection.ucid}-container`;
+    container.className = "chart-oscillator-container";
+    container.appendChild(myCanvas);
+    const body = document.getElementById("main-content");
+    body.appendChild(container);
+
+    if (selection.chart) selection.chart.destroy();
+    selection.chart = new Chart(myCanvas.getContext("2d"), chartConfig);
+
+    // annotations
+    const xPos: ScaleValue = selection.chart.scales["xAxis"].getMinMax(false).min;
+    const yPos: ScaleValue = selection.chart.scales["yAxis"].getMinMax(false).max;
+
+    const annotation: AnnotationOptions =
+      this.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, -3, 1);
+    selection.chart.options.plugins.annotation.annotations = { annotation };
+    selection.chart.update();
+  }
+
+  updateOverlayAnnotations() {
+
+    const xPos: ScaleValue = this.chartOverlay.scales["xAxis"].getMinMax(false).min;
+    const yPos: ScaleValue = this.chartOverlay.scales["yAxis"].getMinMax(false).max;
+    let adjY: number = 0;
+
+    this.chartOverlay.options.plugins.annotation.annotations =
+      this.selections
+        .filter(x => x.chartType == 'overlay')
+        .map((selection: IndicatorSelection, index: number) => {
+          const annotation: AnnotationOptions =
+            this.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, -3, adjY);
+          annotation.id = "legend" + (index + 1).toString();
+          adjY += 12;
+          return annotation;
+        });
+
+    // TODO: are there better variables to use here for min/max of range?
+    this.chartOverlay.options.plugins.annotation.annotations.forEach((a: AnnotationOptions) => {
+      console.log("annotation", a.id, "must be a better way");
+    });
+  }
+
   commonAnnotation(
     label: string,
     fontColor: string,
@@ -234,7 +476,7 @@ export class ChartService {
       font: legendFont,
       color: fontColor,
       backgroundColor: 'rgba(33,33,33,0.5)',
-      padding: 1,
+      padding: 0,
       position: 'start',
       xScaleID: 'xAxis',
       yScaleID: 'yAxis',
@@ -247,124 +489,10 @@ export class ChartService {
     return annotation;
   }
 
-  defaultIndicatorSelection(uiid: string): IndicatorSelection {
-
-    const indicator = this.listings.find(x => x.uiid == uiid);
-
-    const selection: IndicatorSelection = {
-      ucid: this.getChartGuid(),
-      uiid: indicator.uiid,
-      label: indicator.labelTemplate,
-      params: [],
-      results: []
-    };
-
-    // load default parameters
-    indicator.parameters.forEach((param) => {
-
-      const p = {
-        name: param.paramName,
-        value: param.defaultValue
-      } as IndicatorParam
-
-      selection.params.push(p);
-    });
-
-    // load default results colors and containers
-    indicator.results.forEach((result) => {
-
-      const r = {
-        label: result.legendTemplate,
-        color: result.defaultColor,
-        dataName: result.dataName,
-        chartType: (result.altChartType == null) ? indicator.chartType : result.altChartType
-      } as IndicatorResult
-
-      selection.results.push(r);
-    });
-
-    return selection;
-  }
-
-  selectionTokenReplacment(selection: IndicatorSelection): IndicatorSelection {
-
-    selection.params.forEach((param, index) => {
-
-      selection.label = selection.label.replace(`[P${index + 1}]`, param.value.toString());
-
-      selection.results.forEach(r => {
-        r.label = r.label.replace(`[P${index + 1}]`, param.value.toString());
-      });
-    });
-    return selection;
-  }
-
-  configDataset(lineType: string, r: IndicatorResult, index: number) {
-
-    switch (lineType) {
-
-      case 'line':
-        const lineDataset: ChartDataset = {
-          label: r.label,
-          type: 'line',
-          data: r.data,
-          yAxisID: 'yAxis',
-          pointRadius: 0,
-          borderWidth: 2,
-          borderColor: r.color,
-          backgroundColor: r.color,
-          order: index + 1
-        };
-        return lineDataset;
-
-      case 'dash':
-        const dashDataset: ChartDataset = {
-          label: r.label,
-          type: 'line',
-          data: r.data,
-          yAxisID: 'yAxis',
-          pointRadius: 0,
-          borderWidth: 1.5,
-          borderDash: [3, 2],
-          borderColor: r.color,
-          backgroundColor: r.color,
-          order: index + 1
-        };
-        return dashDataset;
-
-      case 'dots':
-        const dotsDataset: ChartDataset = {
-          label: r.label,
-          type: 'line',
-          data: r.data,
-          yAxisID: 'yAxis',
-          pointRadius: 2,
-          pointBorderWidth: 0,
-          pointBorderColor: r.color,
-          pointBackgroundColor: r.color,
-          showLine: true,
-          order: index + 1
-        };
-        return dotsDataset;
-
-      case 'bar':
-        const barDataset: ChartDataset = {
-          label: r.label,
-          type: 'bar',
-          data: r.data,
-          yAxisID: 'yAxis',
-          borderWidth: 0,
-          borderColor: r.color,
-          backgroundColor: r.color,
-          order: index + 1
-        };
-        return barDataset;
-    }
-  }
 
   // helper functions
-  getChartGuid(): string {
-    return `chart${Guid.create().toString().replace(/-/gi, "")}`;
+  getGuid(prefix: string = "chart"): string {
+    return `${prefix}${Guid.create().toString().replace(/-/gi, "")}`;
   }
 
 }

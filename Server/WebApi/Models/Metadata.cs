@@ -8,11 +8,22 @@ public class IndicatorList
     public string Endpoint { get; set; }
     public string Category { get; set; }
     public string ChartType { get; set; }
+    public Order Order { get; set; } = Order.Front;
 
     public ChartConfig ChartConfig { get; set; }
 
     public virtual ICollection<IndicatorParamConfig> Parameters { get; set; }
     public virtual ICollection<IndicatorResultConfig> Results { get; set; }
+}
+
+public enum Order
+{
+    // price is 75/76
+    // thresholds are 99
+    Front = 1,
+    Behind = 50,
+    BehindPrice = 80,
+    Back = 95
 }
 
 public class IndicatorParamConfig
@@ -29,13 +40,14 @@ public class IndicatorParamConfig
 
 public class IndicatorResultConfig
 {
-    public string LegendTemplate { get; set; }
+    public string LabelTemplate { get; set; }
     public string DataName { get; set; }
     public string DataType { get; set; }
     public string LineType { get; set; }
+    public float LineWidth { get; set; } = 2;
     public string DefaultColor { get; set; }
-    public string AltChartType { get; set; }
-    public ChartConfig AltChartConfig { get; set; }
+    public ChartFill Fill { get; set; }
+
 }
 
 public class ChartConfig
@@ -51,10 +63,10 @@ public class ChartThreshold
     public double Value { get; set; }
     public string Color { get; set; }
     public string Style { get; set; }
-    public ChartThresholdFill Fill { get; set; }
+    public ChartFill Fill { get; set; }
 }
 
-public class ChartThresholdFill
+public class ChartFill
 {
     public string Target { get; set; }
     public string ColorAbove { get; set; }
@@ -66,13 +78,13 @@ public static class Metadata
     public static List<IndicatorList> IndicatorList(string baseUrl)
     {
         string standardRed = "#DD2C00";
-        string standardOrange = "#EF6C00";
+        //string standardOrange = "#EF6C00";
         string standardGreen = "#2E7D32";
         string standardBlue = "#1E88E5";
         string standardPurple = "#8E24AA";
-        string standardGray = "#9E9E9E";
+        //string standardGray = "#9E9E9E";
         string darkGray = "#757575";
-
+        string darkGrayTransparent = "#75757515";
         string thresholdRed = "#B71C1C70";
         string thresholdGreen = "#1B5E2070";
 
@@ -87,6 +99,7 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/BB/",
                 Category = "price-channel",
                 ChartType = "overlay",
+                Order = Order.BehindPrice,
                 Parameters = new List<IndicatorParamConfig>
                 {
                     new IndicatorParamConfig {
@@ -112,51 +125,34 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LegendTemplate = "BB([P1],[P2]) Centerline",
+                        LabelTemplate = "BB([P1],[P2]) Upper Band",
+                        DataName = "upperBand",
+                        DataType = "number",
+                        LineType = "line",
+                        LineWidth = 1,
+                        DefaultColor = darkGray,
+                        Fill = new ChartFill
+                        {
+                            Target = "+2",
+                            ColorAbove = darkGrayTransparent,
+                            ColorBelow = darkGrayTransparent
+                        }
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "BB([P1],[P2]) Centerline",
                         DataName = "sma",
                         DataType = "number",
+                        LineType = "dash",
+                        LineWidth = 1,
                         DefaultColor = darkGray
                     },
                     new IndicatorResultConfig {
-                        LegendTemplate = "BB([P1],[P2]) Upper Band",
-                        DataName = "upperBand",
-                        DataType = "number",
-                        DefaultColor = standardGray
-                    },
-                    new IndicatorResultConfig {
-                        LegendTemplate = "BB([P1],[P2]) Lower Band",
+                        LabelTemplate = "BB([P1],[P2]) Lower Band",
                         DataName = "lowerBand",
                         DataType = "number",
-                        DefaultColor = standardGray
-                    },
-                    new IndicatorResultConfig {
-                        LegendTemplate = "BB([P1],[P2]) %B",
-                        DataName = "percentB",
-                        DataType = "number",
-                        DefaultColor = standardOrange,
-                        AltChartType = "oscillator",
-                        AltChartConfig = new ChartConfig
-                        {
-                            Thresholds = new List<ChartThreshold>{
-                                new ChartThreshold {
-                                    Value = 1,
-                                    Color = thresholdRed,
-                                    Style = "solid"
-                                },
-                                new ChartThreshold
-                                {
-                                    Value = 0.5,
-                                    Color = standardGray,
-                                    Style = "dotted"
-                                },
-                                new ChartThreshold
-                                {
-                                    Value = 0,
-                                    Color = thresholdGreen,
-                                    Style = "solid"
-                                }
-                            }
-                        }
+                        LineType = "line",
+                        LineWidth = 1,
+                        DefaultColor = darkGray
                     }
                 }
             },
@@ -185,7 +181,7 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LegendTemplate = "EMA([P1])",
+                        LabelTemplate = "EMA([P1])",
                         DataName = "ema",
                         DataType = "number",
                         LineType = "line",
@@ -229,7 +225,7 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LegendTemplate = "PSAR([P1],[P2])",
+                        LabelTemplate = "PSAR([P1],[P2])",
                         DataName = "sar",
                         DataType = "number",
                         LineType= "dots",
@@ -258,7 +254,7 @@ public static class Metadata
                             Value = 70,
                             Color = thresholdRed,
                             Style = "dash",
-                            Fill = new ChartThresholdFill
+                            Fill = new ChartFill
                             {
                                 Target = "+2",
                                 ColorAbove = "transparent",
@@ -269,7 +265,7 @@ public static class Metadata
                             Value = 30,
                             Color = thresholdGreen,
                             Style = "dash",
-                            Fill = new ChartThresholdFill
+                            Fill = new ChartFill
                             {
                                 Target = "+1",
                                 ColorAbove = thresholdGreen,
@@ -293,7 +289,7 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LegendTemplate = "RSI([P1])",
+                        LabelTemplate = "RSI([P1])",
                         DataName = "rsi",
                         DataType = "number",
                         LineType = "line",
@@ -319,7 +315,7 @@ public static class Metadata
                             Value = 80,
                             Color = thresholdRed,
                             Style = "dash",
-                            Fill = new ChartThresholdFill
+                            Fill = new ChartFill
                             {
                                 Target = "+2",
                                 ColorAbove = "transparent",
@@ -330,7 +326,7 @@ public static class Metadata
                             Value = 20,
                             Color = thresholdGreen,
                             Style = "dash",
-                            Fill = new ChartThresholdFill
+                            Fill = new ChartFill
                             {
                                 Target = "+1",
                                 ColorAbove = thresholdGreen,
@@ -364,21 +360,21 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LegendTemplate = "STO %K([P1])",
+                        LabelTemplate = "STO %K([P1])",
                         DataName = "k",
                         DataType = "number",
                         LineType = "line",
                         DefaultColor = standardBlue
                     },
                     new IndicatorResultConfig {
-                        LegendTemplate = "STO %D([P2])",
+                        LabelTemplate = "STO %D([P2])",
                         DataName = "d",
                         DataType = "number",
                         LineType= "line",
                         DefaultColor = standardRed
                     },
                     new IndicatorResultConfig {
-                        LegendTemplate = "STO %J",
+                        LabelTemplate = "STO %J",
                         DataName = "j",
                         DataType = "number",
                         LineType = "dash",

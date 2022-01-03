@@ -34,7 +34,7 @@
 
 <!-- action pane -->
 <div mat-dialog-actions align="center">
-  <button mat-button (click)="onNoClick()">Cancel</button>
+  <button mat-button mat-dialog-close >Cancel</button>
   <button mat-raised-button cdkFocusInitial (click)="onSubmit()" color="accent" [mat-dialog-close]="selection">
     Add
   </button>

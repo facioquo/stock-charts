@@ -6,7 +6,7 @@ mat-toolbar {
   font-family: Google Sans, Roboto, Arial, Helvetica, sans-serif;
   color: mat.get-color-from-palette($palette-primary, 700) !important;
   background-color: mat.get-color-from-palette($palette-primary, 900) !important;
-  padding: 0 16px;
+  padding: 0 16px 0 8px;
 
   a {
     text-decoration: none;

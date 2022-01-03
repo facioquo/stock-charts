@@ -1,4 +1,4 @@
-import { BarControllerDatasetOptions, Chart, ScatterDataPoint } from "chart.js";
+import { BarControllerDatasetOptions, Chart, ChartDataset, ScatterDataPoint } from "chart.js";
 
 export interface Quote {
   date: Date;
@@ -18,6 +18,7 @@ export interface IndicatorListing {
   endpoint: string;
   category: string;
   chartType: string;
+  order: number,
   chartConfig: ChartConfig | null;
   parameters: IndicatorParamConfig[];
   results: IndicatorResultConfig[];
@@ -35,13 +36,15 @@ export interface IndicatorParamConfig {
 }
 
 export interface IndicatorResultConfig {
-  legendTemplate: string;
+  labelTemplate: string;
+  displayName: string;
   dataName: string;
   dataType: string;
   lineType: string;
+  lineWidth: number;
   defaultColor: string;
-  altChartType: null | string;
-  altChartConfig: ChartConfig | null;
+  fill: ChartFill;
+  order: number
 }
 
 export interface ChartConfig {
@@ -54,10 +57,10 @@ export interface ChartThreshold {
   value: number;
   color: string;
   style: string;
-  fill: ChartThresholdFill
+  fill: ChartFill;
 }
 
-export interface ChartThresholdFill {
+export interface ChartFill {
   target: string,
   colorAbove: string,
   colorBelow: string
@@ -69,6 +72,7 @@ export interface IndicatorSelection {
   ucid: string,
   uiid: string,
   label: string,
+  chartType: string,
   params: IndicatorParam[],
   results: IndicatorResult[],
   chart?: Chart
@@ -81,10 +85,13 @@ export interface IndicatorParam {
 
 export interface IndicatorResult {
   label: string,
-  color: string,
+  displayName: string,
   dataName: string,
-  chartType: string,
-  data: ScatterDataPoint[]
+  color: string,
+  lineType: string,
+  lineWidth: number
+  order: number,
+  dataset: ChartDataset
 }
 
 // MISSING CHART.JS TYPINGS (OVERRIDES)
