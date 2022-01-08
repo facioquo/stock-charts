@@ -41,6 +41,7 @@ public class IndicatorParamConfig
 public class IndicatorResultConfig
 {
     public string LabelTemplate { get; set; }
+    public string DisplayName { get; set; }
     public string DataName { get; set; }
     public string DataType { get; set; }
     public string LineType { get; set; }
@@ -126,9 +127,10 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "BB([P1],[P2]) Upper Band",
+                        DisplayName = "Upper Band",
                         DataName = "upperBand",
                         DataType = "number",
-                        LineType = "line",
+                        LineType = "solid",
                         LineWidth = 1,
                         DefaultColor = darkGray,
                         Fill = new ChartFill
@@ -140,6 +142,7 @@ public static class Metadata
                     },
                     new IndicatorResultConfig {
                         LabelTemplate = "BB([P1],[P2]) Centerline",
+                        DisplayName = "Centerline",
                         DataName = "sma",
                         DataType = "number",
                         LineType = "dash",
@@ -148,9 +151,10 @@ public static class Metadata
                     },
                     new IndicatorResultConfig {
                         LabelTemplate = "BB([P1],[P2]) Lower Band",
+                        DisplayName = "Lower Band",
                         DataName = "lowerBand",
                         DataType = "number",
-                        LineType = "line",
+                        LineType = "solid",
                         LineWidth = 1,
                         DefaultColor = darkGray
                     }
@@ -182,9 +186,10 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "EMA([P1])",
+                        DisplayName = "EMA",
                         DataName = "ema",
                         DataType = "number",
-                        LineType = "line",
+                        LineType = "solid",
                         DefaultColor = standardBlue
                     }
                 }
@@ -226,6 +231,7 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "PSAR([P1],[P2])",
+                        DisplayName = "PSAR",
                         DataName = "sar",
                         DataType = "number",
                         LineType= "dots",
@@ -292,7 +298,7 @@ public static class Metadata
                         LabelTemplate = "RSI([P1])",
                         DataName = "rsi",
                         DataType = "number",
-                        LineType = "line",
+                        LineType = "solid",
                         DefaultColor = standardBlue
                     }
                 }
@@ -361,20 +367,23 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "STO %K([P1])",
+                        DisplayName  = "%K",
                         DataName = "k",
                         DataType = "number",
-                        LineType = "line",
+                        LineType = "solid",
                         DefaultColor = standardBlue
                     },
                     new IndicatorResultConfig {
                         LabelTemplate = "STO %D([P2])",
+                        DisplayName = "%D",
                         DataName = "d",
                         DataType = "number",
-                        LineType= "line",
+                        LineType= "solid",
                         DefaultColor = standardRed
                     },
                     new IndicatorResultConfig {
                         LabelTemplate = "STO %J",
+                        DisplayName = "%J",
                         DataName = "j",
                         DataType = "number",
                         LineType = "dash",

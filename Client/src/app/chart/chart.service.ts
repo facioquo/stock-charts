@@ -258,7 +258,8 @@ export class ChartService {
     listing.parameters.forEach((config: IndicatorParamConfig) => {
 
       const param = {
-        name: config.paramName,
+        paramName: config.paramName,
+        displayName: config.displayName,
         value: config.defaultValue
       } as IndicatorParam
 
@@ -341,7 +342,7 @@ export class ChartService {
   // CHARTS OPERATIONS
   addSelectionToOverlayChart(selection: IndicatorSelection) {
 
-    // add indicator data
+    // add selection
     selection.results.forEach((r: IndicatorResult) => {
       this.chartOverlay.data.datasets.push(r.dataset);
     });
@@ -401,7 +402,7 @@ export class ChartService {
     chartConfig.options.scales.yAxis.min = listing.chartConfig?.minimumYAxis;
     chartConfig.options.scales.yAxis.max = listing.chartConfig?.maximumYAxis;
 
-    // add indicator data
+    // add selection
     selection.results.forEach((r: IndicatorResult) => {
       chartConfig.data.datasets.push(r.dataset);
     });
@@ -425,7 +426,7 @@ export class ChartService {
     const yPos: ScaleValue = selection.chart.scales["yAxis"].getMinMax(false).max;
 
     const annotation: AnnotationOptions =
-      this.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, -3, 1);
+      this.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, -2, 1);
     selection.chart.options.plugins.annotation.annotations = { annotation };
     selection.chart.update();
   }
@@ -441,7 +442,7 @@ export class ChartService {
         .filter(x => x.chartType == 'overlay')
         .map((selection: IndicatorSelection, index: number) => {
           const annotation: AnnotationOptions =
-            this.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, -3, adjY);
+            this.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, -2, adjY);
           annotation.id = "legend" + (index + 1).toString();
           adjY += 12;
           return annotation;

@@ -16,8 +16,8 @@ export class PickListComponent {
   ) { }
 
 
-  openLink(event: MouseEvent, indicator: IndicatorListing): void {
-    this.bsRef.dismiss(indicator);
+  openLink(event: MouseEvent, listing: IndicatorListing): void {
+    this.bsRef.dismiss(listing);
     event.preventDefault();
   }
 }

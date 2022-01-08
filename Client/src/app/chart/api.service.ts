@@ -39,7 +39,7 @@ export class ApiService {
       let url = `${listing.endpoint}?`;
       selection.params.forEach((param: IndicatorParam, param_index: number) => {
         if (param_index != 0) url += "&";
-        url += `${param.name}=${param.value}`;
+        url += `${param.paramName}=${param.value}`;
       });
 
       // fetch data
@@ -86,7 +86,7 @@ export class ApiService {
 
     switch (r.lineType) {
 
-      case 'line':
+      case 'solid':
         const lineDataset: ChartDataset = {
           label: r.label,
           type: 'line',

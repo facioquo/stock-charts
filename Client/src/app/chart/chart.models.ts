@@ -79,7 +79,8 @@ export interface IndicatorSelection {
 }
 
 export interface IndicatorParam {
-  name: string,
+  paramName: string,
+  displayName: string,
   value?: number
 }
 

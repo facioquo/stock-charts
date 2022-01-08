@@ -47,7 +47,11 @@ mat-chip-list {
   justify-content: center;
 }
 
-mat-dialog-container {
+.mat-dialog-actions {
+  justify-content: center;
+}
+
+.mat-dialog-container {
   h1 {
     font-size: 1.3em;
     font-weight: normal;
@@ -64,6 +68,11 @@ mat-dialog-container {
 mat-radio-group {
   margin: 16px;
 }
+
+.mat-tab-body-wrapper {
+  padding: 16px;
+}
+
 
 // COMMON CONTROLS
 .radio-button {

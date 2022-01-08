@@ -155,7 +155,7 @@ export class ChartComponent implements OnInit {
     this.cs.addSelection(selectFinal4);
 
     const selectDefault5 = this.cs.defaultSelection("RSI");
-    selectDefault5.params.find(x => x.name == "lookbackPeriods").value = 5;
+    selectDefault5.params.find(x => x.paramName == "lookbackPeriods").value = 5;
     const selectFinal5 = this.cs.selectionTokenReplacement(selectDefault5);
     this.cs.addSelection(selectFinal5);
   }
@@ -167,19 +167,19 @@ export class ChartComponent implements OnInit {
     const bsRef = this.bs.open(PickListComponent, { data: this.cs.listings });
 
     bsRef.afterDismissed()
-      .subscribe((indicator: IndicatorListing) => {
+      .subscribe((listing: IndicatorListing) => {
 
-        if (indicator){
-          this.openPickDialog(indicator);
+        if (listing){
+          this.openPickDialog(listing);
         }
       });
   }
 
-  openPickDialog(indicator: IndicatorListing): void {
+  openPickDialog(listing: IndicatorListing): void {
 
     const dialogRef = this.dialog.open(PickFormComponent, {
       minWidth: '300px',
-      data: indicator
+      data: listing
     });
 
     dialogRef.afterClosed()
