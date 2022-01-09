@@ -22,11 +22,7 @@ mat-toolbar {
   }
 }
 
-.badge-container {
-  text-align: center;
-  .badge {
-    margin-top: 0.25em;
-    padding-left: 0.25em;
-    padding-right: 0.25em;
-  }
+.badge {
+  margin-top: 0.25em;
+  margin-right: 16px;
 }

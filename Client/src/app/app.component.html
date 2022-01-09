@@ -1,9 +1,14 @@
 <mat-toolbar class="toolbar noselect" color="accent">
-  <h1 matTooltip="Documentation site for Stock Indicators for .NET">
+  <h1 matTooltip="Visit the documentation site for Stock Indicators for .NET">
     <a href="https://daveskender.github.io/Stock.Indicators/">
-    Stock Indicators for .NET demo
-  </a></h1>
+      Stock.Chart
+    </a>
+  </h1>
   <div class="filler"></div>
+  <a class="badge" href="https://www.nuget.org/packages/Skender.Stock.Indicators"
+    matTooltip="NuGet package for Stock Indicators for .NET">
+    <img src="https://img.shields.io/nuget/v/skender.stock.indicators?color=black&logo=NuGet&label=NuGet" />
+  </a>
   <div matTooltip="GitHub repository for this demo">
     <a href="https://github.com/DaveSkender/Stock.Charts">
       <fa-icon [icon]="faGithub" size="2x"></fa-icon>
@@ -12,26 +17,5 @@
 </mat-toolbar>
 
 <div id="main-content" class="body-container">
-
-  <!-- intro -->
-  <!-- <div class="badge-container">
-    <a class="badge" href="https://www.nuget.org/packages/Skender.Stock.Indicators">
-      <img src="https://img.shields.io/nuget/v/skender.stock.indicators?color=blue&logo=NuGet&label=NuGet" />
-    </a>
-    <a class="badge" href="https://badge.fury.io/py/stock-indicators">
-      <img src="https://img.shields.io/pypi/v/stock-indicators?color=blue&label=PyPI" />
-    </a>
-  </div>
-
-  <p class="noselect">
-    This is a demo of the
-    <a href="https://daveskender.github.io/Stock.Indicators/">Stock Indicators for .NET</a>
-    library. It generates server-side stock indicators using the
-    <a href="https://www.nuget.org/packages/Skender.Stock.Indicators">Skender.Stock.Indicators</a>
-    NuGet package for a <a href="https://www.chartjs.org/">Chart.js</a> financial chart.
-    A <a href="https://daveskender.github.io/Stock.Indicators.Python/">Python version</a> is also
-    available as a the PyPI <a href="https://pypi.org/project/stock-indicators/">stock-indicators</a> package.
-  </p> -->
-
   <app-chart></app-chart>
 </div>
