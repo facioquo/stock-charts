@@ -1,6 +1,18 @@
 <mat-nav-list>
 
-  <a mat-list-item *ngFor="let listing of data" (click)="openLink($event, listing)">
+  <h3 class="center noselect" *ngIf="selections.length>0">Currently shown</h3>
+  <a mat-list-item *ngFor="let selection of selections" matTooltip="delete this indicator"
+    (click)="removeSelection($event, selection.ucid)">
+    <span mat-line>{{selection.label}}</span>
+    <button mat-flat-button color="accent">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </a>
+
+  <mat-divider *ngIf="selections.length>0"></mat-divider>
+
+  <h3 class="center noselect">Add new indicator</h3>
+  <a mat-list-item *ngFor="let listing of listings" (click)="openEditor($event, listing)">
     <span mat-line>{{listing.name}}</span>
     <span mat-line>{{listing.category}}</span>
   </a>

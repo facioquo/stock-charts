@@ -20,8 +20,7 @@ interface LineStyle {
 
 @Component({
   selector: 'app-listing',
-  templateUrl: 'pick-form.component.html',
-  styleUrls: ['pick-form.component.scss']
+  templateUrl: 'pick-form.component.html'
 })
 export class PickFormComponent {
 
@@ -73,9 +72,8 @@ export class PickFormComponent {
 
   onSubmit(): void {
 
-    // label token replacement
-    this.selection = this.cs.selectionTokenReplacement(this.selection);
     this.dialogRef.close;
+    this.cs.addSelection(this.selection);
   }
 
   onNoClick(): void {

@@ -300,6 +300,10 @@ export class ChartService {
 
   addSelection(selection: IndicatorSelection) {
 
+    // replace tokens
+    selection = this.selectionTokenReplacement(selection);
+
+    // add to collection
     this.selections.push(selection);
     // TODO: save to cache
 
@@ -326,17 +330,24 @@ export class ChartService {
   deleteSelection(ucid: string) {
 
     const selection = this.selections.find(x => x.ucid == ucid);
-    const listing = this.listings.find(x => x.uiid == selection.uiid);
 
-    // TODO: store full dataset in IndicatorResult so we can splice it from the Chart dataset
-    // const rsiDataset = this.chartRsi.data.datasets.indexOf(line, 0);  // keep thi
-    // this.chartRsi.data.datasets.splice(rsiDataset, 1);
-    // handle mixed types (maybe listing="mixed", then use result subtype)
-    // non-Overlay:
-    //selection.chart.destroy()
+    const sx = this.selections.indexOf(selection, 0);
+    this.selections.splice(sx, 1);
 
-    // remove from selections
+    if (selection.chartType == "overlay") {
 
+      selection.results.forEach((result: IndicatorResult) => {
+        const dx = this.chartOverlay.data.datasets.indexOf(result.dataset, 0);
+        this.chartOverlay.data.datasets.splice(dx, 1);
+      });
+      this.updateOverlayAnnotations();
+      this.chartOverlay.update();
+
+    } else {
+      const body = document.getElementById("main-content");
+      const chart = document.getElementById(`${selection.ucid}-container`);
+      body.removeChild(chart);
+    }
   }
 
   // CHARTS OPERATIONS
@@ -346,6 +357,7 @@ export class ChartService {
     selection.results.forEach((r: IndicatorResult) => {
       this.chartOverlay.data.datasets.push(r.dataset);
     });
+    this.chartOverlay.update(); // ensures scales are drawn to correct size first
     this.updateOverlayAnnotations();
     this.chartOverlay.update();
   }
@@ -447,11 +459,6 @@ export class ChartService {
           adjY += 12;
           return annotation;
         });
-
-    // TODO: are there better variables to use here for min/max of range?
-    this.chartOverlay.options.plugins.annotation.annotations.forEach((a: AnnotationOptions) => {
-      console.log("annotation", a.id, "must be a better way");
-    });
   }
 
   commonAnnotation(

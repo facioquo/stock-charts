@@ -14,8 +14,6 @@ import {
 
 import { PickListComponent } from './picker/pick-list.component';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { MatDialog } from '@angular/material/dialog';
-import { PickFormComponent } from './picker/pick-form.component';
 
 @Component({
   selector: 'app-chart',
@@ -25,10 +23,9 @@ import { PickFormComponent } from './picker/pick-form.component';
 export class ChartComponent implements OnInit {
 
   constructor(
-    private readonly cs: ChartService,
+    public readonly cs: ChartService,
     private readonly api: ApiService,
-    private readonly bs: MatBottomSheet,
-    private dialog: MatDialog,
+    private readonly bs: MatBottomSheet
   ) { }
 
   @ViewChild('chartsTop') chartTopRef: ElementRef;
@@ -142,54 +139,27 @@ export class ChartComponent implements OnInit {
 
     // TODO: get from cache or use defaults if none
 
-    const selectDefault2 = this.cs.defaultSelection("EMA");
-    const selectFinal2 = this.cs.selectionTokenReplacement(selectDefault2);
-    this.cs.addSelection(selectFinal2);
+    const def1 = this.cs.defaultSelection("EMA");
+    this.cs.addSelection(def1);
 
-    const selectDefault3 = this.cs.defaultSelection("BB");
-    const selectFinal3 = this.cs.selectionTokenReplacement(selectDefault3);
-    this.cs.addSelection(selectFinal3);
+    const def2 = this.cs.defaultSelection("BB");
+    this.cs.addSelection(def2);
 
-    const selectDefault4 = this.cs.defaultSelection("STO");
-    const selectFinal4 = this.cs.selectionTokenReplacement(selectDefault4);
-    this.cs.addSelection(selectFinal4);
+    const def3 = this.cs.defaultSelection("STO");
+    this.cs.addSelection(def3);
 
-    const selectDefault5 = this.cs.defaultSelection("RSI");
-    selectDefault5.params.find(x => x.paramName == "lookbackPeriods").value = 5;
-    const selectFinal5 = this.cs.selectionTokenReplacement(selectDefault5);
-    this.cs.addSelection(selectFinal5);
+    const def4 = this.cs.defaultSelection("RSI");
+    def4.params.find(x => x.paramName == "lookbackPeriods").value = 5;
+    this.cs.addSelection(def4);
   }
 
 
   // PICKERS
   openPickList(): void {
-
-    const bsRef = this.bs.open(PickListComponent, { data: this.cs.listings });
-
-    bsRef.afterDismissed()
-      .subscribe((listing: IndicatorListing) => {
-
-        if (listing){
-          this.openPickDialog(listing);
-        }
-      });
+    const bsRef = this.bs.open(PickListComponent);
   }
 
-  openPickDialog(listing: IndicatorListing): void {
 
-    const dialogRef = this.dialog.open(PickFormComponent, {
-      minWidth: '300px',
-      data: listing
-    });
-
-    dialogRef.afterClosed()
-      .subscribe((selection: IndicatorSelection) => {
-        console.log(`The dialog was closed for ${selection.label}`);
-
-        if (selection)
-          this.cs.addSelection(selection);
-      });
-  }
 
   // DATA OPERATIONS
   updateData() {

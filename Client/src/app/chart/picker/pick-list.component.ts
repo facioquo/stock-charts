@@ -1,6 +1,10 @@
-import { Component, Inject } from '@angular/core';
-import { MatBottomSheetRef, MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
-import { IndicatorListing } from '../chart.models';
+import { Component } from '@angular/core';
+import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { MatDialog } from '@angular/material/dialog';
+
+import { IndicatorListing, IndicatorSelection } from '../chart.models';
+import { ChartService } from '../chart.service';
+import { PickFormComponent } from '../picker/pick-form.component';
 
 @Component({
   selector: 'app-listing',
@@ -9,15 +13,36 @@ import { IndicatorListing } from '../chart.models';
 })
 export class PickListComponent {
 
+  listings: IndicatorListing[];
+  selections: IndicatorSelection[];
+
   constructor(
-    @Inject(MAT_BOTTOM_SHEET_DATA)
-    public data: IndicatorListing[],
-    private bsRef: MatBottomSheetRef<PickListComponent>
-  ) { }
+    private bsRef: MatBottomSheetRef<PickListComponent>,
+    private cs: ChartService,
+    private dialog: MatDialog
+  ) {
+    this.listings = this.cs.listings;
+    this.selections = this.cs.selections;
+  }
 
 
-  openLink(event: MouseEvent, listing: IndicatorListing): void {
+  openEditor(event: MouseEvent, listing: IndicatorListing): void {
     this.bsRef.dismiss(listing);
     event.preventDefault();
+
+    const dialogRef = this.dialog.open(PickFormComponent, {
+      minWidth: '300px',
+      data: listing
+    });
+
+    dialogRef.afterClosed()
+      .subscribe((selection: IndicatorSelection) => { });
   }
+
+  removeSelection(event: MouseEvent, ucid: string): void {
+    this.bsRef.dismiss();
+    event.preventDefault();
+    this.cs.deleteSelection(ucid);
+  }
+
 }
