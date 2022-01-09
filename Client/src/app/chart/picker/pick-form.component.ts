@@ -6,7 +6,7 @@ import { ColorEvent } from 'ngx-color';
 import { TinyColor } from '@ctrl/tinycolor';
 
 import { ChartService } from '../chart.service';
-import { IndicatorListing, IndicatorSelection } from '../chart.models';
+import { IndicatorListing, IndicatorParam, IndicatorSelection } from '../chart.models';
 
 interface LineWidth {
   name: string;
@@ -77,6 +77,10 @@ export class PickFormComponent {
 
   onNoClick(): void {
     this.dialogRef.close();
+  }
+
+  paramRangeError(param: IndicatorParam): string {
+    return `Valid range is ${param.minimum} to ${param.maximum}`;
   }
 
   getHex8(e: ColorEvent): string {

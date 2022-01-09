@@ -15,7 +15,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { MtxColorpickerModule } from '@ng-matero/extensions/colorpicker';
-import { ColorSketchModule } from 'ngx-color/sketch';
+import { ColorCompactModule } from 'ngx-color/compact';
 
 import { ChartComponent } from './chart.component';
 import { PickListComponent } from './picker/pick-list.component';
@@ -23,6 +23,7 @@ import { PickFormComponent } from './picker/pick-form.component';
 
 import { ChartService } from './chart.service';
 import { ApiService } from './api.service';
+import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,7 @@ import { ApiService } from './api.service';
     MatTooltipModule,
 
     MtxColorpickerModule,
-    ColorSketchModule
+    ColorCompactModule
   ],
   exports: [
     ChartComponent,
@@ -56,7 +57,8 @@ import { ApiService } from './api.service';
   ],
   providers: [
     ChartService,
-    ApiService
+    ApiService,
+    { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher }
   ],
   bootstrap: [ChartComponent]
 })

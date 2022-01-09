@@ -260,6 +260,8 @@ export class ChartService {
       const param = {
         paramName: config.paramName,
         displayName: config.displayName,
+        minimum: config.minimum,
+        maximum: config.maximum,
         value: config.defaultValue
       } as IndicatorParam
 

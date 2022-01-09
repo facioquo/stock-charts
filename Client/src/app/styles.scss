@@ -52,13 +52,13 @@ mat-chip-list {
   h1 {
     font-size: 1.3em;
     font-weight: normal;
-    color: mat.get-color-from-palette($palette-primary, 500) !important;
+    color: $color-primary-light !important;
   }
 
   h2 {
     font-size: 1em;
     font-weight: normal;
-    color: mat.get-color-from-palette($palette-primary, 600) !important;
+    color: $color-primary-light !important;
   }
 }
 

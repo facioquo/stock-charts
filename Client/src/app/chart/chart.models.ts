@@ -81,6 +81,8 @@ export interface IndicatorSelection {
 export interface IndicatorParam {
   paramName: string,
   displayName: string,
+  minimum: number,
+  maximum: number,
   value?: number
 }
 
