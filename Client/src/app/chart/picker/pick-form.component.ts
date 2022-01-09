@@ -66,7 +66,6 @@ export class PickFormComponent {
 
     // pre-populate selection
     this.selection = this.cs.defaultSelection(listing.uiid);
-    console.log("opening", listing.name, this.selection);
   }
 
 

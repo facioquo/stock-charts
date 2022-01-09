@@ -1,4 +1,3 @@
-@use "@angular/material" as mat;
 @import "../styles";
 
 .chart-overlay-container {
@@ -23,11 +22,11 @@
   left: 50%;
   margin-left: -28px;
   bottom: 15px;
-  color: mat.get-color-from-palette($palette-primary, 700) !important;
-  background-color: mat.get-color-from-palette($palette-primary, 800, 0.2) !important;
+  color: $color-primary-700 !important;
+  background-color: $color-primary-800T !important;
 
   &:hover {
-    color: mat.get-color-from-palette($palette-primary, 500) !important;
-    background-color: mat.get-color-from-palette($palette-accent, 800) !important;
+    color: $color-primary-500 !important;
+    background-color: $color-accent-800 !important;
   }
 }
