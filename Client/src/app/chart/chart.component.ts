@@ -137,20 +137,28 @@ export class ChartComponent implements OnInit {
 
   loadSelections() {
 
-    // TODO: get from cache or use defaults if none
+    // get from cache
+    const selections = JSON.parse(localStorage.getItem('selections'));
 
-    const def1 = this.cs.defaultSelection("EMA");
-    this.cs.addSelection(def1);
+    if (selections) {
+      selections.forEach((selection: IndicatorSelection) => {
+        this.cs.addSelection(selection);
+      });
+    }
+    else { // add defaults
+      const def1 = this.cs.defaultSelection("EMA");
+      this.cs.addSelection(def1);
 
-    const def2 = this.cs.defaultSelection("BB");
-    this.cs.addSelection(def2);
+      const def2 = this.cs.defaultSelection("BB");
+      this.cs.addSelection(def2);
 
-    const def3 = this.cs.defaultSelection("STO");
-    this.cs.addSelection(def3);
+      const def3 = this.cs.defaultSelection("STO");
+      this.cs.addSelection(def3);
 
-    const def4 = this.cs.defaultSelection("RSI");
-    def4.params.find(x => x.paramName == "lookbackPeriods").value = 5;
-    this.cs.addSelection(def4);
+      const def4 = this.cs.defaultSelection("RSI");
+      def4.params.find(x => x.paramName == "lookbackPeriods").value = 5;
+      this.cs.addSelection(def4);
+    }
   }
 
 

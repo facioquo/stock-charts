@@ -80,7 +80,7 @@ public static class Metadata
     {
         string standardRed = "#DD2C00";
         //string standardOrange = "#EF6C00";
-        string standardGreen = "#2E7D32";
+        //string standardGreen = "#2E7D32";
         string standardBlue = "#1E88E5";
         string standardPurple = "#8E24AA";
         //string standardGray = "#9E9E9E";
@@ -381,14 +381,14 @@ public static class Metadata
                         LineType= "solid",
                         DefaultColor = standardRed
                     },
-                    new IndicatorResultConfig {
-                        LabelTemplate = "STO %J",
-                        DisplayName = "%J",
-                        DataName = "j",
-                        DataType = "number",
-                        LineType = "dash",
-                        DefaultColor = standardGreen
-                    }
+                    //new IndicatorResultConfig {
+                    //    LabelTemplate = "STO %J",
+                    //    DisplayName = "%J",
+                    //    DataName = "j",
+                    //    DataType = "number",
+                    //    LineType = "dash",
+                    //    DefaultColor = standardGreen
+                    //}
                 }
             }
         };

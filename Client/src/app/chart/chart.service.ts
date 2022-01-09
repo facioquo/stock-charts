@@ -325,6 +325,8 @@ export class ChartService {
         },
         error: (e: HttpErrorResponse) => { console.log(e); }
       });
+
+    this.cacheSelections();
   }
 
   deleteSelection(ucid: string) {
@@ -348,6 +350,20 @@ export class ChartService {
       const chart = document.getElementById(`${selection.ucid}-container`);
       body.removeChild(chart);
     }
+
+    this.cacheSelections();
+  }
+
+  cacheSelections() {
+
+    const selections = this.selections;
+
+    // remove unsavable data
+    selections.forEach((selection:IndicatorSelection)=>{
+      selection.chart = undefined;
+    });
+
+    localStorage.setItem('selections', JSON.stringify(selections));
   }
 
   // CHARTS OPERATIONS
