@@ -1,89 +1,28 @@
-// PAGE CONTAINERS
-
-.page-container {
-    margin: 16px;
-    padding-bottom: 16px;
-}
-
-.page-intro {
-    max-width: 950px;
-    text-align: center;
-    margin: auto;
-    margin-bottom: 1em;
-}
-
-.badge-container {
-    text-align: center;
-    margin-top: 0.25em;
-
-    .badge {
-        margin-top: 0.25em;
-        padding-left: 0.25em;
-        padding-right: 0.25em;
-    }
-}
-
-.container {
-    position: relative;
-    margin: auto;
-    max-width: 950px;
-    text-align: center;
-}
-
-.chart-label {
-    margin: 0;
-    padding: 5px 0 0 10px;
-    text-align: left;
-    font-size: 10px;
-}
-
-.chart-container-oscillator {
-    padding: 0;
-    margin: 0;
-}
-
-.select-container {
-    margin: auto;
-    max-width: 950px;
-}
+@import "styles";
 
 // TOOLBAR
-.toolbar {
-    a {
-        text-decoration: none;
-        color: white;
+mat-toolbar {
+  font-family: Google Sans, Roboto, Arial, Helvetica, sans-serif;
+  color: $color-primary-700 !important;
+  background-color: $color-primary !important;
+  padding: 0 16px 0 8px;
+
+  a {
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+      color: $color-primary-500 !important;
     }
+  }
 
-    font-family: Google Sans, Roboto, Arial, Helvetica, sans-serif;
-
-    .filler {
-        flex: 1 1 auto;
-        text-align: center;
-    }
+  .filler {
+    flex: 1 1 auto;
+    text-align: center;
+  }
 }
 
-// CONTROLS
-
-mat-chip-list {
-    margin: 16px;
-    display: flex;
-    justify-content: center;
-}
-
-mat-radio-group {
-    margin: 16px;
-}
-
-.radio-button {
-    margin: 5px;
-}
-
-.button-row {
-    margin-top: 25px;
-    margin-bottom: 25px;
-}
-
-.button-row > button {
-    margin-left: 4px;
-    margin-right: 4px;
+.badge {
+  margin-top: 0.25em;
+  margin-right: 16px;
 }

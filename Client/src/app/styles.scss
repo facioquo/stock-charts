@@ -1,0 +1,87 @@
+@use "@angular/material" as mat;
+@import "styles-theme";
+
+// BASE STYLES
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  color: $color-primary-light;
+  background-color: $color-primary;
+}
+
+.center {
+  text-align: center;
+}
+.right {
+  text-align: right;
+}
+
+.noselect {
+  cursor: default;
+}
+
+.no-wrap {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.body-container {
+  margin-bottom: 16px;
+  padding: 0 8px;
+}
+
+// ANGULAR MATERIAL OVERRIDES
+mat-chip-list {
+  margin: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.mat-dialog-actions {
+  justify-content: center;
+}
+
+.mat-dialog-container {
+  h1 {
+    font-size: 1.3em;
+    font-weight: normal;
+    color: $color-primary-light !important;
+  }
+
+  h2 {
+    font-size: 1em;
+    font-weight: normal;
+    color: $color-primary-light !important;
+  }
+}
+
+mat-radio-group {
+  margin: 16px;
+}
+
+.mat-tab-body-wrapper {
+  padding: 16px;
+}
+
+
+// COMMON CONTROLS
+.radio-button {
+  margin: 5px;
+}
+
+.button-row {
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+.button-row > button {
+  margin-left: 4px;
+  margin-right: 4px;
+}

@@ -1,0 +1,23 @@
+<!-- CHART STACK -->
+<a #chartsTop></a>
+
+<!-- loading -->
+<div *ngIf="loading">
+
+  <div style="margin-top:175px;text-align:center;font-family:Roboto,Arial,sans-serif;font-size:12px;">
+    <p><img src="../assets/spinner.gif" alt="logging in" height="25"><br>WAKING UP DEMO. STANDBY</p>
+  </div>
+
+</div>
+
+<!-- CHART (MAIN OVERLAY) -->
+<div class="chart-overlay-container">
+  <canvas id="chartOverlay"></canvas>
+</div>
+
+<!-- ADD INDICATOR -->
+<button mat-fab color="accent" class="button-listing" (click)="openPickList()" matTooltip="add a new indicator">
+  <mat-icon>add</mat-icon>/<mat-icon>remove</mat-icon>
+</button>
+
+<!-- CHART (OSCILLATORS) -->

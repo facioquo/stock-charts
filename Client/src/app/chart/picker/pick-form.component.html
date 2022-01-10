@@ -1,0 +1,76 @@
+<h1 mat-dialog-title>{{listing.name}}</h1>
+
+<!-- form content -->
+<form #paramForm="ngForm" name="paramForm">
+  <div mat-dialog-content>
+
+    <mat-tab-group animationDuration="0ms" mat-align-tabs="center">
+
+      <mat-tab label="Parameters">
+        <div *ngFor="let p of selection.params; index as i" style="margin-top:0.5em;">
+          <mat-form-field [style.width.px]=150>
+            <mat-label>{{p.displayName}}</mat-label>
+            <input matInput #param="ngModel" name="param{{i}}" [(ngModel)]="p.value" type="number" required
+              min="{{p.minimum}}" max="{{p.maximum}}">
+            <mat-error *ngIf="param.invalid">{{paramRangeError(p)}}</mat-error>
+          </mat-form-field>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Styles">
+        <div *ngFor="let r of selection.results; index">
+
+          <h2>{{r.displayName}}</h2>
+
+          <!-- color -->
+          <mat-form-field [style.width.px]=110>
+            <mat-label>Color</mat-label>
+            <input matInput name="color" [mtxColorpicker]="customPicker" [(ngModel)]="r.color" disabled>
+            <mtx-colorpicker-toggle matSuffix [for]="customPicker" [ngStyle]="{'color':r.color}">
+            </mtx-colorpicker-toggle>
+            <mtx-colorpicker #customPicker [content]="customPickerContent" disabled="false"></mtx-colorpicker>
+          </mat-form-field>
+
+          <ng-template #customPickerContent>
+            <div>
+              <color-compact [colors]="presetColors" [color]="customPicker.selected"
+                (onChangeComplete)="customPicker.select(getHex8($event))">
+              </color-compact>
+            </div>
+          </ng-template>
+
+          <!-- style -->
+          <mat-form-field [style.width.px]=100 [style.margin-left.px]=8>
+            <mat-label>Line style</mat-label>
+            <mat-select name="linetype" [(ngModel)]="r.lineType">
+              <mat-option *ngFor="let s of lineStyles" [value]="s.value">
+                {{s.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- width -->
+          <mat-form-field [style.width.px]=100 [style.margin-left.px]=8>
+            <mat-label>Line width</mat-label>
+            <mat-select name="linewidth" [(ngModel)]="r.lineWidth">
+              <mat-option *ngFor="let w of lineWidths" [value]="w.value">
+                {{w.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+  </div>
+
+  <!-- action pane -->
+  <div mat-dialog-actions>
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-raised-button cdkFocusInitial (click)="onSubmit()" color="accent" [mat-dialog-close]="selection"
+      [disabled]="paramForm.invalid">
+      Add
+    </button>
+  </div>
+</form>

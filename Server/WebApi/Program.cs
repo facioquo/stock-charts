@@ -1,22 +1,46 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+// STARTUP CONFIGURATION
 
-namespace WebApi
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+IServiceCollection services = builder.Services;
+ConfigurationManager configuration = builder.Configuration;
+
+// add framework services
+services.AddControllers()
+        .AddNewtonsoftJson(x =>
+           x.SerializerSettings.ReferenceLoopHandling
+           = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+// setup CORS for website
+IConfigurationSection corsOrigins = configuration.GetSection("CorsOrigins");
+
+services.AddCors(options =>
 {
-    public class Program
+    options.AddPolicy("CorsPolicy",
+    cors =>
     {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+        _ = cors.AllowAnyHeader();
+        _ = cors.AllowAnyMethod();
+        _ = cors.AllowCredentials();
+        _ = cors.WithOrigins(corsOrigins["Website"]);
+    });
+});
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-        }
-    }
-}
+WebApplication app = builder.Build();
+
+// Configure the HTTP request pipeline.
+_ = app.Environment.IsDevelopment()
+  ? app.UseDeveloperExceptionPage()
+  : app.UseHsts();
+
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseCors("CorsPolicy");
+app.UseAuthentication();
+app.UseEndpoints(ep =>
+{
+    _ = ep.MapControllers()
+          .RequireCors("CorsPolicy");  // on all controllers
+});
+
+app.Run();

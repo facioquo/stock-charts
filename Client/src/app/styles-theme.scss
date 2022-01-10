@@ -1,0 +1,45 @@
+// Angular Material Theme info only
+// Use styles.scss for main site styles
+
+@use "@angular/material" as mat;
+@use "@ng-matero/extensions" as mtx;
+@include mat.core();
+
+// ref: https://www.materialpalette.com
+$palette-primary: mat.define-palette(mat.$grey-palette, 900);
+$palette-accent: mat.define-palette(mat.$blue-gray-palette, 900);
+$palette-warn: mat.define-palette(mat.$deep-orange-palette, 900, 0.8);
+
+$theme: mat.define-dark-theme(
+  (
+    color: (
+      primary: $palette-primary,
+      accent: $palette-accent,
+      warn: $palette-warn,
+    ),
+  )
+);
+
+@include mat.all-component-themes($theme);
+
+// angular extensions theming
+@include mtx.all-component-themes($theme);
+@include mtx.all-experimental-component-themes($theme);
+
+// standard colors
+$color-primary: mat.get-color-from-palette($palette-primary, 900);
+$color-accent: mat.get-color-from-palette($palette-accent, 900);
+$color-warn: mat.get-color-from-palette($palette-warn, 900);
+
+// light colors
+$color-primary-light: mat.get-color-from-palette($palette-primary, "lighter");
+$color-accent-light: mat.get-color-from-palette($palette-accent, "lighter");
+$color-warn-light: mat.get-color-from-palette($palette-warn, "lighter");
+
+// other colors
+$color-primary-500: mat.get-color-from-palette($palette-primary, 500);
+$color-primary-700: mat.get-color-from-palette($palette-primary, 700);
+$color-primary-800T: mat.get-color-from-palette($palette-primary, 800, 0.2);
+
+$color-accent-800: mat.get-color-from-palette($palette-accent, 800);
+
