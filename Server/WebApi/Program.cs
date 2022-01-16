@@ -19,13 +19,15 @@ services.AddCors(options =>
     options.AddPolicy("CorsPolicy",
     cors =>
     {
-        _ = cors.AllowAnyHeader();
-        _ = cors.AllowAnyMethod();
-        _ = cors.AllowCredentials();
-        _ = cors.WithOrigins(corsOrigins["Website"]);
+        cors.AllowAnyHeader();
+        cors.AllowAnyMethod();
+        cors.WithOrigins(corsOrigins["Website"]);
     });
 });
 
+Console.WriteLine($"CORS Origins: {corsOrigins["Website"]}");
+
+// build application
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,11 +38,6 @@ _ = app.Environment.IsDevelopment()
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("CorsPolicy");
-app.UseAuthentication();
-app.UseEndpoints(ep =>
-{
-    _ = ep.MapControllers()
-          .RequireCors("CorsPolicy");  // on all controllers
-});
-
+app.UseResponseCaching();
+app.MapControllers();
 app.Run();
