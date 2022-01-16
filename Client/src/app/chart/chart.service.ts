@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 
 import 'chartjs-adapter-date-fns';
-import 'chartjs-chart-financial';
-
 import { enUS } from 'date-fns/locale';
 import { add, parseISO } from 'date-fns';
 import { Guid } from "guid-typescript";
@@ -13,6 +11,7 @@ import {
   ChartConfiguration,
   ChartDataset,
   FontSpec,
+  Interaction,
   ScaleOptions,
   ScatterDataPoint,
   Tick
@@ -29,6 +28,13 @@ import {
 // plugins
 import annotationPlugin, { AnnotationOptions, ScaleValue }
   from 'chartjs-plugin-annotation';
+
+import {
+  CrosshairPlugin,
+  CrosshairOptions,
+  Interpolate
+}
+from 'chartjs-plugin-crosshair'
 
 // internal models
 import {
@@ -47,7 +53,10 @@ Chart.register(
   OhlcController,
   CandlestickElement,
   OhlcElement,
-  annotationPlugin);
+  annotationPlugin,
+  CrosshairPlugin);
+
+Interaction.modes.interpolate = Interpolate;
 
 @Injectable()
 export class ChartService {
@@ -65,6 +74,7 @@ export class ChartService {
   baseConfig() {
 
     const commonXaxes = this.commonXAxes();
+    const crosshairOptions = this.crosshairPluginOptions();
 
     const backgroundPlugin =
     {
@@ -98,14 +108,15 @@ export class ChartService {
           },
           tooltip: {
             enabled: true,
-            mode: 'index',
+            mode: 'interpolate',
             intersect: false
           },
           annotation: {
             clip: false,
             drawTime: 'afterDraw',
             annotations: []
-          }
+          },
+          crosshair: crosshairOptions
         },
         layout: {
           padding: 0,
@@ -240,6 +251,41 @@ export class ChartService {
 
     return axes;
   }
+
+  crosshairPluginOptions(): CrosshairOptions {
+
+    const crosshairOptions: CrosshairOptions = {
+        line: {
+            color: '#F66',                                      // crosshair line color
+            width: 1                                            // crosshair line width
+        },
+        sync: {
+            enabled: true,                                      // enable trace line syncing with other charts
+            group: 1,                                           // chart group (can be unique set of groups)
+            suppressTooltips: true                              // suppress tooltips when showing a synced tracer
+        },
+        zoom: {
+            enabled: false,                                     // enable zooming
+            zoomboxBackgroundColor: 'rgba(66,133,244,0.2)',     // background color of zoom box
+            zoomboxBorderColor: '#48F',                         // border color of zoom box
+            zoomButtonText: 'Reset Zoom',                       // reset zoom button text
+            zoomButtonClass: 'reset-zoom',                      // reset zoom button class
+        },
+        snap: {
+            enabled: true
+        },
+        callbacks: {
+            beforeZoom: (start, end) => {                       // called before zoom, return false to prevent zoom
+                return true;
+            },
+            afterZoom: (start, end) => {                        // called after zoom
+            }
+        }
+    };
+
+    return crosshairOptions;
+  }
+
 
   defaultSelection(uiid: string): IndicatorSelection {
 

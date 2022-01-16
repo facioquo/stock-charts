@@ -1,4 +1,12 @@
-import { BarControllerDatasetOptions, Chart, ChartDataset, ScatterDataPoint } from "chart.js";
+import {
+  Chart,
+  ChartDataset,
+  BarControllerDatasetOptions
+} from "chart.js";
+
+import {
+  CrosshairOptions
+} from 'chartjs-plugin-crosshair'
 
 export interface Quote {
   date: Date;
@@ -105,4 +113,19 @@ type CandleDatasetOption = BarControllerDatasetOptions & {
     down: string,
     unchanged: string
   };
+}
+
+// MISSING CROSSHAIR PLUGIN TYPINGS
+declare module 'chart.js' {
+  interface PluginOptionsByType<TType extends ChartType> {
+    crosshair?: CrosshairOptions | undefined;
+  }
+
+  interface InteractionModeMap {
+    interpolate: InteractionModeFunction;
+  }
+
+  interface ChartDataSets {
+    interpolate?: boolean | undefined;
+  }
 }
