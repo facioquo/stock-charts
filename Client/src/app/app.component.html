@@ -7,7 +7,7 @@
     </h1>
     <div class="filler"></div>
     <div class="toggle">
-      <mat-slide-toggle [(ngModel)]="ts.isDarkTheme" [color]="toggleColor">
+      <mat-slide-toggle [(ngModel)]="ts.isDarkTheme" [color]="toggleColor" (change)="ts.onToggle($event)">
         dark theme
       </mat-slide-toggle>
     </div>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { StyleService } from './style.service';
 
@@ -7,7 +7,7 @@ import { StyleService } from './style.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
   toggleColor = "warn";
   faGithub = faGithub;
@@ -15,4 +15,8 @@ export class AppComponent {
   constructor(
     public readonly ts: StyleService
   ) { }
+
+  ngOnInit(): void {
+    this.ts.getTheme();
+  }
 }
