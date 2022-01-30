@@ -390,6 +390,74 @@ public static class Metadata
                     //    DefaultColor = standardGreen
                     //}
                 }
+            },
+
+            // Zig Zag (close)
+            new IndicatorList
+            {
+                Name = "Zig Zag (close)",
+                Uiid = "ZIGZAG-CL",
+                LabelTemplate = "ZIGZAG(CLOSE,[P1]%)",
+                Endpoint = $"{baseUrl}/ZIGZAG-CLOSE/",
+                Category = "price-transform",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Percent Change",
+                        ParamName = "percentChange",
+                        DataType = "number",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 5,
+                        Minimum = 1,
+                        Maximum = 200
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "ZIGZAG(CLOSE,[P1]%)",
+                        DisplayName = "ZigZag",
+                        DataName = "zigZag",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
+            // Zig Zag (high/low)
+            new IndicatorList
+            {
+                Name = "Zig Zag (high/low)",
+                Uiid = "ZIGZAG-HL",
+                LabelTemplate = "ZIGZAG(HL,[P1]%)",
+                Endpoint = $"{baseUrl}/ZIGZAG-HIGHLOW/",
+                Category = "price-transform",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Percent Change",
+                        ParamName = "percentChange",
+                        DataType = "number",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 5,
+                        Minimum = 1,
+                        Maximum = 200
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "ZIGZAG(HL,[P1]%)",
+                        DisplayName = "ZigZag",
+                        DataName = "zigZag",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
             }
         };
     }
