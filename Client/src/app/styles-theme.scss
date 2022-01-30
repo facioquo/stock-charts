@@ -46,8 +46,22 @@ $color-primary: mat.get-color-from-palette($dark-primary, 900);
 $color-accent: mat.get-color-from-palette($dark-accent, 900);
 $color-warn: mat.get-color-from-palette($dark-warn, 900);
 
+// light colors
+$color-primary-light: mat.get-color-from-palette($dark-primary, "lighter");
+$color-accent-light: mat.get-color-from-palette($dark-accent, "lighter");
+$color-warn-light: mat.get-color-from-palette($dark-warn, "lighter");
+
+// other colors
+$color-primary-500: mat.get-color-from-palette($dark-primary, 500);
+$color-primary-700: mat.get-color-from-palette($dark-primary, 700);
+$color-primary-800T: mat.get-color-from-palette($dark-primary, 800, 0.2);
+
+$color-accent-800: mat.get-color-from-palette($dark-accent, 800);
+
 .dark-theme {
+  color: $color-primary-500;
   background-color: $color-primary;
+  min-height: 100vh;
 }
 
 // Apply the light theme only when the `.light-theme` CSS class is applied
@@ -62,15 +76,3 @@ $color-warn: mat.get-color-from-palette($dark-warn, 900);
 
   background-color: "white" !important;
 }
-
-// light colors
-$color-primary-light: mat.get-color-from-palette($dark-primary, "lighter");
-$color-accent-light: mat.get-color-from-palette($dark-accent, "lighter");
-$color-warn-light: mat.get-color-from-palette($dark-warn, "lighter");
-
-// other colors
-$color-primary-500: mat.get-color-from-palette($dark-primary, 500);
-$color-primary-700: mat.get-color-from-palette($dark-primary, 700);
-$color-primary-800T: mat.get-color-from-palette($dark-primary, 800, 0.2);
-
-$color-accent-800: mat.get-color-from-palette($dark-accent, 800);

@@ -9,11 +9,10 @@ import { StyleService } from './style.service';
 })
 export class AppComponent implements OnInit {
 
-  toggleColor = "warn";
   faGithub = faGithub;
 
   constructor(
-    public readonly ts: StyleService
+    public readonly ts: StyleService,
   ) { }
 
   ngOnInit(): void {

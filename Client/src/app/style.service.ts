@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
 @Injectable()
 export class StyleService {
 
+  isDarkTheme = true;
+
   constructor(
   ) { }
 
-  isDarkTheme = true;
-
-  onToggle(event: MatSlideToggleChange) {
-    localStorage.setItem("isDark", event.checked.valueOf().toString())
+  toggleTheme(checked: boolean) {
+    localStorage.setItem("isDark", checked.valueOf().toString())
   }
 
   getTheme() {
