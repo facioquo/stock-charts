@@ -123,4 +123,43 @@ public class MainController : ControllerBase
             return BadRequest(rex.Message);
         }
     }
+
+    [HttpGet("ZIGZAG-CLOSE")]
+    public IActionResult GetZigZagClose(
+     decimal percentChange)
+    {
+        try
+        {
+            IEnumerable<ZigZagResult> results =
+                quotes.GetZigZag(EndType.Close, percentChange)
+                      .Where(x => x.PointType != null
+                          && x.Date >= dateStart);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("ZIGZAG-HIGHLOW")]
+    public IActionResult GetZigZagHighLow(
+      decimal percentChange)
+    {
+        try
+        {
+            IEnumerable<ZigZagResult> results =
+                quotes.GetZigZag(EndType.HighLow, percentChange)
+                      .Where(x => x.PointType != null
+                          && x.Date >= dateStart);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
 }
