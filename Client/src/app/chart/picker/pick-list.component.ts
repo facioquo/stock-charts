@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
+
+import { StyleService } from 'src/app/style.service';
 
 import { IndicatorListing, IndicatorSelection } from '../chart.models';
 import { ChartService } from '../chart.service';
@@ -15,10 +18,12 @@ export class PickListComponent {
 
   listings: IndicatorListing[];
   selections: IndicatorSelection[];
+  toggleColor = "warn";
 
   constructor(
-    private bsRef: MatBottomSheetRef<PickListComponent>,
+    public ts: StyleService,
     private cs: ChartService,
+    private bsRef: MatBottomSheetRef<PickListComponent>,
     private dialog: MatDialog
   ) {
     this.listings = this.cs.listings;
@@ -45,4 +50,8 @@ export class PickListComponent {
     this.cs.deleteSelection(ucid);
   }
 
+  toggleTheme(event: MatSlideToggleChange) {
+    this.ts.toggleTheme(event.checked);
+    this.cs.resetChartTheme();
+  }
 }

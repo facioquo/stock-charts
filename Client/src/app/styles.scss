@@ -11,8 +11,6 @@ body {
   margin: 0;
   padding: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  color: $color-primary-light;
-  background-color: $color-primary;
 }
 
 .center {
@@ -52,13 +50,11 @@ mat-chip-list {
   h1 {
     font-size: 1.3em;
     font-weight: normal;
-    color: $color-primary-light !important;
   }
 
   h2 {
     font-size: 1em;
     font-weight: normal;
-    color: $color-primary-light !important;
   }
 }
 

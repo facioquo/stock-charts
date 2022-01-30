@@ -1,6 +1,13 @@
+<h3 class="center noselect">Global settings</h3>
+<div class="toggle">
+  <mat-slide-toggle [(ngModel)]="ts.isDarkTheme" [color]="toggleColor" (change)="toggleTheme($event)">
+    Dark theme
+  </mat-slide-toggle>
+</div>
+
 <mat-nav-list>
 
-  <h3 class="center noselect" *ngIf="selections.length>0">Currently shown</h3>
+  <h3 class="center noselect" *ngIf="selections.length>0">Indicators shown</h3>
   <a mat-list-item *ngFor="let selection of selections" matTooltip="delete this indicator"
     (click)="removeSelection($event, selection.ucid)">
     <span mat-line>{{selection.label}}</span>
