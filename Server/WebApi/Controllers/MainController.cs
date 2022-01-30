@@ -132,8 +132,7 @@ public class MainController : ControllerBase
         {
             IEnumerable<ZigZagResult> results =
                 quotes.GetZigZag(EndType.Close, percentChange)
-                      .Where(x => x.PointType != null
-                          && x.Date >= dateStart);
+                      .Where(x => x.Date >= dateStart);
 
             return Ok(results);
         }
@@ -151,8 +150,7 @@ public class MainController : ControllerBase
         {
             IEnumerable<ZigZagResult> results =
                 quotes.GetZigZag(EndType.HighLow, percentChange)
-                      .Where(x => x.PointType != null
-                          && x.Date >= dateStart);
+                      .Where(x => x.Date >= dateStart);
 
             return Ok(results);
         }
