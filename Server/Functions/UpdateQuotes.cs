@@ -12,10 +12,8 @@ namespace Functions;
 
 public class Jobs
 {
-    private IAlpacaDataClient alpacaDataClient;
-
     [FunctionName("UpdateQuotes")]
-    public async Task Run([TimerTrigger("0 */1 08-18 * * *")] TimerInfo myTimer, ILogger log)
+    public static async Task Run([TimerTrigger("0 */1 08-18 * * *")] TimerInfo myTimer, ILogger log)
     {
         // ~ extended market hours, every minute "0 */1 08-18 * * *"
         // for dev: minutely "0 */1 * * * *"
@@ -26,13 +24,14 @@ public class Jobs
         log.LogInformation($"Quotes updated at: {DateTime.Now}, {myTimer.ScheduleStatus}");
     }
 
-    private async Task StoreQuoteDaily(string symbol, ILogger log)
+    // STORE QUOTE
+    private static async Task StoreQuoteDaily(string symbol, ILogger log)
     {
         string alpacaApiKey = Environment.GetEnvironmentVariable("AlpacaApiKey");
         string alpacaSecret = Environment.GetEnvironmentVariable("AlpacaSecret");
 
         // fetch from Alpaca paper trading API
-        alpacaDataClient = Environments.Paper
+        IAlpacaDataClient alpacaDataClient = Environments.Paper
             .GetAlpacaDataClient(new SecretKey(alpacaApiKey, alpacaSecret));
 
         DateTime into = DateTime.Now.Subtract(TimeSpan.FromMinutes(16));
@@ -51,23 +50,20 @@ public class Jobs
         // store in Azure Blog
         string blobName = $"{symbol}-DAILY.csv";
         await PutBlob(blobName, csv);
+
         log.LogInformation($"Updated {blobName}");
     }
 
     // SAVE BLOB
     private static async Task<bool> PutBlob(string blobName, string csv)
     {
-        // application/json will be loaded as uncompressed JSON string
-        // application/octet-stream will be a compressed binary object
-
         BlobClient blob = GetBlobReference(blobName);
         BlobHttpHeaders httpHeader = new()
         {
             ContentType = "application/text"
         };
 
-        using (MemoryStream ms =
-            new(Encoding.UTF8.GetBytes(csv)))
+        using (MemoryStream ms = new(Encoding.UTF8.GetBytes(csv)))
         {
             ms.Position = 0;
             await blob.UploadAsync(ms, httpHeader);
@@ -75,14 +71,7 @@ public class Jobs
         return true;
     }
 
-    // helpers
-
-    private static BlobContainerClient GetContainerReference(string containerName)
-    {
-        string awjsConnection = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
-        return new BlobContainerClient(awjsConnection, containerName);
-    }
-
+    // HELPERS
     private static BlobClient GetBlobReference(string blobName)
     {
         BlobContainerClient blobContainer = GetContainerReference("chart-demo");
@@ -91,4 +80,9 @@ public class Jobs
         return blob;
     }
 
+    private static BlobContainerClient GetContainerReference(string containerName)
+    {
+        string awjsConnection = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+        return new BlobContainerClient(awjsConnection, containerName);
+    }
 }
