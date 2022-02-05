@@ -1,79 +1,5 @@
 namespace WebApi.Services;
 
-public class IndicatorList
-{
-    public string Name { get; set; }
-    public string Uiid { get; set; }
-    public string LabelTemplate { get; set; }
-    public string Endpoint { get; set; }
-    public string Category { get; set; }
-    public string ChartType { get; set; }
-    public Order Order { get; set; } = Order.Front;
-
-    public ChartConfig ChartConfig { get; set; }
-
-    public virtual ICollection<IndicatorParamConfig> Parameters { get; set; }
-    public virtual ICollection<IndicatorResultConfig> Results { get; set; }
-}
-
-public enum Order
-{
-    // price is 75/76
-    // thresholds are 99
-    Front = 1,
-    Behind = 50,
-    BehindPrice = 80,
-    Back = 95
-}
-
-public class IndicatorParamConfig
-{
-    public string DisplayName { get; set; }
-    public string ParamName { get; set; }
-    public string DataType { get; set; }
-    public int Order { get; set; }
-    public bool Required { get; set; }
-    public double? DefaultValue { get; set; }
-    public double Minimum { get; set; } // greater than
-    public double Maximum { get; set; } // less than
-}
-
-public class IndicatorResultConfig
-{
-    public string LabelTemplate { get; set; }
-    public string DisplayName { get; set; }
-    public string DataName { get; set; }
-    public string DataType { get; set; }
-    public string LineType { get; set; }
-    public float LineWidth { get; set; } = 2;
-    public string DefaultColor { get; set; }
-    public ChartFill Fill { get; set; }
-
-}
-
-public class ChartConfig
-{
-    public double? MinimumYAxis { get; set; }
-    public double? MaximumYAxis { get; set; }
-
-    public virtual ICollection<ChartThreshold> Thresholds { get; set; }
-}
-
-public class ChartThreshold
-{
-    public double Value { get; set; }
-    public string Color { get; set; }
-    public string Style { get; set; }
-    public ChartFill Fill { get; set; }
-}
-
-public class ChartFill
-{
-    public string Target { get; set; }
-    public string ColorAbove { get; set; }
-    public string ColorBelow { get; set; }
-}
-
 public static class Metadata
 {
     public static List<IndicatorList> IndicatorList(string baseUrl)
@@ -397,7 +323,7 @@ public static class Metadata
             {
                 Name = "Zig Zag (close)",
                 Uiid = "ZIGZAG-CL",
-                LabelTemplate = "ZIGZAG(CLOSE,[P1]%)",
+                LabelTemplate = "ZIGZAG([P1]% CLOSE)",
                 Endpoint = $"{baseUrl}/ZIGZAG-CLOSE/",
                 Category = "price-transform",
                 ChartType = "overlay",
@@ -416,7 +342,7 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "ZIGZAG(CLOSE,[P1]%)",
+                        LabelTemplate = "ZIGZAG([P1]% CLOSE)",
                         DisplayName = "ZigZag",
                         DataName = "zigZag",
                         DataType = "number",
@@ -431,7 +357,7 @@ public static class Metadata
             {
                 Name = "Zig Zag (high/low)",
                 Uiid = "ZIGZAG-HL",
-                LabelTemplate = "ZIGZAG(HL,[P1]%)",
+                LabelTemplate = "ZIGZAG([P1]% HIGH/LOW)",
                 Endpoint = $"{baseUrl}/ZIGZAG-HIGHLOW/",
                 Category = "price-transform",
                 ChartType = "overlay",
@@ -450,7 +376,7 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "ZIGZAG(HL,[P1]%)",
+                        LabelTemplate = "ZIGZAG([P1]% HIGH/LOW)",
                         DisplayName = "ZigZag",
                         DataName = "zigZag",
                         DataType = "number",

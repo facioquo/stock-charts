@@ -13,9 +13,9 @@ namespace Functions;
 public class Jobs
 {
     [FunctionName("UpdateQuotes")]
-    public static async Task Run([TimerTrigger("0 */1 08-18 * * *")] TimerInfo myTimer, ILogger log)
+    public static async Task Run([TimerTrigger("0 */1 08-18 * * 1-5")] TimerInfo myTimer, ILogger log)
     {
-        // ~ extended market hours, every minute "0 */1 08-18 * * *"
+        // ~ extended market hours, every minute "0 */1 08-18 * * 1-5"
         // for dev: minutely "0 */1 * * * *"
         await StoreQuoteDaily("DIA", log);
         await StoreQuoteDaily("SPY", log);
