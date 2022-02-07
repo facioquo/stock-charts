@@ -63,16 +63,6 @@ jobs:
           projects: Server/**/*.csproj
           arguments: -c Release -o $(Build.ArtifactStagingDirectory)
 
-      - task: CopyFiles@2
-        displayName: Stage artifacts
-        inputs:
-          SourceFolder: Server
-          Contents: "**/WebApi.zip"
-          TargetFolder: $(Build.ArtifactStagingDirectory)
-          CleanTargetFolder: true
-          OverWrite: true
-          flattenFolders: true
-
       - task: PublishBuildArtifacts@1
         displayName: Save artifacts
 
