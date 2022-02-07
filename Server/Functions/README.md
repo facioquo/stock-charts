@@ -2,9 +2,11 @@
 
 ### ENVIRONMENT VARIABLES for local dev
 
+```bash
 setx AzureWebJobsStorage "UseDevelopmentStorage=true"
 setx AlpacaApiKey "YOUR ALPACA API KEY"
 setx AlpacaSecret "YOUR ALPACA SECRET KEY"
+```
 
 ### CRON 
 
