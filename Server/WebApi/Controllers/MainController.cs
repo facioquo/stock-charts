@@ -144,6 +144,25 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("SUPERTREND")]
+    public IActionResult GetSuperTrend(
+     int lookbackPeriods = 10,
+     double multiplier = 3)
+    {
+        try
+        {
+            IEnumerable<SuperTrendResult> results =
+                quotes.GetSuperTrend(lookbackPeriods, multiplier)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("ZIGZAG-CLOSE")]
     public IActionResult GetZigZagClose(
      decimal percentChange)

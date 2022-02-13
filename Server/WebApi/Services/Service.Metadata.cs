@@ -6,7 +6,7 @@ public static class Metadata
     {
         string standardRed = "#DD2C00";
         //string standardOrange = "#EF6C00";
-        //string standardGreen = "#2E7D32";
+        string standardGreen = "#2E7D32";
         string standardBlue = "#1E88E5";
         string standardPurple = "#8E24AA";
         //string standardGray = "#9E9E9E";
@@ -397,6 +397,68 @@ public static class Metadata
                     //    LineType = "dash",
                     //    DefaultColor = standardGreen
                     //}
+                }
+            },
+
+            // SuperTrend
+            new IndicatorList
+            {
+                Name = "SuperTrend",
+                Uiid = "SUPERTREND",
+                LabelTemplate = "SUPERTREND([P1],[P2])",
+                Endpoint = $"{baseUrl}/SUPERTREND/",
+                Category = "price-trend",
+                ChartType = "overlay",
+                Order = Order.Front,
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Multiplier",
+                        ParamName= "multiplier",
+                        DataType = "number",
+                        Order = 2,
+                        Required = true,
+                        DefaultValue = 3,
+                        Minimum = 0.1,
+                        Maximum = 10
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "ST Upper Band",
+                        DisplayName = "ST Upper Band",
+                        DataName = "upperBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "ST Lower Band",
+                        DisplayName = "ST Lower Band",
+                        DataName = "lowerBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "SuperTrend",
+                        DisplayName = "SuperTrend",
+                        DataName = "superTrend",
+                        DataType = "number",
+                        LineType = "dash",
+                        LineWidth = 1,
+                        DefaultColor = darkGrayTransparent
+                    }
                 }
             },
 
