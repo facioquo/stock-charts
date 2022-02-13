@@ -1,12 +1,13 @@
 using System;
-using System.IO;
-using System.Text;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Alpaca.Markets;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using Skender.Stock.Indicators;
+using WebApi.Services;
 
 namespace Functions;
 
@@ -17,7 +18,6 @@ public class Jobs
     {
         // ~ extended market hours, every minute "0 */1 08-18 * * 1-5"
         // for dev: minutely "0 */1 * * * *"
-        await StoreQuoteDaily("DIA", log);
         await StoreQuoteDaily("SPY", log);
         await StoreQuoteDaily("QQQ", log);
 
@@ -40,49 +40,29 @@ public class Jobs
         IPage<IBar> barSet = await alpacaDataClient.ListHistoricalBarsAsync(
             new HistoricalBarsRequest(symbol, from, into, BarTimeFrame.Day));
 
-        // compose CSV
-        string csv = string.Empty;
+        List<Quote> quotes = new(barSet.Items.Count);
+
+        // compose 
         foreach (IBar bar in barSet.Items)
         {
-            csv += $"{bar.TimeUtc:d},{bar.Open},{bar.High},{bar.Low},{bar.Close},{bar.Volume}\r\n";
+            Quote q = new()
+            {
+                Date = bar.TimeUtc,
+                Open = bar.Open,
+                High = bar.High,
+                Low = bar.Low,
+                Close = bar.Close,
+                Volume = bar.Volume
+            };
+            quotes.Add(q);
         }
 
+        string json = JsonSerializer.Serialize(quotes.OrderBy(x => x.Date));
+
         // store in Azure Blog
-        string blobName = $"{symbol}-DAILY.csv";
-        await PutBlob(blobName, csv);
+        string blobName = $"{symbol}-DAILY.json";
+        await Storage.PutBlob(blobName, json);
 
         log.LogInformation($"Updated {blobName}");
-    }
-
-    // SAVE BLOB
-    private static async Task<bool> PutBlob(string blobName, string csv)
-    {
-        BlobClient blob = GetBlobReference(blobName);
-        BlobHttpHeaders httpHeader = new()
-        {
-            ContentType = "application/text"
-        };
-
-        using (MemoryStream ms = new(Encoding.UTF8.GetBytes(csv)))
-        {
-            ms.Position = 0;
-            await blob.UploadAsync(ms, httpHeader);
-        };
-        return true;
-    }
-
-    // HELPERS
-    private static BlobClient GetBlobReference(string blobName)
-    {
-        BlobContainerClient blobContainer = GetContainerReference("chart-demo");
-        BlobClient blob = blobContainer.GetBlobClient(blobName);
-
-        return blob;
-    }
-
-    private static BlobContainerClient GetContainerReference(string containerName)
-    {
-        string awjsConnection = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
-        return new BlobContainerClient(awjsConnection, containerName);
     }
 }

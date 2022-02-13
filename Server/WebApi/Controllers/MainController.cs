@@ -9,7 +9,7 @@ namespace WebApi.Controllers;
 public class MainController : ControllerBase
 {
     internal static readonly IEnumerable<Quote> quotes = FetchQuotes.Get();
-    internal static readonly DateTime dateStart = DateTime.Parse("6/1/2018");
+    internal static readonly int limitLast = 130;
 
     [HttpGet]
     public string Get()
@@ -20,7 +20,7 @@ public class MainController : ControllerBase
     [HttpGet("quotes")]
     public IActionResult GetQuotes()
     {
-        return Ok(quotes.Where(x => x.Date >= dateStart));
+        return Ok(quotes.TakeLast(limitLast));
     }
 
     [HttpGet("indicators")]
@@ -41,7 +41,7 @@ public class MainController : ControllerBase
         {
             IEnumerable<BollingerBandsResult> results =
                 quotes.GetBollingerBands(lookbackPeriods, standardDeviations)
-                      .Where(x => x.Date >= dateStart);
+                      .TakeLast(limitLast);
 
             return Ok(results);
         }
@@ -58,7 +58,7 @@ public class MainController : ControllerBase
         {
             IEnumerable<EmaResult> results =
                 quotes.GetEma(lookbackPeriods)
-                      .Where(x => x.Date >= dateStart);
+                      .TakeLast(limitLast);
 
             return Ok(results);
         }
@@ -77,7 +77,7 @@ public class MainController : ControllerBase
         {
             IEnumerable<ParabolicSarResult> results =
                 quotes.GetParabolicSar(accelerationStep, maxAccelerationFactor)
-                      .Where(x => x.Date >= dateStart);
+                      .TakeLast(limitLast);
 
             return Ok(results);
         }
@@ -95,7 +95,7 @@ public class MainController : ControllerBase
         {
             IEnumerable<RsiResult> results =
                 quotes.GetRsi(lookbackPeriods)
-                      .Where(x => x.Date >= dateStart);
+                      .TakeLast(limitLast);
 
             return Ok(results);
         }
@@ -114,7 +114,7 @@ public class MainController : ControllerBase
         {
             IEnumerable<StochResult> results =
                 quotes.GetStoch(lookbackPeriods, signalPeriods)
-                      .Where(x => x.Date >= dateStart);
+                      .TakeLast(limitLast);
 
             return Ok(results);
         }
@@ -132,7 +132,7 @@ public class MainController : ControllerBase
         {
             IEnumerable<ZigZagResult> results =
                 quotes.GetZigZag(EndType.Close, percentChange)
-                      .Where(x => x.Date >= dateStart);
+                      .TakeLast(limitLast);
 
             return Ok(results);
         }
@@ -150,7 +150,7 @@ public class MainController : ControllerBase
         {
             IEnumerable<ZigZagResult> results =
                 quotes.GetZigZag(EndType.HighLow, percentChange)
-                      .Where(x => x.Date >= dateStart);
+                      .TakeLast(limitLast);
 
             return Ok(results);
         }
