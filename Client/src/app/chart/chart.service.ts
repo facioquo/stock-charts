@@ -66,11 +66,13 @@ export class ChartService {
   selections: IndicatorSelection[] = [];
   chartOverlay: Chart;
 
-  // solid background plugin (for copy/paste)
+  // CHART CONFIGURATIONS
   baseConfig() {
 
     const commonXaxes = this.commonXAxes();
     const gridColor = this.ts.isDarkTheme ? '#424242' : '#CCCCCC';
+
+    // solid background plugin (for copy/paste)
     const backgroundPlugin =
     {
       id: 'background',
@@ -84,6 +86,7 @@ export class ChartService {
       }
     };
 
+    // base configuration
     const config: ChartConfiguration = {
 
       type: 'candlestick',
@@ -246,6 +249,7 @@ export class ChartService {
     return axes;
   }
 
+  // INDICATOR SELECTIONS
   defaultSelection(uiid: string): IndicatorSelection {
 
     const listing = this.listings.find(x => x.uiid == uiid);

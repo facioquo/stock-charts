@@ -195,6 +195,27 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("STORSI")]
+    public IActionResult GetStochRsi(
+        int rsiPeriods,
+        int stochPeriods,
+        int signalPeriods,
+        int smoothPeriods = 1)
+    {
+        try
+        {
+            IEnumerable<StochRsiResult> results =
+                quotes.GetStochRsi(rsiPeriods, stochPeriods, signalPeriods, smoothPeriods)
+                        .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("SUPERTREND")]
     public IActionResult GetSuperTrend(
         int lookbackPeriods = 10,

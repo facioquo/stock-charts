@@ -281,7 +281,7 @@ public static class Metadata
             // Exponential Moving Average
             new IndicatorList
             {
-                Name = "Exponential Moving Average",
+                Name = "Exponential Moving Average (EMA)",
                 Uiid = "EMA",
                 LabelTemplate = "EMA([P1])",
                 Endpoint = $"{baseUrl}/EMA/",
@@ -344,7 +344,7 @@ public static class Metadata
             // Moving Average Convergence/Divergence
             new IndicatorList
             {
-                Name = "Moving Average Convergence/Divergence",
+                Name = "Moving Average Convergence/Divergence (MACD)",
                 Uiid = "MACD",
                 LabelTemplate = "MACD([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/MACD/",
@@ -425,7 +425,7 @@ public static class Metadata
             // Parabolic SAR
             new IndicatorList
             {
-                Name = "Parabolic SAR",
+                Name = "Parabolic Stop and Reverse (SAR)",
                 Uiid = "PSAR",
                 LabelTemplate = "PSAR([P1],[P2])",
                 Endpoint = $"{baseUrl}/PSAR/",
@@ -470,7 +470,7 @@ public static class Metadata
             // Relative Strength Index
             new IndicatorList
             {
-                Name = "Relative Strength Index",
+                Name = "Relative Strength Index (RSI)",
                 Uiid = "RSI",
                 LabelTemplate = "RSI([P1])",
                 Endpoint = $"{baseUrl}/RSI/",
@@ -616,6 +616,106 @@ public static class Metadata
                     //    LineType = "dash",
                     //    DefaultColor = standardGreen
                     //}
+                }
+            },
+
+            // Stochastic RSI
+            new IndicatorList
+            {
+                Name = "Stochastic RSI",
+                Uiid = "STOCHRSI",
+                LabelTemplate = "StochRSI ([P1],[P2],[P3],[P4])",
+                Endpoint = $"{baseUrl}/STORSI/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 80,
+                            Color = thresholdRed,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = thresholdGreen
+                            }
+                        },
+                        new ChartThreshold {
+                            Value = 20,
+                            Color = thresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+1",
+                                ColorAbove = thresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "RSI Periods",
+                        ParamName = "rsiPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Stochastic Periods",
+                        ParamName = "stochPeriods",
+                        DataType = "int",
+                        Order = 2,
+                        Required = true,
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Signal Periods",
+                        ParamName = "signalPeriods",
+                        DataType = "int",
+                        Order = 3,
+                        Required = true,
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Smooth Periods",
+                        ParamName = "stochPeriods",
+                        DataType = "int",
+                        Order = 4,
+                        Required = true,
+                        DefaultValue = 1,
+                        Minimum = 1,
+                        Maximum = 50
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "StochRSI ([P1],[P2],[P3],[P4]) Oscillator",
+                        DisplayName  = "Oscillator",
+                        DataName = "stochRsi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "StochRSI ([P1],[P2],[P3],[P4]) Signal",
+                        DisplayName = "Signal line",
+                        DataName = "signal",
+                        DataType = "number",
+                        LineType= "solid",
+                        DefaultColor = standardRed
+                    }
                 }
             },
 
