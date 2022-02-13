@@ -32,8 +32,25 @@ public class MainController : ControllerBase
     //////////////////////////////////////////
     // INDICATORS (sorted alphabetically)
 
+    [HttpGet("ADX")]
+    public IActionResult GetAdx(int lookbackPeriods = 14)
+    {
+        try
+        {
+            IEnumerable<AdxResult> results =
+                quotes.GetAdx(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("AROON")]
-    public IActionResult GetAroon(int lookbackPeriods)
+    public IActionResult GetAroon(int lookbackPeriods = 25)
     {
         try
         {

@@ -18,6 +18,85 @@ public static class Metadata
 
         return new List<IndicatorList>()
         {
+            // Average Directional Index (ADX)
+            new IndicatorList
+            {
+                Name = "Average Directional Index (ADX)",
+                Uiid = "ADX",
+                LabelTemplate = "ADX([P1])",
+                Endpoint = $"{baseUrl}/ADX/",
+                Category = "price-trend",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    //MinimumYAxis = 0,
+                    //MaximumYAxis = 100,
+
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        //new ChartThreshold {
+                        //    Value = 50,
+                        //    Color = standardGrayTransparent,
+                        //    Style = "dash"
+                        //},
+                        new ChartThreshold {
+                            Value = 40,
+                            Color = standardGrayTransparent,
+                            Style = "dash"
+                        },
+                        new ChartThreshold {
+                            Value = 20,
+                            Color = standardGrayTransparent,
+                            Style = "dash"
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "ADX([P1])",
+                        DataName = "adx",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "DI+([P1])",
+                        DataName = "pdi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "DI-([P1])",
+                        DataName = "mdi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "ADXR([P1])",
+                        DataName = "adxr",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = darkGrayTransparent
+                    }
+
+                }
+            },
+
             // Aroon Up/Down
             new IndicatorList
             {
