@@ -190,7 +190,7 @@ public static class Metadata
                             {
                                 Target = "+2",
                                 ColorAbove = "transparent",
-                                ColorBelow = thresholdRed
+                                ColorBelow = thresholdGreen
                             }
                         },
                         new ChartThreshold {
@@ -200,7 +200,7 @@ public static class Metadata
                             Fill = new ChartFill
                             {
                                 Target = "+1",
-                                ColorAbove = thresholdGreen,
+                                ColorAbove = thresholdRed,
                                 ColorBelow = "transparent"
                             }
                         }
@@ -251,7 +251,7 @@ public static class Metadata
                             {
                                 Target = "+2",
                                 ColorAbove = "transparent",
-                                ColorBelow = thresholdRed
+                                ColorBelow = thresholdGreen
                             }
                         },
                         new ChartThreshold {
@@ -261,7 +261,7 @@ public static class Metadata
                             Fill = new ChartFill
                             {
                                 Target = "+1",
-                                ColorAbove = thresholdGreen,
+                                ColorAbove = thresholdRed,
                                 ColorBelow = "transparent"
                             }
                         }
