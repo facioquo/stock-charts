@@ -18,6 +18,117 @@ public static class Metadata
 
         return new List<IndicatorList>()
         {
+            // Aroon Up/Down
+            new IndicatorList
+            {
+                Name = "Aroon Up/Down",
+                Uiid = "AROON UP/DOWN",
+                LabelTemplate = "AROON([P1]) Up/Down",
+                Endpoint = $"{baseUrl}/AROON/",
+                Category = "price-trend",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    MinimumYAxis = 0,
+                    MaximumYAxis = 100,
+
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 70,
+                            Color = standardGrayTransparent,
+                            Style = "solid"
+                        },
+                        new ChartThreshold {
+                            Value = 50,
+                            Color = standardGrayTransparent,
+                            Style = "dash"
+                        },
+                        new ChartThreshold {
+                            Value = 30,
+                            Color = standardGrayTransparent,
+                            Style = "solid"
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 25,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "UP([P1])",
+                        DataName = "aroonUp",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "DOWN([P1])",
+                        DataName = "aroonDown",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
+            // Aroon Oscillator
+            new IndicatorList
+            {
+                Name = "Aroon Oscillator",
+                Uiid = "AROON OSC",
+                LabelTemplate = "AROON([P1]) Oscillator",
+                Endpoint = $"{baseUrl}/AROON/",
+                Category = "price-trend",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    MinimumYAxis = -100,
+                    MaximumYAxis = 100,
+
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 0,
+                            Color = standardGrayTransparent,
+                            Style = "dash"
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 25,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "OSC([P1])",
+                        DataName = "oscillator",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Bollinger Bands
             new IndicatorList
             {

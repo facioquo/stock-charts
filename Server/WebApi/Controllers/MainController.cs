@@ -32,10 +32,27 @@ public class MainController : ControllerBase
     //////////////////////////////////////////
     // INDICATORS (sorted alphabetically)
 
+    [HttpGet("AROON")]
+    public IActionResult GetAroon(int lookbackPeriods)
+    {
+        try
+        {
+            IEnumerable<AroonResult> results =
+                quotes.GetAroon(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("BB")]
     public IActionResult GetBollingerBands(
-         int lookbackPeriods = 20,
-         double standardDeviations = 2)
+        int lookbackPeriods = 20,
+        double standardDeviations = 2)
     {
         try
         {
@@ -87,9 +104,9 @@ public class MainController : ControllerBase
 
     [HttpGet("MACD")]
     public IActionResult GetMacd(
-     int fastPeriods = 12,
-     int slowPeriods = 26,
-     int signalPeriods = 9)
+        int fastPeriods = 12,
+        int slowPeriods = 26,
+        int signalPeriods = 9)
     {
         try
         {
@@ -107,8 +124,8 @@ public class MainController : ControllerBase
 
     [HttpGet("PSAR")]
     public IActionResult GetParabolicSar(
-         decimal accelerationStep = 0.02m,
-         decimal maxAccelerationFactor = 0.2m)
+        decimal accelerationStep = 0.02m,
+        decimal maxAccelerationFactor = 0.2m)
     {
         try
         {
@@ -144,14 +161,14 @@ public class MainController : ControllerBase
 
     [HttpGet("STO")]
     public IActionResult GetStoch(
-         int lookbackPeriods = 14,
-         int signalPeriods = 3)
+        int lookbackPeriods = 14,
+        int signalPeriods = 3)
     {
         try
         {
             IEnumerable<StochResult> results =
                 quotes.GetStoch(lookbackPeriods, signalPeriods)
-                      .TakeLast(limitLast);
+                        .TakeLast(limitLast);
 
             return Ok(results);
         }
@@ -163,8 +180,8 @@ public class MainController : ControllerBase
 
     [HttpGet("SUPERTREND")]
     public IActionResult GetSuperTrend(
-     int lookbackPeriods = 10,
-     double multiplier = 3)
+        int lookbackPeriods = 10,
+        double multiplier = 3)
     {
         try
         {
@@ -182,7 +199,7 @@ public class MainController : ControllerBase
 
     [HttpGet("ZIGZAG-CLOSE")]
     public IActionResult GetZigZagClose(
-     decimal percentChange)
+        decimal percentChange)
     {
         try
         {
@@ -200,7 +217,7 @@ public class MainController : ControllerBase
 
     [HttpGet("ZIGZAG-HIGHLOW")]
     public IActionResult GetZigZagHighLow(
-      decimal percentChange)
+        decimal percentChange)
     {
         try
         {
