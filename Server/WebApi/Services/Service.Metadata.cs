@@ -10,6 +10,7 @@ public static class Metadata
         string standardBlue = "#1E88E5";
         string standardPurple = "#8E24AA";
         //string standardGray = "#9E9E9E";
+        string standardGrayTransparent = "#9E9E9E50";
         string darkGray = "#757575";
         string darkGrayTransparent = "#75757515";
         string thresholdRed = "#B71C1C70";
@@ -117,6 +118,87 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardBlue
+                    }
+                }
+            },
+
+            // Moving Average Convergence/Divergence
+            new IndicatorList
+            {
+                Name = "Moving Average Convergence/Divergence",
+                Uiid = "MACD",
+                LabelTemplate = "MACD([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/MACD/",
+                Category = "price-trend",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 0,
+                            Color = darkGrayTransparent,
+                            Style = "dash"
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Fast Periods",
+                        ParamName = "fastPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 12,
+                        Minimum = 1,
+                        Maximum = 200
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Slow Periods",
+                        ParamName = "signalPeriods",
+                        DataType = "int",
+                        Order = 2,
+                        Required = true,
+                        DefaultValue = 26,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Signal Periods",
+                        ParamName = "signalPeriods",
+                        DataType = "int",
+                        Order = 3,
+                        Required = true,
+                        DefaultValue = 9,
+                        Minimum = 1,
+                        Maximum = 50
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "MACD",
+                        DisplayName  = "MACD",
+                        DataName = "macd",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "Signal",
+                        DisplayName = "Signal",
+                        DataName = "signal",
+                        DataType = "number",
+                        LineType= "solid",
+                        DefaultColor = standardRed
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "Histogram",
+                        DisplayName = "Histogram",
+                        DataName = "histogram",
+                        DataType = "number",
+                        LineType = "bar",
+                        DefaultColor = standardGrayTransparent
                     }
                 }
             },

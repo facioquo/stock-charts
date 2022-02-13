@@ -68,6 +68,26 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("MACD")]
+    public IActionResult GetMacd(
+     int fastPeriods = 12,
+     int slowPeriods = 26,
+     int signalPeriods = 9)
+    {
+        try
+        {
+            IEnumerable<MacdResult> results =
+                quotes.GetMacd(fastPeriods, slowPeriods, signalPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("PSAR")]
     public IActionResult GetParabolicSar(
          decimal accelerationStep = 0.02m,
