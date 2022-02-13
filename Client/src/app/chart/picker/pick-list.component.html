@@ -1,4 +1,6 @@
-<h3 class="center noselect">Global settings</h3>
+<mat-toolbar class="noselect">
+  global settings
+</mat-toolbar>
 <div class="toggle">
   <mat-slide-toggle [(ngModel)]="ts.isDarkTheme" [color]="toggleColor" (change)="toggleTheme($event)">
     Dark theme
@@ -7,18 +9,26 @@
 
 <mat-nav-list>
 
-  <h3 class="center noselect" *ngIf="selections.length>0">Indicators shown</h3>
+  <mat-toolbar class="noselect" *ngIf="selections.length>0">
+    indicators shown
+  </mat-toolbar>
   <a mat-list-item *ngFor="let selection of selections" matTooltip="delete this indicator"
     (click)="removeSelection($event, selection.ucid)">
     <span mat-line>{{selection.label}}</span>
-    <button mat-flat-button color="accent">
-      <mat-icon>delete</mat-icon>
+    <button mat-mini-fab color="accent">
+      <mat-icon>delete_forever</mat-icon>
     </button>
   </a>
 
-  <mat-divider *ngIf="selections.length>0"></mat-divider>
-
-  <h3 class="center noselect">Add new indicator</h3>
+  <mat-toolbar class="noselect">
+    add new indicator
+    <div class="filler"></div>
+    <div matTooltip="indicator documentation">
+      <a mat-mini-fab href="https://daveskender.github.io/Stock.Indicators/indicators/" target="_blank">
+        ?
+      </a>
+    </div>
+  </mat-toolbar>
   <a mat-list-item *ngFor="let listing of listings" (click)="openEditor($event, listing)">
     <span mat-line>{{listing.name}}</span>
     <span mat-line>{{listing.category}}</span>

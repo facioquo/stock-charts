@@ -68,6 +68,43 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("HTL")]
+    public IActionResult GetHTL()
+    {
+        try
+        {
+            IEnumerable<HtlResult> results =
+                quotes.GetHtTrendline()
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("MACD")]
+    public IActionResult GetMacd(
+     int fastPeriods = 12,
+     int slowPeriods = 26,
+     int signalPeriods = 9)
+    {
+        try
+        {
+            IEnumerable<MacdResult> results =
+                quotes.GetMacd(fastPeriods, slowPeriods, signalPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("PSAR")]
     public IActionResult GetParabolicSar(
          decimal accelerationStep = 0.02m,
@@ -114,6 +151,25 @@ public class MainController : ControllerBase
         {
             IEnumerable<StochResult> results =
                 quotes.GetStoch(lookbackPeriods, signalPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("SUPERTREND")]
+    public IActionResult GetSuperTrend(
+     int lookbackPeriods = 10,
+     double multiplier = 3)
+    {
+        try
+        {
+            IEnumerable<SuperTrendResult> results =
+                quotes.GetSuperTrend(lookbackPeriods, multiplier)
                       .TakeLast(limitLast);
 
             return Ok(results);
