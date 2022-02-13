@@ -60,7 +60,7 @@ public static class Metadata
                         Order = 1,
                         Required = true,
                         DefaultValue = 14,
-                        Minimum = 1,
+                        Minimum = 2,
                         Maximum = 250
                     }
                 },
@@ -274,6 +274,94 @@ public static class Metadata
                         LineType = "solid",
                         LineWidth = 1,
                         DefaultColor = darkGray
+                    }
+                }
+            },
+
+            // Chandelier Exit (long)
+            new IndicatorList
+            {
+                Name = "Chandelier Exit (long)",
+                Uiid = "CHEXIT-LONG",
+                LabelTemplate = "CHANDELIER([P1],[P2],LONG)",
+                Endpoint = $"{baseUrl}/CHEXIT-LONG/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 22,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Multiplier",
+                        ParamName = "multiplier",
+                        DataType = "number",
+                        Order = 2,
+                        Required = true,
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 10
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "CHANDELIER([P1],[P2],LONG)",
+                        DisplayName = "Chandelier Exit",
+                        DataName = "chandelierExit",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardOrange
+                    }
+                }
+            },
+
+            // Chandelier Exit (short)
+            new IndicatorList
+            {
+                Name = "Chandelier Exit (short)",
+                Uiid = "CHEXIT-SHORT",
+                LabelTemplate = "CHANDELIER([P1],[P2],SHORT)",
+                Endpoint = $"{baseUrl}/CHEXIT-SHORT/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 22,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Multiplier",
+                        ParamName = "multiplier",
+                        DataType = "number",
+                        Order = 2,
+                        Required = true,
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 10
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "CHANDELIER([P1],[P2],LONG)",
+                        DisplayName = "Chandelier Exit",
+                        DataName = "chandelierExit",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = standardOrange
                     }
                 }
             },

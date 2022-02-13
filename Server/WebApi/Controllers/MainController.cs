@@ -85,6 +85,40 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("CHEXIT-LONG")]
+    public IActionResult GetChandelierLong(int lookbackPeriods, double multiplier)
+    {
+        try
+        {
+            IEnumerable<ChandelierResult> results =
+                quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Long)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("CHEXIT-SHORT")]
+    public IActionResult GetChandelierShort(int lookbackPeriods, double multiplier)
+    {
+        try
+        {
+            IEnumerable<ChandelierResult> results =
+                quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Short)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("EMA")]
     public IActionResult GetEMA(int lookbackPeriods)
     {
