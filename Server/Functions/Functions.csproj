@@ -5,9 +5,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Alpaca.Markets" Version="5.2.8" />
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WebApi\WebApi.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
