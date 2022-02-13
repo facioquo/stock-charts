@@ -12,7 +12,7 @@ import { PickFormComponent } from '../picker/pick-form.component';
 @Component({
   selector: 'app-listing',
   templateUrl: 'pick-list.component.html',
-  styleUrls: ['../chart.component.scss']
+  styleUrls: ['pick-list.component.scss']
 })
 export class PickListComponent {
 
