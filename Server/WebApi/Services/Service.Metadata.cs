@@ -126,8 +126,8 @@ public static class Metadata
             new IndicatorList
             {
                 Name = "Hilbert Transform Instantaneous Trendline",
-                Uiid = "HTL",
-                LabelTemplate = "HTL",
+                Uiid = "HT Trendline",
+                LabelTemplate = "HT Trendline",
                 Endpoint = $"{baseUrl}/HTL/",
                 Category = "moving-average",
                 ChartType = "overlay",
@@ -185,7 +185,7 @@ public static class Metadata
                     },
                     new IndicatorParamConfig {
                         DisplayName = "Slow Periods",
-                        ParamName = "signalPeriods",
+                        ParamName = "slowPeriods",
                         DataType = "int",
                         Order = 2,
                         Required = true,

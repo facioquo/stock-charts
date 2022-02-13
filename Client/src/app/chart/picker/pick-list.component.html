@@ -12,7 +12,7 @@
   <mat-toolbar class="noselect" *ngIf="selections.length>0">
     indicators shown
   </mat-toolbar>
-  <a mat-list-item *ngFor="let selection of selections" matTooltip="delete this indicator"
+  <a mat-list-item *ngFor="let selection of selections" matTooltip="remove this indicator"
     (click)="removeSelection($event, selection.ucid)">
     <span mat-line>{{selection.label}}</span>
     <button mat-mini-fab color="accent">

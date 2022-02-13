@@ -328,11 +328,10 @@ export class ChartService {
             this.addSelectionToNewChart(selection, listing);
           };
 
+          this.cacheSelections();
         },
         error: (e: HttpErrorResponse) => { console.log(e); }
       });
-
-    this.cacheSelections();
   }
 
   deleteSelection(ucid: string) {

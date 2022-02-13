@@ -74,7 +74,10 @@ export class ApiService {
             observer.next(selection.results);
           },
 
-          error: (e: HttpErrorResponse) => { console.log(e); return null; }
+          error: (e: HttpErrorResponse) => {
+            console.log("DATA", e);
+            observer.error(e);
+          }
         });
 
     });
