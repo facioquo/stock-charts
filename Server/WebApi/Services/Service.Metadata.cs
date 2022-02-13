@@ -5,7 +5,7 @@ public static class Metadata
     public static List<IndicatorList> IndicatorList(string baseUrl)
     {
         string standardRed = "#DD2C00";
-        //string standardOrange = "#EF6C00";
+        string standardOrange = "#EF6C00";
         string standardGreen = "#2E7D32";
         string standardBlue = "#1E88E5";
         string standardPurple = "#8E24AA";
@@ -118,6 +118,35 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardBlue
+                    }
+                }
+            },
+
+            // Hilbert Transform Instantaneous Trendline
+            new IndicatorList
+            {
+                Name = "Hilbert Transform Instantaneous Trendline",
+                Uiid = "HTL",
+                LabelTemplate = "HTL",
+                Endpoint = $"{baseUrl}/HTL/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "HT Trendline",
+                        DisplayName = "HT Trendline",
+                        DataName = "trendline",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardOrange
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "HT Smooth Price",
+                        DisplayName = "HT Smooth Price",
+                        DataName = "smoothPrice",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
                     }
                 }
             },

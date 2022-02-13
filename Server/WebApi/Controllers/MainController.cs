@@ -68,6 +68,23 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("HTL")]
+    public IActionResult GetHTL()
+    {
+        try
+        {
+            IEnumerable<HtlResult> results =
+                quotes.GetHtTrendline()
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("MACD")]
     public IActionResult GetMacd(
      int fastPeriods = 12,

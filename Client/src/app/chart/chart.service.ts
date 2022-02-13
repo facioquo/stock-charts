@@ -260,7 +260,7 @@ export class ChartService {
     };
 
     // load default parameters
-    listing.parameters.forEach((config: IndicatorParamConfig) => {
+    listing.parameters?.forEach((config: IndicatorParamConfig) => {
 
       const param = {
         paramName: config.paramName,
