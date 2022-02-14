@@ -66,11 +66,13 @@ export class ChartService {
   selections: IndicatorSelection[] = [];
   chartOverlay: Chart;
 
-  // solid background plugin (for copy/paste)
+  // CHART CONFIGURATIONS
   baseConfig() {
 
     const commonXaxes = this.commonXAxes();
     const gridColor = this.ts.isDarkTheme ? '#424242' : '#CCCCCC';
+
+    // solid background plugin (for copy/paste)
     const backgroundPlugin =
     {
       id: 'background',
@@ -84,6 +86,7 @@ export class ChartService {
       }
     };
 
+    // base configuration
     const config: ChartConfiguration = {
 
       type: 'candlestick',
@@ -246,6 +249,7 @@ export class ChartService {
     return axes;
   }
 
+  // INDICATOR SELECTIONS
   defaultSelection(uiid: string): IndicatorSelection {
 
     const listing = this.listings.find(x => x.uiid == uiid);
@@ -328,11 +332,10 @@ export class ChartService {
             this.addSelectionToNewChart(selection, listing);
           };
 
+          this.cacheSelections();
         },
         error: (e: HttpErrorResponse) => { console.log(e); }
       });
-
-    this.cacheSelections();
   }
 
   deleteSelection(ucid: string) {
@@ -534,9 +537,9 @@ export class ChartService {
   loadCharts() {
     this.api.getQuotes()
       .subscribe({
-        next: (q: Quote[]) => {
+        next: (quotes: Quote[]) => {
 
-          this.loadOverlayChart(q);
+          this.loadOverlayChart(quotes);
 
           // load default selections
           this.api.getListings()
@@ -593,6 +596,19 @@ export class ChartService {
       const c = (q.close >= q.open) ? '#1B5E2060' : '#B71C1C60';
       barColor.push(c);
     });
+
+    // add extra bars
+    const nextDate = new Date(Math.max.apply(null, quotes.map(h => new Date(h.date))));
+
+    for (let i = 1; i < this.api.extraBars; i++) {
+      nextDate.setDate(nextDate.getDate() + 1);
+
+      // intentionally excluding price (gap covered by volume)
+      volume.push({
+        x: new Date(nextDate).valueOf(),
+        y: null
+      });
+    }
 
     // define base datasets
     chartConfig.data = {
@@ -651,59 +667,6 @@ export class ChartService {
       def4.params.find(x => x.paramName == "lookbackPeriods").value = 5;
       this.addSelection(def4);
     }
-  }
-
-  updateData() {
-
-    // update selections data
-    this.selections.forEach((selection: IndicatorSelection) => {
-
-      // lookup config data
-      const listing = this.listings.find(x => x.uiid == selection.uiid);
-
-      this.api.getSelectionData(selection, listing)
-        .subscribe({
-          next: () => {
-            if (listing.chartType != 'overlay') {
-              selection.chart.update();
-            };
-          },
-          error: (e: HttpErrorResponse) => { console.log(e); }
-        });
-    });
-
-    // update primary data
-    this.api.getQuotes()
-      .subscribe({
-        next: (quotes: Quote[]) => {
-
-          // TODO: refactor redundant code (see load)
-          const price: FinancialDataPoint[] = [];
-          const volume: ScatterDataPoint[] = [];
-          let sumVol = 0;
-
-          quotes.forEach((q: Quote) => {
-            price.push({
-              x: new Date(q.date).valueOf(),
-              o: q.open,
-              h: q.high,
-              l: q.low,
-              c: q.close
-            });
-            volume.push({
-              x: new Date(q.date).valueOf(),
-              y: q.volume
-            });
-            sumVol += q.volume;
-
-            // get size for volume axis
-            const volumeAxisSize = 20 * (sumVol / volume.length) || 0;
-            this.chartOverlay.options.scales.volumeAxis.max = volumeAxisSize;
-            this.chartOverlay.update();
-          });
-        },
-        error: (e: HttpErrorResponse) => { console.log(e); }
-      });
   }
 
   resetChartTheme() {

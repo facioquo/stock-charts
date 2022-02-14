@@ -18,6 +18,203 @@ public static class Metadata
 
         return new List<IndicatorList>()
         {
+            // Average Directional Index (ADX)
+            new IndicatorList
+            {
+                Name = "Average Directional Index (ADX)",
+                Uiid = "ADX",
+                LabelTemplate = "ADX([P1])",
+                Endpoint = $"{baseUrl}/ADX/",
+                Category = "price-trend",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    //MinimumYAxis = 0,
+                    //MaximumYAxis = 100,
+
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        //new ChartThreshold {
+                        //    Value = 50,
+                        //    Color = standardGrayTransparent,
+                        //    Style = "dash"
+                        //},
+                        new ChartThreshold {
+                            Value = 40,
+                            Color = standardGrayTransparent,
+                            Style = "dash"
+                        },
+                        new ChartThreshold {
+                            Value = 20,
+                            Color = standardGrayTransparent,
+                            Style = "dash"
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 14,
+                        Minimum = 2,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "ADX([P1])",
+                        DisplayName = "ADX",
+                        DataName = "adx",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "DI+([P1])",
+                        DisplayName = "DI+",
+                        DataName = "pdi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "DI-([P1])",
+                        DisplayName= "DI-",
+                        DataName = "mdi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "ADXR([P1])",
+                        DisplayName = "ADX Rating",
+                        DataName = "adxr",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = darkGrayTransparent
+                    }
+
+                }
+            },
+
+            // Aroon Up/Down
+            new IndicatorList
+            {
+                Name = "Aroon Up/Down",
+                Uiid = "AROON UP/DOWN",
+                LabelTemplate = "AROON([P1]) Up/Down",
+                Endpoint = $"{baseUrl}/AROON/",
+                Category = "price-trend",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    MinimumYAxis = 0,
+                    MaximumYAxis = 100,
+
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 70,
+                            Color = standardGrayTransparent,
+                            Style = "solid"
+                        },
+                        new ChartThreshold {
+                            Value = 50,
+                            Color = standardGrayTransparent,
+                            Style = "dash"
+                        },
+                        new ChartThreshold {
+                            Value = 30,
+                            Color = standardGrayTransparent,
+                            Style = "solid"
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 25,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "UP([P1])",
+                        DisplayName = "Aroon Up",
+                        DataName = "aroonUp",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "DOWN([P1])",
+                        DisplayName= "Aroon Down",
+                        DataName = "aroonDown",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
+            // Aroon Oscillator
+            new IndicatorList
+            {
+                Name = "Aroon Oscillator",
+                Uiid = "AROON OSC",
+                LabelTemplate = "AROON([P1]) Oscillator",
+                Endpoint = $"{baseUrl}/AROON/",
+                Category = "price-trend",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    MinimumYAxis = -100,
+                    MaximumYAxis = 100,
+
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 0,
+                            Color = standardGrayTransparent,
+                            Style = "dash"
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 25,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "OSC([P1])",
+                        DisplayName = "Oscillator",
+                        DataName = "oscillator",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Bollinger Bands
             new IndicatorList
             {
@@ -88,10 +285,98 @@ public static class Metadata
                 }
             },
 
+            // Chandelier Exit (long)
+            new IndicatorList
+            {
+                Name = "Chandelier Exit (long)",
+                Uiid = "CHEXIT-LONG",
+                LabelTemplate = "CHANDELIER([P1],[P2],LONG)",
+                Endpoint = $"{baseUrl}/CHEXIT-LONG/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 22,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Multiplier",
+                        ParamName = "multiplier",
+                        DataType = "number",
+                        Order = 2,
+                        Required = true,
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 10
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "CHANDELIER([P1],[P2],LONG)",
+                        DisplayName = "Chandelier Exit",
+                        DataName = "chandelierExit",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardOrange
+                    }
+                }
+            },
+
+            // Chandelier Exit (short)
+            new IndicatorList
+            {
+                Name = "Chandelier Exit (short)",
+                Uiid = "CHEXIT-SHORT",
+                LabelTemplate = "CHANDELIER([P1],[P2],SHORT)",
+                Endpoint = $"{baseUrl}/CHEXIT-SHORT/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 22,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Multiplier",
+                        ParamName = "multiplier",
+                        DataType = "number",
+                        Order = 2,
+                        Required = true,
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 10
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "CHANDELIER([P1],[P2],LONG)",
+                        DisplayName = "Chandelier Exit",
+                        DataName = "chandelierExit",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = standardOrange
+                    }
+                }
+            },
+
             // Exponential Moving Average
             new IndicatorList
             {
-                Name = "Exponential Moving Average",
+                Name = "Exponential Moving Average (EMA)",
                 Uiid = "EMA",
                 LabelTemplate = "EMA([P1])",
                 Endpoint = $"{baseUrl}/EMA/",
@@ -126,8 +411,8 @@ public static class Metadata
             new IndicatorList
             {
                 Name = "Hilbert Transform Instantaneous Trendline",
-                Uiid = "HTL",
-                LabelTemplate = "HTL",
+                Uiid = "HT Trendline",
+                LabelTemplate = "HT Trendline",
                 Endpoint = $"{baseUrl}/HTL/",
                 Category = "moving-average",
                 ChartType = "overlay",
@@ -142,7 +427,7 @@ public static class Metadata
                     },
                     new IndicatorResultConfig {
                         LabelTemplate = "HT Smooth Price",
-                        DisplayName = "HT Smooth Price",
+                        DisplayName = "HT Smoothed Price",
                         DataName = "smoothPrice",
                         DataType = "number",
                         LineType = "solid",
@@ -154,7 +439,7 @@ public static class Metadata
             // Moving Average Convergence/Divergence
             new IndicatorList
             {
-                Name = "Moving Average Convergence/Divergence",
+                Name = "Moving Average Convergence/Divergence (MACD)",
                 Uiid = "MACD",
                 LabelTemplate = "MACD([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/MACD/",
@@ -185,7 +470,7 @@ public static class Metadata
                     },
                     new IndicatorParamConfig {
                         DisplayName = "Slow Periods",
-                        ParamName = "signalPeriods",
+                        ParamName = "slowPeriods",
                         DataType = "int",
                         Order = 2,
                         Required = true,
@@ -235,7 +520,7 @@ public static class Metadata
             // Parabolic SAR
             new IndicatorList
             {
-                Name = "Parabolic SAR",
+                Name = "Parabolic Stop and Reverse (SAR)",
                 Uiid = "PSAR",
                 LabelTemplate = "PSAR([P1],[P2])",
                 Endpoint = $"{baseUrl}/PSAR/",
@@ -268,7 +553,7 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "PSAR([P1],[P2])",
-                        DisplayName = "PSAR",
+                        DisplayName = "Parabolic SAR",
                         DataName = "sar",
                         DataType = "number",
                         LineType= "dots",
@@ -280,7 +565,7 @@ public static class Metadata
             // Relative Strength Index
             new IndicatorList
             {
-                Name = "Relative Strength Index",
+                Name = "Relative Strength Index (RSI)",
                 Uiid = "RSI",
                 LabelTemplate = "RSI([P1])",
                 Endpoint = $"{baseUrl}/RSI/",
@@ -333,6 +618,7 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "RSI([P1])",
+                        DisplayName = "RSI",
                         DataName = "rsi",
                         DataType = "number",
                         LineType = "solid",
@@ -429,6 +715,106 @@ public static class Metadata
                 }
             },
 
+            // Stochastic RSI
+            new IndicatorList
+            {
+                Name = "Stochastic RSI",
+                Uiid = "STOCHRSI",
+                LabelTemplate = "StochRSI ([P1],[P2],[P3],[P4])",
+                Endpoint = $"{baseUrl}/STORSI/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 80,
+                            Color = thresholdRed,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = thresholdGreen
+                            }
+                        },
+                        new ChartThreshold {
+                            Value = 20,
+                            Color = thresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+1",
+                                ColorAbove = thresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "RSI Periods",
+                        ParamName = "rsiPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Stochastic Periods",
+                        ParamName = "stochPeriods",
+                        DataType = "int",
+                        Order = 2,
+                        Required = true,
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Signal Periods",
+                        ParamName = "signalPeriods",
+                        DataType = "int",
+                        Order = 3,
+                        Required = true,
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Smooth Periods",
+                        ParamName = "stochPeriods",
+                        DataType = "int",
+                        Order = 4,
+                        Required = true,
+                        DefaultValue = 1,
+                        Minimum = 1,
+                        Maximum = 50
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "StochRSI ([P1],[P2],[P3],[P4]) Oscillator",
+                        DisplayName  = "Oscillator",
+                        DataName = "stochRsi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "StochRSI ([P1],[P2],[P3],[P4]) Signal",
+                        DisplayName = "Signal line",
+                        DataName = "signal",
+                        DataType = "number",
+                        LineType= "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
             // SuperTrend
             new IndicatorList
             {
@@ -481,7 +867,7 @@ public static class Metadata
                     },
                     new IndicatorResultConfig {
                         LabelTemplate = "SuperTrend",
-                        DisplayName = "SuperTrend",
+                        DisplayName = "SuperTrend (transition line)",
                         DataName = "superTrend",
                         DataType = "number",
                         LineType = "dash",
@@ -516,7 +902,7 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "ZIGZAG([P1]% CLOSE)",
-                        DisplayName = "ZigZag",
+                        DisplayName = "Zig Zag",
                         DataName = "zigZag",
                         DataType = "number",
                         LineType = "solid",
@@ -550,7 +936,7 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "ZIGZAG([P1]% HIGH/LOW)",
-                        DisplayName = "ZigZag",
+                        DisplayName = "Zig Zag",
                         DataName = "zigZag",
                         DataType = "number",
                         LineType = "solid",
