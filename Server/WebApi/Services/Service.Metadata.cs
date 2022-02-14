@@ -292,7 +292,7 @@ public static class Metadata
                 Uiid = "CHEXIT-LONG",
                 LabelTemplate = "CHANDELIER([P1],[P2],LONG)",
                 Endpoint = $"{baseUrl}/CHEXIT-LONG/",
-                Category = "moving-average",
+                Category = "stop-and-reverse",
                 ChartType = "overlay",
                 Parameters = new List<IndicatorParamConfig>
                 {
@@ -336,7 +336,7 @@ public static class Metadata
                 Uiid = "CHEXIT-SHORT",
                 LabelTemplate = "CHANDELIER([P1],[P2],SHORT)",
                 Endpoint = $"{baseUrl}/CHEXIT-SHORT/",
-                Category = "moving-average",
+                Category = "stop-and-reverse",
                 ChartType = "overlay",
                 Parameters = new List<IndicatorParamConfig>
                 {
