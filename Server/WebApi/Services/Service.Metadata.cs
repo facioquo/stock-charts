@@ -67,6 +67,7 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "ADX([P1])",
+                        DisplayName = "ADX",
                         DataName = "adx",
                         DataType = "number",
                         LineType = "solid",
@@ -74,6 +75,7 @@ public static class Metadata
                     },
                     new IndicatorResultConfig {
                         LabelTemplate = "DI+([P1])",
+                        DisplayName = "DI+",
                         DataName = "pdi",
                         DataType = "number",
                         LineType = "solid",
@@ -81,6 +83,7 @@ public static class Metadata
                     },
                     new IndicatorResultConfig {
                         LabelTemplate = "DI-([P1])",
+                        DisplayName= "DI-",
                         DataName = "mdi",
                         DataType = "number",
                         LineType = "solid",
@@ -88,6 +91,7 @@ public static class Metadata
                     },
                     new IndicatorResultConfig {
                         LabelTemplate = "ADXR([P1])",
+                        DisplayName = "ADX Rating",
                         DataName = "adxr",
                         DataType = "number",
                         LineType = "dash",
@@ -146,6 +150,7 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "UP([P1])",
+                        DisplayName = "Aroon Up",
                         DataName = "aroonUp",
                         DataType = "number",
                         LineType = "solid",
@@ -153,6 +158,7 @@ public static class Metadata
                     },
                     new IndicatorResultConfig {
                         LabelTemplate = "DOWN([P1])",
+                        DisplayName= "Aroon Down",
                         DataName = "aroonDown",
                         DataType = "number",
                         LineType = "solid",
@@ -200,6 +206,7 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "OSC([P1])",
+                        DisplayName = "Oscillator",
                         DataName = "oscillator",
                         DataType = "number",
                         LineType = "solid",
@@ -420,7 +427,7 @@ public static class Metadata
                     },
                     new IndicatorResultConfig {
                         LabelTemplate = "HT Smooth Price",
-                        DisplayName = "HT Smooth Price",
+                        DisplayName = "HT Smoothed Price",
                         DataName = "smoothPrice",
                         DataType = "number",
                         LineType = "solid",
@@ -546,7 +553,7 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "PSAR([P1],[P2])",
-                        DisplayName = "PSAR",
+                        DisplayName = "Parabolic SAR",
                         DataName = "sar",
                         DataType = "number",
                         LineType= "dots",
@@ -611,6 +618,7 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "RSI([P1])",
+                        DisplayName = "RSI",
                         DataName = "rsi",
                         DataType = "number",
                         LineType = "solid",
@@ -859,7 +867,7 @@ public static class Metadata
                     },
                     new IndicatorResultConfig {
                         LabelTemplate = "SuperTrend",
-                        DisplayName = "SuperTrend",
+                        DisplayName = "SuperTrend (transition line)",
                         DataName = "superTrend",
                         DataType = "number",
                         LineType = "dash",
@@ -894,7 +902,7 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "ZIGZAG([P1]% CLOSE)",
-                        DisplayName = "ZigZag",
+                        DisplayName = "Zig Zag",
                         DataName = "zigZag",
                         DataType = "number",
                         LineType = "solid",
@@ -928,7 +936,7 @@ public static class Metadata
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
                         LabelTemplate = "ZIGZAG([P1]% HIGH/LOW)",
-                        DisplayName = "ZigZag",
+                        DisplayName = "Zig Zag",
                         DataName = "zigZag",
                         DataType = "number",
                         LineType = "solid",

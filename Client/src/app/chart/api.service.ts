@@ -19,6 +19,8 @@ import {
 @Injectable()
 export class ApiService {
 
+  extraBars = 8;
+
   constructor(
     private readonly http: HttpClient
   ) { }
@@ -66,6 +68,17 @@ export class ApiService {
                       y: dt[result.dataName]
                     });
                 });
+
+                // add extra bars
+                const nextDate = new Date(Math.max.apply(null, data.map(h => new Date(h.x))));
+
+                for (let i = 1; i < this.extraBars; i++) {
+                  nextDate.setDate(nextDate.getDate() + 1);
+                  data.push({
+                    x: new Date(nextDate).valueOf(),
+                    y: null
+                  });
+                }
 
                 dataset.data = data;
                 result.dataset = dataset;

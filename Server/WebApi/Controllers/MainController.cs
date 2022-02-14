@@ -9,7 +9,7 @@ namespace WebApi.Controllers;
 public class MainController : ControllerBase
 {
     internal static readonly IEnumerable<Quote> quotes = FetchQuotes.Get();
-    internal static readonly int limitLast = 130;
+    internal static readonly int limitLast = 120;
 
     [HttpGet]
     public string Get()
