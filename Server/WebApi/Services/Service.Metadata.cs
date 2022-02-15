@@ -373,6 +373,71 @@ public static class Metadata
                 }
             },
 
+            // Choppiness Index
+            new IndicatorList
+            {
+                Name = "Choppiness Index",
+                Uiid = "CHOP",
+                LabelTemplate = "CHOP([P1])",
+                Endpoint = $"{baseUrl}/CHOP/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    MinimumYAxis = 0,
+                    MaximumYAxis = 100,
+
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 61.8,
+                            Color = darkGrayTransparent,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = thresholdRed
+                            }
+                        },
+                        new ChartThreshold {
+                            Value = 38.2,
+                            Color = darkGrayTransparent,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+1",
+                                ColorAbove = thresholdGreen,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "CHOP([P1])",
+                        DisplayName = "Choppiness",
+                        DataName = "chop",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Exponential Moving Average
             new IndicatorList
             {
