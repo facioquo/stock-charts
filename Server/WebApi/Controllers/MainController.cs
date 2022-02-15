@@ -8,7 +8,6 @@ namespace WebApi.Controllers;
 [Route("")]
 public class MainController : ControllerBase
 {
-    internal static readonly IEnumerable<Quote> quotes = FetchQuotes.Get();
     internal static readonly int limitLast = 120;
 
     [HttpGet]
@@ -20,6 +19,7 @@ public class MainController : ControllerBase
     [HttpGet("quotes")]
     public IActionResult GetQuotes()
     {
+        IEnumerable<Quote> quotes = FetchQuotes.Get();
         return Ok(quotes.TakeLast(limitLast));
     }
 
@@ -37,6 +37,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<AdxResult> results =
                 quotes.GetAdx(lookbackPeriods)
                       .TakeLast(limitLast);
@@ -54,6 +56,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<AroonResult> results =
                 quotes.GetAroon(lookbackPeriods)
                       .TakeLast(limitLast);
@@ -73,6 +77,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<BollingerBandsResult> results =
                 quotes.GetBollingerBands(lookbackPeriods, standardDeviations)
                       .TakeLast(limitLast);
@@ -90,6 +96,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<ChandelierResult> results =
                 quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Long)
                       .TakeLast(limitLast);
@@ -107,6 +115,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<ChandelierResult> results =
                 quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Short)
                       .TakeLast(limitLast);
@@ -124,6 +134,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<EmaResult> results =
                 quotes.GetEma(lookbackPeriods)
                       .TakeLast(limitLast);
@@ -141,6 +153,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<HtlResult> results =
                 quotes.GetHtTrendline()
                       .TakeLast(limitLast);
@@ -161,6 +175,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<MacdResult> results =
                 quotes.GetMacd(fastPeriods, slowPeriods, signalPeriods)
                       .TakeLast(limitLast);
@@ -180,6 +196,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<ParabolicSarResult> results =
                 quotes.GetParabolicSar(accelerationStep, maxAccelerationFactor)
                       .TakeLast(limitLast);
@@ -198,6 +216,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<RsiResult> results =
                 quotes.GetRsi(lookbackPeriods)
                       .TakeLast(limitLast);
@@ -217,6 +237,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<StochResult> results =
                 quotes.GetStoch(lookbackPeriods, signalPeriods)
                         .TakeLast(limitLast);
@@ -238,6 +260,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<StochRsiResult> results =
                 quotes.GetStochRsi(rsiPeriods, stochPeriods, signalPeriods, smoothPeriods)
                         .TakeLast(limitLast);
@@ -257,6 +281,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<SuperTrendResult> results =
                 quotes.GetSuperTrend(lookbackPeriods, multiplier)
                       .TakeLast(limitLast);
@@ -275,6 +301,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<ZigZagResult> results =
                 quotes.GetZigZag(EndType.Close, percentChange)
                       .TakeLast(limitLast);
@@ -293,6 +321,8 @@ public class MainController : ControllerBase
     {
         try
         {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            
             IEnumerable<ZigZagResult> results =
                 quotes.GetZigZag(EndType.HighLow, percentChange)
                       .TakeLast(limitLast);
