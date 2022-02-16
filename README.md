@@ -4,7 +4,7 @@
 
 This is a demo of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular website with a [Chart.js](https://github.com/chartjs/chartjs-chart-financial) financial/candlestick stock chart, with a .NET Web API backend to generate indicators.  The indicator library can be implemented in any .NET compatible ecosystem (it does not have to be in an API like this).  See the [library documentation](https://daveskender.github.io/Stock.Indicators) for more information and a full list of available indicators.
 
-Live demo site: [https://stock-charts.azurewebsites.net :chart_with_upwards_trend:](https://stock-charts.azurewebsites.net/)
+Live demo site: [https://stock-charts.azurewebsites.net](https://stock-charts.azurewebsites.net/)
 
 If you want to host on your local computer and review the source code, follow the instructions below.
 
