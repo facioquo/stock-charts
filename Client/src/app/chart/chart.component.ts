@@ -17,7 +17,6 @@ export class ChartComponent implements OnInit {
     private readonly bs: MatBottomSheet
   ) { }
 
-  @ViewChild('chartsTop') chartTopRef: ElementRef;
   loading = true;
 
   // STARTUP OPERATIONS
@@ -34,12 +33,5 @@ export class ChartComponent implements OnInit {
   // PICKERS
   openPickList(): void {
     const bsRef = this.bs.open(PickListComponent);
-  }
-
-  // HELPERS
-  scrollToChartTop() {
-    setTimeout(() => {
-      this.chartTopRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
-    }, 200);
   }
 }

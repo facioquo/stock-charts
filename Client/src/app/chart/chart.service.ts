@@ -65,6 +65,7 @@ export class ChartService {
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
   chartOverlay: Chart;
+  loading = true;
 
   // CHART CONFIGURATIONS
   baseConfig() {
@@ -202,6 +203,14 @@ export class ChartService {
 
     // remove x-axis
     config.options.scales.xAxis.display = false;
+
+    // top padding
+    config.options.layout.padding = {
+      top: 5,
+      right: 0,
+      bottom: 0,
+      left: 0
+    };
 
     // remove first and last y-axis labels
     config.options.scales.yAxis.ticks.callback = (value, index, values) => {
@@ -385,6 +394,8 @@ export class ChartService {
     this.chartOverlay.update(); // ensures scales are drawn to correct size first
     this.updateOverlayAnnotations();
     this.chartOverlay.update();
+
+    if (!this.loading) this.scrollToStart("chart-overlay");
   }
 
   addSelectionToNewChart(selection: IndicatorSelection, listing: IndicatorListing) {
@@ -473,10 +484,13 @@ export class ChartService {
     const xPos: ScaleValue = selection.chart.scales["xAxis"].getMinMax(false).min;
     const yPos: ScaleValue = selection.chart.scales["yAxis"].getMinMax(false).max;
 
+    const labelColor = this.ts.isDarkTheme ? '#757575' : '#212121';
     const annotation: AnnotationOptions =
-      this.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, -2, 1);
+      this.commonAnnotation(selection.label, labelColor, xPos, yPos, -2, 1);
     selection.chart.options.plugins.annotation.annotations = { annotation };
     selection.chart.update();
+
+    if (!this.loading) this.scrollToEnd(container.id);
   }
 
   updateOverlayAnnotations() {
@@ -519,7 +533,7 @@ export class ChartService {
       content: [label],
       font: legendFont,
       color: fontColor,
-      backgroundColor: this.ts.isDarkTheme ? 'rgba(33,33,33,0.5)' : 'rgba(255,255,255,0.9)',
+      backgroundColor: this.ts.isDarkTheme ? 'rgba(33,33,33,0.5)' : 'rgba(255,255,255,0.7)',
       padding: 0,
       position: 'start',
       xScaleID: 'xAxis',
@@ -546,7 +560,7 @@ export class ChartService {
             .subscribe({
               next: (listings: IndicatorListing[]) => {
                 this.listings = listings;
-                this.loadSelections()
+                this.loadSelections();
               },
               error: (e: HttpErrorResponse) => { console.log(e); }
             });
@@ -667,6 +681,8 @@ export class ChartService {
       def4.params.find(x => x.paramName == "lookbackPeriods").value = 5;
       this.addSelection(def4);
     }
+
+    this.loading = false;
   }
 
   resetChartTheme() {
@@ -680,4 +696,17 @@ export class ChartService {
     return `${prefix}${Guid.create().toString().replace(/-/gi, "")}`;
   }
 
+  scrollToStart(id: string) {
+    setTimeout(() => {
+      const element = document.getElementById(id);
+      element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+    }, 200);
+  }
+
+  scrollToEnd(id: string) {
+    setTimeout(() => {
+      const element = document.getElementById(id);
+      element.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });
+    }, 200);
+  }
 }
