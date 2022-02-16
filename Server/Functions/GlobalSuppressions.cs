@@ -6,11 +6,6 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage(
-    "Globalization",
-    "CA1305:Specify IFormatProvider",
-    Justification = "Not doing localization.")]
-
-[assembly: SuppressMessage(
     "Style",
     "IDE0058:Expression value is never used",
-    Justification = "Not actually a good rule for all uses.")]
+    Justification = "Not implemented.")]

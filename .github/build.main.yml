@@ -63,16 +63,6 @@ jobs:
           projects: Server/**/*.csproj
           arguments: -c Release -o $(Build.ArtifactStagingDirectory)
 
-      - task: CopyFiles@2
-        displayName: Stage artifacts
-        inputs:
-          SourceFolder: Server
-          Contents: "**/WebApi.zip"
-          TargetFolder: $(Build.ArtifactStagingDirectory)
-          CleanTargetFolder: true
-          OverWrite: true
-          flattenFolders: true
-
       - task: PublishBuildArtifacts@1
         displayName: Save artifacts
 
@@ -95,6 +85,15 @@ jobs:
         inputs:
           workingDir: Client
           verbose: false
+
+      - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+        displayName: Update GA tag
+        inputs:
+          rootDirectory: 'Client/src'
+          targetFiles: '**/index.html'
+          escapeType: none
+          tokenPrefix: __
+          tokenSuffix: __
 
       - task: Npm@1
         displayName: Build

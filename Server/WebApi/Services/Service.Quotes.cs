@@ -1,10 +1,41 @@
-﻿using Skender.Stock.Indicators;
+using System.Text.Json;
+using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Skender.Stock.Indicators;
 
 namespace WebApi.Services;
 
 internal static class FetchQuotes
 {
-    internal static IEnumerable<Quote> Get()
+    internal static IEnumerable<Quote> Get(string symbol = "QQQ")
+    {
+        string blobName = $"{symbol}-DAILY.json";
+
+        try
+        {
+            BlobClient blob = Storage.GetBlobReference(blobName);
+            Response<BlobDownloadInfo> response = blob.Download();
+
+            List<Quote> quotes = JsonSerializer
+                .Deserialize<List<Quote>>(response.Value.Content);
+
+            if (quotes == null || quotes.Count == 0)
+            {
+                return GetBackup();
+            }
+
+            return quotes
+                .OrderBy(x => x.Date)
+                .ToList();
+        }
+        catch
+        {
+            return GetBackup();
+        }
+    }
+
+    internal static IEnumerable<Quote> GetBackup()
     {
         List<Quote> h = new()
         {

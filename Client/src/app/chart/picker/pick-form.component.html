@@ -6,7 +6,7 @@
 
     <mat-tab-group animationDuration="0ms" mat-align-tabs="center">
 
-      <mat-tab label="Parameters">
+      <mat-tab label="Parameters" *ngIf="selection.params.length>0">
         <div *ngFor="let p of selection.params; index as i" style="margin-top:0.5em;">
           <mat-form-field [style.width.px]=150>
             <mat-label>{{p.displayName}}</mat-label>

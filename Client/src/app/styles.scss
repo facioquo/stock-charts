@@ -11,8 +11,6 @@ body {
   margin: 0;
   padding: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  color: $color-primary-light;
-  background-color: $color-primary;
 }
 
 .center {
@@ -38,6 +36,27 @@ body {
 }
 
 // ANGULAR MATERIAL OVERRIDES
+
+// TOOLBAR
+mat-toolbar {
+  font-family: Google Sans, Roboto, Arial, Helvetica, sans-serif;
+  color: $color-primary-700 !important;
+
+  a {
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+      color: $color-primary-500 !important;
+    }
+  }
+
+  .filler {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+}
+
 mat-chip-list {
   margin: 16px;
   display: flex;
@@ -52,13 +71,11 @@ mat-chip-list {
   h1 {
     font-size: 1.3em;
     font-weight: normal;
-    color: $color-primary-light !important;
   }
 
   h2 {
     font-size: 1em;
     font-weight: normal;
-    color: $color-primary-light !important;
   }
 }
 

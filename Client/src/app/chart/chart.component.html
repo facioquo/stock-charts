@@ -1,6 +1,3 @@
-<!-- CHART STACK -->
-<a #chartsTop></a>
-
 <!-- loading -->
 <div *ngIf="loading">
 
@@ -11,13 +8,13 @@
 </div>
 
 <!-- CHART (MAIN OVERLAY) -->
-<div class="chart-overlay-container">
+<div id="chart-overlay" class="chart-overlay-container">
   <canvas id="chartOverlay"></canvas>
 </div>
 
 <!-- ADD INDICATOR -->
-<button mat-fab color="accent" class="button-listing" (click)="openPickList()" matTooltip="add a new indicator">
-  <mat-icon>add</mat-icon>/<mat-icon>remove</mat-icon>
+<button mat-mini-fab color="accent" class="button-listing" (click)="openPickList()" matTooltip="add a new indicator">
+  <mat-icon>settings</mat-icon>
 </button>
 
 <!-- CHART (OSCILLATORS) -->
