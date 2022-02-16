@@ -86,6 +86,15 @@ jobs:
           workingDir: Client
           verbose: false
 
+      - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+        displayName: Update GA tag
+        inputs:
+          rootDirectory: 'Client/src'
+          targetFiles: '**/index.html'
+          escapeType: none
+          tokenPrefix: __
+          tokenSuffix: __
+
       - task: Npm@1
         displayName: Build
         inputs:
