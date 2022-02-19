@@ -1,19 +1,32 @@
 <div [ngClass]="ts.isDarkTheme ? 'dark-theme' : 'light-theme'">
   <mat-toolbar class="toolbar noselect">
-    <h1 matTooltip="Visit the documentation site for Stock Indicators for .NET">
+    <h1 class="no-wrap" matTooltip="Visit the documentation site for Stock Indicators for .NET">
       <a href="https://daveskender.github.io/Stock.Indicators/">
-        Stock.Charts
+        Stock Indicators for .NET (demo)
       </a>
     </h1>
     <div class="filler"></div>
-    <div matTooltip="GitHub repository for this demo">
-      <a href="https://github.com/DaveSkender/Stock.Charts">
-        <fa-icon [icon]="faGithub" size="2x"></fa-icon>
-      </a>
+    <div class="item">
+      <button mat-mini-fab color="default" (click)="openPickList()" matTooltip="change indicators and settings">
+        <mat-icon>edit</mat-icon>
+      </button>
     </div>
   </mat-toolbar>
 
   <div id="main-content" class="body-container">
     <app-chart></app-chart>
+  </div>
+
+  <div class="footer">
+    This is the demo site for
+    <strong>
+      <a href="https://daveskender.github.io/Stock.Indicators/" target="_blank" rel="noopener">
+        Stock Indicators for .NET</a>
+    </strong>, a C# NuGet library
+  </div>
+  <div class="footer" matTooltip="GitHub repository for this demo">
+    <a href="https://github.com/DaveSkender/Stock.Charts">
+      <fa-icon [icon]="faGithub" size="2x"></fa-icon>
+    </a>
   </div>
 </div>

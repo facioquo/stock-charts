@@ -1,5 +1,25 @@
+@import "styles-theme";
 @import "./styles";
 
-mat-toolbar{
-  padding-left: 8px;
+mat-toolbar {
+  padding: 0 8px;
+
+  .item {
+    margin-left: 8px;
+  }
+}
+
+.footer {
+  padding: 0 8px 8px 8px;
+  text-align: center;
+
+  a {
+    &:hover {
+      color: "red";
+    }
+
+    &:visited {
+      color: unset;
+    }
+  }
 }

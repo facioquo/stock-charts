@@ -20,17 +20,3 @@
   border-width: 0;
   height: 10vh;
 }
-
-.button-listing {
-  position: fixed;
-  left: 50%;
-  margin-left: -28px;
-  bottom: 15px;
-  color: $color-primary-700 !important;
-  background-color: $color-primary-800T !important;
-
-  &:hover {
-    color: $color-primary-500 !important;
-    background-color: $color-accent-800 !important;
-  }
-}

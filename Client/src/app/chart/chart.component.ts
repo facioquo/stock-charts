@@ -2,9 +2,6 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 
 import { ChartService } from './chart.service';
 
-import { PickListComponent } from './picker/pick-list.component';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
-
 @Component({
   selector: 'app-chart',
   templateUrl: './chart.component.html',
@@ -13,8 +10,7 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 export class ChartComponent implements OnInit {
 
   constructor(
-    public readonly cs: ChartService,
-    private readonly bs: MatBottomSheet
+    public readonly cs: ChartService
   ) { }
 
   loading = true;
@@ -25,13 +21,7 @@ export class ChartComponent implements OnInit {
   }
 
   startup() {
-
     this.cs.loadCharts();
     this.loading = false;
-  }
-
-  // PICKERS
-  openPickList(): void {
-    const bsRef = this.bs.open(PickListComponent);
   }
 }
