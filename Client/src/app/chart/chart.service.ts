@@ -65,7 +65,6 @@ export class ChartService {
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
   chartOverlay: Chart;
-  loading = true;
 
   // CHART CONFIGURATIONS
   baseConfig() {
@@ -318,7 +317,9 @@ export class ChartService {
     return selection;
   }
 
-  addSelection(selection: IndicatorSelection) {
+  addSelection(
+    selection: IndicatorSelection,
+    scrollToMe: boolean) {
 
     // replace tokens
     selection = this.selectionTokenReplacement(selection);
@@ -335,10 +336,10 @@ export class ChartService {
 
           // add needed charts
           if (selection.chartType == 'overlay') {
-            this.addSelectionToOverlayChart(selection);
+            this.addSelectionToOverlayChart(selection, scrollToMe);
           }
           else {
-            this.addSelectionToNewChart(selection, listing);
+            this.addSelectionToNewChart(selection, listing, scrollToMe);
           };
 
           this.cacheSelections();
@@ -385,7 +386,9 @@ export class ChartService {
   }
 
   // CHARTS OPERATIONS
-  addSelectionToOverlayChart(selection: IndicatorSelection) {
+  addSelectionToOverlayChart(
+    selection: IndicatorSelection,
+    scrollToMe: boolean) {
 
     // add selection
     selection.results.forEach((r: IndicatorResult) => {
@@ -395,10 +398,13 @@ export class ChartService {
     this.updateOverlayAnnotations();
     this.chartOverlay.update();
 
-    if (!this.loading) this.scrollToStart("chart-overlay");
+    if (scrollToMe) this.scrollToStart("chart-overlay");
   }
 
-  addSelectionToNewChart(selection: IndicatorSelection, listing: IndicatorListing) {
+  addSelectionToNewChart(
+    selection: IndicatorSelection,
+    listing: IndicatorListing,
+    scrollToMe: boolean) {
     const chartConfig = this.baseOscillatorConfig();
 
     // initialize chart datasets
@@ -490,7 +496,7 @@ export class ChartService {
     selection.chart.options.plugins.annotation.annotations = { annotation };
     selection.chart.update();
 
-    if (!this.loading) this.scrollToEnd(container.id);
+    if (scrollToMe) this.scrollToEnd(container.id);
   }
 
   updateOverlayAnnotations() {
@@ -664,25 +670,23 @@ export class ChartService {
 
     if (selections) {
       selections.forEach((selection: IndicatorSelection) => {
-        this.addSelection(selection);
+        this.addSelection(selection, false);
       });
     }
     else { // add defaults
       const def1 = this.defaultSelection("EMA");
-      this.addSelection(def1);
+      this.addSelection(def1, false);
 
       const def2 = this.defaultSelection("BB");
-      this.addSelection(def2);
+      this.addSelection(def2, false);
 
       const def3 = this.defaultSelection("STO");
-      this.addSelection(def3);
+      this.addSelection(def3, false);
 
       const def4 = this.defaultSelection("RSI");
       def4.params.find(x => x.paramName == "lookbackPeriods").value = 5;
-      this.addSelection(def4);
+      this.addSelection(def4, false);
     }
-
-    this.loading = false;
   }
 
   resetChartTheme() {
