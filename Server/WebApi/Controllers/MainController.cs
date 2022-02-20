@@ -148,6 +148,25 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("ELDER-RAY")]
+    public IActionResult GetElderRay(int lookbackPeriods = 13)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<ElderRayResult> results =
+                quotes.GetElderRay(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("EMA")]
     public IActionResult GetEMA(int lookbackPeriods)
     {
@@ -167,6 +186,25 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("FRACTAL")]
+    public IActionResult GetFractal(int windowSpan = 2)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<FractalResult> results =
+                quotes.GetFractal(windowSpan)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("HTL")]
     public IActionResult GetHTL()
     {
@@ -176,6 +214,28 @@ public class MainController : ControllerBase
 
             IEnumerable<HtlResult> results =
                 quotes.GetHtTrendline()
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("KELTNER")]
+    public IActionResult GetKeltner(
+    int emaPeriods = 20,
+    decimal multiplier = 2,
+    int atrPeriods = 10)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<KeltnerResult> results =
+                quotes.GetKeltner(emaPeriods, multiplier, atrPeriods)
                       .TakeLast(limitLast);
 
             return Ok(results);

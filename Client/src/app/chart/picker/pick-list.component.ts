@@ -23,29 +23,28 @@ export class PickListComponent {
   constructor(
     public ts: StyleService,
     private cs: ChartService,
-    private bsRef: MatBottomSheetRef<PickListComponent>,
-    private dialog: MatDialog
+    private listRef: MatDialog,
+    private picker: MatDialog
   ) {
     this.listings = this.cs.listings;
     this.selections = this.cs.selections;
   }
 
-
   openEditor(event: MouseEvent, listing: IndicatorListing): void {
-    this.bsRef.dismiss(listing);
+    this.listRef.closeAll();
     event.preventDefault();
 
-    const dialogRef = this.dialog.open(PickFormComponent, {
+    const pickerRef = this.picker.open(PickFormComponent, {
       minWidth: '300px',
       data: listing
     });
 
-    dialogRef.afterClosed()
+    pickerRef.afterClosed()
       .subscribe((selection: IndicatorSelection) => { });
   }
 
   removeSelection(event: MouseEvent, ucid: string): void {
-    this.bsRef.dismiss();
+    this.listRef.closeAll();
     event.preventDefault();
     this.cs.deleteSelection(ucid);
   }
@@ -53,5 +52,9 @@ export class PickListComponent {
   toggleTheme(event: MatSlideToggleChange) {
     this.ts.toggleTheme(event.checked);
     this.cs.resetChartTheme();
+  }
+
+  closeListDialog() {
+    this.listRef.closeAll();
   }
 }

@@ -19,7 +19,7 @@ import {
 @Injectable()
 export class ApiService {
 
-  extraBars = 8;
+  extraBars = 7;
 
   constructor(
     private readonly http: HttpClient
@@ -142,7 +142,7 @@ export class ApiService {
           type: 'line',
           data: [],
           yAxisID: 'yAxis',
-          pointRadius: 2,
+          pointRadius: r.lineWidth,
           pointBorderWidth: 0,
           pointBorderColor: r.color,
           pointBackgroundColor: r.color,
@@ -162,6 +162,12 @@ export class ApiService {
           backgroundColor: r.color,
           order: r.order
         };
+
+        // add stack, if specified
+        if (c.stack) {
+          barDataset.stack = c.stack;
+        }
+
         return barDataset;
     }
   }
