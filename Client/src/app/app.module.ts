@@ -2,11 +2,9 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
@@ -25,14 +23,11 @@ import { ChartModule } from './chart/chart.module';
     // Angular
     BrowserModule,
     BrowserAnimationsModule,
-
     CommonModule,
-    FormsModule,
 
     // Materials Design
     MatButtonModule,
     MatIconModule,
-    MatSlideToggleModule,
     MatToolbarModule,
     MatTooltipModule,
 

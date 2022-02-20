@@ -13,10 +13,15 @@ export class StyleService {
   }
 
   getTheme() {
+
     const checked = localStorage.getItem("isDark");
-    if (checked === undefined) {
+
+    // if not cached, cache default value (above)
+    if (checked == undefined || checked == null) {
       localStorage.setItem("isDark", this.isDarkTheme.valueOf().toString())
     }
+
+    // otherwise, use value
     else {
       this.isDarkTheme = (checked === "true") ? true : false;
     }

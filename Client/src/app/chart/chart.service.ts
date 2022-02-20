@@ -65,7 +65,6 @@ export class ChartService {
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
   chartOverlay: Chart;
-  loading = true;
 
   // CHART CONFIGURATIONS
   baseConfig() {
@@ -126,6 +125,7 @@ export class ChartService {
         scales: {
           xAxis: commonXaxes,
           yAxis: {
+            alignToPixels: true,
             display: true,
             type: 'linear',
             axis: 'y',
@@ -228,6 +228,7 @@ export class ChartService {
   commonXAxes(): ScaleOptions {
 
     const axes: ScaleOptions = {
+      alignToPixels: true,
       display: false,
       type: 'timeseries',
       time: {
@@ -266,7 +267,7 @@ export class ChartService {
     const selection: IndicatorSelection = {
       ucid: this.getGuid("chart"),
       uiid: listing.uiid,
-      label: listing.labelTemplate,
+      label: listing.legendTemplate,
       chartType: listing.chartType,
       params: [],
       results: []
@@ -290,7 +291,7 @@ export class ChartService {
     listing.results.forEach((config: IndicatorResultConfig) => {
 
       const result = {
-        label: config.labelTemplate,
+        label: config.tooltipTemplate,
         color: config.defaultColor,
         dataName: config.dataName,
         displayName: config.displayName,
@@ -318,7 +319,9 @@ export class ChartService {
     return selection;
   }
 
-  addSelection(selection: IndicatorSelection) {
+  addSelection(
+    selection: IndicatorSelection,
+    scrollToMe: boolean) {
 
     // replace tokens
     selection = this.selectionTokenReplacement(selection);
@@ -335,10 +338,10 @@ export class ChartService {
 
           // add needed charts
           if (selection.chartType == 'overlay') {
-            this.addSelectionToOverlayChart(selection);
+            this.addSelectionToOverlayChart(selection, scrollToMe);
           }
           else {
-            this.addSelectionToNewChart(selection, listing);
+            this.addSelectionToNewChart(selection, listing, scrollToMe);
           };
 
           this.cacheSelections();
@@ -364,7 +367,7 @@ export class ChartService {
       this.chartOverlay.update();
 
     } else {
-      const body = document.getElementById("main-content");
+      const body = document.getElementById("oscillators-zone");
       const chart = document.getElementById(`${selection.ucid}-container`);
       body.removeChild(chart);
     }
@@ -385,7 +388,9 @@ export class ChartService {
   }
 
   // CHARTS OPERATIONS
-  addSelectionToOverlayChart(selection: IndicatorSelection) {
+  addSelectionToOverlayChart(
+    selection: IndicatorSelection,
+    scrollToMe: boolean) {
 
     // add selection
     selection.results.forEach((r: IndicatorResult) => {
@@ -395,10 +400,13 @@ export class ChartService {
     this.updateOverlayAnnotations();
     this.chartOverlay.update();
 
-    if (!this.loading) this.scrollToStart("chart-overlay");
+    if (scrollToMe) this.scrollToStart("chart-overlay");
   }
 
-  addSelectionToNewChart(selection: IndicatorSelection, listing: IndicatorListing) {
+  addSelectionToNewChart(
+    selection: IndicatorSelection,
+    listing: IndicatorListing,
+    scrollToMe: boolean) {
     const chartConfig = this.baseOscillatorConfig();
 
     // initialize chart datasets
@@ -409,7 +417,7 @@ export class ChartService {
     // chart configurations
 
     // add thresholds (reference lines)
-    const qtyThresholds = listing.chartConfig.thresholds.length;
+    const qtyThresholds = listing.chartConfig?.thresholds?.length;
 
     listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold, index: number) => {
 
@@ -443,8 +451,10 @@ export class ChartService {
     });
 
     // hide thresholds from tooltips
-    chartConfig.options.plugins.tooltip.filter = (tooltipItem) =>
-      (tooltipItem.datasetIndex > (qtyThresholds - 1));
+    if (qtyThresholds > 0) {
+      chartConfig.options.plugins.tooltip.filter = (tooltipItem) =>
+        (tooltipItem.datasetIndex > (qtyThresholds - 1));
+    }
 
     // y-scale
     chartConfig.options.scales.yAxis.min = listing.chartConfig?.minimumYAxis;
@@ -455,9 +465,8 @@ export class ChartService {
       chartConfig.data.datasets.push(r.dataset);
     });
 
-
     // compose html
-    const body = document.getElementById("main-content");
+    const body = document.getElementById("oscillators-zone");
     const containerId = `${selection.ucid}-container`;
 
     // pre-delete, if exists (needed for theme change)
@@ -490,7 +499,7 @@ export class ChartService {
     selection.chart.options.plugins.annotation.annotations = { annotation };
     selection.chart.update();
 
-    if (!this.loading) this.scrollToEnd(container.id);
+    if (scrollToMe) this.scrollToEnd(container.id);
   }
 
   updateOverlayAnnotations() {
@@ -664,25 +673,23 @@ export class ChartService {
 
     if (selections) {
       selections.forEach((selection: IndicatorSelection) => {
-        this.addSelection(selection);
+        this.addSelection(selection, false);
       });
     }
     else { // add defaults
       const def1 = this.defaultSelection("EMA");
-      this.addSelection(def1);
+      this.addSelection(def1, false);
 
       const def2 = this.defaultSelection("BB");
-      this.addSelection(def2);
+      this.addSelection(def2, false);
 
       const def3 = this.defaultSelection("STO");
-      this.addSelection(def3);
+      this.addSelection(def3, false);
 
       const def4 = this.defaultSelection("RSI");
       def4.params.find(x => x.paramName == "lookbackPeriods").value = 5;
-      this.addSelection(def4);
+      this.addSelection(def4, false);
     }
-
-    this.loading = false;
   }
 
   resetChartTheme() {
