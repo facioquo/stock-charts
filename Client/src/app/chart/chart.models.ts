@@ -1,4 +1,8 @@
-import { BarControllerDatasetOptions, Chart, ChartDataset, ScatterDataPoint } from "chart.js";
+import {
+  BarControllerDatasetOptions,
+  Chart,
+  ChartDataset
+} from "chart.js";
 
 export interface Quote {
   date: Date;
@@ -41,6 +45,7 @@ export interface IndicatorResultConfig {
   dataName: string;
   dataType: string;
   lineType: string;
+  stack: string,
   lineWidth: number;
   defaultColor: string;
   fill: ChartFill;

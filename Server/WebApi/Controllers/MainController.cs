@@ -148,6 +148,25 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("ELDER-RAY")]
+    public IActionResult GetElderRay(int lookbackPeriods = 13)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<ElderRayResult> results =
+                quotes.GetElderRay(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("EMA")]
     public IActionResult GetEMA(int lookbackPeriods)
     {

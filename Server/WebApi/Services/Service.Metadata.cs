@@ -438,6 +438,50 @@ public static class Metadata
                 }
             },
 
+            // Elder-ray
+            new IndicatorList
+            {
+                Name = "Elder-ray Index",
+                Uiid = "ELDER-RAY",
+                LabelTemplate = "ELDER-RAY([P1])",
+                Endpoint = $"{baseUrl}/ELDER-RAY/",
+                Category = "price-trend",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 13,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "Elder-ray Bull Power ([P1])",
+                        DisplayName = "Bull Power",
+                        DataName = "bullPower",
+                        DataType = "number",
+                        LineType = "bar",
+                        Stack = "eray",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "Elder-ray Bear Power ([P1])",
+                        DisplayName = "Bear Power",
+                        DataName = "bearPower",
+                        DataType = "number",
+                        LineType = "bar",
+                        Stack = "eray",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
             // Exponential Moving Average
             new IndicatorList
             {

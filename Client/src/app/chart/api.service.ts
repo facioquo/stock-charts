@@ -162,6 +162,12 @@ export class ApiService {
           backgroundColor: r.color,
           order: r.order
         };
+
+        // add stack, if specified
+        if (c.stack) {
+          barDataset.stack = c.stack;
+        }
+
         return barDataset;
     }
   }

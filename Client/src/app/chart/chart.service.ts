@@ -125,6 +125,7 @@ export class ChartService {
         scales: {
           xAxis: commonXaxes,
           yAxis: {
+            alignToPixels: true,
             display: true,
             type: 'linear',
             axis: 'y',
@@ -227,6 +228,7 @@ export class ChartService {
   commonXAxes(): ScaleOptions {
 
     const axes: ScaleOptions = {
+      alignToPixels: true,
       display: false,
       type: 'timeseries',
       time: {
@@ -415,7 +417,7 @@ export class ChartService {
     // chart configurations
 
     // add thresholds (reference lines)
-    const qtyThresholds = listing.chartConfig.thresholds.length;
+    const qtyThresholds = listing.chartConfig?.thresholds?.length;
 
     listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold, index: number) => {
 
@@ -449,8 +451,10 @@ export class ChartService {
     });
 
     // hide thresholds from tooltips
-    chartConfig.options.plugins.tooltip.filter = (tooltipItem) =>
-      (tooltipItem.datasetIndex > (qtyThresholds - 1));
+    if (qtyThresholds > 0) {
+      chartConfig.options.plugins.tooltip.filter = (tooltipItem) =>
+        (tooltipItem.datasetIndex > (qtyThresholds - 1));
+    }
 
     // y-scale
     chartConfig.options.scales.yAxis.min = listing.chartConfig?.minimumYAxis;
@@ -460,7 +464,6 @@ export class ChartService {
     selection.results.forEach((r: IndicatorResult) => {
       chartConfig.data.datasets.push(r.dataset);
     });
-
 
     // compose html
     const body = document.getElementById("main-content");
