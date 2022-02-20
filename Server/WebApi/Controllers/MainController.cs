@@ -17,9 +17,11 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("quotes")]
-    public IActionResult GetQuotes()
+    public IActionResult GetQuotes(
+        string symbol = "QQQ",
+        string timeSpan = "DAILY")
     {
-        IEnumerable<Quote> quotes = FetchQuotes.Get();
+        IEnumerable<Quote> quotes = FetchQuotes.Get(symbol, timeSpan);
         return Ok(quotes.TakeLast(limitLast));
     }
 
@@ -92,7 +94,9 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("CHEXIT-LONG")]
-    public IActionResult GetChandelierLong(int lookbackPeriods, double multiplier)
+    public IActionResult GetChandelierLong(
+        int lookbackPeriods,
+        double multiplier)
     {
         try
         {
@@ -111,7 +115,9 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("CHEXIT-SHORT")]
-    public IActionResult GetChandelierShort(int lookbackPeriods, double multiplier)
+    public IActionResult GetChandelierShort(
+        int lookbackPeriods,
+        double multiplier)
     {
         try
         {
@@ -226,9 +232,9 @@ public class MainController : ControllerBase
 
     [HttpGet("KELTNER")]
     public IActionResult GetKeltner(
-    int emaPeriods = 20,
-    decimal multiplier = 2,
-    int atrPeriods = 10)
+        int emaPeriods = 20,
+        decimal multiplier = 2,
+        int atrPeriods = 10)
     {
         try
         {
