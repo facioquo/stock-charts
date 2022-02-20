@@ -589,6 +589,86 @@ public static class Metadata
                 }
             },
 
+            // Keltner Channels
+            new IndicatorList
+            {
+                Name = "Keltner Channels",
+                Uiid = "KELTNER",
+                LabelTemplate = "KELTNER([P1],[P2])",
+                Endpoint = $"{baseUrl}/KELTNER/",
+                Category = "price-channel",
+                ChartType = "overlay",
+                Order = Order.BehindPrice,
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "EMA Periods",
+                        ParamName = "emaPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 20,
+                        Minimum = 2,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Multiplier",
+                        ParamName= "multiplier",
+                        DataType = "number",
+                        Order = 2,
+                        Required = true,
+                        DefaultValue = 2,
+                        Minimum = 0.01,
+                        Maximum = 10
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "ATR Periods",
+                        ParamName= "atrPeriods",
+                        DataType = "number",
+                        Order = 3,
+                        Required = true,
+                        DefaultValue = 10,
+                        Minimum = 2,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "KELTNER([P1],[P2]) Upper Band",
+                        DisplayName = "Upper Band",
+                        DataName = "upperBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1,
+                        DefaultColor = standardOrange,
+                        Fill = new ChartFill
+                        {
+                            Target = "+2",
+                            ColorAbove = darkGrayTransparent,
+                            ColorBelow = darkGrayTransparent
+                        }
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "KELTNER([P1],[P2]) Centerline",
+                        DisplayName = "Centerline",
+                        DataName = "centerline",
+                        DataType = "number",
+                        LineType = "dash",
+                        LineWidth = 1,
+                        DefaultColor = standardOrange
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "KELTNER([P1],[P2]) Lower Band",
+                        DisplayName = "Lower Band",
+                        DataName = "lowerBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1,
+                        DefaultColor = standardOrange
+                    }
+                }
+            },
+
             // Moving Average Convergence/Divergence
             new IndicatorList
             {

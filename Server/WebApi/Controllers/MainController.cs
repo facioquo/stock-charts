@@ -224,6 +224,28 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("KELTNER")]
+    public IActionResult GetKeltner(
+    int emaPeriods = 20,
+    decimal multiplier = 2,
+    int atrPeriods = 10)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<KeltnerResult> results =
+                quotes.GetKeltner(emaPeriods, multiplier, atrPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("MACD")]
     public IActionResult GetMacd(
         int fastPeriods = 12,
