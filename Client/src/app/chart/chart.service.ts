@@ -367,7 +367,7 @@ export class ChartService {
       this.chartOverlay.update();
 
     } else {
-      const body = document.getElementById("main-content");
+      const body = document.getElementById("oscillators-zone");
       const chart = document.getElementById(`${selection.ucid}-container`);
       body.removeChild(chart);
     }
@@ -466,7 +466,7 @@ export class ChartService {
     });
 
     // compose html
-    const body = document.getElementById("main-content");
+    const body = document.getElementById("oscillators-zone");
     const containerId = `${selection.ucid}-container`;
 
     // pre-delete, if exists (needed for theme change)
