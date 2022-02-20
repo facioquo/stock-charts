@@ -2,7 +2,7 @@ namespace WebApi.Services;
 
 public static class Metadata
 {
-    public static List<IndicatorList> IndicatorList(string baseUrl)
+    public static IEnumerable<IndicatorList> IndicatorList(string baseUrl)
     {
         string standardRed = "#DD2C00";
         string standardOrange = "#EF6C00";
@@ -16,14 +16,14 @@ public static class Metadata
         string thresholdRed = "#B71C1C70";
         string thresholdGreen = "#1B5E2070";
 
-        return new List<IndicatorList>()
+        List<IndicatorList> listing = new()
         {
             // Average Directional Index (ADX)
             new IndicatorList
             {
                 Name = "Average Directional Index (ADX)",
                 Uiid = "ADX",
-                LabelTemplate = "ADX([P1])",
+                LegendTemplate = "ADX([P1])",
                 Endpoint = $"{baseUrl}/ADX/",
                 Category = "price-trend",
                 ChartType = "oscillator",
@@ -66,32 +66,32 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "ADX([P1])",
                         DisplayName = "ADX",
+                        TooltipTemplate = "ADX([P1])",
                         DataName = "adx",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardBlue
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "DI+([P1])",
                         DisplayName = "DI+",
+                        TooltipTemplate = "DI+([P1])",
                         DataName = "pdi",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardGreen
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "DI-([P1])",
                         DisplayName= "DI-",
+                        TooltipTemplate = "DI-([P1])",
                         DataName = "mdi",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardRed
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "ADXR([P1])",
                         DisplayName = "ADX Rating",
+                        TooltipTemplate = "ADXR([P1])",
                         DataName = "adxr",
                         DataType = "number",
                         LineType = "dash",
@@ -106,7 +106,7 @@ public static class Metadata
             {
                 Name = "Aroon Up/Down",
                 Uiid = "AROON UP/DOWN",
-                LabelTemplate = "AROON([P1]) Up/Down",
+                LegendTemplate = "AROON([P1]) Up/Down",
                 Endpoint = $"{baseUrl}/AROON/",
                 Category = "price-trend",
                 ChartType = "oscillator",
@@ -149,16 +149,16 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "UP([P1])",
                         DisplayName = "Aroon Up",
+                        TooltipTemplate = "Aroon Up",
                         DataName = "aroonUp",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardGreen
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "DOWN([P1])",
                         DisplayName= "Aroon Down",
+                        TooltipTemplate = "Aroon Down",
                         DataName = "aroonDown",
                         DataType = "number",
                         LineType = "solid",
@@ -172,7 +172,7 @@ public static class Metadata
             {
                 Name = "Aroon Oscillator",
                 Uiid = "AROON OSC",
-                LabelTemplate = "AROON([P1]) Oscillator",
+                LegendTemplate = "AROON([P1]) Oscillator",
                 Endpoint = $"{baseUrl}/AROON/",
                 Category = "price-trend",
                 ChartType = "oscillator",
@@ -205,8 +205,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "OSC([P1])",
                         DisplayName = "Oscillator",
+                        TooltipTemplate = "AROON([P1]) Oscillator",
                         DataName = "oscillator",
                         DataType = "number",
                         LineType = "solid",
@@ -220,7 +220,7 @@ public static class Metadata
             {
                 Name = "Bollinger Bands®",
                 Uiid = "BB",
-                LabelTemplate = "BB([P1],[P2])",
+                LegendTemplate = "BB([P1],[P2])",
                 Endpoint = $"{baseUrl}/BB/",
                 Category = "price-channel",
                 ChartType = "overlay",
@@ -250,8 +250,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "BB([P1],[P2]) Upper Band",
                         DisplayName = "Upper Band",
+                        TooltipTemplate = "BB([P1],[P2]) Upper Band",
                         DataName = "upperBand",
                         DataType = "number",
                         LineType = "solid",
@@ -265,8 +265,8 @@ public static class Metadata
                         }
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "BB([P1],[P2]) Centerline",
                         DisplayName = "Centerline",
+                        TooltipTemplate = "BB([P1],[P2]) Centerline",
                         DataName = "sma",
                         DataType = "number",
                         LineType = "dash",
@@ -274,8 +274,8 @@ public static class Metadata
                         DefaultColor = darkGray
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "BB([P1],[P2]) Lower Band",
                         DisplayName = "Lower Band",
+                        TooltipTemplate = "BB([P1],[P2]) Lower Band",
                         DataName = "lowerBand",
                         DataType = "number",
                         LineType = "solid",
@@ -290,7 +290,7 @@ public static class Metadata
             {
                 Name = "Chandelier Exit (long)",
                 Uiid = "CHEXIT-LONG",
-                LabelTemplate = "CHANDELIER([P1],[P2],LONG)",
+                LegendTemplate = "CHANDELIER([P1],[P2],LONG)",
                 Endpoint = $"{baseUrl}/CHEXIT-LONG/",
                 Category = "stop-and-reverse",
                 ChartType = "overlay",
@@ -319,8 +319,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "CHANDELIER([P1],[P2],LONG)",
                         DisplayName = "Chandelier Exit",
+                        TooltipTemplate = "CHANDELIER([P1],[P2],LONG)",
                         DataName = "chandelierExit",
                         DataType = "number",
                         LineType = "solid",
@@ -334,7 +334,7 @@ public static class Metadata
             {
                 Name = "Chandelier Exit (short)",
                 Uiid = "CHEXIT-SHORT",
-                LabelTemplate = "CHANDELIER([P1],[P2],SHORT)",
+                LegendTemplate = "CHANDELIER([P1],[P2],SHORT)",
                 Endpoint = $"{baseUrl}/CHEXIT-SHORT/",
                 Category = "stop-and-reverse",
                 ChartType = "overlay",
@@ -363,8 +363,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "CHANDELIER([P1],[P2],LONG)",
                         DisplayName = "Chandelier Exit",
+                        TooltipTemplate = "CHANDELIER([P1],[P2],LONG)",
                         DataName = "chandelierExit",
                         DataType = "number",
                         LineType = "dash",
@@ -378,7 +378,7 @@ public static class Metadata
             {
                 Name = "Choppiness Index",
                 Uiid = "CHOP",
-                LabelTemplate = "CHOP([P1])",
+                LegendTemplate = "CHOP([P1])",
                 Endpoint = $"{baseUrl}/CHOP/",
                 Category = "oscillator",
                 ChartType = "oscillator",
@@ -428,8 +428,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "CHOP([P1])",
                         DisplayName = "Choppiness",
+                        TooltipTemplate = "Choppiness",
                         DataName = "chop",
                         DataType = "number",
                         LineType = "solid",
@@ -443,7 +443,7 @@ public static class Metadata
             {
                 Name = "Elder-ray Index",
                 Uiid = "ELDER-RAY",
-                LabelTemplate = "ELDER-RAY([P1])",
+                LegendTemplate = "ELDER-RAY([P1])",
                 Endpoint = $"{baseUrl}/ELDER-RAY/",
                 Category = "price-trend",
                 ChartType = "oscillator",
@@ -462,8 +462,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "Elder-ray Bull Power ([P1])",
                         DisplayName = "Bull Power",
+                        TooltipTemplate = "Bull Power",
                         DataName = "bullPower",
                         DataType = "number",
                         LineType = "bar",
@@ -471,8 +471,8 @@ public static class Metadata
                         DefaultColor = standardGreen
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "Elder-ray Bear Power ([P1])",
                         DisplayName = "Bear Power",
+                        TooltipTemplate = "Bear Power",
                         DataName = "bearPower",
                         DataType = "number",
                         LineType = "bar",
@@ -487,7 +487,7 @@ public static class Metadata
             {
                 Name = "Exponential Moving Average (EMA)",
                 Uiid = "EMA",
-                LabelTemplate = "EMA([P1])",
+                LegendTemplate = "EMA([P1])",
                 Endpoint = $"{baseUrl}/EMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
@@ -506,8 +506,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "EMA([P1])",
                         DisplayName = "EMA",
+                        TooltipTemplate = "EMA([P1])",
                         DataName = "ema",
                         DataType = "number",
                         LineType = "solid",
@@ -521,7 +521,7 @@ public static class Metadata
             {
                 Name = "Williams Fractal (high/low)",
                 Uiid = "FRACTAL",
-                LabelTemplate = "FRACTAL([P1])",
+                LegendTemplate = "FRACTAL([P1])",
                 Endpoint = $"{baseUrl}/FRACTAL/",
                 Category = "price-pattern",
                 ChartType = "overlay",
@@ -540,7 +540,7 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "Fractal Bull ([P1])",
+                        TooltipTemplate = "Fractal Bull ([P1])",
                         DisplayName = "Fractal Bull",
                         DataName = "fractalBull",
                         DataType = "number",
@@ -549,7 +549,7 @@ public static class Metadata
                         DefaultColor = standardRed
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "Fractal Bear ([P1])",
+                        TooltipTemplate = "Fractal Bear ([P1])",
                         DisplayName = "Fractal Bear",
                         DataName = "fractalBear",
                         DataType = "number",
@@ -565,22 +565,22 @@ public static class Metadata
             {
                 Name = "Hilbert Transform Instantaneous Trendline",
                 Uiid = "HT Trendline",
-                LabelTemplate = "HT Trendline",
+                LegendTemplate = "HT TRENDLINE",
                 Endpoint = $"{baseUrl}/HTL/",
                 Category = "moving-average",
                 ChartType = "overlay",
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "HT Trendline",
                         DisplayName = "HT Trendline",
+                        TooltipTemplate = "HT Trendline",
                         DataName = "trendline",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardOrange
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "HT Smooth Price",
                         DisplayName = "HT Smoothed Price",
+                        TooltipTemplate = "HT Smooth Price",
                         DataName = "smoothPrice",
                         DataType = "number",
                         LineType = "solid",
@@ -594,7 +594,7 @@ public static class Metadata
             {
                 Name = "Keltner Channels",
                 Uiid = "KELTNER",
-                LabelTemplate = "KELTNER([P1],[P2])",
+                LegendTemplate = "KELTNER([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/KELTNER/",
                 Category = "price-channel",
                 ChartType = "overlay",
@@ -634,8 +634,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "KELTNER([P1],[P2]) Upper Band",
                         DisplayName = "Upper Band",
+                        TooltipTemplate = "KELTNER([P1],[P2],[P3]) Upper Band",
                         DataName = "upperBand",
                         DataType = "number",
                         LineType = "solid",
@@ -649,8 +649,8 @@ public static class Metadata
                         }
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "KELTNER([P1],[P2]) Centerline",
                         DisplayName = "Centerline",
+                        TooltipTemplate = "KELTNER([P1],[P2],[P3]) Centerline",
                         DataName = "centerline",
                         DataType = "number",
                         LineType = "dash",
@@ -658,8 +658,8 @@ public static class Metadata
                         DefaultColor = standardOrange
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "KELTNER([P1],[P2]) Lower Band",
                         DisplayName = "Lower Band",
+                        TooltipTemplate = "KELTNER([P1],[P2],[P3]) Lower Band",
                         DataName = "lowerBand",
                         DataType = "number",
                         LineType = "solid",
@@ -674,7 +674,7 @@ public static class Metadata
             {
                 Name = "Moving Average Convergence/Divergence (MACD)",
                 Uiid = "MACD",
-                LabelTemplate = "MACD([P1],[P2],[P3])",
+                LegendTemplate = "MACD([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/MACD/",
                 Category = "price-trend",
                 ChartType = "oscillator",
@@ -724,24 +724,24 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "MACD",
                         DisplayName  = "MACD",
+                        TooltipTemplate = "MACD",
                         DataName = "macd",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardBlue
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "Signal",
                         DisplayName = "Signal",
+                        TooltipTemplate = "Signal",
                         DataName = "signal",
                         DataType = "number",
                         LineType= "solid",
                         DefaultColor = standardRed
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "Histogram",
                         DisplayName = "Histogram",
+                        TooltipTemplate = "Histogram",
                         DataName = "histogram",
                         DataType = "number",
                         LineType = "bar",
@@ -755,7 +755,7 @@ public static class Metadata
             {
                 Name = "Parabolic Stop and Reverse (SAR)",
                 Uiid = "PSAR",
-                LabelTemplate = "PSAR([P1],[P2])",
+                LegendTemplate = "PSAR([P1],[P2])",
                 Endpoint = $"{baseUrl}/PSAR/",
                 Category = "stop-and-reverse",
                 ChartType = "overlay",
@@ -785,8 +785,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "PSAR([P1],[P2])",
                         DisplayName = "Parabolic SAR",
+                        TooltipTemplate = "PSAR([P1],[P2])",
                         DataName = "sar",
                         DataType = "number",
                         LineType= "dots",
@@ -801,7 +801,7 @@ public static class Metadata
             {
                 Name = "Relative Strength Index (RSI)",
                 Uiid = "RSI",
-                LabelTemplate = "RSI([P1])",
+                LegendTemplate = "RSI([P1])",
                 Endpoint = $"{baseUrl}/RSI/",
                 Category = "oscillator",
                 ChartType = "oscillator",
@@ -851,8 +851,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "RSI([P1])",
                         DisplayName = "RSI",
+                        TooltipTemplate = "RSI([P1])",
                         DataName = "rsi",
                         DataType = "number",
                         LineType = "solid",
@@ -866,7 +866,7 @@ public static class Metadata
             {
                 Name = "Stochastic Oscillator",
                 Uiid = "STO",
-                LabelTemplate = "STO %K([P1]) %D([P2])",
+                LegendTemplate = "STO %K([P1]) %D([P2])",
                 Endpoint = $"{baseUrl}/STO/",
                 Category = "oscillator",
                 ChartType = "oscillator",
@@ -923,16 +923,16 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "STO %K([P1])",
                         DisplayName  = "%K",
+                        TooltipTemplate = "STO %K([P1])",
                         DataName = "k",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardBlue
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "STO %D([P2])",
                         DisplayName = "%D",
+                        TooltipTemplate = "STO %D([P2])",
                         DataName = "d",
                         DataType = "number",
                         LineType= "solid",
@@ -954,7 +954,7 @@ public static class Metadata
             {
                 Name = "Stochastic RSI",
                 Uiid = "STOCHRSI",
-                LabelTemplate = "StochRSI ([P1],[P2],[P3],[P4])",
+                LegendTemplate = "StochRSI ([P1],[P2],[P3],[P4])",
                 Endpoint = $"{baseUrl}/STORSI/",
                 Category = "oscillator",
                 ChartType = "oscillator",
@@ -1031,16 +1031,16 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "StochRSI ([P1],[P2],[P3],[P4]) Oscillator",
                         DisplayName  = "Oscillator",
+                        TooltipTemplate = "StochRSI Oscillator",
                         DataName = "stochRsi",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardBlue
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "StochRSI ([P1],[P2],[P3],[P4]) Signal",
                         DisplayName = "Signal line",
+                        TooltipTemplate = "Signal line",
                         DataName = "signal",
                         DataType = "number",
                         LineType= "solid",
@@ -1054,7 +1054,7 @@ public static class Metadata
             {
                 Name = "SuperTrend",
                 Uiid = "SUPERTREND",
-                LabelTemplate = "SUPERTREND([P1],[P2])",
+                LegendTemplate = "SUPERTREND([P1],[P2])",
                 Endpoint = $"{baseUrl}/SUPERTREND/",
                 Category = "price-trend",
                 ChartType = "overlay",
@@ -1084,24 +1084,24 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "ST Upper Band",
-                        DisplayName = "ST Upper Band",
+                        TooltipTemplate = "Upper Band",
+                        DisplayName = "SUPERTREND([P1],[P2]) Upper Band",
                         DataName = "upperBand",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardRed
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "ST Lower Band",
-                        DisplayName = "ST Lower Band",
+                        DisplayName = "Lower Band",
+                        TooltipTemplate = "SUPERTREND([P1],[P2]) Lower Band",
                         DataName = "lowerBand",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardGreen
                     },
                     new IndicatorResultConfig {
-                        LabelTemplate = "SuperTrend",
-                        DisplayName = "SuperTrend (transition line)",
+                        DisplayName = "Transition line",
+                        TooltipTemplate = "SUPERTREND([P1],[P2]) Transition Line",
                         DataName = "superTrend",
                         DataType = "number",
                         LineType = "dash",
@@ -1116,7 +1116,7 @@ public static class Metadata
             {
                 Name = "Zig Zag (close)",
                 Uiid = "ZIGZAG-CL",
-                LabelTemplate = "ZIGZAG([P1]% CLOSE)",
+                LegendTemplate = "ZIGZAG([P1]% CLOSE)",
                 Endpoint = $"{baseUrl}/ZIGZAG-CLOSE/",
                 Category = "price-transform",
                 ChartType = "overlay",
@@ -1135,8 +1135,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "ZIGZAG([P1]% CLOSE)",
                         DisplayName = "Zig Zag",
+                        TooltipTemplate = "ZIGZAG([P1]% CLOSE)",
                         DataName = "zigZag",
                         DataType = "number",
                         LineType = "solid",
@@ -1150,7 +1150,7 @@ public static class Metadata
             {
                 Name = "Zig Zag (high/low)",
                 Uiid = "ZIGZAG-HL",
-                LabelTemplate = "ZIGZAG([P1]% HIGH/LOW)",
+                LegendTemplate = "ZIGZAG([P1]% HIGH/LOW)",
                 Endpoint = $"{baseUrl}/ZIGZAG-HIGHLOW/",
                 Category = "price-transform",
                 ChartType = "overlay",
@@ -1169,8 +1169,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        LabelTemplate = "ZIGZAG([P1]% HIGH/LOW)",
                         DisplayName = "Zig Zag",
+                        TooltipTemplate = "ZIGZAG([P1]% HIGH/LOW)",
                         DataName = "zigZag",
                         DataType = "number",
                         LineType = "solid",
@@ -1179,5 +1179,9 @@ public static class Metadata
                 }
             }
         };
+
+        return listing
+            .OrderBy(x => x.Name)
+            .ToList();
     }
 }

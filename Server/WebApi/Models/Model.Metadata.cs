@@ -4,7 +4,7 @@ public class IndicatorList
 {
     public string Name { get; set; }
     public string Uiid { get; set; }
-    public string LabelTemplate { get; set; }
+    public string LegendTemplate { get; set; }
     public string Endpoint { get; set; }
     public string Category { get; set; }
     public string ChartType { get; set; }
@@ -40,8 +40,8 @@ public class IndicatorParamConfig
 
 public class IndicatorResultConfig
 {
-    public string LabelTemplate { get; set; }
     public string DisplayName { get; set; }
+    public string TooltipTemplate { get; set; }
     public string DataName { get; set; }
     public string DataType { get; set; }
     public string LineType { get; set; }

@@ -267,7 +267,7 @@ export class ChartService {
     const selection: IndicatorSelection = {
       ucid: this.getGuid("chart"),
       uiid: listing.uiid,
-      label: listing.labelTemplate,
+      label: listing.legendTemplate,
       chartType: listing.chartType,
       params: [],
       results: []
@@ -291,7 +291,7 @@ export class ChartService {
     listing.results.forEach((config: IndicatorResultConfig) => {
 
       const result = {
-        label: config.labelTemplate,
+        label: config.tooltipTemplate,
         color: config.defaultColor,
         dataName: config.dataName,
         displayName: config.displayName,

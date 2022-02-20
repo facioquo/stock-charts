@@ -18,7 +18,7 @@ export interface Quote {
 export interface IndicatorListing {
   name: string;
   uiid: string;
-  labelTemplate: string;
+  legendTemplate: string;
   endpoint: string;
   category: string;
   chartType: string;
@@ -40,8 +40,8 @@ export interface IndicatorParamConfig {
 }
 
 export interface IndicatorResultConfig {
-  labelTemplate: string;
   displayName: string;
+  tooltipTemplate: string;
   dataName: string;
   dataType: string;
   lineType: string;
