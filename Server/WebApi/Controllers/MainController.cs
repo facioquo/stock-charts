@@ -186,6 +186,25 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("FRACTAL")]
+    public IActionResult GetFractal(int windowSpan = 2)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<FractalResult> results =
+                quotes.GetFractal(windowSpan)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("HTL")]
     public IActionResult GetHTL()
     {

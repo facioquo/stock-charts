@@ -142,7 +142,7 @@ export class ApiService {
           type: 'line',
           data: [],
           yAxisID: 'yAxis',
-          pointRadius: 2,
+          pointRadius: r.lineWidth,
           pointBorderWidth: 0,
           pointBorderColor: r.color,
           pointBackgroundColor: r.color,

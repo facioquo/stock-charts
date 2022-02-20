@@ -516,6 +516,50 @@ public static class Metadata
                 }
             },
 
+            // Fractal (Williams)
+            new IndicatorList
+            {
+                Name = "Williams Fractal (high/low)",
+                Uiid = "FRACTAL",
+                LabelTemplate = "FRACTAL([P1])",
+                Endpoint = $"{baseUrl}/FRACTAL/",
+                Category = "price-pattern",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Window Span",
+                        ParamName = "windowSpan",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 2,
+                        Minimum = 1,
+                        Maximum = 100
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        LabelTemplate = "Fractal Bull ([P1])",
+                        DisplayName = "Fractal Bull",
+                        DataName = "fractalBull",
+                        DataType = "number",
+                        LineType = "dots",
+                        LineWidth = 3,
+                        DefaultColor = standardRed
+                    },
+                    new IndicatorResultConfig {
+                        LabelTemplate = "Fractal Bear ([P1])",
+                        DisplayName = "Fractal Bear",
+                        DataName = "fractalBear",
+                        DataType = "number",
+                        LineType = "dots",
+                        LineWidth = 3,
+                        DefaultColor = standardGreen
+                    }
+                }
+            },
+
             // Hilbert Transform Instantaneous Trendline
             new IndicatorList
             {
@@ -666,6 +710,7 @@ public static class Metadata
                         DataName = "sar",
                         DataType = "number",
                         LineType= "dots",
+                        LineWidth = 2,
                         DefaultColor = standardPurple
                     }
                 }
