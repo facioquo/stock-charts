@@ -19,7 +19,7 @@ import {
 @Injectable()
 export class ApiService {
 
-  extraBars = 8;
+  extraBars = 7;
 
   constructor(
     private readonly http: HttpClient

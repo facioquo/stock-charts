@@ -1,5 +1,10 @@
 <mat-toolbar class="noselect">
   general settings
+
+  <div class="filler"></div>
+  <button mat-mini-fab class="close-button" color="default" (click)="closeListDialog()" matTooltip="close">
+    <mat-icon>close</mat-icon>
+  </button>
 </mat-toolbar>
 <div class="toggle">
   <mat-slide-toggle [(ngModel)]="ts.isDarkTheme" [color]="toggleColor" (change)="toggleTheme($event)">

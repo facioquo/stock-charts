@@ -3,7 +3,7 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { StyleService } from './style.service';
 
 import { PickListComponent } from './chart/picker/pick-list.component';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +16,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     public readonly ts: StyleService,
-    private readonly bs: MatBottomSheet
+    private readonly list: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -25,7 +25,10 @@ export class AppComponent implements OnInit {
 
   // PICKERS
   openPickList(): void {
-    const bsRef = this.bs.open(PickListComponent);
+    const listRef = this.list.open(PickListComponent, {
+      minWidth: '300px',
+      maxHeight: '80vh'
+    });
   }
 
 }
