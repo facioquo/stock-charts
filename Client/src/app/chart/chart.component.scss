@@ -5,8 +5,11 @@
   margin: 0;
   border-style: none;
   border-width: 0;
-  min-height: 50vh;
-  max-height: calc(100vh - 64px);
+  height: 50vh;
+
+  @media (max-height: 900px){
+    height: 40vh;
+  }
 
   @media (max-height: 400px){
     height: calc(100vh - 64px); // full-screen (with toolbar)
@@ -18,5 +21,13 @@
   margin: 0;
   border-style: none;
   border-width: 0;
-  height: 12vh;
+  height: 15vh;
+
+  @media (max-height: 800px){
+    height: 20vh;
+  }
+
+  @media (max-height: 400px){
+    height: 30vh;
+  }
 }
