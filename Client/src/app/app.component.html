@@ -6,12 +6,11 @@
       </a>
     </h1>
     <div class="filler"></div>
-    <div class="item">
-      <button mat-mini-fab color="default" (click)="openPickList()" matTooltip="change indicators and settings">
-        <mat-icon>edit</mat-icon>
-      </button>
-    </div>
+    <button mat-mini-fab color="default" (click)="openPickList()" class="edit-button" matTooltip="change indicators and settings">
+      <mat-icon color="primary">edit</mat-icon>
+    </button>
   </mat-toolbar>
+
 
   <div id="main-content" class="body-container">
     <app-chart></app-chart>
