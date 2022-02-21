@@ -270,6 +270,25 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("GATOR")]
+    public IActionResult GetGator()
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<GatorResult> results =
+                quotes.GetGator()
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("HTL")]
     public IActionResult GetHTL()
     {
@@ -489,6 +508,26 @@ public class MainController : ControllerBase
 
             IEnumerable<SuperTrendResult> results =
                 quotes.GetSuperTrend(lookbackPeriods, multiplier)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("VORTEX")]
+    public IActionResult GetVortex(
+        int lookbackPeriods = 14)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<VortexResult> results =
+                quotes.GetVortex(lookbackPeriods)
                       .TakeLast(limitLast);
 
             return Ok(results);

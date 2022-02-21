@@ -535,7 +535,7 @@ public static class Metadata
                 }
             },
 
-            // Keltner Channels
+            // Donchian Channels
             new IndicatorList
             {
                 Name = "Donchian Channels",
@@ -1121,7 +1121,7 @@ public static class Metadata
                 }
             },
 
-            // Exponential Moving Average
+            // Simple Moving Average
             new IndicatorList
             {
                 Name = "Simple Moving Average (SMA)",
@@ -1392,6 +1392,47 @@ public static class Metadata
                         LineType = "dash",
                         LineWidth = 1,
                         DefaultColor = darkGrayTransparent
+                    }
+                }
+            },
+
+            // Average Directional Index (ADX)
+            new IndicatorList
+            {
+                Name = "Vortex Indicator",
+                Uiid = "VORTEX",
+                LegendTemplate = "VORTEX([P1])",
+                Endpoint = $"{baseUrl}/VORTEX/",
+                Category = "price-trend",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        DefaultValue = 14,
+                        Minimum = 2,
+                        Maximum = 100
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "VI+",
+                        TooltipTemplate = "VI+",
+                        DataName = "pvi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "VI+",
+                        TooltipTemplate = "VI-",
+                        DataName = "nvi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
                     }
                 }
             },
