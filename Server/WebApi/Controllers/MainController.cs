@@ -356,6 +356,26 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("SLOPE")]
+    public IActionResult GetSlope(
+        int lookbackPeriods = 14)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<SlopeResult> results =
+                quotes.GetSlope(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("STO")]
     public IActionResult GetStoch(
         int lookbackPeriods = 14,

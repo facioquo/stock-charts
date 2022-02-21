@@ -981,6 +981,74 @@ public static class Metadata
                 }
             },
 
+            // Slope
+            new IndicatorList
+            {
+                Name = "Slope",
+                Uiid = "SLOPE",
+                LegendTemplate = "SLOPE([P1])",
+                Endpoint = $"{baseUrl}/SLOPE/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Slope",
+                        TooltipTemplate = "SLOPE([P1])",
+                        DataName = "slope",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
+            // Linear Regression
+            new IndicatorList
+            {
+                Name = "Linear Regression",
+                Uiid = "LINEAR",
+                LegendTemplate = "LINEAR([P1])",
+                Endpoint = $"{baseUrl}/SLOPE/",
+                Category = "price-characteristic",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Linear Regression",
+                        TooltipTemplate = "LINEAR([P1])",
+                        DataName = "line",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Stochastic Oscillator
             new IndicatorList
             {
