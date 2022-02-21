@@ -232,6 +232,25 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("EPMA")]
+    public IActionResult GetEpma(int lookbackPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<EpmaResult> results =
+                quotes.GetEpma(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("EMA")]
     public IActionResult GetEma(int lookbackPeriods)
     {

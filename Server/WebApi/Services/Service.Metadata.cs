@@ -637,6 +637,39 @@ public static class Metadata
                 }
             },
 
+            // Endpoint Moving Average
+            new IndicatorList
+            {
+                Name = "Endpoint Moving Average (EPMA)",
+                Uiid = "EPMA",
+                LegendTemplate = "EPMA([P1])",
+                Endpoint = $"{baseUrl}/EPMA/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "EPMA",
+                        TooltipTemplate = "EPMA([P1])",
+                        DataName = "epma",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Exponential Moving Average
             new IndicatorList
             {
