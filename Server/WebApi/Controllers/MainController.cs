@@ -295,6 +295,27 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("ROC")]
+    public IActionResult GetRoc(
+        int lookbackPeriods,
+        int smaPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<RocResult> results =
+                quotes.GetRoc(lookbackPeriods, smaPeriods)
+                        .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("RSI")]
     public IActionResult GetRsi(
         int lookbackPeriods = 14)

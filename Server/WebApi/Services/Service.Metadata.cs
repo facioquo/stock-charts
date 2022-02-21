@@ -796,6 +796,58 @@ public static class Metadata
                 }
             },
 
+            // Rate of Change
+            new IndicatorList
+            {
+                Name = "Rate of Change",
+                Uiid = "ROC",
+                LegendTemplate = "ROC([P1],[P2])",
+                Endpoint = $"{baseUrl}/ROC/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "SMA Periods",
+                        ParamName = "smaPeriods",
+                        DataType = "int",
+                        Order = 2,
+                        Required = false,
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 50
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName  = "Rate of Change",
+                        TooltipTemplate = "ROC([P1],[P2])",
+                        DataName = "roc",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "SMA of ROC",
+                        TooltipTemplate = "STO %D([P2])",
+                        DataName = "rocSma",
+                        DataType = "number",
+                        LineType= "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
             // Relative Strength Index
             new IndicatorList
             {
