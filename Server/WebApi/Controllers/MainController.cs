@@ -213,7 +213,7 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("EMA")]
-    public IActionResult GetEMA(int lookbackPeriods)
+    public IActionResult GetEma(int lookbackPeriods)
     {
         try
         {
@@ -385,6 +385,25 @@ public class MainController : ControllerBase
 
             IEnumerable<SlopeResult> results =
                 quotes.GetSlope(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("SMA")]
+    public IActionResult GetSma(int lookbackPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<SmaResult> results =
+                quotes.GetSma(lookbackPeriods)
                       .TakeLast(limitLast);
 
             return Ok(results);
