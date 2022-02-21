@@ -688,7 +688,8 @@ export class ChartService {
       const def2 = this.defaultSelection("BB");
       this.addSelection(def2, false);
 
-      const def3 = this.defaultSelection("STOCHRSI");
+      const def3 = this.defaultSelection("RSI");
+      def3.params.find(x => x.paramName == "lookbackPeriods").value = 5;
       this.addSelection(def3, false);
 
       const def4 = this.defaultSelection("ADX");
