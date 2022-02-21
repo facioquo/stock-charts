@@ -17,9 +17,11 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("quotes")]
-    public IActionResult GetQuotes()
+    public IActionResult GetQuotes(
+        string symbol = "QQQ",
+        string timeSpan = "DAILY")
     {
-        IEnumerable<Quote> quotes = FetchQuotes.Get();
+        IEnumerable<Quote> quotes = FetchQuotes.Get(symbol, timeSpan);
         return Ok(quotes.TakeLast(limitLast));
     }
 
@@ -31,6 +33,26 @@ public class MainController : ControllerBase
 
     //////////////////////////////////////////
     // INDICATORS (sorted alphabetically)
+
+    [HttpGet("ADL")]
+    public IActionResult GetAdl(
+        int smaPeriods = 3)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<AdlResult> results =
+                quotes.GetAdl(smaPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
 
     [HttpGet("ADX")]
     public IActionResult GetAdx(int lookbackPeriods = 14)
@@ -70,6 +92,26 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("ATR")]
+    public IActionResult GetAtr(
+    int lookbackPeriods = 14)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<AtrResult> results =
+                quotes.GetAtr(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("BB")]
     public IActionResult GetBollingerBands(
         int lookbackPeriods = 20,
@@ -92,7 +134,9 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("CHEXIT-LONG")]
-    public IActionResult GetChandelierLong(int lookbackPeriods, double multiplier)
+    public IActionResult GetChandelierLong(
+        int lookbackPeriods,
+        double multiplier)
     {
         try
         {
@@ -111,7 +155,9 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("CHEXIT-SHORT")]
-    public IActionResult GetChandelierShort(int lookbackPeriods, double multiplier)
+    public IActionResult GetChandelierShort(
+        int lookbackPeriods,
+        double multiplier)
     {
         try
         {
@@ -148,6 +194,25 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("DONCHIAN")]
+    public IActionResult GetDonchian(int lookbackPeriods = 20)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<DonchianResult> results =
+                quotes.GetDonchian(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("ELDER-RAY")]
     public IActionResult GetElderRay(int lookbackPeriods = 13)
     {
@@ -167,8 +232,27 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("EPMA")]
+    public IActionResult GetEpma(int lookbackPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<EpmaResult> results =
+                quotes.GetEpma(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("EMA")]
-    public IActionResult GetEMA(int lookbackPeriods)
+    public IActionResult GetEma(int lookbackPeriods)
     {
         try
         {
@@ -176,6 +260,26 @@ public class MainController : ControllerBase
 
             IEnumerable<EmaResult> results =
                 quotes.GetEma(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("FISHER")]
+    public IActionResult GetFisher(
+        int lookbackPeriods = 10)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<FisherTransformResult> results =
+                quotes.GetFisherTransform(lookbackPeriods)
                       .TakeLast(limitLast);
 
             return Ok(results);
@@ -195,6 +299,25 @@ public class MainController : ControllerBase
 
             IEnumerable<FractalResult> results =
                 quotes.GetFractal(windowSpan)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("GATOR")]
+    public IActionResult GetGator()
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<GatorResult> results =
+                quotes.GetGator()
                       .TakeLast(limitLast);
 
             return Ok(results);
@@ -226,9 +349,9 @@ public class MainController : ControllerBase
 
     [HttpGet("KELTNER")]
     public IActionResult GetKeltner(
-    int emaPeriods = 20,
-    decimal multiplier = 2,
-    int atrPeriods = 10)
+        int emaPeriods = 20,
+        decimal multiplier = 2,
+        int atrPeriods = 10)
     {
         try
         {
@@ -268,6 +391,25 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("MFI")]
+    public IActionResult GetMfi(int lookbackPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<MfiResult> results =
+                quotes.GetMfi(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("PSAR")]
     public IActionResult GetParabolicSar(
         decimal accelerationStep = 0.02m,
@@ -289,6 +431,27 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("ROC")]
+    public IActionResult GetRoc(
+        int lookbackPeriods,
+        int smaPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<RocResult> results =
+                quotes.GetRoc(lookbackPeriods, smaPeriods)
+                        .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("RSI")]
     public IActionResult GetRsi(
         int lookbackPeriods = 14)
@@ -299,6 +462,45 @@ public class MainController : ControllerBase
 
             IEnumerable<RsiResult> results =
                 quotes.GetRsi(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("SLOPE")]
+    public IActionResult GetSlope(
+        int lookbackPeriods = 14)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<SlopeResult> results =
+                quotes.GetSlope(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("SMA")]
+    public IActionResult GetSma(int lookbackPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<SmaResult> results =
+                quotes.GetSma(lookbackPeriods)
                       .TakeLast(limitLast);
 
             return Ok(results);
@@ -364,6 +566,26 @@ public class MainController : ControllerBase
 
             IEnumerable<SuperTrendResult> results =
                 quotes.GetSuperTrend(lookbackPeriods, multiplier)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("VORTEX")]
+    public IActionResult GetVortex(
+        int lookbackPeriods = 14)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<VortexResult> results =
+                quotes.GetVortex(lookbackPeriods)
                       .TakeLast(limitLast);
 
             return Ok(results);

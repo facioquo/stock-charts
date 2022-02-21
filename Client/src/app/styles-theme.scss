@@ -7,9 +7,9 @@
 // ref: https://www.materialpalette.com
 
 // Define a light theme
-$light-primary: mat.define-palette(mat.$indigo-palette);
-$light-accent: mat.define-palette(mat.$pink-palette);
-$light-warn: mat.define-palette(mat.$red-palette);
+$light-primary: mat.define-palette(mat.$grey-palette);
+$light-accent: mat.define-palette(mat.$blue-gray-palette);
+$light-warn: mat.define-palette(mat.$deep-orange-palette);
 $light-theme: mat.define-light-theme(
   (
     color: (
