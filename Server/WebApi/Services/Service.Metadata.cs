@@ -860,6 +860,70 @@ public static class Metadata
                 }
             },
 
+            // Money Flow Index
+            new IndicatorList
+            {
+                Name = "Money Flow Index (MFI)",
+                Uiid = "MFI",
+                LegendTemplate = "MFI([P1])",
+                Endpoint = $"{baseUrl}/MFI/",
+                Category = "oscillator",
+                ChartType = "volume-based",
+                ChartConfig = new ChartConfig
+                {
+                    MinimumYAxis = 0,
+                    MaximumYAxis = 100,
+
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 80,
+                            Color = thresholdRed,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = thresholdGreen
+                            }
+                        },
+                        new ChartThreshold {
+                            Value = 20,
+                            Color = thresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+1",
+                                ColorAbove = thresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "MFI",
+                        TooltipTemplate = "MFI([P1])",
+                        DataName = "mfi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Moving Average Convergence/Divergence
             new IndicatorList
             {

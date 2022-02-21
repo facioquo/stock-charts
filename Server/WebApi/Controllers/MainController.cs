@@ -372,6 +372,25 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("MFI")]
+    public IActionResult GetMfi(int lookbackPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<MfiResult> results =
+                quotes.GetMfi(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("PSAR")]
     public IActionResult GetParabolicSar(
         decimal accelerationStep = 0.02m,
