@@ -72,6 +72,26 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("ATR")]
+    public IActionResult GetAtr(
+    int lookbackPeriods = 14)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<AtrResult> results =
+                quotes.GetAtr(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("BB")]
     public IActionResult GetBollingerBands(
         int lookbackPeriods = 20,

@@ -215,6 +215,74 @@ public static class Metadata
                 }
             },
 
+            // Average True Range
+            new IndicatorList
+            {
+                Name = "Average True Range (ATR)",
+                Uiid = "ATR",
+                LegendTemplate = "ATR([P1])",
+                Endpoint = $"{baseUrl}/ATR/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 14,
+                        Minimum = 2,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Average True Range",
+                        TooltipTemplate = "ATR([P1])",
+                        DataName = "atr",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
+            // Average True Range Percent
+            new IndicatorList
+            {
+                Name = "Average True Range (ATR) Percent",
+                Uiid = "ATRP",
+                LegendTemplate = "ATR([P1]) %",
+                Endpoint = $"{baseUrl}/ATR/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 14,
+                        Minimum = 2,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Average True Range Percent",
+                        TooltipTemplate = "ATR([P1]) %",
+                        DataName = "atrp",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Bollinger Bands
             new IndicatorList
             {
