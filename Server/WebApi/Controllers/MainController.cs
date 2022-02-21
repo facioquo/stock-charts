@@ -34,6 +34,26 @@ public class MainController : ControllerBase
     //////////////////////////////////////////
     // INDICATORS (sorted alphabetically)
 
+    [HttpGet("ADL")]
+    public IActionResult GetAdl(
+        int smaPeriods = 3)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<AdlResult> results =
+                quotes.GetAdl(smaPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("ADX")]
     public IActionResult GetAdx(int lookbackPeriods = 14)
     {

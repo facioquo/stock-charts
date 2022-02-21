@@ -45,7 +45,7 @@ export class PickListComponent {
 
   removeSelection(event: MouseEvent, ucid: string): void {
     event.preventDefault();
-    this.listRef.closeAll();
+    // this.listRef.closeAll();
     this.cs.deleteSelection(ucid);
   }
 

@@ -18,6 +18,47 @@ public static class Metadata
 
         List<IndicatorList> listing = new()
         {
+            // Accumulation Distribution Line (ADL)
+            new IndicatorList
+            {
+                Name = "Accumulation Distribution Line (ADL)",
+                Uiid = "ADL",
+                LegendTemplate = "ADL w/ SMA([P1])",
+                Endpoint = $"{baseUrl}/ADL/",
+                Category = "volume-based",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "SMA Periods",
+                        ParamName = "smaPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 50
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Accumulation Distribution Line",
+                        TooltipTemplate = "ADL",
+                        DataName = "adl",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "SMA of ADL",
+                        TooltipTemplate = "ADL SMA([P1])",
+                        DataName = "adlSma",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
             // Average Directional Index (ADX)
             new IndicatorList
             {
