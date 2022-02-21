@@ -251,6 +251,26 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("FISHER")]
+    public IActionResult GetFisher(
+        int lookbackPeriods = 10)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<FisherTransformResult> results =
+                quotes.GetFisherTransform(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("FRACTAL")]
     public IActionResult GetFractal(int windowSpan = 2)
     {

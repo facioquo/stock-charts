@@ -670,6 +670,47 @@ public static class Metadata
                 }
             },
 
+            // Fisher Transform
+            new IndicatorList
+            {
+                Name = "Ehlers Fisher Transform",
+                Uiid = "FISHER",
+                LegendTemplate = "FISHER([P1])",
+                Endpoint = $"{baseUrl}/FISHER/",
+                Category = "price-transform",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Fisher Transform",
+                        TooltipTemplate = "Fisher Transform",
+                        DataName = "fisher",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Trigger",
+                        TooltipTemplate = "Trigger",
+                        DataName = "trigger",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
             // Fractal (Williams)
             new IndicatorList
             {
@@ -1396,7 +1437,7 @@ public static class Metadata
                 }
             },
 
-            // Average Directional Index (ADX)
+            // Vortex Indicator
             new IndicatorList
             {
                 Name = "Vortex Indicator",
