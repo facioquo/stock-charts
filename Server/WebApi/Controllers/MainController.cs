@@ -174,6 +174,25 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("DONCHIAN")]
+    public IActionResult GetDonchian(int lookbackPeriods = 20)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<DonchianResult> results =
+                quotes.GetDonchian(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("ELDER-RAY")]
     public IActionResult GetElderRay(int lookbackPeriods = 13)
     {

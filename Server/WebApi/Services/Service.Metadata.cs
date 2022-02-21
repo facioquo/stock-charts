@@ -506,6 +506,66 @@ public static class Metadata
                 }
             },
 
+            // Keltner Channels
+            new IndicatorList
+            {
+                Name = "Donchian Channels",
+                Uiid = "DONCHIAN",
+                LegendTemplate = "DONCHIAN([P1])",
+                Endpoint = $"{baseUrl}/DONCHIAN/",
+                Category = "price-channel",
+                ChartType = "overlay",
+                Order = Order.BehindPrice,
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        Required = true,
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Upper Band",
+                        TooltipTemplate = "DONCHIAN([P1]) Upper Band",
+                        DataName = "upperBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1,
+                        DefaultColor = standardOrange,
+                        Fill = new ChartFill
+                        {
+                            Target = "+2",
+                            ColorAbove = darkGrayTransparent,
+                            ColorBelow = darkGrayTransparent
+                        }
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Centerline",
+                        TooltipTemplate = "DONCHIAN([P1]) Centerline",
+                        DataName = "centerline",
+                        DataType = "number",
+                        LineType = "dash",
+                        LineWidth = 1,
+                        DefaultColor = standardOrange
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Lower Band",
+                        TooltipTemplate = "DONCHIAN([P1]) Lower Band",
+                        DataName = "lowerBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1,
+                        DefaultColor = standardOrange
+                    }
+                }
+            },
+
             // Elder-ray
             new IndicatorList
             {
