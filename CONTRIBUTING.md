@@ -1,4 +1,4 @@
-# Contributing to Stock.Indicators
+# Contributing guidelines
 
 Thanks for taking the time to contribute!
 
@@ -30,7 +30,7 @@ After a Pull Request is reviewed, accepted, and merged to `main`, we may batch c
 
 ## Contact us
 
-Contact us through the NuGet [Contact Owners](https://www.nuget.org/packages/Skender.Stock.Indicators) method (preferred) or [submit an Issue](https://github.com/DaveSkender/Stock.Charts/issues) with your question if it is publicly relevant.
+Contact us through the NuGet [Contact Owners](https://www.nuget.org/packages/Skender.Stock.Indicators) method, privately direct message [@daveskender](https://twitter.com/messages/compose?recipient_id=27475431) on Twitter, or [submit an Issue](https://github.com/DaveSkender/Stock.Charts/issues) with your question if it is publicly relevant.
 
 Thanks,
 Dave Skender
