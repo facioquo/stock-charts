@@ -55,7 +55,8 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("ADX")]
-    public IActionResult GetAdx(int lookbackPeriods = 14)
+    public IActionResult GetAdx(
+        int lookbackPeriods = 14)
     {
         try
         {
@@ -74,7 +75,8 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("AROON")]
-    public IActionResult GetAroon(int lookbackPeriods = 25)
+    public IActionResult GetAroon(
+        int lookbackPeriods = 25)
     {
         try
         {
@@ -176,7 +178,8 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("CHOP")]
-    public IActionResult GetChop(int lookbackPeriods)
+    public IActionResult GetChop(
+        int lookbackPeriods)
     {
         try
         {
@@ -195,7 +198,8 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("DONCHIAN")]
-    public IActionResult GetDonchian(int lookbackPeriods = 20)
+    public IActionResult GetDonchian(
+        int lookbackPeriods = 20)
     {
         try
         {
@@ -214,7 +218,8 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("ELDER-RAY")]
-    public IActionResult GetElderRay(int lookbackPeriods = 13)
+    public IActionResult GetElderRay(
+        int lookbackPeriods = 13)
     {
         try
         {
@@ -233,7 +238,8 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("EPMA")]
-    public IActionResult GetEpma(int lookbackPeriods)
+    public IActionResult GetEpma(
+        int lookbackPeriods)
     {
         try
         {
@@ -252,7 +258,8 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("EMA")]
-    public IActionResult GetEma(int lookbackPeriods)
+    public IActionResult GetEma(
+        int lookbackPeriods)
     {
         try
         {
@@ -291,7 +298,8 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("FRACTAL")]
-    public IActionResult GetFractal(int windowSpan = 2)
+    public IActionResult GetFractal(
+        int windowSpan = 2)
     {
         try
         {
@@ -392,7 +400,8 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("MFI")]
-    public IActionResult GetMfi(int lookbackPeriods)
+    public IActionResult GetMfi(
+        int lookbackPeriods)
     {
         try
         {
@@ -493,7 +502,8 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("SMA")]
-    public IActionResult GetSma(int lookbackPeriods)
+    public IActionResult GetSma(
+        int lookbackPeriods)
     {
         try
         {
@@ -501,6 +511,27 @@ public class MainController : ControllerBase
 
             IEnumerable<SmaResult> results =
                 quotes.GetSma(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("STDEV")]
+    public IActionResult GetStdDev(
+        int lookbackPeriods,
+        int smaPeriods = 3)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<StdDevResult> results =
+                quotes.GetStdDev(lookbackPeriods, smaPeriods)
                       .TakeLast(limitLast);
 
             return Ok(results);

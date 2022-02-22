@@ -1292,6 +1292,89 @@ public static class Metadata
                 }
             },
 
+            // Standard Deviation (absolute)
+            new IndicatorList
+            {
+                Name = "Standard Deviation (absolute)",
+                Uiid = "STDEV",
+                LegendTemplate = "STDEV([P1])",
+                Endpoint = $"{baseUrl}/STDEV/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "SMA Periods",
+                        ParamName = "smaPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 50
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Standard Deviation",
+                        TooltipTemplate = "STDEV([P1])",
+                        DataName = "stdDev",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "SMA of Standard Deviation",
+                        TooltipTemplate = "STDEV([P1]) SMA",
+                        DataName = "stdDevSma",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
+            // Standard Deviation (absolute)
+            new IndicatorList
+            {
+                Name = "Standard Deviation (Z-Score)",
+                Uiid = "STDEV-ZSCORE",
+                LegendTemplate = "STDEV-ZSCORE([P1])",
+                Endpoint = $"{baseUrl}/STDEV/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Standard Deviation (absolute)",
+                        TooltipTemplate = "Z-Score",
+                        DataName = "zScore",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Stochastic Oscillator
             new IndicatorList
             {
