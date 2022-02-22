@@ -31,7 +31,6 @@ public class IndicatorParamConfig
     public string DisplayName { get; set; }
     public string ParamName { get; set; }
     public string DataType { get; set; }
-    public int Order { get; set; }
     public double? DefaultValue { get; set; }
     public double Minimum { get; set; } // greater than
     public double Maximum { get; set; } // less than

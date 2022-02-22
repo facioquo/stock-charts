@@ -74,6 +74,28 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("ALMA")]
+    public IActionResult GetAlma(
+        int lookbackPeriods = 9,
+        double offset = 0.85,
+        double sigma = 6)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<AlmaResult> results =
+                quotes.GetAlma(lookbackPeriods, offset, sigma)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("AROON")]
     public IActionResult GetAroon(
         int lookbackPeriods = 25)
