@@ -1515,7 +1515,7 @@ public static class Metadata
             {
                 Name = "Stochastic RSI",
                 Uiid = "STOCHRSI",
-                LegendTemplate = "StochRSI ([P1],[P2],[P3],[P4])",
+                LegendTemplate = "STOCH-RSI ([P1],[P2],[P3],[P4])",
                 Endpoint = $"{baseUrl}/STORSI/",
                 Category = "oscillator",
                 ChartType = "oscillator",
