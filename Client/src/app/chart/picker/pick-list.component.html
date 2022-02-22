@@ -12,19 +12,21 @@
   </mat-slide-toggle>
 </div>
 
-<mat-nav-list>
-
+<mat-action-list>
   <mat-toolbar class="noselect" *ngIf="selections.length>0">
     indicators selected
   </mat-toolbar>
-  <a mat-list-item *ngFor="let selection of selections" matTooltip="click to remove this indicator"
-    (click)="removeSelection($event, selection.ucid)">
+  <button mat-list-item *ngFor="let selection of selections">
     <span mat-line>{{selection.label}}</span>
-    <button mat-mini-fab color="accent">
+    <div class="filler"></div>
+    <button mat-icon-button color="accent" (click)="removeSelection($event, selection.ucid)"
+      matTooltip="remove this indicator">
       <mat-icon>delete_forever</mat-icon>
     </button>
-  </a>
+  </button>
+</mat-action-list>
 
+<mat-nav-list>
   <mat-toolbar class="noselect">
     add new indicator
     <div class="filler"></div>

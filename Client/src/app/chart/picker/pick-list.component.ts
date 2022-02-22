@@ -18,7 +18,7 @@ export class PickListComponent {
 
   listings: IndicatorListing[];
   selections: IndicatorSelection[];
-  toggleColor = "warn";
+  toggleColor = "accent";
 
   constructor(
     public ts: StyleService,

@@ -39,7 +39,7 @@ body {
 // TOOLBAR
 mat-toolbar {
   font-family: Google Sans, Roboto, Arial, Helvetica, sans-serif;
-  color: $color-primary-700 !important;
+  // color: $color-primary-700 !important;
 
   a {
     text-decoration: none;
@@ -49,11 +49,11 @@ mat-toolbar {
       color: $color-primary-500 !important;
     }
   }
+}
 
-  .filler {
-    flex: 1 1 auto;
-    text-align: center;
-  }
+.filler {
+  flex: 1 1 auto;
+  text-align: center;
 }
 
 mat-chip-list {
@@ -85,7 +85,6 @@ mat-radio-group {
 .mat-tab-body-wrapper {
   padding: 16px;
 }
-
 
 // COMMON CONTROLS
 .radio-button {
