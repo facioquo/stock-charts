@@ -387,6 +387,48 @@ public static class Metadata
                 }
             },
 
+            // Bollinger Bands %B
+            new IndicatorList
+            {
+                Name = "Bollinger Bands® %B",
+                Uiid = "BB-PCTB",
+                LegendTemplate = "BB([P1],[P2]) %B",
+                Endpoint = $"{baseUrl}/BB/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        Order = 1,
+                        DefaultValue = 20,
+                        Minimum = 2,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Standard Deviations",
+                        ParamName= "standardDeviations",
+                        DataType = "number",
+                        Order = 2,
+                        DefaultValue = 2,
+                        Minimum = 0.01,
+                        Maximum = 10
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "%B",
+                        TooltipTemplate = "BB([P1],[P2]) %B",
+                        DataName = "percentB",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue,
+                    }
+                }
+            },
+
             // Chandelier Exit (long)
             new IndicatorList
             {
@@ -1342,7 +1384,7 @@ public static class Metadata
                 }
             },
 
-            // Standard Deviation (absolute)
+            // Standard Deviation (z-score)
             new IndicatorList
             {
                 Name = "Standard Deviation (Z-Score)",
