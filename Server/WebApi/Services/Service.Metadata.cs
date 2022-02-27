@@ -68,16 +68,8 @@ public static class Metadata
                 ChartType = "oscillator",
                 ChartConfig = new ChartConfig
                 {
-                    //MinimumYAxis = 0,
-                    //MaximumYAxis = 100,
-
                     Thresholds = new List<ChartThreshold>
                     {
-                        //new ChartThreshold {
-                        //    Value = 50,
-                        //    Color = standardGrayTransparent,
-                        //    Style = "dash"
-                        //},
                         new ChartThreshold {
                             Value = 40,
                             Color = standardGrayTransparent,
@@ -1550,7 +1542,7 @@ public static class Metadata
             {
                 Name = "Stochastic Oscillator",
                 Uiid = "STO",
-                LegendTemplate = "STO %K([P1]) %D([P2])",
+                LegendTemplate = "STOCH %K([P1]) %D([P2])",
                 Endpoint = $"{baseUrl}/STO/",
                 Category = "oscillator",
                 ChartType = "oscillator",
