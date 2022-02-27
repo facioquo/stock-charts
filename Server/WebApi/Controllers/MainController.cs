@@ -588,6 +588,28 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("STC")]
+    public IActionResult GetStc(
+        int cyclePeriods = 10,
+        int fastPeriods = 23,
+        int slowPeriods = 50)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<StcResult> results =
+                quotes.GetStc(cyclePeriods, fastPeriods, slowPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("STDEV")]
     public IActionResult GetStdDev(
         int lookbackPeriods,

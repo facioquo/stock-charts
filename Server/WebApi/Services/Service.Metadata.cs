@@ -1290,6 +1290,85 @@ public static class Metadata
                 }
             },
 
+            // Schaff Trend Cycle (STC)
+            new IndicatorList
+            {
+                Name = "Schaff Trend Cycle (STC)",
+                Uiid = "STC",
+                LegendTemplate = "STC([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/STC/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    MinimumYAxis = 0,
+                    MaximumYAxis = 100,
+
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 75,
+                            Color = thresholdGreen,
+                            Style = "solid",
+                            Fill = new ChartFill
+                            {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = thresholdGreen
+                            }
+                        },
+                        new ChartThreshold {
+                            Value = 25,
+                            Color = thresholdRed,
+                            Style = "solid",
+                            Fill = new ChartFill
+                            {
+                                Target = "+1",
+                                ColorAbove = thresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Cycle Periods",
+                        ParamName = "cyclePeriods",
+                        DataType = "int",
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Fast Periods",
+                        ParamName = "fastPeriods",
+                        DataType = "int",
+                        DefaultValue = 23,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Slow Periods",
+                        ParamName = "slowPeriods",
+                        DataType = "int",
+                        DefaultValue = 50,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Schaff Trend Cycle",
+                        TooltipTemplate = "Schaff Trend Cycle",
+                        DataName = "stc",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Slope
             new IndicatorList
             {
