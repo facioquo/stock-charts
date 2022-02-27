@@ -8,9 +8,11 @@ namespace WebApi.Services;
 
 internal static class FetchQuotes
 {
-    internal static IEnumerable<Quote> Get(string symbol = "QQQ")
+    internal static IEnumerable<Quote> Get(
+        string symbol = "QQQ",
+        string timeSpan = "DAILY")
     {
-        string blobName = $"{symbol}-DAILY.json";
+        string blobName = $"{symbol}-{timeSpan}.json";
 
         try
         {
@@ -35,7 +37,7 @@ internal static class FetchQuotes
         }
     }
 
-    internal static IEnumerable<Quote> GetBackup()
+    private static IEnumerable<Quote> GetBackup()
     {
         List<Quote> h = new()
         {

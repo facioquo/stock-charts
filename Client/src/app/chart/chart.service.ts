@@ -74,6 +74,7 @@ export class ChartService {
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
   chartOverlay: Chart;
+  loading = true;
 
   // CHART CONFIGURATIONS
   baseConfig() {
@@ -619,7 +620,10 @@ export class ChartService {
               error: (e: HttpErrorResponse) => { console.log(e); }
             });
         },
-        error: (e: HttpErrorResponse) => { console.log(e); }
+        error: (e: HttpErrorResponse) => { console.log(e); },
+        complete: () => {
+          this.loading = false;
+        }
       });
   }
 
@@ -722,18 +726,25 @@ export class ChartService {
       });
     }
     else { // add defaults
-      const def1 = this.defaultSelection("EMA");
+      const def1 = this.defaultSelection("LINEAR");
+      def1.params.find(x => x.paramName == "lookbackPeriods").value = 50;
       this.addSelection(def1, false);
 
       const def2 = this.defaultSelection("BB");
       this.addSelection(def2, false);
 
-      const def3 = this.defaultSelection("STO");
+      const def3 = this.defaultSelection("RSI");
+      def3.params.find(x => x.paramName == "lookbackPeriods").value = 5;
       this.addSelection(def3, false);
 
-      const def4 = this.defaultSelection("RSI");
-      def4.params.find(x => x.paramName == "lookbackPeriods").value = 5;
+      const def4 = this.defaultSelection("ADX");
       this.addSelection(def4, false);
+
+      const def5 = this.defaultSelection("SUPERTREND");
+      this.addSelection(def5, false);
+
+      const def6 = this.defaultSelection("MACD");
+      this.addSelection(def6, false);
     }
   }
 

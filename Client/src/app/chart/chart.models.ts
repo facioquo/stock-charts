@@ -36,8 +36,6 @@ export interface IndicatorParamConfig {
   displayName: string;
   paramName: string;
   dataType: string;
-  order: number;
-  required: boolean;
   defaultValue: number;
   minimum: number;
   maximum: number;

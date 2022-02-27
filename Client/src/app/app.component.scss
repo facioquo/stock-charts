@@ -1,11 +1,8 @@
 @import "./styles";
 
 mat-toolbar {
-  padding: 0 8px;
-
-  .item {
-    margin-left: 8px;
-  }
+  color: $color-primary-700 !important;
+  padding: 0 9px;
 }
 
 .edit-button {
@@ -15,14 +12,13 @@ mat-toolbar {
 }
 
 .footer {
-  padding: 0 8px 8px 8px;
+  padding: 0 9px 9px 8px;
   text-align: center;
+  color: unset;
 
   a {
-    &:hover {
-      color: "red";
-    }
-
+    &:active,
+    &:hover,
     &:visited {
       color: unset;
     }

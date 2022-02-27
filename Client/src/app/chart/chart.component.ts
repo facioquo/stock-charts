@@ -17,15 +17,12 @@ export class ChartComponent implements OnInit {
     public readonly cs: ChartService
   ) { }
 
-  loading = true;
-
-  // STARTUP OPERATIONS
+    // STARTUP OPERATIONS
   ngOnInit() {
     this.startup();
   }
 
   startup() {
     this.cs.loadCharts();
-    this.loading = false;
   }
 }

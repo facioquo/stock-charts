@@ -1,16 +1,16 @@
 <div [ngClass]="ts.isDarkTheme ? 'dark-theme' : 'light-theme'">
   <mat-toolbar class="toolbar noselect">
-    <h1 class="no-wrap" matTooltip="Visit the documentation site for Stock Indicators for .NET">
-      <a href="https://daveskender.github.io/Stock.Indicators/">
-        Stock Indicators for .NET (demo)
+    <h1 class="no-wrap">
+      <a href="https://github.com/DaveSkender/Stock.Charts/">
+        Stock.Charts
       </a>
     </h1>
     <div class="filler"></div>
-    <button mat-mini-fab color="default" (click)="openPickList()" class="edit-button" matTooltip="change indicators and settings">
+    <button mat-fab color="default" (click)="openPickList()" class="edit-button"
+      matTooltip="change indicators and settings">
       <mat-icon color="primary">edit</mat-icon>
     </button>
   </mat-toolbar>
-
 
   <div id="main-content" class="body-container">
     <app-chart></app-chart>

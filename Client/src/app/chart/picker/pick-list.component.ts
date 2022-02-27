@@ -18,7 +18,7 @@ export class PickListComponent {
 
   listings: IndicatorListing[];
   selections: IndicatorSelection[];
-  toggleColor = "warn";
+  toggleColor = "accent";
 
   constructor(
     public ts: StyleService,
@@ -31,8 +31,8 @@ export class PickListComponent {
   }
 
   openEditor(event: MouseEvent, listing: IndicatorListing): void {
-    this.listRef.closeAll();
     event.preventDefault();
+    this.listRef.closeAll();
 
     const pickerRef = this.picker.open(PickFormComponent, {
       minWidth: '300px',
@@ -44,8 +44,8 @@ export class PickListComponent {
   }
 
   removeSelection(event: MouseEvent, ucid: string): void {
-    this.listRef.closeAll();
     event.preventDefault();
+    // this.listRef.closeAll();
     this.cs.deleteSelection(ucid);
   }
 

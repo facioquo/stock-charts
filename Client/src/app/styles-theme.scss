@@ -6,20 +6,6 @@
 @include mat.core();
 // ref: https://www.materialpalette.com
 
-// Define a light theme
-$light-primary: mat.define-palette(mat.$indigo-palette);
-$light-accent: mat.define-palette(mat.$pink-palette);
-$light-warn: mat.define-palette(mat.$red-palette);
-$light-theme: mat.define-light-theme(
-  (
-    color: (
-      primary: $light-primary,
-      accent: $light-accent,
-      warn: $light-warn,
-    ),
-  )
-);
-
 // Define a dark theme
 $dark-primary: mat.define-palette(mat.$grey-palette, 900);
 $dark-accent: mat.define-palette(mat.$blue-gray-palette, 900);
@@ -34,7 +20,22 @@ $dark-theme: mat.define-dark-theme(
   )
 );
 
+// Define a light theme
+$light-primary: mat.define-palette(mat.$grey-palette);
+$light-accent: mat.define-palette(mat.$blue-gray-palette);
+$light-warn: mat.define-palette(mat.$deep-orange-palette);
+$light-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $light-primary,
+      accent: $light-accent,
+      warn: $light-warn,
+    ),
+  )
+);
+
 // Apply the dark theme by default
+@include mat.core-theme($dark-theme);
 @include mat.all-component-themes($dark-theme);
 
 // angular extensions theming
@@ -60,7 +61,7 @@ $color-accent-800: mat.get-color-from-palette($dark-accent, 800);
 
 .dark-theme {
   color: $color-primary-500;
-  background-color: $color-primary;
+  background-color: $color-primary !important;
   min-height: 100vh;
 }
 
@@ -75,4 +76,5 @@ $color-accent-800: mat.get-color-from-palette($dark-accent, 800);
   $color-warn: mat.get-color-from-palette($light-warn, 900);
 
   background-color: "white" !important;
+  min-height: 100vh;
 }
