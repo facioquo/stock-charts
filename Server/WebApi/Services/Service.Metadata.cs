@@ -855,6 +855,47 @@ public static class Metadata
                 }
             },
 
+            // Fractal Chaos Bands (FCB)
+            new IndicatorList
+            {
+                Name = "Fractal Chaos Bands",
+                Uiid = "FCB",
+                LegendTemplate = "FCB([P1])",
+                Endpoint = $"{baseUrl}/FCB/",
+                Category = "price-channels",
+                ChartType = "overlay",
+                Order = Order.Front,
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Window Span",
+                        ParamName = "windowSpan",
+                        DataType = "int",
+                        DefaultValue = 2,
+                        Minimum = 2,
+                        Maximum = 30
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        TooltipTemplate = "Upper Band",
+                        DisplayName = "FCB([P1]) Upper Band",
+                        DataName = "upperBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Lower Band",
+                        TooltipTemplate = "FCB([P1]) Lower Band",
+                        DataName = "lowerBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
             // Hilbert Transform Instantaneous Trendline
             new IndicatorList
             {

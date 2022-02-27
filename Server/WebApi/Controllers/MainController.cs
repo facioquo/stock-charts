@@ -324,6 +324,26 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("FCB")]
+    public IActionResult GetFcb(
+        int windowSpan)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<FcbResult> results =
+                quotes.GetFcb(windowSpan)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("FISHER")]
     public IActionResult GetFisher(
         int lookbackPeriods = 10)
