@@ -96,6 +96,31 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("ALLIGATOR")]
+    public IActionResult GetAlligator(
+        int jawPeriods = 13,
+        int jawOffset = 8,
+        int teethPeriods = 8,
+        int teethOffset = 5,
+        int lipsPeriods = 5,
+        int lipsOffset = 3)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<AlligatorResult> results =
+                quotes.GetAlligator(jawPeriods, jawOffset, teethPeriods, teethOffset, lipsPeriods, lipsOffset)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("AROON")]
     public IActionResult GetAroon(
         int lookbackPeriods = 25)
@@ -289,6 +314,26 @@ public class MainController : ControllerBase
 
             IEnumerable<EmaResult> results =
                 quotes.GetEma(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("FCB")]
+    public IActionResult GetFcb(
+        int windowSpan)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<FcbResult> results =
+                quotes.GetFcb(windowSpan)
                       .TakeLast(limitLast);
 
             return Ok(results);
@@ -533,6 +578,28 @@ public class MainController : ControllerBase
 
             IEnumerable<SmaResult> results =
                 quotes.GetSma(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("STC")]
+    public IActionResult GetStc(
+        int cyclePeriods = 10,
+        int fastPeriods = 23,
+        int slowPeriods = 50)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<StcResult> results =
+                quotes.GetStc(cyclePeriods, fastPeriods, slowPeriods)
                       .TakeLast(limitLast);
 
             return Ok(results);

@@ -9,7 +9,6 @@ public static class Metadata
         string standardGreen = "#2E7D32";
         string standardBlue = "#1E88E5";
         string standardPurple = "#8E24AA";
-        //string standardGray = "#9E9E9E";
         string standardGrayTransparent = "#9E9E9E50";
         string darkGray = "#757575";
         string darkGrayTransparent = "#75757515";
@@ -856,6 +855,47 @@ public static class Metadata
                 }
             },
 
+            // Fractal Chaos Bands (FCB)
+            new IndicatorList
+            {
+                Name = "Fractal Chaos Bands",
+                Uiid = "FCB",
+                LegendTemplate = "FCB([P1])",
+                Endpoint = $"{baseUrl}/FCB/",
+                Category = "price-channels",
+                ChartType = "overlay",
+                Order = Order.Front,
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Window Span",
+                        ParamName = "windowSpan",
+                        DataType = "int",
+                        DefaultValue = 2,
+                        Minimum = 2,
+                        Maximum = 30
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        TooltipTemplate = "Upper Band",
+                        DisplayName = "FCB([P1]) Upper Band",
+                        DataName = "upperBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Lower Band",
+                        TooltipTemplate = "FCB([P1]) Lower Band",
+                        DataName = "lowerBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
             // Hilbert Transform Instantaneous Trendline
             new IndicatorList
             {
@@ -1250,6 +1290,85 @@ public static class Metadata
                 }
             },
 
+            // Schaff Trend Cycle (STC)
+            new IndicatorList
+            {
+                Name = "Schaff Trend Cycle (STC)",
+                Uiid = "STC",
+                LegendTemplate = "STC([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/STC/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    MinimumYAxis = 0,
+                    MaximumYAxis = 100,
+
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 75,
+                            Color = thresholdGreen,
+                            Style = "solid",
+                            Fill = new ChartFill
+                            {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = thresholdGreen
+                            }
+                        },
+                        new ChartThreshold {
+                            Value = 25,
+                            Color = thresholdRed,
+                            Style = "solid",
+                            Fill = new ChartFill
+                            {
+                                Target = "+1",
+                                ColorAbove = thresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Cycle Periods",
+                        ParamName = "cyclePeriods",
+                        DataType = "int",
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Fast Periods",
+                        ParamName = "fastPeriods",
+                        DataType = "int",
+                        DefaultValue = 23,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Slow Periods",
+                        ParamName = "slowPeriods",
+                        DataType = "int",
+                        DefaultValue = 50,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Schaff Trend Cycle",
+                        TooltipTemplate = "Schaff Trend Cycle",
+                        DataName = "stc",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Slope
             new IndicatorList
             {
@@ -1515,7 +1634,7 @@ public static class Metadata
             {
                 Name = "Stochastic RSI",
                 Uiid = "STOCHRSI",
-                LegendTemplate = "StochRSI ([P1],[P2],[P3],[P4])",
+                LegendTemplate = "STOCH-RSI ([P1],[P2],[P3],[P4])",
                 Endpoint = $"{baseUrl}/STORSI/",
                 Category = "oscillator",
                 ChartType = "oscillator",
@@ -1696,6 +1815,94 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardRed
+                    }
+                }
+            },
+
+            // Williams Alligator
+            new IndicatorList
+            {
+                Name = "Williams Alligator",
+                Uiid = "ALLIGATOR",
+                LegendTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6])",
+                Endpoint = $"{baseUrl}/ALLIGATOR/",
+                Category = "price-trend",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Jaw Periods",
+                        ParamName = "jawPeriods",
+                        DataType = "int",
+                        DefaultValue = 13,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Jaw Offset",
+                        ParamName = "jawOffset",
+                        DataType = "int",
+                        DefaultValue = 8,
+                        Minimum = 1,
+                        Maximum = 30
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Teeth Periods",
+                        ParamName = "teethPeriods",
+                        DataType = "int",
+                        DefaultValue = 8,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Teeth Offset",
+                        ParamName = "teethOffset",
+                        DataType = "int",
+                        DefaultValue = 5,
+                        Minimum = 1,
+                        Maximum = 30
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Lips Periods",
+                        ParamName = "lipsPeriods",
+                        DataType = "int",
+                        DefaultValue = 5,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Lips Offset",
+                        ParamName = "lipsOffset",
+                        DataType = "int",
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 30
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Jaw",
+                        TooltipTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6]) Jaw",
+                        DataName = "jaw",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Jaw",
+                        TooltipTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6]) Teeth",
+                        DataName = "teeth",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Jaw",
+                        TooltipTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6]) Lips",
+                        DataName = "lips",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
                     }
                 }
             },

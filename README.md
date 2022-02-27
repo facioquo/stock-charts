@@ -57,4 +57,4 @@ If the [Client] website does not launch, check to make sure you have a recent ve
 
 ## Contributing
 
-This is an open-source project.  If you want to report or contribute bug fixes or add new indicators, please review our [contributing guidelines](CONTRIBUTING.md).
+This is an open-source project.  If you want to report or contribute bug fixes or add new indicators, please review our [contributing guidelines](docs/CONTRIBUTING.md).
