@@ -9,7 +9,6 @@ public static class Metadata
         string standardGreen = "#2E7D32";
         string standardBlue = "#1E88E5";
         string standardPurple = "#8E24AA";
-        //string standardGray = "#9E9E9E";
         string standardGrayTransparent = "#9E9E9E50";
         string darkGray = "#757575";
         string darkGrayTransparent = "#75757515";
@@ -1696,6 +1695,94 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardRed
+                    }
+                }
+            },
+
+            // Williams Alligator
+            new IndicatorList
+            {
+                Name = "Williams Alligator",
+                Uiid = "ALLIGATOR",
+                LegendTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6])",
+                Endpoint = $"{baseUrl}/ALLIGATOR/",
+                Category = "price-trend",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Jaw Periods",
+                        ParamName = "jawPeriods",
+                        DataType = "int",
+                        DefaultValue = 13,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Jaw Offset",
+                        ParamName = "jawOffset",
+                        DataType = "int",
+                        DefaultValue = 8,
+                        Minimum = 1,
+                        Maximum = 30
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Teeth Periods",
+                        ParamName = "teethPeriods",
+                        DataType = "int",
+                        DefaultValue = 8,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Teeth Offset",
+                        ParamName = "teethOffset",
+                        DataType = "int",
+                        DefaultValue = 5,
+                        Minimum = 1,
+                        Maximum = 30
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Lips Periods",
+                        ParamName = "lipsPeriods",
+                        DataType = "int",
+                        DefaultValue = 5,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Lips Offset",
+                        ParamName = "lipsOffset",
+                        DataType = "int",
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 30
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Jaw",
+                        TooltipTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6]) Jaw",
+                        DataName = "jaw",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Jaw",
+                        TooltipTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6]) Teeth",
+                        DataName = "teeth",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Jaw",
+                        TooltipTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6]) Lips",
+                        DataName = "lips",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
                     }
                 }
             },

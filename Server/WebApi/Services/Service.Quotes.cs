@@ -37,7 +37,7 @@ internal static class FetchQuotes
         }
     }
 
-    internal static IEnumerable<Quote> GetBackup()
+    private static IEnumerable<Quote> GetBackup()
     {
         List<Quote> h = new()
         {
