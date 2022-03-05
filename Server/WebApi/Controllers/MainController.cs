@@ -610,6 +610,28 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("STARC")]
+    public IActionResult GetStarc(
+        int smaPeriods = 5,
+        decimal multiplier = 2,
+        int atrPeriods = 10)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<StarcBandsResult> results =
+                quotes.GetStarcBands(smaPeriods, multiplier, atrPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("STDEV")]
     public IActionResult GetStdDev(
         int lookbackPeriods,

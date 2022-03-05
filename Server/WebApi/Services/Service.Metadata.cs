@@ -1537,6 +1537,80 @@ public static class Metadata
                 }
             },
 
+            // STARC Bands
+            new IndicatorList
+            {
+                Name = "STARC Bands",
+                Uiid = "STARC",
+                LegendTemplate = "STARC([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/STARC/",
+                Category = "price-channel",
+                ChartType = "overlay",
+                Order = Order.BehindPrice,
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "SMA Periods",
+                        ParamName = "smaPeriods",
+                        DataType = "int",
+                        DefaultValue = 5,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Multiplier",
+                        ParamName = "multiplier",
+                        DataType = "number",
+                        DefaultValue = 2,
+                        Minimum = 1,
+                        Maximum = 10
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "ATR Periods",
+                        ParamName = "atrPeriods",
+                        DataType = "int",
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 50
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Upper Band",
+                        TooltipTemplate = "STARC([P1],[P2],[P3]) Upper Band",
+                        DataName = "upperBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1,
+                        DefaultColor = standardOrange,
+                        Fill = new ChartFill
+                        {
+                            Target = "+2",
+                            ColorAbove = darkGrayTransparent,
+                            ColorBelow = darkGrayTransparent
+                        }
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Centerline",
+                        TooltipTemplate = "STARC([P1],[P2],[P3]) Centerline",
+                        DataName = "centerline",
+                        DataType = "number",
+                        LineType = "dash",
+                        LineWidth = 1,
+                        DefaultColor = standardOrange
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Lower Band",
+                        TooltipTemplate = "STARC([P1],[P2],[P3]) Lower Band",
+                        DataName = "lowerBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1,
+                        DefaultColor = standardOrange
+                    }
+                }
+            },
+
             // Stochastic Oscillator
             new IndicatorList
             {
