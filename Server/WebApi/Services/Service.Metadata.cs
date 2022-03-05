@@ -1611,6 +1611,98 @@ public static class Metadata
                 }
             },
 
+            // Stochastic Momentum Index
+            new IndicatorList
+            {
+                Name = "Stochastic Momentum Index",
+                Uiid = "SMI",
+                LegendTemplate = "SMI([P1],[P2],[P3],[P4])",
+                Endpoint = $"{baseUrl}/SMI/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 40,
+                            Color = thresholdRed,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = thresholdGreen
+                            }
+                        },
+                        new ChartThreshold {
+                            Value = -40,
+                            Color = thresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+1",
+                                ColorAbove = thresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "First Smooth Periods",
+                        ParamName = "firstSmoothPeriods",
+                        DataType = "int",
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 30
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Second Smooth Periods",
+                        ParamName = "secondSmoothPeriods",
+                        DataType = "int",
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 30
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Signal Periods",
+                        ParamName = "signalPeriods",
+                        DataType = "int",
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 30
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName  = "SMI",
+                        TooltipTemplate = "SMI",
+                        DataName = "smi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Signal",
+                        TooltipTemplate = "Signal",
+                        DataName = "signal",
+                        DataType = "number",
+                        LineType= "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
             // Stochastic Oscillator
             new IndicatorList
             {

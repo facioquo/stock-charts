@@ -588,6 +588,29 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("SMI")]
+    public IActionResult GetSmi(
+        int lookbackPeriods = 10,
+        int firstSmoothPeriods = 3,
+        int secondSmoothPeriods = 3,
+        int signalPeriods = 3)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<SmiResult> results =
+                quotes.GetSmi(lookbackPeriods, firstSmoothPeriods, secondSmoothPeriods, signalPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("STC")]
     public IActionResult GetStc(
         int cyclePeriods = 10,
