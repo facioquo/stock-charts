@@ -68,16 +68,8 @@ public static class Metadata
                 ChartType = "oscillator",
                 ChartConfig = new ChartConfig
                 {
-                    //MinimumYAxis = 0,
-                    //MaximumYAxis = 100,
-
                     Thresholds = new List<ChartThreshold>
                     {
-                        //new ChartThreshold {
-                        //    Value = 50,
-                        //    Color = standardGrayTransparent,
-                        //    Style = "dash"
-                        //},
                         new ChartThreshold {
                             Value = 40,
                             Color = standardGrayTransparent,
@@ -1545,12 +1537,178 @@ public static class Metadata
                 }
             },
 
+            // STARC Bands
+            new IndicatorList
+            {
+                Name = "STARC Bands",
+                Uiid = "STARC",
+                LegendTemplate = "STARC([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/STARC/",
+                Category = "price-channel",
+                ChartType = "overlay",
+                Order = Order.BehindPrice,
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "SMA Periods",
+                        ParamName = "smaPeriods",
+                        DataType = "int",
+                        DefaultValue = 5,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Multiplier",
+                        ParamName = "multiplier",
+                        DataType = "number",
+                        DefaultValue = 2,
+                        Minimum = 1,
+                        Maximum = 10
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "ATR Periods",
+                        ParamName = "atrPeriods",
+                        DataType = "int",
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 50
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Upper Band",
+                        TooltipTemplate = "STARC([P1],[P2],[P3]) Upper Band",
+                        DataName = "upperBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1,
+                        DefaultColor = standardOrange,
+                        Fill = new ChartFill
+                        {
+                            Target = "+2",
+                            ColorAbove = darkGrayTransparent,
+                            ColorBelow = darkGrayTransparent
+                        }
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Centerline",
+                        TooltipTemplate = "STARC([P1],[P2],[P3]) Centerline",
+                        DataName = "centerline",
+                        DataType = "number",
+                        LineType = "dash",
+                        LineWidth = 1,
+                        DefaultColor = standardOrange
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Lower Band",
+                        TooltipTemplate = "STARC([P1],[P2],[P3]) Lower Band",
+                        DataName = "lowerBand",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1,
+                        DefaultColor = standardOrange
+                    }
+                }
+            },
+
+            // Stochastic Momentum Index
+            new IndicatorList
+            {
+                Name = "Stochastic Momentum Index",
+                Uiid = "SMI",
+                LegendTemplate = "SMI([P1],[P2],[P3],[P4])",
+                Endpoint = $"{baseUrl}/SMI/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 40,
+                            Color = thresholdRed,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = thresholdGreen
+                            }
+                        },
+                        new ChartThreshold {
+                            Value = -40,
+                            Color = thresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+1",
+                                ColorAbove = thresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "First Smooth Periods",
+                        ParamName = "firstSmoothPeriods",
+                        DataType = "int",
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 30
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Second Smooth Periods",
+                        ParamName = "secondSmoothPeriods",
+                        DataType = "int",
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 30
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Signal Periods",
+                        ParamName = "signalPeriods",
+                        DataType = "int",
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 30
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName  = "SMI",
+                        TooltipTemplate = "SMI",
+                        DataName = "smi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Signal",
+                        TooltipTemplate = "Signal",
+                        DataName = "signal",
+                        DataType = "number",
+                        LineType= "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
             // Stochastic Oscillator
             new IndicatorList
             {
                 Name = "Stochastic Oscillator",
                 Uiid = "STO",
-                LegendTemplate = "STO %K([P1]) %D([P2])",
+                LegendTemplate = "STOCH %K([P1]) %D([P2])",
                 Endpoint = $"{baseUrl}/STO/",
                 Category = "oscillator",
                 ChartType = "oscillator",
