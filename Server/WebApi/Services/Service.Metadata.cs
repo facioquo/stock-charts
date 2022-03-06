@@ -601,6 +601,40 @@ public static class Metadata
                 }
             },
 
+            // Doji
+            new IndicatorList
+            {
+                Name = "Doji",
+                Uiid = "DOJI",
+                LegendTemplate = "DOJI([P1])",
+                Endpoint = $"{baseUrl}/DOJI/",
+                Category = "candlestick-pattern",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Max Price Change % (decimalized)",
+                        ParamName = "maxPriceChangePercent",
+                        DataType = "number",
+                        DefaultValue = 0.001,
+                        Minimum = 0,
+                        Maximum = 0.005
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        TooltipTemplate = "DOJI([P1])",
+                        DisplayName = "Doji",
+                        DataName = "price",
+                        DataType = "number",
+                        LineType = "triangle-up",
+                        LineWidth = 8,
+                        CandleOffset = -1,
+                        DefaultColor = standardOrange
+                    }
+                }
+            },
+
             // Donchian Channels
             new IndicatorList
             {
@@ -986,6 +1020,40 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
+                        DefaultColor = standardOrange
+                    }
+                }
+            },
+
+            // Marubozu
+            new IndicatorList
+            {
+                Name = "Marubozu",
+                Uiid = "MARUBOZU",
+                LegendTemplate = "MARUBOZU([P1])",
+                Endpoint = $"{baseUrl}/MARUBOZU/",
+                Category = "candlestick-pattern",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Min Body Percent % (decimalized)",
+                        ParamName = "minBodyPercent",
+                        DataType = "number",
+                        DefaultValue = 0.9,
+                        Minimum = 0.8,
+                        Maximum = 1
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        TooltipTemplate = "MARUBOZU([P1])",
+                        DisplayName = "Marubozu",
+                        DataName = "price",
+                        DataType = "number",
+                        LineType = "triangle-up",
+                        LineWidth = 8,
+                        CandleOffset = -1,
                         DefaultColor = standardOrange
                     }
                 }

@@ -45,6 +45,7 @@ export interface IndicatorResultConfig {
   lineType: string;
   stack: string,
   lineWidth: number;
+  candleOffset: number,
   defaultColor: string;
   fill: ChartFill;
   order: number
@@ -95,7 +96,7 @@ export interface IndicatorResult {
   dataName: string,
   color: string,
   lineType: string,
-  lineWidth: number
+  lineWidth: number,
   order: number,
   dataset: ChartDataset
 }

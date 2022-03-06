@@ -244,6 +244,26 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("DOJI")]
+    public IActionResult GetDoji(
+        double maxPriceChangePercent = 0.001)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<CandleResult> results =
+                quotes.GetDoji(maxPriceChangePercent)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("DONCHIAN")]
     public IActionResult GetDonchian(
         int lookbackPeriods = 20)
@@ -456,6 +476,26 @@ public class MainController : ControllerBase
 
             IEnumerable<MacdResult> results =
                 quotes.GetMacd(fastPeriods, slowPeriods, signalPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("MARUBOZU")]
+    public IActionResult GetMarubozu(
+        double minBodyPercent = 0.95)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<CandleResult> results =
+                quotes.GetMarubozu(minBodyPercent)
                       .TakeLast(limitLast);
 
             return Ok(results);

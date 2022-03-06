@@ -5,8 +5,10 @@
   margin: auto;
   border-style: none;
   border-width: 0;
-  // max-width: 850px;
   height: 50vh;
+
+  // max-width: 850px;  // for doc site only
+  // height: 300px;     // for doc site only
 
   @media (max-height: 700px){
     height: 40vh;
@@ -22,8 +24,9 @@
   margin: auto;
   border-style: none;
   border-width: 0;
-  // max-width: 850px;
   height: 15vh;
+
+  // max-width: 850px; // for doc site only
 
   @media (max-height: 800px){
     height: 20vh;
