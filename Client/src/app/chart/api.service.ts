@@ -60,12 +60,24 @@ export class ApiService {
                 const data: ScatterDataPoint[] = [];
 
                 // populate data
-                apidata.forEach(dt => {
+                apidata.forEach(row => {
+
+                  let yValue = row[result.dataName];
+
+                  // apply candle offset
+                  if (yValue && config.candleOffset !== 0) {
+
+                    console.log("candle", row["candle"].high);
+
+                    yValue = config.candleOffset > 0
+                      ? (1 + config.candleOffset/100) * row["candle"].high
+                      : (1 + config.candleOffset/100) * row["candle"].low;
+                  }
 
                   data
                     .push({
-                      x: new Date(dt.date).valueOf(),
-                      y: dt[result.dataName]
+                      x: new Date(row.date).valueOf(),
+                      y: yValue
                     });
                 });
 
@@ -151,24 +163,39 @@ export class ApiService {
         };
         return dotsDataset;
 
-      case 'bar':
-        const barDataset: ChartDataset = {
+      case 'triangle-up':
+        const triUpDataset: ChartDataset = {
           label: r.label,
-          type: 'bar',
+          type: 'line',
           data: [],
           yAxisID: 'yAxis',
-          borderWidth: 0,
-          borderColor: r.color,
-          backgroundColor: r.color,
+          pointRadius: r.lineWidth,
+          pointBorderWidth: 0,
+          pointBorderColor: "none",
+          pointBackgroundColor: r.color,
+          pointStyle: 'triangle',
+          pointRotation: 0,
+          showLine: false,
           order: r.order
         };
+        return triUpDataset;
 
-        // add stack, if specified
-        if (c.stack) {
-          barDataset.stack = c.stack;
-        }
-
-        return barDataset;
+      case 'triangle-down':
+        const triDnDataset: ChartDataset = {
+          label: r.label,
+          type: 'line',
+          data: [],
+          yAxisID: 'yAxis',
+          pointRadius: r.lineWidth,
+          pointBorderWidth: 0,
+          pointBorderColor: "none",
+          pointBackgroundColor: r.color,
+          pointStyle: 'triangle',
+          pointRotation: 180,
+          showLine: false,
+          order: r.order
+        };
+        return triDnDataset;
     }
   }
 
