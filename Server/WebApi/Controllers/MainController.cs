@@ -8,6 +8,7 @@ namespace WebApi.Controllers;
 [Route("")]
 public class MainController : ControllerBase
 {
+    // GLOBALS
     internal static readonly int limitLast = 120;
 
     [HttpGet]
