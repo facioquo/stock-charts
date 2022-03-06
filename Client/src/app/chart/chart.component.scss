@@ -24,8 +24,9 @@
   margin: auto;
   border-style: none;
   border-width: 0;
-  // max-width: 850px;
   height: 15vh;
+
+  // max-width: 850px; // for doc site only
 
   @media (max-height: 800px){
     height: 20vh;
