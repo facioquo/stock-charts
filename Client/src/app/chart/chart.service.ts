@@ -214,11 +214,19 @@ export class ChartService {
     };
 
     // remove first and last y-axis labels
-    config.options.scales.yAxis.ticks.callback = (value, index, values) => {
+    config.options.scales.yAxis.ticks.callback = (value: number, index, values) => {
 
       this.yAxisTicks = values;
 
       if (index === 0 || index === values.length - 1) return null;
+      else if (value > 10000000000) {
+        return value / 1000000000 + "B";
+      }
+      else if (value > 10000000) {
+        return value / 1000000 + "M";
+      }
+      else if (value > 10000)
+        return value / 1000 + "K";
       else
         return value;
     };
