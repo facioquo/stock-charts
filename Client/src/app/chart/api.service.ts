@@ -35,6 +35,10 @@ export class ApiService {
 
   getSelectionData(selection: IndicatorSelection, listing: IndicatorListing): Observable<any> {
 
+    const green = "#2E7D32";
+    const red = "#DD2C00";
+    const gray = "#9E9E9E";
+
     const obs = new Observable((observer) => {
 
       // compose url
@@ -58,27 +62,49 @@ export class ApiService {
                 const config = listing.results.find(x => x.dataName == result.dataName);
                 const dataset = this.initializeDataset(result, config);
                 const data: ScatterDataPoint[] = [];
+                const pointColor: string[] = [];
+                const pointRotation: number[] = [];
 
                 // populate data
                 apidata.forEach(row => {
 
                   let yValue = row[result.dataName];
 
-                  // apply candle offset
-                  if (yValue && config.candleOffset !== 0) {
+                  // apply candle pointers
+                  if (yValue && listing.category == "candlestick-pattern") {
 
-                    console.log("candle", row["candle"].high);
+                    console.log("candle", row["signal"]);
+                    switch (row["signal"]) {
 
-                    yValue = config.candleOffset > 0
-                      ? (1 + config.candleOffset/100) * row["candle"].high
-                      : (1 + config.candleOffset/100) * row["candle"].low;
+                      case -100:
+                        yValue = 1.01 * row["candle"].high;
+                        pointColor.push(red);
+                        pointRotation.push(180);
+                        break;
+
+                      case 100:
+                        yValue = 0.99 * row["candle"].low;
+                        pointColor.push(green);
+                        pointRotation.push(0);
+                        break;
+
+                      default:
+                        yValue = 0.99 * row["candle"].low;
+                        pointColor.push(gray);
+                        pointRotation.push(0);
+                        break;
+                    }
                   }
 
-                  data
-                    .push({
-                      x: new Date(row.date).valueOf(),
-                      y: yValue
-                    });
+                  else {
+                    pointColor.push(config.defaultColor);
+                    pointRotation.push(0);
+                  }
+
+                  data.push({
+                    x: new Date(row.date).valueOf(),
+                    y: yValue
+                  });
                 });
 
                 // add extra bars
@@ -90,6 +116,13 @@ export class ApiService {
                     x: new Date(nextDate).valueOf(),
                     y: null
                   });
+                }
+
+                // custom candlestick pattern points
+                if (listing.category == "candlestick-pattern") {
+                  dataset.pointRotation = pointRotation;
+                  dataset.pointBackgroundColor = pointColor;
+                  dataset.pointBorderColor = pointColor;
                 }
 
                 dataset.data = data;
@@ -163,39 +196,22 @@ export class ApiService {
         };
         return dotsDataset;
 
-      case 'triangle-up':
-        const triUpDataset: ChartDataset = {
+      case 'pointer':
+        const ptDataset: ChartDataset = {
           label: r.label,
           type: 'line',
           data: [],
           yAxisID: 'yAxis',
           pointRadius: r.lineWidth,
           pointBorderWidth: 0,
-          pointBorderColor: "none",
+          pointBorderColor: r.color,
           pointBackgroundColor: r.color,
           pointStyle: 'triangle',
           pointRotation: 0,
           showLine: false,
           order: r.order
         };
-        return triUpDataset;
-
-      case 'triangle-down':
-        const triDnDataset: ChartDataset = {
-          label: r.label,
-          type: 'line',
-          data: [],
-          yAxisID: 'yAxis',
-          pointRadius: r.lineWidth,
-          pointBorderWidth: 0,
-          pointBorderColor: "none",
-          pointBackgroundColor: r.color,
-          pointStyle: 'triangle',
-          pointRotation: 180,
-          showLine: false,
-          order: r.order
-        };
-        return triDnDataset;
+        return ptDataset;
     }
   }
 

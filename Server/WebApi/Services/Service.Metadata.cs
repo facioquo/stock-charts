@@ -627,10 +627,9 @@ public static class Metadata
                         DisplayName = "Doji",
                         DataName = "price",
                         DataType = "number",
-                        LineType = "triangle-up",
+                        LineType = "pointer",
                         LineWidth = 8,
-                        CandleOffset = -1,
-                        DefaultColor = standardOrange
+                        DefaultColor = darkGray
                     }
                 }
             },
@@ -1051,10 +1050,9 @@ public static class Metadata
                         DisplayName = "Marubozu",
                         DataName = "price",
                         DataType = "number",
-                        LineType = "triangle-up",
+                        LineType = "pointer",
                         LineWidth = 8,
-                        CandleOffset = -1,
-                        DefaultColor = standardOrange
+                        DefaultColor = darkGray
                     }
                 }
             },
