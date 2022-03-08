@@ -20,6 +20,10 @@ mat-toolbar {
     &:active,
     &:hover,
     &:visited {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+
       color: unset;
     }
   }

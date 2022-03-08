@@ -244,6 +244,26 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("DOJI")]
+    public IActionResult GetDoji(
+        double maxPriceChangePercent = 0.001)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<CandleResult> results =
+                quotes.GetDoji(maxPriceChangePercent)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("DONCHIAN")]
     public IActionResult GetDonchian(
         int lookbackPeriods = 20)
@@ -466,6 +486,26 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("MARUBOZU")]
+    public IActionResult GetMarubozu(
+        double minBodyPercent = 0.95)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<CandleResult> results =
+                quotes.GetMarubozu(minBodyPercent)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("MFI")]
     public IActionResult GetMfi(
         int lookbackPeriods)
@@ -588,6 +628,29 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("SMI")]
+    public IActionResult GetSmi(
+        int lookbackPeriods = 10,
+        int firstSmoothPeriods = 3,
+        int secondSmoothPeriods = 3,
+        int signalPeriods = 3)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<SmiResult> results =
+                quotes.GetSmi(lookbackPeriods, firstSmoothPeriods, secondSmoothPeriods, signalPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("STC")]
     public IActionResult GetStc(
         int cyclePeriods = 10,
@@ -600,6 +663,28 @@ public class MainController : ControllerBase
 
             IEnumerable<StcResult> results =
                 quotes.GetStc(cyclePeriods, fastPeriods, slowPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("STARC")]
+    public IActionResult GetStarc(
+        int smaPeriods = 5,
+        decimal multiplier = 2,
+        int atrPeriods = 10)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<StarcBandsResult> results =
+                quotes.GetStarcBands(smaPeriods, multiplier, atrPeriods)
                       .TakeLast(limitLast);
 
             return Ok(results);

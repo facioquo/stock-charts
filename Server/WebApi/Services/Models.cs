@@ -46,6 +46,7 @@ public class IndicatorResultConfig
     public string Stack { get; set; }
     public float LineWidth { get; set; } = 2;
     public string DefaultColor { get; set; }
+    public double CandleOffset { get; set; }
     public ChartFill Fill { get; set; }
 
 }
