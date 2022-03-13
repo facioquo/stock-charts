@@ -346,7 +346,7 @@ export class ChartService {
         next: () => {
 
           // add needed charts
-          if (selection.chartType == 'overlay') {
+          if (listing.chartType == 'overlay') {
             this.addSelectionToOverlayChart(selection, scrollToMe);
           }
           else {
