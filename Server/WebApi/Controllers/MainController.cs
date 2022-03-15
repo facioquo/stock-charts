@@ -19,7 +19,7 @@ public class MainController : ControllerBase
 
     [HttpGet("quotes")]
     public IActionResult GetQuotes(
-        string symbol = "QQQ",
+        string symbol = "SPY",
         string timeSpan = "DAILY")
     {
         IEnumerable<Quote> quotes = FetchQuotes.Get(symbol, timeSpan);
