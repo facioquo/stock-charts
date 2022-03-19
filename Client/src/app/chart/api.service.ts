@@ -119,7 +119,7 @@ export class ApiService {
                 }
 
                 // custom candlestick pattern points
-                if (listing.category == "candlestick-pattern") {
+                if (listing.category == "candlestick-pattern" && dataset.type != 'bar') {
                   dataset.pointRotation = pointRotation;
                   dataset.pointBackgroundColor = pointColor;
                   dataset.pointBorderColor = pointColor;
@@ -195,6 +195,24 @@ export class ApiService {
           order: r.order
         };
         return dotsDataset;
+
+      case 'bar':
+        const barDataset: ChartDataset = {
+          label: r.label,
+          type: 'bar',
+          data: [],
+          yAxisID: 'yAxis',
+          borderWidth: 0,
+          borderColor: r.color,
+          backgroundColor: r.color,
+          order: r.order
+        };
+
+        // add stack, if specified
+        if (c.stack) {
+          barDataset.stack = c.stack;
+        }
+        return barDataset;
 
       case 'pointer':
         const ptDataset: ChartDataset = {
