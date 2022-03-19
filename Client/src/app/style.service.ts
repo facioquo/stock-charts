@@ -17,7 +17,7 @@ export class StyleService {
     const checked = localStorage.getItem("isDark");
 
     // if not cached, cache default value (above)
-    if (checked == undefined || checked == null) {
+    if (checked == undefined) {
       localStorage.setItem("isDark", this.isDarkTheme.valueOf().toString())
     }
 

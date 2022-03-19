@@ -71,10 +71,10 @@ export class PickFormComponent {
 
   onSubmit(): void {
 
-    this.dialogRef.close;
+    // TODO: do a trial GET and catch 400 error and do not Close, present error to correct
+    // e.g. when MACD fast > slow periods, see issue #192, then do Close and "addSelection"
 
-    // TODO: catch 400 error and do not close, present error to correct
-    // e.g. when MACD fast > slow periods, see issue #192
+    this.dialogRef.close;
     this.cs.addSelection(this.selection, true);
   }
 

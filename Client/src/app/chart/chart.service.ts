@@ -9,7 +9,6 @@ import 'chartjs-adapter-date-fns';
 import 'chartjs-chart-financial';
 
 import { enUS } from 'date-fns/locale';
-import { add, parseISO } from 'date-fns';
 import { Guid } from "guid-typescript";
 
 import {
@@ -486,7 +485,7 @@ export class ChartService {
 
     // create chart container
     const container = document.createElement('div') as HTMLDivElement;
-    container.id = containerId
+    container.id = containerId;
     container.className = "chart-oscillator-container";
 
     // add chart
