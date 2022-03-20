@@ -314,48 +314,42 @@ export class ChartService {
     return selection;
   }
 
-  selectionTokenReplacement(selection: IndicatorSelection): IndicatorSelection {
-
-    selection.params.forEach((param, index) => {
-
-      selection.label = selection.label.replace(`[P${index + 1}]`, param.value.toString());
-
-      selection.results.forEach(r => {
-        r.label = r.label.replace(`[P${index + 1}]`, param.value.toString());
-      });
-    });
-    return selection;
-  }
-
-  addSelection(
-    selection: IndicatorSelection,
-    scrollToMe: boolean) {
-
-    // replace tokens
-    selection = this.selectionTokenReplacement(selection);
-
-    // add to collection
-    this.selections.push(selection);
+  addSelectionWithoutScroll(
+    selection: IndicatorSelection
+  ) {
 
     // lookup config data
     const listing = this.listings.find(x => x.uiid == selection.uiid);
 
-    this.api.getSelectionData(selection, listing)
+    this.api.getSelection(selection, listing)
       .subscribe({
-        next: () => {
+        next: (selectionWithData: IndicatorSelection) => {
 
-          // add needed charts
-          if (listing.chartType == 'overlay') {
-            this.addSelectionToOverlayChart(selection, scrollToMe);
-          }
-          else {
-            this.addSelectionToNewChart(selection, listing, scrollToMe);
-          };
-
-          this.cacheSelections();
+          this.displaySelection(selectionWithData, listing, false);
         },
         error: (e: HttpErrorResponse) => { console.log(e); }
       });
+  }
+
+  displaySelection(
+    selection: IndicatorSelection,
+    listing: IndicatorListing,
+    scrollToMe: boolean
+  ) {
+
+    // add to collection
+    this.selections.push(selection);
+
+    // add needed charts
+    if (listing.chartType == 'overlay') {
+      this.addSelectionToOverlayChart(selection, scrollToMe);
+    }
+    else {
+      this.addSelectionToNewChart(selection, listing, scrollToMe);
+    };
+
+    this.cacheSelections();
+
   }
 
   deleteSelection(ucid: string) {
@@ -684,29 +678,29 @@ export class ChartService {
 
     if (selections) {
       selections.forEach((selection: IndicatorSelection) => {
-        this.addSelection(selection, false);
+        this.addSelectionWithoutScroll(selection);
       });
     }
     else { // add defaults
       const def1 = this.defaultSelection("LINEAR");
       def1.params.find(x => x.paramName == "lookbackPeriods").value = 50;
-      this.addSelection(def1, false);
+      this.addSelectionWithoutScroll(def1);
 
       const def2 = this.defaultSelection("BB");
-      this.addSelection(def2, false);
+      this.addSelectionWithoutScroll(def2);
 
       const def3 = this.defaultSelection("RSI");
       def3.params.find(x => x.paramName == "lookbackPeriods").value = 5;
-      this.addSelection(def3, false);
+      this.addSelectionWithoutScroll(def3);
 
       const def4 = this.defaultSelection("ADX");
-      this.addSelection(def4, false);
+      this.addSelectionWithoutScroll(def4);
 
       const def5 = this.defaultSelection("SUPERTREND");
-      this.addSelection(def5, false);
+      this.addSelectionWithoutScroll(def5);
 
       const def6 = this.defaultSelection("MACD");
-      this.addSelection(def6, false);
+      this.addSelectionWithoutScroll(def6);
     }
   }
 

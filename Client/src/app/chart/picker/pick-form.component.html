@@ -63,14 +63,18 @@
       </mat-tab>
     </mat-tab-group>
 
+    <div class="error" *ngIf="errorMessage">
+      <p><small>Please correct the following error:</small></p>
+      <p class="font-warn">{{errorMessage}}</p>
+    </div>
+
   </div>
 
   <!-- action pane -->
   <div mat-dialog-actions>
     <button mat-button mat-dialog-close>Cancel</button>
-    <button mat-raised-button cdkFocusInitial (click)="onSubmit()" color="accent" [mat-dialog-close]="selection"
-      [disabled]="paramForm.invalid">
-      Add
+    <button mat-raised-button cdkFocusInitial (click)="onSubmit()" color="accent" [disabled]="paramForm.invalid">
+      {{closeButtonLabel}}
     </button>
   </div>
 </form>

@@ -33,7 +33,7 @@ export class ApiService {
     return this.http.get(`${env.api}/indicators`, this.requestHeader());
   }
 
-  getSelectionData(selection: IndicatorSelection, listing: IndicatorListing): Observable<any> {
+  getSelection(selection: IndicatorSelection, listing: IndicatorListing): Observable<any> {
 
     const green = "#2E7D32";
     const red = "#DD2C00";
@@ -129,7 +129,10 @@ export class ApiService {
                 result.dataset = dataset;
               });
 
-            observer.next(selection.results);
+            // replace tokens with values
+            selection = this.selectionTokenReplacement(selection);
+
+            observer.next(selection);
           },
 
           error: (e: HttpErrorResponse) => {
@@ -241,4 +244,18 @@ export class ApiService {
 
     return { headers: simpleHeaders };
   }
+
+  selectionTokenReplacement(selection: IndicatorSelection): IndicatorSelection {
+
+    selection.params.forEach((param, index) => {
+
+      selection.label = selection.label.replace(`[P${index + 1}]`, param.value.toString());
+
+      selection.results.forEach(r => {
+        r.label = r.label.replace(`[P${index + 1}]`, param.value.toString());
+      });
+    });
+    return selection;
+  }
+
 }

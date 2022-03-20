@@ -5,8 +5,10 @@ import { MtxColorpicker } from '@ng-matero/extensions/colorpicker';
 import { ColorEvent } from 'ngx-color';
 import { TinyColor } from '@ctrl/tinycolor';
 
+import { ApiService } from '../api.service';
 import { ChartService } from '../chart.service';
 import { IndicatorListing, IndicatorParam, IndicatorSelection } from '../chart.models';
+import { HttpErrorResponse } from '@angular/common/http';
 
 interface LineWidth {
   name: string;
@@ -20,12 +22,15 @@ interface LineStyle {
 
 @Component({
   selector: 'app-listing',
-  templateUrl: 'pick-form.component.html'
+  templateUrl: 'pick-form.component.html',
+  styleUrls: ['pick-form.component.scss']
 })
 export class PickFormComponent {
 
   selection: IndicatorSelection;
   customPicker: MtxColorpicker;
+  errorMessage: string;
+  closeButtonLabel = "Add";
 
   presetColors: string[] = [
     '#DD2C00', // deep orange A700 (red)
@@ -61,7 +66,8 @@ export class PickFormComponent {
     @Inject(MAT_DIALOG_DATA)
     public listing: IndicatorListing,
     private dialogRef: MatDialogRef<PickFormComponent>,
-    private cs: ChartService
+    private cs: ChartService,
+    private api: ApiService
   ) {
 
     // pre-populate selection
@@ -71,11 +77,21 @@ export class PickFormComponent {
 
   onSubmit(): void {
 
-    // TODO: do a trial GET and catch 400 error and do not Close, present error to correct
-    // e.g. when MACD fast > slow periods, see issue #192, then do Close and "addSelection"
+    this.api.getSelection(this.selection, this.listing)
+      .subscribe({
+        next: (selectionWithData: IndicatorSelection) => {
 
-    this.dialogRef.close;
-    this.cs.addSelection(this.selection, true);
+          this.cs.displaySelection(selectionWithData, this.listing, true);
+          this.errorMessage = undefined;
+          this.closeButtonLabel = "Resolved ...";
+          this.dialogRef.close();
+        },
+        error: (e: HttpErrorResponse) => {
+          console.log(e);
+          this.errorMessage = e.error;
+          this.closeButtonLabel = "Retry";
+        }
+      });
   }
 
   onNoClick(): void {
