@@ -20,6 +20,7 @@ public class Jobs
         // for dev: minutely "0 */1 * * * *"
         await StoreQuoteDaily("SPY", log);
         await StoreQuoteDaily("QQQ", log);
+        await StoreQuoteDaily("TSLA", log);
 
         log.LogInformation($"Quotes updated at: {DateTime.Now}, {myTimer.ScheduleStatus}");
     }
@@ -42,7 +43,7 @@ public class Jobs
 
         List<Quote> quotes = new(barSet.Items.Count);
 
-        // compose 
+        // compose
         foreach (IBar bar in barSet.Items)
         {
             Quote q = new()

@@ -9,7 +9,7 @@ namespace WebApi.Services;
 internal static class FetchQuotes
 {
     internal static IEnumerable<Quote> Get(
-        string symbol = "QQQ",
+        string symbol = "TSLA",
         string timeSpan = "DAILY")
     {
         string blobName = $"{symbol}-{timeSpan}.json";
