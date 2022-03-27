@@ -59,7 +59,8 @@ export class PickFormComponent {
   lineStyles: LineStyle[] = [
     { name: "solid", value: "solid" },
     { name: "dashes", value: "dash" },
-    { name: "dots", value: "dots" }
+    { name: "dots", value: "dots" },
+    { name: "bar", value: "bar" }
   ];
 
   constructor(
@@ -72,6 +73,7 @@ export class PickFormComponent {
 
     // pre-populate selection
     this.selection = this.cs.defaultSelection(listing.uiid);
+    console.log(this.selection);
   }
 
 

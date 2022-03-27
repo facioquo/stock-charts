@@ -18,14 +18,14 @@
       </mat-tab>
 
       <mat-tab label="Styles">
-        <div *ngFor="let r of selection.results; index">
+        <div *ngFor="let r of selection.results; index as i">
 
           <h2>{{r.displayName}}</h2>
 
           <!-- color -->
           <mat-form-field [style.width.px]=110>
             <mat-label>Color</mat-label>
-            <input matInput name="color" [mtxColorpicker]="customPicker" [(ngModel)]="r.color" disabled>
+            <input matInput name="color{{i}}" [mtxColorpicker]="customPicker" [(ngModel)]="r.color" disabled>
             <mtx-colorpicker-toggle matSuffix [for]="customPicker" [ngStyle]="{'color':r.color}">
             </mtx-colorpicker-toggle>
             <mtx-colorpicker #customPicker [content]="customPickerContent" disabled="false"></mtx-colorpicker>
@@ -42,9 +42,9 @@
           <!-- style -->
           <mat-form-field [style.width.px]=100 [style.margin-left.px]=8>
             <mat-label>Line style</mat-label>
-            <mat-select name="linetype" [(ngModel)]="r.lineType">
-              <mat-option *ngFor="let s of lineStyles" [value]="s.value">
-                {{s.name}}
+            <mat-select name="linetype{{i}}" [(ngModel)]="r.lineType">
+              <mat-option *ngFor="let style of lineStyles" [value]="style.value">
+                {{style.name}}
               </mat-option>
             </mat-select>
           </mat-form-field>
@@ -52,7 +52,7 @@
           <!-- width -->
           <mat-form-field [style.width.px]=100 [style.margin-left.px]=8>
             <mat-label>Line width</mat-label>
-            <mat-select name="linewidth" [(ngModel)]="r.lineWidth">
+            <mat-select name="linewidth{{i}}" [(ngModel)]="r.lineWidth">
               <mat-option *ngFor="let w of lineWidths" [value]="w.value">
                 {{w.name}}
               </mat-option>

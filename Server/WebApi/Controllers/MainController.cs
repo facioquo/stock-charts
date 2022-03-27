@@ -183,6 +183,28 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("BETA")]
+    public IActionResult GetBeta(
+        int lookbackPeriods = 20,
+        BetaType type = BetaType.All)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> market = FetchQuotes.Get("SPY");
+
+            IEnumerable<BetaResult> results =
+                Indicator.GetBeta(market, quotes, lookbackPeriods, type)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("CHEXIT-LONG")]
     public IActionResult GetChandelierLong(
         int lookbackPeriods,

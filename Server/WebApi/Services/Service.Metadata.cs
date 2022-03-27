@@ -352,6 +352,65 @@ public static class Metadata
                 }
             },
 
+            // Beta
+            new IndicatorList
+            {
+                Name = "Beta",
+                Uiid = "BETA",
+                LegendTemplate = "BETA([P1])",
+                Endpoint = $"{baseUrl}/BETA/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 1,
+                            Color = standardGrayTransparent,
+                            Style = "dash"
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 50,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Beta",
+                        TooltipTemplate = "Beta",
+                        DataName = "beta",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Beta+",
+                        TooltipTemplate = "Beta+",
+                        DataName = "betaUp",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName= "Beta-",
+                        TooltipTemplate = "Beta-",
+                        DataName = "betaDown",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
             // Bollinger Bands
             new IndicatorList
             {
