@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
 
   // PICKERS
   openPickList(): void {
-    const listRef = this.list.open(PickListComponent, {
+    this.list.open(PickListComponent, {
       minWidth: '300px',
       maxHeight: '80vh'
     });
