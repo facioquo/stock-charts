@@ -226,6 +226,8 @@ export class ChartService {
       }
       else if (value > 10000)
         return value / 1000 + "K";
+      else if (value < 10)
+        return Math.round((value+Number.EPSILON)*100000000)/100000000;
       else
         return value;
     };

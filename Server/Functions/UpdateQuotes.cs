@@ -20,7 +20,6 @@ public class Jobs
         // for dev: minutely "0 */1 * * * *"
         await StoreQuoteDaily("SPY", log);
         await StoreQuoteDaily("QQQ", log);
-        await StoreQuoteDaily("TSLA", log);
 
         log.LogInformation($"Quotes updated at: {DateTime.Now}, {myTimer.ScheduleStatus}");
     }

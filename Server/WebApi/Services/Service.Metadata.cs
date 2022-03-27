@@ -517,7 +517,7 @@ public static class Metadata
                 }
             },
 
-            // Beta
+            // Chaikin Money Flow
             new IndicatorList
             {
                 Name = "Chaikin Money Flow (CMF)",
