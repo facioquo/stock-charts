@@ -5,8 +5,10 @@ import { MtxColorpicker } from '@ng-matero/extensions/colorpicker';
 import { ColorEvent } from 'ngx-color';
 import { TinyColor } from '@ctrl/tinycolor';
 
+import { ApiService } from '../api.service';
 import { ChartService } from '../chart.service';
 import { IndicatorListing, IndicatorParam, IndicatorSelection } from '../chart.models';
+import { HttpErrorResponse } from '@angular/common/http';
 
 interface LineWidth {
   name: string;
@@ -20,12 +22,15 @@ interface LineStyle {
 
 @Component({
   selector: 'app-listing',
-  templateUrl: 'pick-form.component.html'
+  templateUrl: 'pick-form.component.html',
+  styleUrls: ['pick-form.component.scss']
 })
 export class PickFormComponent {
 
   selection: IndicatorSelection;
   customPicker: MtxColorpicker;
+  errorMessage: string;
+  closeButtonLabel = "Add";
 
   presetColors: string[] = [
     '#DD2C00', // deep orange A700 (red)
@@ -54,14 +59,16 @@ export class PickFormComponent {
   lineStyles: LineStyle[] = [
     { name: "solid", value: "solid" },
     { name: "dashes", value: "dash" },
-    { name: "dots", value: "dots" }
+    { name: "dots", value: "dots" },
+    { name: "bar", value: "bar" }
   ];
 
   constructor(
     @Inject(MAT_DIALOG_DATA)
     public listing: IndicatorListing,
     private dialogRef: MatDialogRef<PickFormComponent>,
-    private cs: ChartService
+    private cs: ChartService,
+    private api: ApiService
   ) {
 
     // pre-populate selection
@@ -71,11 +78,21 @@ export class PickFormComponent {
 
   onSubmit(): void {
 
-    this.dialogRef.close;
+    this.api.getSelection(this.selection, this.listing)
+      .subscribe({
+        next: (selectionWithData: IndicatorSelection) => {
 
-    // TODO: catch 400 error and do not close, present error to correct
-    // e.g. when MACD fast > slow periods, see issue #192
-    this.cs.addSelection(this.selection, true);
+          this.cs.displaySelection(selectionWithData, this.listing, true);
+          this.errorMessage = undefined;
+          this.closeButtonLabel = "Resolved ...";
+          this.dialogRef.close();
+        },
+        error: (e: HttpErrorResponse) => {
+          console.log(e);
+          this.errorMessage = e.error;
+          this.closeButtonLabel = "Retry";
+        }
+      });
   }
 
   onNoClick(): void {
