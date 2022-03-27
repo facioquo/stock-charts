@@ -517,6 +517,49 @@ public static class Metadata
                 }
             },
 
+            // Beta
+            new IndicatorList
+            {
+                Name = "Chaikin Money Flow (CMF)",
+                Uiid = "CMF",
+                LegendTemplate = "CMF([P1])",
+                Endpoint = $"{baseUrl}/CMF/",
+                Category = "volume-based",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 0,
+                            Color = standardGrayTransparent,
+                            Style = "dash"
+                        }
+                    }
+                },
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "CMF",
+                        TooltipTemplate = "Chaikin Money Flow",
+                        DataName = "cmf",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Chandelier Exit (long)
             new IndicatorList
             {

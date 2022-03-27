@@ -267,6 +267,26 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("CMF")]
+    public IActionResult GetCmf(
+        int lookbackPeriods = 20)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<CmfResult> results =
+                quotes.GetCmf(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("DOJI")]
     public IActionResult GetDoji(
         double maxPriceChangePercent = 0.001)
