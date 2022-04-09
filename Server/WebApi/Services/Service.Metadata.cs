@@ -173,7 +173,7 @@ public static class Metadata
                         DataName = "alma",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardOrange
+                        DefaultColor = standardBlue
                     }
                 }
             },
@@ -486,6 +486,34 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/BB/",
                 Category = "oscillator",
                 ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    Thresholds = new List<ChartThreshold>
+                    {
+                        new ChartThreshold {
+                            Value = 1,
+                            Color = thresholdRed,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = thresholdGreen
+                            }
+                        },
+                        new ChartThreshold {
+                            Value = 0,
+                            Color = thresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+1",
+                                ColorAbove = thresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    }
+                },
                 Parameters = new List<IndicatorParamConfig>
                 {
                     new IndicatorParamConfig {
@@ -651,8 +679,8 @@ public static class Metadata
                 ChartType = "oscillator",
                 ChartConfig = new ChartConfig
                 {
-                    MinimumYAxis = 0,
-                    MaximumYAxis = 100,
+                    //MinimumYAxis = 0,
+                    //MaximumYAxis = 100,
 
                     Thresholds = new List<ChartThreshold>
                     {
@@ -1039,7 +1067,7 @@ public static class Metadata
                         DataName = "trendline",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardOrange
+                        DefaultColor = standardBlue
                     },
                     new IndicatorResultConfig {
                         DisplayName = "HT Smoothed Price",
@@ -1047,7 +1075,7 @@ public static class Metadata
                         DataName = "smoothPrice",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = standardOrange
                     }
                 }
             },
@@ -2261,6 +2289,22 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Zig Zag Retrace High",
+                        TooltipTemplate = "ZIGZAG([P1]% CLOSE) Retrace High",
+                        DataName = "retraceHigh",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = standardGrayTransparent
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Zig Zag Retrace Low",
+                        TooltipTemplate = "ZIGZAG([P1]% CLOSE) Retrace Low",
+                        DataName = "retraceLow",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = standardGrayTransparent
                     }
                 }
             },
@@ -2293,6 +2337,22 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardBlue
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Zig Zag Retrace High",
+                        TooltipTemplate = "ZIGZAG([P1]% HIGH/LOW) Retrace High",
+                        DataName = "retraceHigh",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = standardGrayTransparent
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Zig Zag Retrace Low",
+                        TooltipTemplate = "ZIGZAG([P1]% HIGH/LOW) Retrace Low",
+                        DataName = "retraceLow",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = standardGrayTransparent
                     }
                 }
             }

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { StyleService } from './style.service';
 
 import { PickListComponent } from './chart/picker/pick-list.component';
@@ -11,8 +10,6 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-
-  faGithub = faGithub;
 
   constructor(
     public readonly ts: StyleService,
