@@ -2292,7 +2292,7 @@ public static class Metadata
                     },
                     new IndicatorResultConfig {
                         DisplayName = "Zig Zag Retrace High",
-                        TooltipTemplate = "ZIGZAG([P1]% HIGH/LOW) Retrace High",
+                        TooltipTemplate = "ZIGZAG([P1]% CLOSE) Retrace High",
                         DataName = "retraceHigh",
                         DataType = "number",
                         LineType = "dash",
@@ -2300,7 +2300,7 @@ public static class Metadata
                     },
                     new IndicatorResultConfig {
                         DisplayName = "Zig Zag Retrace Low",
-                        TooltipTemplate = "ZIGZAG([P1]% HIGH/LOW) Retrace Low",
+                        TooltipTemplate = "ZIGZAG([P1]% CLOSE) Retrace Low",
                         DataName = "retraceLow",
                         DataType = "number",
                         LineType = "dash",
