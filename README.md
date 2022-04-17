@@ -49,6 +49,16 @@ If you want to host on your local computer and review the source code, follow th
 
     The web application should launch automatically.
 
+### Azurite Storage Emulator
+
+If you intend to use the local Azure storage emulator to get and store local quote Blob data, you'll need to set some local Environment variables:
+
+``` bash
+setx AlpacaApiKey "ALPACA_API_KEY"
+setx AlpacaSecret "ALPACA_SECRET"
+setx AzureWebJobsStorage "UseDevelopmentStorage=true"
+```
+
 ## Troubleshooting
 
 If the [Server] Web API does not launch, right-click the Solution and "Restore NuGet Packages"; then, try to Rebuild the entire Solution in Visual Studio.  Make sure the WebApi project is highlighted (bold font), then try `CTRL+F5` again.

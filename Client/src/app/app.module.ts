@@ -8,8 +8,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-
 import { AppComponent } from './app.component';
 import { StyleService } from './style.service';
 import { ChartModule } from './chart/chart.module';
@@ -30,9 +28,6 @@ import { ChartModule } from './chart/chart.module';
     MatIconModule,
     MatToolbarModule,
     MatTooltipModule,
-
-    // Other
-    FontAwesomeModule,
 
     // Application
     ChartModule

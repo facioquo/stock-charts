@@ -33,7 +33,11 @@ export class ApiService {
     return this.http.get(`${env.api}/indicators`, this.requestHeader());
   }
 
-  getSelectionData(selection: IndicatorSelection, listing: IndicatorListing): Observable<any> {
+  getSelection(selection: IndicatorSelection, listing: IndicatorListing): Observable<any> {
+
+    const green = "#2E7D32";
+    const red = "#DD2C00";
+    const gray = "#9E9E9E";
 
     const obs = new Observable((observer) => {
 
@@ -58,27 +62,49 @@ export class ApiService {
                 const config = listing.results.find(x => x.dataName == result.dataName);
                 const dataset = this.initializeDataset(result, config);
                 const data: ScatterDataPoint[] = [];
+                const pointColor: string[] = [];
+                const pointRotation: number[] = [];
 
                 // populate data
                 apidata.forEach(row => {
 
                   let yValue = row[result.dataName];
 
-                  // apply candle offset
-                  if (yValue && config.candleOffset !== 0) {
+                  // apply candle pointers
+                  if (yValue && listing.category == "candlestick-pattern") {
 
-                    console.log("candle", row["candle"].high);
+                    console.log("candle", row["signal"]);
+                    switch (row["signal"]) {
 
-                    yValue = config.candleOffset > 0
-                      ? (1 + config.candleOffset/100) * row["candle"].high
-                      : (1 + config.candleOffset/100) * row["candle"].low;
+                      case -100:
+                        yValue = 1.01 * row["candle"].high;
+                        pointColor.push(red);
+                        pointRotation.push(180);
+                        break;
+
+                      case 100:
+                        yValue = 0.99 * row["candle"].low;
+                        pointColor.push(green);
+                        pointRotation.push(0);
+                        break;
+
+                      default:
+                        yValue = 0.99 * row["candle"].low;
+                        pointColor.push(gray);
+                        pointRotation.push(0);
+                        break;
+                    }
                   }
 
-                  data
-                    .push({
-                      x: new Date(row.date).valueOf(),
-                      y: yValue
-                    });
+                  else {
+                    pointColor.push(config.defaultColor);
+                    pointRotation.push(0);
+                  }
+
+                  data.push({
+                    x: new Date(row.date).valueOf(),
+                    y: yValue
+                  });
                 });
 
                 // add extra bars
@@ -92,11 +118,21 @@ export class ApiService {
                   });
                 }
 
+                // custom candlestick pattern points
+                if (listing.category == "candlestick-pattern" && dataset.type != 'bar') {
+                  dataset.pointRotation = pointRotation;
+                  dataset.pointBackgroundColor = pointColor;
+                  dataset.pointBorderColor = pointColor;
+                }
+
                 dataset.data = data;
                 result.dataset = dataset;
               });
 
-            observer.next(selection.results);
+            // replace tokens with values
+            selection = this.selectionTokenReplacement(selection);
+
+            observer.next(selection);
           },
 
           error: (e: HttpErrorResponse) => {
@@ -163,39 +199,40 @@ export class ApiService {
         };
         return dotsDataset;
 
-      case 'triangle-up':
-        const triUpDataset: ChartDataset = {
+      case 'bar':
+        const barDataset: ChartDataset = {
+          label: r.label,
+          type: 'bar',
+          data: [],
+          yAxisID: 'yAxis',
+          borderWidth: 0,
+          borderColor: r.color,
+          backgroundColor: r.color,
+          order: r.order
+        };
+
+        // add stack, if specified
+        if (c.stack) {
+          barDataset.stack = c.stack;
+        }
+        return barDataset;
+
+      case 'pointer':
+        const ptDataset: ChartDataset = {
           label: r.label,
           type: 'line',
           data: [],
           yAxisID: 'yAxis',
           pointRadius: r.lineWidth,
           pointBorderWidth: 0,
-          pointBorderColor: "none",
+          pointBorderColor: r.color,
           pointBackgroundColor: r.color,
           pointStyle: 'triangle',
           pointRotation: 0,
           showLine: false,
           order: r.order
         };
-        return triUpDataset;
-
-      case 'triangle-down':
-        const triDnDataset: ChartDataset = {
-          label: r.label,
-          type: 'line',
-          data: [],
-          yAxisID: 'yAxis',
-          pointRadius: r.lineWidth,
-          pointBorderWidth: 0,
-          pointBorderColor: "none",
-          pointBackgroundColor: r.color,
-          pointStyle: 'triangle',
-          pointRotation: 180,
-          showLine: false,
-          order: r.order
-        };
-        return triDnDataset;
+        return ptDataset;
     }
   }
 
@@ -207,4 +244,18 @@ export class ApiService {
 
     return { headers: simpleHeaders };
   }
+
+  selectionTokenReplacement(selection: IndicatorSelection): IndicatorSelection {
+
+    selection.params.forEach((param, index) => {
+
+      selection.label = selection.label.replace(`[P${index + 1}]`, param.value.toString());
+
+      selection.results.forEach(r => {
+        r.label = r.label.replace(`[P${index + 1}]`, param.value.toString());
+      });
+    });
+    return selection;
+  }
+
 }

@@ -42,7 +42,7 @@ public class Jobs
 
         List<Quote> quotes = new(barSet.Items.Count);
 
-        // compose 
+        // compose
         foreach (IBar bar in barSet.Items)
         {
             Quote q = new()
