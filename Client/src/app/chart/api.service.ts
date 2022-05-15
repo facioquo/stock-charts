@@ -73,8 +73,7 @@ export class ApiService {
                   // apply candle pointers
                   if (yValue && listing.category == "candlestick-pattern") {
 
-                    console.log("candle", row["signal"]);
-                    switch (row["signal"]) {
+                    switch (row["match"]) {
 
                       case -100:
                         yValue = 1.01 * row["candle"].high;
