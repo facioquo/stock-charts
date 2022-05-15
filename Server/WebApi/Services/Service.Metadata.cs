@@ -736,24 +736,24 @@ public static class Metadata
             {
                 Name = "Doji",
                 Uiid = "DOJI",
-                LegendTemplate = "DOJI([P1])",
+                LegendTemplate = "DOJI([P1]%)",
                 Endpoint = $"{baseUrl}/DOJI/",
                 Category = "candlestick-pattern",
                 ChartType = "overlay",
                 Parameters = new List<IndicatorParamConfig>
                 {
                     new IndicatorParamConfig {
-                        DisplayName = "Max Price Change % (decimalized)",
+                        DisplayName = "Max Price Change %",
                         ParamName = "maxPriceChangePercent",
                         DataType = "number",
-                        DefaultValue = 0.001,
+                        DefaultValue = 0.1,
                         Minimum = 0,
-                        Maximum = 0.005
+                        Maximum = 0.5
                     }
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        TooltipTemplate = "DOJI([P1])",
+                        TooltipTemplate = "DOJI([P1]%)",
                         DisplayName = "Doji",
                         DataName = "price",
                         DataType = "number",
@@ -1159,24 +1159,24 @@ public static class Metadata
             {
                 Name = "Marubozu",
                 Uiid = "MARUBOZU",
-                LegendTemplate = "MARUBOZU([P1])",
+                LegendTemplate = "MARUBOZU([P1]%)",
                 Endpoint = $"{baseUrl}/MARUBOZU/",
                 Category = "candlestick-pattern",
                 ChartType = "overlay",
                 Parameters = new List<IndicatorParamConfig>
                 {
                     new IndicatorParamConfig {
-                        DisplayName = "Min Body Percent % (decimalized)",
+                        DisplayName = "Min Body Percent %",
                         ParamName = "minBodyPercent",
                         DataType = "number",
-                        DefaultValue = 0.9,
-                        Minimum = 0.8,
-                        Maximum = 1
+                        DefaultValue = 90,
+                        Minimum = 80,
+                        Maximum = 100
                     }
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        TooltipTemplate = "MARUBOZU([P1])",
+                        TooltipTemplate = "MARUBOZU([P1]%)",
                         DisplayName = "Marubozu",
                         DataName = "price",
                         DataType = "number",
