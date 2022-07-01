@@ -6,7 +6,7 @@ This is a demo of the [Skender.Stock.Indicators](https://www.nuget.org/packages/
 
 Live demo site: [https://stock-charts.azurewebsites.net](https://stock-charts.azurewebsites.net/)
 
-![image](docs/screenshot.png)
+![image](https://raw.githubusercontent.com/DaveSkender/Stock.Indicators/main/docs/examples.png)
 
 ## Author's note
 
