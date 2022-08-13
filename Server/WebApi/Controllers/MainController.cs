@@ -194,7 +194,7 @@ public class MainController : ControllerBase
             IEnumerable<Quote> market = FetchQuotes.Get("SPY");
 
             IEnumerable<BetaResult> results =
-                Indicator.GetBeta(market, quotes, lookbackPeriods, type)
+                quotes.GetBeta(market, lookbackPeriods, type)
                       .TakeLast(limitLast);
 
             return Ok(results);
@@ -488,7 +488,7 @@ public class MainController : ControllerBase
     [HttpGet("KELTNER")]
     public IActionResult GetKeltner(
         int emaPeriods = 20,
-        decimal multiplier = 2,
+        double multiplier = 2,
         int atrPeriods = 10)
     {
         try
@@ -571,8 +571,8 @@ public class MainController : ControllerBase
 
     [HttpGet("PSAR")]
     public IActionResult GetParabolicSar(
-        decimal accelerationStep = 0.02m,
-        decimal maxAccelerationFactor = 0.2m)
+        double accelerationStep = 0.02,
+        double maxAccelerationFactor = 0.2)
     {
         try
         {
@@ -719,7 +719,7 @@ public class MainController : ControllerBase
     [HttpGet("STARC")]
     public IActionResult GetStarc(
         int smaPeriods = 5,
-        decimal multiplier = 2,
+        double multiplier = 2,
         int atrPeriods = 10)
     {
         try
