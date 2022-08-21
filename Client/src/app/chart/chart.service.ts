@@ -111,7 +111,6 @@ export class ChartService {
           },
           annotation: {
             clip: false,
-            drawTime: 'afterDraw',
             annotations: []
           }
         },
