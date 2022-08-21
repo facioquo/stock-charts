@@ -822,6 +822,38 @@ public static class Metadata
                 }
             },
 
+            // Dynamic, McGinley
+            new IndicatorList
+            {
+                Name = "McGinley Dynamic",
+                Uiid = "DYN",
+                LegendTemplate = "DYNAMIC([P1])",
+                Endpoint = $"{baseUrl}/DYN/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Dynamic",
+                        TooltipTemplate = "DYNAMIC([P1])",
+                        DataName = "dynamic",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Elder-ray
             new IndicatorList
             {

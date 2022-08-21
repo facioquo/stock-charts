@@ -327,6 +327,26 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("DYN")]
+    public IActionResult GetDynamic(
+    int lookbackPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<DynamicResult> results =
+                quotes.GetDynamic(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("ELDER-RAY")]
     public IActionResult GetElderRay(
         int lookbackPeriods = 13)
