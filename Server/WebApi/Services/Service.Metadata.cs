@@ -319,8 +319,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        TooltipTemplate = "Buy Stop",
-                        DisplayName = "ATR-STOP([P1],[P2],CLOSE) Buy Stop",
+                        DisplayName = "Buy Stop",
+                        TooltipTemplate = "ATR-STOP([P1],[P2],CLOSE) Buy Stop",
                         DataName = "buyStop",
                         DataType = "number",
                         LineType = "solid",
@@ -368,8 +368,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        TooltipTemplate = "Buy Stop",
-                        DisplayName = "ATR-STOP([P1],[P2],HIGH/LOW) Buy Stop",
+                        DisplayName = "Buy Stop",
+                        TooltipTemplate = "ATR-STOP([P1],[P2],HIGH/LOW) Buy Stop",
                         DataName = "buyStop",
                         DataType = "number",
                         LineType = "solid",
@@ -1152,8 +1152,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        TooltipTemplate = "Fractal Bull ([P1])",
                         DisplayName = "Fractal Bull",
+                        TooltipTemplate = "Fractal Bull ([P1])",
                         DataName = "fractalBull",
                         DataType = "number",
                         LineType = "dots",
@@ -1161,8 +1161,8 @@ public static class Metadata
                         DefaultColor = standardRed
                     },
                     new IndicatorResultConfig {
-                        TooltipTemplate = "Fractal Bear ([P1])",
                         DisplayName = "Fractal Bear",
+                        TooltipTemplate = "Fractal Bear ([P1])",
                         DataName = "fractalBear",
                         DataType = "number",
                         LineType = "dots",
@@ -1338,8 +1338,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        TooltipTemplate = "MARUBOZU([P1]%)",
                         DisplayName = "Marubozu",
+                        TooltipTemplate = "MARUBOZU([P1]%)",
                         DataName = "price",
                         DataType = "number",
                         LineType = "pointer",
@@ -1885,8 +1885,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        DisplayName = "Standard Deviation (absolute)",
-                        TooltipTemplate = "Z-Score",
+                        DisplayName = "Z-Score",
+                        TooltipTemplate = "Z-Score([P1])",
                         DataName = "zScore",
                         DataType = "number",
                         LineType = "solid",
@@ -2133,15 +2133,7 @@ public static class Metadata
                         DataType = "number",
                         LineType= "solid",
                         DefaultColor = standardRed
-                    },
-                    //new IndicatorResultConfig {
-                    //    LabelTemplate = "STO %J",
-                    //    DisplayName = "%J",
-                    //    DataName = "j",
-                    //    DataType = "number",
-                    //    LineType = "dash",
-                    //    DefaultColor = standardGreen
-                    //}
+                    }
                 }
             },
 
@@ -2268,8 +2260,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        TooltipTemplate = "Upper Band",
-                        DisplayName = "SUPERTREND([P1],[P2]) Upper Band",
+                        DisplayName = "Upper Band",
+                        TooltipTemplate = "SUPERTREND([P1],[P2]) Upper Band",
                         DataName = "upperBand",
                         DataType = "number",
                         LineType = "solid",
