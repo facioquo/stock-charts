@@ -288,6 +288,104 @@ public static class Metadata
                 }
             },
 
+            // ATR Trailing Stop (Close offset)
+            new IndicatorList
+            {
+                Name = "ATR Trailing Stop (Close offset)",
+                Uiid = "ATR-STOP-CLOSE",
+                LegendTemplate = "ATR-STOP([P1],[P2],CLOSE)",
+                Endpoint = $"{baseUrl}/ATR-STOP-CLOSE/",
+                Category = "price-trend",
+                ChartType = "overlay",
+                Order = Order.Front,
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 21,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Multiplier",
+                        ParamName= "multiplier",
+                        DataType = "number",
+                        DefaultValue = 3,
+                        Minimum = 0.1,
+                        Maximum = 10
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        TooltipTemplate = "Buy Stop",
+                        DisplayName = "ATR-STOP([P1],[P2],CLOSE) Buy Stop",
+                        DataName = "buyStop",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Sell Stop",
+                        TooltipTemplate = "ATR-STOP([P1],[P2],CLOSE) Sell Stop",
+                        DataName = "sellStop",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
+            // ATR Trailing Stop (High/Low offset)
+            new IndicatorList
+            {
+                Name = "ATR Trailing Stop (High/Low offset)",
+                Uiid = "ATR-STOP-HL",
+                LegendTemplate = "ATR-STOP([P1],[P2],HIGH/LOW)",
+                Endpoint = $"{baseUrl}/ATR-STOP-CLOSE/",
+                Category = "price-trend",
+                ChartType = "overlay",
+                Order = Order.Front,
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 21,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Multiplier",
+                        ParamName= "multiplier",
+                        DataType = "number",
+                        DefaultValue = 3,
+                        Minimum = 0.1,
+                        Maximum = 10
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        TooltipTemplate = "Buy Stop",
+                        DisplayName = "ATR-STOP([P1],[P2],HIGH/LOW) Buy Stop",
+                        DataName = "buyStop",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Sell Stop",
+                        TooltipTemplate = "ATR-STOP([P1],[P2],HIGH/LOW) Sell Stop",
+                        DataName = "sellStop",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
             // Average True Range
             new IndicatorList
             {
@@ -581,6 +679,38 @@ public static class Metadata
                         DisplayName = "CMF",
                         TooltipTemplate = "Chaikin Money Flow",
                         DataName = "cmf",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
+            // Chande Momentum Oscillator
+            new IndicatorList
+            {
+                Name = "Chande Momentum Oscillator",
+                Uiid = "CMO",
+                LegendTemplate = "CMO([P1])",
+                Endpoint = $"{baseUrl}/CMO/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName  = "Chande Momentum Oscillator",
+                        TooltipTemplate = "CMO([P1])",
+                        DataName = "cmo",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = standardBlue
