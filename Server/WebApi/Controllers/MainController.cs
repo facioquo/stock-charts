@@ -162,6 +162,48 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("ATR-STOP-CLOSE")]
+    public IActionResult GetAtrStopClose(
+        int lookbackPeriods = 21,
+        double multiplier = 3)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<AtrStopResult> results =
+                quotes.GetAtrStop(lookbackPeriods, multiplier, EndType.Close)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("ATR-STOP-HL")]
+    public IActionResult GetAtrStopHL(
+        int lookbackPeriods = 21,
+        double multiplier = 3)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<AtrStopResult> results =
+                quotes.GetAtrStop(lookbackPeriods, multiplier, EndType.HighLow)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("BB")]
     public IActionResult GetBollingerBands(
         int lookbackPeriods = 20,
@@ -278,6 +320,26 @@ public class MainController : ControllerBase
             IEnumerable<CmfResult> results =
                 quotes.GetCmf(lookbackPeriods)
                       .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("CMO")]
+    public IActionResult GetCmo(
+        int lookbackPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<CmoResult> results =
+                quotes.GetCmo(lookbackPeriods)
+                        .TakeLast(limitLast);
 
             return Ok(results);
         }
