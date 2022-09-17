@@ -1735,7 +1735,7 @@ public static class Metadata
                         ParamName = "lookbackPeriods",
                         DataType = "int",
                         DefaultValue = 14,
-                        Minimum = 1,
+                        Minimum = 2,
                         Maximum = 250
                     }
                 },
