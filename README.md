@@ -2,7 +2,7 @@
 
 [![Build status](https://dev.azure.com/skender/Stock.Indicators/_apis/build/status/Stock.Charts)](https://dev.azure.com/skender/Stock.Indicators/_build/latest?definitionId=23)
 
-This is a demo of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular website with a [Chart.js](https://github.com/chartjs/chartjs-chart-financial) financial/candlestick stock chart, with a .NET Web API backend to generate indicators.  The indicator library can be implemented in any .NET compatible ecosystem (it does not have to be in an API like this).  See the [library documentation](https://daveskender.github.io/Stock.Indicators) for more information and a full list of available indicators.
+This is a demo of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular website with a [Chart.js](https://github.com/chartjs/chartjs-chart-financial) financial/candlestick stock chart, with a .NET Web API backend to generate indicators.  The indicator library can be implemented in any .NET compatible ecosystem (it does not have to be in an API like this).  See the [library documentation](https://dotnet.stockindicators.dev) for more information and a full list of available indicators.
 
 Live demo site: [https://stock-charts.azurewebsites.net](https://stock-charts.azurewebsites.net/)
 
@@ -10,7 +10,7 @@ Live demo site: [https://stock-charts.azurewebsites.net](https://stock-charts.az
 
 ## Author's note
 
-This repo and charting tool is primarily intended to demonstrate the [Stock Indicators for .NET](https://github.com/DaveSkender/Stock.Indicators) library.  **It is not meant to be a fully featured charting system** and may not be an architectural model that works for your use case.  If you need a more mature charting tool, please explore all of your [charting and visualization options](https://github.com/DaveSkender/Stock.Indicators/discussions/430).
+This repo and charting tool is primarily intended to demonstrate the [Stock Indicators for .NET](https://dotnet.stockindicators.dev) library.  **It is not meant to be a fully featured charting system** and may not be an architectural model that works for your use case.  If you need a more mature charting tool, please explore all of your [charting and visualization options](https://github.com/DaveSkender/Stock.Indicators/discussions/430).
 
 ## Running this demo locally
 
