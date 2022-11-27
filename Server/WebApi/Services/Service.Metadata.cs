@@ -894,6 +894,31 @@ public static class Metadata
                 }
             },
 
+            // Dominant Cycle Period (HT Trendline)
+            new IndicatorList
+            {
+                Name = "Dominant Cycle Periods",
+                Uiid = "DCPERIOD",
+                LegendTemplate = "DC PERIODS",
+                Endpoint = $"{baseUrl}/HTL/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    MinimumYAxis = 0
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "DC PERIODS",
+                        TooltipTemplate = "DC PERIODS",
+                        DataName = "dcPeriods",
+                        DataType = "number",
+                        LineType = "bar",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Donchian Channels
             new IndicatorList
             {
@@ -1356,8 +1381,8 @@ public static class Metadata
                 Uiid = "MFI",
                 LegendTemplate = "MFI([P1])",
                 Endpoint = $"{baseUrl}/MFI/",
-                Category = "oscillator",
-                ChartType = "volume-based",
+                Category = "volume-based",
+                ChartType = "oscillator",
                 ChartConfig = new ChartConfig
                 {
                     MinimumYAxis = 0,
