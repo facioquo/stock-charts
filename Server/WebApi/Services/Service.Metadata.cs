@@ -288,6 +288,104 @@ public static class Metadata
                 }
             },
 
+            // ATR Trailing Stop (Close offset)
+            new IndicatorList
+            {
+                Name = "ATR Trailing Stop (Close offset)",
+                Uiid = "ATR-STOP-CLOSE",
+                LegendTemplate = "ATR-STOP([P1],[P2],CLOSE)",
+                Endpoint = $"{baseUrl}/ATR-STOP-CLOSE/",
+                Category = "price-trend",
+                ChartType = "overlay",
+                Order = Order.Front,
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 21,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Multiplier",
+                        ParamName= "multiplier",
+                        DataType = "number",
+                        DefaultValue = 3,
+                        Minimum = 0.1,
+                        Maximum = 10
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Buy Stop",
+                        TooltipTemplate = "ATR-STOP([P1],[P2],CLOSE) Buy Stop",
+                        DataName = "buyStop",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Sell Stop",
+                        TooltipTemplate = "ATR-STOP([P1],[P2],CLOSE) Sell Stop",
+                        DataName = "sellStop",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
+            // ATR Trailing Stop (High/Low offset)
+            new IndicatorList
+            {
+                Name = "ATR Trailing Stop (High/Low offset)",
+                Uiid = "ATR-STOP-HL",
+                LegendTemplate = "ATR-STOP([P1],[P2],HIGH/LOW)",
+                Endpoint = $"{baseUrl}/ATR-STOP-CLOSE/",
+                Category = "price-trend",
+                ChartType = "overlay",
+                Order = Order.Front,
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 21,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new IndicatorParamConfig {
+                        DisplayName = "Multiplier",
+                        ParamName= "multiplier",
+                        DataType = "number",
+                        DefaultValue = 3,
+                        Minimum = 0.1,
+                        Maximum = 10
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Buy Stop",
+                        TooltipTemplate = "ATR-STOP([P1],[P2],HIGH/LOW) Buy Stop",
+                        DataName = "buyStop",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardGreen
+                    },
+                    new IndicatorResultConfig {
+                        DisplayName = "Sell Stop",
+                        TooltipTemplate = "ATR-STOP([P1],[P2],HIGH/LOW) Sell Stop",
+                        DataName = "sellStop",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardRed
+                    }
+                }
+            },
+
             // Average True Range
             new IndicatorList
             {
@@ -588,6 +686,38 @@ public static class Metadata
                 }
             },
 
+            // Chande Momentum Oscillator
+            new IndicatorList
+            {
+                Name = "Chande Momentum Oscillator",
+                Uiid = "CMO",
+                LegendTemplate = "CMO([P1])",
+                Endpoint = $"{baseUrl}/CMO/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName  = "Chande Momentum Oscillator",
+                        TooltipTemplate = "CMO([P1])",
+                        DataName = "cmo",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Chandelier Exit (long)
             new IndicatorList
             {
@@ -764,6 +894,31 @@ public static class Metadata
                 }
             },
 
+            // Dominant Cycle Period (HT Trendline)
+            new IndicatorList
+            {
+                Name = "Dominant Cycle Periods",
+                Uiid = "DCPERIOD",
+                LegendTemplate = "DC PERIODS",
+                Endpoint = $"{baseUrl}/HTL/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    MinimumYAxis = 0
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "DC PERIODS",
+                        TooltipTemplate = "DC PERIODS",
+                        DataName = "dcPeriods",
+                        DataType = "number",
+                        LineType = "bar",
+                        DefaultColor = standardBlue
+                    }
+                }
+            },
+
             // Donchian Channels
             new IndicatorList
             {
@@ -818,6 +973,38 @@ public static class Metadata
                         LineType = "solid",
                         LineWidth = 1,
                         DefaultColor = standardOrange
+                    }
+                }
+            },
+
+            // Dynamic, McGinley
+            new IndicatorList
+            {
+                Name = "McGinley Dynamic",
+                Uiid = "DYN",
+                LegendTemplate = "DYNAMIC([P1])",
+                Endpoint = $"{baseUrl}/DYN/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters = new List<IndicatorParamConfig>
+                {
+                    new IndicatorParamConfig {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                },
+                Results = new List<IndicatorResultConfig>{
+                    new IndicatorResultConfig {
+                        DisplayName = "Dynamic",
+                        TooltipTemplate = "DYNAMIC([P1])",
+                        DataName = "dynamic",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
                     }
                 }
             },
@@ -990,8 +1177,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        TooltipTemplate = "Fractal Bull ([P1])",
                         DisplayName = "Fractal Bull",
+                        TooltipTemplate = "Fractal Bull ([P1])",
                         DataName = "fractalBull",
                         DataType = "number",
                         LineType = "dots",
@@ -999,8 +1186,8 @@ public static class Metadata
                         DefaultColor = standardRed
                     },
                     new IndicatorResultConfig {
-                        TooltipTemplate = "Fractal Bear ([P1])",
                         DisplayName = "Fractal Bear",
+                        TooltipTemplate = "Fractal Bear ([P1])",
                         DataName = "fractalBear",
                         DataType = "number",
                         LineType = "dots",
@@ -1176,8 +1363,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        TooltipTemplate = "MARUBOZU([P1]%)",
                         DisplayName = "Marubozu",
+                        TooltipTemplate = "MARUBOZU([P1]%)",
                         DataName = "price",
                         DataType = "number",
                         LineType = "pointer",
@@ -1194,8 +1381,8 @@ public static class Metadata
                 Uiid = "MFI",
                 LegendTemplate = "MFI([P1])",
                 Endpoint = $"{baseUrl}/MFI/",
-                Category = "oscillator",
-                ChartType = "volume-based",
+                Category = "volume-based",
+                ChartType = "oscillator",
                 ChartConfig = new ChartConfig
                 {
                     MinimumYAxis = 0,
@@ -1573,7 +1760,7 @@ public static class Metadata
                         ParamName = "lookbackPeriods",
                         DataType = "int",
                         DefaultValue = 14,
-                        Minimum = 1,
+                        Minimum = 2,
                         Maximum = 250
                     }
                 },
@@ -1723,8 +1910,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        DisplayName = "Standard Deviation (absolute)",
-                        TooltipTemplate = "Z-Score",
+                        DisplayName = "Z-Score",
+                        TooltipTemplate = "Z-Score([P1])",
                         DataName = "zScore",
                         DataType = "number",
                         LineType = "solid",
@@ -1971,15 +2158,7 @@ public static class Metadata
                         DataType = "number",
                         LineType= "solid",
                         DefaultColor = standardRed
-                    },
-                    //new IndicatorResultConfig {
-                    //    LabelTemplate = "STO %J",
-                    //    DisplayName = "%J",
-                    //    DataName = "j",
-                    //    DataType = "number",
-                    //    LineType = "dash",
-                    //    DefaultColor = standardGreen
-                    //}
+                    }
                 }
             },
 
@@ -2106,8 +2285,8 @@ public static class Metadata
                 },
                 Results = new List<IndicatorResultConfig>{
                     new IndicatorResultConfig {
-                        TooltipTemplate = "Upper Band",
-                        DisplayName = "SUPERTREND([P1],[P2]) Upper Band",
+                        DisplayName = "Upper Band",
+                        TooltipTemplate = "SUPERTREND([P1],[P2]) Upper Band",
                         DataName = "upperBand",
                         DataType = "number",
                         LineType = "solid",
