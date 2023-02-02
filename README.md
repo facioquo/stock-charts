@@ -51,7 +51,7 @@ If you want to host on your local computer and review the source code, follow th
 
 ### Azurite Storage Emulator
 
-If you intend to use the local Azure storage emulator to get and store local quote Blob data, you'll need to set some local Environment variables:
+If you intend to use the local Azure storage emulator to get and store local quote Blob data, you'll need to set some local Environment variables.  Use your own key and secret values.
 
 ``` bash
 setx AlpacaApiKey "ALPACA_API_KEY"
