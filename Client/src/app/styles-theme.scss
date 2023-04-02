@@ -70,7 +70,7 @@ $color-accent-800: mat.get-color-from-palette($dark-accent, 800);
 .light-theme {
   @include mat.all-component-colors($light-theme);
 
-  // standard ligth colors
+  // standard light colors
   $color-primary: mat.get-color-from-palette($light-primary, 900);
   $color-accent: mat.get-color-from-palette($light-accent, 900);
   $color-warn: mat.get-color-from-palette($light-warn, 900);

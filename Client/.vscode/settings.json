@@ -8,5 +8,11 @@
     },
     "editor.bracketPairColorization.enabled": true,
     "editor.guides.bracketPairs": "active",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "cSpell.words": [
+        "chartjs",
+        "devkit",
+        "matero",
+        "tinycolor"
+    ]
 }
