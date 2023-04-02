@@ -30,22 +30,34 @@ public class Jobs
         string alpacaApiKey = Environment.GetEnvironmentVariable("AlpacaApiKey");
         string alpacaSecret = Environment.GetEnvironmentVariable("AlpacaSecret");
 
-        // fetch from Alpaca paper trading API
-        IAlpacaDataClient alpacaDataClient = Environments.Paper
-            .GetAlpacaDataClient(new SecretKey(alpacaApiKey, alpacaSecret));
+        if (alpacaApiKey == null)
+        {
+            throw new ArgumentNullException(alpacaApiKey);
+        }
 
+        if (alpacaSecret == null)
+        {
+            throw new ArgumentNullException(alpacaSecret);
+        }
+
+        // connect to Alpaca REST API
+        SecretKey secretKey = new(alpacaApiKey, alpacaSecret);
+
+        IAlpacaDataClient client = Environments.Paper.GetAlpacaDataClient(secretKey);
+
+        // compose request (exclude last 15 minutes for free delayed quotes)
         DateTime into = DateTime.Now.Subtract(TimeSpan.FromMinutes(16));
         DateTime from = into.Subtract(TimeSpan.FromDays(800));
 
-        IPage<IBar> barSet = await alpacaDataClient.ListHistoricalBarsAsync(
-            new HistoricalBarsRequest(symbol, from, into, BarTimeFrame.Day));
+        HistoricalBarsRequest request = new(symbol, from, into, BarTimeFrame.Day);
 
-        List<Quote> quotes = new(barSet.Items.Count);
+        // fetch minute-bar quotes in native format
+        IPage<IBar> barSet = await client.ListHistoricalBarsAsync(request);
 
-        // compose
-        foreach (IBar bar in barSet.Items)
-        {
-            Quote q = new()
+        // compose into compatible quotes
+        IEnumerable<Quote> quotes = barSet
+            .Items
+            .Select(bar => new Quote
             {
                 Date = bar.TimeUtc,
                 Open = bar.Open,
@@ -53,9 +65,7 @@ public class Jobs
                 Low = bar.Low,
                 Close = bar.Close,
                 Volume = bar.Volume
-            };
-            quotes.Add(q);
-        }
+            });
 
         string json = JsonSerializer.Serialize(quotes.OrderBy(x => x.Date));
 
