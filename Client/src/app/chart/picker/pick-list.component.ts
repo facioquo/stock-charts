@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacySlideToggleChange as MatSlideToggleChange } from '@angular/material/legacy-slide-toggle';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 
 import { StyleService } from 'src/app/style.service';
 
