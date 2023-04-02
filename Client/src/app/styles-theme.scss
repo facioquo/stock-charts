@@ -3,7 +3,16 @@
 
 @use "@angular/material" as mat;
 @use "@ng-matero/extensions" as mtx;
-@include mat.core();
+// TODO(v15): As of v15 mat.legacy-core no longer includes default typography styles.
+//  The following line adds:
+//    1. Default typography styles for all components
+//    2. Styles for typography hierarchy classes (e.g. .mat-headline-1)
+//  If you specify typography styles for the components you use elsewhere, you should delete this line.
+//  If you don't need the default component typographies but still want the hierarchy styles,
+//  you can delete this line and instead use:
+//    `@include mat.legacy-typography-hierarchy(mat.define-legacy-typography-config());`
+@include mat.all-legacy-component-typographies();
+@include mat.legacy-core();
 // ref: https://www.materialpalette.com
 
 // Define a dark theme
@@ -35,12 +44,11 @@ $light-theme: mat.define-light-theme(
 );
 
 // Apply the dark theme by default
-@include mat.core-theme($dark-theme);
-@include mat.all-component-themes($dark-theme);
+@include mat.legacy-core-theme($dark-theme);
+@include mat.all-legacy-component-themes($dark-theme);
 
 // angular extensions theming
 @include mtx.all-component-themes($dark-theme);
-@include mtx.all-experimental-component-themes($dark-theme);
 
 // standard dark colors
 $color-primary: mat.get-color-from-palette($dark-primary, 900);
@@ -68,7 +76,7 @@ $color-accent-800: mat.get-color-from-palette($dark-accent, 800);
 // Apply the light theme only when the `.light-theme` CSS class is applied
 // to an ancestor element of the components (such as `body`).
 .light-theme {
-  @include mat.all-component-colors($light-theme);
+  @include mat.all-legacy-component-colors($light-theme);
 
   // standard light colors
   $color-primary: mat.get-color-from-palette($light-primary, 900);
