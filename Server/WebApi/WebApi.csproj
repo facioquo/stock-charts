@@ -20,11 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.14.1" />
-    <PackageReference Include="Azure.Storage.Files.Shares" Version="12.12.1" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.15.1" />
+    <PackageReference Include="Azure.Storage.Files.Shares" Version="12.13.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.8" />
-    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.0" />
-    <PackageReference Include="Skender.Stock.Indicators" Version="2.4.1" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.3" />
+    <PackageReference Include="Skender.Stock.Indicators" Version="2.4.10" />
   </ItemGroup>
 
   <ItemGroup>
