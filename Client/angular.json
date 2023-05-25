@@ -38,7 +38,7 @@
               "chart.js",
               "chartjs-plugin-crosshair"
             ],
-            "vendorChunk": true,
+            "vendorChunk": false,
             "extractLicenses": false,
             "buildOptimizer": false,
             "sourceMap": true,
@@ -53,7 +53,16 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "optimization": true,
+              "optimization": {
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": true
+                },
+                "scripts": true,
+                "fonts": {
+                  "inline": true
+                }
+              },
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,

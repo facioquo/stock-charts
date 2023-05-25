@@ -7,21 +7,18 @@ pr:
 name: $(BuildID)-$(SourceBranchName)
 
 resources:
-
   repositories:
     - repository: self
       type: git
       ref: main
 
 jobs:
-
   - job: Server
     displayName: Web API
     pool:
       vmImage: ubuntu-latest
 
     steps:
-
       - checkout: self
         clean: true
 
@@ -31,7 +28,7 @@ jobs:
           targetType: inline
           script: >
             Copy-Item "Server/WebApi/appsettings.Token.json" -Destination "Server/WebApi/appsettings.json" -Force
-            
+
             Remove-Item "Server/WebApi/appsettings.Token.json" -Force
 
       - task: qetza.replacetokens.replacetokens-task.replacetokens@3
@@ -76,9 +73,9 @@ jobs:
         clean: true
 
       - task: UseNode@1
-        displayName: Use Node 16.14.x
+        displayName: Use Node 18.x
         inputs:
-          version: 16.14.x
+          version: 18.16.x
 
       - task: Npm@1
         displayName: Install packages
@@ -89,8 +86,8 @@ jobs:
       - task: qetza.replacetokens.replacetokens-task.replacetokens@3
         displayName: Update GA tag
         inputs:
-          rootDirectory: 'Client/src'
-          targetFiles: '**/index.html'
+          rootDirectory: "Client/src"
+          targetFiles: "**/index.html"
           escapeType: none
           tokenPrefix: __
           tokenSuffix: __
