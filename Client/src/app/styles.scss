@@ -16,6 +16,7 @@ body {
 .center {
   text-align: center;
 }
+
 .right {
   text-align: right;
 }
@@ -43,6 +44,8 @@ body {
 // TOOLBAR
 mat-toolbar {
 
+  max-width: 1024px;
+
   a {
     font-family: "Google Sans", Roboto, Arial, Helvetica, sans-serif;
     text-decoration: none;
@@ -51,6 +54,16 @@ mat-toolbar {
     &:hover {
       color: $color-primary-500 !important;
     }
+  }
+}
+
+.mat-toolbar {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+
+  @media screen and (max-width: 1024px) {
+    padding: 0 8px;
   }
 }
 
@@ -99,7 +112,7 @@ mat-radio-group {
   margin-bottom: 25px;
 }
 
-.button-row > button {
+.button-row>button {
   margin-left: 4px;
   margin-right: 4px;
 }
