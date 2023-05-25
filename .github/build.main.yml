@@ -80,8 +80,9 @@ jobs:
       - task: Npm@1
         displayName: Install packages
         inputs:
-          workingDir: Client
-          verbose: false
+          command: 'custom'
+          workingDir: 'Client'
+          customCommand: 'install --legacy-peer-deps'
 
       - task: qetza.replacetokens.replacetokens-task.replacetokens@3
         displayName: Update GA tag
