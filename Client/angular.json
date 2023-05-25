@@ -35,8 +35,7 @@
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "chart.js",
-              "chartjs-plugin-crosshair"
+              "chart.js"
             ],
             "vendorChunk": false,
             "extractLicenses": false,
