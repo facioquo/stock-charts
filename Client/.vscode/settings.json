@@ -13,6 +13,8 @@
         "chartjs",
         "devkit",
         "matero",
+        "noselect",
+        "Ohlc",
         "tinycolor"
     ]
 }

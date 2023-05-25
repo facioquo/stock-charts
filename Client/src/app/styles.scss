@@ -10,12 +10,13 @@ body {
 body {
   margin: 0;
   padding: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: "Google Sans", Roboto, "Helvetica Neue", sans-serif;
 }
 
 .center {
   text-align: center;
 }
+
 .right {
   text-align: right;
 }
@@ -42,16 +43,29 @@ body {
 
 // TOOLBAR
 mat-toolbar {
-  font-family: Google Sans, Roboto, Arial, Helvetica, sans-serif;
-  // color: $color-primary-700 !important;
+
+  max-width: 1024px;
+  padding: 0 9px;
 
   a {
+    font-family: "Google Sans", Roboto, Arial, Helvetica, sans-serif;
     text-decoration: none;
     color: inherit;
 
     &:hover {
       color: $color-primary-500 !important;
     }
+  }
+}
+
+.toolbar {
+  color: $color-primary-700 !important;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+
+  @media screen and (max-width: 1024px) {
+    padding: 0 8px;
   }
 }
 
@@ -98,9 +112,9 @@ mat-radio-group {
 .button-row {
   margin-top: 25px;
   margin-bottom: 25px;
-}
 
-.button-row > button {
-  margin-left: 4px;
-  margin-right: 4px;
+  .button {
+    margin-left: 4px;
+    margin-right: 4px;
+  }
 }

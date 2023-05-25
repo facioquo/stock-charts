@@ -4,7 +4,7 @@
 
 This is a demo of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular website with a [Chart.js](https://github.com/chartjs/chartjs-chart-financial) financial/candlestick stock chart, with a .NET Web API backend to generate indicators.  The indicator library can be implemented in any .NET compatible ecosystem (it does not have to be in an API like this).  See the [library documentation](https://dotnet.stockindicators.dev) for more information and a full list of available indicators.
 
-Live demo site: [https://stock-charts.azurewebsites.net](https://stock-charts.azurewebsites.net/)
+Live demo site: [charts.StockIndicators.dev](https://charts.stockindicators.dev/)
 
 ![image](https://raw.githubusercontent.com/DaveSkender/Stock.Indicators/main/docs/examples.webp)
 
@@ -51,7 +51,7 @@ If you want to host on your local computer and review the source code, follow th
 
 ### Azurite Storage Emulator
 
-If you intend to use the local Azure storage emulator to get and store local quote Blob data, you'll need to set some local Environment variables:
+If you intend to use the local Azure storage emulator to get and store local quote Blob data, you'll need to set some local Environment variables.  Use your own key and secret values.
 
 ``` bash
 setx AlpacaApiKey "ALPACA_API_KEY"

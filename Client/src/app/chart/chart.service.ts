@@ -533,7 +533,7 @@ export class ChartService {
   ): AnnotationOptions {
 
     const legendFont: FontSpec = {
-      family: "Roboto",
+      family: "Google Sans",
       size: 11,
       style: "normal",
       weight: "normal",
