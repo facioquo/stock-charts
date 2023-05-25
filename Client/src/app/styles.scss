@@ -59,14 +59,14 @@ mat-toolbar {
 }
 
 .toolbar {
-    color: $color-primary-700 !important;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0;
+  color: $color-primary-700 !important;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
 
-    @media screen and (max-width: 1024px) {
-      padding: 0 8px;
-    }
+  @media screen and (max-width: 1024px) {
+    padding: 0 8px;
+  }
 }
 
 .filler {
