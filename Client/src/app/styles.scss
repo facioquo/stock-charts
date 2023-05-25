@@ -45,6 +45,7 @@ body {
 mat-toolbar {
 
   max-width: 1024px;
+  padding: 0 9px;
 
   a {
     font-family: "Google Sans", Roboto, Arial, Helvetica, sans-serif;
@@ -57,14 +58,15 @@ mat-toolbar {
   }
 }
 
-.mat-toolbar {
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0;
+.toolbar {
+    color: $color-primary-700 !important;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0;
 
-  @media screen and (max-width: 1024px) {
-    padding: 0 8px;
-  }
+    @media screen and (max-width: 1024px) {
+      padding: 0 8px;
+    }
 }
 
 .filler {
@@ -110,9 +112,9 @@ mat-radio-group {
 .button-row {
   margin-top: 25px;
   margin-bottom: 25px;
-}
 
-.button-row>button {
-  margin-left: 4px;
-  margin-right: 4px;
+  .button {
+    margin-left: 4px;
+    margin-right: 4px;
+  }
 }
