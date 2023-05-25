@@ -10,8 +10,10 @@
     "editor.guides.bracketPairs": "active",
     "editor.formatOnSave": true,
     "cSpell.words": [
+        "browserconfig",
         "chartjs",
         "devkit",
+        "ecoysystem",
         "lookback",
         "MACD",
         "matero",
