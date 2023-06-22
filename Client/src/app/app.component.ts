@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { StyleService } from './style.service';
 
 import { PickListComponent } from './chart/picker/pick-list.component';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog as MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-root',

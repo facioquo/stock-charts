@@ -6,7 +6,7 @@ import { StyleService } from '../style.service';
 
 import Chart from 'chart.js/auto';  // import all default options
 import 'chartjs-adapter-date-fns';
-import 'chartjs-chart-financial';
+import 'src/assets/js/chartjs-chart-financial';
 
 import { enUS } from 'date-fns/locale';
 import { Guid } from "guid-typescript";
@@ -27,7 +27,7 @@ import {
   CandlestickElement,
   OhlcController,
   OhlcElement
-} from 'chartjs-chart-financial';
+} from 'src/assets/js/chartjs-chart-financial';
 
 // plugins
 import annotationPlugin, { AnnotationOptions, ScaleValue }
@@ -228,7 +228,7 @@ export class ChartService {
       else if (value > 10000)
         return value / 1000 + "K";
       else if (value < 10)
-        return Math.round((value+Number.EPSILON)*100000000)/100000000;
+        return Math.round((value + Number.EPSILON) * 100000000) / 100000000;
       else
         return value;
     };

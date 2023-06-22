@@ -35,7 +35,9 @@
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "chart.js"
+              "chart.js",
+              "src/assets/js/chartjs-chart-financial",
+              "guid-typescript"
             ],
             "vendorChunk": false,
             "extractLicenses": false,
