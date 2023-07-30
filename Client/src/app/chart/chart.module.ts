@@ -1,20 +1,26 @@
 import { NgModule } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
+import {
+  ErrorStateMatcher,
+  ShowOnDirtyErrorStateMatcher
+} from '@angular/material/core';
+
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
-import { MatButtonModule as MatButtonModule } from '@angular/material/button';
-import { MatDialogModule as MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule as MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule as MatInputModule } from '@angular/material/input';
-import { MatListModule as MatListModule } from '@angular/material/list';
-import { MatSelectModule as MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule as MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatTabsModule as MatTabsModule } from '@angular/material/tabs';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatTooltipModule as MatTooltipModule } from '@angular/material/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { MtxColorpickerModule } from '@ng-matero/extensions/colorpicker';
 import { ColorCompactModule } from 'ngx-color/compact';
@@ -25,7 +31,6 @@ import { PickFormComponent } from './picker/pick-form.component';
 
 import { ChartService } from './chart.service';
 import { ApiService } from './api.service';
-import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/material/core';
 
 @NgModule({
   declarations: [

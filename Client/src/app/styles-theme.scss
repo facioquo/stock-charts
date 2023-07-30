@@ -31,16 +31,7 @@ $light-theme: mat.define-light-theme((color: (
 
 // Apply the dark theme by default
 @include mat.core-theme($dark-theme);
-@include mat.button-theme($dark-theme);
-
-// Apply the light theme only when the user prefers light themes.
-@media (prefers-color-scheme: light) {
-  // Use the `-color` mixins to only apply color styles without reapplying the same
-  // typography and density styles.
-  @include mat.core-color($light-theme);
-  @include mat.button-color($light-theme);
-}
-
+@include mat.all-component-themes($dark-theme);
 
 /******************
  REUSABLE VARIABLES
@@ -72,6 +63,7 @@ $color-accent-800: mat.get-color-from-palette($dark-accent, 800);
 // Apply the light theme only when the `.light-theme` CSS class is applied
 // to an ancestor element of the components (such as `body`).
 .light-theme {
+  @include mat.core-color($light-theme);
   @include mat.all-component-colors($light-theme);
 
   // standard light colors
