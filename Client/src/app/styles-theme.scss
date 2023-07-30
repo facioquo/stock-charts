@@ -1,44 +1,50 @@
 // Angular Material Theme info only
 // Use styles.scss for main site styles
-
-@use "@angular/material" as mat;
-@use "@ng-matero/extensions" as mtx;
 // ref: https://www.materialpalette.com
+
+@use '@angular/material' as mat;
+@include mat.core();
 
 // Define a dark theme
 $dark-primary: mat.define-palette(mat.$grey-palette, 900);
 $dark-accent: mat.define-palette(mat.$blue-gray-palette, 900);
 $dark-warn: mat.define-palette(mat.$deep-orange-palette, 900);
-$dark-theme: mat.define-dark-theme(
-  (
-    color: (
-      primary: $dark-primary,
-      accent: $dark-accent,
-      warn: $dark-warn,
-    ),
-  )
-);
+
+$dark-theme: mat.define-dark-theme((color: (
+        primary: $dark-primary,
+        accent: $dark-accent,
+        warn: $dark-warn ),
+      typography: mat.define-typography-config(),
+      density: 0));
 
 // Define a light theme
 $light-primary: mat.define-palette(mat.$grey-palette);
 $light-accent: mat.define-palette(mat.$blue-gray-palette);
 $light-warn: mat.define-palette(mat.$deep-orange-palette);
-$light-theme: mat.define-light-theme(
-  (
-    color: (
-      primary: $light-primary,
-      accent: $light-accent,
-      warn: $light-warn,
-    ),
-  )
-);
+
+$light-theme: mat.define-light-theme((color: (
+        primary: $light-primary,
+        accent: $light-accent,
+        warn: $light-warn,
+      ) // on include typography and density in default theme
+    ));
 
 // Apply the dark theme by default
 @include mat.core-theme($dark-theme);
-@include mat.all-component-themes($dark-theme);
+@include mat.button-theme($dark-theme);
 
-// angular extensions theming
-@include mtx.all-component-themes($dark-theme);
+// Apply the light theme only when the user prefers light themes.
+@media (prefers-color-scheme: light) {
+  // Use the `-color` mixins to only apply color styles without reapplying the same
+  // typography and density styles.
+  @include mat.core-color($light-theme);
+  @include mat.button-color($light-theme);
+}
+
+
+/******************
+ REUSABLE VARIABLES
+ ******************/
 
 // standard dark colors
 $color-primary: mat.get-color-from-palette($dark-primary, 900);

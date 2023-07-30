@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --open",
+    "start": "ng serve --open --live-reload",
     "build": "ng build",
     "build.prod": "ng build --configuration=production",
     "lint": "ng lint",
@@ -22,7 +22,7 @@
     "@angular/platform-browser-dynamic": "^16.1.7",
     "@angular/router": "^16.1.7",
     "@ctrl/tinycolor": "^3.6.0",
-    "@ng-matero/extensions": "^16.0.2",
+    "@ng-matero/extensions": "^16.0.3",
     "chart.js": "^4.3.0",
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-plugin-annotation": "^3.0.1",
