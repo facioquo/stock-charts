@@ -10,11 +10,21 @@
     "editor.guides.bracketPairs": "active",
     "editor.formatOnSave": true,
     "cSpell.words": [
+        "browserconfig",
         "chartjs",
         "devkit",
+        "ecoysystem",
+        "lookback",
+        "MACD",
         "matero",
         "noselect",
         "Ohlc",
-        "tinycolor"
+        "SUPERTREND",
+        "timeseries",
+        "tinycolor",
+        "ucid",
+        "uiid",
+        "unsavable",
+        "Xaxes"
     ]
 }
