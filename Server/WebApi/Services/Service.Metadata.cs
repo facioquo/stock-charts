@@ -2037,33 +2037,33 @@ public static class Metadata
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
                         DataType = "int",
-                        DefaultValue = 10,
+                        DefaultValue = 13,
                         Minimum = 1,
-                        Maximum = 50
+                        Maximum = 300
                     },
                     new IndicatorParamConfig {
                         DisplayName = "First Smooth Periods",
                         ParamName = "firstSmoothPeriods",
                         DataType = "int",
-                        DefaultValue = 3,
+                        DefaultValue = 25,
                         Minimum = 1,
-                        Maximum = 30
+                        Maximum = 300
                     },
                     new IndicatorParamConfig {
                         DisplayName = "Second Smooth Periods",
                         ParamName = "secondSmoothPeriods",
                         DataType = "int",
-                        DefaultValue = 3,
+                        DefaultValue = 2,
                         Minimum = 1,
-                        Maximum = 30
+                        Maximum = 50
                     },
                     new IndicatorParamConfig {
                         DisplayName = "Signal Periods",
                         ParamName = "signalPeriods",
                         DataType = "int",
-                        DefaultValue = 3,
+                        DefaultValue = 9,
                         Minimum = 1,
-                        Maximum = 30
+                        Maximum = 50
                     }
                 },
                 Results = new List<IndicatorResultConfig>{

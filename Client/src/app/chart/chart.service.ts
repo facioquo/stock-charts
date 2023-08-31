@@ -147,10 +147,12 @@ export class ChartService {
                 right: 2
               },
             },
+            border: {
+              display: false
+            },
             grid: {
               drawOnChartArea: true,
               drawTicks: false,
-              drawBorder: false,
               lineWidth: 0.5,
               color: function (context) {
                 if (context.tick.label === null) {
@@ -258,9 +260,11 @@ export class ChartService {
           size: 9
         },
       },
+      border: {
+        display: false
+      },
       grid: {
         drawOnChartArea: false,
-        drawBorder: false,
         tickLength: 2
       }
     };
