@@ -2039,7 +2039,7 @@ public static class Metadata
                         DataType = "int",
                         DefaultValue = 13,
                         Minimum = 1,
-                        Maximum = 50
+                        Maximum = 300
                     },
                     new IndicatorParamConfig {
                         DisplayName = "First Smooth Periods",
@@ -2047,7 +2047,7 @@ public static class Metadata
                         DataType = "int",
                         DefaultValue = 25,
                         Minimum = 1,
-                        Maximum = 30
+                        Maximum = 300
                     },
                     new IndicatorParamConfig {
                         DisplayName = "Second Smooth Periods",
@@ -2055,7 +2055,7 @@ public static class Metadata
                         DataType = "int",
                         DefaultValue = 2,
                         Minimum = 1,
-                        Maximum = 30
+                        Maximum = 50
                     },
                     new IndicatorParamConfig {
                         DisplayName = "Signal Periods",
@@ -2063,7 +2063,7 @@ public static class Metadata
                         DataType = "int",
                         DefaultValue = 9,
                         Minimum = 1,
-                        Maximum = 30
+                        Maximum = 50
                     }
                 },
                 Results = new List<IndicatorResultConfig>{
