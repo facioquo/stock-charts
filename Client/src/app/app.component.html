@@ -1,26 +1,24 @@
-<div [ngClass]="ts.isDarkTheme ? 'dark-theme' : 'light-theme'">
-  <mat-toolbar class="toolbar noselect">
-    <h1 class="no-wrap">
-      <a href="https://github.com/DaveSkender/Stock.Charts/">
-        stock chart
-      </a>
-    </h1>
-    <div class="filler"></div>
-    <button mat-fab color="default" (click)="openPickList()" class="edit-button"
-      matTooltip="change indicators and settings" aria-label="change indicators and settings">
-      <mat-icon color="primary">edit</mat-icon>
-    </button>
-  </mat-toolbar>
+<mat-toolbar class="toolbar noselect main-toolbar" color="default">
+  <h1 class="no-wrap">
+    <a href="https://github.com/DaveSkender/Stock.Charts/">
+      stock chart
+    </a>
+  </h1>
+  <div class="filler"></div>
+  <button mat-mini-fab color="primary" (click)="openPickList()"
+    matTooltip="change indicators and settings" aria-label="change indicators and settings">
+    <mat-icon color="primary">edit</mat-icon>
+  </button>
+</mat-toolbar>
 
-  <div id="main-content" class="body-container">
-    <app-chart></app-chart>
-  </div>
+<div id="main-content" class="body-container">
+  <app-chart></app-chart>
+</div>
 
-  <div class="footer">
-    Demo of the
-    <strong>
-      <a href="https://dotnet.stockindicators.dev/" target="_blank" rel="noopener">
-        Stock Indicators for .NET</a>
-    </strong> NuGet library
-  </div>
+<div class="footer">
+  Demo of the
+  <strong>
+    <a href="https://dotnet.stockindicators.dev/" target="_blank" rel="noopener">
+      Stock Indicators for .NET</a>
+  </strong> NuGet library
 </div>

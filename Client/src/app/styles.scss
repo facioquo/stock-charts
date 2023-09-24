@@ -4,7 +4,7 @@
 // BASE STYLES
 html,
 body {
-  height: 100%;
+  min-height: 100vh;
 }
 
 body {
@@ -46,7 +46,6 @@ mat-toolbar {
 
   max-width: 1024px;
   padding: 0 9px;
-  background-color: unset;
 
   a {
     font-family: "Google Sans", Roboto, Arial, Helvetica, sans-serif;

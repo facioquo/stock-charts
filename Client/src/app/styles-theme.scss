@@ -57,7 +57,6 @@ $color-accent-800: mat.get-color-from-palette($dark-accent, 800);
 .dark-theme {
   color: $color-primary-500;
   background-color: $color-primary !important;
-  min-height: 100vh;
 }
 
 // Apply the light theme only when the `.light-theme` CSS class is applied
@@ -72,5 +71,4 @@ $color-accent-800: mat.get-color-from-palette($dark-accent, 800);
   $color-warn: mat.get-color-from-palette($light-warn, 900);
 
   background-color: "white" !important;
-  min-height: 100vh;
 }

@@ -8,23 +8,35 @@ export class StyleService {
   constructor(
   ) { }
 
-  toggleTheme(checked: boolean) {
-    localStorage.setItem("isDark", checked.valueOf().toString())
+  toggleTheme(isDark: boolean) {
+    this.setTheme(isDark)
   }
 
   getTheme() {
 
-    const checked = localStorage.getItem("isDark");
+    const isDark = localStorage.getItem("isDark");
 
     // if not cached, cache default value (above)
-    if (checked == undefined) {
+    if (isDark == undefined) {
       localStorage.setItem("isDark", this.isDarkTheme.valueOf().toString())
     }
 
     // otherwise, use value
     else {
-      this.isDarkTheme = (checked === "true") ? true : false;
+      this.isDarkTheme = (isDark === "true") ? true : false;
     }
+
+    this.setTheme(this.isDarkTheme);
+  }
+
+  setTheme(isDark: boolean){
+
+    localStorage.setItem("isDark", isDark.valueOf().toString())
+
+    document.body.setAttribute(
+      'class',
+      isDark ? 'dark-theme' : 'light-theme'
+    );
   }
 }
 
