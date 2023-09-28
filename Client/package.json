@@ -23,7 +23,7 @@
     "@angular/router": "^15.2.5",
     "@ctrl/tinycolor": "^3.6.0",
     "@ng-matero/extensions": "^15.2.1",
-    "chart.js": "^4.3.0",
+    "chart.js": "^4.4.0",
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-chart-financial": "^0.1.1",
     "chartjs-plugin-annotation": "^3.0.1",
