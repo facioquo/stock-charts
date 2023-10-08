@@ -1,28 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { StyleService } from './style.service';
 
 import { PickListComponent } from './chart/picker/pick-list.component';
-import { MatDialog as MatDialog } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
 
   constructor(
     public readonly ts: StyleService,
-    private readonly list: MatDialog
-  ) { }
-
-  ngOnInit(): void {
+    private readonly settingsDialog: MatDialog
+  ) {
     this.ts.getTheme();
   }
 
-  // PICKERS
-  openPickList(): void {
-    this.list.open(PickListComponent, {
+  // SETTINGS DIALOG
+  openSettingsDialog(): void {
+    this.settingsDialog.open(PickListComponent, {
       minWidth: '300px',
       maxHeight: '80vh'
     });

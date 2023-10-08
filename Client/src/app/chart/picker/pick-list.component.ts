@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
-import { MatSlideToggleChange as MatSlideToggleChange } from '@angular/material/slide-toggle';
-import { MatDialog as MatDialog } from '@angular/material/dialog';
+
+import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatDialog } from '@angular/material/dialog';
+import { MatListOption, MatSelectionList } from '@angular/material/list';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
 import { StyleService } from 'src/app/style.service';
+import { ChartService } from '../chart.service';
 
 import { IndicatorListing, IndicatorSelection } from '../chart.models';
-import { ChartService } from '../chart.service';
 import { PickFormComponent } from '../picker/pick-form.component';
 
 @Component({
@@ -29,28 +32,30 @@ export class PickListComponent {
     this.selections = this.cs.selections;
   }
 
-  openEditor(event: MouseEvent, listing: IndicatorListing): void {
-    event.preventDefault();
-    this.listRef.closeAll();
-
-    const pickerRef = this.picker.open(PickFormComponent, {
-      minWidth: '300px',
-      data: listing
-    });
-
-    pickerRef.afterClosed()
-      .subscribe((selection: IndicatorSelection) => { });
+  selectDisplayed(event: MatCheckboxChange, shown: MatSelectionList): void {
+    if (event.checked) shown.selectAll(); else shown.deselectAll();
   }
 
-  removeSelection(event: MouseEvent, ucid: string): void {
+  removeSelections(event: MouseEvent, shown: MatListOption[]): void {
     event.preventDefault();
-    // this.listRef.closeAll();
-    this.cs.deleteSelection(ucid);
+    shown.forEach(x => this.cs.deleteSelection(x.value.ucid));
   }
 
   toggleTheme(event: MatSlideToggleChange) {
     this.ts.toggleTheme(event.checked);
     this.cs.resetChartTheme();
+  }
+
+  openIndicatorSettings(listing: IndicatorListing): void {
+
+    // close current settings dialog
+    this.listRef.closeAll();
+
+    // open settings for indicator to add
+    this.picker.open(PickFormComponent, {
+      minWidth: '300px',
+      data: listing
+    });
   }
 
   closeListDialog() {

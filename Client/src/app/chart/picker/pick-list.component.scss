@@ -1,7 +1,14 @@
-.close-button {
-  position: relative;
-  top: 5px;
-  right: 5px;
+
+.toolbar-action {
+  padding-right: 8px;
+}
+
+.list-action {
+  text-align: right;
+  cursor: default;
+
+  --mdc-list-list-item-hover-state-layer-color: none;
+  --mdc-list-list-item-hover-state-layer-opacity: none;
 }
 
 .toggle {

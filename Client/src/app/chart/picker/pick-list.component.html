@@ -1,8 +1,7 @@
 <mat-toolbar class="noselect">
-  general settings
-
+  General settings
   <div class="filler"></div>
-  <button mat-mini-fab class="close-button" color="default" (click)="closeListDialog()" matTooltip="close">
+  <button mat-mini-fab color="default" (click)="closeListDialog()" matTooltip="close">
     <mat-icon>close</mat-icon>
   </button>
 </mat-toolbar>
@@ -12,32 +11,37 @@
   </mat-slide-toggle>
 </div>
 
-<mat-action-list>
-  <mat-toolbar class="noselect" *ngIf="selections.length>0">
-    indicators selected
+<!-- TODO: this doesn't work -->
+<mat-selection-list #shown *ngIf="selections.length>0">
+  <mat-toolbar class="noselect toolbar-action">
+    Displayed indicators
+    <span class="filler"></span>
+    <mat-checkbox (change)="selectDisplayed($event, shown)"></mat-checkbox>
   </mat-toolbar>
-  <button mat-list-item *ngFor="let selection of selections">
-    <span mat-line>{{selection.label}}</span>
-    <div class="filler"></div>
-    <button mat-icon-button color="accent" (click)="removeSelection($event, selection.ucid)"
+  <mat-list-option *ngFor="let selection of selections" [value]="selection">
+    <span matListItemTitle>{{selection.label}}</span>
+  </mat-list-option>
+  <mat-list-item class="list-action" disableRipple="true">
+    <button mat-raised-button color="accent" [disabled]="shown.selectedOptions.selected.length===0"
+      (click)="removeSelections($event, shown.selectedOptions.selected)"
       matTooltip="remove this indicator">
-      <mat-icon>delete_forever</mat-icon>
+      REMOVE SELECTED
     </button>
-  </button>
-</mat-action-list>
+  </mat-list-item>
+</mat-selection-list>
 
 <mat-nav-list>
   <mat-toolbar class="noselect">
-    add new indicator
+    Available indicator
     <div class="filler"></div>
     <div matTooltip="indicator documentation">
-      <a mat-mini-fab href="https://daveskender.github.io/Stock.Indicators/indicators/" target="_blank" rel="noopener">
+      <a mat-mini-fab href="https://dotnet.stockindicators.dev/" target="_blank" rel="noopener">
         ?
       </a>
     </div>
   </mat-toolbar>
-  <a mat-list-item *ngFor="let listing of listings" (click)="openEditor($event, listing)">
-    <span mat-line>{{listing.name}}</span>
-    <span mat-line>{{listing.category}}</span>
+  <a mat-list-item *ngFor="let listing of listings" (click)="openIndicatorSettings(listing)">
+    <span matListItemTitle>{{listing.name}}</span>
+    <span matListItemLine>{{listing.category}}</span>
   </a>
 </mat-nav-list>
