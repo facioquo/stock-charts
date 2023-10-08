@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { ApiService } from './api.service';
-import { StyleService } from '../style.service';
+import { StyleService } from './style.service';
 
 import Chart from 'chart.js/auto';  // import all default options
 import 'chartjs-adapter-date-fns';
@@ -43,7 +43,7 @@ import {
   IndicatorResultConfig,
   IndicatorSelection,
   Quote
-} from './chart.models';
+} from '../chart/chart.models';
 
 Chart.register(
   CandlestickController,

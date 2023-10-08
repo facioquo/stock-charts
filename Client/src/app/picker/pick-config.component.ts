@@ -1,14 +1,19 @@
 import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { HttpErrorResponse } from '@angular/common/http';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { MtxColorpicker } from '@ng-matero/extensions/colorpicker';
 import { ColorEvent } from 'ngx-color';
 import { TinyColor } from '@ctrl/tinycolor';
 
-import { ApiService } from '../api.service';
-import { ChartService } from '../chart.service';
-import { IndicatorListing, IndicatorParam, IndicatorSelection } from '../chart.models';
-import { HttpErrorResponse } from '@angular/common/http';
+import { ApiService } from '../services/api.service';
+import { ChartService } from '../services/chart.service';
+
+import {
+  IndicatorListing,
+  IndicatorParam,
+  IndicatorSelection
+} from '../chart/chart.models';
 
 interface LineWidth {
   name: string;
@@ -21,11 +26,11 @@ interface LineStyle {
 }
 
 @Component({
-  selector: 'app-listing',
-  templateUrl: 'pick-form.component.html',
-  styleUrls: ['pick-form.component.scss']
+  selector: 'app-pick-config',
+  templateUrl: 'pick-config.component.html',
+  styleUrls: ['pick-config.component.scss']
 })
-export class PickFormComponent {
+export class PickConfigComponent {
 
   selection: IndicatorSelection;
   customPicker: MtxColorpicker;
@@ -66,7 +71,7 @@ export class PickFormComponent {
   constructor(
     @Inject(MAT_DIALOG_DATA)
     public listing: IndicatorListing,
-    private dialogRef: MatDialogRef<PickFormComponent>,
+    private dialogRef: MatDialogRef<PickConfigComponent>,
     private cs: ChartService,
     private api: ApiService
   ) {

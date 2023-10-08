@@ -17,7 +17,7 @@
         </div>
       </mat-tab>
 
-      <mat-tab label="Styles" *ngIf="listing.category != 'candlestick-pattern'">
+      <mat-tab label="Styles" *ngIf="listing.category !== 'candlestick-pattern'">
         <div *ngFor="let r of selection.results; index as i">
 
           <h2>{{r.displayName}}</h2>

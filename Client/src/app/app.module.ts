@@ -6,11 +6,14 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule as MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatTooltipModule as MatTooltipModule } from '@angular/material/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
+
+import { ChartModule } from './chart/chart.module';
+import { SettingsModule } from './picker/settings.module';
+
+import { StyleService } from './services/style.service';
 
 import { AppComponent } from './app.component';
-import { StyleService } from './style.service';
-import { ChartModule } from './chart/chart.module';
 
 @NgModule({
   declarations: [
@@ -30,7 +33,8 @@ import { ChartModule } from './chart/chart.module';
     MatTooltipModule,
 
     // Application
-    ChartModule
+    ChartModule,
+    SettingsModule
   ],
   providers: [
     StyleService

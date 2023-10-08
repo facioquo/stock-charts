@@ -5,28 +5,28 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
-import { StyleService } from 'src/app/style.service';
-import { ChartService } from '../chart.service';
+import { StyleService } from '../services/style.service';
+import { ChartService } from '../services/chart.service';
 
-import { IndicatorListing, IndicatorSelection } from '../chart.models';
-import { PickFormComponent } from '../picker/pick-form.component';
+import { IndicatorListing, IndicatorSelection } from '../chart/chart.models';
+import { PickConfigComponent } from './pick-config.component';
 
 @Component({
   selector: 'app-listing',
-  templateUrl: 'pick-list.component.html',
-  styleUrls: ['pick-list.component.scss']
+  templateUrl: 'settings.component.html',
+  styleUrls: ['settings.component.scss']
 })
-export class PickListComponent {
+export class SettingsComponent {
 
   listings: IndicatorListing[];
   selections: IndicatorSelection[];
   toggleColor = "accent";
 
   constructor(
-    public ts: StyleService,
-    private cs: ChartService,
     private listRef: MatDialog,
-    private picker: MatDialog
+    private picker: MatDialog,
+    private cs: ChartService,
+    public ts: StyleService,
   ) {
     this.listings = this.cs.listings;
     this.selections = this.cs.selections;
@@ -52,7 +52,7 @@ export class PickListComponent {
     this.listRef.closeAll();
 
     // open settings for indicator to add
-    this.picker.open(PickFormComponent, {
+    this.picker.open(PickConfigComponent, {
       minWidth: '300px',
       data: listing
     });

@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
-import { StyleService } from './style.service';
-
-import { PickListComponent } from './chart/picker/pick-list.component';
 import { MatDialog } from '@angular/material/dialog';
+import { StyleService } from './services/style.service';
+import { SettingsComponent } from './picker/settings.component';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +19,7 @@ export class AppComponent {
 
   // SETTINGS DIALOG
   openSettingsDialog(): void {
-    this.settingsDialog.open(PickListComponent, {
+    this.settingsDialog.open(SettingsComponent, {
       minWidth: '300px',
       maxHeight: '80vh'
     });
