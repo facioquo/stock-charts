@@ -1,4 +1,10 @@
 
+.close-button {
+  position: relative;
+  top: -30px;
+  right: -30px;
+}
+
 .toolbar-action {
   padding-right: 8px;
 }
@@ -12,5 +18,5 @@
 }
 
 .toggle {
-  margin: 16px 0 8px 16px;
+  float: right;
 }

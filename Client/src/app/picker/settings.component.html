@@ -1,47 +1,57 @@
-<mat-toolbar class="noselect">
-  General settings
-  <div class="filler"></div>
-  <button mat-mini-fab color="default" (click)="closeListDialog()" matTooltip="close">
-    <mat-icon>close</mat-icon>
-  </button>
-</mat-toolbar>
-<div class="toggle">
-  <mat-slide-toggle [(ngModel)]="ts.isDarkTheme" [color]="toggleColor" (change)="toggleTheme($event)">
-    Dark theme
-  </mat-slide-toggle>
-</div>
+<mat-dialog-content>
 
-<!-- TODO: this doesn't work -->
-<mat-selection-list #shown *ngIf="selections.length>0">
-  <mat-toolbar class="noselect toolbar-action">
-    Displayed indicators
-    <span class="filler"></span>
-    <mat-checkbox (change)="selectDisplayed($event, shown)"></mat-checkbox>
-  </mat-toolbar>
-  <mat-list-option *ngFor="let selection of selections" [value]="selection">
-    <span matListItemTitle>{{selection.label}}</span>
-  </mat-list-option>
-  <mat-list-item class="list-action" disableRipple="true">
-    <button mat-raised-button color="accent" [disabled]="shown.selectedOptions.selected.length===0"
-      (click)="removeSelections($event, shown.selectedOptions.selected)"
-      matTooltip="remove this indicator">
-      REMOVE SELECTED
-    </button>
-  </mat-list-item>
-</mat-selection-list>
+  <!-- GENERAL SETTINGS -->
+  <mat-list>
+    <mat-toolbar class="noselect">
+      General settings
+      <span class="filler"></span>
+      <button mat-mini-fab class="close-button" (click)="closeListDialog()" matTooltip="close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-toolbar>
+    <mat-list-item>
+      <span class="no-wrap">Dark theme</span>
+      <mat-slide-toggle class="toggle"
+        [(ngModel)]="ts.isDarkTheme"
+        [color]="toggleColor"
+        (change)="toggleTheme($event)">
+      </mat-slide-toggle>
+    </mat-list-item>
+  </mat-list>
 
-<mat-nav-list>
-  <mat-toolbar class="noselect">
-    Available indicator
-    <div class="filler"></div>
-    <div matTooltip="indicator documentation">
-      <a mat-mini-fab href="https://dotnet.stockindicators.dev/" target="_blank" rel="noopener">
-        ?
-      </a>
-    </div>
-  </mat-toolbar>
-  <a mat-list-item *ngFor="let listing of listings" (click)="openIndicatorSettings(listing)">
-    <span matListItemTitle>{{listing.name}}</span>
-    <span matListItemLine>{{listing.category}}</span>
-  </a>
-</mat-nav-list>
+  <!-- DISPLAYED INDICATORS -->
+  <mat-selection-list #shown *ngIf="selections.length>0">
+    <mat-toolbar class="noselect toolbar-action">
+      Displayed indicators
+      <span class="filler"></span>
+      <mat-checkbox (change)="selectDisplayed($event, shown)"></mat-checkbox>
+    </mat-toolbar>
+    <mat-list-option *ngFor="let selection of selections" [value]="selection">
+      <span matListItemTitle>{{selection.label}}</span>
+    </mat-list-option>
+    <mat-list-item class="list-action" disableRipple="true">
+      <button mat-raised-button color="accent" [disabled]="shown.selectedOptions.selected.length===0"
+        (click)="removeSelections($event, shown.selectedOptions.selected)" matTooltip="remove this indicator">
+        REMOVE SELECTED
+      </button>
+    </mat-list-item>
+  </mat-selection-list>
+
+  <!-- AVAILABLE INDICATORS -->
+  <mat-nav-list>
+    <mat-toolbar class="noselect">
+      Available indicator
+      <span class="filler"></span>
+      <div matTooltip="indicator documentation">
+        <a mat-mini-fab href="https://dotnet.stockindicators.dev/indicators/" target="_blank" rel="noopener">
+          ?
+        </a>
+      </div>
+    </mat-toolbar>
+    <a mat-list-item *ngFor="let listing of listings" (click)="openIndicatorSettings(listing)">
+      <span matListItemTitle>{{listing.name}}</span>
+      <span matListItemLine>{{listing.category}}</span>
+    </a>
+  </mat-nav-list>
+
+</mat-dialog-content>
