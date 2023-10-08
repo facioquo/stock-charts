@@ -1,19 +1,20 @@
+<h2 mat-dialog-title class="noselect">
+  Chart settings
+  <button mat-mini-fab class="close-button" (click)="closeListDialog()" matTooltip="close">
+    <mat-icon>close</mat-icon>
+  </button>
+</h2>
+
 <mat-dialog-content>
 
   <!-- GENERAL SETTINGS -->
   <mat-list>
     <mat-toolbar class="noselect">
-      General settings
-      <span class="filler"></span>
-      <button mat-mini-fab class="close-button" (click)="closeListDialog()" matTooltip="close">
-        <mat-icon>close</mat-icon>
-      </button>
+      Theme settings
     </mat-toolbar>
     <mat-list-item>
       <span class="no-wrap">Dark theme</span>
-      <mat-slide-toggle class="toggle"
-        [(ngModel)]="ts.isDarkTheme"
-        [color]="toggleColor"
+      <mat-slide-toggle class="toggle" [(ngModel)]="ts.isDarkTheme" [color]="toggleColor"
         (change)="toggleTheme($event)">
       </mat-slide-toggle>
     </mat-list-item>
@@ -40,7 +41,7 @@
   <!-- AVAILABLE INDICATORS -->
   <mat-nav-list>
     <mat-toolbar class="noselect">
-      Available indicator
+      Available indicators
       <span class="filler"></span>
       <div matTooltip="indicator documentation">
         <a mat-mini-fab href="https://dotnet.stockindicators.dev/indicators/" target="_blank" rel="noopener">

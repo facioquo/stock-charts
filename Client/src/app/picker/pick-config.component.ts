@@ -35,7 +35,7 @@ export class PickConfigComponent {
   selection: IndicatorSelection;
   customPicker: MtxColorpicker;
   errorMessage: string;
-  closeButtonLabel = "Add";
+  closeButtonLabel = "ADD";
 
   presetColors: string[] = [
     '#DD2C00', // deep orange A700 (red)
@@ -89,13 +89,13 @@ export class PickConfigComponent {
 
           this.cs.displaySelection(selectionWithData, this.listing, true);
           this.errorMessage = undefined;
-          this.closeButtonLabel = "Resolved ...";
+          this.closeButtonLabel = "RESOLVED ...";
           this.dialogRef.close();
         },
         error: (e: HttpErrorResponse) => {
           console.log(e);
           this.errorMessage = e.error;
-          this.closeButtonLabel = "Retry";
+          this.closeButtonLabel = "RETRY";
         }
       });
   }
@@ -108,9 +108,9 @@ export class PickConfigComponent {
     return `Valid range is ${param.minimum} to ${param.maximum}`;
   }
 
-  selectColor(e: ColorEvent, picker: MtxColorpicker): string {
+  getColor(e: ColorEvent, picker: MtxColorpicker): string {
     const color = e.color.rgb.a === 1 ? e.color.hex : new TinyColor(e.color.rgb).toHex8String();
     picker.close();
-    return color;
+    return color.toUpperCase();
   }
 }

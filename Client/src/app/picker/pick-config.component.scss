@@ -1,22 +1,72 @@
+// @import "src/app/styles-theme";
+
 .mat-mdc-dialog-title {
-  white-space: normal;
-  max-width: 350px !important;
-  line-height: 1.1;
+  text-align: center;
 }
 
-mat-toolbar {
-  margin-top: 1em;
-  margin-bottom: 1em;
+mat-dialog-actions {
+  margin: 16px;
+  border-top: solid;
+  border-width: 1px;
+}
+
+h2 {
+  font-size: 1.3em;
+  font-weight: 400;
+}
+
+h3 {
+  font-size: 1em;
+  font-weight: 400;
+  margin-left: 16px;
 }
 
 .param-container {
-  margin-top: 1em;
+  margin: 2rem 1rem 0 1rem;
 }
 
-.param-input,
-.style-input {
+.param-input {
   display: block;
+  max-width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+
+  input {
+    text-align: center;
+  }
 }
+
+.style-container {
+  margin: 1rem;
+
+  @media screen and (max-width: 700px) {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 200px;
+  }
+
+  .style-input {
+
+    width: 150px;
+
+    @media screen and (max-width: 700px) {
+      display: block;
+      width: auto;
+    }
+  }
+
+  mat-form-field:not(:nth-child(2)) {
+    width: 125px;
+    margin-left: 1rem;
+
+    @media screen and (max-width: 700px) {
+      margin-left: 0;
+      width: unset;
+    }
+  }
+}
+
+
 
 .error {
   max-width: fit-content;

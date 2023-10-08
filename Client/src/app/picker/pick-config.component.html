@@ -6,27 +6,30 @@
 
     <mat-tab-group animationDuration="0ms" mat-align-tabs="center">
 
-      <mat-tab label="Parameters" *ngIf="selection.params.length>0">
-        <mat-list-item class="param-container">
-          <mat-form-field class="param-input" *ngFor="let p of selection.params; index as i">
-            <mat-label>{{p.displayName}}</mat-label>
-            <input matInput #param="ngModel" name="param{{i}}" [(ngModel)]="p.value" type="number" required
-              min="{{p.minimum}}" max="{{p.maximum}}">
-            <mat-error *ngIf="param.invalid">{{paramRangeError(p)}}</mat-error>
-          </mat-form-field>
-        </mat-list-item>
+      <mat-tab label="Params" *ngIf="selection.params.length>0">
+        <div class="param-container">
+          <div *ngFor="let p of selection.params; index as i">
+            <mat-form-field class="param-input">
+              <mat-label>{{p.displayName}}</mat-label>
+              <input matInput #param="ngModel" name="param{{i}}" [(ngModel)]="p.value" type="number" required
+                min="{{p.minimum}}" max="{{p.maximum}}">
+              <mat-error *ngIf="param.invalid">{{paramRangeError(p)}}</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
       </mat-tab>
 
       <mat-tab label="Styles" *ngIf="listing.category !== 'candlestick-pattern'">
 
-        <mat-list-item *ngFor="let r of selection.results; index as i">
+        <div class="style-container" *ngFor="let r of selection.results; index as i">
 
-          <mat-toolbar>{{r.displayName}}</mat-toolbar>
+          <h3>{{r.displayName}}</h3>
 
           <!-- color -->
           <mat-form-field class="style-input">
             <mat-label>Color</mat-label>
-            <input matInput name="color{{i}}" [mtxColorpicker]="customPicker" [(ngModel)]="r.color" disabled>
+            <input matInput #hexcolor="ngModel" name="color{{i}}" [mtxColorpicker]="customPicker" [(ngModel)]="r.color" pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3}|[A-Fa-f0-9]{8})$">
+            <mat-error *ngIf="hexcolor.invalid">Invalid HEX color</mat-error>
             <mtx-colorpicker-toggle matSuffix [for]="customPicker" [ngStyle]="{'color':r.color}">
             </mtx-colorpicker-toggle>
             <mtx-colorpicker #customPicker [content]="customPickerContent" disabled="false"></mtx-colorpicker>
@@ -35,12 +38,12 @@
           <ng-template #customPickerContent>
             <div>
               <color-compact [colors]="presetColors" [color]="customPicker.selected"
-                (onChange)="customPicker.select(selectColor($event, customPicker))">
+                (onChange)="customPicker.select(getColor($event, customPicker))">
               </color-compact>
             </div>
           </ng-template>
 
-          <!-- style -->
+          <!-- line type -->
           <mat-form-field class="style-input">
             <mat-label>Line style</mat-label>
             <mat-select name="linetype{{i}}" [(ngModel)]="r.lineType">
@@ -50,17 +53,17 @@
             </mat-select>
           </mat-form-field>
 
-          <!-- width -->
+          <!-- line width -->
           <mat-form-field class="style-input">
             <mat-label>Line width</mat-label>
             <mat-select name="linewidth{{i}}" [(ngModel)]="r.lineWidth">
-              <mat-option *ngFor="let w of lineWidths" [value]="w.value">
-                {{w.name}}
+              <mat-option *ngFor="let width of lineWidths" [value]="width.value">
+                {{width.name}}
               </mat-option>
             </mat-select>
           </mat-form-field>
 
-        </mat-list-item>
+        </div>
       </mat-tab>
     </mat-tab-group>
 
@@ -73,7 +76,7 @@
 
   <!-- action pane -->
   <mat-dialog-actions>
-    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button mat-dialog-close>CANCEL</button>
     <button mat-raised-button cdkFocusInitial (click)="onSubmit()" color="accent" [disabled]="paramForm.invalid">
       {{closeButtonLabel}}
     </button>

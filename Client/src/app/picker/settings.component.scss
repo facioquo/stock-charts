@@ -1,12 +1,19 @@
-
-.close-button {
-  position: relative;
-  top: -30px;
-  right: -30px;
+.mat-mdc-dialog-title {
+  text-align: center;
+  line-height: 1.1;
 }
 
+.close-button {
+  display: flex;
+  position: relative;
+  top: 8px;
+  float: right;
+}
+
+mat-toolbar,
 .toolbar-action {
   padding-right: 8px;
+  font-size: 1.1em;
 }
 
 .list-action {
