@@ -5,12 +5,12 @@
 html,
 body {
   min-height: 100vh;
+  font-family: "Google Sans", Roboto, "Helvetica Neue", sans-serif;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: "Google Sans", Roboto, "Helvetica Neue", sans-serif;
 }
 
 .center {
@@ -81,7 +81,7 @@ mat-chip-list {
 }
 
 mat-dialog-actions {
-  justify-content: center;
+  justify-content: center !important;
 }
 
 mat-radio-group {

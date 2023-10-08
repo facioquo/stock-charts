@@ -1,29 +1,30 @@
-<h1 mat-dialog-title>{{listing.name}}</h1>
+<h2 mat-dialog-title>{{listing.name}}</h2>
 
 <!-- form content -->
 <form #paramForm="ngForm" name="paramForm">
-  <div mat-dialog-content>
+  <mat-dialog-content>
 
     <mat-tab-group animationDuration="0ms" mat-align-tabs="center">
 
       <mat-tab label="Parameters" *ngIf="selection.params.length>0">
-        <div *ngFor="let p of selection.params; index as i" style="margin-top:0.5em;">
-          <mat-form-field [style.width.px]=150>
+        <mat-list-item class="param-container">
+          <mat-form-field class="param-input" *ngFor="let p of selection.params; index as i">
             <mat-label>{{p.displayName}}</mat-label>
             <input matInput #param="ngModel" name="param{{i}}" [(ngModel)]="p.value" type="number" required
               min="{{p.minimum}}" max="{{p.maximum}}">
             <mat-error *ngIf="param.invalid">{{paramRangeError(p)}}</mat-error>
           </mat-form-field>
-        </div>
+        </mat-list-item>
       </mat-tab>
 
       <mat-tab label="Styles" *ngIf="listing.category !== 'candlestick-pattern'">
-        <div *ngFor="let r of selection.results; index as i">
 
-          <h2>{{r.displayName}}</h2>
+        <mat-list-item *ngFor="let r of selection.results; index as i">
+
+          <mat-toolbar>{{r.displayName}}</mat-toolbar>
 
           <!-- color -->
-          <mat-form-field [style.width.px]=110>
+          <mat-form-field class="style-input">
             <mat-label>Color</mat-label>
             <input matInput name="color{{i}}" [mtxColorpicker]="customPicker" [(ngModel)]="r.color" disabled>
             <mtx-colorpicker-toggle matSuffix [for]="customPicker" [ngStyle]="{'color':r.color}">
@@ -34,13 +35,13 @@
           <ng-template #customPickerContent>
             <div>
               <color-compact [colors]="presetColors" [color]="customPicker.selected"
-                (onChangeComplete)="customPicker.select(getHex8($event))">
+                (onChange)="customPicker.select(selectColor($event, customPicker))">
               </color-compact>
             </div>
           </ng-template>
 
           <!-- style -->
-          <mat-form-field [style.width.px]=100 [style.margin-left.px]=8>
+          <mat-form-field class="style-input">
             <mat-label>Line style</mat-label>
             <mat-select name="linetype{{i}}" [(ngModel)]="r.lineType">
               <mat-option *ngFor="let style of lineStyles" [value]="style.value">
@@ -50,7 +51,7 @@
           </mat-form-field>
 
           <!-- width -->
-          <mat-form-field [style.width.px]=100 [style.margin-left.px]=8>
+          <mat-form-field class="style-input">
             <mat-label>Line width</mat-label>
             <mat-select name="linewidth{{i}}" [(ngModel)]="r.lineWidth">
               <mat-option *ngFor="let w of lineWidths" [value]="w.value">
@@ -59,7 +60,7 @@
             </mat-select>
           </mat-form-field>
 
-        </div>
+        </mat-list-item>
       </mat-tab>
     </mat-tab-group>
 
@@ -68,13 +69,13 @@
       <p class="font-warn">{{errorMessage}}</p>
     </div>
 
-  </div>
+  </mat-dialog-content>
 
   <!-- action pane -->
-  <div mat-dialog-actions>
+  <mat-dialog-actions>
     <button mat-button mat-dialog-close>Cancel</button>
     <button mat-raised-button cdkFocusInitial (click)="onSubmit()" color="accent" [disabled]="paramForm.invalid">
       {{closeButtonLabel}}
     </button>
-  </div>
+  </mat-dialog-actions>
 </form>

@@ -108,8 +108,9 @@ export class PickConfigComponent {
     return `Valid range is ${param.minimum} to ${param.maximum}`;
   }
 
-  getHex8(e: ColorEvent): string {
-    const alpha = e.color.rgb.a;
-    return alpha === 1 ? e.color.hex : new TinyColor(e.color.rgb).toHex8String();
+  selectColor(e: ColorEvent, picker: MtxColorpicker): string {
+    const color = e.color.rgb.a === 1 ? e.color.hex : new TinyColor(e.color.rgb).toHex8String();
+    picker.close();
+    return color;
   }
 }
