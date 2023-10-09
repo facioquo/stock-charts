@@ -23,7 +23,7 @@
     "@angular/router": "^16.2.8",
     "@ctrl/tinycolor": "^3.6.0",
     "@ng-matero/extensions": "^16.1.1",
-    "chart.js": "^4.3.0",
+    "chart.js": "^4.4.0",
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-plugin-annotation": "^3.0.1",
     "date-fns": "^2.30.0",
@@ -46,7 +46,7 @@
     "@types/node": "^20.3.1",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
-    "eslint": "^8.43.0",
+    "eslint": "^8.51.0",
     "ts-node": "~10.9.1",
     "typescript": "~5.1.3"
   }
