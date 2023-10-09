@@ -12,6 +12,7 @@ import { enUS } from 'date-fns/locale';
 import { Guid } from "guid-typescript";
 
 import {
+  CartesianScaleOptions,
   ChartConfiguration,
   ChartDataset,
   FinancialDataPoint,
@@ -167,7 +168,6 @@ export class ChartService {
                   return gridColor;
                 }
               },
-
             }
           }
         }
@@ -199,7 +199,10 @@ export class ChartService {
       axis: 'y',
       position: 'left',
       beginAtZero: true,
-      padding: 0
+      padding: 0,
+      border: {
+        display: false
+      }
     } as ScaleOptions;
 
     return config;
@@ -208,12 +211,16 @@ export class ChartService {
   baseOscillatorConfig(): ChartConfiguration {
 
     const config = this.baseConfig();
+    const y = config.options.scales.yAxis as CartesianScaleOptions;
 
     // remove x-axis
     config.options.scales.xAxis.display = false;
 
+    // size to data, instead of next tick
+    y.bounds = "data";
+
     // remove first and last y-axis labels
-    config.options.scales.yAxis.ticks.callback = (value: number, index, values) => {
+    y.ticks.callback = (value: number, index, values) => {
 
       this.yAxisTicks = values;
 
@@ -465,8 +472,8 @@ export class ChartService {
     }
 
     // y-scale
-    chartConfig.options.scales.yAxis.min = listing.chartConfig?.minimumYAxis;
-    chartConfig.options.scales.yAxis.max = listing.chartConfig?.maximumYAxis;
+    chartConfig.options.scales.yAxis.suggestedMin = listing.chartConfig?.minimumYAxis;
+    chartConfig.options.scales.yAxis.suggestedMax = listing.chartConfig?.maximumYAxis;
 
     // add selection
     selection.results.forEach((r: IndicatorResult) => {
