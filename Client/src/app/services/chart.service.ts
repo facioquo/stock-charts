@@ -115,7 +115,7 @@ export class ChartService {
           }
         },
         layout: {
-          padding: 0,
+          padding: 1,
           autoPadding: false
         },
         responsive: true,
@@ -133,18 +133,18 @@ export class ChartService {
             ticks: {
               display: true,
               mirror: true,
-              padding: -5,
               font: {
-                size: 10,
+                family: "Google Sans",
+                size: 12,
                 lineHeight: 1
               },
               showLabelBackdrop: true,
               backdropColor: this.ts.isDarkTheme ? '#212121' : 'white',
               backdropPadding: {
                 top: 0,
-                left: 2,
+                left: 5,
                 bottom: 0,
-                right: 2
+                right: 0
               },
             },
             border: {
@@ -205,14 +205,6 @@ export class ChartService {
     // remove x-axis
     config.options.scales.xAxis.display = false;
 
-    // top padding
-    config.options.layout.padding = {
-      top: 5,
-      right: 0,
-      bottom: 0,
-      left: 0
-    };
-
     // remove first and last y-axis labels
     config.options.scales.yAxis.ticks.callback = (value: number, index, values) => {
 
@@ -239,6 +231,7 @@ export class ChartService {
   commonXAxes(): ScaleOptions {
 
     const axes: ScaleOptions = {
+      offset: true,
       alignToPixels: true,
       display: false,
       type: 'timeseries',
@@ -251,6 +244,7 @@ export class ChartService {
         },
       },
       ticks: {
+        display: false,
         source: "auto",
         padding: 0,
         autoSkip: true,
@@ -264,8 +258,8 @@ export class ChartService {
         display: false
       },
       grid: {
-        drawOnChartArea: false,
-        tickLength: 2
+        display: false,
+        drawOnChartArea: false
       }
     };
 
@@ -506,6 +500,8 @@ export class ChartService {
     selection.chart.options.plugins.annotation.annotations = { annotation };
     selection.chart.update();
 
+    // console.log("annotation", selection.label);  // temp
+
     if (scrollToMe) this.scrollToEnd(container.id);
   }
 
@@ -522,7 +518,7 @@ export class ChartService {
           const annotation: AnnotationOptions =
             this.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, -2, adjY);
           annotation.id = "legend" + (index + 1).toString();
-          adjY += 12;
+          adjY += 15;
           return annotation;
         });
   }
@@ -538,7 +534,7 @@ export class ChartService {
 
     const legendFont: FontSpec = {
       family: "Google Sans",
-      size: 11,
+      size: 13,
       style: "normal",
       weight: "normal",
       lineHeight: 1,
