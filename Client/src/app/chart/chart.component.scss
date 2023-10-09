@@ -1,8 +1,9 @@
 @import "../styles";
 
-.chart-overlay-container {
+// note: width is managed by .content-container
 
-  // note: width is managed by .content-container
+
+.chart-overlay-container {
 
   padding: 0;
   margin: auto;
@@ -20,10 +21,10 @@
 }
 
 .chart-oscillator-container {
+
   padding: 0;
   margin: auto;
-  border-style: none;
-  border-width: 0;
+
   height: 15vh;
 
   @media (max-height: 800px){

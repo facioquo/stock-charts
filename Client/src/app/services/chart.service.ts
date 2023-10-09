@@ -115,7 +115,12 @@ export class ChartService {
           }
         },
         layout: {
-          padding: 1,
+          padding: {
+            top: 0,
+            left: 1,
+            bottom: 0,
+            right: 1
+          },
           autoPadding: false
         },
         responsive: true,
@@ -146,6 +151,7 @@ export class ChartService {
                 bottom: 0,
                 right: 0
               },
+              padding: 0
             },
             border: {
               display: false
@@ -192,7 +198,8 @@ export class ChartService {
       type: 'linear',
       axis: 'y',
       position: 'left',
-      beginAtZero: true
+      beginAtZero: true,
+      padding: 0
     } as ScaleOptions;
 
     return config;
@@ -344,7 +351,7 @@ export class ChartService {
       this.addSelectionToOverlayChart(selection, scrollToMe);
     }
     else {
-      this.addSelectionToNewChart(selection, listing, scrollToMe);
+      this.addSelectionToNewOscillator(selection, listing, scrollToMe);
     };
 
     this.cacheSelections();
@@ -404,7 +411,7 @@ export class ChartService {
     if (scrollToMe) this.scrollToStart("chart-overlay");
   }
 
-  addSelectionToNewChart(
+  addSelectionToNewOscillator(
     selection: IndicatorSelection,
     listing: IndicatorListing,
     scrollToMe: boolean) {
@@ -491,8 +498,8 @@ export class ChartService {
     selection.chart = new Chart(myCanvas.getContext("2d"), chartConfig);
 
     // annotations
-    const xPos: ScaleValue = selection.chart.scales["xAxis"].getMinMax(false).min;
-    const yPos: ScaleValue = selection.chart.scales["yAxis"].getMinMax(false).max;
+    const xPos: ScaleValue = selection.chart.scales["xAxis"].min;
+    const yPos: ScaleValue = selection.chart.scales["yAxis"].max;
 
     const labelColor = this.ts.isDarkTheme ? '#757575' : '#212121';
     const annotation: AnnotationOptions =
@@ -500,15 +507,14 @@ export class ChartService {
     selection.chart.options.plugins.annotation.annotations = { annotation };
     selection.chart.update();
 
-    // console.log("annotation", selection.label);  // temp
 
     if (scrollToMe) this.scrollToEnd(container.id);
   }
 
   updateOverlayAnnotations() {
 
-    const xPos: ScaleValue = this.chartOverlay.scales["xAxis"].getMinMax(false).min;
-    const yPos: ScaleValue = this.chartOverlay.scales["yAxis"].getMinMax(false).max;
+    const xPos: ScaleValue = this.chartOverlay.scales["xAxis"].min;
+    const yPos: ScaleValue = this.chartOverlay.scales["yAxis"].max;
     let adjY: number = 0;
 
     this.chartOverlay.options.plugins.annotation.annotations =
