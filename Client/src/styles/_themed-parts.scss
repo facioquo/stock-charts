@@ -1,7 +1,7 @@
 @use '@angular/material' as mat;
 @use 'sass:map';
 
-@use '../app/picker/tab-theme';
+@use '../app/picker/scrollbar-theme';
 
 // application core styles that are based on the current theme
 @mixin theme($theme) {
@@ -19,16 +19,16 @@
   .main-toolbar {
 
     background-color: transparent;
-    color: mat.get-color-from-palette($accent, 600);
+
+    h1 {
+      color: mat.get-color-from-palette($accent, 600);
+      font-size: 1.4em;
+    }
 
     max-width: $maxwidth;
     margin-left: auto;
     margin-right: auto;
-    padding: 0;
-
-    @media screen and (max-width: $maxwidth) {
-      padding: 0 8px;
-    }
+    padding: 0 1px;
 
     a {
       font-family: "Google Sans", Roboto, Arial, Helvetica, sans-serif;
@@ -44,7 +44,7 @@
 
   // MAIN FOOTER
   .footer {
-    padding: 0 9px 9px 8px;
+    padding: 1rem 9px;
     text-align: center;
     color: mat.get-color-from-palette($accent, 600);
 
@@ -67,5 +67,5 @@
   }
 
   // OTHERS DEFINED SEPARATELY
-  @include tab-theme.theme($theme);
+  @include scrollbar-theme.theme($theme);
 }

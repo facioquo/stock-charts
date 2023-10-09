@@ -1,12 +1,11 @@
 @import "../styles";
 
 .chart-overlay-container {
+
+  // note: width is managed by .content-container
+
   padding: 0;
   margin: auto;
-  border-style: none;
-  border-width: 0;
-
-  max-width: 1024px;
 
   height: 55vh;
   // height: 300px;     // for doc site only
@@ -26,8 +25,6 @@
   border-style: none;
   border-width: 0;
   height: 15vh;
-
-  max-width: 1024px;
 
   @media (max-height: 800px){
     height: 20vh;
