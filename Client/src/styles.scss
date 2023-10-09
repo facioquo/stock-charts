@@ -3,9 +3,9 @@
 @use "./styles/base-elements";
 
 // DEFAULT THEME (see light/dark swap SCSS files)
-$primary: mat.define-palette(mat.$grey-palette, 900);
+$primary: mat.define-palette(mat.$gray-palette, 300);
 $accent: mat.define-palette(mat.$gray-palette, 800);
-$warn: mat.define-palette(mat.$deep-orange-palette, 900);
+$warn: mat.define-palette(mat.$blue-palette, 800);
 
 $theme: mat.define-dark-theme((
   color: (
@@ -23,5 +23,5 @@ $theme: mat.define-dark-theme((
 @include themed-parts.theme($theme);
 
 .app-background {
-  background-color: mat.get-color-from-palette($primary, 900);
+  background-color: mat.get-color-from-palette($accent, 900);
 }

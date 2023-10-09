@@ -1,6 +1,6 @@
 <h2 mat-dialog-title class="noselect">
   CHART SETTINGS
-  <button mat-icon-button class="close-button" (click)="closeListDialog()" matTooltip="close">
+  <button mat-icon-button (click)="closeListDialog()" matTooltip="close">
     <mat-icon>close</mat-icon>
   </button>
 </h2>
@@ -9,9 +9,6 @@
 
   <!-- GENERAL SETTINGS -->
   <mat-list>
-    <mat-toolbar class="noselect">
-      Theme settings
-    </mat-toolbar>
     <mat-list-item>
       <span class="no-wrap">Dark theme</span>
       <mat-slide-toggle class="toggle" [(ngModel)]="ts.isDarkTheme" [color]="toggleColor"

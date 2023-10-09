@@ -1,7 +1,7 @@
 @use '@angular/material' as mat;
 @use 'sass:map';
 
-// @use './app/shared/carousel/carousel-theme';
+@use '../app/picker/tab-theme';
 
 // application core styles that are based on the current theme
 @mixin theme($theme) {
@@ -19,7 +19,7 @@
   .main-toolbar {
 
     background-color: transparent;
-    color: mat.get-color-from-palette($primary, 600);
+    color: mat.get-color-from-palette($accent, 600);
 
     max-width: $maxwidth;
     margin-left: auto;
@@ -36,7 +36,7 @@
       color: inherit;
 
       &:hover {
-        color: mat.get-color-from-palette($primary, 500);
+        color: mat.get-color-from-palette($accent, 500);
       }
     }
   }
@@ -46,7 +46,7 @@
   .footer {
     padding: 0 9px 9px 8px;
     text-align: center;
-    color: mat.get-color-from-palette($primary, 600);
+    color: mat.get-color-from-palette($accent, 600);
 
     a {
 
@@ -61,11 +61,11 @@
       }
 
       &:hover {
-        color: mat.get-color-from-palette($primary, 500);
+        color: mat.get-color-from-palette($accent, 500);
       }
     }
   }
 
   // OTHERS DEFINED SEPARATELY
-  // @include carousel-theme.theme($theme);
+  @include tab-theme.theme($theme);
 }

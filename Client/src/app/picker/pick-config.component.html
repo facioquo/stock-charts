@@ -77,7 +77,7 @@
   <!-- action pane -->
   <mat-dialog-actions>
     <button mat-button mat-dialog-close>CANCEL</button>
-    <button mat-raised-button cdkFocusInitial (click)="onSubmit()" color="primary" [disabled]="paramForm.invalid">
+    <button mat-raised-button cdkFocusInitial (click)="onSubmit()" color="warn" [disabled]="paramForm.invalid">
       {{closeButtonLabel}}
     </button>
   </mat-dialog-actions>
