@@ -1,0 +1,31 @@
+// Angular Material Theme info only
+// Use styles.scss for main site styles
+// ref: https://www.materialpalette.com
+
+@use 'sass:map';
+@use '@angular/material' as mat;
+@use 'themed-parts';
+
+// LIGHT THEME
+$primary: mat.define-palette(mat.$grey-palette);
+$accent: mat.define-palette(mat.$gray-palette, 200);
+$warn: mat.define-palette(mat.$deep-orange-palette, 800);
+
+$theme: mat.define-light-theme((
+  color: (
+    primary: $primary,
+    accent: $accent,
+    warn: $warn
+  ),
+  typography: mat.define-typography-config(),
+));
+
+// apply theme
+@include mat.all-component-themes(map.merge($theme, (
+  typography: mat.define-typography-config()
+)));
+@include themed-parts.theme($theme);
+
+.app-background {
+  background-color: #FFF;
+}

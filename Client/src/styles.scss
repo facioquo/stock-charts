@@ -1,0 +1,27 @@
+@use "@angular/material" as mat;
+@use "./styles/themed-parts";
+@use "./styles/base-elements";
+
+// DEFAULT THEME (see light/dark swap SCSS files)
+$primary: mat.define-palette(mat.$grey-palette, 900);
+$accent: mat.define-palette(mat.$gray-palette, 800);
+$warn: mat.define-palette(mat.$deep-orange-palette, 900);
+
+$theme: mat.define-dark-theme((
+  color: (
+    primary: $primary,
+    accent: $accent,
+    warn: $warn
+  ),
+  typography: mat.define-typography-config(),
+));
+
+// include material core styles
+@include mat.core();
+
+@include mat.all-component-themes($theme);
+@include themed-parts.theme($theme);
+
+.app-background {
+  background-color: mat.get-color-from-palette($primary, 900);
+}

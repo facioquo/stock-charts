@@ -23,13 +23,23 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              "src/assets",
-              "src/ecoysystem.config.js"
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "/assets"
+              }
             ],
             "styles": [
-              "src/app/styles-theme.scss",
-              "src/app/styles.scss"
+              "src/styles.scss",
+              {
+                "inject": false,
+                "input": "src/styles/theme-light.scss",
+                "bundleName": "theme-light"
+              }
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": ["node_modules", "src", "src/styles"]
+            },
             "scripts": [],
             "allowedCommonJsDependencies": [
               "chart.js",

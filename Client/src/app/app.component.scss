@@ -1,23 +1,29 @@
-@import "./styles";
+.content-container {
+  display: block;
+  position: relative;
+  text-align: right;
 
-.main-toolbar {
-  background-color: transparent;
-}
+  width: 100%;
+  max-width: 1024px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 8px 100px 8px;
 
-.footer {
-  padding: 0 9px 9px 8px;
-  text-align: center;
-  color: unset;
+  @media screen and (max-width: 1024px) {
+    padding: 0 8px;
+  }
 
-  a {
-    &:active,
-    &:hover,
-    &:visited {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
+  .button-container {
 
-      color: unset;
+    position: absolute;
+    top: -50px;
+    right: 8px;
+    height: 100%;
+
+    button {
+      opacity: 0.7;
+      position: sticky;
+      top: 8px;
     }
   }
 }

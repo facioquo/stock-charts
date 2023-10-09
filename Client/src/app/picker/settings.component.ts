@@ -54,6 +54,7 @@ export class SettingsComponent {
     // open settings for indicator to add
     this.picker.open(PickConfigComponent, {
       minWidth: '300px',
+      autoFocus: "dialog",
       data: listing
     });
   }

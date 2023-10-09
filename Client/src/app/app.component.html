@@ -1,19 +1,22 @@
-<mat-toolbar class="toolbar noselect main-toolbar" color="default">
+<mat-toolbar class="noselect main-toolbar" color="default">
   <h1 class="no-wrap">
     <a href="https://github.com/DaveSkender/Stock.Charts/">
       stock chart
     </a>
   </h1>
-  <div class="filler"></div>
-  <button mat-mini-fab
-    color="primary" (click)="openSettingsDialog()"
-    matTooltip="change indicators and settings"
-    aria-label="change indicators and settings">
-    <mat-icon color="primary">edit</mat-icon>
-  </button>
 </mat-toolbar>
 
-<div id="main-content" class="body-container">
+<div id="main-content" class="content-container">
+
+  <div class="button-container">
+    <button mat-fab color="accent"
+      (click)="openSettingsDialog()"
+      matTooltip="change indicators and settings"
+      aria-label="change indicators and settings">
+      <mat-icon color="primary">edit</mat-icon>
+    </button>
+  </div>
+
   <app-chart></app-chart>
 </div>
 

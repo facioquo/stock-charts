@@ -1,0 +1,71 @@
+@use '@angular/material' as mat;
+@use 'sass:map';
+
+// @use './app/shared/carousel/carousel-theme';
+
+// application core styles that are based on the current theme
+@mixin theme($theme) {
+  $primary: map.get($theme, primary);
+  $accent: map.get($theme, accent);
+  $warn: map.get($theme, warn);
+  $background: map.get($theme, background);
+  $foreground: map.get($theme, foreground);
+  $maxwidth: 1024px;
+
+
+  // ANGULAR MATERIAL OVERRIDES
+
+  // TOOLBAR
+  .main-toolbar {
+
+    background-color: transparent;
+    color: mat.get-color-from-palette($primary, 600);
+
+    max-width: $maxwidth;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0;
+
+    @media screen and (max-width: $maxwidth) {
+      padding: 0 8px;
+    }
+
+    a {
+      font-family: "Google Sans", Roboto, Arial, Helvetica, sans-serif;
+      text-decoration: none;
+      color: inherit;
+
+      &:hover {
+        color: mat.get-color-from-palette($primary, 500);
+      }
+    }
+  }
+
+
+  // MAIN FOOTER
+  .footer {
+    padding: 0 9px 9px 8px;
+    text-align: center;
+    color: mat.get-color-from-palette($primary, 600);
+
+    a {
+
+      &:active,
+      &:hover,
+      &:visited {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+
+        color: inherit;
+      }
+
+      &:hover {
+        color: mat.get-color-from-palette($primary, 500);
+      }
+    }
+  }
+
+  // OTHERS DEFINED SEPARATELY
+  // @include carousel-theme.theme($theme);
+}
