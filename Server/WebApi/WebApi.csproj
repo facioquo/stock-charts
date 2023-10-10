@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\Client\src\favicon.ico">
+    <None Include="favicon.ico">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
@@ -31,6 +31,12 @@
     <Content Update="appsettings.Token.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="favicon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
