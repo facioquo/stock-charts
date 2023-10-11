@@ -9,9 +9,9 @@
   </mat-toolbar>
 </header>
 
-<main id="main-content" class="content-container" [hidden]="cs.loading">
+<main id="main-content" class="content-container">
 
-  <div class="button-container">
+  <div class="button-container" *ngIf="!cs.loading">
     <button mat-fab color="accent"
       (click)="openSettingsDialog()"
       matTooltip="change indicators and settings"
@@ -23,7 +23,7 @@
   <app-chart></app-chart>
 </main>
 
-<footer class="footer" [hidden]="cs.loading">
+<footer class="footer" *ngIf="!cs.loading">
   Demo of the
   <strong>
     <a href="https://dotnet.stockindicators.dev/" target="_blank" rel="noopener">
