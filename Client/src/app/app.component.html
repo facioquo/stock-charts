@@ -1,21 +1,16 @@
-
-<header class="content-container">
-  <mat-toolbar class="noselect main-toolbar" color="default">
-    <h1 class="no-wrap">
-      <a href="https://github.com/DaveSkender/Stock.Charts/">
-        stock chart
-      </a>
-    </h1>
-  </mat-toolbar>
-</header>
+<mat-toolbar class="noselect main-toolbar" color="default">
+  <h1 class="no-wrap">
+    <a href="https://github.com/DaveSkender/Stock.Charts/">
+      stock chart
+    </a>
+  </h1>
+</mat-toolbar>
 
 <main id="main-content" class="content-container">
 
-  <div class="button-container" *ngIf="!cs.loading">
-    <button mat-fab color="accent"
-      (click)="openSettingsDialog()"
-      matTooltip="change indicators and settings"
-      aria-label="change indicators and settings">
+  <div class="button-container">
+    <button mat-fab color="accent" *ngIf="!cs.loading" (click)="openSettingsDialog()"
+      matTooltip="change indicators and settings" aria-label="change indicators and settings">
       <mat-icon color="primary">edit</mat-icon>
     </button>
   </div>
