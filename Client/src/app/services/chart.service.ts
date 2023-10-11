@@ -217,26 +217,31 @@ export class ChartService {
     config.options.scales.xAxis.display = false;
 
     // size to data, instead of next tick
-    y.bounds = "data";
+    // y.bounds = "data";
 
     // remove first and last y-axis labels
     y.ticks.callback = (value: number, index, values) => {
 
       this.yAxisTicks = values;
+      const v = Math.abs(value);
 
       if (index === 0 || index === values.length - 1) return null;
-      else if (value > 10000000000) {
-        return value / 1000000000 + "B";
-      }
-      else if (value > 10000000) {
-        return value / 1000000 + "M";
-      }
-      else if (value > 10000)
-        return value / 1000 + "K";
-      else if (value < 10)
-        return Math.round((value + Number.EPSILON) * 100000000) / 100000000;
+
+      // otherwise, condense large/small display values
+      else if (v > 10000000000)
+        return Math.trunc(value / 1000000000) + "B";
+      else if (v > 10000000)
+        return Math.trunc(value / 1000000) + "M";
+      else if (v > 10000)
+        return Math.trunc(value / 1000) + "K";
+      else if (v > 10)
+        return Math.trunc(value);
+      else if (v > 0)
+        return Math.round((value + Number.EPSILON) * 10) / 10;
+      else if (v > 0.001)
+        return Math.round((value + Number.EPSILON) * 100000) / 100000;
       else
-        return value;
+        return Math.round((value + Number.EPSILON) * 100000000) / 100000000;
     };
 
     return config;
@@ -245,7 +250,6 @@ export class ChartService {
   commonXAxes(): ScaleOptions {
 
     const axes: ScaleOptions = {
-      offset: true,
       alignToPixels: true,
       display: false,
       type: 'timeseries',

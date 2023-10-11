@@ -26,11 +26,9 @@ public class Storage
             ContentType = "application/json"
         };
 
-        using (MemoryStream ms = new(Encoding.UTF8.GetBytes(csv)))
-        {
-            ms.Position = 0;
-            await blob.UploadAsync(ms, httpHeader);
-        };
+        using MemoryStream ms = new(Encoding.UTF8.GetBytes(csv));
+        ms.Position = 0;
+        await blob.UploadAsync(ms, httpHeader);
         return true;
     }
 

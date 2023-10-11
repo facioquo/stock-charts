@@ -17,7 +17,6 @@ declare module 'chart.js' {
   }
 
   interface FinancialParsedData {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     _custom?: any
   }
 
