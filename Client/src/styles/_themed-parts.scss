@@ -28,7 +28,7 @@
     max-width: $maxwidth;
     margin-left: auto;
     margin-right: auto;
-    padding: 0 1px;
+    padding: 0 9px;
 
     a {
       font-family: "Google Sans", Roboto, Arial, Helvetica, sans-serif;
@@ -45,6 +45,7 @@
   // MAIN FOOTER
   .footer {
     padding: 1rem 9px;
+    margin-top: 3rem;
     text-align: center;
     color: mat.get-color-from-palette($accent, 600);
 

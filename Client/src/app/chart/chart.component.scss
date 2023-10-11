@@ -5,7 +5,8 @@
 
 .chart-overlay-container {
 
-  padding: 0;
+  padding: 0 8px;
+  max-width: 1024px;
   margin: auto;
 
   height: 55vh;
@@ -22,7 +23,8 @@
 
 .chart-oscillator-container {
 
-  padding: 0;
+  padding: 0 8px;
+  max-width: 1024px;
   margin: auto;
   margin-top: 0.5rem;
 
