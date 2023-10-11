@@ -1,25 +1,26 @@
-@import "./styles";
+.content-container {
 
-.edit-button {
-  position: fixed;
-  top: 12px;
-  right: 10px;
-}
+  display: block;
+  position: relative;
+  text-align: right;
 
-.footer {
-  padding: 0 9px 9px 8px;
-  text-align: center;
-  color: unset;
+  width: 100%;
+  max-width: 1024px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 8px;
 
-  a {
-    &:active,
-    &:hover,
-    &:visited {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
+  .button-container {
 
-      color: unset;
+    position: absolute;
+    top: -50px;
+    right: 8px;
+    height: 100%;
+
+    button {
+      opacity: 0.6;
+      position: sticky;
+      top: 8px;
     }
   }
 }

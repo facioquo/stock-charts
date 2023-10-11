@@ -6,14 +6,14 @@ IServiceCollection services = builder.Services;
 ConfigurationManager configuration = builder.Configuration;
 
 // add framework services
-services.AddControllers()
-        .AddNewtonsoftJson(x =>
-           x.SerializerSettings.ReferenceLoopHandling
-           = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+services.AddControllers();
+
+// get CORS origins from appsettings
+IConfigurationSection corsOrigins = configuration.GetSection("CorsOrigins");
+List<string> origins = new();
+origins.Add(item: corsOrigins["Website"]);
 
 // setup CORS for website
-IConfigurationSection corsOrigins = configuration.GetSection("CorsOrigins");
-
 services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy",
@@ -21,7 +21,8 @@ services.AddCors(options =>
     {
         cors.AllowAnyHeader();
         cors.AllowAnyMethod();
-        cors.WithOrigins(corsOrigins["Website"]);
+        cors.AllowCredentials();
+        cors.WithOrigins(origins.ToArray());
     });
 });
 
