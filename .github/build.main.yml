@@ -41,10 +41,10 @@ jobs:
           tokenSuffix: __
 
       - task: UseDotNet@2
-        displayName: Use .Net SDK 6.x
+        displayName: Use .Net SDK 7.x
         continueOnError: True
         inputs:
-          version: 6.x
+          version: 7.x
 
       - task: DotNetCoreCLI@2
         displayName: dotnet restore
@@ -75,14 +75,13 @@ jobs:
       - task: UseNode@1
         displayName: Use Node 18.x
         inputs:
-          version: 18.16.x
+          version: 18.18.x
 
       - task: Npm@1
         displayName: Install packages
         inputs:
-          command: 'custom'
+          command: 'install'
           workingDir: 'Client'
-          customCommand: 'install --legacy-peer-deps'
 
       - task: qetza.replacetokens.replacetokens-task.replacetokens@3
         displayName: Update GA tag

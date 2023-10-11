@@ -1,6 +1,5 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-
-import { ChartService } from './chart.service';
+import { Component, ViewEncapsulation } from '@angular/core';
+import { ChartService } from '../services/chart.service';
 
 @Component({
   selector: 'app-chart',
@@ -11,18 +10,11 @@ import { ChartService } from './chart.service';
   // see https://github.com/angular/angular/issues/7845
   encapsulation: ViewEncapsulation.None
 })
-export class ChartComponent implements OnInit {
+export class ChartComponent {
 
   constructor(
     public readonly cs: ChartService
-  ) { }
-
-    // STARTUP OPERATIONS
-  ngOnInit() {
-    this.startup();
-  }
-
-  startup() {
+  ) {
     this.cs.loadCharts();
   }
 }

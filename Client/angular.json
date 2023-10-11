@@ -23,20 +23,28 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              "src/icons",
-              "src/assets",
-              "src/favicon.ico",
-              "src/browserconfig.xml",
-              "src/ecoysystem.config.js"
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "/assets"
+              }
             ],
             "styles": [
-              "src/app/styles-theme.scss",
-              "src/app/styles.scss"
+              "src/styles.scss",
+              {
+                "inject": false,
+                "input": "src/styles/theme-light.scss",
+                "bundleName": "theme-light"
+              }
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": ["node_modules", "src", "src/styles"]
+            },
             "scripts": [],
             "allowedCommonJsDependencies": [
               "chart.js",
-              "chartjs-plugin-crosshair"
+              "src/assets/js/chartjs-chart-financial",
+              "guid-typescript"
             ],
             "vendorChunk": false,
             "extractLicenses": false,

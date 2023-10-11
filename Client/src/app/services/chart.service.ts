@@ -2,16 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { ApiService } from './api.service';
-import { StyleService } from '../style.service';
+import { StyleService } from './style.service';
 
 import Chart from 'chart.js/auto';  // import all default options
 import 'chartjs-adapter-date-fns';
-import 'chartjs-chart-financial';
+import 'src/assets/js/chartjs-chart-financial';
 
 import { enUS } from 'date-fns/locale';
 import { Guid } from "guid-typescript";
 
 import {
+  CartesianScaleOptions,
   ChartConfiguration,
   ChartDataset,
   FinancialDataPoint,
@@ -27,7 +28,7 @@ import {
   CandlestickElement,
   OhlcController,
   OhlcElement
-} from 'chartjs-chart-financial';
+} from 'src/assets/js/chartjs-chart-financial';
 
 // plugins
 import annotationPlugin, { AnnotationOptions, ScaleValue }
@@ -43,7 +44,7 @@ import {
   IndicatorResultConfig,
   IndicatorSelection,
   Quote
-} from './chart.models';
+} from '../chart/chart.models';
 
 Chart.register(
   CandlestickController,
@@ -115,7 +116,12 @@ export class ChartService {
           }
         },
         layout: {
-          padding: 0,
+          padding: {
+            top: 0,
+            left: 1,
+            bottom: 0,
+            right: 1
+          },
           autoPadding: false
         },
         responsive: true,
@@ -133,19 +139,20 @@ export class ChartService {
             ticks: {
               display: true,
               mirror: true,
-              padding: -5,
               font: {
-                size: 10,
+                family: "Google Sans",
+                size: 12,
                 lineHeight: 1
               },
               showLabelBackdrop: true,
               backdropColor: this.ts.isDarkTheme ? '#212121' : 'white',
               backdropPadding: {
                 top: 0,
-                left: 2,
+                left: 5,
                 bottom: 0,
-                right: 2
+                right: 0
               },
+              padding: 0
             },
             border: {
               display: false
@@ -161,7 +168,6 @@ export class ChartService {
                   return gridColor;
                 }
               },
-
             }
           }
         }
@@ -192,7 +198,11 @@ export class ChartService {
       type: 'linear',
       axis: 'y',
       position: 'left',
-      beginAtZero: true
+      beginAtZero: true,
+      padding: 0,
+      border: {
+        display: false
+      }
     } as ScaleOptions;
 
     return config;
@@ -201,36 +211,37 @@ export class ChartService {
   baseOscillatorConfig(): ChartConfiguration {
 
     const config = this.baseConfig();
+    const y = config.options.scales.yAxis as CartesianScaleOptions;
 
     // remove x-axis
     config.options.scales.xAxis.display = false;
 
-    // top padding
-    config.options.layout.padding = {
-      top: 5,
-      right: 0,
-      bottom: 0,
-      left: 0
-    };
+    // size to data, instead of next tick
+    // y.bounds = "data";
 
     // remove first and last y-axis labels
-    config.options.scales.yAxis.ticks.callback = (value: number, index, values) => {
+    y.ticks.callback = (value: number, index, values) => {
 
       this.yAxisTicks = values;
+      const v = Math.abs(value);
 
       if (index === 0 || index === values.length - 1) return null;
-      else if (value > 10000000000) {
-        return value / 1000000000 + "B";
-      }
-      else if (value > 10000000) {
-        return value / 1000000 + "M";
-      }
-      else if (value > 10000)
-        return value / 1000 + "K";
-      else if (value < 10)
-        return Math.round((value+Number.EPSILON)*100000000)/100000000;
+
+      // otherwise, condense large/small display values
+      else if (v > 10000000000)
+        return Math.trunc(value / 1000000000) + "B";
+      else if (v > 10000000)
+        return Math.trunc(value / 1000000) + "M";
+      else if (v > 10000)
+        return Math.trunc(value / 1000) + "K";
+      else if (v > 10)
+        return Math.trunc(value);
+      else if (v > 0)
+        return Math.round((value + Number.EPSILON) * 10) / 10;
+      else if (v > 0.001)
+        return Math.round((value + Number.EPSILON) * 100000) / 100000;
       else
-        return value;
+        return Math.round((value + Number.EPSILON) * 100000000) / 100000000;
     };
 
     return config;
@@ -251,6 +262,7 @@ export class ChartService {
         },
       },
       ticks: {
+        display: false,
         source: "auto",
         padding: 0,
         autoSkip: true,
@@ -264,8 +276,8 @@ export class ChartService {
         display: false
       },
       grid: {
-        drawOnChartArea: false,
-        tickLength: 2
+        display: false,
+        drawOnChartArea: false
       }
     };
 
@@ -350,7 +362,7 @@ export class ChartService {
       this.addSelectionToOverlayChart(selection, scrollToMe);
     }
     else {
-      this.addSelectionToNewChart(selection, listing, scrollToMe);
+      this.addSelectionToNewOscillator(selection, listing, scrollToMe);
     };
 
     this.cacheSelections();
@@ -410,7 +422,7 @@ export class ChartService {
     if (scrollToMe) this.scrollToStart("chart-overlay");
   }
 
-  addSelectionToNewChart(
+  addSelectionToNewOscillator(
     selection: IndicatorSelection,
     listing: IndicatorListing,
     scrollToMe: boolean) {
@@ -464,8 +476,8 @@ export class ChartService {
     }
 
     // y-scale
-    chartConfig.options.scales.yAxis.min = listing.chartConfig?.minimumYAxis;
-    chartConfig.options.scales.yAxis.max = listing.chartConfig?.maximumYAxis;
+    chartConfig.options.scales.yAxis.suggestedMin = listing.chartConfig?.minimumYAxis;
+    chartConfig.options.scales.yAxis.suggestedMax = listing.chartConfig?.maximumYAxis;
 
     // add selection
     selection.results.forEach((r: IndicatorResult) => {
@@ -497,8 +509,8 @@ export class ChartService {
     selection.chart = new Chart(myCanvas.getContext("2d"), chartConfig);
 
     // annotations
-    const xPos: ScaleValue = selection.chart.scales["xAxis"].getMinMax(false).min;
-    const yPos: ScaleValue = selection.chart.scales["yAxis"].getMinMax(false).max;
+    const xPos: ScaleValue = selection.chart.scales["xAxis"].min;
+    const yPos: ScaleValue = selection.chart.scales["yAxis"].max;
 
     const labelColor = this.ts.isDarkTheme ? '#757575' : '#212121';
     const annotation: AnnotationOptions =
@@ -506,13 +518,14 @@ export class ChartService {
     selection.chart.options.plugins.annotation.annotations = { annotation };
     selection.chart.update();
 
+
     if (scrollToMe) this.scrollToEnd(container.id);
   }
 
   updateOverlayAnnotations() {
 
-    const xPos: ScaleValue = this.chartOverlay.scales["xAxis"].getMinMax(false).min;
-    const yPos: ScaleValue = this.chartOverlay.scales["yAxis"].getMinMax(false).max;
+    const xPos: ScaleValue = this.chartOverlay.scales["xAxis"].min;
+    const yPos: ScaleValue = this.chartOverlay.scales["yAxis"].max;
     let adjY: number = 0;
 
     this.chartOverlay.options.plugins.annotation.annotations =
@@ -522,7 +535,7 @@ export class ChartService {
           const annotation: AnnotationOptions =
             this.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, -2, adjY);
           annotation.id = "legend" + (index + 1).toString();
-          adjY += 12;
+          adjY += 15;
           return annotation;
         });
   }
@@ -538,7 +551,7 @@ export class ChartService {
 
     const legendFont: FontSpec = {
       family: "Google Sans",
-      size: 11,
+      size: 13,
       style: "normal",
       weight: "normal",
       lineHeight: 1,
