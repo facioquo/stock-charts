@@ -1,12 +1,7 @@
 import {
   Chart,
-  ChartDataset,
-  BarControllerDatasetOptions
+  ChartDataset
 } from "chart.js";
-
-import {
-  CrosshairOptions
-} from 'chartjs-plugin-crosshair'
 
 export interface Quote {
   date: Date;
@@ -104,27 +99,3 @@ export interface IndicatorResult {
   dataset: ChartDataset
 }
 
-// MISSING CHART.JS TYPINGS (OVERRIDES)
-// bug: https://github.com/chartjs/chartjs-chart-financial/pull/115
-type CandleDatasetOption = BarControllerDatasetOptions & {
-  borderColor: {
-    up: string,
-    down: string,
-    unchanged: string
-  };
-}
-
-// MISSING CROSSHAIR PLUGIN TYPINGS
-declare module 'chart.js' {
-  interface PluginOptionsByType<TType extends ChartType> {
-    crosshair?: CrosshairOptions | undefined;
-  }
-
-  interface InteractionModeMap {
-    interpolate: InteractionModeFunction;
-  }
-
-  interface ChartDataSets {
-    interpolate?: boolean | undefined;
-  }
-}

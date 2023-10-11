@@ -306,7 +306,7 @@ export class ChartService {
         },
         sync: {
             enabled: true,                                      // enable trace line syncing with other charts
-            group: 1,                                           // chart group (can be unique set of groups)
+            group: 15,                                           // chart group (can be unique set of groups)
             suppressTooltips: true                              // suppress tooltips when showing a synced tracer
         },
         zoom: {
