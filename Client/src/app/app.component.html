@@ -9,7 +9,7 @@
   </mat-toolbar>
 </header>
 
-<main id="main-content" class="content-container">
+<main id="main-content" class="content-container" [hidden]="cs.loading">
 
   <div class="button-container">
     <button mat-fab color="accent"
@@ -23,7 +23,7 @@
   <app-chart></app-chart>
 </main>
 
-<footer class="footer">
+<footer class="footer" [hidden]="cs.loading">
   Demo of the
   <strong>
     <a href="https://dotnet.stockindicators.dev/" target="_blank" rel="noopener">
