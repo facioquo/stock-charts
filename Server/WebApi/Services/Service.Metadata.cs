@@ -2227,7 +2227,7 @@ public static class Metadata
                     },
                     new IndicatorParamConfig {
                         DisplayName = "Smooth Periods",
-                        ParamName = "stochPeriods",
+                        ParamName = "smoothPeriods",
                         DataType = "int",
                         DefaultValue = 1,
                         Minimum = 1,

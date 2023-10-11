@@ -4,7 +4,7 @@ using Azure.Storage.Blobs.Models;
 
 namespace WebApi.Services;
 
-public class Storage
+public static class Storage
 {
     // STARTUP
     public static void Startup()
@@ -26,11 +26,9 @@ public class Storage
             ContentType = "application/json"
         };
 
-        using (MemoryStream ms = new(Encoding.UTF8.GetBytes(csv)))
-        {
-            ms.Position = 0;
-            await blob.UploadAsync(ms, httpHeader);
-        };
+        using MemoryStream ms = new(Encoding.UTF8.GetBytes(csv));
+        ms.Position = 0;
+        await blob.UploadAsync(ms, httpHeader);
         return true;
     }
 

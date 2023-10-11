@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Alpaca.Markets;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Skender.Stock.Indicators;
 using WebApi.Services;
@@ -13,22 +9,36 @@ namespace Functions;
 
 public class Jobs
 {
-    [FunctionName("UpdateQuotes")]
-    public static async Task Run([TimerTrigger("0 */1 08-18 * * 1-5")] TimerInfo myTimer, ILogger log)
+    private readonly ILogger _logger;
+
+    public Jobs(ILoggerFactory loggerFactory)
+    {
+        _logger = loggerFactory.CreateLogger<Jobs>();
+    }
+
+    [Function("UpdateQuotes")]
+    public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5")] TimerInfo myTimer)
     {
         // ~ extended market hours, every minute "0 */1 08-18 * * 1-5"
         // for dev: minutely "0 */1 * * * *"
-        await StoreQuoteDaily("SPY", log);
-        await StoreQuoteDaily("QQQ", log);
+        await StoreQuoteDaily("SPY");
+        await StoreQuoteDaily("QQQ");
 
-        log.LogInformation($"Quotes updated at: {DateTime.Now}, {myTimer.ScheduleStatus}");
+        _logger.LogInformation(
+            "Quotes updated on {date and time} for {schedule status}.",
+             DateTime.Now, myTimer.ScheduleStatus);
     }
 
     // STORE QUOTE
-    private static async Task StoreQuoteDaily(string symbol, ILogger log)
+    private async Task StoreQuoteDaily(string symbol)
     {
-        string alpacaApiKey = Environment.GetEnvironmentVariable("AlpacaApiKey");
-        string alpacaSecret = Environment.GetEnvironmentVariable("AlpacaSecret");
+        string? alpacaApiKey = Environment.GetEnvironmentVariable("AlpacaApiKey");
+        string? alpacaSecret = Environment.GetEnvironmentVariable("AlpacaSecret");
+
+        if (alpacaApiKey == null || alpacaSecret == null)
+        {
+            throw new NullReferenceException("The Alpaca Key or Secret was not detected.");
+        }
 
         // fetch from Alpaca paper trading API
         IAlpacaDataClient alpacaDataClient = Environments.Paper
@@ -63,6 +73,6 @@ public class Jobs
         string blobName = $"{symbol}-DAILY.json";
         await Storage.PutBlob(blobName, json);
 
-        log.LogInformation($"Updated {blobName}");
+        _logger.LogInformation("Updated {blobName name}.", blobName);
     }
 }

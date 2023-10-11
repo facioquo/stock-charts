@@ -1,0 +1,28 @@
+.mat-mdc-dialog-title {
+
+  padding-right: 8px;
+
+  button {
+    display: flex;
+    position: relative;
+    top: 8px;
+    float: right;
+  }
+}
+
+.toolbar-action {
+  padding-right: 8px;
+  font-size: 1.1em;
+}
+
+.list-action {
+  text-align: right;
+  cursor: default;
+
+  --mdc-list-list-item-hover-state-layer-color: none;
+  --mdc-list-list-item-hover-state-layer-opacity: none;
+}
+
+.toggle {
+  float: right;
+}
