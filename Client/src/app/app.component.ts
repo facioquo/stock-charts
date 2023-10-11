@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { StyleService } from './style.service';
-
-import { PickListComponent } from './chart/picker/pick-list.component';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
+import { StyleService } from './services/style.service';
+import { SettingsComponent } from './picker/settings.component';
 
 @Component({
   selector: 'app-root',
@@ -13,18 +12,19 @@ export class AppComponent implements OnInit {
 
   constructor(
     public readonly ts: StyleService,
-    private readonly list: MatDialog
+    private readonly settingsDialog: MatDialog
   ) { }
 
   ngOnInit(): void {
     this.ts.getTheme();
   }
 
-  // PICKERS
-  openPickList(): void {
-    this.list.open(PickListComponent, {
-      minWidth: '300px',
-      maxHeight: '80vh'
+  // SETTINGS DIALOG
+  openSettingsDialog(): void {
+    this.settingsDialog.open(SettingsComponent, {
+      minWidth: "300px",
+      maxHeight: "80vh",
+      autoFocus: "dialog"
     });
   }
 

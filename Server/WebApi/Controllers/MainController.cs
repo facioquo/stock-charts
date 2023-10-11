@@ -18,11 +18,9 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("quotes")]
-    public IActionResult GetQuotes(
-        string symbol = "QQQ",
-        string timeSpan = "DAILY")
+    public IActionResult GetQuotes()
     {
-        IEnumerable<Quote> quotes = FetchQuotes.Get(symbol, timeSpan);
+        IEnumerable<Quote> quotes = FetchQuotes.Get();
         return Ok(quotes.TakeLast(limitLast));
     }
 
@@ -37,7 +35,7 @@ public class MainController : ControllerBase
 
     [HttpGet("ADL")]
     public IActionResult GetAdl(
-        int smaPeriods = 3)
+        int smaPeriods)
     {
         try
         {
@@ -57,7 +55,7 @@ public class MainController : ControllerBase
 
     [HttpGet("ADX")]
     public IActionResult GetAdx(
-        int lookbackPeriods = 14)
+        int lookbackPeriods)
     {
         try
         {
@@ -77,9 +75,9 @@ public class MainController : ControllerBase
 
     [HttpGet("ALMA")]
     public IActionResult GetAlma(
-        int lookbackPeriods = 9,
-        double offset = 0.85,
-        double sigma = 6)
+        int lookbackPeriods,
+        double offset,
+        double sigma)
     {
         try
         {
@@ -99,12 +97,12 @@ public class MainController : ControllerBase
 
     [HttpGet("ALLIGATOR")]
     public IActionResult GetAlligator(
-        int jawPeriods = 13,
-        int jawOffset = 8,
-        int teethPeriods = 8,
-        int teethOffset = 5,
-        int lipsPeriods = 5,
-        int lipsOffset = 3)
+        int jawPeriods,
+        int jawOffset,
+        int teethPeriods,
+        int teethOffset,
+        int lipsPeriods,
+        int lipsOffset)
     {
         try
         {
@@ -124,7 +122,7 @@ public class MainController : ControllerBase
 
     [HttpGet("AROON")]
     public IActionResult GetAroon(
-        int lookbackPeriods = 25)
+        int lookbackPeriods)
     {
         try
         {
@@ -144,7 +142,7 @@ public class MainController : ControllerBase
 
     [HttpGet("ATR")]
     public IActionResult GetAtr(
-    int lookbackPeriods = 14)
+    int lookbackPeriods)
     {
         try
         {
@@ -164,8 +162,8 @@ public class MainController : ControllerBase
 
     [HttpGet("ATR-STOP-CLOSE")]
     public IActionResult GetAtrStopClose(
-        int lookbackPeriods = 21,
-        double multiplier = 3)
+        int lookbackPeriods,
+        double multiplier)
     {
         try
         {
@@ -185,8 +183,8 @@ public class MainController : ControllerBase
 
     [HttpGet("ATR-STOP-HL")]
     public IActionResult GetAtrStopHL(
-        int lookbackPeriods = 21,
-        double multiplier = 3)
+        int lookbackPeriods,
+        double multiplier)
     {
         try
         {
@@ -206,8 +204,8 @@ public class MainController : ControllerBase
 
     [HttpGet("BB")]
     public IActionResult GetBollingerBands(
-        int lookbackPeriods = 20,
-        double standardDeviations = 2)
+        int lookbackPeriods,
+        double standardDeviations)
     {
         try
         {
@@ -227,13 +225,13 @@ public class MainController : ControllerBase
 
     [HttpGet("BETA")]
     public IActionResult GetBeta(
-        int lookbackPeriods = 20,
-        BetaType type = BetaType.All)
+        int lookbackPeriods,
+        BetaType type)
     {
         try
         {
             IEnumerable<Quote> quotes = FetchQuotes.Get();
-            IEnumerable<Quote> market = FetchQuotes.Get("SPY");
+            IEnumerable<Quote> market = FetchQuotes.Get("SPY", "DAILY");
 
             IEnumerable<BetaResult> results =
                 quotes.GetBeta(market, lookbackPeriods, type)
@@ -311,7 +309,7 @@ public class MainController : ControllerBase
 
     [HttpGet("CMF")]
     public IActionResult GetCmf(
-        int lookbackPeriods = 20)
+        int lookbackPeriods)
     {
         try
         {
@@ -351,7 +349,7 @@ public class MainController : ControllerBase
 
     [HttpGet("DOJI")]
     public IActionResult GetDoji(
-        double maxPriceChangePercent = 0.001)
+        double maxPriceChangePercent)
     {
         try
         {
@@ -371,7 +369,7 @@ public class MainController : ControllerBase
 
     [HttpGet("DONCHIAN")]
     public IActionResult GetDonchian(
-        int lookbackPeriods = 20)
+        int lookbackPeriods)
     {
         try
         {
@@ -411,7 +409,7 @@ public class MainController : ControllerBase
 
     [HttpGet("ELDER-RAY")]
     public IActionResult GetElderRay(
-        int lookbackPeriods = 13)
+        int lookbackPeriods)
     {
         try
         {
@@ -491,7 +489,7 @@ public class MainController : ControllerBase
 
     [HttpGet("FISHER")]
     public IActionResult GetFisher(
-        int lookbackPeriods = 10)
+        int lookbackPeriods)
     {
         try
         {
@@ -511,7 +509,7 @@ public class MainController : ControllerBase
 
     [HttpGet("FRACTAL")]
     public IActionResult GetFractal(
-        int windowSpan = 2)
+        int windowSpan)
     {
         try
         {
@@ -569,9 +567,9 @@ public class MainController : ControllerBase
 
     [HttpGet("KELTNER")]
     public IActionResult GetKeltner(
-        int emaPeriods = 20,
-        double multiplier = 2,
-        int atrPeriods = 10)
+        int emaPeriods,
+        double multiplier,
+        int atrPeriods)
     {
         try
         {
@@ -591,9 +589,9 @@ public class MainController : ControllerBase
 
     [HttpGet("MACD")]
     public IActionResult GetMacd(
-        int fastPeriods = 12,
-        int slowPeriods = 26,
-        int signalPeriods = 9)
+        int fastPeriods,
+        int slowPeriods,
+        int signalPeriods)
     {
         try
         {
@@ -613,7 +611,7 @@ public class MainController : ControllerBase
 
     [HttpGet("MARUBOZU")]
     public IActionResult GetMarubozu(
-        double minBodyPercent = 0.95)
+        double minBodyPercent)
     {
         try
         {
@@ -653,8 +651,8 @@ public class MainController : ControllerBase
 
     [HttpGet("PSAR")]
     public IActionResult GetParabolicSar(
-        double accelerationStep = 0.02,
-        double maxAccelerationFactor = 0.2)
+        double accelerationStep,
+        double maxAccelerationFactor)
     {
         try
         {
@@ -695,7 +693,7 @@ public class MainController : ControllerBase
 
     [HttpGet("RSI")]
     public IActionResult GetRsi(
-        int lookbackPeriods = 14)
+        int lookbackPeriods)
     {
         try
         {
@@ -715,7 +713,7 @@ public class MainController : ControllerBase
 
     [HttpGet("SLOPE")]
     public IActionResult GetSlope(
-        int lookbackPeriods = 14)
+        int lookbackPeriods)
     {
         try
         {
@@ -755,10 +753,10 @@ public class MainController : ControllerBase
 
     [HttpGet("SMI")]
     public IActionResult GetSmi(
-        int lookbackPeriods = 10,
-        int firstSmoothPeriods = 3,
-        int secondSmoothPeriods = 3,
-        int signalPeriods = 3)
+        int lookbackPeriods,
+        int firstSmoothPeriods,
+        int secondSmoothPeriods,
+        int signalPeriods)
     {
         try
         {
@@ -778,9 +776,9 @@ public class MainController : ControllerBase
 
     [HttpGet("STC")]
     public IActionResult GetStc(
-        int cyclePeriods = 10,
-        int fastPeriods = 23,
-        int slowPeriods = 50)
+        int cyclePeriods,
+        int fastPeriods,
+        int slowPeriods)
     {
         try
         {
@@ -800,9 +798,9 @@ public class MainController : ControllerBase
 
     [HttpGet("STARC")]
     public IActionResult GetStarc(
-        int smaPeriods = 5,
-        double multiplier = 2,
-        int atrPeriods = 10)
+        int smaPeriods,
+        double multiplier,
+        int atrPeriods)
     {
         try
         {
@@ -823,11 +821,14 @@ public class MainController : ControllerBase
     [HttpGet("STDEV")]
     public IActionResult GetStdDev(
         int lookbackPeriods,
-        int smaPeriods = 3)
+        int smaPeriods)
     {
         try
         {
             IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            // we don't ask for smaPeriods with Z-Score, handle
+            smaPeriods = smaPeriods == 0 ? 1 : smaPeriods;
 
             IEnumerable<StdDevResult> results =
                 quotes.GetStdDev(lookbackPeriods, smaPeriods)
@@ -843,8 +844,8 @@ public class MainController : ControllerBase
 
     [HttpGet("STO")]
     public IActionResult GetStoch(
-        int lookbackPeriods = 14,
-        int signalPeriods = 3)
+        int lookbackPeriods,
+        int signalPeriods)
     {
         try
         {
@@ -867,7 +868,7 @@ public class MainController : ControllerBase
         int rsiPeriods,
         int stochPeriods,
         int signalPeriods,
-        int smoothPeriods = 1)
+        int smoothPeriods)
     {
         try
         {
@@ -887,8 +888,8 @@ public class MainController : ControllerBase
 
     [HttpGet("SUPERTREND")]
     public IActionResult GetSuperTrend(
-        int lookbackPeriods = 10,
-        double multiplier = 3)
+        int lookbackPeriods,
+        double multiplier)
     {
         try
         {
@@ -908,7 +909,7 @@ public class MainController : ControllerBase
 
     [HttpGet("VORTEX")]
     public IActionResult GetVortex(
-        int lookbackPeriods = 14)
+        int lookbackPeriods)
     {
         try
         {
