@@ -24,7 +24,7 @@
   // landscape, full screen
   @media (max-height: 400px) and (orientation: landscape) {
     aspect-ratio: unset;
-    height: calc(100svh - 64px); // with toolbar
+    height: calc(100vh);
   }
 }
 
@@ -42,15 +42,20 @@
     aspect-ratio: 8;
   }
 
-  // landscape
+  // tablet-lg, landscape
+  @media (max-width: 880px)  and (orientation: landscape){
+    aspect-ratio: unset;
+    height: 25vh;  }
+
+  // mobile, landscape
   @media (max-height: 600px) and (orientation: landscape) {
     aspect-ratio: unset;
-    height: 33.33svh;
+    height: 33.33vh;
   }
 
   // mobile
   @media (max-height: 400px) {
     aspect-ratio: unset;
-    height: 50svh;
+    height: 50vh;
   }
 }
