@@ -37,11 +37,18 @@
 
   aspect-ratio: 10;
 
+  // tablet-lg
+  @media (max-width: 880px) {
+    aspect-ratio: 8;
+  }
+
+  // landscape
   @media (max-height: 600px) and (orientation: landscape) {
     aspect-ratio: unset;
     height: 33.33svh;
   }
 
+  // mobile
   @media (max-height: 400px) {
     aspect-ratio: unset;
     height: 50svh;
