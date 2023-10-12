@@ -9,15 +9,22 @@
   max-width: 1024px;
   margin: auto;
 
-  height: 55svh;
-  // height: 300px;     // for doc site only
+  aspect-ratio: 2.5;
 
-  @media (max-height: 700px){
-    height: 40svh;
+  // tablet-lg
+  @media (max-width: 880px) {
+    aspect-ratio: 2;
   }
 
-  @media (max-height: 400px){
-    height: calc(100svh - 64px); // full-screen (with toolbar)
+  // mobile
+  @media (max-width: 600px) {
+    aspect-ratio: 5/4;
+  }
+
+  // landscape, full screen
+  @media (max-height: 400px) and (orientation: landscape) {
+    aspect-ratio: unset;
+    height: calc(100svh - 64px); // with toolbar
   }
 }
 
@@ -26,15 +33,17 @@
   padding: 0 8px;
   max-width: 1024px;
   margin: auto;
-  margin-top: 0.5rem;
+  margin-top: 0;
 
-  height: 15svh;
+  aspect-ratio: 10;
 
-  @media (max-height: 800px){
-    height: 20svh;
+  @media (max-height: 600px) and (orientation: landscape) {
+    aspect-ratio: unset;
+    height: 33.33svh;
   }
 
-  @media (max-height: 400px){
-    height: 30svh;
+  @media (max-height: 400px) {
+    aspect-ratio: unset;
+    height: 50svh;
   }
 }
