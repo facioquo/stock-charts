@@ -9,15 +9,22 @@
   max-width: 1024px;
   margin: auto;
 
-  height: 55vh;
-  // height: 300px;     // for doc site only
+  aspect-ratio: 2.5;
 
-  @media (max-height: 700px){
-    height: 40vh;
+  // tablet-lg
+  @media (max-width: 880px) {
+    aspect-ratio: 2;
   }
 
-  @media (max-height: 400px){
-    height: calc(100vh - 64px); // full-screen (with toolbar)
+  // mobile
+  @media (max-width: 600px) {
+    aspect-ratio: 5/4;
+  }
+
+  // landscape, full screen
+  @media (max-height: 400px) and (orientation: landscape) {
+    aspect-ratio: unset;
+    height: calc(100vh);
   }
 }
 
@@ -26,15 +33,29 @@
   padding: 0 8px;
   max-width: 1024px;
   margin: auto;
-  margin-top: 0.5rem;
+  margin-top: 0;
 
-  height: 15vh;
+  aspect-ratio: 10;
 
-  @media (max-height: 800px){
-    height: 20vh;
+  // tablet-lg
+  @media (max-width: 880px) {
+    aspect-ratio: 8;
   }
 
-  @media (max-height: 400px){
-    height: 30vh;
+  // tablet-lg, landscape
+  @media (max-width: 880px)  and (orientation: landscape){
+    aspect-ratio: unset;
+    height: 25vh;  }
+
+  // mobile, landscape
+  @media (max-height: 600px) and (orientation: landscape) {
+    aspect-ratio: unset;
+    height: 33.33vh;
+  }
+
+  // mobile
+  @media (max-height: 400px) {
+    aspect-ratio: unset;
+    height: 50vh;
   }
 }
