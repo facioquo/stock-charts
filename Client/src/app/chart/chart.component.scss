@@ -9,15 +9,15 @@
   max-width: 1024px;
   margin: auto;
 
-  height: 55vh;
+  height: 55svh;
   // height: 300px;     // for doc site only
 
   @media (max-height: 700px){
-    height: 40vh;
+    height: 40svh;
   }
 
   @media (max-height: 400px){
-    height: calc(100vh - 64px); // full-screen (with toolbar)
+    height: calc(100svh - 64px); // full-screen (with toolbar)
   }
 }
 
@@ -28,13 +28,13 @@
   margin: auto;
   margin-top: 0.5rem;
 
-  height: 15vh;
+  height: 15svh;
 
   @media (max-height: 800px){
-    height: 20vh;
+    height: 20svh;
   }
 
   @media (max-height: 400px){
-    height: 30vh;
+    height: 30svh;
   }
 }
