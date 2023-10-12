@@ -29,9 +29,10 @@
     max-width: $maxwidth;
     margin-left: auto;
     margin-right: auto;
-    padding: 0 8px;
+    padding: 0 8px !important;
 
     a {
+      font-family: "Google Sans", Roboto, Arial, Helvetica, sans-serif;
       text-decoration: none;
       color: inherit;
 
