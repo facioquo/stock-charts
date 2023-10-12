@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
   openSettingsDialog(): void {
     this.settingsDialog.open(SettingsComponent, {
       minWidth: "300px",
-      maxHeight: "80vh",
+      maxHeight: "90vh",
       autoFocus: "dialog"
     });
   }
