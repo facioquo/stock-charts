@@ -2422,7 +2422,7 @@ public static class Metadata
                         DefaultColor = standardBlue
                     },
                     new IndicatorResultConfig {
-                        DisplayName = "Jaw",
+                        DisplayName = "Teeth",
                         TooltipTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6]) Teeth",
                         DataName = "teeth",
                         DataType = "number",
@@ -2430,7 +2430,7 @@ public static class Metadata
                         DefaultColor = standardRed
                     },
                     new IndicatorResultConfig {
-                        DisplayName = "Jaw",
+                        DisplayName = "Lips",
                         TooltipTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6]) Lips",
                         DataName = "lips",
                         DataType = "number",
