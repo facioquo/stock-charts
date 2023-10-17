@@ -514,7 +514,7 @@ export class ChartService {
 
     const labelColor = this.ts.isDarkTheme ? '#757575' : '#212121';
     const annotation: AnnotationOptions =
-      this.commonAnnotation(selection.label, labelColor, xPos, yPos, -2, 1);
+      this.commonAnnotation(selection.label, labelColor, xPos, yPos, 0, 1);
     selection.chart.options.plugins.annotation.annotations = { annotation };
     selection.chart.update();
 
@@ -526,14 +526,14 @@ export class ChartService {
 
     const xPos: ScaleValue = this.chartOverlay.scales["xAxis"].min;
     const yPos: ScaleValue = this.chartOverlay.scales["yAxis"].max;
-    let adjY: number = 0;
+    let adjY: number = 10;
 
     this.chartOverlay.options.plugins.annotation.annotations =
       this.selections
         .filter(x => x.chartType == 'overlay')
         .map((selection: IndicatorSelection, index: number) => {
           const annotation: AnnotationOptions =
-            this.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, -2, adjY);
+            this.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, 0, adjY);
           annotation.id = "legend" + (index + 1).toString();
           adjY += 15;
           return annotation;
