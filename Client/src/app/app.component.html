@@ -1,21 +1,16 @@
-
-<header class="content-container">
-  <mat-toolbar class="noselect main-toolbar" color="default">
-    <h1 class="no-wrap">
-      <a href="https://github.com/DaveSkender/Stock.Charts/">
-        stock chart
-      </a>
-    </h1>
-  </mat-toolbar>
-</header>
+<mat-toolbar class="noselect main-toolbar" color="default">
+  <h1 class="no-wrap">
+    <a href="https://github.com/DaveSkender/Stock.Charts/">
+      stock chart
+    </a>
+  </h1>
+</mat-toolbar>
 
 <main id="main-content" class="content-container">
 
   <div class="button-container">
-    <button mat-fab color="accent"
-      (click)="openSettingsDialog()"
-      matTooltip="change indicators and settings"
-      aria-label="change indicators and settings">
+    <button mat-fab color="accent" *ngIf="!cs.loading" (click)="openSettingsDialog()"
+      matTooltip="change indicators and settings" aria-label="change indicators and settings">
       <mat-icon color="primary">edit</mat-icon>
     </button>
   </div>
@@ -23,7 +18,7 @@
   <app-chart></app-chart>
 </main>
 
-<footer class="footer">
+<footer class="footer" *ngIf="!cs.loading">
   Demo of the
   <strong>
     <a href="https://dotnet.stockindicators.dev/" target="_blank" rel="noopener">

@@ -1,9 +1,13 @@
-// @import "src/app/styles-theme";
-
 .mat-mdc-dialog-title {
   text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
+mat-dialog-content {
+  max-height: calc(100vh - 132.8px) !important;
+}
 
 h2 {
   font-size: 1.3em;
