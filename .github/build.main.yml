@@ -4,7 +4,7 @@ trigger:
 pr:
   - main
 
-name: $(BuildID)-$(SourceBranchName)
+name: $(Date:yyyy.MM.dd)-$(BuildID)
 
 resources:
   repositories:

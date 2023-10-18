@@ -6,16 +6,18 @@
 
   width: 100%;
   max-width: 1024px;
-  margin-left: auto;
+  margin: 0;
   margin-right: auto;
-  padding: 0 8px;
+  margin-left: auto;
+  padding: 0;
 
   .button-container {
 
     position: absolute;
-    top: -50px;
+    top: -56px;
     right: 8px;
     height: 100%;
+    min-height: 100vh;
 
     button {
       opacity: 0.6;
