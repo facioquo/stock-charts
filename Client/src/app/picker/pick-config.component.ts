@@ -20,7 +20,7 @@ interface LineWidth {
   value: number;
 }
 
-interface LineStyle {
+interface LineType {
   name: string;
   value: string;
 }
@@ -61,11 +61,12 @@ export class PickConfigComponent {
     { name: "thick", value: 2 }
   ];
 
-  lineStyles: LineStyle[] = [
+  lineTypes: LineType[] = [
     { name: "solid", value: "solid" },
     { name: "dashes", value: "dash" },
     { name: "dots", value: "dots" },
-    { name: "bar", value: "bar" }
+    { name: "bar", value: "bar" },
+    { name: "none", value: "none" }
   ];
 
   constructor(
