@@ -46,6 +46,12 @@ import {
   Quote
 } from '../chart/chart.models';
 
+import {
+  DEFAULT_LISTINGS,
+  DEFAULT_QUOTES,
+  DEFAULT_SELECTIONS
+} from '../chart/chart.defaults';
+
 Chart.register(
   CandlestickController,
   OhlcController,
@@ -62,10 +68,10 @@ export class ChartService {
   ) { }
 
   yAxisTicks: Tick[] = [];
-  listings: IndicatorListing[] = [];
-  selections: IndicatorSelection[] = [];
+  listings: IndicatorListing[] = JSON.parse(localStorage.getItem('listings'));
+  selections: IndicatorSelection[] = JSON.parse(localStorage.getItem('selections'));
   chartOverlay: Chart;
-  loading = true;
+  loading = false;
 
   // CHART CONFIGURATIONS
   baseConfig() {
@@ -331,101 +337,78 @@ export class ChartService {
     return selection;
   }
 
-  addSelectionWithoutScroll(
-    selection: IndicatorSelection
+  addSelectionOnPageLoad(
+    selection: IndicatorSelection,
+    needData: boolean,
+    exists: boolean
   ) {
 
     // lookup config data
     const listing = this.listings.find(x => x.uiid == selection.uiid);
 
-    this.api.getSelection(selection, listing)
-      .subscribe({
-        next: (selectionWithData: IndicatorSelection) => {
+    // get data, if needed
+    if (needData) {
+      this.api.getSelection(selection, listing)
+        .subscribe({
+          next: (selectionWithData: IndicatorSelection) => {
+            selection = selectionWithData;
+          },
+          error: (e: HttpErrorResponse) => { console.log(e); }
+        });
+    }
 
-          this.displaySelection(selectionWithData, listing, false);
-        },
-        error: (e: HttpErrorResponse) => { console.log(e); }
-      });
+    this.addSelection(selection, listing, exists, false);  // without scroll
   }
 
-  displaySelection(
+  addSelection(
     selection: IndicatorSelection,
     listing: IndicatorListing,
-    scrollToMe: boolean
+    exists: boolean,
+    scrollView: boolean
   ) {
-
-    // add to collection
-    this.selections.push(selection);
 
     // add needed charts
     if (listing.chartType == 'overlay') {
-      this.addSelectionToOverlayChart(selection, scrollToMe);
+      this.addSelectionOverlay(selection, exists, scrollView);
     }
     else {
-      this.addSelectionToNewOscillator(selection, listing, scrollToMe);
+      this.addSelectionOscillator(selection, listing, exists, scrollView);
     };
 
-    this.cacheSelections();
-
-  }
-
-  deleteSelection(ucid: string) {
-
-    const selection = this.selections.find(x => x.ucid == ucid);
-
-    const sx = this.selections.indexOf(selection, 0);
-    this.selections.splice(sx, 1);
-
-    if (selection.chartType == "overlay") {
-
-      selection.results.forEach((result: IndicatorResult) => {
-        const dx = this.chartOverlay.data.datasets.indexOf(result.dataset, 0);
-        this.chartOverlay.data.datasets.splice(dx, 1);
-      });
-      this.updateOverlayAnnotations();
-      this.chartOverlay.update();
-
-    } else {
-      const body = document.getElementById("oscillators-zone");
-      const chart = document.getElementById(`${selection.ucid}-container`);
-      body.removeChild(chart);
-    }
-
-    this.cacheSelections();
-  }
-
-  cacheSelections() {
-
-    const selections = this.selections;
-
-    // remove unsavable data
-    selections.forEach((selection: IndicatorSelection) => {
-      selection.chart = undefined;
-    });
-
-    localStorage.setItem('selections', JSON.stringify(selections));
+    // TODO: add to this.selections and storage Cache
   }
 
   // CHARTS OPERATIONS
-  addSelectionToOverlayChart(
+  addSelectionOverlay(
     selection: IndicatorSelection,
-    scrollToMe: boolean) {
+    exists: boolean,
+    scrollView: boolean) {
 
     // add selection
     selection.results.forEach((r: IndicatorResult) => {
-      this.chartOverlay.data.datasets.push(r.dataset);
+
+      if (exists) {
+        console.log("update TBD", selection.ucid);
+      }
+      else {
+        this.chartOverlay.data.datasets.push(r.dataset);
+        console.log("add", selection.ucid);
+      }
     });
+
     this.chartOverlay.update(); // ensures scales are drawn to correct size first
     this.updateOverlayAnnotations();
     this.chartOverlay.update();
 
-    if (scrollToMe) this.scrollToStart("chart-overlay");
+    if (scrollView) this.scrollToStart("chart-overlay");
   }
 
-  addSelectionToNewOscillator(
+  addSelectionOscillator(
     selection: IndicatorSelection,
     listing: IndicatorListing,
-    scrollToMe: boolean) {
+    exists: boolean,
+    scrollView: boolean) {
+
     const chartConfig = this.baseOscillatorConfig();
 
     // initialize chart datasets
@@ -481,7 +464,16 @@ export class ChartService {
 
     // add selection
     selection.results.forEach((r: IndicatorResult) => {
-      chartConfig.data.datasets.push(r.dataset);
+
+      if (exists) {
+        // TODO: update existing record (early in method)
+        chartConfig.data.datasets.push(r.dataset);
+        console.log("update TBD", selection.ucid);
+      }
+      else {
+        chartConfig.data.datasets.push(r.dataset);
+        console.log("add", selection.ucid);
+      }
     });
 
     // compose html
@@ -519,7 +511,44 @@ export class ChartService {
     selection.chart.update();
 
 
-    if (scrollToMe) this.scrollToEnd(container.id);
+    if (scrollView) this.scrollToEnd(container.id);
+  }
+
+  cacheSelections() {
+
+    const selections = this.selections;
+
+    // remove unsavable data
+    selections.forEach((selection: IndicatorSelection) => {
+      selection.chart = undefined;
+    });
+
+    localStorage.setItem('selections', JSON.stringify(selections));
+  }
+
+  deleteSelection(ucid: string) {
+
+    const selection = this.selections.find(x => x.ucid == ucid);
+
+    const sx = this.selections.indexOf(selection, 0);
+    this.selections.splice(sx, 1);
+
+    if (selection.chartType == "overlay") {
+
+      selection.results.forEach((result: IndicatorResult) => {
+        const dx = this.chartOverlay.data.datasets.indexOf(result.dataset, 0);
+        this.chartOverlay.data.datasets.splice(dx, 1);
+      });
+      this.updateOverlayAnnotations();
+      this.chartOverlay.update();
+
+    } else {
+      const body = document.getElementById("oscillators-zone");
+      const chart = document.getElementById(`${selection.ucid}-container`);
+      body.removeChild(chart);
+    }
+
+    this.cacheSelections();
   }
 
   updateOverlayAnnotations() {
@@ -576,20 +605,63 @@ export class ChartService {
     return annotation;
   }
 
+
   // DATA OPERATIONS
   loadCharts() {
+
+    console.log("LOADING CHARTS");
+
+    if (!this.listings) {
+      this.listings = DEFAULT_LISTINGS;
+      localStorage.setItem("listings", JSON.stringify(this.listings));
+    }
+
+    if (!this.selections) {
+      this.selections = DEFAULT_SELECTIONS;
+      localStorage.setItem("selections", JSON.stringify(this.selections));
+    }
+
+    let quotes: Quote[] = JSON.parse(localStorage.getItem('quotes'));
+
+    if (!quotes) {
+      quotes = DEFAULT_QUOTES;
+      localStorage.setItem("quotes", JSON.stringify(quotes));
+    }
+
+    this.loadOverlayChart(quotes);
+    // this.loading = false;
+
+    // load indicator selections from cache
+    this.selections.forEach((selection: IndicatorSelection) => {
+      this.addSelectionOnPageLoad(selection, false, false);
+    });
+
+    // refresh from API
     this.api.getQuotes()
       .subscribe({
         next: (quotes: Quote[]) => {
 
-          this.loadOverlayChart(quotes);
+          // save quotes to cache
+          localStorage.setItem('quotes', JSON.stringify(quotes));
+
+          // update base overlay chart
+          const dt = this.quoteChartData(quotes);
+          this.chartOverlay.data.datasets.find(x => x.label === "Price").data = dt.price;
+          this.chartOverlay.data.datasets.find(x => x.label === "Volume").data = dt.volume;
 
           // load default selections
           this.api.getListings()
             .subscribe({
               next: (listings: IndicatorListing[]) => {
                 this.listings = listings;
-                this.loadSelections();
+
+                // save listing to cache
+                localStorage.setItem('listings', JSON.stringify(listings));
+
+                // reload indicator selections
+                this.selections.forEach((selection: IndicatorSelection) => {
+                  this.addSelectionOnPageLoad(selection, true, true);
+                });
               },
               error: (e: HttpErrorResponse) => { console.log(e); }
             });
@@ -599,6 +671,8 @@ export class ChartService {
           this.loading = false;
         }
       });
+
+      console.log("overlay data", this.chartOverlay.data)
   }
 
   loadOverlayChart(quotes: Quote[]) {
@@ -616,6 +690,43 @@ export class ChartService {
       down: candleOptions.color.down,
       unchanged: candleOptions.color.unchanged
     };
+
+    const dt = this.quoteChartData(quotes);
+
+    // define base datasets
+    chartConfig.data = {
+      datasets: [
+        {
+          type: 'candlestick',
+          label: 'Price',
+          data: dt.price,
+          yAxisID: 'yAxis',
+          borderColor: candleOptions.borderColor,
+          order: 75
+        },
+        {
+          type: 'bar',
+          label: 'Volume',
+          data: dt.volume,
+          yAxisID: 'volumeAxis',
+          backgroundColor: dt.barColor,
+          borderWidth: 0,
+          order: 76
+        }
+      ]
+    };
+
+    // get size for volume axis
+    const volumeAxisSize = 20 * (dt.sumVol / dt.volume.length) || 0;
+    chartConfig.options.scales.volumeAxis.max = volumeAxisSize;
+
+    // compose chart
+    if (this.chartOverlay) this.chartOverlay.destroy();
+    const myCanvas = document.getElementById("chartOverlay") as HTMLCanvasElement;
+    this.chartOverlay = new Chart(myCanvas.getContext('2d'), chartConfig);
+  }
+
+  quoteChartData(quotes: Quote[]): any {
 
     const price: FinancialDataPoint[] = [];
     const volume: ScatterDataPoint[] = [];
@@ -656,70 +767,7 @@ export class ChartService {
       });
     }
 
-    // define base datasets
-    chartConfig.data = {
-      datasets: [
-        {
-          type: 'candlestick',
-          label: 'Price',
-          data: price,
-          yAxisID: 'yAxis',
-          borderColor: candleOptions.borderColor,
-          order: 75
-        },
-        {
-          type: 'bar',
-          label: 'Volume',
-          data: volume,
-          yAxisID: 'volumeAxis',
-          backgroundColor: barColor,
-          borderWidth: 0,
-          order: 76
-        }
-      ]
-    };
-
-    // get size for volume axis
-    const volumeAxisSize = 20 * (sumVol / volume.length) || 0;
-    chartConfig.options.scales.volumeAxis.max = volumeAxisSize;
-
-    // compose chart
-    if (this.chartOverlay) this.chartOverlay.destroy();
-    const myCanvas = document.getElementById("chartOverlay") as HTMLCanvasElement;
-    this.chartOverlay = new Chart(myCanvas.getContext('2d'), chartConfig);
-  }
-
-  loadSelections() {
-
-    // get from cache
-    const selections = JSON.parse(localStorage.getItem('selections'));
-
-    if (selections) {
-      selections.forEach((selection: IndicatorSelection) => {
-        this.addSelectionWithoutScroll(selection);
-      });
-    }
-    else { // add defaults
-      const def1 = this.defaultSelection("LINEAR");
-      def1.params.find(x => x.paramName == "lookbackPeriods").value = 50;
-      this.addSelectionWithoutScroll(def1);
-
-      const def2 = this.defaultSelection("BB");
-      this.addSelectionWithoutScroll(def2);
-
-      const def3 = this.defaultSelection("RSI");
-      def3.params.find(x => x.paramName == "lookbackPeriods").value = 5;
-      this.addSelectionWithoutScroll(def3);
-
-      const def4 = this.defaultSelection("ADX");
-      this.addSelectionWithoutScroll(def4);
-
-      const def5 = this.defaultSelection("SUPERTREND");
-      this.addSelectionWithoutScroll(def5);
-
-      const def6 = this.defaultSelection("MACD");
-      this.addSelectionWithoutScroll(def6);
-    }
+    return { price, volume, barColor, sumVol }
   }
 
   resetChartTheme() {
@@ -747,3 +795,7 @@ export class ChartService {
     }, 200);
   }
 }
+function datasetQuote(quotes: Quote[]) {
+  throw new Error('Function not implemented.');
+}
+

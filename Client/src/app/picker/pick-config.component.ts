@@ -88,7 +88,7 @@ export class PickConfigComponent {
       .subscribe({
         next: (selectionWithData: IndicatorSelection) => {
 
-          this.cs.displaySelection(selectionWithData, this.listing, true);
+          this.cs.addSelection(selectionWithData, this.listing, false, true);
           this.errorMessage = undefined;
           this.closeButtonLabel = "RESOLVED ...";
           this.dialogRef.close();
