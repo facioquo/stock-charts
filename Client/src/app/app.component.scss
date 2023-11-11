@@ -1,4 +1,4 @@
-.content-container {
+main {
 
   display: block;
   position: relative;
@@ -6,16 +6,15 @@
 
   width: 100%;
   max-width: 1024px;
-  margin: 0;
-  margin-right: auto;
-  margin-left: auto;
+
+  margin: 0 auto;
   padding: 0;
 
   .button-container {
 
     position: absolute;
-    top: -56px;
-    right: 8px;
+    top: 0px;
+    right: 0px;
     height: 100%;
     min-height: 100vh;
 
@@ -24,5 +23,46 @@
       position: sticky;
       top: 8px;
     }
+  }
+}
+
+header,
+footer {
+
+  width: 100%;
+  max-width: 1024px;
+  text-align: left;
+
+  margin: 0 auto;
+  padding: 0;
+
+  background-color: transparent;
+
+  h1 {
+    margin-top: 0;
+    font-size: 1.4em;
+    font-weight: 500;
+  }
+
+  a {
+    font-family: "Google Sans", Roboto, Arial, Helvetica, sans-serif;
+    text-decoration: none;
+    color: inherit;
+
+    &:active,
+    &:visited {
+      color: inherit;
+    }
+  }
+}
+
+footer {
+  padding: 1rem 0;
+  margin: 2rem 0;
+
+  text-align: center;
+
+  a {
+    text-decoration: underline;
   }
 }

@@ -1,12 +1,12 @@
-<mat-toolbar class="noselect main-toolbar" color="default">
-  <h1 class="no-wrap">
-    <a href="https://github.com/DaveSkender/Stock.Charts/">
-      stock chart
-    </a>
-  </h1>
-</mat-toolbar>
+<main id="main-content">
 
-<main id="main-content" class="content-container">
+  <header class="noselect">
+    <h1 class="no-wrap">
+      <a href="https://github.com/DaveSkender/Stock.Charts/">
+        stock chart
+      </a>
+    </h1>
+  </header>
 
   <div class="button-container">
     <button mat-fab color="accent" *ngIf="!cs.loading" (click)="openSettingsDialog()"
@@ -16,12 +16,15 @@
   </div>
 
   <app-chart></app-chart>
-</main>
 
-<footer class="footer" *ngIf="!cs.loading">
-  Demo of the
-  <strong>
-    <a href="https://dotnet.stockindicators.dev/" target="_blank" rel="noopener">
-      Stock Indicators for .NET</a>
-  </strong> NuGet library
-</footer>
+  <footer class="footer" *ngIf="!cs.loading">
+    Demo of the
+    <br />
+    <strong>
+      <a href="https://dotnet.stockindicators.dev/" target="_blank" rel="noopener">
+        Stock Indicators for .NET</a>
+    </strong>
+    <br />
+    NuGet library
+  </footer>
+</main>

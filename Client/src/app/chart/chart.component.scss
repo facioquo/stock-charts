@@ -5,9 +5,8 @@
 
 .chart-overlay-container {
 
-  padding: 0 8px;
-  max-width: 1024px;
-  margin: auto;
+  padding: 0;
+  width: 100%;
 
   aspect-ratio: 2.5;
 
@@ -30,10 +29,8 @@
 
 .chart-oscillator-container {
 
-  padding: 0 8px;
-  max-width: 1024px;
-  margin: auto;
-  margin-top: 0;
+  padding: 0;
+  width: 100%;
 
   aspect-ratio: 10;
 
