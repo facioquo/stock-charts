@@ -5,11 +5,10 @@ export class StyleService {
 
   isDarkTheme = true;
 
-  constructor(
-  ) { }
+  constructor() { }
 
   toggleTheme(isDark: boolean) {
-    this.setTheme(isDark)
+    this.setTheme(isDark);
   }
 
   getTheme() {

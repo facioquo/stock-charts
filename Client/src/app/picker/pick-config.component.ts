@@ -78,9 +78,8 @@ export class PickConfigComponent {
   ) {
 
     // pre-populate selection
-    this.selection = this.cs.defaultSelection(listing.uiid);
+    this.selection = this.cs.baseSelection(listing.uiid);
   }
-
 
   onSubmit(): void {
 
@@ -88,7 +87,8 @@ export class PickConfigComponent {
       .subscribe({
         next: (selectionWithData: IndicatorSelection) => {
 
-          this.cs.addSelection(selectionWithData, this.listing, false, true);
+          this.cs.addSelection(selectionWithData, true);
+          this.cs.cacheSelections();
           this.errorMessage = undefined;
           this.closeButtonLabel = "RESOLVED ...";
           this.dialogRef.close();
