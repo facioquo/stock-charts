@@ -10,7 +10,7 @@ services.AddControllers();
 
 // get CORS origins from appsettings
 IConfigurationSection corsOrigins = configuration.GetSection("CorsOrigins");
-List<string> origins = new();
+List<string> origins = [];
 origins.Add(item: corsOrigins["Website"]);
 
 // setup CORS for website
@@ -22,7 +22,7 @@ services.AddCors(options =>
         cors.AllowAnyHeader();
         cors.AllowAnyMethod();
         cors.AllowCredentials();
-        cors.WithOrigins(origins.ToArray());
+        cors.WithOrigins([.. origins]);
     });
 });
 

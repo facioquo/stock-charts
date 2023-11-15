@@ -41,10 +41,10 @@ jobs:
           tokenSuffix: __
 
       - task: UseDotNet@2
-        displayName: Use .Net SDK 7.x
+        displayName: Install .NET SDK
         continueOnError: True
         inputs:
-          version: 7.x
+          version: 8.x
 
       - task: DotNetCoreCLI@2
         displayName: dotnet restore
