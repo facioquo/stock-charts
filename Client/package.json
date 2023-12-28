@@ -22,7 +22,7 @@
     "@angular/platform-browser-dynamic": "^16.2.12",
     "@angular/router": "^16.2.12",
     "@ctrl/tinycolor": "^4.0.2",
-    "@ng-matero/extensions": "^16.1.2",
+    "@ng-matero/extensions": "^16.2.0",
     "chart.js": "^4.4.0",
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-plugin-annotation": "^3.0.1",
