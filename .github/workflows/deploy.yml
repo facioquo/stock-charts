@@ -1,7 +1,11 @@
 name: Deploy website
 
-on: [ workflow_dispatch ]
-
+#on: [ workflow_dispatch ]
+on:
+    push:
+      branches: [ "main" ]
+    pull_request:
+      branches: [ "main" ]
 concurrency:
   group: website-deployer
   cancel-in-progress: true
