@@ -41,7 +41,7 @@ jobs:
           tokenSuffix: __
 
       - task: UseDotNet@2
-        displayName: Install .NET SDK
+        displayName: Use .Net SDK
         continueOnError: True
         inputs:
           version: 8.x
