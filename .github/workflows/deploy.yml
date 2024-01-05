@@ -40,8 +40,8 @@ jobs:
           
       - name: Package Functions
         run: |
-          dotnet publish Server/Functions/*.csproj --configuration Release --property:publishWebProjects=false
-          dotnet publish Server/WebApi/*.csproj --configuration Release --property:publishWebProjects=false
+          dotnet publish ./Server/Functions/Functions.csproj --configuration Release --property:publishWebProjects=false
+          dotnet publish ./Server/WebApi/WebApi.csproj --configuration Release --property:publishWebProjects=false
 
       - name: Save Web API
         uses: actions/upload-artifact@v3
