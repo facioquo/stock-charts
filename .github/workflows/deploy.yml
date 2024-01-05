@@ -1,13 +1,6 @@
 name: Deploy website
 
-on:
-  workflow_dispatch:
-    inputs:
-      preview:
-        description: Append preview suffix
-        type: boolean
-        default: true
-        required: true
+on: [ workflow_dispatch ]
 
 concurrency:
   group: website-deployer
