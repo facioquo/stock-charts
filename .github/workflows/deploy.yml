@@ -2,10 +2,10 @@ name: Deploy website
 
 #on: [ workflow_dispatch ]
 on:
-    push:
-      branches: [ "main" ]
-    pull_request:
-      branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 concurrency:
   group: website-deployer
   cancel-in-progress: true
@@ -35,7 +35,7 @@ jobs:
           Copy-Item "appsettings.Token.json" -Destination "appsettings.json" -Force
           Remove-Item "appsettings.Token.json" -Force
 
-          (Get-Content appsettings.json -Encoding UTF8) -replace "__Website__", "${{ env.url }}" | Set-Content $SingleFile
+          (Get-Content appsettings.json).Replace("__Website__", "${{ env.url }}") | Set-Content appsettings.json
           Write-Host "... Done!"
           
       - name: Build .NET solution
@@ -80,7 +80,7 @@ jobs:
       shell: pwsh
       working-directory: ./Client/src
       run: |
-        (Get-Content index.html -Encoding UTF8) -replace "__GaTag__", "G-17DX6ZW6HP" | Set-Content $SingleFile
+        (Get-Content index.html).Replace("__GaTag__", "G-17DX6ZW6HP") | Set-Content index.html
         Write-Host "... Done!"
       
     - name: Build site
