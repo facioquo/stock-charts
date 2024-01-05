@@ -5,7 +5,7 @@ using Azure.Storage.Blobs.Models;
 
 namespace WebApi.Services;
 
-public class Storage
+public static class Storage
 {
     // STARTUP
     public static async Task Startup(CancellationToken cancellationToken)
