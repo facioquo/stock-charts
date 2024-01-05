@@ -38,11 +38,10 @@ jobs:
           (Get-Content appsettings.json).Replace("__Website__", "${{ env.url }}") | Set-Content appsettings.json
           Write-Host "... Done!"
           
-      - name: Package backend
-        run: >
-          dotnet publish Server/**/*.csproj
-          --configuration Release
-          --property:publishWebProjects=false
+      - name: Package Functions
+        run: |
+          dotnet publish Server/Functions/*.csproj --configuration Release --property:publishWebProjects=false
+          dotnet publish Server/WebApi/*.csproj --configuration Release --property:publishWebProjects=false
 
       - name: Save Web API
         uses: actions/upload-artifact@v3
