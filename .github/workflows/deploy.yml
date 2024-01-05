@@ -1,0 +1,155 @@
+name: Deploy website
+
+on:
+  workflow_dispatch:
+    inputs:
+      preview:
+        description: Append preview suffix
+        type: boolean
+        default: true
+        required: true
+
+concurrency:
+  group: website-deployer
+  cancel-in-progress: true
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+
+    env:
+      url: https://charts.stockindicators.dev
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.x"
+          dotnet-quality: "ga"
+
+      - name: Update configs
+        shell: pwsh
+        working-directory: ./Server/WebApi
+        run: |
+          Copy-Item "appsettings.Token.json" -Destination "appsettings.json" -Force
+          Remove-Item "appsettings.Token.json" -Force
+
+          (Get-Content appsettings.json -Encoding UTF8) -replace "__Website__", "${{ env.url }}" | Set-Content $SingleFile
+          Write-Host "... Done!"
+          
+      - name: Build .NET solution
+        run: >
+          dotnet build Server/ChartBackend.sln
+          --configuration Release
+          --property:ContinuousIntegrationBuild=true
+          -warnAsError
+
+      - name: Save Web API
+        uses: actions/upload-artifact@v3
+        with:
+          name: api
+          path: ./**/WebApi.zip
+
+      - name: Save Functions
+        uses: actions/upload-artifact@v3
+        with:
+          name: fns
+          path: ./**/Functions.zip
+
+  build-website:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: Client/package-lock.json
+
+    - name: Install packages
+      working-directory: ./Client
+      run: npm install
+
+    - name: Update configs
+      shell: pwsh
+      working-directory: ./Client/src
+      run: |
+        (Get-Content index.html -Encoding UTF8) -replace "__GaTag__", "G-17DX6ZW6HP" | Set-Content $SingleFile
+        Write-Host "... Done!"
+      
+    - name: Build site
+      working-directory: ./Client
+      run: npm run build.prod
+
+    - name: Store artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: web
+        path: Client/dist/app
+    
+  deploy-api:
+    needs: [ "build-backend" ]
+    runs-on: ubuntu-latest
+
+    environment:
+      name: website
+
+    steps:
+
+      - name: Download package
+        uses: actions/download-artifact@v3
+        with:
+          name: api
+          path: artifacts
+
+      - name: Deploy api
+        run: |
+          echo "hello API"
+
+  deploy-fns:
+    needs: [ "build-backend" ]
+    runs-on: ubuntu-latest
+
+    environment:
+      name: website
+
+    steps:
+
+    - name: Download package
+      uses: actions/download-artifact@v3
+      with:
+        name: fns
+        path: artifacts
+
+    - name: Deploy Functions
+      run: |
+        echo "hello Functions!"
+        
+  deploy-website:
+    needs: [ "build-website", "deploy-api", "deploy-fns" ]
+    runs-on: ubuntu-latest
+
+    environment:
+      name: website
+      url: "https://charts.stockindicators.dev"
+
+    steps:
+        
+    - name: Download package
+      uses: actions/download-artifact@v3
+      with:
+        name: website
+        path: artifacts
+  
+    - name: Deploy api
+      run: |
+        echo "hello Functions!"
