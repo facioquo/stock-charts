@@ -144,11 +144,16 @@ jobs:
         name: fns
         path: artifacts
 
-    - name: Deploy Functions
+    - name: Show artifacts
       working-directory: artifacts
-      run: |
-        echo "hello Functions"
-        ls
+      run: ls
+        
+    - name: Deploy Functions
+      uses: Azure/functions-action@v1
+      with:
+        app-name: stock-charts-functions
+        package: artifacts
+        publish-profile: ${{ secrets.PUBLISH_PROFILE_FNS }}
         
   deploy-website:
     needs: [ "build-website", "deploy-api", "deploy-fns" ]
