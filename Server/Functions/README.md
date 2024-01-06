@@ -1,6 +1,8 @@
 # About Functions
 
-### ENVIRONMENT VARIABLES for local dev
+## ENVIRONMENT VARIABLES for local dev
+
+These can be set as either environment variables or project scoped User Secrets.
 
 ```bash
 setx AzureWebJobsStorage "UseDevelopmentStorage=true"
@@ -8,12 +10,11 @@ setx AlpacaApiKey "YOUR ALPACA API KEY"
 setx AlpacaSecret "YOUR ALPACA SECRET KEY"
 ```
 
-### CRON 
+## CRON
 
-https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-timer#cron-expressions
+<https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-timer#cron-expressions>
 
-
-### TIME ZONE
+## TIME ZONE
 
 Azure App Service server app settings on the server:
 `TZ` : `America/New_York` for Linux instance.

@@ -30,30 +30,46 @@ jobs:
 
       - name: Update configs
         shell: pwsh
-        working-directory: ./Server/WebApi
+        working-directory: Server/WebApi
         run: |
           Copy-Item "appsettings.Token.json" -Destination "appsettings.json" -Force
           Remove-Item "appsettings.Token.json" -Force
 
           (Get-Content appsettings.json).Replace("__Website__", "${{ env.url }}") | Set-Content appsettings.json
           Write-Host "... Done!"
-          
-      - name: Package Functions
-        run: |
-          dotnet publish ./Server/Functions/Functions.csproj --configuration Release --property:publishWebProjects=false
-          dotnet publish ./Server/WebApi/WebApi.csproj --configuration Release --property:publishWebProjects=false
 
+      - name: Build .NET solution
+        run: >
+          dotnet build Server/ChartBackend.sln
+          --configuration Release
+          --property:ContinuousIntegrationBuild=true
+          -warnAsError
+
+      - name: Package Web API
+        working-directory: Server
+        run: >
+          dotnet publish WebApi/WebApi.csproj
+          --configuration Release
+          --property:PublishDir="artifacts/api"
+
+      - name: Package Functions
+        working-directory: Server
+        run: >
+          dotnet publish Functions/Functions.csproj
+          --configuration Release
+          --property:PublishDir="artifacts/fns"
+            
       - name: Save Web API
         uses: actions/upload-artifact@v3
         with:
           name: api
-          path: ./**/WebApi.zip
+          path: "artifacts/api"
 
       - name: Save Functions
         uses: actions/upload-artifact@v3
         with:
           name: fns
-          path: ./**/Functions.zip
+          path: "artifacts/fns"
 
   build-website:
     runs-on: ubuntu-latest
@@ -142,9 +158,9 @@ jobs:
     - name: Download package
       uses: actions/download-artifact@v3
       with:
-        name: website
+        name: web
         path: artifacts
   
-    - name: Deploy api
+    - name: Deploy web
       run: |
         echo "hello Functions!"
