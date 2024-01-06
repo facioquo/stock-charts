@@ -64,13 +64,13 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: api
-          path: "artifacts/api"
+          path: "./Server/artifacts/api"
 
       - name: Save Functions
         uses: actions/upload-artifact@v3
         with:
           name: fns
-          path: "artifacts/fns"
+          path: "./Server/artifacts/fns"
 
   build-website:
     runs-on: ubuntu-latest
@@ -124,8 +124,10 @@ jobs:
           path: artifacts
 
       - name: Deploy api
+        working-directory: artifacts
         run: |
           echo "hello API"
+          ls
 
   deploy-fns:
     needs: [ "build-backend" ]
@@ -143,8 +145,10 @@ jobs:
         path: artifacts
 
     - name: Deploy Functions
+      working-directory: artifacts
       run: |
-        echo "hello Functions!"
+        echo "hello Functions"
+        ls
         
   deploy-website:
     needs: [ "build-website", "deploy-api", "deploy-fns" ]
@@ -163,5 +167,7 @@ jobs:
         path: artifacts
   
     - name: Deploy web
+      working-directory: artifacts
       run: |
-        echo "hello Functions!"
+        echo "hello Web"
+        ls
