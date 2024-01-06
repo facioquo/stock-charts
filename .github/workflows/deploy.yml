@@ -6,6 +6,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+
 concurrency:
   group: website-deployer
   cancel-in-progress: true
@@ -50,14 +51,14 @@ jobs:
         run: >
           dotnet publish WebApi/WebApi.csproj
           --configuration Release
-          --property:PublishDir="artifacts/api"
+          --property:PublishDir="../artifacts/api"
 
       - name: Package Functions
         working-directory: Server
         run: >
           dotnet publish Functions/Functions.csproj
           --configuration Release
-          --property:PublishDir="artifacts/fns"
+          --property:PublishDir="../artifacts/fns"
             
       - name: Save Web API
         uses: actions/upload-artifact@v3
@@ -87,18 +88,18 @@ jobs:
         cache-dependency-path: Client/package-lock.json
 
     - name: Install packages
-      working-directory: ./Client
+      working-directory: Client
       run: npm install
 
     - name: Update configs
       shell: pwsh
-      working-directory: ./Client/src
+      working-directory: Client/src
       run: |
         (Get-Content index.html).Replace("__GaTag__", "G-17DX6ZW6HP") | Set-Content index.html
         Write-Host "... Done!"
       
     - name: Build site
-      working-directory: ./Client
+      working-directory: Client
       run: npm run build.prod
 
     - name: Store artifacts
