@@ -161,7 +161,7 @@ jobs:
         publish-profile: ${{ secrets.PUBLISH_PROFILE_FNS }}
         
   deploy-website:
-    needs: [ "build-website", "deploy-api", "deploy-fns" ]
+    needs: [ "build-website", "deploy-api" ]
     runs-on: ubuntu-latest
 
     environment:

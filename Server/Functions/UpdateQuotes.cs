@@ -12,7 +12,7 @@ public class Jobs(ILoggerFactory loggerFactory)
     private readonly ILogger _logger = loggerFactory.CreateLogger<Jobs>();
 
     [Function("UpdateQuotes")]
-    public async Task Run([TimerTrigger("0 */1 * * * *")] TimerInfo myTimer)
+    public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5")] TimerInfo myTimer)
     {
         // ~ extended market hours, every minute "0 */1 08-18 * * 1-5"
         // for dev: minutely "0 */1 * * * *"
