@@ -108,60 +108,8 @@ jobs:
         name: web
         path: Client/dist/app
     
-  deploy-api:
-    needs: [ "build-backend" ]
-    runs-on: ubuntu-latest
-
-    environment:
-      name: website
-
-    steps:
-
-      - name: Download package
-        uses: actions/download-artifact@v3
-        with:
-          name: api
-          path: artifacts
-
-      - name: Show artifacts
-        working-directory: artifacts
-        run: ls
-
-      - name: Deploy API
-        uses: azure/webapps-deploy@v2
-        with: 
-          app-name: stock-charts-api
-          package: artifacts
-          publish-profile: ${{ secrets.PUBLISH_PROFILE_API }}
-
-  deploy-fns:
-    needs: [ "build-backend" ]
-    runs-on: ubuntu-latest
-
-    environment:
-      name: website
-
-    steps:
-
-    - name: Download package
-      uses: actions/download-artifact@v3
-      with:
-        name: fns
-        path: artifacts
-
-    - name: Show artifacts
-      working-directory: artifacts
-      run: ls
-        
-    - name: Deploy Functions
-      uses: Azure/functions-action@v1
-      with:
-        app-name: stock-charts-functions
-        package: artifacts
-        publish-profile: ${{ secrets.PUBLISH_PROFILE_FNS }}
-        
-  deploy-website:
-    needs: [ "build-website", "deploy-api" ]
+  deploy:
+    needs: [ "build-backend", "build-website" ]
     runs-on: ubuntu-latest
 
     environment:
@@ -169,20 +117,54 @@ jobs:
       url: "https://charts.stockindicators.dev"
 
     steps:
-        
-    - name: Download package
+
+    - name: Download Functions package
+      uses: actions/download-artifact@v3
+      with:
+        name: fns
+        path: artifacts/fns
+
+    - name: Show Functions artifacts
+      working-directory: artifacts/fns
+      run: ls
+
+    - name: Download API package
+      uses: actions/download-artifact@v3
+      with:
+        name: api
+        path: artifacts/api
+
+    - name: Show API artifacts
+      working-directory: artifacts/api
+      run: ls
+
+    - name: Download Web package
       uses: actions/download-artifact@v3
       with:
         name: web
-        path: artifacts
+        path: artifacts/web
   
-    - name: Show artifacts
-      working-directory: artifacts
+    - name: Show Web artifacts
+      working-directory: artifacts/web
       run: ls
+
+    - name: Deploy Functions
+      uses: Azure/functions-action@v1
+      with:
+        app-name: stock-charts-functions
+        package: artifacts/fns
+        publish-profile: ${{ secrets.PUBLISH_PROFILE_FNS }}
+        
+    - name: Deploy API
+      uses: azure/webapps-deploy@v2
+      with: 
+        app-name: stock-charts-api
+        package: artifacts/api
+        publish-profile: ${{ secrets.PUBLISH_PROFILE_API }}
 
     - name: Deploy website
       uses: azure/webapps-deploy@v2
       with: 
         app-name: stock-charts
-        package: artifacts
+        package: artifacts/web
         publish-profile: ${{ secrets.PUBLISH_PROFILE_WEB }}
