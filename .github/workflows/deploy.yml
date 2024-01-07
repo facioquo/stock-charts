@@ -123,11 +123,16 @@ jobs:
           name: api
           path: artifacts
 
-      - name: Deploy api
+      - name: Show artifacts
         working-directory: artifacts
-        run: |
-          echo "hello API"
-          ls
+        run: ls
+
+      - name: Deploy API
+        uses: azure/webapps-deploy@v2
+        with: 
+          app-name: stock-charts-api
+          package: artifacts
+          publish-profile: ${{ secrets.PUBLISH_PROFILE_API }}
 
   deploy-fns:
     needs: [ "build-backend" ]
@@ -171,8 +176,13 @@ jobs:
         name: web
         path: artifacts
   
-    - name: Deploy web
+    - name: Show artifacts
       working-directory: artifacts
-      run: |
-        echo "hello Web"
-        ls
+      run: ls
+
+    - name: Deploy website
+      uses: azure/webapps-deploy@v2
+      with: 
+        app-name: stock-charts
+        package: artifacts
+        publish-profile: ${{ secrets.PUBLISH_PROFILE_WEB }}
