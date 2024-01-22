@@ -1,4 +1,5 @@
 using System.Text;
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 
@@ -7,14 +8,26 @@ namespace WebApi.Services;
 public static class Storage
 {
     // STARTUP
-    public static void Startup()
+    public static async Task Startup(CancellationToken cancellationToken)
     {
         // initialize Azure services (setup storage)
         string awjsConnection = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
 
         // main blob container
         BlobContainerClient blobContainer = new(awjsConnection, "chart-demo");
-        blobContainer.CreateIfNotExists();
+
+        Response<BlobContainerInfo> response = await blobContainer
+            .CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+
+        // when new container
+        if (response != null)
+        {
+            Console.WriteLine($"NOTE: New blob container `chart-demo` created {response.Value}.");
+        }
+        else
+        {
+            Console.WriteLine($"NOTE: Blob container already exists.");
+        }
     }
 
     // SAVE BLOB

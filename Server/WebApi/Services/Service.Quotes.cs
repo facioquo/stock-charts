@@ -41,8 +41,8 @@ internal static class FetchQuotes
 
     private static IEnumerable<Quote> GetBackup()
     {
-        List<Quote> h = new()
-        {
+        List<Quote> h =
+        [
             new Quote { Date = DateTime.Parse("2018-12-31"), Open = 244.92m, High = 245.54m, Low = 242.87m, Close = 245.28m, Volume = 147031456 },
             new Quote { Date = DateTime.Parse("2018-12-28"), Open = 244.94m, High = 246.73m, Low = 241.87m, Close = 243.15m, Volume = 155998912 },
             new Quote { Date = DateTime.Parse("2018-12-27"), Open = 238.06m, High = 243.68m, Low = 234.52m, Close = 243.46m, Volume = 189794032 },
@@ -547,7 +547,7 @@ internal static class FetchQuotes
             new Quote { Date = DateTime.Parse("2017-01-03"), Open = 212.61m, High = 213.35m, Low = 211.52m, Close = 212.80m, Volume = 96708880 },
             new Quote { Date = DateTime.Parse("2017-01-02"), Open = 212.61m, High = 213.35m, Low = 211.52m, Close = 212.00m, Volume = 76708880 },
             new Quote { Date = DateTime.Parse("2017-01-01"), Open = 212.61m, High = 213.35m, Low = 211.52m, Close = 211.60m, Volume = 86708880 },
-        };
+        ];
 
         return h.OrderBy(x => x.Date);
     }
