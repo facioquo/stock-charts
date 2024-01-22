@@ -7,14 +7,9 @@ using WebApi.Services;
 
 namespace Functions;
 
-public class Jobs
+public class Jobs(ILoggerFactory loggerFactory)
 {
-    private readonly ILogger _logger;
-
-    public Jobs(ILoggerFactory loggerFactory)
-    {
-        _logger = loggerFactory.CreateLogger<Jobs>();
-    }
+    private readonly ILogger _logger = loggerFactory.CreateLogger<Jobs>();
 
     [Function("UpdateQuotes")]
     public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5")] TimerInfo myTimer)
