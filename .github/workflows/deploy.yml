@@ -163,3 +163,16 @@ jobs:
         app-name: stock-charts
         package: artifacts/web
         publish-profile: ${{ secrets.PUBLISH_PROFILE_WEB }}
+
+    - name: Define tag
+      id: tag
+      run: echo "tag=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
+    
+    - name: Tag and release note
+      uses: ncipollo/release-action@v1
+      if: github.ref == 'refs/heads/main'
+      with:
+        generateReleaseNotes: true
+        draft: false
+        tag: ${{ steps.tag.outputs.tag }}
+        commit: ${{ github.ref_name }}
