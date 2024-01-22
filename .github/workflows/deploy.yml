@@ -172,7 +172,8 @@ jobs:
       uses: ncipollo/release-action@v1
       if: github.ref == 'refs/heads/main'
       with:
-        generateReleaseNotes: true
+        body: |
+          We’ve updated [charts.stockindicators.dev](https://charts.stockindicators.dev)
         draft: true
         tag: ${{ steps.tag.outputs.tag }}
         commit: ${{ github.ref_name }}
