@@ -25,12 +25,34 @@
 
           <h3>{{r.displayName}}</h3>
 
+          <!-- line type -->
+          <mat-form-field class="style-input">
+            <mat-label>Line type</mat-label>
+            <mat-select name="linetype{{i}}" [(ngModel)]="r.lineType">
+              <mat-option *ngFor="let type of lineTypes" [value]="type.value">
+                {{type.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- line width -->
+          <mat-form-field class="style-input">
+            <mat-label>Line width</mat-label>
+            <mat-select name="linewidth{{i}}" [(ngModel)]="r.lineWidth" [disabled]="r.lineType==='none'">
+              <mat-option *ngFor="let width of lineWidths" [value]="width.value">
+                {{width.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
           <!-- color -->
           <mat-form-field class="style-input">
             <mat-label>Color</mat-label>
-            <input matInput #hexcolor="ngModel" name="color{{i}}" [mtxColorpicker]="customPicker" [(ngModel)]="r.color" pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3}|[A-Fa-f0-9]{8})$">
+            <input matInput #hexcolor="ngModel" name="color{{i}}" [mtxColorpicker]="customPicker" [(ngModel)]="r.color"
+              pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3}|[A-Fa-f0-9]{8})$" [disabled]="r.lineType==='none'">
             <mat-error *ngIf="hexcolor.invalid">Invalid HEX color</mat-error>
-            <mtx-colorpicker-toggle matSuffix [for]="customPicker" [ngStyle]="{'color':r.color}">
+            <mtx-colorpicker-toggle matSuffix [for]="customPicker" [ngStyle]="{'color':r.color}"
+              [disabled]="r.lineType==='none'">
             </mtx-colorpicker-toggle>
             <mtx-colorpicker #customPicker [content]="customPickerContent" disabled="false"></mtx-colorpicker>
           </mat-form-field>
@@ -42,27 +64,6 @@
               </color-compact>
             </div>
           </ng-template>
-
-          <!-- line type -->
-          <mat-form-field class="style-input">
-            <mat-label>Line style</mat-label>
-            <mat-select name="linetype{{i}}" [(ngModel)]="r.lineType">
-              <mat-option *ngFor="let style of lineStyles" [value]="style.value">
-                {{style.name}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <!-- line width -->
-          <mat-form-field class="style-input">
-            <mat-label>Line width</mat-label>
-            <mat-select name="linewidth{{i}}" [(ngModel)]="r.lineWidth">
-              <mat-option *ngFor="let width of lineWidths" [value]="width.value">
-                {{width.name}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
         </div>
       </mat-tab>
     </mat-tab-group>

@@ -1,5 +1,7 @@
 // STARTUP CONFIGURATION
 
+using WebApi.Services;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 IServiceCollection services = builder.Services;
@@ -10,7 +12,7 @@ services.AddControllers();
 
 // get CORS origins from appsettings
 IConfigurationSection corsOrigins = configuration.GetSection("CorsOrigins");
-List<string> origins = new();
+List<string> origins = [];
 origins.Add(item: corsOrigins["Website"]);
 
 // setup CORS for website
@@ -22,11 +24,14 @@ services.AddCors(options =>
         cors.AllowAnyHeader();
         cors.AllowAnyMethod();
         cors.AllowCredentials();
-        cors.WithOrigins(origins.ToArray());
+        cors.WithOrigins([.. origins]);
     });
 });
 
 Console.WriteLine($"CORS Origins: {corsOrigins["Website"]}");
+
+// register services
+builder.Services.AddHostedService<StartupService>();
 
 // build application
 WebApplication app = builder.Build();
