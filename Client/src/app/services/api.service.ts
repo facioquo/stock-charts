@@ -232,6 +232,24 @@ export class ApiService {
           order: r.order
         };
         return ptDataset;
+
+      case 'none':
+        // hide instead of exclude "none" lines,
+        // otherwise, it breaks line offset fill
+        const noneDataset: ChartDataset = {
+          label: r.label,
+          type: 'line',
+          data: [],
+          yAxisID: 'yAxis',
+          showLine: false,
+          pointRadius: 0,
+          borderWidth: 0,
+          borderColor: r.color,
+          backgroundColor: r.color,
+          fill: false,
+          order: r.order
+        };
+        return noneDataset;
     }
   }
 

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <Title>charts.stockindicators.dev</Title>
@@ -10,7 +10,7 @@
     <PackageIcon>favicon.ico</PackageIcon>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
@@ -20,11 +20,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.18.0" />
-    <PackageReference Include="Azure.Storage.Files.Shares" Version="12.16.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.12" />
-    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.0" />
-    <PackageReference Include="Skender.Stock.Indicators" Version="2.4.11" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
+    <PackageReference Include="Azure.Storage.Files.Shares" Version="12.17.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.1" />
+    <PackageReference Include="Skender.Stock.Indicators" Version="2.5.0" />
   </ItemGroup>
 
   <ItemGroup>
