@@ -29,9 +29,7 @@ internal static class FetchQuotes
 
             return quotes == null || quotes.Count == 0
                 ? GetBackup()
-                : quotes
-                   .OrderBy(x => x.Date)
-                   .ToList();
+                : [.. quotes.OrderBy(x => x.Date)];
         }
         catch
         {
