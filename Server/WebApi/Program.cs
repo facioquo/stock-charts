@@ -14,6 +14,7 @@ services.AddControllers();
 IConfigurationSection corsOrigins = configuration.GetSection("CorsOrigins");
 List<string> origins = [];
 origins.Add(item: corsOrigins["Website"]);
+origins.Add(item: corsOrigins["Preview"]);
 
 // setup CORS for website
 services.AddCors(options =>
@@ -24,7 +25,8 @@ services.AddCors(options =>
         cors.AllowAnyHeader();
         cors.AllowAnyMethod();
         cors.AllowCredentials();
-        cors.WithOrigins([.. origins]);
+        cors.WithOrigins([.. origins])
+            .SetIsOriginAllowedToAllowWildcardSubdomains();
     });
 });
 

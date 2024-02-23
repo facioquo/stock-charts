@@ -12,6 +12,7 @@ jobs:
 
     env:
       url: https://charts.stockindicators.dev
+      prv: ${{ vars.CLOUDFLARE_PREVIEW_URL }}
 
     steps:
 
@@ -31,7 +32,8 @@ jobs:
           Copy-Item "appsettings.Token.json" -Destination "appsettings.json" -Force
           Remove-Item "appsettings.Token.json" -Force
 
-          (Get-Content appsettings.json).Replace("__Website__", "${{ env.url }}") | Set-Content appsettings.json
+          (Get-Content appsettings.json).Replace("__WebsiteUrl__", "${{ env.url }}") | Set-Content appsettings.json
+          (Get-Content appsettings.json).Replace("__PreviewUrl__", "${{ env.prv }}") | Set-Content appsettings.json
           Write-Host "... Done!"
 
       - name: Build .NET solution
@@ -157,12 +159,15 @@ jobs:
         package: artifacts/api
         publish-profile: ${{ secrets.PUBLISH_PROFILE_API }}
 
-    - name: Deploy website
-      uses: azure/webapps-deploy@v2
-      with: 
-        app-name: stock-charts
-        package: artifacts/web
-        publish-profile: ${{ secrets.PUBLISH_PROFILE_WEB }}
+    - name: Publish to Cloudflare Pages
+      uses: cloudflare/pages-action@v1
+      with:
+        apiToken: ${{ secrets.CLOUDFLARE_API_KEY }}
+        accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        projectName: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+        gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+        directory: artifacts/web
+        wranglerVersion: 'latest'
 
     - name: Define tag
       id: tag
