@@ -6,7 +6,7 @@ using Skender.Stock.Indicators;
 
 namespace WebApi.Services;
 
-internal class FetchQuotes
+internal static class FetchQuotes
 {
     internal static IEnumerable<Quote> Get()
     {
