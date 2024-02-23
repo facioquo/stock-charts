@@ -6,7 +6,7 @@ using Skender.Stock.Indicators;
 
 namespace WebApi.Services;
 
-internal static class FetchQuotes
+internal class FetchQuotes
 {
     internal static IEnumerable<Quote> Get()
     {
@@ -21,21 +21,25 @@ internal static class FetchQuotes
 
         try
         {
-            BlobClient blob = Storage.GetBlobReference(blobName);
+            BlobClient blob = Storage.GetBlobClient(blobName);
             Response<BlobDownloadInfo> response = blob.Download();
 
-            List<Quote> quotes = JsonSerializer
-                .Deserialize<List<Quote>>(response.Value.Content);
+            Stream stream = response.Value.Content;
+
+            List<Quote>? quotes = JsonSerializer
+                .Deserialize<List<Quote>>(stream);
 
             return quotes == null || quotes.Count == 0
-                ? GetBackup()
+                ? backupQuotes
                 : [.. quotes.OrderBy(x => x.Date)];
         }
         catch
         {
-            return GetBackup();
+            return backupQuotes;
         }
     }
+
+    private static readonly IEnumerable<Quote> backupQuotes = GetBackup();
 
     private static IEnumerable<Quote> GetBackup()
     {
