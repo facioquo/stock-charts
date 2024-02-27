@@ -44,7 +44,7 @@ export interface IndicatorResultConfig {
   dataType: string;
   lineType: string;
   stack: string,
-  lineWidth: number;
+  lineWidth: number | null;
   defaultColor: string;
   fill: ChartFill;
   order: number

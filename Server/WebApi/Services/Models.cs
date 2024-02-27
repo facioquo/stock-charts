@@ -47,8 +47,8 @@ public record class IndicatorResultConfig
     public required string DataName { get; init; }
     public required string DataType { get; init; }
     public required string LineType { get; init; }
-    public string? Stack { get; init; }
-    public float? LineWidth { get; set; }
+    public string? Stack { get; set; } = null;
+    public float LineWidth { get; set; } = 1.5;
     public required string DefaultColor { get; init; }
     public ChartFill? Fill { get; set; }
 
