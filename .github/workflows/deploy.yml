@@ -76,6 +76,17 @@ jobs:
       working-directory: Client
       run: npm install
 
+    - name: Define tag
+      id: tag
+      run: echo "tag=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
+    
+    - name: Replace cache markers
+      uses: jacobtomlinson/gha-find-replace@v3
+      with:
+        find: "YYYY.MM.DD"
+        replace: "${{ steps.tag.outputs.version }}"
+        regex: false
+
     - name: Update configs
       shell: pwsh
       working-directory: Client/src
