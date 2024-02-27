@@ -11,10 +11,10 @@ public static class Storage
     public static async Task Startup(CancellationToken cancellationToken)
     {
         // initialize Azure services (setup storage)
-        string awjsConnection = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+        string? awjs = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
 
         // main blob container
-        BlobContainerClient blobContainer = new(awjsConnection, "chart-demo");
+        BlobContainerClient blobContainer = new(awjs, "chart-demo");
 
         Response<BlobContainerInfo> response = await blobContainer
             .CreateIfNotExistsAsync(cancellationToken: cancellationToken);
@@ -33,7 +33,7 @@ public static class Storage
     // SAVE BLOB
     public static async Task<bool> PutBlob(string blobName, string csv)
     {
-        BlobClient blob = GetBlobReference(blobName);
+        BlobClient blob = GetBlobClient(blobName);
         BlobHttpHeaders httpHeader = new()
         {
             ContentType = "application/json"
@@ -46,17 +46,17 @@ public static class Storage
     }
 
     // HELPERS
-    internal static BlobClient GetBlobReference(string blobName)
+    internal static BlobClient GetBlobClient(string blobName)
     {
-        BlobContainerClient blobContainer = GetContainerReference("chart-demo");
+        BlobContainerClient blobContainer = GetContainerClient("chart-demo");
         BlobClient blob = blobContainer.GetBlobClient(blobName);
 
         return blob;
     }
 
-    private static BlobContainerClient GetContainerReference(string containerName)
+    private static BlobContainerClient GetContainerClient(string containerName)
     {
-        string awjsConnection = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
-        return new BlobContainerClient(awjsConnection, containerName);
+        string? awjs = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+        return new BlobContainerClient(awjs, containerName);
     }
 }

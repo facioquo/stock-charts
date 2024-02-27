@@ -11,9 +11,16 @@ ConfigurationManager configuration = builder.Configuration;
 services.AddControllers();
 
 // get CORS origins from appsettings
-IConfigurationSection corsOrigins = configuration.GetSection("CorsOrigins");
 List<string> origins = [];
-origins.Add(item: corsOrigins["Website"]);
+
+// reminder: production origins defined in cloud host settings » API » CORS
+IConfigurationSection corsOrigins = configuration.GetSection("CorsOrigins");
+string? allowedOrigin = corsOrigins["Website"];
+
+if (!string.IsNullOrEmpty(allowedOrigin))
+{
+    origins.Add(item: allowedOrigin);
+}
 
 // setup CORS for website
 services.AddCors(options =>
@@ -24,11 +31,12 @@ services.AddCors(options =>
         cors.AllowAnyHeader();
         cors.AllowAnyMethod();
         cors.AllowCredentials();
-        cors.WithOrigins([.. origins]);
+        cors.WithOrigins([.. origins])
+            .SetIsOriginAllowedToAllowWildcardSubdomains();
     });
 });
 
-Console.WriteLine($"CORS Origins: {corsOrigins["Website"]}");
+Console.WriteLine($"CORS Origin: {corsOrigins["Website"]}");
 
 // register services
 builder.Services.AddHostedService<StartupService>();
