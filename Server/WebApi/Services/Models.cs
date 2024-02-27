@@ -1,21 +1,23 @@
 namespace WebApi.Services;
 
-public class IndicatorList
+[Serializable]
+public record class IndicatorList
 {
-    public string Name { get; set; }
-    public string Uiid { get; set; }
-    public string LegendTemplate { get; set; }
-    public string Endpoint { get; set; }
-    public string Category { get; set; }
-    public string ChartType { get; set; }
-    public Order Order { get; set; } = Order.Front;
+    public required string Name { get; init; }
+    public required string Uiid { get; init; }
+    public required string LegendTemplate { get; init; }
+    public required string Endpoint { get; init; }
+    public required string Category { get; init; }
+    public required string ChartType { get; init; }
+    public Order Order { get; init; } = Order.Front;
 
-    public ChartConfig ChartConfig { get; set; }
+    public ChartConfig? ChartConfig { get; set; }
 
-    public virtual ICollection<IndicatorParamConfig> Parameters { get; set; }
-    public virtual ICollection<IndicatorResultConfig> Results { get; set; }
+    public ICollection<IndicatorParamConfig>? Parameters { get; set; }
+    public required ICollection<IndicatorResultConfig> Results { get; init; }
 }
 
+[Serializable]
 public enum Order
 {
     // price is 75/76
@@ -26,49 +28,54 @@ public enum Order
     Back = 95
 }
 
-public class IndicatorParamConfig
+[Serializable]
+public record class IndicatorParamConfig
 {
-    public string DisplayName { get; set; }
-    public string ParamName { get; set; }
-    public string DataType { get; set; }
-    public double? DefaultValue { get; set; }
-    public double Minimum { get; set; } // greater than
-    public double Maximum { get; set; } // less than
+    public required string DisplayName { get; init; }
+    public required string ParamName { get; init; }
+    public required string DataType { get; init; }
+    public required double Minimum { get; init; } // greater than
+    public required double Maximum { get; init; } // less than
+    public double? DefaultValue { get; init; }
 }
 
-public class IndicatorResultConfig
+[Serializable]
+public record class IndicatorResultConfig
 {
-    public string DisplayName { get; set; }
-    public string TooltipTemplate { get; set; }
-    public string DataName { get; set; }
-    public string DataType { get; set; }
-    public string LineType { get; set; }
-    public string Stack { get; set; }
+    public required string DisplayName { get; init; }
+    public required string TooltipTemplate { get; init; }
+    public required string DataName { get; init; }
+    public required string DataType { get; init; }
+    public required string LineType { get; init; }
+    public string? Stack { get; set; } = null;
     public float LineWidth { get; set; } = 2;
-    public string DefaultColor { get; set; }
-    public ChartFill Fill { get; set; }
+    public required string DefaultColor { get; init; }
+    public ChartFill? Fill { get; set; }
 
 }
 
-public class ChartConfig
+[Serializable]
+public record class ChartConfig
 {
     public double? MinimumYAxis { get; set; }
     public double? MaximumYAxis { get; set; }
 
-    public virtual ICollection<ChartThreshold> Thresholds { get; set; }
+    public ICollection<ChartThreshold>? Thresholds { get; set; }
 }
 
-public class ChartThreshold
+[Serializable]
+public record class ChartThreshold
 {
-    public double Value { get; set; }
-    public string Color { get; set; }
-    public string Style { get; set; }
-    public ChartFill Fill { get; set; }
+    public required double Value { get; init; }
+    public required string Color { get; init; }
+    public required string Style { get; init; }
+    public ChartFill? Fill { get; set; }
 }
 
-public class ChartFill
+[Serializable]
+public record class ChartFill
 {
-    public string Target { get; set; }
-    public string ColorAbove { get; set; }
-    public string ColorBelow { get; set; }
+    public required string Target { get; init; }
+    public required string ColorAbove { get; init; }
+    public required string ColorBelow { get; init; }
 }
