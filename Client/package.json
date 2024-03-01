@@ -23,15 +23,15 @@
     "@angular/router": "^17.2.3",
     "@ctrl/tinycolor": "^4.0.3",
     "@ng-matero/extensions": "^17.1.2",
-    "chart.js": "^4.4.1",
+    "chart.js": "^4.4.2",
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-plugin-annotation": "^3.0.1",
-    "date-fns": "^2.30.0",
+    "date-fns": "^3.3.1",
     "guid-typescript": "^1.0.9",
     "ngx-color": "^9.0.0",
     "rxjs": "^7.8.1",
-    "tslib": "^2.5.3",
-    "zone.js": "~0.14.3"
+    "tslib": "^2.5.4",
+    "zone.js": "~0.14.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.2.2",
@@ -43,10 +43,10 @@
     "@angular/cli": "^17.2.2",
     "@angular/compiler-cli": "^17.2.3",
     "@angular/language-service": "^17.2.3",
-    "@types/node": "^20.11.16",
-    "@typescript-eslint/eslint-plugin": "^7.0.2",
-    "@typescript-eslint/parser": "^7.0.2",
-    "eslint": "^8.56.0",
+    "@types/node": "^20.11.24",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
+    "eslint": "^8.57.0",
     "ts-node": "~10.9.2",
     "typescript": "~5.3.3"
   }
