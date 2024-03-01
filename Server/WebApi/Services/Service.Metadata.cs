@@ -861,6 +861,85 @@ public static class Metadata
                 ]
             },
 
+                        // ConnorsRSI
+            new IndicatorList
+            {
+                Name = "ConnorsRSI (CRSI)",
+                Uiid = "CRSI",
+                LegendTemplate = "CRSI([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/CRSI/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig
+                {
+                    MinimumYAxis = 0,
+                    MaximumYAxis = 100,
+
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 90,
+                            Color = thresholdRed,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = thresholdGreen
+                            }
+                        },
+                        new() {
+                            Value = 10,
+                            Color = thresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartFill
+                            {
+                                Target = "+1",
+                                ColorAbove = thresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "rsiPeriods",
+                        DataType = "int",
+                        DefaultValue = 3,
+                        Minimum = 2,
+                        Maximum = 250
+                    },
+                    new() {
+                        DisplayName = "Streak Periods",
+                        ParamName = "streakPeriods",
+                        DataType = "int",
+                        DefaultValue = 2,
+                        Minimum = 2,
+                        Maximum = 50
+                    },
+                    new() {
+                        DisplayName = "Rank Periods",
+                        ParamName = "rankPeriods",
+                        DataType = "int",
+                        DefaultValue = 100,
+                        Minimum = 2,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "CRSI",
+                        TooltipTemplate = "CRSI([P1],[P2],[P3])",
+                        DataName = "connorsRsi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                ]
+            },
+
             // Doji
             new IndicatorList
             {
