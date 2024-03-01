@@ -347,6 +347,28 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("CRSI")]
+    public IActionResult GetConnorsRsi(
+        int rsiPeriods,
+        int streakPeriods,
+        int rankPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<ConnorsRsiResult> results =
+                quotes.GetConnorsRsi(rsiPeriods, streakPeriods, rankPeriods)
+                        .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("DOJI")]
     public IActionResult GetDoji(
         double maxPriceChangePercent)
