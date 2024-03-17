@@ -2494,7 +2494,7 @@ public static class Metadata
                 Results = [
                     new() {
                         DisplayName = "Jaw",
-                        TooltipTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6]) Jaw",
+                        TooltipTemplate = "Jaw([P1]/[P2])",
                         DataName = "jaw",
                         DataType = "number",
                         LineType = "solid",
@@ -2502,7 +2502,7 @@ public static class Metadata
                     },
                     new() {
                         DisplayName = "Teeth",
-                        TooltipTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6]) Teeth",
+                        TooltipTemplate = "Teeth([P3]/[P4])",
                         DataName = "teeth",
                         DataType = "number",
                         LineType = "solid",
@@ -2510,7 +2510,7 @@ public static class Metadata
                     },
                     new() {
                         DisplayName = "Lips",
-                        TooltipTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6]) Lips",
+                        TooltipTemplate = "Lips([P4]/[P5])",
                         DataName = "lips",
                         DataType = "number",
                         LineType = "solid",
