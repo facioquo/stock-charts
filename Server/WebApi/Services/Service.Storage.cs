@@ -10,8 +10,11 @@ public static class Storage
     // STARTUP
     public static async Task Startup(CancellationToken cancellationToken)
     {
-        // initialize Azure services (setup storage)
-        string? awjs = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+        // initialize Azure services (setup storage),
+        // failover to Azurite local dev storage
+        string awjs = Environment
+            .GetEnvironmentVariable("AzureWebJobsStorage")
+                ?? "UseDevelopmentStorage=true";
 
         // main blob container
         BlobContainerClient blobContainer = new(awjs, "chart-demo");
@@ -22,11 +25,13 @@ public static class Storage
         // when new container
         if (response != null)
         {
-            Console.WriteLine($"NOTE: New blob container `chart-demo` created {response.Value}.");
+            Console.WriteLine(
+                $"NOTE: New blob container `chart-demo` created {response.Value}.");
         }
         else
         {
-            Console.WriteLine($"NOTE: Blob container already exists.");
+            Console.WriteLine(
+                $"NOTE: Blob container already exists.");
         }
     }
 
@@ -48,15 +53,21 @@ public static class Storage
     // HELPERS
     internal static BlobClient GetBlobClient(string blobName)
     {
-        BlobContainerClient blobContainer = GetContainerClient("chart-demo");
-        BlobClient blob = blobContainer.GetBlobClient(blobName);
+        BlobContainerClient blobContainer
+            = GetContainerClient("chart-demo");
+
+        BlobClient blob
+            = blobContainer.GetBlobClient(blobName);
 
         return blob;
     }
 
     private static BlobContainerClient GetContainerClient(string containerName)
     {
-        string? awjs = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+        // failover to Azurite local dev storage
+        string awjs = Environment
+            .GetEnvironmentVariable("AzureWebJobsStorage")
+                ?? "UseDevelopmentStorage=true";
         return new BlobContainerClient(awjs, containerName);
     }
 }
