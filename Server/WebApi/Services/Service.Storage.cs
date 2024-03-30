@@ -39,8 +39,7 @@ public static class Storage
     public static async Task<bool> PutBlob(string blobName, string csv)
     {
         BlobClient blob = GetBlobClient(blobName);
-        BlobHttpHeaders httpHeader = new()
-        {
+        BlobHttpHeaders httpHeader = new() {
             ContentType = "application/json"
         };
 

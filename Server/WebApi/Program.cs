@@ -23,11 +23,9 @@ if (!string.IsNullOrEmpty(allowedOrigin))
 }
 
 // setup CORS for website
-services.AddCors(options =>
-{
+services.AddCors(options => {
     options.AddPolicy("CorsPolicy",
-    cors =>
-    {
+    cors => {
         cors.AllowAnyHeader();
         cors.AllowAnyMethod();
         cors.AllowCredentials();
