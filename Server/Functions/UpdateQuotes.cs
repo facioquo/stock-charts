@@ -27,17 +27,27 @@ public class Jobs(ILoggerFactory loggerFactory)
     // STORE QUOTE
     private async Task StoreQuoteDaily(string symbol)
     {
-        string? alpacaApiKey = Environment.GetEnvironmentVariable("AlpacaApiKey");
-        string? alpacaSecret = Environment.GetEnvironmentVariable("AlpacaSecret");
+        // get and validate keys, see README.md
+        string? ALPACA_KEY = Environment.GetEnvironmentVariable("ALPACA_KEY");
+        string? ALPACA_SECRET = Environment.GetEnvironmentVariable("ALPACA_SECRET");
 
-        if (alpacaApiKey == null || alpacaSecret == null)
+        if (string.IsNullOrEmpty(ALPACA_KEY))
         {
-            throw new NullReferenceException("The Alpaca Key or Secret was not detected.");
+            throw new ArgumentNullException(
+                ALPACA_KEY,
+                $"API KEY missing, use `setx ALPACA_KEY \"MY-ALPACA-KEY\"` to set.");
+        }
+
+        if (string.IsNullOrEmpty(ALPACA_SECRET))
+        {
+            throw new ArgumentNullException(
+                ALPACA_SECRET,
+                $"API SECRET missing, use `setx AlpacaApiSecret \"MY-ALPACA-SECRET\"` to set.");
         }
 
         // fetch from Alpaca paper trading API
         IAlpacaDataClient alpacaDataClient = Environments.Paper
-            .GetAlpacaDataClient(new SecretKey(alpacaApiKey, alpacaSecret));
+            .GetAlpacaDataClient(new SecretKey(ALPACA_KEY, ALPACA_SECRET));
 
         DateTime into = DateTime.Now.Subtract(TimeSpan.FromMinutes(16));
         DateTime from = into.Subtract(TimeSpan.FromDays(800));
@@ -50,8 +60,7 @@ public class Jobs(ILoggerFactory loggerFactory)
         // compose
         foreach (IBar bar in barSet.Items)
         {
-            Quote q = new()
-            {
+            Quote q = new() {
                 Date = bar.TimeUtc,
                 Open = bar.Open,
                 High = bar.High,
