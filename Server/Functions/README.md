@@ -6,8 +6,8 @@ These can be set as either environment variables or project scoped User Secrets.
 
 ```bash
 setx AzureWebJobsStorage "UseDevelopmentStorage=true"
-setx AlpacaApiKey "YOUR ALPACA API KEY"
-setx AlpacaSecret "YOUR ALPACA SECRET KEY"
+setx ALPACA_KEY "YOUR ALPACA API KEY"
+setx ALPACA_SECRET "YOUR ALPACA SECRET KEY"
 ```
 
 ## CRON
