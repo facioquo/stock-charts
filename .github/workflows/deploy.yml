@@ -172,12 +172,13 @@ jobs:
       id: tag
       run: echo "tag=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
     
-    - name: Tag and release note
+    - name: Tag and draft release note
       uses: ncipollo/release-action@v1
       if: github.ref == 'refs/heads/main'
       with:
         body: |
           We’ve updated [charts.stockindicators.dev](https://charts.stockindicators.dev)
+        generateReleaseNotes: true
         draft: true
         tag: ${{ steps.tag.outputs.tag }}
         commit: ${{ github.ref_name }}
