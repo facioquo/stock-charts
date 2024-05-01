@@ -2306,6 +2306,37 @@ public static class Metadata
                 ]
             },
 
+            // Ulcer Index
+            new IndicatorList {
+                Name = "Ulcer Index (UI)",
+                Uiid = "ULCER",
+                LegendTemplate = "ULCER([P1])",
+                Endpoint = $"{baseUrl}/ULCER/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Ulcer Index",
+                        TooltipTemplate = "UI([P1])",
+                        DataName = "ui",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
+                    }
+                ]
+            },
+
             // Vortex Indicator
             new IndicatorList {
                 Name = "Vortex Indicator",

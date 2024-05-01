@@ -2,6 +2,7 @@
   "name": "stock chart | Stock Indicators for .NET",
   "short_name": "Stock Chart",
   "description": "A stock chart to demonstrate the Stock Indicators for .NET NuGet package.",
+  "id": "/",
   "theme_color": "#212121",
   "background_color": "#212121",
   "icons": [

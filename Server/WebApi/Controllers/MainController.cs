@@ -12,10 +12,7 @@ public class MainController : ControllerBase
     internal static readonly int limitLast = 120;
 
     [HttpGet]
-    public string Get()
-    {
-        return "API is functioning nominally.";
-    }
+    public string Get() => "API is functioning nominally.";
 
     [HttpGet("quotes")]
     public IActionResult GetQuotes()
@@ -25,10 +22,7 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("indicators")]
-    public IActionResult GetIndicators()
-    {
-        return Ok(Metadata.IndicatorList($"{Request.Scheme}://{Request.Host}"));
-    }
+    public IActionResult GetIndicators() => Ok(Metadata.IndicatorList($"{Request.Scheme}://{Request.Host}"));
 
     //////////////////////////////////////////
     // INDICATORS (sorted alphabetically)
@@ -919,6 +913,26 @@ public class MainController : ControllerBase
 
             IEnumerable<SuperTrendResult> results =
                 quotes.GetSuperTrend(lookbackPeriods, multiplier)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("ULCER")]
+    public IActionResult GetUlcer(
+        int lookbackPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = FetchQuotes.Get();
+
+            IEnumerable<UlcerIndexResult> results =
+                quotes.GetUlcerIndex(lookbackPeriods)
                       .TakeLast(limitLast);
 
             return Ok(results);

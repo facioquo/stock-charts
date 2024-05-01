@@ -57,11 +57,7 @@
       &:active,
       &:hover,
       &:visited {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-
-        color: inherit;
+        color: mat.get-color-from-palette($accent, 600);
       }
 
       &:hover {
