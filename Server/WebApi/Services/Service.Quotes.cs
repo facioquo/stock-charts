@@ -1,28 +1,32 @@
 using System.Text.Json;
-using Azure;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Skender.Stock.Indicators;
 
 namespace WebApi.Services;
 
-internal static class FetchQuotes
+public class QuoteService
 {
-    internal static IEnumerable<Quote> Get()
-    {
-        return Get("QQQ", "DAILY");
-    }
+    private readonly IEnumerable<Quote> backupQuotes = GetBackup();
 
-    internal static IEnumerable<Quote> Get(
-        string symbol,    // "QQQ"
-        string timeSpan)  // "DAILY"
+    /// <summary>
+    ///   Get default quotes
+    /// </summary>
+    /// <returns cref="Quote">List of default quotes</returns>
+    public async Task<IEnumerable<Quote>> Get() => await Get("QQQ");
+
+    /// <summary>
+    ///   Get quotes for a specific symbol.
+    /// </summary>
+    /// <param name="symbol">"SPY" or "QQQ" only, for now</param>
+    /// <param name="timeSpan">"DAILY" only, for now</param>
+    public async Task<IEnumerable<Quote>> Get(
+        string symbol,              // "SPY" or "QQQ"
+        string timeSpan = "DAILY")  // "DAILY" only
     {
         string blobName = $"{symbol}-{timeSpan}.json";
 
         try
         {
             BlobClient blob = Storage.GetBlobClient(blobName);
-            Response<BlobDownloadInfo> response = blob.Download();
+            Response<BlobDownloadInfo> response = await blob.DownloadAsync();
 
             Stream stream = response.Value.Content;
 
@@ -38,8 +42,6 @@ internal static class FetchQuotes
             return backupQuotes;
         }
     }
-
-    private static readonly IEnumerable<Quote> backupQuotes = GetBackup();
 
     private static IEnumerable<Quote> GetBackup()
     {
