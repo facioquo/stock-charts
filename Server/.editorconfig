@@ -1,25 +1,8 @@
-# top-most EditorConfig file
-root = true
-
-# global baselines
-[*]
-charset = utf-8
-end_of_line = lf
-
-indent_style = space
-indent_size = 2
-tab_width = 2
-
-line_length = 150
-max_line_length = 150
-trim_trailing_whitespace = true
-insert_final_newline = true
+# Server (.NET) editor configurations
+# overload the root
+root = false
 
 [*.{csproj,props,targets}]
-indent_style = space
-indent_size = 2
-
-[*.yml]
 indent_style = space
 indent_size = 2
 
@@ -121,11 +104,14 @@ csharp_style_inlined_variable_declaration = true:suggestion
 
 # braces
 csharp_prefer_braces = true:suggestion
-csharp_prefer
+
 csharp_new_line_before_open_brace = methods, properties, control_blocks, types
 csharp_new_line_before_else = true
 csharp_new_line_before_catch = true
 csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = false
+csharp_new_line_before_members_in_anonymous_types = false
+csharp_new_line_between_query_expression_clauses = false
 
 # braces overrides
 csharp_type_declaration_braces = next_line

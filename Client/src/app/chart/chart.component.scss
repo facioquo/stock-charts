@@ -43,9 +43,10 @@
   }
 
   // tablet-lg, landscape
-  @media (max-width: 880px)  and (orientation: landscape){
+  @media (max-width: 880px) and (orientation: landscape) {
     aspect-ratio: unset;
-    height: 25vh;  }
+    height: 25vh;
+  }
 
   // mobile, landscape
   @media (max-height: 600px) and (orientation: landscape) {

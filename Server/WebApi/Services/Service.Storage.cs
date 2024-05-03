@@ -1,8 +1,3 @@
-using System.Text;
-using Azure;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-
 namespace WebApi.Services;
 
 public static class Storage
