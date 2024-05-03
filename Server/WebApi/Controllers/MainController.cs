@@ -584,6 +584,28 @@ public class MainController(QuoteService quoteService) : ControllerBase
         }
     }
 
+    [HttpGet("ICHIMOKU")]
+    public async Task<IActionResult> GetIchimoku(
+        int tenkanPeriods,
+        int kijunPeriods,
+        int senkouBPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
+
+            IEnumerable<IchimokuResult> results =
+                quotes.GetIchimoku(tenkanPeriods, kijunPeriods, senkouBPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("KELTNER")]
     public async Task<IActionResult> GetKeltner(
         int emaPeriods,
