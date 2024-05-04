@@ -16,12 +16,9 @@ public class QuoteService
     ///   Get quotes for a specific symbol.
     /// </summary>
     /// <param name="symbol">"SPY" or "QQQ" only, for now</param>
-    /// <param name="timeSpan">"DAILY" only, for now</param>
-    public async Task<IEnumerable<Quote>> Get(
-        string symbol,              // "SPY" or "QQQ"
-        string timeSpan = "DAILY")  // "DAILY" only
+    public async Task<IEnumerable<Quote>> Get(string symbol)
     {
-        string blobName = $"{symbol}-{timeSpan}.json";
+        string blobName = $"{symbol}-DAILY.json";
 
         try
         {
