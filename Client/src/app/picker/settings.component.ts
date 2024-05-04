@@ -51,11 +51,18 @@ export class SettingsComponent {
     // close current settings dialog
     this.listRef.closeAll();
 
-    // open settings for indicator to add
+    // open indicator settings for indicator to add
     this.picker.open(PickConfigComponent, {
       autoFocus: "dialog",
       data: listing
-    });
+    }).afterClosed()
+
+      // reopen main settings after close
+      .subscribe(() => {
+        this.listRef.open(SettingsComponent, {
+          autoFocus: "dialog"
+        });
+      });
   }
 
   closeListDialog() {
