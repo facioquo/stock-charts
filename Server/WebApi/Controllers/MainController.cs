@@ -228,7 +228,7 @@ public class MainController(QuoteService quoteService) : ControllerBase
         try
         {
             IEnumerable<Quote> quotes = await quoteFeed.Get();
-            IEnumerable<Quote> market = await quoteFeed.Get("SPY", "DAILY");
+            IEnumerable<Quote> market = await quoteFeed.Get("SPY");
 
             IEnumerable<BetaResult> results =
                 quotes.GetBeta(market, lookbackPeriods, type)
