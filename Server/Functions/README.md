@@ -12,13 +12,23 @@ setx ALPACA_SECRET "YOUR ALPACA SECRET KEY"
 
 ## CRON
 
-<https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-timer#cron-expressions>
+For our demo, we'll generally cache QQQ and SPY daily quotes every minute
+during extended market hours 8am-6pm M-F U.S. eastern time with CRON `"0 */1 08-18 * * 1-5"`.
+
+- [CRON syntax documentation](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-timer#cron-expressions)
+
+To enable use of eastern time zone CRON values, we have configured our Azure Functions
+to override the default UTC timezone; which is okay for our purposes.
 
 ## TIME ZONE
 
-Azure App Service server app settings on the server:
-`TZ` : `America/New_York` for Linux instance.
+Azure App Service server app settings on Linux servers:
 
-This is often documented as `WEBSITE_TIME_ZONE` : `Eastern Standard Time` for Windows instances.
+>`TZ` : `America/New_York` for Linux instance.
 
-This is set in the Azure App Service settings online and potentially in the Release settings, not in any local settings files.
+This is often documented for Windows instances servers as:
+
+>`WEBSITE_TIME_ZONE` : `Eastern Standard Time`
+
+This is set in the Azure App Service settings online
+and not in local app settings files.

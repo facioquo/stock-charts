@@ -1,4 +1,4 @@
 export interface EnvConfig {
-    production: boolean;
-    api: string;
+  production: boolean;
+  api: string;
 }

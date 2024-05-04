@@ -38,7 +38,11 @@
               }
             ],
             "stylePreprocessorOptions": {
-              "includePaths": ["node_modules", "src", "src/styles"]
+              "includePaths": [
+                "node_modules",
+                "src",
+                "src/styles"
+              ]
             },
             "scripts": [],
             "allowedCommonJsDependencies": [

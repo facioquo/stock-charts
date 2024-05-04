@@ -38,7 +38,8 @@
           <!-- line width -->
           <mat-form-field class="style-input">
             <mat-label>Line width</mat-label>
-            <mat-select name="linewidth{{i}}" [(ngModel)]="r.lineWidth" [disabled]="userSpecifiedWidth(r.lineType)===false">
+            <mat-select name="linewidth{{i}}" [(ngModel)]="r.lineWidth"
+              [disabled]="userSpecifiedWidth(r.lineType)===false">
               <mat-option *ngFor="let width of lineWidths" [value]="width.value">
                 {{width.name}}
               </mat-option>

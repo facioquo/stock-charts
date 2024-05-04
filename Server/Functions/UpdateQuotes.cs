@@ -11,6 +11,11 @@ public class Jobs(ILoggerFactory loggerFactory)
 {
     private readonly ILogger _logger = loggerFactory.CreateLogger<Jobs>();
 
+    /// <summary>
+    ///   Schedule to get and cache quotes from source feed.
+    /// </summary>
+    /// <param name="myTimer" cref="TimerInfo">CRON-based schedule</param>
+    /// <returns></returns>
     [Function("UpdateQuotes")]
     public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5")] TimerInfo myTimer)
     {
@@ -24,7 +29,13 @@ public class Jobs(ILoggerFactory loggerFactory)
              DateTime.Now, myTimer.ScheduleStatus);
     }
 
-    // STORE QUOTE
+    /// <summary>
+    ///   STORE QUOTES: get and store historical quotes to blob storage provider.
+    /// </summary>
+    /// <param name="symbol">Security symbol</param>
+    /// <exception cref="ArgumentNullException">
+    ///   When credentials are missing
+    /// </exception>
     private async Task StoreQuoteDaily(string symbol)
     {
         // get and validate keys, see README.md
@@ -42,7 +53,7 @@ public class Jobs(ILoggerFactory loggerFactory)
         {
             throw new ArgumentNullException(
                 ALPACA_SECRET,
-                $"API SECRET missing, use `setx AlpacaApiSecret \"MY-ALPACA-SECRET\"` to set.");
+                $"API SECRET missing, use `setx ALPACA_SECRET \"MY-ALPACA-SECRET\"` to set.");
         }
 
         // fetch from Alpaca paper trading API
