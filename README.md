@@ -52,8 +52,8 @@ If you want to host on your local computer and review the source code, follow th
 If you intend to use the local Azure storage emulator to get and store local quote Blob data, you'll need to set some local Environment variables.  Use your own key and secret values.
 
 ``` bash
-setx AlpacaApiKey "ALPACA_API_KEY"
-setx AlpacaSecret "ALPACA_SECRET"
+setx ALPACA_KEY "YOUR ALPACA API KEY"
+setx ALPACA_SECRET "YOUR ALPACA SECRET KEY"
 setx AzureWebJobsStorage "UseDevelopmentStorage=true"
 ```
 

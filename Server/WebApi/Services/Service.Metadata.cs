@@ -13,7 +13,9 @@ public static class Metadata
         string darkGray = "#757575";
         string darkGrayTransparent = "#75757515";
         string thresholdRed = "#B71C1C70";
+        string thresholdRedTransparent = "#B71C1C20";
         string thresholdGreen = "#1B5E2070";
+        string thresholdGreenTransparent = "#1B5E2020";
 
         List<IndicatorList> listing =
         [
@@ -1300,6 +1302,97 @@ public static class Metadata
                 ]
             },
 
+            // Ichimoku Cloud
+            new IndicatorList {
+                Name = "Ichimoku Cloud",
+                Uiid = "ICHIMOKU",
+                LegendTemplate = "ICHIMOKU([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/ICHIMOKU/",
+                Category = "price-trend",
+                ChartType = "overlay",
+                Order = Order.BehindPrice,
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Tenkan Periods",
+                        ParamName = "tenkanPeriods",
+                        DataType = "int",
+                        DefaultValue = 9,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new() {
+                        DisplayName = "Kijun Periods",
+                        ParamName = "kijunPeriods",
+                        DataType = "int",
+                        DefaultValue = 26,
+                        Minimum = 2,
+                        Maximum = 250
+                    },
+                    new() {
+                        DisplayName = "Senkou Periods",
+                        ParamName = "senkouBPeriods",
+                        DataType = "int",
+                        DefaultValue = 52,
+                        Minimum = 3,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Tenkan-sen",
+                        TooltipTemplate = "ICHIMOKU([P1],[P2],[P3] Tenkan-sen",
+                        DataName = "tenkanSen",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 2,
+                        DefaultColor = standardBlue,
+                    },
+                    new() {
+                        DisplayName = "Kijun-sen",
+                        TooltipTemplate = "ICHIMOKU([P1],[P2],[P3] Kijun-sen",
+                        DataName = "kijunSen",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 2,
+                        DefaultColor = standardPurple,
+                    },
+                    new() {
+                        DisplayName = "Chikou span",
+                        TooltipTemplate = "ICHIMOKU([P1],[P2],[P3] Chikou span",
+                        DataName = "chikouSpan",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 2,
+                        DefaultColor = darkGray,
+                    },
+                    new() {
+                        DisplayName = "Senkou span A",
+                        TooltipTemplate = "ICHIMOKU([P1],[P2],[P3] Senkou span A",
+                        DataName = "senkouSpanA",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1.5f,
+                        DefaultColor = thresholdGreen,
+                    },
+                    new() {
+                        DisplayName = "Senkou span B",
+                        TooltipTemplate = "ICHIMOKU([P1],[P2],[P3] Senkou span B",
+                        DataName = "senkouSpanB",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1.5f,
+                        DefaultColor = thresholdRed,
+                        Fill = new ChartFill {
+                            Target = "-1",
+                            ColorAbove = thresholdRedTransparent,
+                            ColorBelow = thresholdGreenTransparent
+                        }
+                    }
+                ]
+            },
+
+
             // Keltner Channels
             new IndicatorList {
                 Name = "Keltner Channels",
@@ -2302,6 +2395,37 @@ public static class Metadata
                         LineType = "dash",
                         LineWidth = 1,
                         DefaultColor = darkGrayTransparent
+                    }
+                ]
+            },
+
+            // Ulcer Index
+            new IndicatorList {
+                Name = "Ulcer Index (UI)",
+                Uiid = "ULCER",
+                LegendTemplate = "ULCER([P1])",
+                Endpoint = $"{baseUrl}/ULCER/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Ulcer Index",
+                        TooltipTemplate = "UI([P1])",
+                        DataName = "ui",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = standardBlue
                     }
                 ]
             },

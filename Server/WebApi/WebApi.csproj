@@ -4,7 +4,7 @@
     <Title>charts.stockindicators.dev</Title>
     <Description>A stock chart, demonstrating the Stock Indicators for .NET NuGet library</Description>
     <Copyright>@2020 Dave Skender</Copyright>
-    <RepositoryUrl>https://github.com/DaveSkender/Stock.Charts</RepositoryUrl>
+    <RepositoryUrl>https://github.com/facioquo/stock-charts</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
     <PackageIcon>favicon.ico</PackageIcon>
