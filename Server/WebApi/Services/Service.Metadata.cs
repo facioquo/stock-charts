@@ -1355,7 +1355,16 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 2,
-                        DefaultColor = standardOrange,
+                        DefaultColor = standardPurple,
+                    },
+                    new() {
+                        DisplayName = "Chikou span",
+                        TooltipTemplate = "ICHIMOKU([P1],[P2],[P3] Chikou span",
+                        DataName = "chikouSpan",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 2,
+                        DefaultColor = darkGray,
                     },
                     new() {
                         DisplayName = "Senkou span A",
@@ -1379,15 +1388,6 @@ public static class Metadata
                             ColorAbove = thresholdRedTransparent,
                             ColorBelow = thresholdGreenTransparent
                         }
-                    },
-                    new() {
-                        DisplayName = "Chikou span",
-                        TooltipTemplate = "ICHIMOKU([P1],[P2],[P3] Chikou span",
-                        DataName = "chikouSpan",
-                        DataType = "number",
-                        LineType = "solid",
-                        LineWidth = 2,
-                        DefaultColor = standardPurple,
                     }
                 ]
             },
