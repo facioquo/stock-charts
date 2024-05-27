@@ -44,7 +44,7 @@ jobs:
           dotnet publish Functions/Functions.csproj
           --configuration Release
           --property:PublishDir="../artifacts/fns"
-            
+
       - name: Save Web API
         uses: actions/upload-artifact@v4
         with:
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    
+
     - name: Checkout repository
       uses: actions/checkout@v4
 
@@ -93,7 +93,7 @@ jobs:
       run: |
         (Get-Content index.html).Replace("__GaTag__", "G-17DX6ZW6HP") | Set-Content index.html
         Write-Host "... Done!"
-      
+
     - name: Build site
       working-directory: Client
       run: npm run build.prod
@@ -103,13 +103,13 @@ jobs:
       with:
         name: web
         path: Client/dist/app
-    
+
   deploy:
     needs: [ "build-backend", "build-website" ]
     runs-on: ubuntu-latest
 
     environment:
-      name: website
+      name: charts.stockindicators.dev
       url: "https://charts.stockindicators.dev"
 
     steps:
@@ -139,7 +139,7 @@ jobs:
       with:
         name: web
         path: artifacts/web
-  
+
     - name: Show Web artifacts
       working-directory: artifacts/web
       run: ls
@@ -150,10 +150,10 @@ jobs:
         app-name: stock-charts-functions
         package: artifacts/fns
         publish-profile: ${{ secrets.PUBLISH_PROFILE_FNS }}
-        
+
     - name: Deploy API
       uses: azure/webapps-deploy@v3
-      with: 
+      with:
         app-name: stock-charts-api
         package: artifacts/api
         publish-profile: ${{ secrets.PUBLISH_PROFILE_API }}
@@ -171,7 +171,7 @@ jobs:
     - name: Define tag
       id: tag
       run: echo "tag=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
-    
+
     - name: Tag and draft release note
       uses: ncipollo/release-action@v1
       if: github.ref == 'refs/heads/main'
