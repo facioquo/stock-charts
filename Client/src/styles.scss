@@ -2,18 +2,22 @@
 @use "./styles/themed-parts";
 @use "./styles/base-elements";
 
-// DEFAULT THEME (see light/dark swap SCSS files)
-$primary: mat.define-palette(mat.$gray-palette, 300);
-$accent: mat.define-palette(mat.$gray-palette, 800);
-$warn: mat.define-palette(mat.$blue-palette, 800);
+// light theme: src/styles/theme-light.scss
+// see also src/app/services/style.service.scss
 
-$theme: mat.define-dark-theme((
+// DEFAULT THEME (see light/dark swap SCSS files)
+$primary: mat.m2-define-palette(mat.$m2-gray-palette, 300);
+$accent: mat.m2-define-palette(mat.$m2-gray-palette, 800);
+$warn: mat.m2-define-palette(mat.$m2-blue-palette, 800);
+
+$theme: mat.m2-define-dark-theme((
   color: (
+    theme-type: dark,
     primary: $primary,
     accent: $accent,
     warn: $warn
   ),
-  typography: mat.define-typography-config(),
+  typography: mat.m2-define-typography-config(),
 ));
 
 // include material core styles
@@ -23,5 +27,5 @@ $theme: mat.define-dark-theme((
 @include themed-parts.theme($theme);
 
 .app-background {
-  background-color: mat.get-color-from-palette($accent, 900);
+  background-color: mat.m2-get-color-from-palette($accent, 900);
 }
