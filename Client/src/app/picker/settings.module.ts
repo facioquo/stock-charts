@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 import {
@@ -32,42 +32,34 @@ import { PickConfigComponent } from './pick-config.component';
 import { ChartService } from '../services/chart.service';
 import { ApiService } from '../services/api.service';
 
-@NgModule({
-  declarations: [
-    SettingsComponent,
-    PickConfigComponent
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    HttpClientModule,
-
-    MatBottomSheetModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatListModule,
-    MatSelectModule,
-    MatSlideToggleModule,
-    MatTabsModule,
-    MatToolbarModule,
-    MatTooltipModule,
-
-    MtxColorpickerModule,
-    ColorCompactModule
-  ],
-  exports: [
-    SettingsComponent,
-    PickConfigComponent
-  ],
-  providers: [
-    ChartService,
-    ApiService,
-    { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher }
-  ],
-  bootstrap: []
-})
+@NgModule({ declarations: [
+        SettingsComponent,
+        PickConfigComponent
+    ],
+    exports: [
+        SettingsComponent,
+        PickConfigComponent
+    ],
+    bootstrap: [], imports: [CommonModule,
+        FormsModule,
+        MatBottomSheetModule,
+        MatButtonModule,
+        MatCheckboxModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        MatListModule,
+        MatSelectModule,
+        MatSlideToggleModule,
+        MatTabsModule,
+        MatToolbarModule,
+        MatTooltipModule,
+        MtxColorpickerModule,
+        ColorCompactModule], providers: [
+        ChartService,
+        ApiService,
+        { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher },
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class SettingsModule { }

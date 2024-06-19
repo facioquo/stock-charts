@@ -1,6 +1,6 @@
 # Stock Indicators for .NET demo
 
-This is a demo of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular website with a [Chart.js](https://github.com/chartjs/chartjs-chart-financial) financial/candlestick stock chart, with a .NET Web API backend to generate indicators.  The indicator library can be implemented in any .NET compatible ecosystem (it does not have to be in an API like this).  See the [library documentation](https://dotnet.stockindicators.dev) for more information and a full list of available indicators.
+This is a demo of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular website with a [Chart.js](https://github.com/chartjs/chartjs-chart-financial) financial/candlestick stock chart, with a .NET Web API backend to generate indicators.  The indicator library can be implemented in any .NET compatible ecosystem (it does not have to be in an API like this).  See the [library documentation](https://dotnet.stockindicators.dev) for [more examples](https://dotnet.stockindicators.dev/examples), the user guide, and a full list of available indicators.
 
 Live demo site: [charts.StockIndicators.dev](https://charts.stockindicators.dev/)
 
@@ -8,7 +8,7 @@ Live demo site: [charts.StockIndicators.dev](https://charts.stockindicators.dev/
 
 ## Author's note
 
-This repo and charting tool is primarily intended to demonstrate the [Stock Indicators for .NET](https://dotnet.stockindicators.dev) library.  **It is not meant to be a fully featured charting system** and may not be an architectural model that works for your use case.  If you need a more mature charting tool, please explore all of your [charting and visualization options](https://github.com/DaveSkender/Stock.Indicators/discussions/430).
+This repo and charting tool is primarily intended to demonstrate the [Stock Indicators for .NET](https://dotnet.stockindicators.dev) library.  **It is not meant to be a fully featured charting system** and may not be an architectural model that works for your use case.  If you need a mature charting tool, please explore all of your [charting and visualization options](https://github.com/DaveSkender/Stock.Indicators/discussions/430).
 
 ## Running this demo locally
 
@@ -52,8 +52,8 @@ If you want to host on your local computer and review the source code, follow th
 If you intend to use the local Azure storage emulator to get and store local quote Blob data, you'll need to set some local Environment variables.  Use your own key and secret values.
 
 ``` bash
-setx AlpacaApiKey "ALPACA_API_KEY"
-setx AlpacaSecret "ALPACA_SECRET"
+setx ALPACA_KEY "YOUR ALPACA API KEY"
+setx ALPACA_SECRET "YOUR ALPACA SECRET KEY"
 setx AzureWebJobsStorage "UseDevelopmentStorage=true"
 ```
 

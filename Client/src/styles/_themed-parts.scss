@@ -22,7 +22,7 @@
     background-color: transparent;
 
     h1 {
-      color: mat.get-color-from-palette($accent, 600);
+      color: mat.m2-get-color-from-palette($accent, 600);
       font-size: 1.4em;
     }
 
@@ -37,7 +37,7 @@
       color: inherit;
 
       &:hover {
-        color: mat.get-color-from-palette($accent, 500);
+        color: mat.m2-get-color-from-palette($accent, 500);
       }
     }
   }
@@ -50,22 +50,18 @@
     margin-bottom: 3rem;
 
     text-align: center;
-    color: mat.get-color-from-palette($accent, 600);
+    color: mat.m2-get-color-from-palette($accent, 600);
 
     a {
 
       &:active,
       &:hover,
       &:visited {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-
-        color: inherit;
+        color: mat.m2-get-color-from-palette($accent, 600);
       }
 
       &:hover {
-        color: mat.get-color-from-palette($accent, 500);
+        color: mat.m2-get-color-from-palette($accent, 500);
       }
     }
   }

@@ -23,6 +23,7 @@ interface LineWidth {
 interface LineType {
   name: string;
   value: string;
+  userWidth: boolean;  // user can specify width
 }
 
 @Component({
@@ -58,15 +59,16 @@ export class PickConfigComponent {
   lineWidths: LineWidth[] = [
     { name: "thin", value: 1 },
     { name: "normal", value: 1.5 },
-    { name: "thick", value: 2 }
+    { name: "thick", value: 2 },
+    { name: "heavy", value: 3 }
   ];
 
   lineTypes: LineType[] = [
-    { name: "solid", value: "solid" },
-    { name: "dashes", value: "dash" },
-    { name: "dots", value: "dots" },
-    { name: "bar", value: "bar" },
-    { name: "none", value: "none" }
+    { name: "solid", value: "solid", userWidth: true },
+    { name: "dashes", value: "dash", userWidth: true },
+    { name: "dots", value: "dots", userWidth: true },
+    { name: "bar", value: "bar", userWidth: false },
+    { name: "none", value: "none", userWidth: false }
   ];
 
   constructor(
@@ -113,5 +115,9 @@ export class PickConfigComponent {
     const color = e.color.rgb.a === 1 ? e.color.hex : new TinyColor(e.color.rgb).toHex8String();
     picker.close();
     return color.toUpperCase();
+  }
+
+  userSpecifiedWidth(lineValue: string): boolean {
+    return this.lineTypes.find(x => x.value === lineValue)?.userWidth ?? true;
   }
 }

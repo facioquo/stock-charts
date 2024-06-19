@@ -1,17 +1,18 @@
-using System.Text;
-using Azure;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-
 namespace WebApi.Services;
 
 public static class Storage
 {
-    // STARTUP
-    public static async Task Startup(CancellationToken cancellationToken)
+    /// <summary>
+    ///   Initialize Azure services (setup blob storage for quotes)
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public static async Task Initialize(CancellationToken cancellationToken)
     {
-        // initialize Azure services (setup storage)
-        string? awjs = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+        // failover to Azurite local dev storage
+        string awjs = Environment
+            .GetEnvironmentVariable("AzureWebJobsStorage")
+                ?? "UseDevelopmentStorage=true";
 
         // main blob container
         BlobContainerClient blobContainer = new(awjs, "chart-demo");
@@ -22,20 +23,26 @@ public static class Storage
         // when new container
         if (response != null)
         {
-            Console.WriteLine($"NOTE: New blob container `chart-demo` created {response.Value}.");
+            Console.WriteLine(
+                $"NOTE: New blob container `chart-demo` created {response.Value}.");
         }
         else
         {
-            Console.WriteLine($"NOTE: Blob container already exists.");
+            Console.WriteLine(
+                $"NOTE: Blob container already exists.");
         }
     }
 
-    // SAVE BLOB
+    /// <summary>
+    ///   Upload/save blob item (CSV quotes)
+    /// </summary>
+    /// <param name="blobName">Unique name of blob item</param>
+    /// <param name="csv">CSV payload to store</param>
+    /// <returns>True/false success</returns>
     public static async Task<bool> PutBlob(string blobName, string csv)
     {
         BlobClient blob = GetBlobClient(blobName);
-        BlobHttpHeaders httpHeader = new()
-        {
+        BlobHttpHeaders httpHeader = new() {
             ContentType = "application/json"
         };
 
@@ -45,18 +52,33 @@ public static class Storage
         return true;
     }
 
-    // HELPERS
+    /// <summary>
+    ///   Get Azure Blob client
+    /// </summary>
+    /// <param name="blobName">Unique name of blob item</param>
+    /// <returns cref="BlobClient"></returns>
     internal static BlobClient GetBlobClient(string blobName)
     {
-        BlobContainerClient blobContainer = GetContainerClient("chart-demo");
-        BlobClient blob = blobContainer.GetBlobClient(blobName);
+        BlobContainerClient blobContainer
+            = GetContainerClient("chart-demo");
+
+        BlobClient blob
+            = blobContainer.GetBlobClient(blobName);
 
         return blob;
     }
 
+    /// <summary>
+    ///   Get blob storage container client
+    /// </summary>
+    /// <param name="containerName">Unique name of blob container (e.g. "chart-demo")</param>
+    /// <returns cref="BlobContainerClient"></returns>
     private static BlobContainerClient GetContainerClient(string containerName)
     {
-        string? awjs = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+        // failover to Azurite local dev storage
+        string awjs = Environment
+            .GetEnvironmentVariable("AzureWebJobsStorage")
+                ?? "UseDevelopmentStorage=true";
         return new BlobContainerClient(awjs, containerName);
     }
 }

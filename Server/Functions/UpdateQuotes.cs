@@ -11,6 +11,11 @@ public class Jobs(ILoggerFactory loggerFactory)
 {
     private readonly ILogger _logger = loggerFactory.CreateLogger<Jobs>();
 
+    /// <summary>
+    ///   Schedule to get and cache quotes from source feed.
+    /// </summary>
+    /// <param name="myTimer" cref="TimerInfo">CRON-based schedule</param>
+    /// <returns></returns>
     [Function("UpdateQuotes")]
     public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5")] TimerInfo myTimer)
     {
@@ -24,20 +29,36 @@ public class Jobs(ILoggerFactory loggerFactory)
              DateTime.Now, myTimer.ScheduleStatus);
     }
 
-    // STORE QUOTE
+    /// <summary>
+    ///   STORE QUOTES: get and store historical quotes to blob storage provider.
+    /// </summary>
+    /// <param name="symbol">Security symbol</param>
+    /// <exception cref="ArgumentNullException">
+    ///   When credentials are missing
+    /// </exception>
     private async Task StoreQuoteDaily(string symbol)
     {
-        string? alpacaApiKey = Environment.GetEnvironmentVariable("AlpacaApiKey");
-        string? alpacaSecret = Environment.GetEnvironmentVariable("AlpacaSecret");
+        // get and validate keys, see README.md
+        string? ALPACA_KEY = Environment.GetEnvironmentVariable("ALPACA_KEY");
+        string? ALPACA_SECRET = Environment.GetEnvironmentVariable("ALPACA_SECRET");
 
-        if (alpacaApiKey == null || alpacaSecret == null)
+        if (string.IsNullOrEmpty(ALPACA_KEY))
         {
-            throw new NullReferenceException("The Alpaca Key or Secret was not detected.");
+            throw new ArgumentNullException(
+                ALPACA_KEY,
+                $"API KEY missing, use `setx ALPACA_KEY \"MY-ALPACA-KEY\"` to set.");
+        }
+
+        if (string.IsNullOrEmpty(ALPACA_SECRET))
+        {
+            throw new ArgumentNullException(
+                ALPACA_SECRET,
+                $"API SECRET missing, use `setx ALPACA_SECRET \"MY-ALPACA-SECRET\"` to set.");
         }
 
         // fetch from Alpaca paper trading API
         IAlpacaDataClient alpacaDataClient = Environments.Paper
-            .GetAlpacaDataClient(new SecretKey(alpacaApiKey, alpacaSecret));
+            .GetAlpacaDataClient(new SecretKey(ALPACA_KEY, ALPACA_SECRET));
 
         DateTime into = DateTime.Now.Subtract(TimeSpan.FromMinutes(16));
         DateTime from = into.Subtract(TimeSpan.FromDays(800));
@@ -50,8 +71,7 @@ public class Jobs(ILoggerFactory loggerFactory)
         // compose
         foreach (IBar bar in barSet.Items)
         {
-            Quote q = new()
-            {
+            Quote q = new() {
                 Date = bar.TimeUtc,
                 Open = bar.Open,
                 High = bar.High,

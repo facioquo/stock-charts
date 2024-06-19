@@ -4,7 +4,7 @@
     <Title>charts.stockindicators.dev</Title>
     <Description>A stock chart, demonstrating the Stock Indicators for .NET NuGet library</Description>
     <Copyright>@2020 Dave Skender</Copyright>
-    <RepositoryUrl>https://github.com/DaveSkender/Stock.Charts</RepositoryUrl>
+    <RepositoryUrl>https://github.com/facioquo/stock-charts</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
     <PackageIcon>favicon.ico</PackageIcon>
@@ -20,8 +20,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
-    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.2" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.20.0" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.4" />
     <PackageReference Include="Skender.Stock.Indicators" Version="2.5.0" />
   </ItemGroup>
 

@@ -1,45 +1,42 @@
 using Microsoft.AspNetCore.Mvc;
-using Skender.Stock.Indicators;
 using WebApi.Services;
 
 namespace WebApi.Controllers;
 
 [ApiController]
 [Route("")]
-public class MainController : ControllerBase
+public class MainController(QuoteService quoteService) : ControllerBase
 {
+    private readonly QuoteService quoteFeed = quoteService;
+
     // GLOBALS
     internal static readonly int limitLast = 120;
 
     [HttpGet]
-    public string Get()
-    {
-        return "API is functioning nominally.";
-    }
+    public string Get() => "API is functioning nominally.";
 
     [HttpGet("quotes")]
-    public IActionResult GetQuotes()
+    public async Task<IActionResult> GetQuotes()
     {
-        IEnumerable<Quote> quotes = FetchQuotes.Get();
+        IEnumerable<Quote> quotes = await quoteFeed.Get();
         return Ok(quotes.TakeLast(limitLast));
     }
 
     [HttpGet("indicators")]
     public IActionResult GetIndicators()
-    {
-        return Ok(Metadata.IndicatorList($"{Request.Scheme}://{Request.Host}"));
-    }
+        => Ok(Metadata.IndicatorList($"{Request.Scheme}://{Request.Host}"));
+
 
     //////////////////////////////////////////
     // INDICATORS (sorted alphabetically)
 
     [HttpGet("ADL")]
-    public IActionResult GetAdl(
+    public async Task<IActionResult> GetAdl(
         int smaPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<AdlResult> results =
                 quotes.GetAdl(smaPeriods)
@@ -54,12 +51,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("ADX")]
-    public IActionResult GetAdx(
+    public async Task<IActionResult> GetAdx(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<AdxResult> results =
                 quotes.GetAdx(lookbackPeriods)
@@ -74,14 +71,14 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("ALMA")]
-    public IActionResult GetAlma(
+    public async Task<IActionResult> GetAlma(
         int lookbackPeriods,
         double offset,
         double sigma)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<AlmaResult> results =
                 quotes.GetAlma(lookbackPeriods, offset, sigma)
@@ -96,7 +93,7 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("ALLIGATOR")]
-    public IActionResult GetAlligator(
+    public async Task<IActionResult> GetAlligator(
         int jawPeriods,
         int jawOffset,
         int teethPeriods,
@@ -106,7 +103,7 @@ public class MainController : ControllerBase
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<AlligatorResult> results =
                 quotes.GetAlligator(jawPeriods, jawOffset, teethPeriods, teethOffset, lipsPeriods, lipsOffset)
@@ -121,12 +118,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("AROON")]
-    public IActionResult GetAroon(
+    public async Task<IActionResult> GetAroon(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<AroonResult> results =
                 quotes.GetAroon(lookbackPeriods)
@@ -141,12 +138,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("ATR")]
-    public IActionResult GetAtr(
-    int lookbackPeriods)
+    public async Task<IActionResult> GetAtr(
+        int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<AtrResult> results =
                 quotes.GetAtr(lookbackPeriods)
@@ -161,13 +158,13 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("ATR-STOP-CLOSE")]
-    public IActionResult GetAtrStopClose(
+    public async Task<IActionResult> GetAtrStopClose(
         int lookbackPeriods,
         double multiplier)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<AtrStopResult> results =
                 quotes.GetAtrStop(lookbackPeriods, multiplier, EndType.Close)
@@ -182,13 +179,13 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("ATR-STOP-HL")]
-    public IActionResult GetAtrStopHL(
+    public async Task<IActionResult> GetAtrStopHL(
         int lookbackPeriods,
         double multiplier)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<AtrStopResult> results =
                 quotes.GetAtrStop(lookbackPeriods, multiplier, EndType.HighLow)
@@ -203,13 +200,13 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("BB")]
-    public IActionResult GetBollingerBands(
+    public async Task<IActionResult> GetBollingerBands(
         int lookbackPeriods,
         double standardDeviations)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<BollingerBandsResult> results =
                 quotes.GetBollingerBands(lookbackPeriods, standardDeviations)
@@ -224,14 +221,14 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("BETA")]
-    public IActionResult GetBeta(
+    public async Task<IActionResult> GetBeta(
         int lookbackPeriods,
         BetaType type)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
-            IEnumerable<Quote> market = FetchQuotes.Get("SPY", "DAILY");
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
+            IEnumerable<Quote> market = await quoteFeed.Get("SPY");
 
             IEnumerable<BetaResult> results =
                 quotes.GetBeta(market, lookbackPeriods, type)
@@ -246,13 +243,13 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("CHEXIT-LONG")]
-    public IActionResult GetChandelierLong(
+    public async Task<IActionResult> GetChandelierLong(
         int lookbackPeriods,
         double multiplier)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<ChandelierResult> results =
                 quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Long)
@@ -267,13 +264,13 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("CHEXIT-SHORT")]
-    public IActionResult GetChandelierShort(
+    public async Task<IActionResult> GetChandelierShort(
         int lookbackPeriods,
         double multiplier)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<ChandelierResult> results =
                 quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Short)
@@ -288,12 +285,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("CHOP")]
-    public IActionResult GetChop(
+    public async Task<IActionResult> GetChop(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<ChopResult> results =
                 quotes.GetChop(lookbackPeriods)
@@ -308,12 +305,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("CMF")]
-    public IActionResult GetCmf(
+    public async Task<IActionResult> GetCmf(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<CmfResult> results =
                 quotes.GetCmf(lookbackPeriods)
@@ -328,12 +325,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("CMO")]
-    public IActionResult GetCmo(
+    public async Task<IActionResult> GetCmo(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<CmoResult> results =
                 quotes.GetCmo(lookbackPeriods)
@@ -347,13 +344,35 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("CRSI")]
+    public async Task<IActionResult> GetConnorsRsi(
+        int rsiPeriods,
+        int streakPeriods,
+        int rankPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
+
+            IEnumerable<ConnorsRsiResult> results =
+                quotes.GetConnorsRsi(rsiPeriods, streakPeriods, rankPeriods)
+                        .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("DOJI")]
-    public IActionResult GetDoji(
+    public async Task<IActionResult> GetDoji(
         double maxPriceChangePercent)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<CandleResult> results =
                 quotes.GetDoji(maxPriceChangePercent)
@@ -368,12 +387,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("DONCHIAN")]
-    public IActionResult GetDonchian(
+    public async Task<IActionResult> GetDonchian(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<DonchianResult> results =
                 quotes.GetDonchian(lookbackPeriods)
@@ -388,12 +407,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("DYN")]
-    public IActionResult GetDynamic(
-    int lookbackPeriods)
+    public async Task<IActionResult> GetDynamic(
+        int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<DynamicResult> results =
                 quotes.GetDynamic(lookbackPeriods)
@@ -408,12 +427,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("ELDER-RAY")]
-    public IActionResult GetElderRay(
+    public async Task<IActionResult> GetElderRay(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<ElderRayResult> results =
                 quotes.GetElderRay(lookbackPeriods)
@@ -428,12 +447,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("EPMA")]
-    public IActionResult GetEpma(
+    public async Task<IActionResult> GetEpma(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<EpmaResult> results =
                 quotes.GetEpma(lookbackPeriods)
@@ -448,12 +467,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("EMA")]
-    public IActionResult GetEma(
+    public async Task<IActionResult> GetEma(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<EmaResult> results =
                 quotes.GetEma(lookbackPeriods)
@@ -468,12 +487,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("FCB")]
-    public IActionResult GetFcb(
+    public async Task<IActionResult> GetFcb(
         int windowSpan)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<FcbResult> results =
                 quotes.GetFcb(windowSpan)
@@ -488,12 +507,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("FISHER")]
-    public IActionResult GetFisher(
+    public async Task<IActionResult> GetFisher(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<FisherTransformResult> results =
                 quotes.GetFisherTransform(lookbackPeriods)
@@ -508,12 +527,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("FRACTAL")]
-    public IActionResult GetFractal(
+    public async Task<IActionResult> GetFractal(
         int windowSpan)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<FractalResult> results =
                 quotes.GetFractal(windowSpan)
@@ -528,11 +547,11 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("GATOR")]
-    public IActionResult GetGator()
+    public async Task<IActionResult> GetGator()
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<GatorResult> results =
                 quotes.GetGator()
@@ -547,11 +566,11 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("HTL")]
-    public IActionResult GetHTL()
+    public async Task<IActionResult> GetHTL()
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<HtlResult> results =
                 quotes.GetHtTrendline()
@@ -565,15 +584,37 @@ public class MainController : ControllerBase
         }
     }
 
+    [HttpGet("ICHIMOKU")]
+    public async Task<IActionResult> GetIchimoku(
+        int tenkanPeriods,
+        int kijunPeriods,
+        int senkouBPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
+
+            IEnumerable<IchimokuResult> results =
+                quotes.GetIchimoku(tenkanPeriods, kijunPeriods, senkouBPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
     [HttpGet("KELTNER")]
-    public IActionResult GetKeltner(
+    public async Task<IActionResult> GetKeltner(
         int emaPeriods,
         double multiplier,
         int atrPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<KeltnerResult> results =
                 quotes.GetKeltner(emaPeriods, multiplier, atrPeriods)
@@ -588,14 +629,14 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("MACD")]
-    public IActionResult GetMacd(
+    public async Task<IActionResult> GetMacd(
         int fastPeriods,
         int slowPeriods,
         int signalPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<MacdResult> results =
                 quotes.GetMacd(fastPeriods, slowPeriods, signalPeriods)
@@ -610,12 +651,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("MARUBOZU")]
-    public IActionResult GetMarubozu(
+    public async Task<IActionResult> GetMarubozu(
         double minBodyPercent)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<CandleResult> results =
                 quotes.GetMarubozu(minBodyPercent)
@@ -630,12 +671,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("MFI")]
-    public IActionResult GetMfi(
+    public async Task<IActionResult> GetMfi(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<MfiResult> results =
                 quotes.GetMfi(lookbackPeriods)
@@ -650,13 +691,13 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("PSAR")]
-    public IActionResult GetParabolicSar(
+    public async Task<IActionResult> GetParabolicSar(
         double accelerationStep,
         double maxAccelerationFactor)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<ParabolicSarResult> results =
                 quotes.GetParabolicSar(accelerationStep, maxAccelerationFactor)
@@ -671,13 +712,13 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("ROC")]
-    public IActionResult GetRoc(
+    public async Task<IActionResult> GetRoc(
         int lookbackPeriods,
         int smaPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<RocResult> results =
                 quotes.GetRoc(lookbackPeriods, smaPeriods)
@@ -692,12 +733,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("RSI")]
-    public IActionResult GetRsi(
+    public async Task<IActionResult> GetRsi(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<RsiResult> results =
                 quotes.GetRsi(lookbackPeriods)
@@ -712,12 +753,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("SLOPE")]
-    public IActionResult GetSlope(
+    public async Task<IActionResult> GetSlope(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<SlopeResult> results =
                 quotes.GetSlope(lookbackPeriods)
@@ -732,12 +773,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("SMA")]
-    public IActionResult GetSma(
+    public async Task<IActionResult> GetSma(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<SmaResult> results =
                 quotes.GetSma(lookbackPeriods)
@@ -752,7 +793,7 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("SMI")]
-    public IActionResult GetSmi(
+    public async Task<IActionResult> GetSmi(
         int lookbackPeriods,
         int firstSmoothPeriods,
         int secondSmoothPeriods,
@@ -760,7 +801,7 @@ public class MainController : ControllerBase
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<SmiResult> results =
                 quotes.GetSmi(lookbackPeriods, firstSmoothPeriods, secondSmoothPeriods, signalPeriods)
@@ -775,14 +816,14 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("STC")]
-    public IActionResult GetStc(
+    public async Task<IActionResult> GetStc(
         int cyclePeriods,
         int fastPeriods,
         int slowPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<StcResult> results =
                 quotes.GetStc(cyclePeriods, fastPeriods, slowPeriods)
@@ -797,14 +838,14 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("STARC")]
-    public IActionResult GetStarc(
+    public async Task<IActionResult> GetStarc(
         int smaPeriods,
         double multiplier,
         int atrPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<StarcBandsResult> results =
                 quotes.GetStarcBands(smaPeriods, multiplier, atrPeriods)
@@ -819,13 +860,13 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("STDEV")]
-    public IActionResult GetStdDev(
+    public async Task<IActionResult> GetStdDev(
         int lookbackPeriods,
         int smaPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             // we don't ask for smaPeriods with Z-Score, handle
             smaPeriods = smaPeriods == 0 ? 1 : smaPeriods;
@@ -843,13 +884,13 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("STO")]
-    public IActionResult GetStoch(
+    public async Task<IActionResult> GetStoch(
         int lookbackPeriods,
         int signalPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<StochResult> results =
                 quotes.GetStoch(lookbackPeriods, signalPeriods)
@@ -864,7 +905,7 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("STORSI")]
-    public IActionResult GetStochRsi(
+    public async Task<IActionResult> GetStochRsi(
         int rsiPeriods,
         int stochPeriods,
         int signalPeriods,
@@ -872,7 +913,7 @@ public class MainController : ControllerBase
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<StochRsiResult> results =
                 quotes.GetStochRsi(rsiPeriods, stochPeriods, signalPeriods, smoothPeriods)
@@ -887,13 +928,13 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("SUPERTREND")]
-    public IActionResult GetSuperTrend(
+    public async Task<IActionResult> GetSuperTrend(
         int lookbackPeriods,
         double multiplier)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<SuperTrendResult> results =
                 quotes.GetSuperTrend(lookbackPeriods, multiplier)
@@ -907,13 +948,33 @@ public class MainController : ControllerBase
         }
     }
 
-    [HttpGet("VORTEX")]
-    public IActionResult GetVortex(
+    [HttpGet("ULCER")]
+    public async Task<IActionResult> GetUlcer(
         int lookbackPeriods)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
+
+            IEnumerable<UlcerIndexResult> results =
+                quotes.GetUlcerIndex(lookbackPeriods)
+                      .TakeLast(limitLast);
+
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    [HttpGet("VORTEX")]
+    public async Task<IActionResult> GetVortex(
+        int lookbackPeriods)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<VortexResult> results =
                 quotes.GetVortex(lookbackPeriods)
@@ -928,12 +989,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("ZIGZAG-CLOSE")]
-    public IActionResult GetZigZagClose(
+    public async Task<IActionResult> GetZigZagClose(
         decimal percentChange)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<ZigZagResult> results =
                 quotes.GetZigZag(EndType.Close, percentChange)
@@ -948,12 +1009,12 @@ public class MainController : ControllerBase
     }
 
     [HttpGet("ZIGZAG-HIGHLOW")]
-    public IActionResult GetZigZagHighLow(
+    public async Task<IActionResult> GetZigZagHighLow(
         decimal percentChange)
     {
         try
         {
-            IEnumerable<Quote> quotes = FetchQuotes.Get();
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
 
             IEnumerable<ZigZagResult> results =
                 quotes.GetZigZag(EndType.HighLow, percentChange)
