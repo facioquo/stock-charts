@@ -9,16 +9,16 @@
   },
   "private": false,
   "dependencies": {
-    "@angular/animations": "18.0.2",
-    "@angular/cdk": "18.0.2",
-    "@angular/common": "18.0.2",
-    "@angular/compiler": "18.0.2",
-    "@angular/core": "18.0.2",
-    "@angular/forms": "18.0.2",
-    "@angular/material": "18.0.2",
-    "@angular/platform-browser": "18.0.2",
-    "@angular/platform-browser-dynamic": "18.0.2",
-    "@angular/router": "18.0.2",
+    "@angular/animations": "18.0.3",
+    "@angular/cdk": "18.0.3",
+    "@angular/common": "18.0.3",
+    "@angular/compiler": "18.0.3",
+    "@angular/core": "18.0.3",
+    "@angular/forms": "18.0.3",
+    "@angular/material": "18.0.3",
+    "@angular/platform-browser": "18.0.3",
+    "@angular/platform-browser-dynamic": "18.0.3",
+    "@angular/router": "18.0.3",
     "@ctrl/tinycolor": "4.1.0",
     "@ng-matero/extensions": "18.0.1",
     "chart.js": "4.4.3",
@@ -32,9 +32,9 @@
     "zone.js": "0.14.6"
   },
   "devDependencies": {
-    "@angular/build": "^18.0.3",
-    "@angular/cli": "18.0.3",
-    "@angular/compiler-cli": "18.0.2",
+    "@angular/build": "^18.0.4",
+    "@angular/cli": "18.0.4",
+    "@angular/compiler-cli": "18.0.3",
     "typescript": "5.4.5"
   }
 }
