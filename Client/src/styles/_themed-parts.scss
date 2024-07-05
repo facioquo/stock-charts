@@ -24,6 +24,7 @@
     h1 {
       color: mat.m2-get-color-from-palette($accent, 600);
       font-size: 1.4em;
+      font-weight: 600;
     }
 
     max-width: $maxwidth;
@@ -32,7 +33,7 @@
     padding: 0 8px !important;
 
     a {
-      font-family: "Google Sans", Roboto, Arial, Helvetica, sans-serif;
+      font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
       text-decoration: none;
       color: inherit;
 

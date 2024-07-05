@@ -2,7 +2,7 @@
 html,
 body {
   min-height: 100vh;
-  font-family: "Google Sans", Roboto, "Helvetica Neue", sans-serif;
+  font-family: "Rubik", "Google Sans", "Roboto", "Helvetica Neue", sans-serif;
 }
 
 body {
@@ -14,7 +14,7 @@ body {
 // TYPOGRAPHY
 h1,
 h2 {
-  font-weight: 400;
+  font-weight: 600;
 }
 
 // ALIGNMENT
@@ -66,5 +66,5 @@ mat-dialog-actions {
 
 // COMMON CONTROLS
 .error {
-  color: #B71C1C;
+  color: #B00020;
 }
