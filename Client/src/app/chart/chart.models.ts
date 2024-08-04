@@ -1,5 +1,4 @@
 import {
-  BarControllerDatasetOptions,
   Chart,
   ChartDataset
 } from "chart.js";
@@ -100,12 +99,3 @@ export interface IndicatorResult {
   dataset: ChartDataset
 }
 
-// MISSING CHART.JS TYPINGS (OVERRIDES)
-// bug: https://github.com/chartjs/chartjs-chart-financial/pull/115
-type CandleDatasetOption = BarControllerDatasetOptions & {
-  borderColor: {
-    up: string,
-    down: string,
-    unchanged: string
-  };
-}
