@@ -30,6 +30,11 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "/assets"
+              },
+              {
+                "glob": "_headers",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": [
