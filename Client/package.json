@@ -20,8 +20,8 @@
     "@angular/platform-browser-dynamic": "18.2.0",
     "@angular/router": "18.2.0",
     "@ctrl/tinycolor": "4.1.0",
-    "@ng-matero/extensions": "18.0.1",
-    "chart.js": "4.4.3",
+    "@ng-matero/extensions": "18.2.0",
+    "chart.js": "4.4.4",
     "chartjs-adapter-date-fns": "3.0.0",
     "chartjs-plugin-annotation": "3.0.1",
     "date-fns": "3.6.0",
@@ -35,6 +35,6 @@
     "@angular/build": "^18.2.1",
     "@angular/cli": "^18.2.1",
     "@angular/compiler-cli": "^18.2.0",
-    "typescript": "5.4.5"
+    "typescript": "5.5.4"
   }
 }
