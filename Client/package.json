@@ -9,19 +9,19 @@
   },
   "private": false,
   "dependencies": {
-    "@angular/animations": "18.1.3",
-    "@angular/cdk": "18.1.3",
-    "@angular/common": "18.1.3",
-    "@angular/compiler": "18.1.3",
-    "@angular/core": "18.1.3",
-    "@angular/forms": "18.1.3",
-    "@angular/material": "18.1.3",
-    "@angular/platform-browser": "18.1.3",
-    "@angular/platform-browser-dynamic": "18.1.3",
-    "@angular/router": "18.1.3",
+    "@angular/animations": "18.2.0",
+    "@angular/cdk": "18.2.0",
+    "@angular/common": "18.2.0",
+    "@angular/compiler": "18.2.0",
+    "@angular/core": "18.2.0",
+    "@angular/forms": "18.2.0",
+    "@angular/material": "18.2.0",
+    "@angular/platform-browser": "18.2.0",
+    "@angular/platform-browser-dynamic": "18.2.0",
+    "@angular/router": "18.2.0",
     "@ctrl/tinycolor": "4.1.0",
-    "@ng-matero/extensions": "18.0.1",
-    "chart.js": "4.4.3",
+    "@ng-matero/extensions": "18.2.0",
+    "chart.js": "4.4.4",
     "chartjs-adapter-date-fns": "3.0.0",
     "chartjs-plugin-annotation": "3.0.1",
     "date-fns": "3.6.0",
@@ -29,12 +29,12 @@
     "ngx-color": "9.0.0",
     "rxjs": "7.8.1",
     "tslib": "2.6.3",
-    "zone.js": "0.14.7"
+    "zone.js": "0.14.10"
   },
   "devDependencies": {
-    "@angular/build": "^18.1.3",
-    "@angular/cli": "^18.1.3",
-    "@angular/compiler-cli": "^18.1.3",
-    "typescript": "5.4.5"
+    "@angular/build": "^18.2.1",
+    "@angular/cli": "^18.2.1",
+    "@angular/compiler-cli": "^18.2.0",
+    "typescript": "5.5.4"
   }
 }

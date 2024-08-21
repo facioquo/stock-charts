@@ -8,10 +8,9 @@
   $primary: map.get($theme, primary);
   $accent: map.get($theme, accent);
   $warn: map.get($theme, warn);
-  $background: map.get($theme, background);
-  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, 'background');
+  $foreground: map.get($theme, 'foreground');
   $maxwidth: 1024px;
-
 
   // ANGULAR MATERIAL OVERRIDES
 
@@ -19,32 +18,60 @@
   .main-toolbar,
   .mat-toolbar-single-row {
 
-    background-color: transparent;
-
-    h1 {
-      color: mat.m2-get-color-from-palette($accent, 600);
-      font-size: 1.4em;
-      font-weight: 600;
-    }
+    display: flex;
+    justify-content: left;
 
     max-width: $maxwidth;
     margin-left: auto;
     margin-right: auto;
     padding: 0 8px !important;
 
-    a {
-      font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
-      text-decoration: none;
-      color: inherit;
+    background-color: transparent;
+    line-height: unset !important;
 
-      &:hover {
-        color: mat.m2-get-color-from-palette($accent, 500);
+    .toolbar-content {
+      display: flex;
+      flex-direction: column;
+      align-items: left;
+    }
+
+    h1 {
+      font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
+      font-size: 1.4em;
+      font-weight: 600;
+      color: rgba(230, 199, 76, 0.75);
+      line-height: unset !important;
+
+      a {
+        text-decoration: none;
+        color: inherit;
+
+        &:hover {
+          color: rgba(230, 199, 76, 0.85);
+        }
+      }
+    }
+
+    h2 {
+      font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
+      font-size: 0.6em;
+      font-weight: normal;
+      color: mat.m2-get-color-from-palette($accent, 500);
+      line-height: unset !important;
+
+      a {
+        text-decoration: none;
+        color: inherit;
+
+        &:hover {
+          color: mat.m2-get-color-from-palette($accent, 400);
+        }
       }
     }
   }
 
 
-  // MAIN FOOTER
+  // MAIN FOOTER (unused)
   .footer {
     padding: 1rem 8px;
     margin-top: 3rem;
