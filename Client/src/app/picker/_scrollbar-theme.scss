@@ -6,10 +6,10 @@
   $primary: map.get($theme, primary);
   $accent: map.get($theme, accent);
   $warn: map.get($theme, warn);
-  $background: map.get($theme, background);
-  $foreground: map.get($theme, foreground);
+  $background: map.get($theme, 'background');
+  $foreground: map.get($theme, 'foreground');
 
-  @media screen and (min-width: 800px) {
+  @media screen and (width >= 800px) {
 
     /* width */
     ::-webkit-scrollbar {

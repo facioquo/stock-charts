@@ -25,7 +25,7 @@ h3 {
 }
 
 .param-container {
-  margin: 2rem 1rem 0 1rem;
+  margin: 2rem 1rem 0;
 }
 
 .param-input {
@@ -42,7 +42,7 @@ h3 {
 .style-container {
   margin: 1rem;
 
-  @media screen and (max-width: 700px) {
+  @media screen and (width <= 700px) {
     margin-left: auto;
     margin-right: auto;
     max-width: 200px;
@@ -52,7 +52,7 @@ h3 {
 
     width: 150px;
 
-    @media screen and (max-width: 700px) {
+    @media screen and (width <= 700px) {
       display: block;
       width: auto;
     }
@@ -62,7 +62,7 @@ h3 {
     width: 125px;
     margin-left: 1rem;
 
-    @media screen and (max-width: 700px) {
+    @media screen and (width <= 700px) {
       margin-left: 0;
       width: unset;
     }
