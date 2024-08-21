@@ -1,6 +1,7 @@
 // STARTUP CONFIGURATION
 
-using Microsoft.Net.Http.Headers;
+using System.IO.Compression;
+using Microsoft.AspNetCore.ResponseCompression;
 using WebApi.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -8,10 +9,10 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 IServiceCollection services = builder.Services;
 ConfigurationManager configuration = builder.Configuration;
 
-// add framework services
+// Add framework services
 services.AddControllers();
 
-// get CORS origins from appsettings
+// Get CORS origins from appsettings
 // reminder: production origins defined in cloud host settings » API » CORS
 // so these are really only for localhost / development
 IConfigurationSection corsOrigins = configuration.GetSection("CorsOrigins");
@@ -21,10 +22,10 @@ List<string> origins = [];
 
 if (!string.IsNullOrEmpty(allowedOrigin))
 {
-    origins.Add(item: allowedOrigin);
+    origins.Add(allowedOrigin);
 }
 
-// setup CORS for website
+// Setup CORS for website
 services.AddCors(options => {
     options.AddPolicy("CorsPolicy",
     cors => {
@@ -38,23 +39,45 @@ services.AddCors(options => {
 
 Console.WriteLine($"CORS Origin: {allowedOrigin}");
 
-// register services
+// Register services
 services.AddHostedService<StartupService>();
 services.AddTransient<QuoteService>();
 
-// build application
+// Add response compression services
+services.AddResponseCompression(options => {
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+});
+
+// Configure compression options
+services.Configure<BrotliCompressionProviderOptions>(options => {
+    options.Level = CompressionLevel.Fastest;
+});
+
+services.Configure<GzipCompressionProviderOptions>(options => {
+    options.Level = CompressionLevel.Fastest;
+});
+
+// Build application
 WebApplication app = builder.Build();
 
-// configure the HTTP request pipeline
-_ = app.Environment.IsDevelopment()
-  ? app.UseDeveloperExceptionPage()
-  : app.UseHsts();
+// Configure the HTTP request pipeline
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseHsts();
+}
 
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("CorsPolicy");
 app.UseResponseCaching();
+app.UseResponseCompression();
 
-// controller endpoints
+// Controller endpoints
 app.MapControllers();
 app.Run();
