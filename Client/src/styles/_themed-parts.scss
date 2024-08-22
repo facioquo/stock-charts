@@ -18,9 +18,6 @@
   .main-toolbar,
   .mat-toolbar-single-row {
 
-    display: flex;
-    justify-content: left;
-
     max-width: $maxwidth;
     margin-left: auto;
     margin-right: auto;
@@ -28,12 +25,6 @@
 
     background-color: transparent;
     line-height: unset !important;
-
-    .toolbar-content {
-      display: flex;
-      flex-direction: column;
-      align-items: left;
-    }
 
     h1 {
       font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
