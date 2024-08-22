@@ -13,19 +13,27 @@ import { ChartComponent } from './chart.component';
 
 import { ChartService } from '../services/chart.service';
 
-@NgModule({ declarations: [
-        ChartComponent
-    ],
-    exports: [
-        ChartComponent
-    ],
-    bootstrap: [ChartComponent], imports: [CommonModule,
-        MatButtonModule,
-        MatDialogModule,
-        MatIconModule,
-        MatToolbarModule,
-        MatTooltipModule], providers: [
-        ChartService,
-        provideHttpClient(withInterceptorsFromDi())
-    ] })
+@NgModule({
+  declarations: [
+    ChartComponent
+  ],
+  exports: [
+    ChartComponent
+  ],
+  bootstrap: [
+    ChartComponent
+  ],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatIconModule,
+    MatToolbarModule,
+    MatTooltipModule
+  ],
+  providers: [
+    ChartService,
+    provideHttpClient(withInterceptorsFromDi())
+  ]
+})
 export class ChartModule { }
