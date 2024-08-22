@@ -1,9 +1,17 @@
 <mat-toolbar class="noselect main-toolbar" color="default">
-  <h1 class="no-wrap">
-    <a href="https://github.com/facioquo/stock-charts/">
-      stock chart
-    </a>
-  </h1>
+  <div>
+    <h1 class="no-wrap">
+      <a href="https://github.com/facioquo/stock-charts" target="_blank" rel="noopener">
+        stock chart
+      </a>
+    </h1>
+    <h2>
+      demo of
+      <a href="https://dotnet.stockindicators.dev" target="_blank" rel="noopener">
+        <strong>Stock Indicators for .NET</strong>
+      </a>
+    </h2>
+  </div>
 </mat-toolbar>
 
 <main id="main-content" class="content-container">
@@ -17,11 +25,3 @@
 
   <app-chart></app-chart>
 </main>
-
-<footer class="footer" *ngIf="!cs.loading">
-  Demo of the
-  <strong>
-    <a href="https://dotnet.stockindicators.dev/" target="_blank" rel="noopener">
-      Stock Indicators for .NET</a>
-  </strong> NuGet library
-</footer>

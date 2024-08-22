@@ -61,6 +61,7 @@ dotnet_naming_style.pascal_case.capitalization = pascal_case
 dotnet_code_quality_unused_parameters = all:suggestion
 
 dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
 
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 dotnet_style_predefined_type_for_locals_parameters_members = true:silent

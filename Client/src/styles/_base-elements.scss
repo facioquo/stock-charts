@@ -3,6 +3,7 @@ html,
 body {
   min-height: 100vh;
   font-family: Rubik, "Google Sans", Roboto, "Helvetica Neue", sans-serif;
+  font-size: 16px;
 }
 
 body {
@@ -53,9 +54,9 @@ mat-dialog-content {
   padding-top: 1rem !important;
 
   box-shadow:
-    0 0 3px 0 rgba(0, 0, 0, 0.20),
-    0 0 5px 0 rgba(0, 0, 0, 0.14),
-    0 0 8px 0 rgba(0, 0, 0, 0.12);
+    0 0 3px 0 rgb(0 0 0 / 20%),
+    0 0 5px 0 rgb(0 0 0 / 14%),
+    0 0 8px 0 rgb(0 0 0 / 12%);
 }
 
 mat-dialog-actions {
