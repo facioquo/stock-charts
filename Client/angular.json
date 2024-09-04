@@ -54,7 +54,6 @@
             },
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "chart.js",
               "src/assets/js/chartjs-chart-financial",
               "guid-typescript"
             ],
@@ -72,18 +71,9 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "optimization": {
-                "styles": {
-                  "minify": true,
-                  "inlineCritical": true
-                },
-                "scripts": true,
-                "fonts": {
-                  "inline": true
-                }
-              },
+              "optimization": true,
               "outputHashing": "all",
-              "sourceMap": true,
+              "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
               "budgets": [

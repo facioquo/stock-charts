@@ -1,0 +1,44 @@
+{
+  "version": "YYYY.MM.DD",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/index.html",
+          "/*.css",
+          "/*.js"
+        ]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/assets/**",
+          "/*.(png|jpg|jpeg|svg)"
+        ]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "reference-data",
+      "urls": [
+        "https://stock-charts-api.azurewebsites.net/indicators",
+        "https://localhost:44392/indicators"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 10,
+        "maxAge": "1h",
+        "timeout": "10s"
+      }
+    }
+  ]
+}
