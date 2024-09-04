@@ -31,7 +31,7 @@
       font-size: 1.4em;
       font-weight: 600;
       color: rgba(230, 199, 76, 0.75);
-      line-height: unset !important;
+      line-height: 1.0 !important;
 
       a {
         text-decoration: none;
@@ -45,10 +45,11 @@
 
     h2 {
       font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
-      font-size: 0.6em;
+      font-size: 0.5em;
       font-weight: normal;
       color: mat.m2-get-color-from-palette($accent, 500);
-      line-height: unset !important;
+      line-height: 0.9 !important;
+      letter-spacing: 0.35px;
 
       a {
         text-decoration: none;
