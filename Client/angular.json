@@ -54,7 +54,6 @@
             },
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "chart.js",
               "src/assets/js/chartjs-chart-financial",
               "guid-typescript"
             ],
