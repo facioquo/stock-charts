@@ -50,12 +50,14 @@ jobs:
         with:
           name: api
           path: "./Server/artifacts/api"
+          include-hidden-files: true
 
       - name: Save Functions
         uses: actions/upload-artifact@v4
         with:
           name: fns
           path: "./Server/artifacts/fns"
+          include-hidden-files: true
 
   build-website:
     runs-on: ubuntu-latest
@@ -103,6 +105,7 @@ jobs:
       with:
         name: web
         path: Client/dist/app/browser
+        include-hidden-files: true
 
   deploy:
     needs: [ "build-backend", "build-website" ]
