@@ -1,7 +1,8 @@
 # top-most EditorConfig file
 root = true
 
-# see Client and Server folder for more specific configurations
+# see Client and Server folders for
+# language unique editor configurations
 
 # global baselines
 [*]
@@ -16,3 +17,7 @@ line_length = 150
 max_line_length = 150
 trim_trailing_whitespace = true
 insert_final_newline = true
+
+[*.{xml,yml}]
+indent_style = space
+indent_size = 2
