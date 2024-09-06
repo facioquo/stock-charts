@@ -4,16 +4,16 @@ namespace WebApi.Services;
 
 public class QuoteService
 {
-    private readonly IEnumerable<Quote> backupQuotes = GetBackup();
+    private static readonly IReadOnlyList<Quote> backupQuotes = GetBackup();
 
     /// <summary>
-    ///   Get default quotes
+    /// Get default quotes
     /// </summary>
     /// <returns cref="Quote">List of default quotes</returns>
     public async Task<IEnumerable<Quote>> Get() => await Get("QQQ");
 
     /// <summary>
-    ///   Get quotes for a specific symbol.
+    /// Get quotes for a specific symbol.
     /// </summary>
     /// <param name="symbol">"SPY" or "QQQ" only, for now</param>
     public async Task<IEnumerable<Quote>> Get(string symbol)
@@ -32,7 +32,7 @@ public class QuoteService
 
             return quotes == null || quotes.Count == 0
                 ? backupQuotes
-                : [.. quotes.OrderBy(x => x.Date)];
+                : [.. quotes];  // pre-sorted
         }
         catch
         {
@@ -40,7 +40,9 @@ public class QuoteService
         }
     }
 
-    private static IEnumerable<Quote> GetBackup()
+    #region Backup Quotes (for failover)
+
+    private static List<Quote> GetBackup()
     {
         List<Quote> h =
         [
@@ -550,6 +552,7 @@ public class QuoteService
             new Quote { Date = DateTime.Parse("2017-01-01"), Open = 212.61m, High = 213.35m, Low = 211.52m, Close = 211.60m, Volume = 86708880 },
         ];
 
-        return h.OrderBy(x => x.Date);
+        return [.. h.OrderBy(x => x.Date)];
     }
+    #endregion
 }

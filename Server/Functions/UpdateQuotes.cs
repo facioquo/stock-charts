@@ -15,7 +15,7 @@ public class Jobs(ILoggerFactory loggerFactory)
     ///   Schedule to get and cache quotes from source feed.
     /// </summary>
     /// <param name="myTimer" cref="TimerInfo">CRON-based schedule</param>
-    /// <returns></returns>
+    /// <remarks>Depends on TZ environment settings for EST time zone</remarks>
     [Function("UpdateQuotes")]
     public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5")] TimerInfo myTimer)
     {
@@ -84,7 +84,7 @@ public class Jobs(ILoggerFactory loggerFactory)
 
         string json = JsonSerializer.Serialize(quotes.OrderBy(x => x.Date));
 
-        // store in Azure Blog
+        // store in Azure Blob Storage
         string blobName = $"{symbol}-DAILY.json";
         await Storage.PutBlob(blobName, json);
 
