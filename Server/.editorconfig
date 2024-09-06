@@ -9,7 +9,6 @@ indent_size = 2
 [*.{cs,vb}]
 tab_width = 4
 indent_size = 4
-end_of_line = lf
 
 #### Naming styles ####
 
@@ -53,11 +52,6 @@ dotnet_naming_style.pascal_case.required_suffix =
 dotnet_naming_style.pascal_case.word_separator =
 dotnet_naming_style.pascal_case.capitalization = pascal_case
 
-dotnet_naming_style.pascal_case.required_prefix =
-dotnet_naming_style.pascal_case.required_suffix =
-dotnet_naming_style.pascal_case.word_separator =
-dotnet_naming_style.pascal_case.capitalization = pascal_case
-
 dotnet_code_quality_unused_parameters = all:suggestion
 
 dotnet_sort_system_directives_first = true
@@ -71,7 +65,7 @@ dotnet_style_null_propagation = true:suggestion
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
 dotnet_style_prefer_auto_properties = true:silent
 dotnet_style_object_initializer = true:suggestion
-dotnet_style_prefer_collection_expression = true:suggestion
+dotnet_style_prefer_collection_expression = false:suggestion
 
 [*.cs]
 # ref: https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/csharp-formatting-options
