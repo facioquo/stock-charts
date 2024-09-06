@@ -1,6 +1,9 @@
 # top-most EditorConfig file
 root = true
 
+# see Client and Server folders for
+# language unique editor configurations
+
 # global baselines
 [*]
 charset = utf-8
@@ -18,6 +21,3 @@ insert_final_newline = true
 [*.{xml,yml}]
 indent_style = space
 indent_size = 2
-
-# see Client and Server folders for
-# language unique editor configurations
