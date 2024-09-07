@@ -257,7 +257,8 @@ var CrosshairPlugin = {
       x: xScale.getPixelForValue(e.xValue),
       y: e.original.y,
       native: {
-        buttons: buttons
+        buttons: buttons,
+        type: e.original.type == "click" ? "mousemove" : e.original.type
       },
       stop: true
     };
