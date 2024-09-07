@@ -8,7 +8,7 @@ concurrency:
 
 jobs:
   build-backend:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     env:
       url: https://charts.stockindicators.dev
