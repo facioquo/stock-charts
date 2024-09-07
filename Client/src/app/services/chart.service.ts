@@ -7,6 +7,7 @@ import { StyleService } from './style.service';
 import Chart from 'chart.js/auto';  // import all default options
 import 'chartjs-adapter-date-fns';
 import 'src/assets/js/chartjs-chart-financial';
+// import 'src/assets/js/chartjs-plugin-crosshair';
 
 import { enUS } from 'date-fns/locale';
 import { Guid } from "guid-typescript";
@@ -15,7 +16,6 @@ import {
   CartesianScaleOptions,
   ChartConfiguration,
   ChartDataset,
-  FinancialDataPoint,
   FontSpec,
   Interaction,
   ScaleOptions,
@@ -27,6 +27,7 @@ import {
 import {
   CandlestickController,
   CandlestickElement,
+  FinancialDataPoint,
   OhlcController,
   OhlcElement
 } from 'src/assets/js/chartjs-chart-financial';
@@ -35,12 +36,8 @@ import {
 import annotationPlugin, { AnnotationOptions, ScaleValue }
   from 'chartjs-plugin-annotation';
 
-import {
-  CrosshairPlugin,
-  CrosshairOptions,
-  Interpolate
-}
-from 'chartjs-plugin-crosshair'
+import CrosshairPlugin, { CrosshairOptions }
+  from 'src/assets/js/chartjs-plugin-crosshair';
 
 // internal models
 import {
@@ -61,8 +58,6 @@ Chart.register(
   OhlcElement,
   annotationPlugin,
   CrosshairPlugin);
-
-Interaction.modes.interpolate = Interpolate;
 
 @Injectable()
 export class ChartService {
@@ -300,32 +295,32 @@ export class ChartService {
   crosshairPluginOptions(): CrosshairOptions {
 
     const crosshairOptions: CrosshairOptions = {
-        line: {
-            color: '#F66',                                      // crosshair line color
-            width: 1                                            // crosshair line width
+      line: {
+        color: '#F66',                                      // crosshair line color
+        width: 1                                            // crosshair line width
+      },
+      sync: {
+        enabled: true,                                      // enable trace line syncing with other charts
+        group: 1,                                           // chart group (can be unique set of groups)
+        suppressTooltips: true                              // suppress tooltips when showing a synced tracer
+      },
+      zoom: {
+        enabled: false,                                     // enable zooming
+        zoomboxBackgroundColor: 'rgba(66,133,244,0.2)',     // background color of zoom box
+        zoomboxBorderColor: '#48F',                         // border color of zoom box
+        zoomButtonText: 'Reset Zoom',                       // reset zoom button text
+        zoomButtonClass: 'reset-zoom',                      // reset zoom button class
+      },
+      snap: {
+        enabled: true
+      },
+      callbacks: {
+        beforeZoom: (start, end) => {                       // called before zoom, return false to prevent zoom
+          return true;
         },
-        sync: {
-            enabled: true,                                      // enable trace line syncing with other charts
-            group: 15,                                           // chart group (can be unique set of groups)
-            suppressTooltips: true                              // suppress tooltips when showing a synced tracer
-        },
-        zoom: {
-            enabled: false,                                     // enable zooming
-            zoomboxBackgroundColor: 'rgba(66,133,244,0.2)',     // background color of zoom box
-            zoomboxBorderColor: '#48F',                         // border color of zoom box
-            zoomButtonText: 'Reset Zoom',                       // reset zoom button text
-            zoomButtonClass: 'reset-zoom',                      // reset zoom button class
-        },
-        snap: {
-            enabled: true
-        },
-        callbacks: {
-            beforeZoom: (start, end) => {                       // called before zoom, return false to prevent zoom
-                return true;
-            },
-            afterZoom: (start, end) => {                        // called after zoom
-            }
+        afterZoom: (start, end) => {                        // called after zoom
         }
+      }
     };
 
     return crosshairOptions;
