@@ -1,4 +1,4 @@
-// ref: // https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/chartjs-plugin-crosshair
+// types for chartjs-plugin-crosshair
 
 import {
   ChartType,

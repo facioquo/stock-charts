@@ -1,4 +1,6 @@
-// chartjs-plugin-crosshair.esm.js (renamed)
+// chartjs-plugin-crosshair
+// based on https://github.com/AbelHeinsbroek/chartjs-plugin-crosshair
+
 import { Interaction } from 'chart.js';
 import { valueOrDefault } from 'chart.js/helpers';
 

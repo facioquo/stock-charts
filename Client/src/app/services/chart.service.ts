@@ -6,8 +6,6 @@ import { StyleService } from './style.service';
 
 import Chart from 'chart.js/auto';  // import all default options
 import 'chartjs-adapter-date-fns';
-import 'src/assets/js/chartjs-chart-financial';
-// import 'src/assets/js/chartjs-plugin-crosshair';
 
 import { enUS } from 'date-fns/locale';
 import { Guid } from "guid-typescript";
@@ -17,7 +15,6 @@ import {
   ChartConfiguration,
   ChartDataset,
   FontSpec,
-  Interaction,
   ScaleOptions,
   ScatterDataPoint,
   Tick
@@ -33,11 +30,20 @@ import {
 } from 'src/assets/js/chartjs-chart-financial';
 
 // plugins
-import annotationPlugin, { AnnotationOptions, ScaleValue }
+import AnnotationPlugin, { AnnotationOptions, ScaleValue }
   from 'chartjs-plugin-annotation';
 
 import CrosshairPlugin, { CrosshairOptions }
   from 'src/assets/js/chartjs-plugin-crosshair';
+
+// register extensions and plugins
+Chart.register(
+  CandlestickController,
+  CandlestickElement,
+  OhlcController,
+  OhlcElement,
+  AnnotationPlugin,
+  CrosshairPlugin);
 
 // internal models
 import {
@@ -50,14 +56,6 @@ import {
   IndicatorSelection,
   Quote
 } from '../chart/chart.models';
-
-Chart.register(
-  CandlestickController,
-  OhlcController,
-  CandlestickElement,
-  OhlcElement,
-  annotationPlugin,
-  CrosshairPlugin);
 
 @Injectable()
 export class ChartService {

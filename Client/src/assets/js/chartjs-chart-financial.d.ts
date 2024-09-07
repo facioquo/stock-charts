@@ -1,3 +1,5 @@
+// types for chartjs-chart-financial
+
 import {
   BarController,
   BarControllerChartOptions,
