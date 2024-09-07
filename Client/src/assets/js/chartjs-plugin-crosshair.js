@@ -250,9 +250,8 @@ var CrosshairPlugin = {
       buttons = 0;
     }
 
-
+    // bug fix: chartjs-plugin-crosshair/issues/95#issuecomment-1027262402
     var newEvent = {
-      type: e.original.type == "click" ? "mousemove" : e.original.type,  // do not transmit click events to prevent unwanted changing of synced charts. We do need to transmit a event to stop zooming on synced charts however.
       chart: chart,
       x: xScale.getPixelForValue(e.xValue),
       y: e.original.y,
