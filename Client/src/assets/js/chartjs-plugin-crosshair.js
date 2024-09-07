@@ -268,15 +268,15 @@ var CrosshairPlugin = {
 
   afterEvent: function (chart, event) {
 
-    if (chart.config.options.scales.x.length == 0) {
-      return
+    if (chart.config.options.scales.x.length === 0) {
+      return;
     }
 
     let e = event.event;
 
     var xScaleType = chart.config.options.scales.x.type;
 
-    if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xscaleType !== 'logarithmic') {
+    if (xScaleType !== 'linear' && xScaleType !== 'time' && xScaleType !== 'category' && xScaleType !== 'logarithmic') {
       return;
     }
 
@@ -324,7 +324,7 @@ var CrosshairPlugin = {
         chart.update('none');
       }
       chart.crosshair.dragStarted = false; // cancel zoom in progress
-      return false;
+      return;
     }
     chart.crosshair.suppressUpdate = false;
 
@@ -350,10 +350,7 @@ var CrosshairPlugin = {
     }
 
     chart.crosshair.x = e.x;
-
-
     chart.draw();
-
   },
 
   afterDraw: function (chart) {
@@ -369,8 +366,6 @@ var CrosshairPlugin = {
       this.interpolateValues(chart);
       this.drawTracePoints(chart);
     }
-
-    return true;
   },
 
   beforeTooltipDraw: function (chart) {
@@ -475,14 +470,11 @@ var CrosshairPlugin = {
     chart.options.scales.x.max = end;
 
     // make a copy of the original data for later restoration
-
     var storeOriginals = (chart.crosshair.originalData.length === 0) ? true : false;
-
 
     var filterDataset = (chart.config.options.scales.x.type !== 'category');
 
     if (filterDataset) {
-
 
       for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
 
