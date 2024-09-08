@@ -20,7 +20,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-
           # Configure additional validation for the subject based on a regex.
           # We enforce that the subject starts with an uppercase character.
           subjectPattern: ^([A-Z]).+$
