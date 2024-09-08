@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { ApiService } from './api.service';
-import { StyleService } from './style.service';
+import { ConfigService } from './config.service';
 
 import Chart from 'chart.js/auto';  // import all default options
 import 'chartjs-adapter-date-fns';
@@ -60,33 +60,40 @@ import {
 @Injectable()
 export class ChartService {
 
-  constructor(
-    private readonly api: ApiService,
-    private readonly ts: StyleService
-  ) { }
-
   yAxisTicks: Tick[] = [];
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
   chartOverlay: Chart;
   loading = true;
 
+  constructor(
+    private readonly api: ApiService,
+    private readonly cfg: ConfigService
+  ) { }
+
   // CHART CONFIGURATIONS
+
+  resetCharts() {
+
+    this.selections = [];
+    this.loadCharts();
+  }
+
   baseConfig() {
 
     const commonXaxes = this.commonXAxes();
     const crosshairOptions = this.crosshairPluginOptions();
-    const gridColor = this.ts.isDarkTheme ? '#424242' : '#CCCCCC';
+    const gridColor = this.cfg.isDarkTheme ? '#424242' : '#CCCCCC';
 
     // solid background plugin (for copy/paste)
     const backgroundPlugin =
     {
       id: 'background',
-      beforeDraw: (chart) => {
+      beforeDraw: (chart: Chart) => {
         const ctx = chart.canvas.getContext('2d');
         ctx.save();
         ctx.globalCompositeOperation = 'destination-over';
-        ctx.fillStyle = this.ts.isDarkTheme ? '#212121' : 'white';
+        ctx.fillStyle = this.cfg.isDarkTheme ? '#212121' : 'white';
         ctx.fillRect(0, 0, chart.width, chart.height);
         ctx.restore();
       }
@@ -111,7 +118,7 @@ export class ChartService {
             display: false
           },
           tooltip: {
-            enabled: true,
+            enabled: this.cfg.showTooltips,
             mode: 'interpolate',
             intersect: false
           },
@@ -151,7 +158,7 @@ export class ChartService {
                 lineHeight: 1
               },
               showLabelBackdrop: true,
-              backdropColor: this.ts.isDarkTheme ? '#212121' : 'white',
+              backdropColor: this.cfg.isDarkTheme ? '#212121' : 'white',
               backdropPadding: {
                 top: 0,
                 left: 5,
@@ -292,6 +299,8 @@ export class ChartService {
 
   crosshairPluginOptions(): CrosshairOptions {
 
+    if (this.cfg.showCrosshairs == false) return null;
+
     const crosshairOptions: CrosshairOptions = {
       line: {
         color: '#F66',                                      // crosshair line color
@@ -314,7 +323,7 @@ export class ChartService {
       },
       callbacks: {
         beforeZoom: (start, end) => {                       // called before zoom, return false to prevent zoom
-          return true;
+          return false;
         },
         afterZoom: (start, end) => {                        // called after zoom
         }
@@ -552,7 +561,7 @@ export class ChartService {
     const xPos: ScaleValue = selection.chart.scales["xAxis"].min;
     const yPos: ScaleValue = selection.chart.scales["yAxis"].max;
 
-    const labelColor = this.ts.isDarkTheme ? '#757575' : '#212121';
+    const labelColor = this.cfg.isDarkTheme ? '#757575' : '#212121';
     const annotation: AnnotationOptions =
       this.commonAnnotation(selection.label, labelColor, xPos, yPos, 0, 1);
     selection.chart.options.plugins.annotation.annotations = { annotation };
@@ -602,7 +611,7 @@ export class ChartService {
       content: [label],
       font: legendFont,
       color: fontColor,
-      backgroundColor: this.ts.isDarkTheme ? 'rgba(33,33,33,0.5)' : 'rgba(255,255,255,0.7)',
+      backgroundColor: this.cfg.isDarkTheme ? 'rgba(33,33,33,0.5)' : 'rgba(255,255,255,0.7)',
       padding: 0,
       position: 'start',
       xScaleID: 'xAxis',
@@ -760,12 +769,6 @@ export class ChartService {
       const def6 = this.defaultSelection("MACD");
       this.addSelectionWithoutScroll(def6);
     }
-  }
-
-  resetChartTheme() {
-
-    this.selections = [];
-    this.loadCharts();
   }
 
   // helper functions
