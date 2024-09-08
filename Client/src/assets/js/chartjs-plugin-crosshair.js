@@ -1,17 +1,21 @@
 // chartjs-plugin-crosshair
 // based on https://github.com/AbelHeinsbroek/chartjs-plugin-crosshair
 
+// TODO:
+// 1. fix mouse events to reach last data point in series
+// 2. lock trace line on mouse click
+// 3. migrate to native Angular/Typescript
+
 import { Interaction } from 'chart.js';
 import { valueOrDefault } from 'chart.js/helpers';
 
 Interaction.modes.interpolate = interpolate;
 
-function interpolate(chart, e, options) {
+function interpolate(chart, event, options) {
 
   var items = [];  // InteractionItem[]
 
   for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
-
 
     // check for interpolate setting
     if (!chart.data.datasets[datasetIndex].interpolate) {
@@ -24,11 +28,10 @@ function interpolate(chart, e, options) {
       continue;
     }
 
-
     var xScale = chart.scales[meta.xAxisID];
     var yScale = chart.scales[meta.yAxisID];
 
-    var xValue = xScale.getValueForPixel(e.x);
+    var xValue = xScale.getValueForPixel(event.x);
 
     if (xValue > xScale.max || xValue < xScale.min) {
       continue;
@@ -43,7 +46,6 @@ function interpolate(chart, e, options) {
     if (index === -1) {
       continue;
     }
-
 
     // linear interpolate value
     var prev = data[index - 1];
@@ -70,7 +72,6 @@ function interpolate(chart, e, options) {
     }
 
     // create a 'fake' event point
-
     var fakePoint = {
       hasValue: function () {
         return true;
@@ -78,7 +79,7 @@ function interpolate(chart, e, options) {
       tooltipPosition: function () {
         return this._model
       },
-      _model: { x: e.x, y: yPosition },
+      _model: { x: event.x, y: yPosition },
       skip: false,
       stop: false,
       x: xValue,
@@ -88,9 +89,8 @@ function interpolate(chart, e, options) {
     items.push({ datasetIndex: datasetIndex, element: fakePoint, index: 0 });
   }
 
-
   // add other, not interpolated, items
-  var xItems = Interaction.modes.x(chart, e, options);
+  var xItems = Interaction.modes.x(chart, event, options);
   for (index = 0; index < xItems.length; index++) {
     var item = xItems[index];
     if (!chart.data.datasets[item.datasetIndex].interpolate) {
@@ -112,22 +112,8 @@ var defaultOptions = {
     group: 1,
     suppressTooltips: false
   },
-  zoom: {
-    enabled: true,
-    zoomboxBackgroundColor: 'rgba(66,133,244,0.2)',
-    zoomboxBorderColor: '#48F',
-    zoomButtonText: 'Reset Zoom',
-    zoomButtonClass: 'reset-zoom',
-  },
   snap: {
     enabled: false,
-  },
-  callbacks: {
-    beforeZoom: function (start, end) {
-      return true;
-    },
-    afterZoom: function (start, end) {
-    }
   }
 };
 
@@ -161,58 +147,24 @@ var CrosshairPlugin = {
       dragStartX: null,
       dragEndX: null,
       suppressTooltips: false,
-      ignoreNextEvents: 0,
-      reset: function () {
-        this.resetZoom(chart, false, false);
-      }.bind(this)
+      ignoreNextEvents: 0
     };
 
     var syncEnabled = this.getOption(chart, 'sync', 'enabled');
     if (syncEnabled) {
-      chart.crosshair.syncEventHandler = function (e) {
-        this.handleSyncEvent(chart, e);
-      }.bind(this);
-
-      chart.crosshair.resetZoomEventHandler = function (e) {
-
-        var syncGroup = this.getOption(chart, 'sync', 'group');
-
-        if (e.chartId !== chart.id && e.syncGroup === syncGroup) {
-          this.resetZoom(chart, true);
-        }
+      chart.crosshair.syncEventHandler = function (event) {
+        this.handleSyncEvent(chart, event);
       }.bind(this);
 
       window.addEventListener('sync-event', chart.crosshair.syncEventHandler);
-      window.addEventListener('reset-zoom-event', chart.crosshair.resetZoomEventHandler);
     }
-
-    chart.panZoom = this.panZoom.bind(this, chart);
   },
 
   afterDestroy: function (chart) {
     var syncEnabled = this.getOption(chart, 'sync', 'enabled');
     if (syncEnabled) {
       window.removeEventListener('sync-event', chart.crosshair.syncEventHandler);
-      window.removeEventListener('reset-zoom-event', chart.crosshair.resetZoomEventHandler);
     }
-  },
-
-  panZoom: function (chart, increment) {
-    if (chart.crosshair.originalData.length === 0) {
-      return;
-    }
-    var diff = chart.crosshair.end - chart.crosshair.start;
-    var min = chart.crosshair.min;
-    var max = chart.crosshair.max;
-    if (increment < 0) { // left
-      chart.crosshair.start = Math.max(chart.crosshair.start + increment, min);
-      chart.crosshair.end = chart.crosshair.start === min ? min + diff : chart.crosshair.end + increment;
-    } else { // right
-      chart.crosshair.end = Math.min(chart.crosshair.end + increment, chart.crosshair.max);
-      chart.crosshair.start = chart.crosshair.end === max ? max - diff : chart.crosshair.start + increment;
-    }
-
-    this.doZoom(chart, chart.crosshair.start, chart.crosshair.end);
   },
 
   getOption: function (chart, category, name) {
@@ -226,17 +178,17 @@ var CrosshairPlugin = {
     return chart.scales[chart.getDatasetMeta(0).yAxisID];
   },
 
-  handleSyncEvent: function (chart, e) {
+  handleSyncEvent: function (chart, event) {
 
     var syncGroup = this.getOption(chart, 'sync', 'group');
 
     // stop if the sync event was fired from this chart
-    if (e.chartId === chart.id) {
+    if (event.chartId === chart.id) {
       return;
     }
 
     // stop if the sync event was fired from a different group
-    if (e.syncGroup !== syncGroup) {
+    if (event.syncGroup !== syncGroup) {
       return;
     }
 
@@ -247,19 +199,19 @@ var CrosshairPlugin = {
     }
 
     // Safari fix
-    var buttons = (e.original.native.buttons === undefined ? e.original.native.which : e.original.native.buttons);
-    if (e.original.type === 'mouseup') {
+    var buttons = (event.original.native.buttons === undefined ? event.original.native.which : event.original.native.buttons);
+    if (event.original.type === 'mouseup') {
       buttons = 0;
     }
 
     // bug fix: chartjs-plugin-crosshair/issues/95#issuecomment-1027262402
     var newEvent = {
       chart: chart,
-      x: xScale.getPixelForValue(e.xValue),
-      y: e.original.y,
+      x: xScale.getPixelForValue(event.xValue),
+      y: event.original.y,
       native: {
         buttons: buttons,
-        type: e.original.type == "click" ? "mousemove" : e.original.type
+        type: event.original.type == "click" ? "mousemove" : event.original.type
       },
       stop: true
     };
@@ -323,32 +275,9 @@ var CrosshairPlugin = {
         chart.crosshair.suppressUpdate = true;
         chart.update('none');
       }
-      chart.crosshair.dragStarted = false; // cancel zoom in progress
       return;
     }
     chart.crosshair.suppressUpdate = false;
-
-    // handle drag to zoom
-    var zoomEnabled = this.getOption(chart, 'zoom', 'enabled');
-
-    if (buttons === 1 && !chart.crosshair.dragStarted && zoomEnabled) {
-      chart.crosshair.dragStartX = e.x;
-      chart.crosshair.dragStarted = true;
-    }
-
-    // handle drag to zoom
-    if (chart.crosshair.dragStarted && buttons === 0) {
-      chart.crosshair.dragStarted = false;
-
-      var start = xScale.getValueForPixel(chart.crosshair.dragStartX);
-      var end = xScale.getValueForPixel(chart.crosshair.x);
-
-      if (Math.abs(chart.crosshair.dragStartX - chart.crosshair.x) > 1) {
-        this.doZoom(chart, start, end);
-      }
-      chart.update('none');
-    }
-
     chart.crosshair.x = e.x;
     chart.draw();
   },
@@ -359,197 +288,9 @@ var CrosshairPlugin = {
       return;
     }
 
-    if (chart.crosshair.dragStarted) {
-      this.drawZoombox(chart);
-    } else {
-      this.drawTraceLine(chart);
-      this.interpolateValues(chart);
-      this.drawTracePoints(chart);
-    }
-  },
-
-  beforeTooltipDraw: function (chart) {
-    // suppress tooltips on dragging
-    return !chart.crosshair.dragStarted && !chart.crosshair.suppressTooltips;
-  },
-
-  resetZoom: function (chart) {
-
-    var stop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    var update = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-
-    if (update) {
-      if (chart.crosshair.originalData.length > 0) {
-        // reset original data
-        for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
-          var dataset = chart.data.datasets[datasetIndex];
-          dataset.data = chart.crosshair.originalData.shift(0);
-        }
-      }
-
-      // reset original xRange
-      if (chart.crosshair.originalXRange.min) {
-        chart.options.scales.x.min = chart.crosshair.originalXRange.min;
-        chart.crosshair.originalXRange.min = null;
-      } else {
-        delete chart.options.scales.x.min;
-      }
-      if (chart.crosshair.originalXRange.max) {
-        chart.options.scales.x.max = chart.crosshair.originalXRange.max;
-        chart.crosshair.originalXRange.max = null;
-      } else {
-        delete chart.options.scales.x.max;
-      }
-    }
-
-    if (chart.crosshair.button && chart.crosshair.button.parentNode) {
-      chart.crosshair.button.parentNode.removeChild(chart.crosshair.button);
-      chart.crosshair.button = false;
-    }
-
-    var syncEnabled = this.getOption(chart, 'sync', 'enabled');
-
-    if (!stop && update && syncEnabled) {
-
-      var syncGroup = this.getOption(chart, 'sync', 'group');
-
-      var event = new CustomEvent('reset-zoom-event');
-      event.chartId = chart.id;
-      event.syncGroup = syncGroup;
-      window.dispatchEvent(event);
-    }
-    if (update) {
-      chart.update('none');
-    }
-  },
-
-  doZoom: function (chart, start, end) {
-
-    // swap start/end if user dragged from right to left
-    if (start > end) {
-      var tmp = start;
-      start = end;
-      end = tmp;
-    }
-
-    // notify delegate
-    var beforeZoomCallback = valueOrDefault(chart.options.plugins.crosshair.callbacks ? chart.options.plugins.crosshair.callbacks.beforeZoom : undefined, defaultOptions.callbacks.beforeZoom);
-
-    if (!beforeZoomCallback(start, end)) {
-      return false;
-    }
-
-    chart.crosshair.dragStarted = false;
-
-    if (chart.options.scales.x.min && chart.crosshair.originalData.length === 0) {
-      chart.crosshair.originalXRange.min = chart.options.scales.x.min;
-    }
-    if (chart.options.scales.x.max && chart.crosshair.originalData.length === 0) {
-      chart.crosshair.originalXRange.max = chart.options.scales.x.max;
-    }
-
-    if (!chart.crosshair.button) {
-      // add restore zoom button
-      var button = document.createElement('button');
-
-      var buttonText = this.getOption(chart, 'zoom', 'zoomButtonText');
-      var buttonClass = this.getOption(chart, 'zoom', 'zoomButtonClass');
-
-      var buttonLabel = document.createTextNode(buttonText);
-      button.appendChild(buttonLabel);
-      button.className = buttonClass;
-      button.addEventListener('click', function () {
-        this.resetZoom(chart);
-      }.bind(this));
-      chart.canvas.parentNode.appendChild(button);
-      chart.crosshair.button = button;
-    }
-
-    // set axis scale
-    chart.options.scales.x.min = start;
-    chart.options.scales.x.max = end;
-
-    // make a copy of the original data for later restoration
-    var storeOriginals = (chart.crosshair.originalData.length === 0) ? true : false;
-
-    var filterDataset = (chart.config.options.scales.x.type !== 'category');
-
-    if (filterDataset) {
-
-      for (var datasetIndex = 0; datasetIndex < chart.data.datasets.length; datasetIndex++) {
-
-        var newData = [];
-
-        var index = 0;
-        var started = false;
-        var stop = false;
-        if (storeOriginals) {
-          chart.crosshair.originalData[datasetIndex] = chart.data.datasets[datasetIndex].data;
-        }
-
-        var sourceDataset = chart.crosshair.originalData[datasetIndex];
-
-        for (var oldDataIndex = 0; oldDataIndex < sourceDataset.length; oldDataIndex++) {
-
-          var oldData = sourceDataset[oldDataIndex];
-          // var oldDataX = this.getXScale(chart).getRightValue(oldData)
-          var oldDataX = oldData.x !== undefined ? oldData.x : NaN;
-
-          // append one value outside of bounds
-          if (oldDataX >= start && !started && index > 0) {
-            newData.push(sourceDataset[index - 1]);
-            started = true;
-          }
-          if (oldDataX >= start && oldDataX <= end) {
-            newData.push(oldData);
-          }
-          if (oldDataX > end && !stop && index < sourceDataset.length) {
-            newData.push(oldData);
-            stop = true;
-          }
-          index += 1;
-        }
-
-        chart.data.datasets[datasetIndex].data = newData;
-      }
-    }
-
-    chart.crosshair.start = start;
-    chart.crosshair.end = end;
-
-
-    if (storeOriginals) {
-      var xAxes = this.getXScale(chart);
-      chart.crosshair.min = xAxes.min;
-      chart.crosshair.max = xAxes.max;
-    }
-
-    chart.crosshair.ignoreNextEvents = 2; // ignore next 2 events to prevent starting a new zoom action after updating the chart
-
-    chart.update('none');
-
-
-    var afterZoomCallback = this.getOption(chart, 'callbacks', 'afterZoom');
-
-    afterZoomCallback(start, end);
-  },
-
-  drawZoombox: function (chart) {
-
-    var yScale = this.getYScale(chart);
-
-    var borderColor = this.getOption(chart, 'zoom', 'zoomboxBorderColor');
-    var fillColor = this.getOption(chart, 'zoom', 'zoomboxBackgroundColor');
-
-    chart.ctx.beginPath();
-    chart.ctx.rect(chart.crosshair.dragStartX, yScale.getPixelForValue(yScale.max), chart.crosshair.x - chart.crosshair.dragStartX, yScale.getPixelForValue(yScale.min) - yScale.getPixelForValue(yScale.max));
-    chart.ctx.lineWidth = 1;
-    chart.ctx.strokeStyle = borderColor;
-    chart.ctx.fillStyle = fillColor;
-    chart.ctx.fill();
-    chart.ctx.fillStyle = '';
-    chart.ctx.stroke();
-    chart.ctx.closePath();
+    this.drawTraceLine(chart);
+    this.interpolateValues(chart);
+    this.drawTracePoints(chart);
   },
 
   drawTraceLine: function (chart) {
@@ -575,7 +316,6 @@ var CrosshairPlugin = {
     chart.ctx.lineTo(lineX, yScale.getPixelForValue(yScale.min));
     chart.ctx.stroke();
     chart.ctx.setLineDash([]);
-
   },
 
   drawTracePoints: function (chart) {
@@ -598,7 +338,6 @@ var CrosshairPlugin = {
       chart.ctx.strokeStyle = dataset.borderColor;
       chart.ctx.fill();
       chart.ctx.stroke();
-
     }
 
   },

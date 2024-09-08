@@ -309,24 +309,10 @@ export class ChartService {
       sync: {
         enabled: true,                                      // enable trace line syncing with other charts
         group: 1,                                           // chart group (can be unique set of groups)
-        suppressTooltips: true                              // suppress tooltips when showing a synced tracer
-      },
-      zoom: {
-        enabled: false,                                     // enable zooming
-        zoomboxBackgroundColor: 'rgba(66,133,244,0.2)',     // background color of zoom box
-        zoomboxBorderColor: '#48F',                         // border color of zoom box
-        zoomButtonText: 'Reset Zoom',                       // reset zoom button text
-        zoomButtonClass: 'reset-zoom',                      // reset zoom button class
+        suppressTooltips: true                              // suppress tooltips (on other chart) when synced tracer
       },
       snap: {
-        enabled: true
-      },
-      callbacks: {
-        beforeZoom: (start, end) => {                       // called before zoom, return false to prevent zoom
-          return false;
-        },
-        afterZoom: (start, end) => {                        // called after zoom
-        }
+        enabled: true                                       // snap to data points
       }
     };
 

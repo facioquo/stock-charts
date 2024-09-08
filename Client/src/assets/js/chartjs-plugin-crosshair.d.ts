@@ -17,29 +17,14 @@ interface SyncOptions {
   suppressTooltips?: boolean | undefined;
 }
 
-interface ZoomOptions {
-  enabled?: boolean | undefined;
-  zoomboxBackgroundColor?: string | undefined;
-  zoomboxBorderColor?: string | undefined;
-  zoomButtonText?: string | undefined;
-  zoomButtonClass?: string | undefined;
-}
-
 interface SnapOptions {
   enabled?: boolean | undefined;
-}
-
-interface CallbackOptions {
-  beforeZoom?: ((start: number, end: number) => boolean) | undefined;
-  afterZoom?: ((start: number, end: number) => void) | undefined;
 }
 
 interface CrosshairOptions {
   line?: LineOptions | undefined;
   sync?: SyncOptions | undefined;
-  zoom?: ZoomOptions | undefined;
   snap?: SnapOptions | undefined;
-  callbacks?: CallbackOptions | undefined;
 }
 
 declare module 'chart.js' {
