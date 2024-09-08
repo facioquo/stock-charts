@@ -5,8 +5,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
-import { StyleService } from '../services/style.service';
 import { ChartService } from '../services/chart.service';
+import { ConfigService } from '../services/config.service';
 
 import { IndicatorListing, IndicatorSelection } from '../chart/chart.models';
 import { PickConfigComponent } from './pick-config.component';
@@ -25,11 +25,11 @@ export class SettingsComponent {
   constructor(
     private listRef: MatDialog,
     private picker: MatDialog,
-    private cs: ChartService,
-    public ts: StyleService,
+    public cht: ChartService,
+    public cfg: ConfigService
   ) {
-    this.listings = this.cs.listings;
-    this.selections = this.cs.selections;
+    this.listings = this.cht.listings;
+    this.selections = this.cht.selections;
   }
 
   selectDisplayed(event: MatCheckboxChange, shown: MatSelectionList): void {
@@ -38,12 +38,22 @@ export class SettingsComponent {
 
   removeSelections(event: MouseEvent, shown: MatListOption[]): void {
     event.preventDefault();
-    shown.forEach(x => this.cs.deleteSelection(x.value.ucid));
+    shown.forEach(x => this.cht.deleteSelection(x.value.ucid));
   }
 
   toggleTheme(event: MatSlideToggleChange) {
-    this.ts.toggleTheme(event.checked);
-    this.cs.resetChartTheme();
+    this.cfg.changeTheme(event.checked);
+    this.cht.resetCharts();
+  }
+
+  toggleCrosshairs(event: MatSlideToggleChange) {
+    this.cfg.changeCrosshairs(event.checked);
+    this.cht.resetCharts();
+  }
+
+  toggleTooltips(event: MatSlideToggleChange) {
+    this.cfg.changeTooltips(event.checked);
+    this.cht.resetCharts();
   }
 
   openIndicatorSettings(listing: IndicatorListing): void {

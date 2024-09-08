@@ -55,6 +55,7 @@
             "scripts": [],
             "allowedCommonJsDependencies": [
               "src/assets/js/chartjs-chart-financial",
+              "src/assets/js/chartjs-plugin-crosshair",
               "guid-typescript"
             ],
             "extractLicenses": false,

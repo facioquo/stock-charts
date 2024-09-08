@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { StyleService } from './services/style.service';
 import { SettingsComponent } from './picker/settings.component';
+
 import { ChartService } from './services/chart.service';
+import { ConfigService } from './services/config.service';
 
 @Component({
   selector: 'app-root',
@@ -12,13 +13,15 @@ import { ChartService } from './services/chart.service';
 export class AppComponent implements OnInit {
 
   constructor(
-    public readonly cs: ChartService,
-    public readonly ts: StyleService,
+    public readonly cht: ChartService,
+    public readonly cfg: ConfigService,
     private readonly settingsDialog: MatDialog
   ) { }
 
   ngOnInit(): void {
-    this.ts.getTheme();
+
+    // load user preferences
+    this.cfg.loadSettings();
   }
 
   // SETTINGS DIALOG
@@ -27,5 +30,4 @@ export class AppComponent implements OnInit {
       autoFocus: "dialog"
     });
   }
-
 }
