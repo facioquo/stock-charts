@@ -1,13 +1,6 @@
-/*!
- * @license
- * chartjs-chart-financial
- * http://chartjs.org/
- * Version: 0.1.2
- *
- * Copyright 2023 Chart.js Contributors
- * Released under the MIT license
- * https://github.com/chartjs/chartjs-chart-financial/blob/master/LICENSE.md
- */
+// chartjs-chart-financial
+// based on https://github.com/chartjs/chartjs-chart-financial
+
 import { Chart, Element, defaults, BarController } from 'chart.js';
 import { merge, valueOrDefault, isNullOrUndef, clipArea, unclipArea } from 'chart.js/helpers';
 

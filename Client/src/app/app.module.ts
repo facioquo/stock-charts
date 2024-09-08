@@ -11,7 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChartModule } from './chart/chart.module';
 import { SettingsModule } from './picker/settings.module';
 
-import { StyleService } from './services/style.service';
+import { ConfigService } from './services/config.service';
 
 import { AppComponent } from './app.component';
 
@@ -37,7 +37,7 @@ import { AppComponent } from './app.component';
     SettingsModule
   ],
   providers: [
-    StyleService
+    ConfigService
   ],
   bootstrap: [
     AppComponent
