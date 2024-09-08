@@ -1,6 +1,6 @@
 name: Deploy website
 
-on: [ workflow_dispatch ]
+on: workflow_dispatch
 
 concurrency:
   group: website-deployer
@@ -8,13 +8,12 @@ concurrency:
 
 jobs:
   build-backend:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     env:
       url: https://charts.stockindicators.dev
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -60,66 +59,65 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: api
-          path: "./Server/artifacts/api"
+          path: "Server/artifacts/api"
           include-hidden-files: true
 
       - name: Save Functions
         uses: actions/upload-artifact@v4
         with:
           name: fns
-          path: "./Server/artifacts/fns"
+          path: "Server/artifacts/fns"
           include-hidden-files: true
 
   build-website:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: Client/package-lock.json
 
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        cache-dependency-path: Client/package-lock.json
+      - name: Install packages
+        working-directory: Client
+        run: npm install
 
-    - name: Install packages
-      working-directory: Client
-      run: npm install
+      - name: Define cache marker
+        id: marker
+        run: echo "version=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
 
-    - name: Define cache marker
-      id: marker
-      run: echo "version=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
+      - name: Replace cache markers
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "YYYY.MM.DD"
+          replace: "${{ steps.marker.outputs.version }}"
+          regex: false
 
-    - name: Replace cache markers
-      uses: jacobtomlinson/gha-find-replace@v3
-      with:
-        find: "YYYY.MM.DD"
-        replace: "${{ steps.marker.outputs.version }}"
-        regex: false
+      - name: Update configs
+        shell: pwsh
+        working-directory: Client/src
+        run: |
+          (Get-Content index.html).Replace("__GaTag__", "G-17DX6ZW6HP") | Set-Content index.html
+          Write-Host "... Done!"
 
-    - name: Update configs
-      shell: pwsh
-      working-directory: Client/src
-      run: |
-        (Get-Content index.html).Replace("__GaTag__", "G-17DX6ZW6HP") | Set-Content index.html
-        Write-Host "... Done!"
+      - name: Build site
+        working-directory: Client
+        run: npm run build.prod
 
-    - name: Build site
-      working-directory: Client
-      run: npm run build.prod
-
-    - name: Store artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: web
-        path: Client/dist/app/browser
-        include-hidden-files: true
+      - name: Save artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web
+          path: Client/dist/app/browser
+          include-hidden-files: true
 
   deploy:
-    needs: [ "build-backend", "build-website" ]
+    needs: ["build-backend", "build-website"]
     runs-on: ubuntu-latest
 
     environment:
@@ -127,72 +125,71 @@ jobs:
       url: "https://charts.stockindicators.dev"
 
     steps:
+      - name: Download Functions package
+        uses: actions/download-artifact@v4
+        with:
+          name: fns
+          path: artifacts/fns
 
-    - name: Download Functions package
-      uses: actions/download-artifact@v4
-      with:
-        name: fns
-        path: artifacts/fns
+      - name: Show Functions artifacts
+        working-directory: artifacts/fns
+        run: ls
 
-    - name: Show Functions artifacts
-      working-directory: artifacts/fns
-      run: ls
+      - name: Download API package
+        uses: actions/download-artifact@v4
+        with:
+          name: api
+          path: artifacts/api
 
-    - name: Download API package
-      uses: actions/download-artifact@v4
-      with:
-        name: api
-        path: artifacts/api
+      - name: Show API artifacts
+        working-directory: artifacts/api
+        run: ls
 
-    - name: Show API artifacts
-      working-directory: artifacts/api
-      run: ls
+      - name: Download Web package
+        uses: actions/download-artifact@v4
+        with:
+          name: web
+          path: artifacts/web
 
-    - name: Download Web package
-      uses: actions/download-artifact@v4
-      with:
-        name: web
-        path: artifacts/web
+      - name: Show Web artifacts
+        working-directory: artifacts/web
+        run: ls
 
-    - name: Show Web artifacts
-      working-directory: artifacts/web
-      run: ls
+      - name: Deploy Functions
+        uses: Azure/functions-action@v1
+        with:
+          app-name: stock-charts-functions
+          package: artifacts/fns
+          publish-profile: ${{ secrets.PUBLISH_PROFILE_FNS }}
 
-    - name: Deploy Functions
-      uses: Azure/functions-action@v1
-      with:
-        app-name: stock-charts-functions
-        package: artifacts/fns
-        publish-profile: ${{ secrets.PUBLISH_PROFILE_FNS }}
+      - name: Deploy API
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: stock-charts-api
+          package: artifacts/api
+          publish-profile: ${{ secrets.PUBLISH_PROFILE_API }}
 
-    - name: Deploy API
-      uses: azure/webapps-deploy@v3
-      with:
-        app-name: stock-charts-api
-        package: artifacts/api
-        publish-profile: ${{ secrets.PUBLISH_PROFILE_API }}
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_KEY }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          directory: artifacts/web
+          wranglerVersion: "latest"
 
-    - name: Publish to Cloudflare Pages
-      uses: cloudflare/pages-action@v1
-      with:
-        apiToken: ${{ secrets.CLOUDFLARE_API_KEY }}
-        accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        projectName: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
-        gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-        directory: artifacts/web
-        wranglerVersion: 'latest'
+      - name: Define tag
+        id: tag
+        run: echo "tag=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
 
-    - name: Define tag
-      id: tag
-      run: echo "tag=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
-
-    - name: Tag and draft release note
-      uses: ncipollo/release-action@v1
-      if: github.ref == 'refs/heads/main'
-      with:
-        body: |
-          We’ve updated [charts.stockindicators.dev](https://charts.stockindicators.dev)
-        generateReleaseNotes: true
-        draft: true
-        tag: ${{ steps.tag.outputs.tag }}
-        commit: ${{ github.ref_name }}
+      - name: Tag and draft release note
+        uses: ncipollo/release-action@v1
+        if: github.ref == 'refs/heads/main'
+        with:
+          body: |
+            We’ve updated [charts.stockindicators.dev](https://charts.stockindicators.dev)
+          generateReleaseNotes: true
+          draft: true
+          tag: ${{ steps.tag.outputs.tag }}
+          commit: ${{ github.ref_name }}
