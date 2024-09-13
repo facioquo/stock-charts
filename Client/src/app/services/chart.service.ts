@@ -4,30 +4,35 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ApiService } from './api.service';
 import { StyleService } from './style.service';
 
-import Chart from 'chart.js/auto';  // import all default options
 import 'chartjs-adapter-date-fns';
-import 'src/assets/js/chartjs-chart-financial';
-
 import { enUS } from 'date-fns/locale';
 import { Guid } from "guid-typescript";
 
 import {
+  BarController,
+  BarElement,
   CartesianScaleOptions,
+  CategoryScale,
+  Chart,
   ChartConfiguration,
   ChartDataset,
+  Filler,
   FinancialDataPoint,
   FontSpec,
+  LinearScale,
+  LineController,
+  LineElement,
+  PointElement,
   ScaleOptions,
   ScatterDataPoint,
-  Tick
+  Tick,
+  TimeSeriesScale
 } from 'chart.js';
 
 // extensions
 import {
   CandlestickController,
-  CandlestickElement,
-  OhlcController,
-  OhlcElement
+  CandlestickElement
 } from 'src/assets/js/chartjs-chart-financial';
 
 // plugins
@@ -47,11 +52,27 @@ import {
 } from '../chart/chart.models';
 
 Chart.register(
+
+  // controllers
+  BarController,
   CandlestickController,
-  OhlcController,
+  LineController,
+
+  // elements
+  BarElement,
   CandlestickElement,
-  OhlcElement,
-  annotationPlugin);
+  LineElement,
+  PointElement,
+
+  // plugins
+  annotationPlugin,
+  Filler,
+
+  // scales
+  CategoryScale,
+  LinearScale,
+  TimeSeriesScale
+);
 
 @Injectable()
 export class ChartService {
@@ -77,7 +98,7 @@ export class ChartService {
     const backgroundPlugin =
     {
       id: 'background',
-      beforeDraw: (chart) => {
+      beforeDraw: (chart: Chart) => {
         const ctx = chart.canvas.getContext('2d');
         ctx.save();
         ctx.globalCompositeOperation = 'destination-over';
