@@ -2,53 +2,51 @@ name: "Build"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
-  
+    branches: ["main"]
+
 jobs:
   build-backend:
     name: "Backend"
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.x"
+          dotnet-quality: "ga"
 
-    - name: Install .NET SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: "8.x"
-        dotnet-quality: "ga"
-
-    - name: Build .NET solution
-      run: >
-        dotnet build Server/ChartBackend.sln
-        --configuration Release
-        --property:ContinuousIntegrationBuild=true
-        -warnAsError
+      - name: Build .NET solution
+        run: >
+          dotnet build Server/ChartBackend.sln
+          --configuration Release
+          --property:ContinuousIntegrationBuild=true
+          -warnAsError
 
   build-website:
     name: "Website"
     runs-on: ubuntu-latest
-      
-    steps:
-  
-    - name: Checkout repository
-      uses: actions/checkout@v4
-  
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        cache-dependency-path: Client/package-lock.json
 
-    - name: Install packages
-      working-directory: ./Client
-      run: npm install
-  
-    - name: Build site
-      working-directory: ./Client
-      run: npm run build.prod
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: Client/package-lock.json
+
+      - name: Install packages
+        working-directory: ./Client
+        run: npm install
+
+      - name: Build site
+        working-directory: ./Client
+        run: npm run build.prod

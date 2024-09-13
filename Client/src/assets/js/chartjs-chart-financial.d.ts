@@ -1,3 +1,5 @@
+// types for chartjs-chart-financial
+
 import {
   BarController,
   BarControllerChartOptions,
@@ -8,6 +10,7 @@ import {
 } from 'chart.js';
 
 declare module 'chart.js' {
+
   interface FinancialDataPoint {
     x: number,
     o: number,
@@ -44,6 +47,7 @@ declare const CandlestickController: ChartComponent & {
   prototype: BarController;
   new(chart: Chart, datasetIndex: number): BarController;
 };
+
 declare const OhlcController: ChartComponent & {
   prototype: BarController;
   new(chart: Chart, datasetIndex: number): BarController;
@@ -51,4 +55,3 @@ declare const OhlcController: ChartComponent & {
 
 declare const CandlestickElement: Element;
 declare const OhlcElement: Element;
-
