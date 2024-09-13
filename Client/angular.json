@@ -17,6 +17,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "aot": true,
             "outputPath": {
               "base": "dist/app"
             },
@@ -54,7 +55,6 @@
             },
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "src/assets/js/chartjs-chart-financial",
               "guid-typescript"
             ],
             "extractLicenses": false,
@@ -73,7 +73,7 @@
               ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
+              "sourceMap": true,
               "namedChunks": false,
               "extractLicenses": true,
               "budgets": [
