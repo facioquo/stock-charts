@@ -53,10 +53,6 @@
                 "src/styles"
               ]
             },
-            "scripts": [],
-            "allowedCommonJsDependencies": [
-              "guid-typescript"
-            ],
             "extractLicenses": false,
             "sourceMap": true,
             "optimization": false,
