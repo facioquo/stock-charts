@@ -9,11 +9,12 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ChartModule } from './chart/chart.module';
-import { SettingsModule } from './picker/settings.module';
 
 import { ConfigService } from './services/config.service';
 
 import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
+import { ApiService } from './services/api.service';
 
 @NgModule({
   declarations: [
@@ -34,10 +35,11 @@ import { AppComponent } from './app.component';
 
     // Application
     ChartModule,
-    SettingsModule
+    AppRoutingModule
   ],
   providers: [
-    ConfigService
+    ConfigService,
+    ApiService
   ],
   bootstrap: [
     AppComponent

@@ -15,16 +15,13 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular/build:application",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "aot": true,
-            "outputPath": {
-              "base": "dist/app"
-            },
+            "outputPath": "dist/app",
             "index": "src/index.html",
-            "polyfills": [
-              "src/polyfills.ts"
-            ],
+            "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -54,10 +51,16 @@
               ]
             },
             "extractLicenses": false,
-            "sourceMap": true,
+            "sourceMap": {
+              "scripts": true,
+              "styles": false,
+              "hidden": true,
+              "vendor": false
+            },
             "optimization": false,
             "namedChunks": true,
-            "browser": "src/main.ts"
+            "vendorChunk": true,
+            "commonChunk": true
           },
           "configurations": {
             "production": {
@@ -69,14 +72,21 @@
               ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": true,
+              "sourceMap": {
+                "scripts": true,
+                "styles": false,
+                "hidden": true,
+                "vendor": false
+              },
               "namedChunks": false,
               "extractLicenses": true,
+              "vendorChunk": true,
+              "commonChunk": true,
               "budgets": [
                 {
                   "type": "initial",
                   "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+                  "maximumError": "4mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -88,7 +98,7 @@
           }
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "port": 4200,
             "buildTarget": "app:build"
@@ -100,7 +110,7 @@
           }
         },
         "extract-i18n": {
-          "builder": "@angular/build:extract-i18n",
+          "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
             "buildTarget": "app:build"
           }

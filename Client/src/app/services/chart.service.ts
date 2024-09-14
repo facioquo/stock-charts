@@ -6,7 +6,7 @@ import { ConfigService } from './config.service';
 
 import 'chartjs-adapter-date-fns';
 import { enUS } from 'date-fns/locale';
-import { Guid } from "guid-typescript";
+import { v4 as Guid } from 'uuid';
 
 import {
   BarController,
@@ -781,7 +781,7 @@ export class ChartService {
 
   // helper functions
   getGuid(prefix: string = "chart"): string {
-    return `${prefix}${Guid.create().toString().replace(/-/gi, "")}`;
+    return `${prefix}${Guid()}`;
   }
 
   scrollToStart(id: string) {
