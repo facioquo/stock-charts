@@ -113,7 +113,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: web
-          path: Client/dist/app
+          path: Client/dist/app/browser
           include-hidden-files: true
 
   deploy:
