@@ -17,6 +17,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "aot": true,
             "outputPath": {
               "base": "dist/app"
             },
@@ -52,14 +53,13 @@
                 "src/styles"
               ]
             },
-            "scripts": [],
-            "allowedCommonJsDependencies": [
-              "src/assets/js/chartjs-chart-financial",
-              "src/assets/js/chartjs-plugin-crosshair",
-              "guid-typescript"
-            ],
             "extractLicenses": false,
-            "sourceMap": true,
+            "sourceMap": {
+              "scripts": true,
+              "styles": false,
+              "hidden": true,
+              "vendor": false
+            },
             "optimization": false,
             "namedChunks": true,
             "browser": "src/main.ts"
@@ -74,14 +74,19 @@
               ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
+              "sourceMap": {
+                "scripts": true,
+                "styles": false,
+                "hidden": true,
+                "vendor": false
+              },
               "namedChunks": false,
               "extractLicenses": true,
               "budgets": [
                 {
                   "type": "initial",
                   "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+                  "maximumError": "4mb"
                 },
                 {
                   "type": "anyComponentStyle",

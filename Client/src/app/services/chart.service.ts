@@ -4,29 +4,35 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ApiService } from './api.service';
 import { ConfigService } from './config.service';
 
-import Chart from 'chart.js/auto';  // import all default options
 import 'chartjs-adapter-date-fns';
-
 import { enUS } from 'date-fns/locale';
-import { Guid } from "guid-typescript";
+import { v4 as Guid } from 'uuid';
 
 import {
+  BarController,
+  BarElement,
   CartesianScaleOptions,
+  CategoryScale,
+  Chart,
   ChartConfiguration,
   ChartDataset,
+  Filler,
+  FinancialDataPoint,
   FontSpec,
+  LinearScale,
+  LineController,
+  LineElement,
+  PointElement,
   ScaleOptions,
   ScatterDataPoint,
-  Tick
+  Tick,
+  TimeSeriesScale
 } from 'chart.js';
 
 // extensions
 import {
   CandlestickController,
-  CandlestickElement,
-  FinancialDataPoint,
-  OhlcController,
-  OhlcElement
+  CandlestickElement
 } from 'src/assets/js/chartjs-chart-financial';
 
 // plugins
@@ -38,12 +44,28 @@ import CrosshairPlugin, { CrosshairOptions }
 
 // register extensions and plugins
 Chart.register(
+
+  // controllers
+  BarController,
   CandlestickController,
+  LineController,
+
+  // elements
+  BarElement,
   CandlestickElement,
-  OhlcController,
-  OhlcElement,
+  LineElement,
+  PointElement,
+
+  // plugins
   AnnotationPlugin,
-  CrosshairPlugin);
+  CrosshairPlugin,
+  Filler,
+
+  // scales
+  CategoryScale,
+  LinearScale,
+  TimeSeriesScale
+);
 
 // internal models
 import {
@@ -759,7 +781,7 @@ export class ChartService {
 
   // helper functions
   getGuid(prefix: string = "chart"): string {
-    return `${prefix}${Guid.create().toString().replace(/-/gi, "")}`;
+    return `${prefix}${Guid()}`;
   }
 
   scrollToStart(id: string) {
