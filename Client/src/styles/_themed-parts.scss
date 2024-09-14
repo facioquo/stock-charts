@@ -36,6 +36,7 @@
       a {
         text-decoration: none;
         color: inherit;
+        padding-top: 0.5rem;
 
         &:hover {
           color: rgba(230, 199, 76, 0.85);
@@ -45,15 +46,16 @@
 
     h2 {
       font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
-      font-size: 0.5em;
+      font-size: 0.6em;
       font-weight: normal;
       color: mat.m2-get-color-from-palette($accent, 500);
       line-height: 0.9 !important;
-      letter-spacing: 0.35px;
+      letter-spacing: 0.6px;
 
       a {
         text-decoration: none;
         color: inherit;
+        padding-bottom: 0.9rem;
 
         &:hover {
           color: mat.m2-get-color-from-palette($accent, 400);

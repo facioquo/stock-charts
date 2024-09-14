@@ -10,7 +10,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ChartComponent } from './chart.component';
-
 import { ChartService } from '../services/chart.service';
 
 @NgModule({
