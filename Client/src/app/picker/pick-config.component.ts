@@ -33,6 +33,8 @@ interface LineType {
 })
 export class PickConfigComponent {
 
+  // ref: https://ng-matero.github.io/extensions/components/colorpicker
+
   selection: IndicatorSelection;
   customPicker: MtxColorpicker;
   errorMessage: string;

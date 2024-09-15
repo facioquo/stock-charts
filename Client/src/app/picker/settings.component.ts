@@ -20,7 +20,6 @@ export class SettingsComponent {
 
   listings: IndicatorListing[];
   selections: IndicatorSelection[];
-  toggleColor = "accent";
 
   constructor(
     private listRef: MatDialog,

@@ -11,19 +11,19 @@
   <mat-list>
     <mat-list-item>
       <span class="no-wrap">Dark theme</span>
-      <mat-slide-toggle class="toggle" [color]="toggleColor" [(ngModel)]="cfg.isDarkTheme"
+      <mat-slide-toggle class="toggle" [(ngModel)]="cfg.isDarkTheme"
         (change)="toggleTheme($event)">
       </mat-slide-toggle>
     </mat-list-item>
     <mat-list-item>
       <span class="no-wrap">Show crosshairs</span>
-      <mat-slide-toggle class="toggle" [color]="toggleColor" [(ngModel)]="cfg.showCrosshairs"
+      <mat-slide-toggle class="toggle" [(ngModel)]="cfg.showCrosshairs"
         (change)="toggleCrosshairs($event)">
       </mat-slide-toggle>
     </mat-list-item>
     <mat-list-item>
       <span class="no-wrap">Show tooltips</span>
-      <mat-slide-toggle class="toggle" [color]="toggleColor" [(ngModel)]="cfg.showTooltips"
+      <mat-slide-toggle class="toggle" [(ngModel)]="cfg.showTooltips"
         (change)="toggleTooltips($event)">
       </mat-slide-toggle>
     </mat-list-item>
@@ -41,7 +41,7 @@
     </mat-list-option>
     <mat-list-item class="list-action" disableRipple="true">
       <button mat-raised-button color="warn" [disabled]="shown.selectedOptions.selected.length===0"
-        (click)="removeSelections($event, shown.selectedOptions.selected)" matTooltip="remove this indicator">
+        (click)="removeSelections($event, shown.selectedOptions.selected)" matTooltip="remove selected indicators">
         REMOVE SELECTED
       </button>
     </mat-list-item>

@@ -105,21 +105,8 @@ export class ChartService {
 
     const commonXaxes = this.commonXAxes();
     const crosshairOptions = this.crosshairPluginOptions();
-    const gridColor = this.cfg.isDarkTheme ? '#424242' : '#CCCCCC';
-
-    // solid background plugin (for copy/paste)
-    const backgroundPlugin =
-    {
-      id: 'background',
-      beforeDraw: (chart: Chart) => {
-        const ctx = chart.canvas.getContext('2d');
-        ctx.save();
-        ctx.globalCompositeOperation = 'destination-over';
-        ctx.fillStyle = this.cfg.isDarkTheme ? '#212121' : 'white';
-        ctx.fillRect(0, 0, chart.width, chart.height);
-        ctx.restore();
-      }
-    };
+    const labelFillColor = this.cfg.isDarkTheme ? '#12131680' : '#FAF9FD90';
+    const gridlineColor = this.cfg.isDarkTheme ? '#2E2E2E' : '#E0E0E0';
 
     // base configuration
     const config: ChartConfiguration = {
@@ -128,9 +115,6 @@ export class ChartService {
       data: {
         datasets: []
       },
-      plugins: [
-        backgroundPlugin
-      ],
       options: {
         plugins: {
           title: {
@@ -180,7 +164,7 @@ export class ChartService {
                 lineHeight: 1
               },
               showLabelBackdrop: true,
-              backdropColor: this.cfg.isDarkTheme ? '#212121' : 'white',
+              backdropColor: labelFillColor,
               backdropPadding: {
                 top: 0,
                 left: 5,
@@ -196,13 +180,7 @@ export class ChartService {
               drawOnChartArea: true,
               drawTicks: false,
               lineWidth: 0.5,
-              color: function (context) {
-                if (context.tick.label === null) {
-                  return 'transparent';
-                } else {
-                  return gridColor;
-                }
-              },
+              color: gridlineColor
             }
           }
         }
@@ -483,6 +461,8 @@ export class ChartService {
     selection: IndicatorSelection,
     listing: IndicatorListing,
     scrollToMe: boolean) {
+
+    const labelFontColor = this.cfg.isDarkTheme ? '#757575' : '#121316';
     const chartConfig = this.baseOscillatorConfig();
 
     // initialize chart datasets
@@ -569,12 +549,10 @@ export class ChartService {
     const xPos: ScaleValue = selection.chart.scales["xAxis"].min;
     const yPos: ScaleValue = selection.chart.scales["yAxis"].max;
 
-    const labelColor = this.cfg.isDarkTheme ? '#757575' : '#212121';
     const annotation: AnnotationOptions =
-      this.commonAnnotation(selection.label, labelColor, xPos, yPos, 0, 1);
+      this.commonAnnotation(selection.label, labelFontColor, xPos, yPos, 0, 1);
     selection.chart.options.plugins.annotation.annotations = { annotation };
     selection.chart.update();
-
 
     if (scrollToMe) this.scrollToEnd(container.id);
   }
@@ -606,6 +584,8 @@ export class ChartService {
     yAdj: number = 0
   ): AnnotationOptions {
 
+    const labelFillColor = this.cfg.isDarkTheme ? '#12131680' : '#FAF9FD90';
+
     const legendFont: FontSpec = {
       family: "Google Sans",
       size: 13,
@@ -619,7 +599,7 @@ export class ChartService {
       content: [label],
       font: legendFont,
       color: fontColor,
-      backgroundColor: this.cfg.isDarkTheme ? 'rgba(33,33,33,0.5)' : 'rgba(255,255,255,0.7)',
+      backgroundColor: labelFillColor,
       padding: 0,
       position: 'start',
       xScaleID: 'xAxis',

@@ -52,8 +52,7 @@
             <input matInput #hexcolor="ngModel" name="color{{i}}" [mtxColorpicker]="customPicker" [(ngModel)]="r.color"
               pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3}|[A-Fa-f0-9]{8})$" [disabled]="r.lineType==='none'">
             <mat-error *ngIf="hexcolor.invalid">Invalid HEX color</mat-error>
-            <mtx-colorpicker-toggle matSuffix [for]="customPicker" [ngStyle]="{'color':r.color}"
-              [disabled]="r.lineType==='none'">
+            <mtx-colorpicker-toggle matSuffix [for]="customPicker" [ngStyle]="{'color': r.color}" [disabled]="r.lineType==='none'">
             </mtx-colorpicker-toggle>
             <mtx-colorpicker #customPicker [content]="customPickerContent" disabled="false"></mtx-colorpicker>
           </mat-form-field>

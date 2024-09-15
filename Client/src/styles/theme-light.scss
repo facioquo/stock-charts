@@ -1,50 +1,49 @@
-@use 'sass:map';
 @use '@angular/material' as mat;
 @use 'themed-parts';
 
-// LIGHT THEME
-// see src/styles.scss for default (dark) theme
-// ref: https://www.materialpalette.com
-$primary: mat.m2-define-palette(mat.$m2-grey-palette, 900);
-$accent: mat.m2-define-palette(mat.$m2-gray-palette, 400);
-$warn: mat.m2-define-palette(mat.$m2-light-blue-palette, 700);
+// LIGHT THEME (see styles.scss for default dark theme)
+// ref: https://material.angular.io/guide/theming
 
-$theme: mat.m2-define-light-theme((color: (theme-type: light,
-        primary: $primary,
-        accent: $accent,
-        warn: $warn ),
-      typography: mat.m2-define-typography-config(),
-    ));
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+      primary: mat.$azure-palette
+    ),
+    typography: (
+      brand-family: "Rubik, Roboto, Arial, Helvetica, sans-serif",
+    ),
+    density: (
+      scale: 0
+    )
+));
 
-// apply theme (merge)
-@include mat.all-component-themes(map.merge($theme, (typography: mat.m2-define-typography-config())));
-@include themed-parts.theme($theme);
+// apply theme (base)
+:root {
 
-// DARK OVERRIDES (only)
+  @include mat.all-component-themes($theme);
+  @include themed-parts.theme($theme);
 
-// background
-.app-background {
-  background-color: #FFF;
-}
+  // DARK OVERRIDES (only)
 
-// toolbar
-.main-toolbar {
-  h1 {
-    color: mat.m2-get-color-from-palette($accent, 800);
+  // toolbar
+  .main-toolbar {
+    h1 {
+      color: mat.get-theme-color($theme, neutral, 40);
 
-    a {
-      &:hover {
-        color: mat.m2-get-color-from-palette($accent, 700);
+      a {
+        &:hover {
+          color: mat.get-theme-color($theme, neutral, 20);
+        }
       }
     }
-  }
 
-  h2 {
-    color: mat.m2-get-color-from-palette($accent, 600);
+    h2 {
+      color: mat.get-theme-color($theme, neutral, 50);
 
-    a {
-      &:hover {
-        color: mat.m2-get-color-from-palette($accent, 500);
+      a {
+        &:hover {
+          color: mat.get-theme-color($theme, neutral, 30);
+        }
       }
     }
   }
