@@ -1,0 +1,77 @@
+@use '@angular/material' as mat;
+@use 'themed-parts';
+
+// DEFAULT DARK THEME (see theme-light.scss swap file)
+// ref: https://material.angular.io/guide/theming
+
+$theme: mat.define-theme((
+  color: (
+    theme-type: dark,
+    primary: mat.$azure-palette
+    ),
+    typography: (
+      brand-family: "Rubik, Roboto, Arial, Helvetica, sans-serif",
+    ),
+    density: (
+      scale: 0
+    )
+));
+
+// apply theme (base)
+:root {
+
+  @include mat.all-component-themes($theme);
+  @include themed-parts.theme($theme);
+
+  $maxwidth: 1024px;
+
+  // toolbar
+  .main-toolbar {
+
+    max-width: $maxwidth;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 8px !important;
+
+    background-color: transparent;
+    line-height: unset !important;
+
+    h1 {
+      font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
+      font-size: 1.25em;
+      font-weight: 600;
+      color: rgba(230, 199, 76, 0.75);
+      line-height: 1.0 !important;
+      letter-spacing: 0.65px;
+
+      a {
+        text-decoration: none;
+        color: inherit;
+        padding-top: 0.5rem;
+
+        &:hover {
+          color: rgba(230, 199, 76, 0.85);
+        }
+      }
+    }
+
+    h2 {
+      font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
+      font-size: 0.55em;
+      font-weight: normal;
+      color: mat.get-theme-color($theme, neutral, 60);
+      line-height: 0.9 !important;
+      letter-spacing: 0.55px;
+
+      a {
+        text-decoration: none;
+        color: inherit;
+        padding-bottom: 0.9rem;
+
+        &:hover {
+          color: mat.get-theme-color($theme, neutral, 40);
+        }
+      }
+    }
+  }
+}
