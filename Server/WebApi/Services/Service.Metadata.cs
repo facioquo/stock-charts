@@ -14,6 +14,7 @@ public static class Metadata
         string darkGrayTransparent = "#75757515";
         string thresholdRed = "#B71C1C70";
         string thresholdRedTransparent = "#B71C1C20";
+        string thresholdGrayTransparent = "#8E8E8E80";
         string thresholdGreen = "#1B5E2070";
         string thresholdGreenTransparent = "#1B5E2020";
 
@@ -71,12 +72,12 @@ public static class Metadata
                     [
                         new() {
                             Value = 40,
-                            Color = standardGrayTransparent,
+                            Color = thresholdGrayTransparent,
                             Style = "dash"
                         },
                         new() {
                             Value = 20,
-                            Color = standardGrayTransparent,
+                            Color = thresholdGrayTransparent,
                             Style = "dash"
                         }
                     ]
@@ -123,9 +124,9 @@ public static class Metadata
                         DataName = "adxr",
                         DataType = "number",
                         LineType = "dash",
-                        DefaultColor = darkGrayTransparent
+                        LineWidth = 2,
+                        DefaultColor = standardGrayTransparent
                     }
-
                 ]
             },
 
@@ -192,17 +193,17 @@ public static class Metadata
                     [
                         new() {
                             Value = 70,
-                            Color = standardGrayTransparent,
+                            Color = thresholdGrayTransparent,
                             Style = "solid"
                         },
                         new() {
                             Value = 50,
-                            Color = standardGrayTransparent,
+                            Color = thresholdGrayTransparent,
                             Style = "dash"
                         },
                         new() {
                             Value = 30,
-                            Color = standardGrayTransparent,
+                            Color = thresholdGrayTransparent,
                             Style = "solid"
                         }
                     ]
@@ -254,7 +255,7 @@ public static class Metadata
                     [
                         new() {
                             Value = 0,
-                            Color = standardGrayTransparent,
+                            Color = thresholdGrayTransparent,
                             Style = "dash"
                         }
                     ]
@@ -316,7 +317,8 @@ public static class Metadata
                         TooltipTemplate = "ATR-STOP([P1],[P2],CLOSE) Buy Stop",
                         DataName = "buyStop",
                         DataType = "number",
-                        LineType = "solid",
+                        LineType = "dots",
+                        LineWidth = 2,
                         DefaultColor = standardGreen
                     },
                     new() {
@@ -324,7 +326,8 @@ public static class Metadata
                         TooltipTemplate = "ATR-STOP([P1],[P2],CLOSE) Sell Stop",
                         DataName = "sellStop",
                         DataType = "number",
-                        LineType = "solid",
+                        LineType = "dots",
+                        LineWidth = 2,
                         DefaultColor = standardRed
                     }
                 ]
@@ -364,7 +367,8 @@ public static class Metadata
                         TooltipTemplate = "ATR-STOP([P1],[P2],HIGH/LOW) Buy Stop",
                         DataName = "buyStop",
                         DataType = "number",
-                        LineType = "solid",
+                        LineType = "dots",
+                        LineWidth = 2,
                         DefaultColor = standardGreen
                     },
                     new() {
@@ -372,7 +376,8 @@ public static class Metadata
                         TooltipTemplate = "ATR-STOP([P1],[P2],HIGH/LOW) Sell Stop",
                         DataName = "sellStop",
                         DataType = "number",
-                        LineType = "solid",
+                        LineType = "dots",
+                        LineWidth = 2,
                         DefaultColor = standardRed
                     }
                 ]
@@ -453,7 +458,7 @@ public static class Metadata
                     [
                         new() {
                             Value = 1,
-                            Color = standardGrayTransparent,
+                            Color = thresholdGrayTransparent,
                             Style = "dash"
                         }
                     ]
@@ -638,7 +643,7 @@ public static class Metadata
                     [
                         new() {
                             Value = 0,
-                            Color = standardGrayTransparent,
+                            Color = thresholdGrayTransparent,
                             Style = "dash"
                         }
                     ]
@@ -2590,7 +2595,7 @@ public static class Metadata
                         DataName = "retraceHigh",
                         DataType = "number",
                         LineType = "dash",
-                        DefaultColor = standardGrayTransparent
+                        DefaultColor = thresholdGrayTransparent
                     },
                     new() {
                         DisplayName = "Zig Zag Retrace Low",
@@ -2598,7 +2603,7 @@ public static class Metadata
                         DataName = "retraceLow",
                         DataType = "number",
                         LineType = "dash",
-                        DefaultColor = standardGrayTransparent
+                        DefaultColor = thresholdGrayTransparent
                     }
                 ]
             },
@@ -2637,7 +2642,7 @@ public static class Metadata
                         DataName = "retraceHigh",
                         DataType = "number",
                         LineType = "dash",
-                        DefaultColor = standardGrayTransparent
+                        DefaultColor = thresholdGrayTransparent
                     },
                     new() {
                         DisplayName = "Zig Zag Retrace Low",
@@ -2645,7 +2650,7 @@ public static class Metadata
                         DataName = "retraceLow",
                         DataType = "number",
                         LineType = "dash",
-                        DefaultColor = standardGrayTransparent
+                        DefaultColor = thresholdGrayTransparent
                     }
                 ]
             }
