@@ -19,11 +19,14 @@ export class ConfigService {
     this.initTooltips();
   }
 
+  // TODO: refactor these to be generic handlers
+  // for defined settings codes, values, and storage names
+
   initTheme() {
 
     const isDark = localStorage.getItem(this.isDarkStorageName);
 
-    // if not cached, set default
+    // if not cached, set default (dark theme)
     if (isDark == undefined) {
       localStorage.setItem(this.isDarkStorageName, this.isDarkTheme.valueOf().toString())
     }
@@ -71,7 +74,7 @@ export class ConfigService {
 
     const showCrosshairs = localStorage.getItem(this.showCrosshairsStorageName);
 
-    // if not cached, set default
+    // if not cached, set default (off)
     if (showCrosshairs == undefined) {
       localStorage.setItem(this.showCrosshairsStorageName, this.showCrosshairs.valueOf().toString())
     }
@@ -86,8 +89,7 @@ export class ConfigService {
 
   changeCrosshairs(hasCrosshairs: boolean) {
 
-    // default crosshairs setting is off
-
+    // value is picked up by chart service
     this.showCrosshairs = hasCrosshairs;
 
     // store new setting
@@ -98,7 +100,7 @@ export class ConfigService {
 
     const showTooltips = localStorage.getItem(this.showTooltipsStorageName);
 
-    // if not cached, set default
+    // if not cached, set default (off)
     if (showTooltips == undefined) {
       localStorage.setItem(this.showTooltipsStorageName, this.showTooltips.valueOf().toString())
     }
@@ -108,13 +110,12 @@ export class ConfigService {
       this.showTooltips = (showTooltips === "true") ? true : false;
     }
 
-    this.changeCrosshairs(this.showCrosshairs);
+    this.changeTooltips(this.showTooltips);
   }
 
   changeTooltips(showTootlips: boolean) {
 
-    // default tooltips setting is off
-
+    // value is picked up by chart service
     this.showTooltips = showTootlips;
 
     // store new setting

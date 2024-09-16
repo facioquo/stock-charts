@@ -21,13 +21,13 @@
     <mat-list-item>
       <span class="no-wrap">Show crosshairs</span>
       <mat-slide-toggle class="toggle" labelPosition="before"
-        [(ngModel)]="cfg.showCrosshairs" (change)="toggleCrosshairs($event)">
+       [(ngModel)]="cfg.showCrosshairs" (change)="toggleCrosshairs($event)">
       </mat-slide-toggle>
     </mat-list-item>
-    <mat-list-item *ngIf="cfg.showCrosshairs">
+    <mat-list-item>
+      <span class="no-wrap">Show tooltips</span>
       <mat-slide-toggle class="toggle" labelPosition="before"
         [(ngModel)]="cfg.showTooltips" (change)="toggleTooltips($event)">
-        with tooltips
       </mat-slide-toggle>
     </mat-list-item>
   </mat-list>
@@ -55,9 +55,9 @@
     <mat-toolbar class="noselect">
       <div style="line-height: 1 !important;">Available indicators
         <br />
-        <div class="help-link">
-          <a matTooltip="indicator documentation" href="https://dotnet.stockindicators.dev/indicators/" target="_blank"
-            rel="noopener">
+        <div class="help-link">» more info in our
+          <a matTooltip="indicator documentation" target="_blank" rel="noopener"
+            href="https://dotnet.stockindicators.dev/indicators/">
             online docs
           </a>
         </div>

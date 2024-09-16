@@ -26,7 +26,8 @@ import {
   ScaleOptions,
   ScatterDataPoint,
   Tick,
-  TimeSeriesScale
+  TimeSeriesScale,
+  Tooltip
 } from 'chart.js';
 
 // extensions
@@ -49,6 +50,7 @@ Chart.register(
   BarController,
   CandlestickController,
   LineController,
+  Tooltip,
 
   // elements
   BarElement,
@@ -103,11 +105,6 @@ export class ChartService {
 
   baseConfig() {
 
-    const commonXaxes = this.commonXAxes();
-    const crosshairOptions = this.crosshairPluginOptions();
-    const labelFillColor = this.cfg.isDarkTheme ? '#12131680' : '#FAF9FD90';
-    const gridlineColor = this.cfg.isDarkTheme ? '#2E2E2E' : '#E0E0E0';
-
     // base configuration
     const config: ChartConfiguration = {
 
@@ -132,7 +129,7 @@ export class ChartService {
             clip: false,
             annotations: []
           },
-          crosshair: crosshairOptions
+          crosshair: this.crosshairPluginOptions()
         },
         layout: {
           padding: {
@@ -147,7 +144,7 @@ export class ChartService {
         maintainAspectRatio: false,
         animation: false,
         scales: {
-          xAxis: commonXaxes,
+          xAxis: this.commonXAxes(),
           yAxis: {
             alignToPixels: true,
             display: true,
@@ -164,7 +161,7 @@ export class ChartService {
                 lineHeight: 1
               },
               showLabelBackdrop: true,
-              backdropColor: labelFillColor,
+              backdropColor: this.cfg.isDarkTheme ? '#12131680' : '#FAF9FD90',
               backdropPadding: {
                 top: 0,
                 left: 5,
@@ -180,7 +177,7 @@ export class ChartService {
               drawOnChartArea: true,
               drawTicks: false,
               lineWidth: 0.5,
-              color: gridlineColor
+              color: this.cfg.isDarkTheme ? '#2E2E2E' : '#E0E0E0'
             }
           }
         }
