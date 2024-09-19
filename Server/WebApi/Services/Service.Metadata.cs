@@ -2,7 +2,7 @@ namespace WebApi.Services;
 
 public static class Metadata
 {
-    public static IEnumerable<IndicatorList> IndicatorList(string baseUrl)
+    public static IEnumerable<IndicatorListing> IndicatorListing(string baseUrl)
     {
         string standardRed = "#DD2C00";
         string standardOrange = "#EF6C00";
@@ -18,10 +18,10 @@ public static class Metadata
         string thresholdGreen = "#1B5E2070";
         string thresholdGreenTransparent = "#1B5E2020";
 
-        List<IndicatorList> listing =
+        List<IndicatorListing> listing =
         [
             // Accumulation Distribution Line (ADL)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Accumulation Distribution Line (ADL)",
                 Uiid = "ADL",
                 LegendTemplate = "ADL w/ SMA([P1])",
@@ -60,7 +60,7 @@ public static class Metadata
             },
 
             // Average Directional Index (ADX)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Average Directional Index (ADX)",
                 Uiid = "ADX",
                 LegendTemplate = "ADX([P1])",
@@ -131,7 +131,7 @@ public static class Metadata
             },
 
             // Arnaud Legoux Moving Average (ALMA)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Arnaud Legoux Moving Average (ALMA)",
                 Uiid = "ALMA",
                 LegendTemplate = "ALMA([P1],[P2],[P3])",
@@ -178,7 +178,7 @@ public static class Metadata
             },
 
             // Aroon Up/Down
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Aroon Up/Down",
                 Uiid = "AROON UP/DOWN",
                 LegendTemplate = "AROON([P1]) Up/Down",
@@ -240,7 +240,7 @@ public static class Metadata
             },
 
             // Aroon Oscillator
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Aroon Oscillator",
                 Uiid = "AROON OSC",
                 LegendTemplate = "AROON([P1]) Oscillator",
@@ -284,7 +284,7 @@ public static class Metadata
             },
 
             // ATR Trailing Stop (Close offset)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "ATR Trailing Stop (Close offset)",
                 Uiid = "ATR-STOP-CLOSE",
                 LegendTemplate = "ATR-STOP([P1],[P2],CLOSE)",
@@ -334,7 +334,7 @@ public static class Metadata
             },
 
             // ATR Trailing Stop (High/Low offset)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "ATR Trailing Stop (High/Low offset)",
                 Uiid = "ATR-STOP-HL",
                 LegendTemplate = "ATR-STOP([P1],[P2],HIGH/LOW)",
@@ -384,7 +384,7 @@ public static class Metadata
             },
 
             // Average True Range
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Average True Range (ATR)",
                 Uiid = "ATR",
                 LegendTemplate = "ATR([P1])",
@@ -415,7 +415,7 @@ public static class Metadata
             },
 
             // Average True Range Percent
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Average True Range (ATR) Percent",
                 Uiid = "ATRP",
                 LegendTemplate = "ATR([P1]) %",
@@ -446,7 +446,7 @@ public static class Metadata
             },
 
             // Beta
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Beta",
                 Uiid = "BETA",
                 LegendTemplate = "BETA([P1])",
@@ -503,7 +503,7 @@ public static class Metadata
             },
 
             // Bollinger Bands
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Bollinger Bands®",
                 Uiid = "BB",
                 LegendTemplate = "BB([P1],[P2])",
@@ -567,7 +567,7 @@ public static class Metadata
             },
 
             // Bollinger Bands %B
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Bollinger Bands® %B",
                 Uiid = "BB-PCTB",
                 LegendTemplate = "BB([P1],[P2]) %B",
@@ -631,7 +631,7 @@ public static class Metadata
             },
 
             // Chaikin Money Flow
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Chaikin Money Flow (CMF)",
                 Uiid = "CMF",
                 LegendTemplate = "CMF([P1])",
@@ -672,7 +672,7 @@ public static class Metadata
             },
 
             // Chande Momentum Oscillator
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Chande Momentum Oscillator",
                 Uiid = "CMO",
                 LegendTemplate = "CMO([P1])",
@@ -703,7 +703,7 @@ public static class Metadata
             },
 
             // Chandelier Exit (long)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Chandelier Exit (long)",
                 Uiid = "CHEXIT-LONG",
                 LegendTemplate = "CHANDELIER([P1],[P2],LONG)",
@@ -742,7 +742,7 @@ public static class Metadata
             },
 
             // Chandelier Exit (short)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Chandelier Exit (short)",
                 Uiid = "CHEXIT-SHORT",
                 LegendTemplate = "CHANDELIER([P1],[P2],SHORT)",
@@ -781,7 +781,7 @@ public static class Metadata
             },
 
             // Choppiness Index
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Choppiness Index",
                 Uiid = "CHOP",
                 LegendTemplate = "CHOP([P1])",
@@ -840,7 +840,7 @@ public static class Metadata
             },
 
             // ConnorsRSI
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "ConnorsRSI (CRSI)",
                 Uiid = "CRSI",
                 LegendTemplate = "CRSI([P1],[P2],[P3])",
@@ -915,7 +915,7 @@ public static class Metadata
             },
 
             // Doji
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Doji",
                 Uiid = "DOJI",
                 LegendTemplate = "DOJI([P1]%)",
@@ -947,7 +947,7 @@ public static class Metadata
             },
 
             // Dominant Cycle Period (HT Trendline)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Dominant Cycle Periods",
                 Uiid = "DCPERIOD",
                 LegendTemplate = "DC PERIODS",
@@ -970,7 +970,7 @@ public static class Metadata
             },
 
             // Donchian Channels
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Donchian Channels",
                 Uiid = "DONCHIAN",
                 LegendTemplate = "DONCHIAN([P1])",
@@ -1026,7 +1026,7 @@ public static class Metadata
             },
 
             // Dynamic, McGinley
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "McGinley Dynamic",
                 Uiid = "DYN",
                 LegendTemplate = "DYNAMIC([P1])",
@@ -1057,7 +1057,7 @@ public static class Metadata
             },
 
             // Elder-ray
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Elder-ray Index",
                 Uiid = "ELDER-RAY",
                 LegendTemplate = "ELDER-RAY([P1])",
@@ -1098,7 +1098,7 @@ public static class Metadata
             },
 
             // Endpoint Moving Average
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Endpoint Moving Average (EPMA)",
                 Uiid = "EPMA",
                 LegendTemplate = "EPMA([P1])",
@@ -1129,7 +1129,7 @@ public static class Metadata
             },
 
             // Exponential Moving Average
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Exponential Moving Average (EMA)",
                 Uiid = "EMA",
                 LegendTemplate = "EMA([P1])",
@@ -1160,7 +1160,7 @@ public static class Metadata
             },
 
             // Fisher Transform
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Ehlers Fisher Transform",
                 Uiid = "FISHER",
                 LegendTemplate = "FISHER([P1])",
@@ -1199,7 +1199,7 @@ public static class Metadata
             },
 
             // Fractal (Williams)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Williams Fractal (high/low)",
                 Uiid = "FRACTAL",
                 LegendTemplate = "FRACTAL([P1])",
@@ -1240,7 +1240,7 @@ public static class Metadata
             },
 
             // Fractal Chaos Bands (FCB)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Fractal Chaos Bands",
                 Uiid = "FCB",
                 LegendTemplate = "FCB([P1])",
@@ -1280,7 +1280,7 @@ public static class Metadata
             },
 
             // Hilbert Transform Instantaneous Trendline
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Hilbert Transform Instantaneous Trendline",
                 Uiid = "HT Trendline",
                 LegendTemplate = "HT TRENDLINE",
@@ -1308,7 +1308,7 @@ public static class Metadata
             },
 
             // Ichimoku Cloud
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Ichimoku Cloud",
                 Uiid = "ICHIMOKU",
                 LegendTemplate = "ICHIMOKU([P1],[P2],[P3])",
@@ -1399,7 +1399,7 @@ public static class Metadata
 
 
             // Keltner Channels
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Keltner Channels",
                 Uiid = "KELTNER",
                 LegendTemplate = "KELTNER([P1],[P2],[P3])",
@@ -1471,7 +1471,7 @@ public static class Metadata
             },
 
             // Marubozu
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Marubozu",
                 Uiid = "MARUBOZU",
                 LegendTemplate = "MARUBOZU([P1]%)",
@@ -1503,7 +1503,7 @@ public static class Metadata
             },
 
             // Money Flow Index
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Money Flow Index (MFI)",
                 Uiid = "MFI",
                 LegendTemplate = "MFI([P1])",
@@ -1562,7 +1562,7 @@ public static class Metadata
             },
 
             // Moving Average Convergence/Divergence
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Moving Average Convergence/Divergence (MACD)",
                 Uiid = "MACD",
                 LegendTemplate = "MACD([P1],[P2],[P3])",
@@ -1635,7 +1635,7 @@ public static class Metadata
             },
 
             // Parabolic SAR
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Parabolic Stop and Reverse (SAR)",
                 Uiid = "PSAR",
                 LegendTemplate = "PSAR([P1],[P2])",
@@ -1676,7 +1676,7 @@ public static class Metadata
             },
 
             // Rate of Change
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Rate of Change",
                 Uiid = "ROC",
                 LegendTemplate = "ROC([P1],[P2])",
@@ -1723,7 +1723,7 @@ public static class Metadata
             },
 
             // Relative Strength Index
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Relative Strength Index (RSI)",
                 Uiid = "RSI",
                 LegendTemplate = "RSI([P1])",
@@ -1782,7 +1782,7 @@ public static class Metadata
             },
 
             // Schaff Trend Cycle (STC)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Schaff Trend Cycle (STC)",
                 Uiid = "STC",
                 LegendTemplate = "STC([P1],[P2],[P3])",
@@ -1857,7 +1857,7 @@ public static class Metadata
             },
 
             // Slope
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Slope",
                 Uiid = "SLOPE",
                 LegendTemplate = "SLOPE([P1])",
@@ -1888,7 +1888,7 @@ public static class Metadata
             },
 
             // Linear Regression
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Linear Regression",
                 Uiid = "LINEAR",
                 LegendTemplate = "LINEAR([P1])",
@@ -1919,7 +1919,7 @@ public static class Metadata
             },
 
             // Simple Moving Average
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Simple Moving Average (SMA)",
                 Uiid = "SMA",
                 LegendTemplate = "SMA([P1])",
@@ -1950,7 +1950,7 @@ public static class Metadata
             },
 
             // Standard Deviation (absolute)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Standard Deviation (absolute)",
                 Uiid = "STDEV",
                 LegendTemplate = "STDEV([P1])",
@@ -1997,7 +1997,7 @@ public static class Metadata
             },
 
             // Standard Deviation (z-score)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Standard Deviation (Z-Score)",
                 Uiid = "STDEV-ZSCORE",
                 LegendTemplate = "STDEV-ZSCORE([P1])",
@@ -2028,7 +2028,7 @@ public static class Metadata
             },
 
             // STARC Bands
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "STARC Bands",
                 Uiid = "STARC",
                 LegendTemplate = "STARC([P1],[P2],[P3])",
@@ -2100,7 +2100,7 @@ public static class Metadata
             },
 
             // Stochastic Momentum Index
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Stochastic Momentum Index",
                 Uiid = "SMI",
                 LegendTemplate = "SMI([P1],[P2],[P3],[P4])",
@@ -2188,7 +2188,7 @@ public static class Metadata
             },
 
             // Stochastic Oscillator
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Stochastic Oscillator",
                 Uiid = "STO",
                 LegendTemplate = "STOCH %K([P1]) %D([P2])",
@@ -2260,7 +2260,7 @@ public static class Metadata
             },
 
             // Stochastic RSI
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Stochastic RSI",
                 Uiid = "STOCHRSI",
                 LegendTemplate = "STOCH-RSI ([P1],[P2],[P3],[P4])",
@@ -2348,7 +2348,7 @@ public static class Metadata
             },
 
             // SuperTrend
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "SuperTrend",
                 Uiid = "SUPERTREND",
                 LegendTemplate = "SUPERTREND([P1],[P2])",
@@ -2405,7 +2405,7 @@ public static class Metadata
             },
 
             // Ulcer Index
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Ulcer Index (UI)",
                 Uiid = "ULCER",
                 LegendTemplate = "ULCER([P1])",
@@ -2436,7 +2436,7 @@ public static class Metadata
             },
 
             // Vortex Indicator
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Vortex Indicator",
                 Uiid = "VORTEX",
                 LegendTemplate = "VORTEX([P1])",
@@ -2475,7 +2475,7 @@ public static class Metadata
             },
 
             // Williams Alligator
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Williams Alligator",
                 Uiid = "ALLIGATOR",
                 LegendTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6])",
@@ -2562,7 +2562,7 @@ public static class Metadata
             },
 
             // Zig Zag (close)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Zig Zag (close)",
                 Uiid = "ZIGZAG-CL",
                 LegendTemplate = "ZIGZAG([P1]% CLOSE)",
@@ -2609,7 +2609,7 @@ public static class Metadata
             },
 
             // Zig Zag (high/low)
-            new IndicatorList {
+            new IndicatorListing {
                 Name = "Zig Zag (high/low)",
                 Uiid = "ZIGZAG-HL",
                 LegendTemplate = "ZIGZAG([P1]% HIGH/LOW)",

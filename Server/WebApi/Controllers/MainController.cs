@@ -23,13 +23,13 @@ public class MainController(QuoteService quoteService) : ControllerBase
     }
 
     [HttpGet("indicators")]
-    public IActionResult GetIndicators()
+    public IActionResult GetIndicatorCatalog()
     {
         Response.Headers.CacheControl = "public, max-age=3600"; // 1 hour TTL
         Response.Headers.ETag = "YYYY.MM.DD"; // only changes with deployment
         Response.Headers.LastModified = DateTime.UtcNow.ToString("R");
 
-        return Ok(Metadata.IndicatorList($"{Request.Scheme}://{Request.Host}"));
+        return Ok(Metadata.IndicatorListing($"{Request.Scheme}://{Request.Host}"));
     }
 
 

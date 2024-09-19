@@ -1,7 +1,7 @@
 namespace WebApi.Services;
 
 [Serializable]
-public record class IndicatorList
+public record class IndicatorListing
 {
     public required string Name { get; init; }
     public required string Uiid { get; init; }
