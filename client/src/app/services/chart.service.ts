@@ -1,22 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs/internal/Observable';
 
 import { ApiService } from './api.service';
-import { ConfigService } from './config.service';
+import { ChartConfigService } from './chart-config.service';
+import { UserConfigService } from './user-config.service';
 
-import 'chartjs-adapter-date-fns';
-import { enUS } from 'date-fns/locale';
 import { v4 as Guid } from 'uuid';
 
 import {
   BarController,
   BarElement,
-  CartesianScaleOptions,
-  CategoryScale,
   Chart,
-  ChartConfiguration,
+  ChartData,
   ChartDataset,
-  Filler,
   FinancialDataPoint,
   FontSpec,
   LinearScale,
@@ -40,7 +37,7 @@ import {
 import AnnotationPlugin, { AnnotationOptions, ScaleValue }
   from 'chartjs-plugin-annotation';
 
-import CrosshairPlugin, { CrosshairOptions }
+import CrosshairPlugin
   from 'src/assets/js/chartjs-plugin-crosshair';
 
 // register extensions and plugins
@@ -61,10 +58,8 @@ Chart.register(
   // plugins
   AnnotationPlugin,
   CrosshairPlugin,
-  Filler,
 
   // scales
-  CategoryScale,
   LinearScale,
   TimeSeriesScale
 );
@@ -84,239 +79,20 @@ import {
 @Injectable()
 export class ChartService {
 
-  yAxisTicks: Tick[] = [];
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
   chartOverlay: Chart;
   loading = true;
+  extraBars = 7;
 
   constructor(
     private readonly api: ApiService,
-    private readonly cfg: ConfigService
+    private readonly cfg: ChartConfigService,
+    private readonly usr: UserConfigService  // TODO: move usage to config service
   ) { }
 
-  // CHART CONFIGURATIONS
 
-  resetCharts() {
-
-    this.selections = [];
-    this.loadCharts();
-  }
-
-  baseConfig() {
-
-    // base configuration
-    const config: ChartConfiguration = {
-
-      type: 'candlestick',
-      data: {
-        datasets: []
-      },
-      options: {
-        plugins: {
-          title: {
-            display: false
-          },
-          legend: {
-            display: false
-          },
-          tooltip: {
-            enabled: this.cfg.showTooltips,
-            mode: 'interpolate',
-            intersect: false
-          },
-          annotation: {
-            clip: false,
-            annotations: []
-          },
-          crosshair: this.crosshairPluginOptions()
-        },
-        layout: {
-          padding: {
-            top: 0,
-            left: 1,
-            bottom: 0,
-            right: 1
-          },
-          autoPadding: false
-        },
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: false,
-        scales: {
-          xAxis: this.commonXAxes(),
-          yAxis: {
-            alignToPixels: true,
-            display: true,
-            type: 'linear',
-            axis: 'y',
-            position: 'right',
-            beginAtZero: false,
-            ticks: {
-              display: true,
-              mirror: true,
-              font: {
-                family: "Google Sans",
-                size: 12,
-                lineHeight: 1
-              },
-              showLabelBackdrop: true,
-              backdropColor: this.cfg.isDarkTheme ? '#12131680' : '#FAF9FD90',
-              backdropPadding: {
-                top: 0,
-                left: 5,
-                bottom: 0,
-                right: 0
-              },
-              padding: 0
-            },
-            border: {
-              display: false
-            },
-            grid: {
-              drawOnChartArea: true,
-              drawTicks: false,
-              lineWidth: 0.5,
-              color: this.cfg.isDarkTheme ? '#2E2E2E' : '#E0E0E0'
-            }
-          }
-        }
-      }
-    };
-
-    return config;
-  }
-
-  baseOverlayConfig(): ChartConfiguration {
-
-    const config = this.baseConfig();
-    config.type = 'candlestick';
-
-    // format y-axis, add dollar sign
-    config.options.scales.yAxis.ticks.callback = (value, index, values) => {
-
-      this.yAxisTicks = values;
-
-      if (index === 0 || index === values.length - 1) return null;
-      else
-        return '$' + value;
-    };
-
-    // volume axis
-    config.options.scales.volumeAxis = {
-      display: false,
-      type: 'linear',
-      axis: 'y',
-      position: 'left',
-      beginAtZero: true,
-      padding: 0,
-      border: {
-        display: false
-      }
-    } as ScaleOptions;
-
-    return config;
-  }
-
-  baseOscillatorConfig(): ChartConfiguration {
-
-    const config = this.baseConfig();
-    const y = config.options.scales.yAxis as CartesianScaleOptions;
-
-    // remove x-axis
-    config.options.scales.xAxis.display = false;
-
-    // size to data, instead of next tick
-    // y.bounds = "data";
-
-    // remove first and last y-axis labels
-    y.ticks.callback = (value: number, index, values) => {
-
-      this.yAxisTicks = values;
-      const v = Math.abs(value);
-
-      if (index === 0 || index === values.length - 1) return null;
-
-      // otherwise, condense large/small display values
-      else if (v > 10000000000)
-        return Math.trunc(value / 1000000000) + "B";
-      else if (v > 10000000)
-        return Math.trunc(value / 1000000) + "M";
-      else if (v > 10000)
-        return Math.trunc(value / 1000) + "K";
-      else if (v > 10)
-        return Math.trunc(value);
-      else if (v > 0)
-        return Math.round((value + Number.EPSILON) * 10) / 10;
-      else if (v > 0.001)
-        return Math.round((value + Number.EPSILON) * 100000) / 100000;
-      else
-        return Math.round((value + Number.EPSILON) * 100000000) / 100000000;
-    };
-
-    return config;
-  }
-
-  commonXAxes(): ScaleOptions {
-
-    const axes: ScaleOptions = {
-      alignToPixels: true,
-      display: false,
-      type: 'timeseries',
-      time: {
-        unit: 'day'
-      },
-      adapters: {
-        date: {
-          locale: enUS
-        },
-      },
-      ticks: {
-        display: false,
-        source: "auto",
-        padding: 0,
-        autoSkip: true,
-        maxRotation: 0,
-        minRotation: 0,
-        font: {
-          size: 9
-        },
-      },
-      border: {
-        display: false
-      },
-      grid: {
-        display: false,
-        drawOnChartArea: false
-      }
-    };
-
-    return axes;
-  }
-
-  crosshairPluginOptions(): CrosshairOptions {
-
-    if (this.cfg.showCrosshairs == false) return null;
-
-    const crosshairOptions: CrosshairOptions = {
-      line: {
-        color: '#F66',                                      // crosshair line color
-        width: 1                                            // crosshair line width
-      },
-      sync: {
-        enabled: true,                                      // enable trace line syncing with other charts
-        group: 1,                                           // chart group (can be unique set of groups)
-        suppressTooltips: true                              // suppress tooltips (on other chart) when synced tracer
-      },
-      snap: {
-        enabled: true                                       // snap to data points
-      }
-    };
-
-    return crosshairOptions;
-  }
-
-  // INDICATOR SELECTIONS
+  //#region INDICATOR SELECTIONS
   defaultSelection(uiid: string): IndicatorSelection {
 
     const listing = this.listings.find(x => x.uiid == uiid);
@@ -363,18 +139,215 @@ export class ChartService {
     return selection;
   }
 
+  addSelectionPicked(
+    selection: IndicatorSelection,
+    listing: IndicatorListing): Observable<any> {
+
+    const green = "#2E7D32";
+    const gray = "#9E9E9E";
+    const red = "#DD2C00";
+
+    // load selection to chart
+    const obs = new Observable((observer) => {
+
+      // TODO: we really only want to return API observable
+      // here to catch backend validation errors only, not more.
+
+      // fetch API data
+      this.api.getSelectionData(selection, listing)
+        .subscribe({
+
+          // compose datasets
+          next: (data: any[]) => {
+
+            // compose datasets
+            // parse each dataset
+            selection.results
+              .forEach((result: IndicatorResult) => {
+
+                // initialize dataset
+                const resultConfig = listing.results.find(x => x.dataName == result.dataName);
+                const dataset = this.cfg.baseDataset(result, resultConfig);
+                const dataPoints: ScatterDataPoint[] = [];
+                const pointColor: string[] = [];
+                const pointRotation: number[] = [];
+
+                // populate data
+                data.forEach(row => {
+
+                  let yValue = row[result.dataName];
+
+                  // apply candle pointers
+                  if (yValue && listing.category == "candlestick-pattern") {
+
+                    switch (row["match"]) {
+
+                      case -100:
+                        yValue = 1.01 * row["candle"].high;
+                        pointColor.push(red);
+                        pointRotation.push(180);
+                        break;
+
+                      case 100:
+                        yValue = 0.99 * row["candle"].low;
+                        pointColor.push(green);
+                        pointRotation.push(0);
+                        break;
+
+                      default:
+                        yValue = 0.99 * row["candle"].low;
+                        pointColor.push(gray);
+                        pointRotation.push(0);
+                        break;
+                    }
+                  }
+
+                  else {
+                    pointColor.push(resultConfig.defaultColor);
+                    pointRotation.push(0);
+                  }
+
+                  dataPoints.push({
+                    x: new Date(row.date).valueOf(),
+                    y: yValue
+                  });
+                });
+
+                // add extra bars
+                const nextDate = new Date(Math.max.apply(null, dataPoints.map(h => new Date(h.x))));
+
+                for (let i = 1; i < this.extraBars; i++) {
+                  nextDate.setDate(nextDate.getDate() + 1);
+                  dataPoints.push({
+                    x: new Date(nextDate).valueOf(),
+                    y: null
+                  });
+                }
+
+                // custom candlestick pattern points
+                if (listing.category == "candlestick-pattern" && dataset.type != 'bar') {
+                  dataset.pointRotation = pointRotation;
+                  dataset.pointBackgroundColor = pointColor;
+                  dataset.pointBorderColor = pointColor;
+                }
+
+                dataset.data = dataPoints;
+                result.dataset = dataset;
+              });
+
+            // replace tokens with values
+            selection = this.selectionTokenReplacement(selection);
+
+            // add to chart
+            this.displaySelection(selection, listing, false);
+
+            // inform caller
+            observer.next();
+          },
+          error: (e: HttpErrorResponse) => {
+            console.log(e);
+            observer.error(e);
+          }
+        });
+    });
+
+    return obs;
+  }
+
   addSelectionWithoutScroll(
     selection: IndicatorSelection
   ) {
+    const green = "#2E7D32";
+    const red = "#DD2C00";
+    const gray = "#9E9E9E";
 
     // lookup config data
     const listing = this.listings.find(x => x.uiid == selection.uiid);
 
-    this.api.getSelection(selection, listing)
+    this.api.getSelectionData(selection, listing)
       .subscribe({
-        next: (selectionWithData: IndicatorSelection) => {
+        next: (apidata: any[]) => {
 
-          this.displaySelection(selectionWithData, listing, false);
+          // compose datasets
+          // parse each dataset
+          selection.results
+            .forEach((result: IndicatorResult) => {
+
+              // initialize dataset
+              const resultConfig = listing.results.find(x => x.dataName == result.dataName);
+              const dataset = this.cfg.baseDataset(result, resultConfig);
+              const data: ScatterDataPoint[] = [];
+              const pointColor: string[] = [];
+              const pointRotation: number[] = [];
+
+              // populate data
+              apidata.forEach(row => {
+
+                let yValue = row[result.dataName];
+
+                // apply candle pointers
+                if (yValue && listing.category == "candlestick-pattern") {
+
+                  switch (row["match"]) {
+
+                    case -100:
+                      yValue = 1.01 * row["candle"].high;
+                      pointColor.push(red);
+                      pointRotation.push(180);
+                      break;
+
+                    case 100:
+                      yValue = 0.99 * row["candle"].low;
+                      pointColor.push(green);
+                      pointRotation.push(0);
+                      break;
+
+                    default:
+                      yValue = 0.99 * row["candle"].low;
+                      pointColor.push(gray);
+                      pointRotation.push(0);
+                      break;
+                  }
+                }
+
+                else {
+                  pointColor.push(resultConfig.defaultColor);
+                  pointRotation.push(0);
+                }
+
+                data.push({
+                  x: new Date(row.date).valueOf(),
+                  y: yValue
+                });
+              });
+
+              // add extra bars
+              const nextDate = new Date(Math.max.apply(null, data.map(h => new Date(h.x))));
+
+              for (let i = 1; i < this.extraBars; i++) {
+                nextDate.setDate(nextDate.getDate() + 1);
+                data.push({
+                  x: new Date(nextDate).valueOf(),
+                  y: null
+                });
+              }
+
+              // custom candlestick pattern points
+              if (listing.category == "candlestick-pattern" && dataset.type != 'bar') {
+                dataset.pointRotation = pointRotation;
+                dataset.pointBackgroundColor = pointColor;
+                dataset.pointBorderColor = pointColor;
+              }
+
+              dataset.data = data;
+              result.dataset = dataset;
+            });
+
+          // replace tokens with values
+          selection = this.selectionTokenReplacement(selection);
+
+          // add to chart
+          this.displaySelection(selection, listing, false);
         },
         error: (e: HttpErrorResponse) => { console.log(e); }
       });
@@ -437,8 +410,9 @@ export class ChartService {
 
     localStorage.setItem('selections', JSON.stringify(selections));
   }
+  //#endregion
 
-  // CHARTS OPERATIONS
+  //#region CHARTS OPERATIONS
   addSelectionToOverlayChart(
     selection: IndicatorSelection,
     scrollToMe: boolean) {
@@ -459,8 +433,8 @@ export class ChartService {
     listing: IndicatorListing,
     scrollToMe: boolean) {
 
-    const labelFontColor = this.cfg.isDarkTheme ? '#757575' : '#121316';
-    const chartConfig = this.baseOscillatorConfig();
+    const labelFontColor = this.usr.isDarkTheme ? '#757575' : '#121316';
+    const chartConfig = this.cfg.baseOscillatorConfig();
 
     // initialize chart datasets
     chartConfig.data = {
@@ -581,7 +555,7 @@ export class ChartService {
     yAdj: number = 0
   ): AnnotationOptions {
 
-    const labelFillColor = this.cfg.isDarkTheme ? '#12131680' : '#FAF9FD90';
+    const labelFillColor = this.usr.isDarkTheme ? '#12131680' : '#FAF9FD90';
 
     const legendFont: FontSpec = {
       family: "Google Sans",
@@ -610,7 +584,45 @@ export class ChartService {
     return annotation;
   }
 
-  // DATA OPERATIONS
+  updateChartTheme() {
+
+    // strategically update chart theme
+    // without destroying and re-creating charts
+
+    // update overlay chart
+    if (this.chartOverlay) {
+
+      // carry over volume axis size (computed)
+      const volumeAxisSize = this.chartOverlay.scales.volumeAxis.max;
+
+      // overlay configuration (with new theme settings)
+      this.chartOverlay.options = this.cfg.baseOverlayConfig(volumeAxisSize).options;
+      this.chartOverlay.update();
+    }
+
+    // update oscillator charts
+    this.selections.forEach((selection: IndicatorSelection) => {
+
+      if (selection.chart) {
+        selection.chart.options.plugins.crosshair = this.cfg.crosshairPluginOptions();
+        selection.chart.update();
+      }
+    });
+
+    // update annotations
+    this.updateOverlayAnnotations();
+    this.chartOverlay.update();
+
+    // update grid colors
+
+
+
+
+  }
+
+  //#endregion
+
+  //#region DATA OPERATIONS
   loadCharts() {
     this.api.getQuotes()
       .subscribe({
@@ -637,7 +649,6 @@ export class ChartService {
 
   loadOverlayChart(quotes: Quote[]) {
 
-    const chartConfig = this.baseOverlayConfig();
     const candleOptions = Chart.defaults.elements["candlestick"];
 
     // custom border colors
@@ -680,7 +691,7 @@ export class ChartService {
     // add extra bars
     const nextDate = new Date(Math.max.apply(null, quotes.map(h => new Date(h.date))));
 
-    for (let i = 1; i < this.api.extraBars; i++) {
+    for (let i = 1; i < this.extraBars; i++) {
       nextDate.setDate(nextDate.getDate() + 1);
 
       // intentionally excluding price (gap covered by volume)
@@ -691,7 +702,7 @@ export class ChartService {
     }
 
     // define base datasets
-    chartConfig.data = {
+    const chartData: ChartData = {
       datasets: [
         {
           type: 'candlestick',
@@ -713,9 +724,14 @@ export class ChartService {
       ]
     };
 
-    // get size for volume axis
+    // volume axis size
     const volumeAxisSize = 20 * (sumVol / volume.length) || 0;
-    chartConfig.options.scales.volumeAxis.max = volumeAxisSize;
+
+    // default overlay chart configuration
+    const chartConfig = this.cfg.baseOverlayConfig(volumeAxisSize);
+
+    // add chart data
+    chartConfig.data = chartData;
 
     // compose chart
     if (this.chartOverlay) this.chartOverlay.destroy();
@@ -756,7 +772,27 @@ export class ChartService {
     }
   }
 
+  resetCharts() {
+
+    this.selections = [];
+    this.loadCharts();
+  }
+
   // helper functions
+
+  selectionTokenReplacement(selection: IndicatorSelection): IndicatorSelection {
+
+    selection.params.forEach((param, index) => {
+
+      selection.label = selection.label.replace(`[P${index + 1}]`, param.value.toString());
+
+      selection.results.forEach(r => {
+        r.label = r.label.replace(`[P${index + 1}]`, param.value.toString());
+      });
+    });
+    return selection;
+  }
+
   getGuid(prefix: string = "chart"): string {
     return `${prefix}${Guid()}`;
   }
@@ -774,4 +810,5 @@ export class ChartService {
       element.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });
     }, 200);
   }
+  //#endregion
 }

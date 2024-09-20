@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 @Injectable()
-export class ConfigService {
+export class UserConfigService {
 
   // default settings
   isDarkTheme: boolean = true;

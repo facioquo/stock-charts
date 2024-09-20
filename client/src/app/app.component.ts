@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { SettingsComponent } from './picker/settings.component';
 
 import { ChartService } from './services/chart.service';
-import { ConfigService } from './services/config.service';
+import { UserConfigService } from './services/user-config.service';
 
 @Component({
   selector: 'app-root',
@@ -14,14 +14,14 @@ export class AppComponent implements OnInit {
 
   constructor(
     public readonly cht: ChartService,
-    public readonly cfg: ConfigService,
+    public readonly usr: UserConfigService,
     private readonly settingsDialog: MatDialog
   ) { }
 
   ngOnInit(): void {
 
     // load user preferences
-    this.cfg.loadSettings();
+    this.usr.loadSettings();
   }
 
   // SETTINGS DIALOG

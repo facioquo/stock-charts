@@ -6,7 +6,6 @@ import { MtxColorpicker } from '@ng-matero/extensions/colorpicker';
 import { ColorEvent } from 'ngx-color';
 import { TinyColor } from '@ctrl/tinycolor';
 
-import { ApiService } from '../services/api.service';
 import { ChartService } from '../services/chart.service';
 
 import {
@@ -77,26 +76,27 @@ export class PickConfigComponent {
     @Inject(MAT_DIALOG_DATA)
     public listing: IndicatorListing,
     private dialogRef: MatDialogRef<PickConfigComponent>,
-    private cs: ChartService,
-    private api: ApiService
+    private cht: ChartService
   ) {
 
     // pre-populate selection
-    this.selection = this.cs.defaultSelection(listing.uiid);
+    this.selection = this.cht.defaultSelection(listing.uiid);
   }
-
 
   onSubmit(): void {
 
-    this.api.getSelection(this.selection, this.listing)
+    // try to add selection to chart
+    this.cht.addSelectionPicked(this.selection, this.listing)
       .subscribe({
-        next: (selectionWithData: IndicatorSelection) => {
 
-          this.cs.displaySelection(selectionWithData, this.listing, true);
+        // successfully added to chart
+        next: () => {
           this.errorMessage = undefined;
           this.closeButtonLabel = "RESOLVED ...";
           this.dialogRef.close();
         },
+
+        // inform user of [validation] error
         error: (e: HttpErrorResponse) => {
           console.log(e);
           this.errorMessage = e.error;

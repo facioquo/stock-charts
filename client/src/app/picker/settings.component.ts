@@ -6,7 +6,7 @@ import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
 import { ChartService } from '../services/chart.service';
-import { ConfigService } from '../services/config.service';
+import { UserConfigService } from '../services/user-config.service';
 
 import { IndicatorListing, IndicatorSelection } from '../chart/chart.models';
 import { PickConfigComponent } from './pick-config.component';
@@ -25,7 +25,7 @@ export class SettingsComponent {
     private listRef: MatDialog,
     private picker: MatDialog,
     public cht: ChartService,
-    public cfg: ConfigService
+    public usr: UserConfigService
   ) {
     this.listings = this.cht.listings;
     this.selections = this.cht.selections;
@@ -41,17 +41,17 @@ export class SettingsComponent {
   }
 
   toggleTheme(event: MatSlideToggleChange) {
-    this.cfg.changeTheme(event.checked);
+    this.usr.changeTheme(event.checked);
     this.cht.resetCharts();
   }
 
   toggleCrosshairs(event: MatSlideToggleChange) {
-    this.cfg.changeCrosshairs(event.checked);
+    this.usr.changeCrosshairs(event.checked);
     this.cht.resetCharts();
   }
 
   toggleTooltips(event: MatSlideToggleChange) {
-    this.cfg.changeTooltips(event.checked);
+    this.usr.changeTooltips(event.checked);
     this.cht.resetCharts();
   }
 

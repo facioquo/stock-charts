@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ChartComponent } from './chart.component';
 import { ChartService } from '../services/chart.service';
+import { ChartConfigService } from '../services/chart-config.service';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { ChartService } from '../services/chart.service';
   ],
   providers: [
     ChartService,
+    ChartConfigService,
     provideHttpClient(withInterceptorsFromDi())
   ]
 })

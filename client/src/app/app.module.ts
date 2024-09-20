@@ -10,7 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ChartModule } from './chart/chart.module';
 
-import { ConfigService } from './services/config.service';
+import { UserConfigService } from './services/user-config.service';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -38,7 +38,7 @@ import { ApiService } from './services/api.service';
     AppRoutingModule
   ],
   providers: [
-    ConfigService,
+    UserConfigService,
     ApiService
   ],
   bootstrap: [
