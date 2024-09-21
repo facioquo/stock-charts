@@ -1,15 +1,23 @@
 import { Injectable } from '@angular/core';
 
+interface Settings {
+  isDarkTheme: boolean;
+  showCrosshairs: boolean;
+  showTooltips: boolean;
+}
+
 @Injectable()
 export class UserConfigService {
 
   // default settings
-  isDarkTheme: boolean = true;
-  showCrosshairs: boolean = false;
-  showTooltips: boolean = false;
+  settings: Settings = {
+    isDarkTheme: true,
+    showCrosshairs: false,
+    showTooltips: false
+  };
 
   // storage names
-  isDarkStorageName: string = "isDark";
+  isDarkThemeStorageName: string = "isDarkTheme";
   showCrosshairsStorageName: string = "showCrosshairs";
   showTooltipsStorageName: string = "showTooltips";
 
@@ -24,22 +32,22 @@ export class UserConfigService {
 
   initTheme() {
 
-    const isDark = localStorage.getItem(this.isDarkStorageName);
+    const isDarkTheme = localStorage.getItem(this.isDarkThemeStorageName);
 
     // if not cached, set default (dark theme)
-    if (isDark == undefined) {
-      localStorage.setItem(this.isDarkStorageName, this.isDarkTheme.valueOf().toString())
+    if (isDarkTheme == undefined) {
+      localStorage.setItem(this.isDarkThemeStorageName, this.settings.isDarkTheme.valueOf().toString())
     }
 
     // otherwise, use value
     else {
-      this.isDarkTheme = (isDark === "true") ? true : false;
+      this.settings.isDarkTheme = (isDarkTheme === "true") ? true : false;
     }
 
-    this.changeTheme(this.isDarkTheme);
+    this.changeTheme(this.settings.isDarkTheme);
   }
 
-  changeTheme(isDark: boolean) {
+  changeTheme(isDarkTheme: boolean) {
 
     // default site style is dark.
     // we override by adding the light theme CSS file in <head>
@@ -52,7 +60,7 @@ export class UserConfigService {
     lightElement.classList.add(refClassName);
 
     // restore dark theme
-    if (isDark) {
+    if (isDarkTheme) {
       const linkExists = document.head.querySelector(`link[rel="stylesheet"].${refClassName}`)
 
       if (linkExists) {
@@ -67,7 +75,7 @@ export class UserConfigService {
     }
 
     // store new setting
-    localStorage.setItem(this.isDarkStorageName, isDark.valueOf().toString())
+    localStorage.setItem(this.isDarkThemeStorageName, isDarkTheme.valueOf().toString())
   }
 
   initCrosshairs() {
@@ -76,21 +84,21 @@ export class UserConfigService {
 
     // if not cached, set default (off)
     if (showCrosshairs == undefined) {
-      localStorage.setItem(this.showCrosshairsStorageName, this.showCrosshairs.valueOf().toString())
+      localStorage.setItem(this.showCrosshairsStorageName, this.settings.showCrosshairs.valueOf().toString())
     }
 
     // otherwise, use value
     else {
-      this.showCrosshairs = (showCrosshairs === "true") ? true : false;
+      this.settings.showCrosshairs = (showCrosshairs === "true") ? true : false;
     }
 
-    this.changeCrosshairs(this.showCrosshairs);
+    this.changeCrosshairs(this.settings.showCrosshairs);
   }
 
   changeCrosshairs(hasCrosshairs: boolean) {
 
     // value is picked up by chart service
-    this.showCrosshairs = hasCrosshairs;
+    this.settings.showCrosshairs = hasCrosshairs;
 
     // store new setting
     localStorage.setItem(this.showCrosshairsStorageName, hasCrosshairs.valueOf().toString())
@@ -102,21 +110,21 @@ export class UserConfigService {
 
     // if not cached, set default (off)
     if (showTooltips == undefined) {
-      localStorage.setItem(this.showTooltipsStorageName, this.showTooltips.valueOf().toString())
+      localStorage.setItem(this.showTooltipsStorageName, this.settings.showTooltips.valueOf().toString())
     }
 
     // otherwise, use value
     else {
-      this.showTooltips = (showTooltips === "true") ? true : false;
+      this.settings.showTooltips = (showTooltips === "true") ? true : false;
     }
 
-    this.changeTooltips(this.showTooltips);
+    this.changeTooltips(this.settings.showTooltips);
   }
 
   changeTooltips(showTootlips: boolean) {
 
     // value is picked up by chart service
-    this.showTooltips = showTootlips;
+    this.settings.showTooltips = showTootlips;
 
     // store new setting
     localStorage.setItem(this.showTooltipsStorageName, showTootlips.valueOf().toString())

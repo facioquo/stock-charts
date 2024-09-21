@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
-import { ChartService } from '../services/chart.service';
+import { ChartControlService } from '../services/chart-control.service';
 import { UserConfigService } from '../services/user-config.service';
 
 import { IndicatorListing, IndicatorSelection } from '../chart/chart.models';
@@ -24,7 +24,7 @@ export class SettingsComponent {
   constructor(
     private listRef: MatDialog,
     private picker: MatDialog,
-    public cht: ChartService,
+    public cht: ChartControlService,
     public usr: UserConfigService
   ) {
     this.listings = this.cht.listings;
@@ -42,17 +42,17 @@ export class SettingsComponent {
 
   toggleTheme(event: MatSlideToggleChange) {
     this.usr.changeTheme(event.checked);
-    this.cht.resetCharts();
+    this.cht.onSettingsChange();
   }
 
   toggleCrosshairs(event: MatSlideToggleChange) {
     this.usr.changeCrosshairs(event.checked);
-    this.cht.resetCharts();
+    this.cht.onSettingsChange();
   }
 
   toggleTooltips(event: MatSlideToggleChange) {
     this.usr.changeTooltips(event.checked);
-    this.cht.resetCharts();
+    this.cht.onSettingsChange();
   }
 
   openIndicatorSettings(listing: IndicatorListing): void {
@@ -61,12 +61,16 @@ export class SettingsComponent {
     this.listRef.closeAll();
 
     // open indicator settings for indicator to add
-    this.picker.open(PickConfigComponent, {
-      autoFocus: "dialog",
-      data: listing
-    }).afterClosed()
+    this.picker
+      .open(PickConfigComponent, {
+        autoFocus: "dialog",
+        data: listing
+       })
+      .afterClosed()
 
       // reopen main settings after close
+      // TODO: return "reopen" choice, not just close
+      // TODO: scroll to chart if not reopened
       .subscribe(() => {
         this.listRef.open(SettingsComponent, {
           autoFocus: "dialog"

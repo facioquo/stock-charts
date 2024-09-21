@@ -82,30 +82,8 @@ export class ChartConfigService {
       data: {
         datasets: []
       },
-      options: this.baseChartOptions()
+      options: this.baseOverlayOptions(volumeAxisSize)
     };
-
-    // format y-axis, add dollar sign
-    config.options.scales.yAxis.ticks.callback = (value, index, values) => {
-
-      if (index === 0 || index === values.length - 1) return null;
-      else
-        return '$' + value;
-    };
-
-    // volume axis
-    config.options.scales.volumeAxis = {
-      display: false,
-      type: 'linear',
-      axis: 'y',
-      position: 'left',
-      beginAtZero: true,
-      padding: 0,
-      border: {
-        display: false
-      },
-      max: volumeAxisSize
-    } as ScaleOptions;
 
     return config;
   }
@@ -119,23 +97,143 @@ export class ChartConfigService {
       data: {
         datasets: []
       },
-      options: this.baseChartOptions()
+      options: this.baseOscillatorOptions()
     };
 
-    // remove x-axis
-    config.options.scales.xAxis.display = false;
+    return config;
+  }
 
-    // format y-axis
-    const y = config.options.scales.yAxis as CartesianScaleOptions;
+  baseChartOptions(): ChartOptions {
+
+    const options: ChartOptions = {
+      plugins: {
+        title: {
+          display: false
+        },
+        legend: {
+          display: false
+        },
+        tooltip: {
+          enabled: this.usr.settings.showTooltips,
+          mode: 'interpolate',
+          intersect: false
+        },
+        annotation: {
+          clip: false,
+          annotations: []
+        },
+        crosshair: this.crosshairPluginOptions()
+      },
+      // normalized: true,  // TODO: try, for performance
+      // parsing: {         // TODO: try, for performance; may also add y-axis conditionally in dataset.parsing
+      //   xAxisKey: 'date'
+      // },
+      layout: {
+        padding: {
+          top: 0,
+          left: 1,
+          bottom: 0,
+          right: 1
+        },
+        autoPadding: false
+      },
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      scales: {
+        x: this.defaultXAxisOptions(),
+        y: {
+          alignToPixels: true,
+          display: true,
+          type: 'linear',
+          axis: 'y',
+          position: 'right',
+          beginAtZero: false,
+          ticks: {
+            display: true,
+            mirror: true,
+            font: {
+              family: "Google Sans",
+              size: 12,
+              lineHeight: 1
+            },
+            showLabelBackdrop: true,
+            backdropColor: this.usr.settings.isDarkTheme ? '#12131680' : '#FAF9FD90',
+            backdropPadding: {
+              top: 0,
+              left: 5,
+              bottom: 0,
+              right: 0
+            },
+            padding: 0
+          },
+          border: {
+            display: false
+          },
+          grid: {
+            drawOnChartArea: true,
+            drawTicks: false,
+            lineWidth: 0.5,
+            color: this.usr.settings.isDarkTheme ? '#2E2E2E' : '#E0E0E0'
+          }
+        }
+      }
+    };
+
+    return options;
+  }
+
+  baseOverlayOptions(volumeAxisSize: number): ChartOptions {
+
+    const options = this.baseChartOptions();
+
+    // format primary y-axis labels
+    options.scales.y.ticks.callback = (value, index, values) => {
+
+      // remove first and last y-axis labels
+      if (index === 0 || index === values.length - 1) return null;
+
+      // otherwise, add dollar sign
+      else
+        return '$' + value;
+    };
+
+    // define secondary y-axis for volume
+    options.scales.volumeAxis = {
+      display: false,  // hide by default
+      type: 'linear',
+      axis: 'y',
+      position: 'left',
+      beginAtZero: true,
+      padding: 0,
+      border: {
+        display: false
+      },
+      max: volumeAxisSize
+    } as ScaleOptions;
+
+    return options;
+  }
+
+  baseOscillatorOptions(): ChartOptions {
+
+    const options = this.baseChartOptions();
+
+    // remove x-axis
+    options.scales.x.display = false;
+
+    // format y-axis (helper context)
+    const y = options.scales.y as CartesianScaleOptions;
 
     // size to data, instead of next tick
     // y.bounds = "data";
 
-    // remove first and last y-axis labels
+    // rescale labels
     y.ticks.callback = (value: number, index, values) => {
 
       const v = Math.abs(value);
 
+      // remove first and last y-axis labels
       if (index === 0 || index === values.length - 1) return null;
 
       // otherwise, condense large/small display values
@@ -155,82 +253,6 @@ export class ChartConfigService {
         return Math.round((value + Number.EPSILON) * 100000000) / 100000000;
     };
 
-    return config;
-  }
-
-  baseChartOptions(): ChartOptions {
-
-    const options: ChartOptions = {
-      plugins: {
-        title: {
-          display: false
-        },
-        legend: {
-          display: false
-        },
-        tooltip: {
-          enabled: this.usr.showTooltips,
-          mode: 'interpolate',
-          intersect: false
-        },
-        annotation: {
-          clip: false,
-          annotations: []
-        },
-        crosshair: this.crosshairPluginOptions()
-      },
-      layout: {
-        padding: {
-          top: 0,
-          left: 1,
-          bottom: 0,
-          right: 1
-        },
-        autoPadding: false
-      },
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: false,
-      scales: {
-        xAxis: this.defaultXAxisOptions(),
-        yAxis: {
-          alignToPixels: true,
-          display: true,
-          type: 'linear',
-          axis: 'y',
-          position: 'right',
-          beginAtZero: false,
-          ticks: {
-            display: true,
-            mirror: true,
-            font: {
-              family: "Google Sans",
-              size: 12,
-              lineHeight: 1
-            },
-            showLabelBackdrop: true,
-            backdropColor: this.usr.isDarkTheme ? '#12131680' : '#FAF9FD90',
-            backdropPadding: {
-              top: 0,
-              left: 5,
-              bottom: 0,
-              right: 0
-            },
-            padding: 0
-          },
-          border: {
-            display: false
-          },
-          grid: {
-            drawOnChartArea: true,
-            drawTicks: false,
-            lineWidth: 0.5,
-            color: this.usr.isDarkTheme ? '#2E2E2E' : '#E0E0E0'
-          }
-        }
-      }
-    };
-
     return options;
   }
 
@@ -238,7 +260,7 @@ export class ChartConfigService {
 
     const options: ScaleOptions = {
       alignToPixels: true,
-      display: false,
+      display: false,  // hide by default
       type: 'timeseries',
       time: {
         unit: 'day'
@@ -273,20 +295,20 @@ export class ChartConfigService {
 
   crosshairPluginOptions(): CrosshairOptions {
 
-    if (this.usr.showCrosshairs == false) return null;
+    if (this.usr.settings.showCrosshairs === false) return null;
 
     const crosshairOptions: CrosshairOptions = {
       line: {
-        color: '#F66',                                      // crosshair line color
-        width: 1                                            // crosshair line width
+        color: '#F66',           // crosshair line color
+        width: 1                 // crosshair line width
       },
       sync: {
-        enabled: true,                                      // enable trace line syncing with other charts
-        group: 1,                                           // chart group (can be unique set of groups)
-        suppressTooltips: true                              // suppress tooltips (on other chart) when synced tracer
+        enabled: true,           // enable trace line syncing with other charts
+        group: 1,                // chart group (can be unique set of groups)
+        suppressTooltips: true   // suppress tooltips (on other chart) when synced tracer
       },
       snap: {
-        enabled: true                                       // snap to data points
+        enabled: true            // snap to data points
       }
     };
 
@@ -304,7 +326,7 @@ export class ChartConfigService {
           label: r.label,
           type: 'line',
           data: [],
-          yAxisID: 'yAxis',
+          yAxisID: 'y',
           pointRadius: 0,
           borderWidth: r.lineWidth,
           borderColor: r.color,
@@ -323,7 +345,7 @@ export class ChartConfigService {
           label: r.label,
           type: 'line',
           data: [],
-          yAxisID: 'yAxis',
+          yAxisID: 'y',
           pointRadius: 0,
           borderWidth: r.lineWidth,
           borderDash: [3, 2],
@@ -338,7 +360,7 @@ export class ChartConfigService {
           label: r.label,
           type: 'line',
           data: [],
-          yAxisID: 'yAxis',
+          yAxisID: 'y',
           pointRadius: r.lineWidth,
           pointBorderWidth: 0,
           pointBorderColor: r.color,
@@ -353,7 +375,7 @@ export class ChartConfigService {
           label: r.label,
           type: 'bar',
           data: [],
-          yAxisID: 'yAxis',
+          yAxisID: 'y',
           borderWidth: 0,
           borderColor: r.color,
           backgroundColor: r.color,
@@ -371,7 +393,7 @@ export class ChartConfigService {
           label: r.label,
           type: 'line',
           data: [],
-          yAxisID: 'yAxis',
+          yAxisID: 'y',
           pointRadius: r.lineWidth,
           pointBorderWidth: 0,
           pointBorderColor: r.color,
@@ -390,7 +412,7 @@ export class ChartConfigService {
           label: r.label,
           type: 'line',
           data: [],
-          yAxisID: 'yAxis',
+          yAxisID: 'y',
           showLine: false,
           pointRadius: 0,
           borderWidth: 0,

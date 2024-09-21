@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { SettingsComponent } from './picker/settings.component';
 
-import { ChartService } from './services/chart.service';
+import { ChartControlService } from './services/chart-control.service';
 import { UserConfigService } from './services/user-config.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { UserConfigService } from './services/user-config.service';
 export class AppComponent implements OnInit {
 
   constructor(
-    public readonly cht: ChartService,
+    public readonly cht: ChartControlService,
     public readonly usr: UserConfigService,
     private readonly settingsDialog: MatDialog
   ) { }

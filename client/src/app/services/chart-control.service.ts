@@ -77,7 +77,7 @@ import {
 } from '../chart/chart.models';
 
 @Injectable()
-export class ChartService {
+export class ChartControlService {
 
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
@@ -92,7 +92,7 @@ export class ChartService {
   ) { }
 
 
-  //#region INDICATOR SELECTIONS
+  //#region SELECTION MGMT
   defaultSelection(uiid: string): IndicatorSelection {
 
     const listing = this.listings.find(x => x.uiid == uiid);
@@ -257,6 +257,10 @@ export class ChartService {
   addSelectionWithoutScroll(
     selection: IndicatorSelection
   ) {
+
+    // TODO: reuse addSelectionPicked to avoid duplicate code
+    // TODO: add use of dataset.parsing for y-axis (conditionally, also mentioned above)
+
     const green = "#2E7D32";
     const red = "#DD2C00";
     const gray = "#9E9E9E";
@@ -412,7 +416,7 @@ export class ChartService {
   }
   //#endregion
 
-  //#region CHARTS OPERATIONS
+  //#region CHARTS CHANGE
   addSelectionToOverlayChart(
     selection: IndicatorSelection,
     scrollToMe: boolean) {
@@ -433,19 +437,13 @@ export class ChartService {
     listing: IndicatorListing,
     scrollToMe: boolean) {
 
-    const labelFontColor = this.usr.isDarkTheme ? '#757575' : '#121316';
+    // default configuration
     const chartConfig = this.cfg.baseOscillatorConfig();
-
-    // initialize chart datasets
-    chartConfig.data = {
-      datasets: []
-    };
-
-    // chart configurations
 
     // add thresholds (reference lines)
     const qtyThresholds = listing.chartConfig?.thresholds?.length;
 
+    // TODO: change these to line annotations; randomly using results[0] as basis
     listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold, index: number) => {
 
       const lineData: ScatterDataPoint[] = [];
@@ -459,7 +457,7 @@ export class ChartService {
         label: "threshold",
         type: 'line',
         data: lineData,
-        yAxisID: 'yAxis',
+        yAxisID: 'y',
         pointRadius: 0,
         borderWidth: 2.5,
         borderDash: threshold.style == "dash" ? [5, 2] : [],
@@ -484,8 +482,8 @@ export class ChartService {
     }
 
     // y-scale
-    chartConfig.options.scales.yAxis.suggestedMin = listing.chartConfig?.minimumYAxis;
-    chartConfig.options.scales.yAxis.suggestedMax = listing.chartConfig?.maximumYAxis;
+    chartConfig.options.scales.y.suggestedMin = listing.chartConfig?.minimumYAxis;
+    chartConfig.options.scales.y.suggestedMax = listing.chartConfig?.maximumYAxis;
 
     // add selection
     selection.results.forEach((r: IndicatorResult) => {
@@ -516,22 +514,19 @@ export class ChartService {
     if (selection.chart) selection.chart.destroy();
     selection.chart = new Chart(myCanvas.getContext("2d"), chartConfig);
 
-    // annotations
-    const xPos: ScaleValue = selection.chart.scales["xAxis"].min;
-    const yPos: ScaleValue = selection.chart.scales["yAxis"].max;
+    // annotations (after scales are drawn)
+    selection.chart.options.plugins.annotation.annotations
+      = this.oscillatorAnnotation(selection);
 
-    const annotation: AnnotationOptions =
-      this.commonAnnotation(selection.label, labelFontColor, xPos, yPos, 0, 1);
-    selection.chart.options.plugins.annotation.annotations = { annotation };
+    // apply changes
     selection.chart.update();
-
     if (scrollToMe) this.scrollToEnd(container.id);
   }
 
   updateOverlayAnnotations() {
 
-    const xPos: ScaleValue = this.chartOverlay.scales["xAxis"].min;
-    const yPos: ScaleValue = this.chartOverlay.scales["yAxis"].max;
+    const xPos: ScaleValue = this.chartOverlay.scales["x"].min;
+    const yPos: ScaleValue = this.chartOverlay.scales["y"].max;
     let adjY: number = 10;
 
     this.chartOverlay.options.plugins.annotation.annotations =
@@ -546,6 +541,17 @@ export class ChartService {
         });
   }
 
+  oscillatorAnnotation(selection: IndicatorSelection) {
+
+    const labelFontColor = this.usr.settings.isDarkTheme ? '#757575' : '#121316';
+
+    const xPos: ScaleValue = selection.chart.scales["x"].min;
+    const yPos: ScaleValue = selection.chart.scales["y"].max;
+
+    const annotation = this.commonAnnotation(selection.label, labelFontColor, xPos, yPos, 0, 1);
+    return { annotation };
+  }
+
   commonAnnotation(
     label: string,
     fontColor: string,
@@ -555,7 +561,7 @@ export class ChartService {
     yAdj: number = 0
   ): AnnotationOptions {
 
-    const labelFillColor = this.usr.isDarkTheme ? '#12131680' : '#FAF9FD90';
+    const labelFillColor = this.usr.settings.isDarkTheme ? '#12131680' : '#FAF9FD90';
 
     const legendFont: FontSpec = {
       family: "Google Sans",
@@ -573,8 +579,8 @@ export class ChartService {
       backgroundColor: labelFillColor,
       padding: 0,
       position: 'start',
-      xScaleID: 'xAxis',
-      yScaleID: 'yAxis',
+      xScaleID: 'x',
+      yScaleID: 'y',
       xValue: xPos,
       yValue: yPos,
       xAdjust: xAdj,
@@ -584,7 +590,10 @@ export class ChartService {
     return annotation;
   }
 
-  updateChartTheme() {
+   onSettingsChange() {
+
+    // FIX: does not reset y-axis label background color
+    // `selection` may not hold master chart reference?!
 
     // strategically update chart theme
     // without destroying and re-creating charts
@@ -592,49 +601,62 @@ export class ChartService {
     // update overlay chart
     if (this.chartOverlay) {
 
-      // carry over volume axis size (computed)
+      // remember dynamic options to restore
       const volumeAxisSize = this.chartOverlay.scales.volumeAxis.max;
 
-      // overlay configuration (with new theme settings)
-      this.chartOverlay.options = this.cfg.baseOverlayConfig(volumeAxisSize).options;
-      this.chartOverlay.update();
+      // replace chart options (has new theme)
+      const options = this.cfg.baseOverlayOptions(volumeAxisSize);
+      this.chartOverlay.options = options;
+
+      // regenerate annotations
+      this.chartOverlay.update('none');  // redraws scales
+      this.updateOverlayAnnotations();
+
+      // apply changes (final)
+      this.chartOverlay.update('none');
     }
 
     // update oscillator charts
-    this.selections.forEach((selection: IndicatorSelection) => {
+    this.selections
+      .filter(x => x.chartType == "oscillator" && x.chart)
+      .forEach((selection: IndicatorSelection) => {
 
-      if (selection.chart) {
-        selection.chart.options.plugins.crosshair = this.cfg.crosshairPluginOptions();
-        selection.chart.update();
-      }
-    });
+        // replace chart options (has new theme)
+        selection.chart.options = this.cfg.baseOscillatorOptions();
 
-    // update annotations
-    this.updateOverlayAnnotations();
-    this.chartOverlay.update();
+        // regenerate annotations
+        selection.chart.update('none'); // redraws scales
+        selection.chart.options.plugins.annotation.annotations
+          = this.oscillatorAnnotation(selection);  // FIX: does not reset background color
 
-    // update grid colors
-
-
-
-
+        // apply changes
+        selection.chart.update('none');
+      });
   }
-
   //#endregion
 
   //#region DATA OPERATIONS
   loadCharts() {
+
+    // base overlay chart with quotes
     this.api.getQuotes()
       .subscribe({
         next: (quotes: Quote[]) => {
 
+          // load base overlay chart
           this.loadOverlayChart(quotes);
 
-          // load default selections
+          // add/load indicators
           this.api.getListings()
             .subscribe({
+
+              // load catalog
               next: (listings: IndicatorListing[]) => {
+
+                // cache catalog
                 this.listings = listings;
+
+                // load indicators
                 this.loadSelections();
               },
               error: (e: HttpErrorResponse) => { console.log(e); }
@@ -708,7 +730,7 @@ export class ChartService {
           type: 'candlestick',
           label: 'Price',
           data: price,
-          yAxisID: 'yAxis',
+          yAxisID: 'y',
           borderColor: candleOptions.borderColor,
           order: 75
         },
@@ -741,6 +763,14 @@ export class ChartService {
 
   loadSelections() {
 
+    // TODO: cache default JSON if not found, without loading
+    // then  (a) compose layout asynchronously with placeholders (from listing/selection info only)
+    //         » labels, styles, thresholds, etc. without primary data (except for chart overlay quotes)
+    //           however, this may need a separate method to compose chart layout
+    // while (b) get data asynchronously
+    //   and (c) follow data with selection composition
+    // PROBLEM: causing web vitals to be blocked
+
     // get from cache
     const selections = JSON.parse(localStorage.getItem('selections'));
 
@@ -771,14 +801,9 @@ export class ChartService {
       this.addSelectionWithoutScroll(def6);
     }
   }
+  //#endregion
 
-  resetCharts() {
-
-    this.selections = [];
-    this.loadCharts();
-  }
-
-  // helper functions
+  //#region UTILITIES
 
   selectionTokenReplacement(selection: IndicatorSelection): IndicatorSelection {
 

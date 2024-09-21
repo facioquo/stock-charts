@@ -3,6 +3,16 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
 
+import {
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
+
+import {
+  ErrorStateMatcher,
+  ShowOnDirtyErrorStateMatcher
+} from '@angular/material/core';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -10,11 +20,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ChartModule } from './chart/chart.module';
 
-import { UserConfigService } from './services/user-config.service';
-
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+
 import { ApiService } from './services/api.service';
+import { ChartControlService } from './services/chart-control.service';
+import { ChartConfigService } from './services/chart-config.service';
+import { UserConfigService } from './services/user-config.service';
 
 @NgModule({
   declarations: [
@@ -38,8 +50,15 @@ import { ApiService } from './services/api.service';
     AppRoutingModule
   ],
   providers: [
+    ApiService,
+    {
+      provide: ErrorStateMatcher,
+      useClass: ShowOnDirtyErrorStateMatcher
+    },
+    ChartControlService,
+    ChartConfigService,
     UserConfigService,
-    ApiService
+    provideHttpClient(withInterceptorsFromDi())
   ],
   bootstrap: [
     AppComponent

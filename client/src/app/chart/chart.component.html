@@ -1,5 +1,5 @@
 <!-- loading -->
-<div *ngIf="cs.loading">
+<div *ngIf="cht.loading">
   <div style="font-family:Rubik,Roboto,Arial,sans-serif;font-size:10px;text-align:center;">
     <p style="margin:0;padding-top:175px;"><img src="../assets/candle-spinner.svg" alt="loading" height="30" style="opacity:0.5;"></p>
     <p style="margin-top:5px;color:#777;">LOADING</p>
@@ -7,9 +7,9 @@
 </div>
 
 <!-- CHART (MAIN OVERLAY) -->
-<div id="chart-overlay" class="chart-overlay-container" [hidden]="cs.loading">
+<div id="chart-overlay" class="chart-overlay-container" [hidden]="cht.loading">
   <canvas id="chartOverlay"></canvas>
 </div>
 
 <!-- CHART (OSCILLATORS) -->
-<div id="oscillators-zone" [hidden]="cs.loading"></div>
+<div id="oscillators-zone" [hidden]="cht.loading"></div>

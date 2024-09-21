@@ -15,19 +15,19 @@
     <mat-list-item>
       <span class="no-wrap">Dark theme</span>
       <mat-slide-toggle class="toggle" labelPosition="before"
-        [(ngModel)]="usr.isDarkTheme" (change)="toggleTheme($event)">
+        [(ngModel)]="usr.settings.isDarkTheme" (change)="toggleTheme($event)">
       </mat-slide-toggle>
     </mat-list-item>
     <mat-list-item>
       <span class="no-wrap">Show crosshairs</span>
       <mat-slide-toggle class="toggle" labelPosition="before"
-       [(ngModel)]="usr.showCrosshairs" (change)="toggleCrosshairs($event)">
+       [(ngModel)]="usr.settings.showCrosshairs" (change)="toggleCrosshairs($event)">
       </mat-slide-toggle>
     </mat-list-item>
     <mat-list-item>
       <span class="no-wrap">Show tooltips</span>
       <mat-slide-toggle class="toggle" labelPosition="before"
-        [(ngModel)]="usr.showTooltips" (change)="toggleTooltips($event)">
+        [(ngModel)]="usr.settings.showTooltips" (change)="toggleTooltips($event)">
       </mat-slide-toggle>
     </mat-list-item>
   </mat-list>

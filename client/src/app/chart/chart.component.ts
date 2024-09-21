@@ -1,5 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { ChartService } from '../services/chart.service';
+import { ChartControlService } from '../services/chart-control.service';
 
 @Component({
   selector: 'app-chart',
@@ -13,8 +13,8 @@ import { ChartService } from '../services/chart.service';
 export class ChartComponent {
 
   constructor(
-    public readonly cs: ChartService
+    public readonly cht: ChartControlService
   ) {
-    this.cs.loadCharts();
+    this.cht.loadCharts();
   }
 }

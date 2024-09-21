@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -10,8 +8,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ChartComponent } from './chart.component';
-import { ChartService } from '../services/chart.service';
-import { ChartConfigService } from '../services/chart-config.service';
 
 @NgModule({
   declarations: [
@@ -31,10 +27,6 @@ import { ChartConfigService } from '../services/chart-config.service';
     MatToolbarModule,
     MatTooltipModule
   ],
-  providers: [
-    ChartService,
-    ChartConfigService,
-    provideHttpClient(withInterceptorsFromDi())
-  ]
+  providers: []
 })
 export class ChartModule { }

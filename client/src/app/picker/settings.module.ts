@@ -1,13 +1,7 @@
 import { NgModule } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-
-import {
-  ErrorStateMatcher,
-  ShowOnDirtyErrorStateMatcher
-} from '@angular/material/core';
 
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,9 +22,6 @@ import { ColorCompactModule } from 'ngx-color/compact';
 
 import { SettingsComponent } from './settings.component';
 import { PickConfigComponent } from './pick-config.component';
-
-import { ChartService } from '../services/chart.service';
-import { ApiService } from '../services/api.service';
 
 @NgModule({
   declarations: [
@@ -61,14 +52,6 @@ import { ApiService } from '../services/api.service';
     MtxColorpickerModule,
     ColorCompactModule
   ],
-  providers: [
-    ChartService,
-    ApiService,
-    {
-      provide: ErrorStateMatcher,
-      useClass: ShowOnDirtyErrorStateMatcher
-    },
-    provideHttpClient(withInterceptorsFromDi())
-  ]
+  providers: []
 })
 export class SettingsModule { }
