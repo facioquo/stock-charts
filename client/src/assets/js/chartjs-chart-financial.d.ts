@@ -9,15 +9,15 @@ import {
   ChartComponent
 } from 'chart.js';
 
-declare module 'chart.js' {
+export interface FinancialDataPoint {
+  x: number,
+  o: number,
+  h: number,
+  l: number,
+  c: number
+}
 
-  interface FinancialDataPoint {
-    x: number,
-    o: number,
-    h: number,
-    l: number,
-    c: number
-  }
+declare module 'chart.js' {
 
   interface FinancialParsedData {
     _custom?: any

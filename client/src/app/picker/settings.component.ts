@@ -24,11 +24,11 @@ export class SettingsComponent {
   constructor(
     private listRef: MatDialog,
     private picker: MatDialog,
-    public cht: ChartControlService,
+    private cht: ChartControlService,
     public usr: UserConfigService
   ) {
     this.listings = this.cht.listings;
-    this.selections = this.cht.selections;
+    this.selections = this.cht.selections;  // FIX: this is redundant?
   }
 
   selectDisplayed(event: MatCheckboxChange, shown: MatSelectionList): void {
@@ -65,7 +65,7 @@ export class SettingsComponent {
       .open(PickConfigComponent, {
         autoFocus: "dialog",
         data: listing
-       })
+      })
       .afterClosed()
 
       // reopen main settings after close

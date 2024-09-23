@@ -26,7 +26,7 @@ public class MainController(QuoteService quoteService) : ControllerBase
     public IActionResult GetIndicatorCatalog()
     {
         Response.Headers.CacheControl = "public, max-age=3600"; // 1 hour TTL
-        Response.Headers.ETag = "YYYY.MM.DD"; // only changes with deployment
+        Response.Headers.ETag = "YYYY.MM.DD"; // replaced in build deployment
         Response.Headers.LastModified = DateTime.UtcNow.ToString("R");
 
         return Ok(Metadata.IndicatorListing($"{Request.Scheme}://{Request.Host}"));

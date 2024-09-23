@@ -1,3 +1,5 @@
+// CHARTS
+
 import {
   Chart,
   ChartDataset
@@ -10,6 +12,14 @@ export interface Quote {
   low: number;
   close: number;
   volume: number;
+}
+
+// SETTINGS
+
+export interface UserSettings {
+  isDarkTheme: boolean;
+  showCrosshairs: boolean;
+  showTooltips: boolean;
 }
 
 // LISTING

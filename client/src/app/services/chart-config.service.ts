@@ -1,70 +1,33 @@
 import { Injectable } from '@angular/core';
 import { UserConfigService } from './user-config.service';
 
+import {
+  IndicatorResult,
+  IndicatorResultConfig
+} from '../chart/chart.models';
+
+// chart.js
 import 'chartjs-adapter-date-fns';
 import { enUS } from 'date-fns/locale';
 
 import {
-  BarController,
-  BarElement,
   CartesianScaleOptions,
-  CategoryScale,
-  Chart,
   ChartConfiguration,
   ChartDataset,
   ChartOptions,
-  Filler,
   FontSpec,
-  LinearScale,
-  LineController,
-  LineElement,
-  PointElement,
   ScaleOptions,
-  ScatterDataPoint,
-  Tick,
-  TimeSeriesScale,
-  Tooltip
 } from 'chart.js';
 
-// extensions
-import {
-  CandlestickController,
-  CandlestickElement
-} from 'src/assets/js/chartjs-chart-financial';
-
 // plugins
-import AnnotationPlugin, { AnnotationOptions, ScaleValue }
-  from 'chartjs-plugin-annotation';
+import {
+  AnnotationOptions,
+  LabelAnnotationOptions,
+  ScaleValue
+} from 'chartjs-plugin-annotation';
 
-import CrosshairPlugin, { CrosshairOptions }
+import { CrosshairOptions }
   from 'src/assets/js/chartjs-plugin-crosshair';
-import { IndicatorResult, IndicatorResultConfig } from '../chart/chart.models';
-
-// register extensions and plugins
-Chart.register(
-
-  // controllers
-  BarController,
-  CandlestickController,
-  LineController,
-  Tooltip,
-
-  // elements
-  BarElement,
-  CandlestickElement,
-  LineElement,
-  PointElement,
-
-  // plugins
-  CrosshairPlugin,
-  Filler,
-
-  // scales
-  CategoryScale,
-  LinearScale,
-  TimeSeriesScale
-);
-
 
 @Injectable()
 export class ChartConfigService {
@@ -315,7 +278,9 @@ export class ChartConfigService {
     return crosshairOptions;
   }
 
-  baseDataset(r: IndicatorResult, c: IndicatorResultConfig) {
+  baseDataset(
+    r: IndicatorResult,
+    c: IndicatorResultConfig) {
 
     // FIX: why won't candlestick work with ChartDataset return type?
 
@@ -423,5 +388,43 @@ export class ChartConfigService {
         };
         return noneDataset;
     }
+  }
+
+  commonLegendAnnotation(
+    labelText: string,
+    xPos: ScaleValue,
+    yPos: ScaleValue,
+    yAdj: number = 0
+  ): AnnotationOptions & LabelAnnotationOptions {
+
+    const fontColor = this.usr.settings.isDarkTheme ? '#757575' : '#121316';
+    const fillColor = this.usr.settings.isDarkTheme ? '#12131680' : '#FAF9FD90'
+
+    const legendFont: FontSpec = {
+      family: "Google Sans",
+      size: 13,
+      style: "normal",
+      weight: "normal",
+      lineHeight: 1,
+    };
+
+    const annotation: AnnotationOptions & LabelAnnotationOptions = {
+      id: "legend",
+      type: 'label',
+      content: [labelText],
+      font: legendFont,
+      color: fontColor,
+      backgroundColor: fillColor,
+      padding: 0,
+      position: 'start',
+      xScaleID: 'x',
+      yScaleID: 'y',
+      xValue: xPos,
+      yValue: yPos,
+      xAdjust: 0,
+      yAdjust: yAdj
+    };
+
+    return annotation;
   }
 }

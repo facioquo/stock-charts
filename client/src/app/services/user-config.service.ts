@@ -1,50 +1,44 @@
 import { Injectable } from '@angular/core';
-
-interface Settings {
-  isDarkTheme: boolean;
-  showCrosshairs: boolean;
-  showTooltips: boolean;
-}
+import { UserSettings } from '../chart/chart.models';
 
 @Injectable()
 export class UserConfigService {
 
-  // default settings
-  settings: Settings = {
-    isDarkTheme: true,
-    showCrosshairs: false,
-    showTooltips: false
-  };
+  settings: UserSettings; // initialized in app.component.ts
 
-  // storage names
-  isDarkThemeStorageName: string = "isDarkTheme";
-  showCrosshairsStorageName: string = "showCrosshairs";
-  showTooltipsStorageName: string = "showTooltips";
+  initSettings() {
 
-  loadSettings() {
-    this.initTheme();
-    this.initCrosshairs();
-    this.initTooltips();
+    // load user preference settings from cache,
+    // without applying changes to the UI
+
+    // get from cache
+    const settings = localStorage.getItem("settings");
+
+    // if not cached, set default
+    if (settings == undefined) {
+
+      this.settings = {
+        isDarkTheme: true,
+        showCrosshairs: false,
+        showTooltips: false
+      }
+
+      // store/cache new setting
+      this.cacheSettings();
+      return;
+    }
+
+    // otherwise, use cached values
+    this.settings = JSON.parse(settings);
+
+    // apply settings
+    this.changeTheme(this.settings.isDarkTheme);
+    this.changeCrosshairs(this.settings.showCrosshairs);
+    this.changeTooltips(this.settings.showTooltips);
   }
 
-  // TODO: refactor these to be generic handlers
-  // for defined settings codes, values, and storage names
-
-  initTheme() {
-
-    const isDarkTheme = localStorage.getItem(this.isDarkThemeStorageName);
-
-    // if not cached, set default (dark theme)
-    if (isDarkTheme == undefined) {
-      localStorage.setItem(this.isDarkThemeStorageName, this.settings.isDarkTheme.valueOf().toString())
-    }
-
-    // otherwise, use value
-    else {
-      this.settings.isDarkTheme = (isDarkTheme === "true") ? true : false;
-    }
-
-    this.changeTheme(this.settings.isDarkTheme);
+  cacheSettings() {
+    localStorage.setItem("settings", JSON.stringify(this.settings));
   }
 
   changeTheme(isDarkTheme: boolean) {
@@ -53,6 +47,11 @@ export class UserConfigService {
     // we override by adding the light theme CSS file in <head>
     // then remove it when going to dark, if it exists
 
+    // store/cache new setting
+    this.settings.isDarkTheme = isDarkTheme;
+    this.cacheSettings();
+
+    // add/remove theme stylesheet
     const refClassName = "theme-stylesheet";
 
     const lightElement = document.createElement('link');
@@ -73,60 +72,23 @@ export class UserConfigService {
       lightElement.setAttribute('href', 'theme-light.css');
       document.head.appendChild(lightElement);
     }
-
-    // store new setting
-    localStorage.setItem(this.isDarkThemeStorageName, isDarkTheme.valueOf().toString())
   }
 
-  initCrosshairs() {
+  changeCrosshairs(showCrosshairs: boolean) {
 
-    const showCrosshairs = localStorage.getItem(this.showCrosshairsStorageName);
+    // store/cache new setting
+    this.settings.showCrosshairs = showCrosshairs;
+    this.cacheSettings();
 
-    // if not cached, set default (off)
-    if (showCrosshairs == undefined) {
-      localStorage.setItem(this.showCrosshairsStorageName, this.settings.showCrosshairs.valueOf().toString())
-    }
-
-    // otherwise, use value
-    else {
-      this.settings.showCrosshairs = (showCrosshairs === "true") ? true : false;
-    }
-
-    this.changeCrosshairs(this.settings.showCrosshairs);
+    // note: actual add/remove of crosshairs is done in chart service
   }
 
-  changeCrosshairs(hasCrosshairs: boolean) {
+  changeTooltips(showTooltips: boolean) {
 
-    // value is picked up by chart service
-    this.settings.showCrosshairs = hasCrosshairs;
+    // store/cache new setting
+    this.settings.showTooltips = showTooltips;
+    this.cacheSettings();
 
-    // store new setting
-    localStorage.setItem(this.showCrosshairsStorageName, hasCrosshairs.valueOf().toString())
-  }
-
-  initTooltips() {
-
-    const showTooltips = localStorage.getItem(this.showTooltipsStorageName);
-
-    // if not cached, set default (off)
-    if (showTooltips == undefined) {
-      localStorage.setItem(this.showTooltipsStorageName, this.settings.showTooltips.valueOf().toString())
-    }
-
-    // otherwise, use value
-    else {
-      this.settings.showTooltips = (showTooltips === "true") ? true : false;
-    }
-
-    this.changeTooltips(this.settings.showTooltips);
-  }
-
-  changeTooltips(showTootlips: boolean) {
-
-    // value is picked up by chart service
-    this.settings.showTooltips = showTootlips;
-
-    // store new setting
-    localStorage.setItem(this.showTooltipsStorageName, showTootlips.valueOf().toString())
+    // note: actual add/remove of tooltips is done in chart service
   }
 }

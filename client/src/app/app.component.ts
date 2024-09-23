@@ -14,14 +14,14 @@ export class AppComponent implements OnInit {
 
   constructor(
     public readonly cht: ChartControlService,
-    public readonly usr: UserConfigService,
+    private readonly usr: UserConfigService,
     private readonly settingsDialog: MatDialog
   ) { }
 
   ngOnInit(): void {
 
-    // load user preferences
-    this.usr.loadSettings();
+    // load/apply user prefs
+    this.usr.initSettings();
   }
 
   // SETTINGS DIALOG

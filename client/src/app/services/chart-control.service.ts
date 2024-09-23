@@ -4,25 +4,22 @@ import { Observable } from 'rxjs/internal/Observable';
 
 import { ApiService } from './api.service';
 import { ChartConfigService } from './chart-config.service';
-import { UserConfigService } from './user-config.service';
 
 import { v4 as Guid } from 'uuid';
 
 import {
   BarController,
   BarElement,
+  CategoryScale,
   Chart,
   ChartData,
   ChartDataset,
-  FinancialDataPoint,
-  FontSpec,
+  Filler,
   LinearScale,
   LineController,
   LineElement,
   PointElement,
-  ScaleOptions,
   ScatterDataPoint,
-  Tick,
   TimeSeriesScale,
   Tooltip
 } from 'chart.js';
@@ -30,12 +27,16 @@ import {
 // extensions
 import {
   CandlestickController,
-  CandlestickElement
+  CandlestickElement,
+  FinancialDataPoint
 } from 'src/assets/js/chartjs-chart-financial';
 
 // plugins
-import AnnotationPlugin, { AnnotationOptions, ScaleValue }
-  from 'chartjs-plugin-annotation';
+import AnnotationPlugin, {
+  AnnotationOptions,
+  LabelAnnotationOptions,
+  ScaleValue
+} from 'chartjs-plugin-annotation';
 
 import CrosshairPlugin
   from 'src/assets/js/chartjs-plugin-crosshair';
@@ -58,8 +59,10 @@ Chart.register(
   // plugins
   AnnotationPlugin,
   CrosshairPlugin,
+  Filler,
 
   // scales
+  CategoryScale,
   LinearScale,
   TimeSeriesScale
 );
@@ -87,10 +90,8 @@ export class ChartControlService {
 
   constructor(
     private readonly api: ApiService,
-    private readonly cfg: ChartConfigService,
-    private readonly usr: UserConfigService  // TODO: move usage to config service
+    private readonly cfg: ChartConfigService
   ) { }
-
 
   //#region SELECTION MGMT
   defaultSelection(uiid: string): IndicatorSelection {
@@ -375,7 +376,6 @@ export class ChartControlService {
     };
 
     this.cacheSelections();
-
   }
 
   deleteSelection(ucid: string) {
@@ -391,7 +391,7 @@ export class ChartControlService {
         const dx = this.chartOverlay.data.datasets.indexOf(result.dataset, 0);
         this.chartOverlay.data.datasets.splice(dx, 1);
       });
-      this.updateOverlayAnnotations();
+      this.addOverlayLegend();
       this.chartOverlay.update();
 
     } else {
@@ -405,12 +405,11 @@ export class ChartControlService {
 
   cacheSelections() {
 
-    const selections = this.selections;
-
-    // remove unsavable data
-    selections.forEach((selection: IndicatorSelection) => {
-      selection.chart = undefined;
-    });
+    // deep copy without the chart object
+    const selections: IndicatorSelection[]
+      = this.selections.map(({ chart, ...rest }) => ({
+        ...rest
+      }));
 
     localStorage.setItem('selections', JSON.stringify(selections));
   }
@@ -425,9 +424,9 @@ export class ChartControlService {
     selection.results.forEach((r: IndicatorResult) => {
       this.chartOverlay.data.datasets.push(r.dataset);
     });
-    this.chartOverlay.update(); // ensures scales are drawn to correct size first
-    this.updateOverlayAnnotations();
-    this.chartOverlay.update();
+    this.chartOverlay.update('none'); // ensures scales are drawn to correct size first
+    this.addOverlayLegend();
+    this.chartOverlay.update('none');
 
     if (scrollToMe) this.scrollToStart("chart-overlay");
   }
@@ -443,7 +442,8 @@ export class ChartControlService {
     // add thresholds (reference lines)
     const qtyThresholds = listing.chartConfig?.thresholds?.length;
 
-    // TODO: change these to line annotations; randomly using results[0] as basis
+    // TODO: change these to line annotations,
+    // currently using random results[0] as basis
     listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold, index: number) => {
 
       const lineData: ScatterDataPoint[] = [];
@@ -515,85 +515,52 @@ export class ChartControlService {
     selection.chart = new Chart(myCanvas.getContext("2d"), chartConfig);
 
     // annotations (after scales are drawn)
-    selection.chart.options.plugins.annotation.annotations
-      = this.oscillatorAnnotation(selection);
+    selection.chart.update('none');
+    this.addOscillatorLegend(selection);
 
     // apply changes
-    selection.chart.update();
+    selection.chart.update('none');
     if (scrollToMe) this.scrollToEnd(container.id);
   }
 
-  updateOverlayAnnotations() {
+  addOverlayLegend() {
 
-    const xPos: ScaleValue = this.chartOverlay.scales["x"].min;
-    const yPos: ScaleValue = this.chartOverlay.scales["y"].max;
-    let adjY: number = 10;
+    const chart = this.chartOverlay;
+    const xPos: ScaleValue = chart.scales["x"].min;
+    const yPos: ScaleValue = chart.scales["y"].max;
+    let adjY: number = 10; // first position
 
-    this.chartOverlay.options.plugins.annotation.annotations =
+    chart.options.plugins.annotation.annotations =
       this.selections
         .filter(x => x.chartType == 'overlay')
+        .sort((a, b) => a.label.localeCompare(b.label))
         .map((selection: IndicatorSelection, index: number) => {
-          const annotation: AnnotationOptions =
-            this.commonAnnotation(selection.label, selection.results[0].color, xPos, yPos, 0, adjY);
+
+          // annotation with defaults
+          const annotation: AnnotationOptions & LabelAnnotationOptions =
+            this.cfg.commonLegendAnnotation(selection.label, xPos, yPos, adjY);
+
+          // customize annotation
           annotation.id = "legend" + (index + 1).toString();
+          annotation.color = selection.results[0].color;
+
           adjY += 15;
           return annotation;
         });
   }
 
-  oscillatorAnnotation(selection: IndicatorSelection) {
+  addOscillatorLegend(selection: IndicatorSelection) {
 
-    const labelFontColor = this.usr.settings.isDarkTheme ? '#757575' : '#121316';
+    const chart = selection.chart;
+    const xPos: ScaleValue = chart.scales["x"].min;
+    const yPos: ScaleValue = chart.scales["y"].max;
 
-    const xPos: ScaleValue = selection.chart.scales["x"].min;
-    const yPos: ScaleValue = selection.chart.scales["y"].max;
+    const annotation = this.cfg.commonLegendAnnotation(selection.label, xPos, yPos, 1);
 
-    const annotation = this.commonAnnotation(selection.label, labelFontColor, xPos, yPos, 0, 1);
-    return { annotation };
+    chart.options.plugins.annotation.annotations = { annotation };
   }
 
-  commonAnnotation(
-    label: string,
-    fontColor: string,
-    xPos: ScaleValue,
-    yPos: ScaleValue,
-    xAdj: number = 0,
-    yAdj: number = 0
-  ): AnnotationOptions {
-
-    const labelFillColor = this.usr.settings.isDarkTheme ? '#12131680' : '#FAF9FD90';
-
-    const legendFont: FontSpec = {
-      family: "Google Sans",
-      size: 13,
-      style: "normal",
-      weight: "normal",
-      lineHeight: 1,
-    };
-
-    const annotation: AnnotationOptions = {
-      type: 'label',
-      content: [label],
-      font: legendFont,
-      color: fontColor,
-      backgroundColor: labelFillColor,
-      padding: 0,
-      position: 'start',
-      xScaleID: 'x',
-      yScaleID: 'y',
-      xValue: xPos,
-      yValue: yPos,
-      xAdjust: xAdj,
-      yAdjust: yAdj
-    };
-
-    return annotation;
-  }
-
-   onSettingsChange() {
-
-    // FIX: does not reset y-axis label background color
-    // `selection` may not hold master chart reference?!
+  onSettingsChange() {
 
     // strategically update chart theme
     // without destroying and re-creating charts
@@ -604,34 +571,34 @@ export class ChartControlService {
       // remember dynamic options to restore
       const volumeAxisSize = this.chartOverlay.scales.volumeAxis.max;
 
-      // replace chart options (has new theme)
-      const options = this.cfg.baseOverlayOptions(volumeAxisSize);
-      this.chartOverlay.options = options;
+      // replace chart options (applies theme)
+      this.chartOverlay.options
+        = this.cfg.baseOverlayOptions(volumeAxisSize);
 
       // regenerate annotations
-      this.chartOverlay.update('none');  // redraws scales
-      this.updateOverlayAnnotations();
+      this.addOverlayLegend();
 
-      // apply changes (final)
+      // apply changes
       this.chartOverlay.update('none');
     }
 
     // update oscillator charts
-    this.selections
-      .filter(x => x.chartType == "oscillator" && x.chart)
-      .forEach((selection: IndicatorSelection) => {
+    const charts = this.selections
+      .filter(s => s.chartType === "oscillator");
 
-        // replace chart options (has new theme)
-        selection.chart.options = this.cfg.baseOscillatorOptions();
+    charts.forEach((selection: IndicatorSelection) => {
 
-        // regenerate annotations
-        selection.chart.update('none'); // redraws scales
-        selection.chart.options.plugins.annotation.annotations
-          = this.oscillatorAnnotation(selection);  // FIX: does not reset background color
+      const chart = selection.chart;
 
-        // apply changes
-        selection.chart.update('none');
-      });
+      // replace chart options (applies theme)
+      chart.options = this.cfg.baseOscillatorOptions();
+
+      // regenerate annotations
+      this.addOscillatorLegend(selection);
+
+      // apply changes
+      chart.update('none');
+    });
   }
   //#endregion
 
@@ -670,6 +637,8 @@ export class ChartControlService {
   }
 
   loadOverlayChart(quotes: Quote[]) {
+
+    // loads base with quotes only
 
     const candleOptions = Chart.defaults.elements["candlestick"];
 
