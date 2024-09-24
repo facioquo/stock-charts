@@ -25,8 +25,8 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { ApiService } from './services/api.service';
 import { ChartService } from './services/chart.service';
-import { ChartConfigService } from './services/chart-config.service';
-import { UserConfigService } from './services/user-config.service';
+import { ChartConfigService } from './services/config.service';
+import { UserService } from './services/user.service';
 
 @NgModule({
   declarations: [
@@ -57,7 +57,7 @@ import { UserConfigService } from './services/user-config.service';
     },
     ChartService,
     ChartConfigService,
-    UserConfigService,
+    UserService,
     provideHttpClient(withInterceptorsFromDi())
   ],
   bootstrap: [

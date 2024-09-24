@@ -6,7 +6,7 @@ import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
 import { ChartService } from '../services/chart.service';
-import { UserConfigService } from '../services/user-config.service';
+import { UserService } from '../services/user.service';
 
 import { IndicatorListing, IndicatorSelection } from '../chart/chart.models';
 import { PickConfigComponent } from './pick-config.component';
@@ -25,7 +25,7 @@ export class SettingsComponent {
     private listRef: MatDialog,
     private picker: MatDialog,
     public cht: ChartService,
-    public usr: UserConfigService
+    public usr: UserService
   ) {
     this.listings = this.cht.listings;
   }

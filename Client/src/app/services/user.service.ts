@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { UserSettings } from '../chart/chart.models';
 
 @Injectable()
-export class UserConfigService {
+export class UserService {
 
   settings: UserSettings; // initialized in app.component.ts
 

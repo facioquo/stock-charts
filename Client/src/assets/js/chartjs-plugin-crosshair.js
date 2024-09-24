@@ -1,7 +1,7 @@
 // chartjs-plugin-crosshair
 // based on https://github.com/AbelHeinsbroek/chartjs-plugin-crosshair
 
-// TODO:
+// TODO: modernize crosshair plugin
 // 1. fix mouse events to reach last data point in series
 // 2. lock trace line on mouse click
 // 3. migrate to native Angular/Typescript

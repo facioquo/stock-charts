@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { UserConfigService } from './user-config.service';
+import { UserService } from './user.service';
 
 import {
   IndicatorResult,
@@ -33,7 +33,7 @@ import { CrosshairOptions }
 export class ChartConfigService {
 
   constructor(
-    private readonly usr: UserConfigService
+    private readonly usr: UserService
   ) { }
 
   baseOverlayConfig(volumeAxisSize: number): ChartConfiguration {

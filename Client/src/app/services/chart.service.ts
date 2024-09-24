@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/internal/Observable';
 
 import { ApiService } from './api.service';
-import { ChartConfigService } from './chart-config.service';
+import { ChartConfigService } from './config.service';
 
 import { v4 as Guid } from 'uuid';
 
