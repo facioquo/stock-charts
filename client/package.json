@@ -1,5 +1,9 @@
 {
   "name": "stock.charts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/facioquo/stock-charts.git"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open --live-reload",
@@ -33,7 +37,7 @@
     "zone.js": "0.14.10"
   },
   "devDependencies": {
-    "@angular/build": "^18.2.5",
+    "@angular/build": "18.2.5",
     "@angular/cli": "18.2.5",
     "@angular/compiler-cli": "18.2.5",
     "typescript": "5.5.4"
