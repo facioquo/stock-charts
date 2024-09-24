@@ -134,9 +134,11 @@ export class PickConfigComponent {
       }
     })();
 
+    const width = r.lineWidth * ((style==="dotted") ? 2 : 1);
+
     return {
       "border-bottom-color": r.color,
-      "border-bottom-width": r.lineWidth + "px",
+      "border-bottom-width": width + "px",
       "border-bottom-style": style
     };
   }
