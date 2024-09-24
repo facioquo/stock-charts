@@ -123,7 +123,7 @@ public static class Metadata
                         TooltipTemplate = "ADXR([P1])",
                         DataName = "adxr",
                         DataType = "number",
-                        LineType = "dash",
+                        LineType = "solid",
                         LineWidth = 2,
                         DefaultColor = standardGrayTransparent
                     }

@@ -47,4 +47,18 @@ $theme: mat.define-theme((
       }
     }
   }
+
+  // main content
+  a {
+    text-decoration: underline;
+    color: mat.get-theme-color($theme, neutral, 30);
+
+    &:visited {
+      color: unset;
+    }
+
+    &:hover {
+      color: mat.get-theme-color($theme, neutral, 50);
+    }
+  }
 }
