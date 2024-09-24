@@ -79,7 +79,7 @@ export class ChartConfigService {
         },
         annotation: {
           clip: false,
-          annotations: []
+          annotations: {}
         }
       },
       // normalized: true,  // TODO: try, for performance
@@ -87,12 +87,7 @@ export class ChartConfigService {
       //   xAxisKey: 'date'
       // },
       layout: {
-        padding: {
-          top: 0,
-          left: 1,
-          bottom: 0,
-          right: 1
-        },
+        padding: 0,
         autoPadding: false
       },
       responsive: true,
@@ -111,7 +106,7 @@ export class ChartConfigService {
             display: true,
             mirror: true,
             font: {
-              family: "Google Sans",
+              family: 'Google Sans',
               size: 12,
               lineHeight: 1
             },
@@ -145,8 +140,14 @@ export class ChartConfigService {
 
     const options = this.baseChartOptions();
 
+    // format y-axis (helper context)
+    const y = options.scales.y as CartesianScaleOptions;
+
+    // size to data, instead of next tick
+    // y.bounds = 'data';  // fix: needs formatting
+
     // format primary y-axis labels
-    options.scales.y.ticks.callback = (value, index, values) => {
+    y.ticks.callback = (value, index, values) => {
 
       // remove first and last y-axis labels
       if (index === 0 || index === values.length - 1) return null;
@@ -183,9 +184,6 @@ export class ChartConfigService {
     // format y-axis (helper context)
     const y = options.scales.y as CartesianScaleOptions;
 
-    // size to data, instead of next tick
-    // y.bounds = "data";
-
     // rescale labels
     y.ticks.callback = (value: number, index, values) => {
 
@@ -196,11 +194,11 @@ export class ChartConfigService {
 
       // otherwise, condense large/small display values
       else if (v > 10000000000)
-        return Math.trunc(value / 1000000000) + "B";
+        return Math.trunc(value / 1000000000) + 'B';
       else if (v > 10000000)
-        return Math.trunc(value / 1000000) + "M";
+        return Math.trunc(value / 1000000) + 'M';
       else if (v > 10000)
-        return Math.trunc(value / 1000) + "K";
+        return Math.trunc(value / 1000) + 'K';
       else if (v > 10)
         return Math.trunc(value);
       else if (v > 0)
@@ -230,14 +228,14 @@ export class ChartConfigService {
       },
       ticks: {
         display: false,
-        source: "auto",
+        source: 'auto',
         padding: 0,
         autoSkip: true,
         maxRotation: 0,
         minRotation: 0,
         font: {
           size: 9
-        },
+        }
       },
       border: {
         display: false
@@ -254,8 +252,6 @@ export class ChartConfigService {
   baseDataset(
     r: IndicatorResult,
     c: IndicatorResultConfig) {
-
-    // FIX: why won't candlestick work with ChartDataset return type?
 
     switch (r.lineType) {
 
@@ -344,7 +340,7 @@ export class ChartConfigService {
         return ptDataset;
 
       case 'none':
-        // hide instead of exclude "none" lines,
+        // hide instead of exclude 'none' lines,
         // otherwise, it breaks line offset fill
         const noneDataset: ChartDataset = {
           label: r.label,
@@ -374,17 +370,18 @@ export class ChartConfigService {
     const fillColor = this.usr.settings.isDarkTheme ? '#12131680' : '#FAF9FD90'
 
     const legendFont: FontSpec = {
-      family: "Google Sans",
+      family: 'Google Sans',
       size: 13,
-      style: "normal",
-      weight: "normal",
+      style: 'normal',
+      weight: 'normal',
       lineHeight: 1,
     };
 
     const annotation: AnnotationOptions & LabelAnnotationOptions = {
-      id: "legend",
+      id: 'legend',
       type: 'label',
       content: [labelText],
+      textAlign: 'start',
       font: legendFont,
       color: fontColor,
       backgroundColor: fillColor,

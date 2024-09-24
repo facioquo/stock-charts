@@ -86,7 +86,7 @@ export class PickConfigComponent {
   onSubmit(): void {
 
     // try to add selection to chart
-    this.cht.addSelectionPicked(this.selection, this.listing)
+    this.cht.addSelection(this.selection, this.listing)
       .subscribe({
 
         // successfully added to chart

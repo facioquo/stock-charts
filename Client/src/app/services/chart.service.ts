@@ -20,6 +20,7 @@ import {
   LineElement,
   PointElement,
   ScatterDataPoint,
+  TimeScale,
   TimeSeriesScale,
   Tooltip
 } from 'chart.js';
@@ -60,6 +61,7 @@ Chart.register(
   // scales
   CategoryScale,
   LinearScale,
+  TimeScale,
   TimeSeriesScale
 );
 
@@ -95,7 +97,7 @@ export class ChartService {
     const listing = this.listings.find(x => x.uiid == uiid);
 
     const selection: IndicatorSelection = {
-      ucid: this.getGuid("chart"),
+      ucid: this.getGuid('chart'),
       uiid: listing.uiid,
       label: listing.legendTemplate,
       chartType: listing.chartType,
@@ -136,13 +138,14 @@ export class ChartService {
     return selection;
   }
 
-  addSelectionPicked(
+  addSelection(
     selection: IndicatorSelection,
-    listing: IndicatorListing): Observable<any> {
+    listing: IndicatorListing,
+    scrollToMe: boolean = false): Observable<any> {
 
-    const green = "#2E7D32";
-    const gray = "#9E9E9E";
-    const red = "#DD2C00";
+    const green = '#2E7D32';
+    const gray = '#9E9E9E';
+    const red = '#DD2C00';
 
     // load selection to chart
     const obs = new Observable((observer) => {
@@ -236,7 +239,7 @@ export class ChartService {
             selection = this.selectionTokenReplacement(selection);
 
             // add to chart
-            this.displaySelection(selection, listing, false);
+            this.displaySelection(selection, listing, scrollToMe);
 
             // inform caller
             observer.next();
@@ -255,107 +258,16 @@ export class ChartService {
     selection: IndicatorSelection
   ) {
 
-    // TODO: reuse addSelectionPicked to avoid duplicate code
-    // TODO: add use of dataset.parsing for y-axis (conditionally, also mentioned above)
-
-    const green = "#2E7D32";
-    const red = "#DD2C00";
-    const gray = "#9E9E9E";
-
     // lookup config data
     const listing = this.listings.find(x => x.uiid == selection.uiid);
 
-    this.api.getSelectionData(selection, listing)
-      .subscribe({
-        next: (apidata: any[]) => {
-
-          // compose datasets
-          // parse each dataset
-          selection.results
-            .forEach((result: IndicatorResult) => {
-
-              // initialize dataset
-              const resultConfig = listing.results.find(x => x.dataName == result.dataName);
-              const dataset = this.cfg.baseDataset(result, resultConfig);
-              const data: ScatterDataPoint[] = [];
-              const pointColor: string[] = [];
-              const pointRotation: number[] = [];
-
-              // populate data
-              apidata.forEach(row => {
-
-                let yValue = row[result.dataName];
-
-                // apply candle pointers
-                if (yValue && listing.category == "candlestick-pattern") {
-
-                  switch (row["match"]) {
-
-                    case -100:
-                      yValue = 1.01 * row["candle"].high;
-                      pointColor.push(red);
-                      pointRotation.push(180);
-                      break;
-
-                    case 100:
-                      yValue = 0.99 * row["candle"].low;
-                      pointColor.push(green);
-                      pointRotation.push(0);
-                      break;
-
-                    default:
-                      yValue = 0.99 * row["candle"].low;
-                      pointColor.push(gray);
-                      pointRotation.push(0);
-                      break;
-                  }
-                }
-
-                else {
-                  pointColor.push(resultConfig.defaultColor);
-                  pointRotation.push(0);
-                }
-
-                data.push({
-                  x: new Date(row.date).valueOf(),
-                  y: yValue
-                });
-              });
-
-              // add extra bars
-              const nextDate = new Date(Math.max.apply(null, data.map(h => new Date(h.x))));
-
-              for (let i = 1; i < this.extraBars; i++) {
-                nextDate.setDate(nextDate.getDate() + 1);
-                data.push({
-                  x: new Date(nextDate).valueOf(),
-                  y: null
-                });
-              }
-
-              // custom candlestick pattern points
-              if (listing.category == "candlestick-pattern" && dataset.type != 'bar') {
-                dataset.pointRotation = pointRotation;
-                dataset.pointBackgroundColor = pointColor;
-                dataset.pointBorderColor = pointColor;
-              }
-
-              dataset.data = data;
-              result.dataset = dataset;
-            });
-
-          // replace tokens with values
-          selection = this.selectionTokenReplacement(selection);
-
-          // add to chart
-          this.displaySelection(selection, listing, false);
-        },
-        error: (e: HttpErrorResponse) => { console.log(e); }
-      });
+    // add to chart
+    this.addSelection(selection, listing, false)
+      .subscribe();  // no need to wait
   }
 
   displaySelection(
-    selection: IndicatorSelection,
+    selection: IndicatorSelection, // with data
     listing: IndicatorListing,
     scrollToMe: boolean
   ) {
@@ -381,7 +293,7 @@ export class ChartService {
     const sx = this.selections.indexOf(selection, 0);
     this.selections.splice(sx, 1);
 
-    if (selection.chartType == "overlay") {
+    if (selection.chartType == 'overlay') {
 
       selection.results.forEach((result: IndicatorResult) => {
         const dx = this.chartOverlay.data.datasets.indexOf(result.dataset, 0);
@@ -391,7 +303,7 @@ export class ChartService {
       this.chartOverlay.update();
 
     } else {
-      const body = document.getElementById("oscillators-zone");
+      const body = document.getElementById('oscillators-zone');
       const chart = document.getElementById(`${selection.ucid}-container`);
       body.removeChild(chart);
     }
@@ -424,7 +336,7 @@ export class ChartService {
     this.addOverlayLegend();
     this.chartOverlay.update('none');
 
-    if (scrollToMe) this.scrollToStart("chart-overlay");
+    if (scrollToMe) this.scrollToStart('chart-overlay');
   }
 
   addSelectionToNewOscillator(
@@ -450,13 +362,13 @@ export class ChartService {
       });
 
       const thresholdDataset: ChartDataset = {
-        label: "threshold",
+        label: 'threshold',
         type: 'line',
         data: lineData,
         yAxisID: 'y',
         pointRadius: 0,
         borderWidth: 2.5,
-        borderDash: threshold.style == "dash" ? [5, 2] : [],
+        borderDash: threshold.style == 'dash' ? [5, 2] : [],
         borderColor: threshold.color,
         backgroundColor: threshold.color,
         spanGaps: true,
@@ -487,7 +399,7 @@ export class ChartService {
     });
 
     // compose html
-    const body = document.getElementById("oscillators-zone");
+    const body = document.getElementById('oscillators-zone');
     const containerId = `${selection.ucid}-container`;
 
     // pre-delete, if exists (needed for theme change)
@@ -499,7 +411,7 @@ export class ChartService {
     // create chart container
     const container = document.createElement('div') as HTMLDivElement;
     container.id = containerId;
-    container.className = "chart-oscillator-container";
+    container.className = 'chart-oscillator-container';
 
     // add chart
     const myCanvas = document.createElement('canvas') as HTMLCanvasElement;
@@ -508,7 +420,7 @@ export class ChartService {
     body.appendChild(container);
 
     if (selection.chart) selection.chart.destroy();
-    selection.chart = new Chart(myCanvas.getContext("2d"), chartConfig);
+    selection.chart = new Chart(myCanvas.getContext('2d'), chartConfig);
 
     // annotations (after scales are drawn)
     selection.chart.update('none');
@@ -522,8 +434,8 @@ export class ChartService {
   addOverlayLegend() {
 
     const chart = this.chartOverlay;
-    const xPos: ScaleValue = chart.scales["x"].min;
-    const yPos: ScaleValue = chart.scales["y"].max;
+    const xPos: ScaleValue = chart.scales['x'].min;
+    const yPos: ScaleValue = chart.scales['y'].max;
     let adjY: number = 10; // first position
 
     chart.options.plugins.annotation.annotations =
@@ -537,7 +449,7 @@ export class ChartService {
             this.cfg.commonLegendAnnotation(selection.label, xPos, yPos, adjY);
 
           // customize annotation
-          annotation.id = "legend" + (index + 1).toString();
+          annotation.id = 'legend' + (index + 1).toString();
           annotation.color = selection.results[0].color;
 
           adjY += 15;
@@ -548,8 +460,8 @@ export class ChartService {
   addOscillatorLegend(selection: IndicatorSelection) {
 
     const chart = selection.chart;
-    const xPos: ScaleValue = chart.scales["x"].min;
-    const yPos: ScaleValue = chart.scales["y"].max;
+    const xPos: ScaleValue = chart.scales['x'].min;
+    const yPos: ScaleValue = chart.scales['y'].max;
 
     const annotation = this.cfg.commonLegendAnnotation(selection.label, xPos, yPos, 1);
 
@@ -581,7 +493,7 @@ export class ChartService {
 
     // update oscillator charts
     const charts = this.selections
-      .filter(s => s.chartType === "oscillator");
+      .filter(s => s.chartType === 'oscillator');
 
     charts.forEach((selection: IndicatorSelection) => {
 
@@ -615,10 +527,9 @@ export class ChartService {
           this.api.getListings()
             .subscribe({
 
-              // load catalog
               next: (listings: IndicatorListing[]) => {
 
-                // cache catalog
+                // load catalog
                 this.listings = listings;
 
                 // load indicators
@@ -638,7 +549,7 @@ export class ChartService {
 
     // loads base with quotes only
 
-    const candleOptions = Chart.defaults.elements["candlestick"];
+    const candleOptions = Chart.defaults.elements['candlestick'];
 
     // custom border colors
     candleOptions.color.up = '#1B5E20';
@@ -724,7 +635,7 @@ export class ChartService {
 
     // compose chart
     if (this.chartOverlay) this.chartOverlay.destroy();
-    const myCanvas = document.getElementById("chartOverlay") as HTMLCanvasElement;
+    const myCanvas = document.getElementById('chartOverlay') as HTMLCanvasElement;
     this.chartOverlay = new Chart(myCanvas.getContext('2d'), chartConfig);
   }
 
@@ -745,28 +656,30 @@ export class ChartService {
       selections.forEach((selection: IndicatorSelection) => {
         this.addSelectionWithoutScroll(selection);
       });
+
+      return;
     }
-    else { // add defaults
-      const def1 = this.defaultSelection("LINEAR");
-      def1.params.find(x => x.paramName == "lookbackPeriods").value = 50;
-      this.addSelectionWithoutScroll(def1);
 
-      const def2 = this.defaultSelection("BB");
-      this.addSelectionWithoutScroll(def2);
+    // otherwise, load defaults
+    const def1 = this.defaultSelection('LINEAR');
+    def1.params.find(x => x.paramName == 'lookbackPeriods').value = 50;
+    this.addSelectionWithoutScroll(def1);
 
-      const def3 = this.defaultSelection("RSI");
-      def3.params.find(x => x.paramName == "lookbackPeriods").value = 5;
-      this.addSelectionWithoutScroll(def3);
+    const def2 = this.defaultSelection('BB');
+    this.addSelectionWithoutScroll(def2);
 
-      const def4 = this.defaultSelection("ADX");
-      this.addSelectionWithoutScroll(def4);
+    const def3 = this.defaultSelection('RSI');
+    def3.params.find(x => x.paramName == 'lookbackPeriods').value = 5;
+    this.addSelectionWithoutScroll(def3);
 
-      const def5 = this.defaultSelection("SUPERTREND");
-      this.addSelectionWithoutScroll(def5);
+    const def4 = this.defaultSelection('ADX');
+    this.addSelectionWithoutScroll(def4);
 
-      const def6 = this.defaultSelection("MACD");
-      this.addSelectionWithoutScroll(def6);
-    }
+    const def5 = this.defaultSelection('SUPERTREND');
+    this.addSelectionWithoutScroll(def5);
+
+    const def6 = this.defaultSelection('MACD');
+    this.addSelectionWithoutScroll(def6);
   }
   //#endregion
 
@@ -785,7 +698,7 @@ export class ChartService {
     return selection;
   }
 
-  getGuid(prefix: string = "chart"): string {
+  getGuid(prefix: string = 'chart'): string {
     return `${prefix}${Guid()}`;
   }
 
