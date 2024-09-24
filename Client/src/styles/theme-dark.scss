@@ -18,6 +18,20 @@ $theme: mat.define-theme((color: (theme-type: dark,
 
   $maxwidth: 1024px;
 
+  // main content
+  a {
+    text-decoration: underline;
+    color: mat.get-theme-color($theme, neutral, 30);
+
+    &:visited {
+      color: unset;
+    }
+
+    &:hover {
+      color: mat.get-theme-color($theme, neutral, 70);
+    }
+  }
+
   // toolbar
   .main-toolbar {
 
@@ -68,17 +82,17 @@ $theme: mat.define-theme((color: (theme-type: dark,
     }
   }
 
-  // main content
-  a {
-    text-decoration: underline;
-    color: mat.get-theme-color($theme, neutral, 30);
+  // dialog content
+  h2.mat-mdc-dialog-title {
+    color: mat.get-theme-color($theme, neutral, 50);
+    font-size: larger;
+    font-weight: 600;
+  }
 
-    &:visited {
-      color: unset;
-    }
-
-    &:hover {
-      color: mat.get-theme-color($theme, neutral, 70);
-    }
+  .indicators-displayed-toolbar,
+  .indicators-available-toolbar{
+    color: mat.get-theme-color($theme, neutral, 50);
+    font-size: 1.3rem;
+    font-weight: 600;
   }
 }

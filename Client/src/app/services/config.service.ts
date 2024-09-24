@@ -82,10 +82,6 @@ export class ChartConfigService {
           annotations: {}
         }
       },
-      // normalized: true,  // TODO: try, for performance
-      // parsing: {         // TODO: try, for performance; may also add y-axis conditionally in dataset.parsing
-      //   xAxisKey: 'date'
-      // },
       layout: {
         padding: {
           top: 0,

@@ -25,6 +25,20 @@ $theme: mat.define-theme((
 
   // DARK OVERRIDES (only)
 
+  // main content
+  a {
+    text-decoration: underline;
+    color: mat.get-theme-color($theme, neutral, 30);
+
+    &:visited {
+      color: unset;
+    }
+
+    &:hover {
+      color: mat.get-theme-color($theme, neutral, 50);
+    }
+  }
+
   // toolbar
   .main-toolbar {
     h1 {
@@ -32,7 +46,7 @@ $theme: mat.define-theme((
 
       a {
         &:hover {
-          color: mat.get-theme-color($theme, neutral, 20);
+          color: mat.get-theme-color($theme, neutral, 30);
         }
       }
     }
@@ -48,17 +62,13 @@ $theme: mat.define-theme((
     }
   }
 
-  // main content
-  a {
-    text-decoration: underline;
-    color: mat.get-theme-color($theme, neutral, 30);
+  // dialog content
+  h2.mat-mdc-dialog-title {
+    color: mat.get-theme-color($theme, neutral, 40);
+  }
 
-    &:visited {
-      color: unset;
-    }
-
-    &:hover {
-      color: mat.get-theme-color($theme, neutral, 50);
-    }
+  .indicators-displayed-toolbar,
+  .indicators-available-toolbar{
+    color: mat.get-theme-color($theme, neutral, 10);
   }
 }
