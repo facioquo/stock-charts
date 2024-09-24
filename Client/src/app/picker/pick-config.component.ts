@@ -11,8 +11,10 @@ import { ChartService } from '../services/chart.service';
 import {
   IndicatorListing,
   IndicatorParam,
+  IndicatorResult,
   IndicatorSelection
 } from '../chart/chart.models';
+import { style } from '@angular/animations';
 
 interface LineWidth {
   name: string;
@@ -117,6 +119,26 @@ export class PickConfigComponent {
     const color = e.color.rgb.a === 1 ? e.color.hex : new TinyColor(e.color.rgb).toHex8String();
     picker.close();
     return color.toUpperCase();
+  }
+
+  getLineSample(r: IndicatorResult) {
+
+    const style = (() => {
+      switch (r.lineType) {
+      case "dots":
+        return "dotted";
+      case "dash":
+        return "dashed";
+      default:
+        return "solid";
+      }
+    })();
+
+    return {
+      "border-bottom-color": r.color,
+      "border-bottom-width": r.lineWidth + "px",
+      "border-bottom-style": style
+    };
   }
 
   userSpecifiedWidth(lineValue: string): boolean {

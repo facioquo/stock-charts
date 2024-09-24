@@ -33,6 +33,7 @@
                 {{type.name}}
               </mat-option>
             </mat-select>
+            <div [ngStyle]="getLineSample(r)"></div>
           </mat-form-field>
 
           <!-- line width -->
@@ -44,6 +45,7 @@
                 {{width.name}}
               </mat-option>
             </mat-select>
+            <div [ngStyle]="getLineSample(r)"></div>
           </mat-form-field>
 
           <!-- color -->
@@ -55,6 +57,7 @@
             <mtx-colorpicker-toggle matSuffix [for]="customPicker" [ngStyle]="{'color': r.color}" [disabled]="r.lineType==='none'">
             </mtx-colorpicker-toggle>
             <mtx-colorpicker #customPicker [content]="customPickerContent" disabled="false"></mtx-colorpicker>
+            <div [ngStyle]="getLineSample(r)"></div>
           </mat-form-field>
 
           <ng-template #customPickerContent>
