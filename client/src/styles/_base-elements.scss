@@ -1,0 +1,71 @@
+// LAYOUT
+html,
+body {
+  min-height: 100vh;
+  font-family: Rubik, "Google Sans", Roboto, "Helvetica Neue", sans-serif;
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+
+// TYPOGRAPHY
+h1,
+h2 {
+  font-weight: 600;
+}
+
+// ALIGNMENT
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}
+
+.noselect {
+  cursor: default;
+}
+
+.no-wrap {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filler {
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+
+// ANGULAR MATERIALS COMPONENTS
+
+.mat-mdc-dialog-title {
+  padding-bottom: 1rem !important;
+}
+
+mat-dialog-content {
+
+  padding-top: 1rem !important;
+
+  box-shadow:
+    0 0 3px 0 rgb(0 0 0 / 20%),
+    0 0 5px 0 rgb(0 0 0 / 14%),
+    0 0 8px 0 rgb(0 0 0 / 12%);
+}
+
+mat-dialog-actions {
+  justify-content: center !important;
+  padding: 1rem !important;
+}
+
+
+// COMMON CONTROLS
+.error {
+  color: #B71C1C;
+}

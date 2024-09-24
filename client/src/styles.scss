@@ -1,0 +1,4 @@
+@use "@angular/material" as mat;
+@use "./styles/theme-dark"; // default theme
+@use "./styles/base-elements";
+@include mat.core(); // material core styles

@@ -1,0 +1,41 @@
+{
+  "name": "stock.charts",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve --open --live-reload",
+    "build": "ng build --configuration=development",
+    "build.prod": "ng build --configuration=production",
+    "watch": "ng build --configuration=development --watch"
+  },
+  "private": false,
+  "dependencies": {
+    "@angular/animations": "18.2.5",
+    "@angular/cdk": "18.2.5",
+    "@angular/common": "18.2.5",
+    "@angular/compiler": "18.2.5",
+    "@angular/core": "18.2.5",
+    "@angular/forms": "18.2.5",
+    "@angular/material": "18.2.5",
+    "@angular/platform-browser": "18.2.5",
+    "@angular/platform-browser-dynamic": "18.2.5",
+    "@angular/router": "18.2.5",
+    "@angular/service-worker": "18.2.5",
+    "@ctrl/tinycolor": "4.1.0",
+    "@ng-matero/extensions": "18.2.1",
+    "chart.js": "4.4.4",
+    "chartjs-adapter-date-fns": "3.0.0",
+    "chartjs-plugin-annotation": "3.0.1",
+    "date-fns": "4.1.0",
+    "ngx-color": "9.0.0",
+    "rxjs": "7.8.1",
+    "tslib": "2.7.0",
+    "uuid": "10.0.0",
+    "zone.js": "0.14.10"
+  },
+  "devDependencies": {
+    "@angular/build": "^18.2.5",
+    "@angular/cli": "18.2.5",
+    "@angular/compiler-cli": "18.2.5",
+    "typescript": "5.5.4"
+  }
+}

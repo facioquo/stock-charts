@@ -1,0 +1,66 @@
+<mat-toolbar>
+  <h2 mat-dialog-title class="noselect">
+    chart settings
+  </h2>
+  <span class="filler"></span>
+  <button mat-icon-button (click)="closeListDialog()" matTooltip="close">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-toolbar>
+
+<mat-dialog-content>
+
+  <!-- GENERAL SETTINGS -->
+  <mat-list class="general-settings">
+    <mat-list-item>
+      <span class="toggle-label no-wrap">Dark theme</span>
+      <mat-slide-toggle class="toggle" labelPosition="before"
+        [(ngModel)]="usr.settings.isDarkTheme" (change)="toggleTheme($event)">
+      </mat-slide-toggle>
+    </mat-list-item>
+    <mat-list-item>
+      <span class="toggle-label no-wrap">Show tooltips</span>
+      <mat-slide-toggle class="toggle" labelPosition="before"
+        [(ngModel)]="usr.settings.showTooltips" (change)="toggleTooltips($event)">
+      </mat-slide-toggle>
+    </mat-list-item>
+  </mat-list>
+
+  <!-- DISPLAYED INDICATORS -->
+  <mat-selection-list #shown *ngIf="cht.selections.length>0">
+    <mat-toolbar class="noselect indicators-displayed-toolbar">
+      displayed indicators
+      <span class="filler"></span>
+      <mat-checkbox (change)="selectDisplayed($event, shown)"></mat-checkbox>
+    </mat-toolbar>
+    <mat-list-option *ngFor="let selection of cht.selections" [value]="selection">
+      <span matListItemTitle>{{selection.label}}</span>
+    </mat-list-option>
+    <div class="action-button-container">
+      <button mat-raised-button color="primary" [disabled]="shown.selectedOptions.selected.length===0"
+        (click)="removeSelections($event, shown.selectedOptions.selected)" matTooltip="remove selected indicators">
+        REMOVE SELECTED
+      </button>
+    </div>
+  </mat-selection-list>
+
+  <!-- AVAILABLE INDICATORS -->
+  <mat-nav-list>
+    <mat-toolbar class="noselect">
+      <div class="indicators-displayed-toolbar" style="line-height: 1 !important;">available indicators
+        <br />
+        <div class="help-link">» more info in our
+          <a matTooltip="indicator documentation" target="_blank" rel="noopener"
+            href="https://dotnet.stockindicators.dev/indicators/">
+            online docs
+          </a>
+        </div>
+      </div>
+    </mat-toolbar>
+    <a mat-list-item *ngFor="let listing of listings" (click)="openIndicatorSettings(listing)">
+      <span matListItemTitle>{{listing.name}}</span>
+      <span matListItemLine>{{listing.category}}</span>
+    </a>
+  </mat-nav-list>
+
+</mat-dialog-content>

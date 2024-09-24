@@ -81,10 +81,10 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: Client/package-lock.json
+          cache-dependency-path: client/package-lock.json
 
       - name: Install packages
-        working-directory: Client
+        working-directory: client
         run: npm install
 
       - name: Define cache marker
@@ -100,20 +100,20 @@ jobs:
 
       - name: Update configs
         shell: pwsh
-        working-directory: Client/src
+        working-directory: client/src
         run: |
           (Get-Content index.html).Replace("__GaTag__", "G-17DX6ZW6HP") | Set-Content index.html
           Write-Host "... Done!"
 
       - name: Build site
-        working-directory: Client
+        working-directory: client
         run: npm run build.prod
 
       - name: Save artifacts
         uses: actions/upload-artifact@v4
         with:
           name: web
-          path: Client/dist/app/browser
+          path: client/dist/app/browser
           include-hidden-files: true
 
   deploy:

@@ -25,11 +25,11 @@ If you want to host on your local computer and review the source code, follow th
 
 2. Open `\Server\ChartBackend.sln` in Visual Studio.  Take note of the URL in the WebApi project properties.
 
-    ![WebApi Properties ><](Client/src/assets/server-port.png)
+    ![WebApi Properties ><](client/src/assets/server-port.png)
 
 3. Select `WebApi` project and run by either `CTRL+F5` or `dotnet run` CLI command.  You can also View from right-click menus.  If you've done this successfully, a browser window will open and say "API is functioning nominally."  Leave the browser window open.
 
-4. Open `Client\src\environments\environment.ts` and modify the API URL, if needed, then save file.
+4. Open `client\src\environments\environment.ts` and modify the API URL, if needed, then save file.
 
     ```ts
     export const env: EnvConfig = {
@@ -38,7 +38,7 @@ If you want to host on your local computer and review the source code, follow th
     };
     ```
 
-5. Open `Git Bash` window and navigate to the `\Client` folder
+5. Open `Git Bash` window and navigate to the `\client` folder
 
     ``` bash
     npm install
