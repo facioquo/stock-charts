@@ -20,7 +20,6 @@ import {
   LineElement,
   PointElement,
   ScatterDataPoint,
-  TimeScale,
   TimeSeriesScale,
   Tooltip
 } from 'chart.js';
@@ -61,7 +60,6 @@ Chart.register(
   // scales
   CategoryScale,
   LinearScale,
-  TimeScale,
   TimeSeriesScale
 );
 

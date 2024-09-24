@@ -87,7 +87,12 @@ export class ChartConfigService {
       //   xAxisKey: 'date'
       // },
       layout: {
-        padding: 0,
+        padding: {
+          top: 0,
+          left: 1,
+          bottom: 0,
+          right: 1
+        },
         autoPadding: false
       },
       responsive: true,
@@ -217,6 +222,7 @@ export class ChartConfigService {
     const options: ScaleOptions = {
       alignToPixels: true,
       display: false,  // hide by default
+      offset: false,   // centers candles/bars
       type: 'timeseries',
       time: {
         unit: 'day'
