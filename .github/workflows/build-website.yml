@@ -23,7 +23,7 @@ jobs:
 
       - name: Build .NET solution
         run: >
-          dotnet build Server/ChartBackend.sln
+          dotnet build server/ChartBackend.sln
           --configuration Release
           --property:ContinuousIntegrationBuild=true
           -warnAsError

@@ -36,20 +36,20 @@ jobs:
 
       - name: Build .NET solution
         run: >
-          dotnet build Server/ChartBackend.sln
+          dotnet build server/ChartBackend.sln
           --configuration Release
           --property:ContinuousIntegrationBuild=true
           -warnAsError
 
       - name: Package Web API
-        working-directory: Server
+        working-directory: server
         run: >
           dotnet publish WebApi/WebApi.csproj
           --configuration Release
           --property:PublishDir="../artifacts/api"
 
       - name: Package Functions
-        working-directory: Server
+        working-directory: server
         run: >
           dotnet publish Functions/Functions.csproj
           --configuration Release
@@ -59,14 +59,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: api
-          path: "Server/artifacts/api"
+          path: "server/artifacts/api"
           include-hidden-files: true
 
       - name: Save Functions
         uses: actions/upload-artifact@v4
         with:
           name: fns
-          path: "Server/artifacts/fns"
+          path: "server/artifacts/fns"
           include-hidden-files: true
 
   build-website:

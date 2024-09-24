@@ -23,7 +23,7 @@ If you want to host on your local computer and review the source code, follow th
 
 1. [Clone the repo](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository)
 
-2. Open `\Server\ChartBackend.sln` in Visual Studio.  Take note of the URL in the WebApi project properties.
+2. Open `\server\ChartBackend.sln` in Visual Studio.  Take note of the URL in the WebApi project properties.
 
     ![WebApi Properties ><](client/src/assets/server-port.png)
 
