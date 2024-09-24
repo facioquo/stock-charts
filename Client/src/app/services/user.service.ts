@@ -19,7 +19,6 @@ export class UserService {
 
       this.settings = {
         isDarkTheme: true,
-        showCrosshairs: false,
         showTooltips: false
       }
 
@@ -33,7 +32,6 @@ export class UserService {
 
     // apply settings
     this.changeTheme(this.settings.isDarkTheme);
-    this.changeCrosshairs(this.settings.showCrosshairs);
     this.changeTooltips(this.settings.showTooltips);
   }
 
@@ -72,15 +70,6 @@ export class UserService {
       lightElement.setAttribute('href', 'theme-light.css');
       document.head.appendChild(lightElement);
     }
-  }
-
-  changeCrosshairs(showCrosshairs: boolean) {
-
-    // store/cache new setting
-    this.settings.showCrosshairs = showCrosshairs;
-    this.cacheSettings();
-
-    // note: actual add/remove of crosshairs is done in chart service
   }
 
   changeTooltips(showTooltips: boolean) {

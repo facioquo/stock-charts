@@ -38,9 +38,6 @@ import AnnotationPlugin, {
   ScaleValue
 } from 'chartjs-plugin-annotation';
 
-import CrosshairPlugin
-  from 'src/assets/js/chartjs-plugin-crosshair';
-
 // register extensions and plugins
 Chart.register(
 
@@ -58,7 +55,6 @@ Chart.register(
 
   // plugins
   AnnotationPlugin,
-  CrosshairPlugin,
   Filler,
 
   // scales
@@ -575,7 +571,8 @@ export class ChartService {
       this.chartOverlay.options
         = this.cfg.baseOverlayOptions(volumeAxisSize);
 
-      // regenerate annotations
+      // regenerate
+      this.chartOverlay.update('none'); // load scales
       this.addOverlayLegend();
 
       // apply changes
@@ -594,6 +591,7 @@ export class ChartService {
       chart.options = this.cfg.baseOscillatorOptions();
 
       // regenerate annotations
+      chart.update('none'); // load scales
       this.addOscillatorLegend(selection);
 
       // apply changes

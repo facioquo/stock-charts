@@ -44,11 +44,6 @@ export class SettingsComponent {
     this.cht.onSettingsChange();
   }
 
-  toggleCrosshairs(event: MatSlideToggleChange) {
-    this.usr.changeCrosshairs(event.checked);
-    this.cht.onSettingsChange();
-  }
-
   toggleTooltips(event: MatSlideToggleChange) {
     this.usr.changeTooltips(event.checked);
     this.cht.onSettingsChange();

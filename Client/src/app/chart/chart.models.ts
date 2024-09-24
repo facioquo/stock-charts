@@ -18,7 +18,6 @@ export interface Quote {
 
 export interface UserSettings {
   isDarkTheme: boolean;
-  showCrosshairs: boolean;
   showTooltips: boolean;
 }
 

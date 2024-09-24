@@ -26,9 +26,6 @@ import {
   ScaleValue
 } from 'chartjs-plugin-annotation';
 
-import { CrosshairOptions }
-  from 'src/assets/js/chartjs-plugin-crosshair';
-
 @Injectable()
 export class ChartConfigService {
 
@@ -78,14 +75,12 @@ export class ChartConfigService {
         },
         tooltip: {
           enabled: this.usr.settings.showTooltips,
-          mode: 'interpolate',
           intersect: false
         },
         annotation: {
           clip: false,
           annotations: []
-        },
-        crosshair: this.crosshairPluginOptions()
+        }
       },
       // normalized: true,  // TODO: try, for performance
       // parsing: {         // TODO: try, for performance; may also add y-axis conditionally in dataset.parsing
@@ -254,28 +249,6 @@ export class ChartConfigService {
     };
 
     return options;
-  }
-
-  crosshairPluginOptions(): CrosshairOptions {
-
-    if (this.usr.settings.showCrosshairs === false) return null;
-
-    const crosshairOptions: CrosshairOptions = {
-      line: {
-        color: '#F66',           // crosshair line color
-        width: 1                 // crosshair line width
-      },
-      sync: {
-        enabled: true,           // enable trace line syncing with other charts
-        group: 1,                // chart group (can be unique set of groups)
-        suppressTooltips: true   // suppress tooltips (on other chart) when synced tracer
-      },
-      snap: {
-        enabled: true            // snap to data points
-      }
-    };
-
-    return crosshairOptions;
   }
 
   baseDataset(
