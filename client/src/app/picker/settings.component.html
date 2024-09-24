@@ -33,13 +33,13 @@
   </mat-list>
 
   <!-- DISPLAYED INDICATORS -->
-  <mat-selection-list #shown *ngIf="selections.length>0">
+  <mat-selection-list #shown *ngIf="cht.selections.length>0">
     <mat-toolbar class="noselect indicators-displayed-toolbar">
       Displayed indicators
       <span class="filler"></span>
       <mat-checkbox (change)="selectDisplayed($event, shown)"></mat-checkbox>
     </mat-toolbar>
-    <mat-list-option *ngFor="let selection of selections" [value]="selection">
+    <mat-list-option *ngFor="let selection of cht.selections" [value]="selection">
       <span matListItemTitle>{{selection.label}}</span>
     </mat-list-option>
     <div class="action-button-container">

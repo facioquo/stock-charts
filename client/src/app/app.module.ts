@@ -24,7 +24,7 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
 import { ApiService } from './services/api.service';
-import { ChartControlService } from './services/chart-control.service';
+import { ChartService } from './services/chart.service';
 import { ChartConfigService } from './services/chart-config.service';
 import { UserConfigService } from './services/user-config.service';
 
@@ -55,7 +55,7 @@ import { UserConfigService } from './services/user-config.service';
       provide: ErrorStateMatcher,
       useClass: ShowOnDirtyErrorStateMatcher
     },
-    ChartControlService,
+    ChartService,
     ChartConfigService,
     UserConfigService,
     provideHttpClient(withInterceptorsFromDi())

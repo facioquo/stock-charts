@@ -80,7 +80,7 @@ import {
 } from '../chart/chart.models';
 
 @Injectable()
-export class ChartControlService {
+export class ChartService {
 
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];

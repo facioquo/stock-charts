@@ -6,7 +6,7 @@ import { MtxColorpicker } from '@ng-matero/extensions/colorpicker';
 import { ColorEvent } from 'ngx-color';
 import { TinyColor } from '@ctrl/tinycolor';
 
-import { ChartControlService } from '../services/chart-control.service';
+import { ChartService } from '../services/chart.service';
 
 import {
   IndicatorListing,
@@ -76,7 +76,7 @@ export class PickConfigComponent {
     @Inject(MAT_DIALOG_DATA)
     public listing: IndicatorListing,
     private dialogRef: MatDialogRef<PickConfigComponent>,
-    private cht: ChartControlService
+    private cht: ChartService
   ) {
 
     // pre-populate selection

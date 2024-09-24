@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
-import { ChartControlService } from '../services/chart-control.service';
+import { ChartService } from '../services/chart.service';
 import { UserConfigService } from '../services/user-config.service';
 
 import { IndicatorListing, IndicatorSelection } from '../chart/chart.models';
@@ -24,11 +24,10 @@ export class SettingsComponent {
   constructor(
     private listRef: MatDialog,
     private picker: MatDialog,
-    private cht: ChartControlService,
+    public cht: ChartService,
     public usr: UserConfigService
   ) {
     this.listings = this.cht.listings;
-    this.selections = this.cht.selections;  // FIX: this is redundant?
   }
 
   selectDisplayed(event: MatCheckboxChange, shown: MatSelectionList): void {
