@@ -27,6 +27,7 @@ import { ApiService } from './services/api.service';
 import { ChartService } from './services/chart.service';
 import { ChartConfigService } from './services/config.service';
 import { UserService } from './services/user.service';
+import { UtilityService } from './services/utility.service';
 
 @NgModule({
   declarations: [
@@ -55,10 +56,12 @@ import { UserService } from './services/user.service';
       provide: ErrorStateMatcher,
       useClass: ShowOnDirtyErrorStateMatcher
     },
+    provideHttpClient(withInterceptorsFromDi()),
+
     ChartService,
     ChartConfigService,
     UserService,
-    provideHttpClient(withInterceptorsFromDi())
+    UtilityService
   ],
   bootstrap: [
     AppComponent

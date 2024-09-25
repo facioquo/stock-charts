@@ -2,11 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/internal/Observable';
 
-import { ApiService } from './api.service';
-import { ChartConfigService } from './config.service';
-
-import { v4 as Guid } from 'uuid';
-
 import {
   BarController,
   BarElement,
@@ -75,6 +70,11 @@ import {
   Quote
 } from '../chart/chart.models';
 
+// services
+import { ApiService } from './api.service';
+import { ChartConfigService } from './config.service';
+import { UtilityService } from './utility.service';
+
 @Injectable()
 export class ChartService {
 
@@ -86,7 +86,8 @@ export class ChartService {
 
   constructor(
     private readonly api: ApiService,
-    private readonly cfg: ChartConfigService
+    private readonly cfg: ChartConfigService,
+    private readonly util: UtilityService
   ) { }
 
   //#region SELECTION MGMT
@@ -95,7 +96,7 @@ export class ChartService {
     const listing = this.listings.find(x => x.uiid == uiid);
 
     const selection: IndicatorSelection = {
-      ucid: this.getGuid('chart'),
+      ucid: this.util.guid('chart'),
       uiid: listing.uiid,
       label: listing.legendTemplate,
       chartType: listing.chartType,
@@ -334,7 +335,7 @@ export class ChartService {
     this.addOverlayLegend();
     this.chartOverlay.update('none');
 
-    if (scrollToMe) this.scrollToStart('chart-overlay');
+    if (scrollToMe) this.util.scrollToStart('chart-overlay');
   }
 
   addSelectionToNewOscillator(
@@ -426,7 +427,7 @@ export class ChartService {
 
     // apply changes
     selection.chart.update('none');
-    if (scrollToMe) this.scrollToEnd(container.id);
+    if (scrollToMe) this.util.scrollToEnd(container.id);
   }
 
   addOverlayLegend() {
@@ -694,24 +695,6 @@ export class ChartService {
       });
     });
     return selection;
-  }
-
-  getGuid(prefix: string = 'chart'): string {
-    return `${prefix}${Guid()}`;
-  }
-
-  scrollToStart(id: string) {
-    setTimeout(() => {
-      const element = document.getElementById(id);
-      element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
-    }, 200);
-  }
-
-  scrollToEnd(id: string) {
-    setTimeout(() => {
-      const element = document.getElementById(id);
-      element.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });
-    }, 200);
   }
   //#endregion
 }
