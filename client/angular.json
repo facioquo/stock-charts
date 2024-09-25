@@ -27,16 +27,10 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "src/assets",
-                "output": "/assets"
-              },
-              {
-                "glob": "_headers",
-                "input": "src",
-                "output": "/"
-              }
+              "src/assets",
+              "src/_headers",
+              "src/robots.txt",
+              "src/sitemap.xml"
             ],
             "styles": [
               "src/styles.scss",
@@ -47,11 +41,7 @@
               }
             ],
             "stylePreprocessorOptions": {
-              "includePaths": [
-                "node_modules",
-                "src",
-                "src/styles"
-              ]
+              "includePaths": ["node_modules", "src", "src/styles"]
             },
             "extractLicenses": false,
             "sourceMap": {
