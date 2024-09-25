@@ -14,13 +14,5 @@
 </mat-toolbar>
 
 <main id="main-content" class="content-container">
-
-  <div class="button-container">
-    <button mat-fab color="accent" *ngIf="!cht.loading" (click)="openSettingsDialog()"
-      matTooltip="change indicators and settings" aria-label="change indicators and settings">
-      <mat-icon color="primary">edit</mat-icon>
-    </button>
-  </div>
-
-  <app-chart></app-chart>
+  <router-outlet></router-outlet>
 </main>

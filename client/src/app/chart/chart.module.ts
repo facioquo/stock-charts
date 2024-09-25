@@ -7,7 +7,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+// services
+import { ChartService } from '../services/chart.service';
+import { ChartConfigService } from '../services/config.service';
+
+// component
 import { ChartComponent } from './chart.component';
+import { ChartRoutingModule } from './chart-routing.module';
 
 @NgModule({
   declarations: [
@@ -21,12 +27,16 @@ import { ChartComponent } from './chart.component';
   ],
   imports: [
     CommonModule,
+    ChartRoutingModule,
     MatButtonModule,
     MatDialogModule,
     MatIconModule,
     MatToolbarModule,
     MatTooltipModule
   ],
-  providers: []
+  providers: [
+    ChartService,
+    ChartConfigService
+  ]
 })
 export class ChartModule { }

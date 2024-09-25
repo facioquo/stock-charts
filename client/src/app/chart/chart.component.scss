@@ -2,6 +2,19 @@
 
 // note: width is managed by .content-container
 
+.button-container {
+
+  position: absolute;
+  top: -56px;
+  right: 8px;
+  height: 100%;
+
+  button {
+    opacity: 0.6;
+    position: sticky;
+    top: 8px;
+  }
+}
 
 .chart-overlay-container {
 
