@@ -45,8 +45,30 @@ h2 {
 
 // ANGULAR MATERIALS COMPONENTS
 
-.mat-mdc-dialog-title {
-  padding-bottom: 1rem !important;
+// dialog
+mat-toolbar.dialog-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: default;
+
+  padding-left: 38px;
+}
+
+.dialog-section-header {
+
+  font-size: 1.3rem !important;
+  font-weight: 600 !important;
+  cursor: default;
+
+  line-height: 1 !important;
+
+  a {
+    text-decoration: underline;
+
+    &:visited {
+      color: unset;
+    }
+  }
 }
 
 mat-dialog-content {
@@ -54,9 +76,9 @@ mat-dialog-content {
   padding-top: 1rem !important;
 
   box-shadow:
-    0 0 3px 0 rgb(0 0 0 / 20%),
-    0 0 5px 0 rgb(0 0 0 / 14%),
-    0 0 8px 0 rgb(0 0 0 / 12%);
+    0 0 1px 0 rgb(0 0 0 / 20%),
+    0 0 3px 0 rgb(0 0 0 / 14%),
+    0 0 5px 0 rgb(0 0 0 / 12%);
 }
 
 mat-dialog-actions {
@@ -65,7 +87,7 @@ mat-dialog-actions {
 }
 
 
-// COMMON CONTROLS
+// common controls
 .error {
   color: #B71C1C;
 }

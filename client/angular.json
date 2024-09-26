@@ -34,12 +34,7 @@
               "src/sitemap.xml"
             ],
             "styles": [
-              "src/styles.scss",
-              {
-                "inject": false,
-                "input": "src/styles/theme-light.scss",
-                "bundleName": "theme-light"
-              }
+              "src/styles.scss"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [

@@ -1,10 +1,10 @@
 @use '@angular/material' as mat;
 @use 'themed-parts';
 
-// DEFAULT DARK THEME (see theme-light.scss swap file)
+// DARK THEME (default)
 // ref: https://material.angular.io/guide/theming
 
-$theme: mat.define-theme((
+$dark-theme: mat.define-theme((
   color: (
     theme-type: dark,
     primary: mat.$azure-palette
@@ -16,13 +16,13 @@ $theme: mat.define-theme((
       scale: 0
     )));
 
-// apply theme (base)
-:root {
+// theme (applied to body)
+.dark-theme {
 
-  @include mat.all-component-themes($theme);
-  @include themed-parts.theme($theme);
+  @include mat.all-component-themes($dark-theme);
+  @include themed-parts.theme($dark-theme);
 
-  // BASE OVERRIDES (only)
+  // COLOR OVERRIDES only
 
   // toolbar
   .main-toolbar {
@@ -34,39 +34,12 @@ $theme: mat.define-theme((
         color: rgba(230, 199, 76, 0.85);
       }
     }
-  }
 
-  h2 {
-    color: mat.get-theme-color($theme, neutral, 60);
+    h2 {
+      color: mat.get-theme-color($dark-theme, neutral, 60);
 
-    a:hover {
-      color: mat.get-theme-color($theme, neutral, 40);
-    }
-  }
-
-  // dialog content
-  h2.mat-mdc-dialog-title {
-    color: mat.get-theme-color($theme, neutral, 50);
-    font-size: larger;
-    font-weight: 600;
-  }
-
-  .indicators-displayed-toolbar,
-  .indicators-available-toolbar {
-    color: mat.get-theme-color($theme, neutral, 50);
-    font-size: 1.3rem;
-    font-weight: 600;
-
-    a {
-      text-decoration: underline;
-      color: mat.get-theme-color($theme, neutral, 30);
-
-      &:visited {
-        color: unset;
-      }
-
-      &:hover {
-        color: mat.get-theme-color($theme, neutral, 70);
+      a:hover {
+        color: mat.get-theme-color($dark-theme, neutral, 40);
       }
     }
   }
