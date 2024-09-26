@@ -1,13 +1,23 @@
 @use "../styles";
 
-// note: width is managed by .content-container
+// note: width is managed by `main`
+// in app.component.scss
 
+.button-container {
+
+  position: absolute;
+  top: -56px;
+  right: 8px;
+  height: 100%;
+
+  button {
+    opacity: 0.6;
+    position: sticky;
+    top: 8px;
+  }
+}
 
 .chart-overlay-container {
-
-  padding: 0 8px;
-  max-width: 1024px;
-  margin: auto;
 
   aspect-ratio: 2.5;
 
@@ -29,11 +39,6 @@
 }
 
 .chart-oscillator-container {
-
-  padding: 0 8px;
-  max-width: 1024px;
-  margin: auto;
-  margin-top: 0;
 
   aspect-ratio: 10;
 

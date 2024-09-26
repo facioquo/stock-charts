@@ -2,11 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/internal/Observable';
 
-import { ApiService } from './api.service';
-import { ChartConfigService } from './config.service';
-
-import { v4 as Guid } from 'uuid';
-
 import {
   BarController,
   BarElement,
@@ -73,7 +68,12 @@ import {
   IndicatorResultConfig,
   IndicatorSelection,
   Quote
-} from '../chart/chart.models';
+} from '../pages/chart/chart.models';
+
+// services
+import { ApiService } from './api.service';
+import { ChartConfigService } from './config.service';
+import { UtilityService } from './utility.service';
 
 @Injectable()
 export class ChartService {
@@ -86,56 +86,11 @@ export class ChartService {
 
   constructor(
     private readonly api: ApiService,
-    private readonly cfg: ChartConfigService
+    private readonly cfg: ChartConfigService,
+    private readonly util: UtilityService
   ) { }
 
-  //#region SELECTION MGMT
-  defaultSelection(uiid: string): IndicatorSelection {
-
-    const listing = this.listings.find(x => x.uiid == uiid);
-
-    const selection: IndicatorSelection = {
-      ucid: this.getGuid('chart'),
-      uiid: listing.uiid,
-      label: listing.legendTemplate,
-      chartType: listing.chartType,
-      params: [],
-      results: []
-    };
-
-    // load default parameters
-    listing.parameters?.forEach((config: IndicatorParamConfig) => {
-
-      const param = {
-        paramName: config.paramName,
-        displayName: config.displayName,
-        minimum: config.minimum,
-        maximum: config.maximum,
-        value: config.defaultValue
-      } as IndicatorParam
-
-      selection.params.push(param);
-    });
-
-    // load default results colors and containers
-    listing.results.forEach((config: IndicatorResultConfig) => {
-
-      const result = {
-        label: config.tooltipTemplate,
-        color: config.defaultColor,
-        dataName: config.dataName,
-        displayName: config.displayName,
-        lineType: config.lineType,
-        lineWidth: config.lineWidth,
-        order: listing.order
-      } as IndicatorResult
-
-      selection.results.push(result);
-    });
-
-    return selection;
-  }
-
+  //#region SELECT/DISPLAY OPERATIONS
   addSelection(
     selection: IndicatorSelection,
     listing: IndicatorListing,
@@ -264,49 +219,51 @@ export class ChartService {
       .subscribe();  // no need to wait
   }
 
-  displaySelection(
-    selection: IndicatorSelection, // with data
-    listing: IndicatorListing,
-    scrollToMe: boolean
-  ) {
+  defaultSelection(uiid: string): IndicatorSelection {
 
-    // add to collection
-    this.selections.push(selection);
+    const listing = this.listings.find(x => x.uiid == uiid);
 
-    // add needed charts
-    if (listing.chartType == 'overlay') {
-      this.addSelectionToOverlayChart(selection, scrollToMe);
-    }
-    else {
-      this.addSelectionToNewOscillator(selection, listing, scrollToMe);
+    // initialize selection
+    const selection: IndicatorSelection = {
+      ucid: this.util.guid('chart'),
+      uiid: listing.uiid,
+      label: listing.legendTemplate,
+      chartType: listing.chartType,
+      params: [],
+      results: []
     };
 
-    this.cacheSelections();
-  }
+    // load default parameters
+    listing.parameters?.forEach((config: IndicatorParamConfig) => {
 
-  deleteSelection(ucid: string) {
+      const param = {
+        paramName: config.paramName,
+        displayName: config.displayName,
+        minimum: config.minimum,
+        maximum: config.maximum,
+        value: config.defaultValue
+      } as IndicatorParam
 
-    const selection = this.selections.find(x => x.ucid == ucid);
+      selection.params.push(param);
+    });
 
-    const sx = this.selections.indexOf(selection, 0);
-    this.selections.splice(sx, 1);
+    // load default results colors and containers
+    listing.results.forEach((config: IndicatorResultConfig) => {
 
-    if (selection.chartType == 'overlay') {
+      const result = {
+        label: config.tooltipTemplate,
+        color: config.defaultColor,
+        dataName: config.dataName,
+        displayName: config.displayName,
+        lineType: config.lineType,
+        lineWidth: config.lineWidth,
+        order: listing.order
+      } as IndicatorResult
 
-      selection.results.forEach((result: IndicatorResult) => {
-        const dx = this.chartOverlay.data.datasets.indexOf(result.dataset, 0);
-        this.chartOverlay.data.datasets.splice(dx, 1);
-      });
-      this.addOverlayLegend();
-      this.chartOverlay.update();
+      selection.results.push(result);
+    });
 
-    } else {
-      const body = document.getElementById('oscillators-zone');
-      const chart = document.getElementById(`${selection.ucid}-container`);
-      body.removeChild(chart);
-    }
-
-    this.cacheSelections();
+    return selection;
   }
 
   cacheSelections() {
@@ -319,11 +276,29 @@ export class ChartService {
 
     localStorage.setItem('selections', JSON.stringify(selections));
   }
-  //#endregion
 
-  //#region CHARTS CHANGE
-  addSelectionToOverlayChart(
-    selection: IndicatorSelection,
+  displaySelection(
+    selection: IndicatorSelection, // with data
+    listing: IndicatorListing,
+    scrollToMe: boolean
+  ) {
+
+    // add to collection
+    this.selections.push(selection);
+
+    // add needed charts
+    if (listing.chartType == 'overlay') {
+      this.displaySelectionOnOverlayChart(selection, scrollToMe);
+    }
+    else {
+      this.displaySelectionOnNewOscillator(selection, listing, scrollToMe);
+    };
+
+    this.cacheSelections();
+  }
+
+  displaySelectionOnOverlayChart(
+    selection: IndicatorSelection,  // with data
     scrollToMe: boolean) {
 
     // add selection
@@ -334,11 +309,11 @@ export class ChartService {
     this.addOverlayLegend();
     this.chartOverlay.update('none');
 
-    if (scrollToMe) this.scrollToStart('chart-overlay');
+    if (scrollToMe) this.util.scrollToStart('chart-overlay');
   }
 
-  addSelectionToNewOscillator(
-    selection: IndicatorSelection,
+  displaySelectionOnNewOscillator(
+    selection: IndicatorSelection,  // with data
     listing: IndicatorListing,
     scrollToMe: boolean) {
 
@@ -426,7 +401,7 @@ export class ChartService {
 
     // apply changes
     selection.chart.update('none');
-    if (scrollToMe) this.scrollToEnd(container.id);
+    if (scrollToMe) this.util.scrollToEnd(container.id);
   }
 
   addOverlayLegend() {
@@ -464,6 +439,31 @@ export class ChartService {
     const annotation = this.cfg.commonLegendAnnotation(selection.label, xPos, yPos, 1);
 
     chart.options.plugins.annotation.annotations = { annotation };
+  }
+
+  deleteSelection(ucid: string) {
+
+    const selection = this.selections.find(x => x.ucid == ucid);
+
+    const sx = this.selections.indexOf(selection, 0);
+    this.selections.splice(sx, 1);
+
+    if (selection.chartType == 'overlay') {
+
+      selection.results.forEach((result: IndicatorResult) => {
+        const dx = this.chartOverlay.data.datasets.indexOf(result.dataset, 0);
+        this.chartOverlay.data.datasets.splice(dx, 1);
+      });
+      this.addOverlayLegend();
+      this.chartOverlay.update();
+
+    } else {
+      const body = document.getElementById('oscillators-zone');
+      const chart = document.getElementById(`${selection.ucid}-container`);
+      body.removeChild(chart);
+    }
+
+    this.cacheSelections();
   }
 
   onSettingsChange() {
@@ -513,7 +513,7 @@ export class ChartService {
   //#region DATA OPERATIONS
   loadCharts() {
 
-    // base overlay chart with quotes
+    // get data and load charts
     this.api.getQuotes()
       .subscribe({
         next: (quotes: Quote[]) => {
@@ -678,6 +678,9 @@ export class ChartService {
 
     const def6 = this.defaultSelection('MACD');
     this.addSelectionWithoutScroll(def6);
+
+    const def7 = this.defaultSelection('MARUBOZU');
+    this.addSelectionWithoutScroll(def7);
   }
   //#endregion
 
@@ -694,24 +697,6 @@ export class ChartService {
       });
     });
     return selection;
-  }
-
-  getGuid(prefix: string = 'chart'): string {
-    return `${prefix}${Guid()}`;
-  }
-
-  scrollToStart(id: string) {
-    setTimeout(() => {
-      const element = document.getElementById(id);
-      element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
-    }, 200);
-  }
-
-  scrollToEnd(id: string) {
-    setTimeout(() => {
-      const element = document.getElementById(id);
-      element.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });
-    }, 200);
   }
   //#endregion
 }

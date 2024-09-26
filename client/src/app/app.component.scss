@@ -1,28 +1,57 @@
-.content-container {
+@use '@angular/material' as mat;
+
+main,
+header,
+footer {
 
   display: block;
   position: relative;
-  text-align: right;
 
-  width: 100%;
   max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+main {
+
+  // ensures scrollbar without using overflow-y: scroll
+  // since it causes a double scrollbar when dialog opens
   min-height: 100vh;
-  margin: 0;
-  margin-right: auto;
+}
+
+// toolbar, colors in theme files
+.main-toolbar {
+
   margin-left: auto;
-  padding: 0;
+  margin-right: auto;
+  padding: 0 !important;
 
-  .button-container {
+  background-color: transparent;
+  line-height: unset !important;
 
-    position: absolute;
-    top: -56px;
-    right: 8px;
-    height: 100%;
+  h1 {
+    font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
+    font-size: 1.25em;
+    font-weight: 600;
+    line-height: 1.0 !important;
+    letter-spacing: 0.65px;
 
-    button {
-      opacity: 0.6;
-      position: sticky;
-      top: 8px;
+    a {
+      text-decoration: none;
+      padding-top: 0.5rem;
+    }
+  }
+
+  h2 {
+    font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
+    font-size: 0.55em;
+    font-weight: normal;
+    line-height: 0.9 !important;
+    letter-spacing: 0.55px;
+
+    a {
+      text-decoration: none;
+      padding-bottom: 0.9rem;
     }
   }
 }

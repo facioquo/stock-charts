@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { UserSettings } from '../chart/chart.models';
+import { UserSettings } from '../pages/chart/chart.models';
 
 @Injectable()
 export class UserService {
 
   settings: UserSettings; // initialized in app.component.ts
 
-  initSettings() {
+  loadSettings() {
 
     // load user preference settings from cache,
     // without applying changes to the UI
@@ -41,35 +41,17 @@ export class UserService {
 
   changeTheme(isDarkTheme: boolean) {
 
-    // default site style is dark.
-    // we override by adding the light theme CSS file in <head>
-    // then remove it when going to dark, if it exists
-
     // store/cache new setting
     this.settings.isDarkTheme = isDarkTheme;
     this.cacheSettings();
 
-    // add/remove theme stylesheet
-    const refClassName = "theme-stylesheet";
+    // apply
+    const themeClass = isDarkTheme
+      ? 'dark-theme'
+      : 'light-theme';
 
-    const lightElement = document.createElement('link');
-    lightElement.setAttribute('rel', 'stylesheet');
-    lightElement.classList.add(refClassName);
-
-    // restore dark theme
-    if (isDarkTheme) {
-      const linkExists = document.head.querySelector(`link[rel="stylesheet"].${refClassName}`)
-
-      if (linkExists) {
-        document.head.removeChild(linkExists);
-      }
-    }
-
-    // add light theme
-    else {
-      lightElement.setAttribute('href', 'theme-light.css');
-      document.head.appendChild(lightElement);
-    }
+    document.body.classList.remove('dark-theme', 'light-theme');
+    document.body.classList.add(themeClass);
   }
 
   changeTooltips(showTooltips: boolean) {

@@ -6,6 +6,14 @@
   </div>
 </div>
 
+<!-- SETTINGS -->
+<div class="button-container">
+  <button mat-fab color="accent" *ngIf="!cht.loading" (click)="openSettingsDialog()"
+    matTooltip="change indicators and settings" aria-label="edit settings">
+    <mat-icon color="primary">edit</mat-icon>
+  </button>
+</div>
+
 <!-- CHART (MAIN OVERLAY) -->
 <div id="chart-overlay" class="chart-overlay-container" [hidden]="cht.loading">
   <canvas id="chartOverlay"></canvas>

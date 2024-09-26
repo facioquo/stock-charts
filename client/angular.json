@@ -21,77 +21,49 @@
             "outputPath": {
               "base": "dist/app"
             },
+            "browser": "src/main.ts",
             "index": "src/index.html",
             "polyfills": [
               "src/polyfills.ts"
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "src/assets",
-                "output": "/assets"
-              },
-              {
-                "glob": "_headers",
-                "input": "src",
-                "output": "/"
-              }
+              "src/assets",
+              "src/_headers",
+              "src/robots.txt",
+              "src/sitemap.xml"
             ],
             "styles": [
-              "src/styles.scss",
-              {
-                "inject": false,
-                "input": "src/styles/theme-light.scss",
-                "bundleName": "theme-light"
-              }
+              "src/styles.scss"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
                 "node_modules",
                 "src",
-                "src/styles"
-              ]
+                "src/styles"]
             },
-            "extractLicenses": false,
-            "sourceMap": {
-              "scripts": true,
-              "styles": false,
-              "hidden": true,
-              "vendor": false
-            },
-            "optimization": false,
-            "namedChunks": true,
-            "browser": "src/main.ts"
+            "outputHashing": "all"
           },
+          "defaultConfiguration": "production",
           "configurations": {
+            "development": {
+              "optimization": false,
+              "namedChunks": true,
+              "sourceMap": true
+            },
             "production": {
+              "optimization": true,
+              "namedChunks": false,
+              "sourceMap": {
+                "scripts": true,
+                "styles": true,
+                "hidden": false,
+                "vendor": false
+              },
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": {
-                "scripts": true,
-                "styles": false,
-                "hidden": true,
-                "vendor": false
-              },
-              "namedChunks": false,
-              "extractLicenses": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "4mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "150kb",
-                  "maximumError": "200kb"
                 }
               ]
             }
@@ -99,11 +71,11 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
-          "options": {
-            "port": 4200,
-            "buildTarget": "app:build"
-          },
+          "defaultConfiguration": "development",
           "configurations": {
+            "development": {
+              "buildTarget": "app:build:development"
+            },
             "production": {
               "buildTarget": "app:build:production"
             }
@@ -114,31 +86,11 @@
           "options": {
             "buildTarget": "app:build"
           }
-        },
-        "lint": {
-          "builder": "@angular-eslint/builder:lint",
-          "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
-          }
         }
       }
     }
   },
   "cli": {
-    "schematicCollections": [
-      "@angular-eslint/schematics"
-    ],
     "analytics": false
-  },
-  "schematics": {
-    "@angular-eslint/schematics:application": {
-      "setParserOptionsProject": true
-    },
-    "@angular-eslint/schematics:library": {
-      "setParserOptionsProject": true
-    }
   }
 }

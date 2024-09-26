@@ -4,7 +4,7 @@ import { UserService } from './user.service';
 import {
   IndicatorResult,
   IndicatorResultConfig
-} from '../chart/chart.models';
+} from '../pages/chart/chart.models';
 
 // chart.js
 import 'chartjs-adapter-date-fns';

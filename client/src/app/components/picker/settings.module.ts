@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -36,7 +35,6 @@ import { PickConfigComponent } from './pick-config.component';
   imports: [
     CommonModule,
     FormsModule,
-    MatBottomSheetModule,
     MatButtonModule,
     MatCheckboxModule,
     MatDialogModule,

@@ -1,26 +1,20 @@
-<mat-toolbar class="noselect main-toolbar" color="default">
-  <div>
-    <h1 class="no-wrap">
-      <a href="https://github.com/facioquo/stock-charts" target="_blank" rel="noopener">
-        stock chart
-      </a>
-    </h1>
-    <h2>
-      <a href="https://dotnet.stockindicators.dev" target="_blank" rel="noopener">
-        <strong>Stock Indicators for .NET</strong>
-      </a>
-    </h2>
-  </div>
-</mat-toolbar>
+<header>
+  <mat-toolbar class="noselect main-toolbar">
+    <div>
+      <h1 class="no-wrap">
+        <a href="https://github.com/facioquo/stock-charts" target="_blank" rel="noopener noreferrer">
+          stock chart
+        </a>
+      </h1>
+      <h2>
+        <a href="https://dotnet.stockindicators.dev" target="_blank" rel="noopener">
+          <strong>Stock Indicators for .NET</strong>
+        </a>
+      </h2>
+    </div>
+  </mat-toolbar>
+</header>
 
-<main id="main-content" class="content-container">
-
-  <div class="button-container">
-    <button mat-fab color="accent" *ngIf="!cht.loading" (click)="openSettingsDialog()"
-      matTooltip="change indicators and settings" aria-label="change indicators and settings">
-      <mat-icon color="primary">edit</mat-icon>
-    </button>
-  </div>
-
-  <app-chart></app-chart>
+<main id="main-content">
+  <router-outlet></router-outlet>
 </main>

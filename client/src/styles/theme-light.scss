@@ -1,74 +1,48 @@
 @use '@angular/material' as mat;
 @use 'themed-parts';
 
-// LIGHT THEME (see styles.scss for default dark theme)
+// LIGHT THEME
 // ref: https://material.angular.io/guide/theming
 
-$theme: mat.define-theme((
+$light-theme: mat.define-theme((
   color: (
     theme-type: light,
-      primary: mat.$azure-palette
-    ),
-    typography: (
-      brand-family: "Rubik, Roboto, Arial, Helvetica, sans-serif",
-    ),
-    density: (
-      scale: 0
-    )
-));
+    primary: mat.$azure-palette
 
-// apply theme (base)
-:root {
+    // typography and density are inherited
+    // from the default dark theme
+  )));
 
-  @include mat.all-component-themes($theme);
-  @include themed-parts.theme($theme);
+// theme (applied to body)
+.light-theme {
 
-  // DARK OVERRIDES (only)
+  @include mat.all-component-colors($light-theme);
+  @include themed-parts.theme($light-theme);
 
-  // main content
-  a {
-    text-decoration: underline;
-    color: mat.get-theme-color($theme, neutral, 30);
+  // COLOR OVERRIDES only
 
-    &:visited {
-      color: unset;
-    }
-
-    &:hover {
-      color: mat.get-theme-color($theme, neutral, 50);
-    }
+  // typography
+  a:hover {
+    color: mat.get-theme-color($light-theme, neutral, 30);
   }
 
   // toolbar
   .main-toolbar {
-    h1 {
-      color: mat.get-theme-color($theme, neutral, 40);
 
-      a {
-        &:hover {
-          color: mat.get-theme-color($theme, neutral, 30);
-        }
+    h1 {
+      color: mat.get-theme-color($light-theme, neutral, 40);
+
+      a:hover {
+        color: mat.get-theme-color($light-theme, neutral, 10);
       }
     }
 
     h2 {
-      color: mat.get-theme-color($theme, neutral, 50);
+      color: mat.get-theme-color($light-theme, neutral, 50);
 
-      a {
-        &:hover {
-          color: mat.get-theme-color($theme, neutral, 30);
-        }
+      a:hover {
+        color: mat.get-theme-color($light-theme, neutral, 20);
       }
     }
-  }
-
-  // dialog content
-  h2.mat-mdc-dialog-title {
-    color: mat.get-theme-color($theme, neutral, 40);
-  }
-
-  .indicators-displayed-toolbar,
-  .indicators-available-toolbar{
-    color: mat.get-theme-color($theme, neutral, 10);
   }
 }

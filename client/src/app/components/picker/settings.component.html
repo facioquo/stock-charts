@@ -1,7 +1,5 @@
-<mat-toolbar>
-  <h2 mat-dialog-title class="noselect">
-    chart settings
-  </h2>
+<mat-toolbar class="dialog-title">
+  <span>Chart settings</span>
   <span class="filler"></span>
   <button mat-icon-button (click)="closeListDialog()" matTooltip="close">
     <mat-icon>close</mat-icon>
@@ -28,8 +26,8 @@
 
   <!-- DISPLAYED INDICATORS -->
   <mat-selection-list #shown *ngIf="cht.selections.length>0">
-    <mat-toolbar class="noselect indicators-displayed-toolbar">
-      displayed indicators
+    <mat-toolbar class="dialog-section-header indicators-displayed-toolbar">
+      Displayed indicators
       <span class="filler"></span>
       <mat-checkbox (change)="selectDisplayed($event, shown)"></mat-checkbox>
     </mat-toolbar>
@@ -46,8 +44,9 @@
 
   <!-- AVAILABLE INDICATORS -->
   <mat-nav-list>
-    <mat-toolbar class="noselect">
-      <div class="indicators-displayed-toolbar" style="line-height: 1 !important;">available indicators
+    <mat-toolbar class="dialog-section-header indicators-displayed-toolbar">
+      <div>
+        Available indicators
         <br />
         <div class="help-link">» more info in our
           <a matTooltip="indicator documentation" target="_blank" rel="noopener"

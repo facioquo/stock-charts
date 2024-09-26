@@ -14,7 +14,7 @@ import {
   IndicatorResult,
   IndicatorResultConfig,
   IndicatorSelection
-} from '../chart/chart.models';
+} from '../pages/chart/chart.models';
 
 @Injectable()
 export class ApiService {

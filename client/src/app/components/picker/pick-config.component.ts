@@ -6,15 +6,14 @@ import { MtxColorpicker } from '@ng-matero/extensions/colorpicker';
 import { ColorEvent } from 'ngx-color';
 import { TinyColor } from '@ctrl/tinycolor';
 
-import { ChartService } from '../services/chart.service';
+import { ChartService } from '../../services/chart.service';
 
 import {
   IndicatorListing,
   IndicatorParam,
   IndicatorResult,
   IndicatorSelection
-} from '../chart/chart.models';
-import { style } from '@angular/animations';
+} from '../../pages/chart/chart.models';
 
 interface LineWidth {
   name: string;
@@ -34,12 +33,20 @@ interface LineType {
 })
 export class PickConfigComponent {
 
+  // Uses the MtxColorpicker component to allow users to select a color.
   // ref: https://ng-matero.github.io/extensions/components/colorpicker
 
   selection: IndicatorSelection;
   customPicker: MtxColorpicker;
   errorMessage: string;
   closeButtonLabel = "ADD";
+
+  // Material Design (M2) color palette
+  // ref: https://m2.material.io/design/color/the-color-system.html
+
+  // notably other dark/light theme chart colors (Sept. 2024):
+  // gridlines:  #2E2E2E / #E0E0E0
+  // background: #121316 / #FAF9FD
 
   presetColors: string[] = [
     '#DD2C00', // deep orange A700 (red)
@@ -55,9 +62,11 @@ export class PickConfigComponent {
     '#6A1B9A', // purple 800
     '#8E24AA', // purple 600
     '#EC407A', // pink 400
+    '#616161', // gray 700 (dark)
     '#757575', // gray 600
     '#9E9E9E', // gray 500
-    '#BDBDBD'] // gray 400;
+    '#BDBDBD'  // gray 400 (light)
+  ];
 
   lineWidths: LineWidth[] = [
     { name: "thin", value: 1 },
@@ -125,16 +134,16 @@ export class PickConfigComponent {
 
     const style = (() => {
       switch (r.lineType) {
-      case "dots":
-        return "dotted";
-      case "dash":
-        return "dashed";
-      default:
-        return "solid";
+        case "dots":
+          return "dotted";
+        case "dash":
+          return "dashed";
+        default:
+          return "solid";
       }
     })();
 
-    const width = r.lineWidth * ((style==="dotted") ? 2 : 1);
+    const width = r.lineWidth * ((style === "dotted") ? 2 : 1);
 
     return {
       "border-bottom-color": r.color,
