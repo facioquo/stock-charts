@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component } from '@angular/core';
 import { ChartService } from '../services/chart.service';
 import { SettingsComponent } from '../picker/settings.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -6,11 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 @Component({
   selector: 'app-chart',
   templateUrl: './chart.component.html',
-  styleUrls: ['./chart.component.scss'],
-
-  // allows injected HTML to get styles?
-  // see https://github.com/angular/angular/issues/7845
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./chart.component.scss']
 })
 export class ChartComponent {
 

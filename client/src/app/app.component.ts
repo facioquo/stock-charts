@@ -15,6 +15,6 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
 
     // load/apply user prefs
-    this.usr.initSettings();
+    this.usr.loadSettings();
   }
 }

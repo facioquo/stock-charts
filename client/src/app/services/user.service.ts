@@ -6,7 +6,7 @@ export class UserService {
 
   settings: UserSettings; // initialized in app.component.ts
 
-  initSettings() {
+  loadSettings() {
 
     // load user preference settings from cache,
     // without applying changes to the UI

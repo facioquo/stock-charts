@@ -2,22 +2,35 @@ namespace WebApi.Services;
 
 public static class Metadata
 {
+    // colors from Material Design (M2) color palettes
+    // ref: https://m2.material.io/design/color/the-color-system.html
+
+    // notably other dark/light theme chart colors (Sept. 2024):
+    // gridlines:  #2E2E2E / #E0E0E0
+    // background: #121316 / #FAF9FD
+
+    // indicator colors
+    // (a) more are available in UI for user selection
+    // (b) these should be consistently defined in UI colors
+    // TODO: make these available from API, cached in UI for selection
+    const string standardRed = "#DD2C00";                 // deep orange A700 (red)
+    const string standardOrange = "#EF6C00";              // orange 800
+    const string standardGreen = "#2E7D32";               // green 800
+    const string standardBlue = "#1E88E5";                // blue 600
+    const string standardPurple = "#8E24AA";              // purple 600
+    const string standardGrayTransparent = "#9E9E9E50";   // gray 500
+    const string darkGray = "#616161CC";                  // gray 600
+    const string darkGrayTransparent = "#61616110";       // gray 600
+
+    // threshold colors (different from indicator colors)
+    const string thresholdRed = "#B71C1C70";              // red 900
+    const string thresholdRedTransparent = "#B71C1C20";   // red 900
+    const string thresholdGrayTransparent = "#42424280";  // gray 800
+    const string thresholdGreen = "#1B5E2070";            // green 900
+    const string thresholdGreenTransparent = "#1B5E2020"; // green 900
+
     public static IEnumerable<IndicatorListing> IndicatorListing(string baseUrl)
     {
-        string standardRed = "#DD2C00";
-        string standardOrange = "#EF6C00";
-        string standardGreen = "#2E7D32";
-        string standardBlue = "#1E88E5";
-        string standardPurple = "#8E24AA";
-        string standardGrayTransparent = "#9E9E9E50";
-        string darkGray = "#757575";
-        string darkGrayTransparent = "#75757515";
-        string thresholdRed = "#B71C1C70";
-        string thresholdRedTransparent = "#B71C1C20";
-        string thresholdGrayTransparent = "#8E8E8E80";
-        string thresholdGreen = "#1B5E2070";
-        string thresholdGreenTransparent = "#1B5E2020";
-
         List<IndicatorListing> listing =
         [
             // Accumulation Distribution Line (ADL)
