@@ -6,15 +6,14 @@ import { MtxColorpicker } from '@ng-matero/extensions/colorpicker';
 import { ColorEvent } from 'ngx-color';
 import { TinyColor } from '@ctrl/tinycolor';
 
-import { ChartService } from '../services/chart.service';
+import { ChartService } from '../../services/chart.service';
 
 import {
   IndicatorListing,
   IndicatorParam,
   IndicatorResult,
   IndicatorSelection
-} from '../chart/chart.models';
-import { style } from '@angular/animations';
+} from '../../pages/chart/chart.models';
 
 interface LineWidth {
   name: string;

@@ -5,10 +5,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
-import { ChartService } from '../services/chart.service';
-import { UserService } from '../services/user.service';
+import { ChartService } from '../../services/chart.service';
+import { UserService } from '../../services/user.service';
 
-import { IndicatorListing, IndicatorSelection } from '../chart/chart.models';
+import { IndicatorListing, IndicatorSelection } from '../../pages/chart/chart.models';
 import { PickConfigComponent } from './pick-config.component';
 
 @Component({

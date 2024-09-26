@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { UserSettings } from '../chart/chart.models';
+import { UserSettings } from '../pages/chart/chart.models';
 
 @Injectable()
 export class UserService {

@@ -68,7 +68,7 @@ import {
   IndicatorResultConfig,
   IndicatorSelection,
   Quote
-} from '../chart/chart.models';
+} from '../pages/chart/chart.models';
 
 // services
 import { ApiService } from './api.service';

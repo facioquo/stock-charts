@@ -7,13 +7,13 @@ import {
 const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./chart/chart.module')
+    loadChildren: () => import('./pages/chart/chart.module')
       .then(m => m.ChartModule)
   },
 
   {
     path: 'settings',
-    loadChildren: () => import('./picker/settings.module')
+    loadChildren: () => import('./components/picker/settings.module')
       .then(m => m.SettingsModule)
   },
 

@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { ChartService } from '../services/chart.service';
-import { SettingsComponent } from '../picker/settings.component';
 import { MatDialog } from '@angular/material/dialog';
+
+import { ChartService } from '../../services/chart.service';
+import { SettingsComponent } from '../../components/picker/settings.component';
 
 @Component({
   selector: 'app-chart',

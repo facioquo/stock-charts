@@ -7,19 +7,16 @@
 $light-theme: mat.define-theme((
   color: (
     theme-type: light,
-      primary: mat.$azure-palette
-    ),
-    typography: (
-      brand-family: "Rubik, Roboto, Arial, Helvetica, sans-serif",
-    ),
-    density: (
-      scale: 0
-    )));
+    primary: mat.$azure-palette
+
+    // typography and density are inherited
+    // from the default dark theme
+  )));
 
 // theme (applied to body)
 .light-theme {
 
-  @include mat.all-component-themes($light-theme);
+  @include mat.all-component-colors($light-theme);
   @include themed-parts.theme($light-theme);
 
   // COLOR OVERRIDES only
