@@ -24,6 +24,11 @@ $light-theme: mat.define-theme((
 
   // COLOR OVERRIDES only
 
+  // typography
+  a:hover {
+    color: mat.get-theme-color($light-theme, neutral, 30);
+  }
+
   // toolbar
   .main-toolbar {
 
@@ -31,7 +36,7 @@ $light-theme: mat.define-theme((
       color: mat.get-theme-color($light-theme, neutral, 40);
 
       a:hover {
-        color: mat.get-theme-color($light-theme, neutral, 30);
+        color: mat.get-theme-color($light-theme, neutral, 10);
       }
     }
 
@@ -39,7 +44,7 @@ $light-theme: mat.define-theme((
       color: mat.get-theme-color($light-theme, neutral, 50);
 
       a:hover {
-        color: mat.get-theme-color($light-theme, neutral, 30);
+        color: mat.get-theme-color($light-theme, neutral, 20);
       }
     }
   }

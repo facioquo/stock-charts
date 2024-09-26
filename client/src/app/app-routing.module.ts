@@ -15,6 +15,13 @@ const routes: Routes = [
     path: 'settings',
     loadChildren: () => import('./picker/settings.module')
       .then(m => m.SettingsModule)
+  },
+
+  // 404 page (route not found)
+  {
+    path: '**',
+    loadChildren: () => import('./pages/404/404.module')
+      .then(m => m.PageNotFoundModule)
   }
 ];
 

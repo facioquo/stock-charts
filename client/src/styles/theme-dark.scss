@@ -24,6 +24,11 @@ $dark-theme: mat.define-theme((
 
   // COLOR OVERRIDES only
 
+  // typography
+  a:hover {
+    color: mat.get-theme-color($dark-theme, neutral, 70);
+  }
+
   // toolbar
   .main-toolbar {
 
@@ -31,7 +36,7 @@ $dark-theme: mat.define-theme((
       color: rgba(230, 199, 76, 0.75);
 
       a:hover {
-        color: rgba(230, 199, 76, 0.85);
+        color: rgba(230, 199, 76, 0.9);
       }
     }
 
@@ -39,7 +44,7 @@ $dark-theme: mat.define-theme((
       color: mat.get-theme-color($dark-theme, neutral, 60);
 
       a:hover {
-        color: mat.get-theme-color($dark-theme, neutral, 40);
+        color: mat.get-theme-color($dark-theme, neutral, 70);
       }
     }
   }
