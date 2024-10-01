@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { UserSettings } from '../pages/chart/chart.models';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class UserService {
 
   settings: UserSettings; // initialized in app.component.ts

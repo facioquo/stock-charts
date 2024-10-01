@@ -9,7 +9,9 @@ import {
   IndicatorSelection
 } from '../pages/chart/chart.models';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ApiService {
 
   constructor(

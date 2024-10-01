@@ -26,7 +26,9 @@ import {
   ScaleValue
 } from 'chartjs-plugin-annotation';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ChartConfigService {
 
   constructor(

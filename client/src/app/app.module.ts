@@ -4,10 +4,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 
-// services (global)
-import { UserService } from './services/user.service';
-import { UtilityService } from './services/utility.service';
-
 // component
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -28,10 +24,7 @@ import { AppRoutingModule } from './app-routing.module';
     // Application
     AppRoutingModule
   ],
-  providers: [
-    UserService,
-    UtilityService
-  ],
+  providers: [],
   bootstrap: [
     AppComponent
   ]

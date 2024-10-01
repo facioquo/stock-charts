@@ -71,7 +71,9 @@ import { ApiService } from './api.service';
 import { ChartConfigService } from './config.service';
 import { UtilityService } from './utility.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ChartService {
 
   listings: IndicatorListing[] = [];

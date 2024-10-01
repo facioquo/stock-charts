@@ -20,7 +20,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 // services
 import { ApiService } from '../../services/api.service';
 import { ChartService } from '../../services/chart.service';
-import { ChartConfigService } from '../../services/config.service';
 
 // component
 import { ChartComponent } from './chart.component';
@@ -52,8 +51,7 @@ import { ChartRoutingModule } from './chart-routing.module';
       useClass: ShowOnDirtyErrorStateMatcher
     },
     provideHttpClient(withInterceptorsFromDi()),
-    ChartService,
-    ChartConfigService
+    ChartService
   ]
 })
 export class ChartModule { }
