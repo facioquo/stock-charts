@@ -1,5 +1,15 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgIf } from '@angular/common';
+
+import {
+  provideHttpClient,
+  withInterceptorsFromDi
+} from '@angular/common/http';
+
+import {
+  ErrorStateMatcher,
+  ShowOnDirtyErrorStateMatcher
+} from '@angular/material/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -8,6 +18,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 // services
+import { ApiService } from '../../services/api.service';
 import { ChartService } from '../../services/chart.service';
 import { ChartConfigService } from '../../services/config.service';
 
@@ -26,7 +37,7 @@ import { ChartRoutingModule } from './chart-routing.module';
     ChartComponent
   ],
   imports: [
-    CommonModule,
+    NgIf,
     ChartRoutingModule,
     MatButtonModule,
     MatDialogModule,
@@ -35,6 +46,12 @@ import { ChartRoutingModule } from './chart-routing.module';
     MatTooltipModule
   ],
   providers: [
+    ApiService,
+    {
+      provide: ErrorStateMatcher,
+      useClass: ShowOnDirtyErrorStateMatcher
+    },
+    provideHttpClient(withInterceptorsFromDi()),
     ChartService,
     ChartConfigService
   ]
