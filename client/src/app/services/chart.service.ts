@@ -3,9 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/internal/Observable';
 
 import {
-  BarController,
   BarElement,
-  CategoryScale,
   Chart,
   ChartData,
   ChartDataset,
@@ -37,7 +35,6 @@ import AnnotationPlugin, {
 Chart.register(
 
   // controllers
-  BarController,
   CandlestickController,
   LineController,
   Tooltip,
@@ -53,7 +50,6 @@ Chart.register(
   Filler,
 
   // scales
-  CategoryScale,
   LinearScale,
   TimeSeriesScale
 );

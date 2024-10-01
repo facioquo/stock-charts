@@ -16,7 +16,7 @@ import {
   ChartDataset,
   ChartOptions,
   FontSpec,
-  ScaleOptions,
+  ScaleOptions
 } from 'chart.js';
 
 // plugins

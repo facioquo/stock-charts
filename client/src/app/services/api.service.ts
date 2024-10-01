@@ -4,15 +4,8 @@ import { Observable } from 'rxjs/internal/Observable';
 import { env } from '../../environments/environment';
 
 import {
-  ChartDataset,
-  ScatterDataPoint
-} from 'chart.js';
-
-import {
   IndicatorListing,
   IndicatorParam,
-  IndicatorResult,
-  IndicatorResultConfig,
   IndicatorSelection
 } from '../pages/chart/chart.models';
 
