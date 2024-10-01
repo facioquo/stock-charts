@@ -25,7 +25,7 @@
     "@angular/router": "18.2.6",
     "@angular/service-worker": "18.2.6",
     "@ctrl/tinycolor": "4.1.0",
-    "@ng-matero/extensions": "18.2.1",
+    "@ng-matero/extensions": "18.2.2",
     "chart.js": "4.4.4",
     "chartjs-adapter-date-fns": "3.0.0",
     "chartjs-plugin-annotation": "3.0.1",
