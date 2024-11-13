@@ -31,6 +31,8 @@ import {
 })
 export class ChartConfigService {
 
+  fontFamily = "'Google Sans', Roboto, Verdana, Helvetica, Arial, sans-serif";
+
   constructor(
     private readonly usr: UserService
   ) { }
@@ -96,6 +98,9 @@ export class ChartConfigService {
       responsive: true,
       maintainAspectRatio: false,
       animation: false,
+      font: {
+        family: this.fontFamily
+      },
       scales: {
         x: this.defaultXAxisOptions(),
         y: {
@@ -109,7 +114,7 @@ export class ChartConfigService {
             display: true,
             mirror: true,
             font: {
-              family: 'Google Sans',
+              family: this.fontFamily,
               size: 12,
               lineHeight: 1
             },
@@ -374,7 +379,7 @@ export class ChartConfigService {
     const fillColor = this.usr.settings.isDarkTheme ? '#12131680' : '#FAF9FD90'
 
     const legendFont: FontSpec = {
-      family: 'Google Sans',
+      family: this.fontFamily,
       size: 13,
       style: 'normal',
       weight: 'normal',
