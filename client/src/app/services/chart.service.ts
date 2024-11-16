@@ -324,7 +324,7 @@ export class ChartService {
     // currently using random results[0] as basis
     listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold, index: number) => {
 
-      // note: thresholds can't be annoted lines since
+      // note: thresholds can't be annotated lines since
       // offset fill will only work between certain objects.
       const lineData: ScatterDataPoint[] = [];
 
