@@ -18,7 +18,7 @@ jobs:
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "lts"
+          dotnet-version: "9.x"
           dotnet-quality: "ga"
 
       - name: Build .NET solution
