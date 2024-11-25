@@ -12,9 +12,10 @@ import { IndicatorListing, IndicatorSelection } from '../../pages/chart/chart.mo
 import { PickConfigComponent } from './pick-config.component';
 
 @Component({
-  selector: 'app-listing',
-  templateUrl: 'settings.component.html',
-  styleUrls: ['settings.component.scss']
+    selector: 'app-listing',
+    templateUrl: 'settings.component.html',
+    styleUrls: ['settings.component.scss'],
+    standalone: false
 })
 export class SettingsComponent {
 
