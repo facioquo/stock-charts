@@ -24,9 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-        - language: csharp
-        - language: javascript-typescript
+        language: ['javascript-typescript', 'csharp']
 
     steps:
 
@@ -62,11 +60,11 @@ jobs:
         cache-dependency-path: client/package-lock.json
 
     - if: matrix.language == 'javascript-typescript'
-      name: Build website
+      name: Install NPM packages
       working-directory: ./client
       run: |
-        run: npm install
-        run: npm run build.prod
+        npm install
+        npm run build.prod
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
