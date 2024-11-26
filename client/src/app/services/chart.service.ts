@@ -321,10 +321,11 @@ export class ChartService {
     // add thresholds (reference lines)
     const qtyThresholds = listing.chartConfig?.thresholds?.length;
 
-    // TODO: change these to line annotations,
     // currently using random results[0] as basis
     listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold, index: number) => {
 
+      // note: thresholds can't be annotated lines since
+      // offset fill will only work between certain objects.
       const lineData: ScatterDataPoint[] = [];
 
       // compose threshold data

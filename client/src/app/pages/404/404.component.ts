@@ -2,9 +2,10 @@ import { Component } from '@angular/core';
 import { UtilityService } from '../../services/utility.service';
 
 @Component({
-  selector: 'app-404',
-  templateUrl: './404.component.html',
-  styleUrls: ['./404.component.scss']
+    selector: 'app-404',
+    templateUrl: './404.component.html',
+    styleUrls: ['./404.component.scss'],
+    standalone: false
 })
 export class PageNotFoundComponent {
 

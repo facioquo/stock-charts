@@ -1,0 +1,72 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "main" ]
+
+  pull_request:
+    branches: [ "main" ]
+
+  schedule:
+    - cron: '51 14 * * 6'
+
+jobs:
+  analyze:
+    name: analyze
+    runs-on: 'ubuntu-latest'
+
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript-typescript', 'csharp']
+
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+
+    - if: matrix.language == 'csharp'
+      name: Install .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: "9.x"
+        dotnet-quality: "ga"
+
+    - if: matrix.language == 'csharp'
+      name: Build .NET solution
+      run: |
+        dotnet build server/ChartBackend.sln \
+          --configuration Release \
+          --property:ContinuousIntegrationBuild=true \
+          -warnAsError
+
+    - if: matrix.language == 'javascript-typescript'
+      name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "lts/*"
+        cache: "npm"
+        cache-dependency-path: client/package-lock.json
+
+    - if: matrix.language == 'javascript-typescript'
+      name: Install NPM packages
+      working-directory: ./client
+      run: |
+        npm install
+        npm run build.prod
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
