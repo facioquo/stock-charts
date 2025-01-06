@@ -19,7 +19,7 @@ If you want to host on your local computer and review the source code, follow th
 - [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/)
 - [Visual Studio](http://visualstudio.com)
 
-### Steps
+### Steps to run
 
 1. [Clone the repo](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository)
 
@@ -70,7 +70,7 @@ This repository includes a Dev Container configuration to provide a consistent d
 - PowerShell
 - ESLint
 
-### Steps
+### Steps to use Dev Container
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/) and the [Remote - Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
 
@@ -94,7 +94,7 @@ These environment variables are required for fetching quote data from the Alpaca
 
 To securely store and manage secrets such as `ALPACA_KEY` and `ALPACA_SECRET`, you can use Azure Key Vault. Follow the steps below to set up and use Azure Key Vault for storing secrets.
 
-### Steps
+### Steps to use Azure Secrets
 
 1. Create an Azure Key Vault in your Azure subscription.
 
