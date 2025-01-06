@@ -7,7 +7,7 @@
     },
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/powershell:1": {},
-    "ghcr.io/devcontainers/features/azure-functions-core-tools:1": {},
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
     "ghcr.io/devcontainers/features/eslint:1": {}
   },
   "customizations": {
