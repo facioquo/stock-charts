@@ -6,10 +6,28 @@ concurrency:
   group: website-deployer
   cancel-in-progress: true
 
-jobs:
-  build-backend:
-    runs-on: ubuntu-latest
+permissions:
+  contents: write
 
+jobs:
+
+  versioning:
+    name: Define version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.marker.outputs.version }}
+
+    steps:
+
+      - name: Define marker
+        id: marker
+        run: echo "version=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
+
+  build-backend:
+    name: Build backend
+    runs-on: ubuntu-latest
+    needs: 
+      - versioning
     env:
       url: https://charts.stockindicators.dev
 
@@ -17,21 +35,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install .NET SDK
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "9.x"
           dotnet-quality: "ga"
 
-      - name: Define cache marker
-        id: marker
-        run: echo "version=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
-
       - name: Replace cache markers
         uses: jacobtomlinson/gha-find-replace@v3
         with:
           find: "YYYY.MM.DD"
-          replace: "${{ steps.marker.outputs.version }}"
+          replace: "${{ needs.versioning.outputs.version }}"
           regex: false
 
       - name: Build .NET solution
@@ -70,7 +84,10 @@ jobs:
           include-hidden-files: true
 
   build-website:
+    name: Build website
     runs-on: ubuntu-latest
+    needs:
+      - versioning
 
     steps:
       - name: Checkout repository
@@ -83,19 +100,15 @@ jobs:
           cache: "npm"
           cache-dependency-path: client/package-lock.json
 
-      - name: Install packages
+      - name: Install dependencies
         working-directory: client
         run: npm install
-
-      - name: Define cache marker
-        id: marker
-        run: echo "version=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
 
       - name: Replace cache markers
         uses: jacobtomlinson/gha-find-replace@v3
         with:
           find: "YYYY.MM.DD"
-          replace: "${{ steps.marker.outputs.version }}"
+          replace: "${{ needs.versioning.outputs.version }}"
           regex: false
 
       - name: Update configs
@@ -117,8 +130,12 @@ jobs:
           include-hidden-files: true
 
   deploy:
-    needs: ["build-backend", "build-website"]
+    name: Deploy
     runs-on: ubuntu-latest
+    needs: 
+      - versioning
+      - build-backend
+      - build-website
 
     environment:
       name: charts.stockindicators.dev
@@ -131,29 +148,17 @@ jobs:
           name: fns
           path: artifacts/fns
 
-      - name: Show Functions artifacts
-        working-directory: artifacts/fns
-        run: ls
-
       - name: Download API package
         uses: actions/download-artifact@v4
         with:
           name: api
           path: artifacts/api
 
-      - name: Show API artifacts
-        working-directory: artifacts/api
-        run: ls
-
       - name: Download Web package
         uses: actions/download-artifact@v4
         with:
           name: web
           path: artifacts/web
-
-      - name: Show Web artifacts
-        working-directory: artifacts/web
-        run: ls
 
       - name: Deploy Functions
         uses: Azure/functions-action@v1
@@ -179,10 +184,6 @@ jobs:
           directory: artifacts/web
           wranglerVersion: "latest"
 
-      - name: Define tag
-        id: tag
-        run: echo "tag=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
-
       - name: Tag and draft release note
         uses: ncipollo/release-action@v1
         if: github.ref == 'refs/heads/main'
@@ -191,5 +192,5 @@ jobs:
             We’ve updated [charts.stockindicators.dev](https://charts.stockindicators.dev)
           generateReleaseNotes: true
           draft: true
-          tag: ${{ steps.tag.outputs.tag }}
+          tag: ${{ needs.versioning.outputs.version }}
           commit: ${{ github.ref_name }}
