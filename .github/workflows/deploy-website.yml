@@ -6,6 +6,9 @@ concurrency:
   group: website-deployer
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
 
   versioning:
