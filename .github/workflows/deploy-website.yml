@@ -23,6 +23,14 @@ jobs:
         id: marker
         run: echo "version=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
 
+      - name: Summary output
+        run: |
+          {
+            echo "| Info | Value |"
+            echo "| :--- | :---- |"
+            echo "| Version | ${{ steps.marker.outputs.version }} |"
+          } >> $GITHUB_STEP_SUMMARY
+
   build-backend:
     name: Build backend
     runs-on: ubuntu-latest
