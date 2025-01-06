@@ -1,15 +1,19 @@
 using System.Text.Json;
 using Alpaca.Markets;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Skender.Stock.Indicators;
 using WebApi.Services;
 
 namespace Functions;
 
-public class Jobs(ILoggerFactory loggerFactory)
+public class Jobs(ILoggerFactory loggerFactory, IConfiguration configuration)
 {
     private readonly ILogger _logger = loggerFactory.CreateLogger<Jobs>();
+    private readonly IConfiguration _configuration = configuration;
 
     /// <summary>
     ///   Schedule to get and cache quotes from source feed.
@@ -39,26 +43,54 @@ public class Jobs(ILoggerFactory loggerFactory)
     private async Task StoreQuoteDaily(string symbol)
     {
         // get and validate keys, see README.md
-        string? ALPACA_KEY = Environment.GetEnvironmentVariable("ALPACA_KEY");
-        string? ALPACA_SECRET = Environment.GetEnvironmentVariable("ALPACA_SECRET");
+        string? alpacaKey = _configuration["ALPACA_KEY"];
+        string? alpacaSecret = _configuration["ALPACA_SECRET"];
 
-        if (string.IsNullOrEmpty(ALPACA_KEY))
+        if (string.IsNullOrEmpty(alpacaKey) || string.IsNullOrEmpty(alpacaSecret))
+        {
+            // Try to get from User Secrets
+            alpacaKey = _configuration["UserSecrets:ALPACA_KEY"];
+            alpacaSecret = _configuration["UserSecrets:ALPACA_SECRET"];
+        }
+
+        if (string.IsNullOrEmpty(alpacaKey) || string.IsNullOrEmpty(alpacaSecret))
+        {
+            // Try to get from Azure Key Vault
+            string? keyVaultUrl = _configuration["KEY_VAULT_URL"];
+
+            if (string.IsNullOrEmpty(keyVaultUrl))
+            {
+                throw new ArgumentNullException(
+                    keyVaultUrl,
+                    $"Key Vault URL missing, use `setx KEY_VAULT_URL \"MY-KEY-VAULT-URL\"` to set.");
+            }
+
+            SecretClient secretClient = new(new Uri(keyVaultUrl), new DefaultAzureCredential());
+
+            KeyVaultSecret alpacaKeySecret = await secretClient.GetSecretAsync("ALPACA_KEY");
+            KeyVaultSecret alpacaSecretSecret = await secretClient.GetSecretAsync("ALPACA_SECRET");
+
+            alpacaKey = alpacaKeySecret.Value;
+            alpacaSecret = alpacaSecretSecret.Value;
+        }
+
+        if (string.IsNullOrEmpty(alpacaKey))
         {
             throw new ArgumentNullException(
-                ALPACA_KEY,
+                alpacaKey,
                 $"API KEY missing, use `setx ALPACA_KEY \"MY-ALPACA-KEY\"` to set.");
         }
 
-        if (string.IsNullOrEmpty(ALPACA_SECRET))
+        if (string.IsNullOrEmpty(alpacaSecret))
         {
             throw new ArgumentNullException(
-                ALPACA_SECRET,
+                alpacaSecret,
                 $"API SECRET missing, use `setx ALPACA_SECRET \"MY-ALPACA-SECRET\"` to set.");
         }
 
         // fetch from Alpaca paper trading API
         IAlpacaDataClient alpacaDataClient = Environments.Paper
-            .GetAlpacaDataClient(new SecretKey(ALPACA_KEY, ALPACA_SECRET));
+            .GetAlpacaDataClient(new SecretKey(alpacaKey, alpacaSecret));
 
         DateTime into = DateTime.Now.Subtract(TimeSpan.FromMinutes(16));
         DateTime from = into.Subtract(TimeSpan.FromDays(800));

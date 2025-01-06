@@ -19,7 +19,7 @@ If you want to host on your local computer and review the source code, follow th
 - [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/)
 - [Visual Studio](http://visualstudio.com)
 
-### Steps
+### Steps to run
 
 1. [Clone the repo](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository)
 
@@ -56,6 +56,82 @@ setx ALPACA_KEY "YOUR ALPACA API KEY"
 setx ALPACA_SECRET "YOUR ALPACA SECRET KEY"
 setx AzureWebJobsStorage "UseDevelopmentStorage=true"
 ```
+
+## Using the Dev Container
+
+This repository includes a Dev Container configuration to provide a consistent development environment. The Dev Container includes the following tools and dependencies:
+
+- .NET SDK 9
+- Node LTS
+- NPM latest
+- GitHub CLI
+- Angular CLI
+- Azure Functions Core Tools
+- PowerShell
+- ESLint
+
+### Steps to use Dev Container
+
+1. Install [Visual Studio Code](https://code.visualstudio.com/) and the [Remote - Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
+
+2. Clone the repository and open it in Visual Studio Code.
+
+3. When prompted, reopen the repository in the Dev Container.
+
+4. The Dev Container will be built and started automatically. You can now use the integrated terminal and other tools within the Dev Container.
+
+### Environment Variables
+
+The Dev Container includes the following environment variables:
+
+- `ALPACA_KEY`
+- `ALPACA_SECRET`
+- `AzureWebJobsStorage`
+
+These environment variables are required for fetching quote data from the Alpaca API and for local development and debugging of Azure Functions.
+
+## Setting Up Azure Key Vault for Storing Secrets
+
+To securely store and manage secrets such as `ALPACA_KEY` and `ALPACA_SECRET`, you can use Azure Key Vault. Follow the steps below to set up and use Azure Key Vault for storing secrets.
+
+### Steps to use Azure Secrets
+
+1. Create an Azure Key Vault in your Azure subscription.
+
+2. Add the `ALPACA_KEY` and `ALPACA_SECRET` secrets to the Key Vault.
+
+3. Update the application code to retrieve these secrets from Azure Key Vault during runtime.
+
+4. Ensure that the necessary permissions are granted to the application to access the Key Vault.
+
+5. Update the `local.settings.json` file in the `server/Functions` directory to include the `ALPACA_KEY` and `ALPACA_SECRET` environment variables.
+
+6. Update the `README.md` to include instructions for setting up and using Azure Key Vault for storing secrets.
+
+## Using User Secrets for Local Development
+
+For local development, you can use User Secrets to store sensitive information such as `ALPACA_KEY` and `ALPACA_SECRET`. Follow the steps below to set up and use User Secrets for local development.
+
+### Steps
+
+1. In the `server/Functions` directory, run the following command to initialize User Secrets:
+
+    ```bash
+    dotnet user-secrets init
+    ```
+
+2. Add the `ALPACA_KEY` and `ALPACA_SECRET` secrets to User Secrets:
+
+    ```bash
+    dotnet user-secrets set "ALPACA_KEY" "YOUR_ALPACA_API_KEY"
+    dotnet user-secrets set "ALPACA_SECRET" "YOUR_ALPACA_SECRET_KEY"
+    ```
+
+3. Update the application code to retrieve these secrets from User Secrets during runtime.
+
+4. Ensure that the necessary permissions are granted to the application to access the User Secrets.
+
+5. Update the `README.md` to include instructions for setting up and using User Secrets for local development.
 
 ## Contributing
 
