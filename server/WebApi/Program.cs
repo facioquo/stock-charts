@@ -40,7 +40,7 @@ services.AddCors(options => {
 Console.WriteLine($"CORS Origin: {allowedOrigin}");
 
 // Register services
-services.AddHostedService<StartupService>();
+services.AddHostedService<StartupServices>();
 services.AddTransient<QuoteService>();
 
 // Add response compression services

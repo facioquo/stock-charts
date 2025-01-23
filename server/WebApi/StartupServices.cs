@@ -1,8 +1,8 @@
 namespace WebApi.Services;
 
-public class StartupService(ILoggerFactory loggerFactory) : IHostedService
+public class StartupServices(ILoggerFactory loggerFactory) : IHostedService
 {
-    private readonly ILogger _logger = loggerFactory.CreateLogger<StartupService>();
+    private readonly ILogger _logger = loggerFactory.CreateLogger<StartupServices>();
 
     /// <summary>
     /// The code in here will run when the application starts,
