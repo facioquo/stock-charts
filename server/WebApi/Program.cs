@@ -3,6 +3,7 @@
 using System.IO.Compression;
 using Microsoft.AspNetCore.ResponseCompression;
 using WebApi.Services;
+using Microsoft.Extensions.Azure;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
@@ -51,6 +52,12 @@ services.Configure<GzipCompressionProviderOptions>(options => {
 
 // Add logging
 services.AddLogging();
+
+// Add Azure dependencies
+services.AddAzureClients(builder => {
+    builder.AddBlobServiceClient(configuration.GetValue<string>("Storage:ConnectionString")
+        ?? "UseDevelopmentStorage=true");
+});
 
 // Add application services
 services.AddSingleton<IStorage, Storage>();

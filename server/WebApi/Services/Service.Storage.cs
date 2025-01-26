@@ -11,14 +11,9 @@ public class Storage : IStorage
 {
     private readonly string _containerName;
     private readonly BlobContainerClient _blobClient;
-    private readonly ILogger<Storage> _logger;
 
-    public Storage(
-        IConfiguration configuration,
-        ILogger<Storage> logger)
+    public Storage(IConfiguration configuration)
     {
-        _logger = logger;
-
         _containerName
             = configuration.GetValue<string>("Storage:ContainerName")
             ?? "chart-demo";
@@ -38,22 +33,7 @@ public class Storage : IStorage
     /// <returns>Task representing the async operation</returns>
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        try
-        {
-            _logger.LogInformation("Initializing blob storage for container {ContainerName}...", _containerName);
-
-            Response<BlobContainerInfo> response = await _blobClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
-            string message = response?.Value != null
-                ? "Created new blob container"
-                : "Using existing blob container";
-
-            _logger.LogInformation("{Message} {ContainerName}", message, _containerName);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to initialize blob storage for {ContainerName}", _containerName);
-            throw;
-        }
+        await _blobClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -64,25 +44,8 @@ public class Storage : IStorage
     /// <returns>Task representing the async operation</returns>
     public async Task PutBlobAsync(string blobName, string content)
     {
-        try
-        {
-            BlobClient blob = GetBlobClient(blobName);
-            if (await blob.ExistsAsync())
-            {
-                _logger.LogWarning("Overwriting existing blob {BlobName}", blobName);
-            }
-
-            BlobHttpHeaders httpHeader = new() { ContentType = "application/json" };
-            using MemoryStream ms = new(Encoding.UTF8.GetBytes(content));
-            await blob.UploadAsync(ms, httpHeader);
-
-            _logger.LogInformation("Successfully uploaded blob {BlobName}", blobName);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to upload blob {BlobName}", blobName);
-            throw;
-        }
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+        await _blobClient.GetBlobClient(blobName).UploadAsync(stream, overwrite: true);
     }
 
     /// <summary>

@@ -6,9 +6,9 @@ namespace WebApi.Controllers;
 
 [ApiController]
 [Route("")]
-public class Main(QuoteService quoteService) : ControllerBase
+public class Main(IQuoteService quoteService) : ControllerBase
 {
-    private readonly QuoteService quoteFeed = quoteService;
+    private readonly IQuoteService quoteFeed = quoteService;
 
     // GLOBALS
     private static readonly int limitLast = 120;

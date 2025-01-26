@@ -1,76 +1,10 @@
-using System.Text.Json;
-
 namespace WebApi.Services;
 
-public interface IQuoteService
-{
-    Task<IEnumerable<Quote>> Get();
-    Task<IEnumerable<Quote>> Get(string symbol);
-}
-
-public class QuoteService(
-    ILogger<QuoteService> logger,
-    IStorage storage) : IQuoteService
+public partial class QuoteService
 {
     private static readonly IReadOnlyList<Quote> backupQuotes = GetBackup().OrderBy(x => x.Date).ToList();
-    private readonly ILogger<QuoteService> _logger = logger;
-    private readonly IStorage _storage = storage;
 
-    /// <summary>
-    /// Get default quotes
-    /// </summary>
-    /// <returns cref="Quote">List of default quotes</returns>
-    public async Task<IEnumerable<Quote>> Get()
-        => await Get("QQQ");
-
-    /// <summary>
-    /// Get quotes for a specific symbol.
-    /// </summary>
-    /// <param name="symbol">"SPY" or "QQQ" only, for now</param>
-    public async Task<IEnumerable<Quote>> Get(string symbol)
-    {
-        string blobName = $"{symbol}-DAILY.json";
-
-        try
-        {
-            BlobClient blob = _storage.GetBlobClient(blobName);
-
-            if (!await blob.ExistsAsync())
-            {
-                _logger.LogWarning("Blob {BlobName} not found, using backup data", blobName);
-                return backupQuotes;
-            }
-
-            Response<BlobDownloadInfo> response = await blob.DownloadAsync();
-            using Stream? stream = response?.Value.Content;
-
-            if (stream == null)
-            {
-                _logger.LogError("Download stream was null for {BlobName}", blobName);
-                return backupQuotes;
-            }
-
-            List<Quote>? quotes = await JsonSerializer.DeserializeAsync<List<Quote>>(stream);
-
-            if (quotes == null || quotes.Count == 0)
-            {
-                _logger.LogWarning("No quotes found in {BlobName}", blobName);
-                return backupQuotes;
-            }
-
-            return quotes;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to retrieve quotes for {Symbol}", symbol);
-            return backupQuotes;
-        }
-    }
-
-    #region Backup Quotes (for failover)
-
-    private static List<Quote> GetBackup()
-        =>
+    private static List<Quote> GetBackup() =>
     [
         new() { Date = DateTime.Parse("2018-12-31"), Open = 244.92m, High = 245.54m, Low = 242.87m, Close = 245.28m, Volume = 147031456 },
         new() { Date = DateTime.Parse("2018-12-28"), Open = 244.94m, High = 246.73m, Low = 241.87m, Close = 243.15m, Volume = 155998912 },
@@ -577,7 +511,5 @@ public class QuoteService(
         new() { Date = DateTime.Parse("2017-01-02"), Open = 212.61m, High = 213.35m, Low = 211.52m, Close = 212.00m, Volume = 76708880 },
         new() { Date = DateTime.Parse("2017-01-01"), Open = 212.61m, High = 213.35m, Low = 211.52m, Close = 211.60m, Volume = 86708880 },
     ];
-
-    #endregion
 }
 
