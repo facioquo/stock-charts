@@ -13,14 +13,17 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "angular.ng-template",
+        "azurite.azurite",
         "ms-azuretools.vscode-azurefunctions",
-        "ms-dotnettools.csharp",
-        "angular.ng-template"
-      ]
+        "ms-azuretools.vscode-azurestorage",
+        "ms-dotnettools.csdevkit",
+        "ms-vscode-remote.remote-containers"
+      ],
+      "settings": {
+        "terminal.integrated.shell.linux": "/usr/bin/bash"
+      }
     }
-  },
-  "settings": {
-    "terminal.integrated.shell.linux": "/usr/bin/bash"
   },
   "postCreateCommand": "cd client && npm install",
   "remoteEnv": {

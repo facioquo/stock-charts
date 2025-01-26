@@ -72,6 +72,9 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "defaultConfiguration": "development",
+          "options": {
+            "hmr": false
+          },
           "configurations": {
             "development": {
               "buildTarget": "app:build:development"

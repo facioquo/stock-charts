@@ -2,12 +2,12 @@
 
 using System.IO.Compression;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.Extensions.Azure;
 using WebApi.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-IServiceCollection services = builder.Services;
 ConfigurationManager configuration = builder.Configuration;
+IServiceCollection services = builder.Services;
 
 // Add framework services
 services.AddControllers();
@@ -15,33 +15,24 @@ services.AddControllers();
 // Get CORS origins from appsettings
 // reminder: production origins defined in cloud host settings » API » CORS
 // so these are really only for localhost / development
-IConfigurationSection corsOrigins = configuration.GetSection("CorsOrigins");
-string? allowedOrigin = corsOrigins["Website"];
-
-List<string> origins = [];
+string? allowedOrigin = configuration.GetValue<string>("CorsOrigins:Website");
 
 if (!string.IsNullOrEmpty(allowedOrigin))
 {
-    origins.Add(allowedOrigin);
-}
-
-// Setup CORS for website
-services.AddCors(options => {
-    options.AddPolicy("CorsPolicy",
-    cors => {
-        cors.AllowAnyHeader();
-        cors.AllowAnyMethod();
-        cors.AllowCredentials();
-        cors.WithOrigins([.. origins])
-            .SetIsOriginAllowedToAllowWildcardSubdomains();
+    // Setup CORS for website
+    services.AddCors(options => {
+        options.AddPolicy("CorsPolicy",
+        cors => {
+            cors.AllowAnyHeader();
+            cors.AllowAnyMethod();
+            cors.AllowCredentials();
+            cors.WithOrigins(allowedOrigin)
+                .SetIsOriginAllowedToAllowWildcardSubdomains();
+        });
     });
-});
 
-Console.WriteLine($"CORS Origin: {allowedOrigin}");
-
-// Register services
-services.AddHostedService<StartupService>();
-services.AddTransient<QuoteService>();
+    Console.WriteLine($"CORS Origin: {allowedOrigin}");
+}
 
 // Add response compression services
 services.AddResponseCompression(options => {
@@ -58,6 +49,20 @@ services.Configure<BrotliCompressionProviderOptions>(options => {
 services.Configure<GzipCompressionProviderOptions>(options => {
     options.Level = CompressionLevel.Fastest;
 });
+
+// Add logging
+services.AddLogging();
+
+// Add Azure dependencies
+services.AddAzureClients(builder => {
+    builder.AddBlobServiceClient(configuration.GetValue<string>("Storage:ConnectionString")
+        ?? "UseDevelopmentStorage=true");
+});
+
+// Add application services
+services.AddSingleton<IStorage, Storage>();
+services.AddSingleton<IQuoteService, QuoteService>();
+services.AddHostedService<StartupServices>();
 
 // Build application
 WebApplication app = builder.Build();
