@@ -1,23 +1,39 @@
-# top-most EditorConfig file
+# EditorConfig: https://EditorConfig.org
 root = true
 
-# see Client and Server folders for
-# language unique editor configurations
-
-# global baselines
+#### Core EditorConfig Options ####
 [*]
-charset = utf-8
-end_of_line = lf
+charset = utf-8                   # Use UTF-8 character encoding
+end_of_line = lf                  # Use LF line endings (Unix-style)
+insert_final_newline = true       # Add empty line at end of files
+trim_trailing_whitespace = true   # Remove whitespace at end of lines
+indent_style = space              # Use spaces for indentation
+indent_size = 2                   # Use 2 spaces per indentation level
+tab_width = 2                     # Set tab width to 2 spaces
 
-indent_style = space
-indent_size = 2
-tab_width = 2
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false  # Allow trailing whitespace for line breaks
 
-line_length = 150
-max_line_length = 150
-trim_trailing_whitespace = true
-insert_final_newline = true
+# Batch and command files
+[*.{cmd,bat}]
+end_of_line = crlf                # Use CRLF for Windows specific files
 
-[*.{xml,yml}]
-indent_style = space
-indent_size = 2
+# .NET source files
+[*.{cs,vb}]
+indent_size = 4                   # Use 4 spaces for .NET files
+tab_width = 4                     # Set tab width to 4 spaces
+
+dotnet_sort_system_directives_first = true               # Place System.* usings before others
+dotnet_separate_import_directive_groups = false          # Don't add blank lines between using directives
+
+csharp_style_var_elsewhere = false                       # Use explicit types when type isn't obvious
+csharp_style_var_for_built_in_types = false              # Use explicit types for built-in types
+csharp_style_var_when_type_is_apparent = false           # Use explicit types even when obvious
+
+# Expression-level preferences that differ from defaults
+csharp_style_expression_bodied_methods = true:silent     # Allow expression-bodied methods
+csharp_style_expression_bodied_properties = true:silent  # Allow expression-bodied properties
+
+# Diagnostic overrides
+dotnet_diagnostic.IDE0058.severity = none    # Disable "use '_' discard" value warnings

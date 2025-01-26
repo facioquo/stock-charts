@@ -1,48 +1,91 @@
+using WebApi.Models;
+
 namespace WebApi.Services;
+
+public static class MetadataHelpers
+{
+    public static ChartConfig GetOscillatorConfig(float min = 0, float max = 100, float upperThreshold = 80, float lowerThreshold = 20)
+        => new() {
+            MinimumYAxis = min,
+            MaximumYAxis = max,
+            Thresholds = [
+                new() {
+                    Value = upperThreshold,
+                    Color = ChartColors.ThresholdRed,
+                    Style = "dash",
+                    Fill = new() {
+                        Target = "+2",
+                        ColorAbove = "transparent",
+                        ColorBelow = ChartColors.ThresholdGreen
+                    }
+                },
+                new() {
+                    Value = lowerThreshold,
+                    Color = ChartColors.ThresholdGreen,
+                    Style = "dash",
+                    Fill = new() {
+                        Target = "+1",
+                        ColorAbove = ChartColors.ThresholdRed,
+                        ColorBelow = "transparent"
+                    }
+                }
+            ]
+        };
+
+    public static List<IndicatorResultConfig> GetPriceBandResults(string name, string? color = null)
+    {
+        color ??= ChartColors.StandardOrange;
+        return [
+            new IndicatorResultConfig {
+                DisplayName = "Upper Band",
+                TooltipTemplate = $"{name} Upper Band",
+                DataName = "upperBand",
+                DataType = "number",
+                LineType = "solid",
+                LineWidth = 1,
+                DefaultColor = color,
+                Fill = new() {
+                    Target = "+2",
+                    ColorAbove = ChartColors.DarkGrayTransparent,
+                    ColorBelow = ChartColors.DarkGrayTransparent
+                }
+            },
+            new() {
+                DisplayName = "Centerline",
+                TooltipTemplate = $"{name} Centerline",
+                DataName = "centerline",
+                DataType = "number",
+                LineType = "dash",
+                LineWidth = 1,
+                DefaultColor = color
+            },
+            new() {
+                DisplayName = "Lower Band",
+                TooltipTemplate = $"{name} Lower Band",
+                DataName = "lowerBand",
+                DataType = "number",
+                LineType = "solid",
+                LineWidth = 1,
+                DefaultColor = color
+            }
+        ];
+    }
+}
 
 public static class Metadata
 {
-    // colors from Material Design (M2) color palettes
-    // ref: https://m2.material.io/design/color/the-color-system.html
-
-    // notably other dark/light theme chart colors (Sept. 2024):
-    // gridlines:  #2E2E2E / #E0E0E0
-    // background: #121316 / #FAF9FD
-
-    // indicator colors
-    // (a) more are available in UI for user selection
-    // (b) these should be consistently defined in UI colors
-    // TODO: make these available from API, cached in UI for selection
-    const string standardRed = "#DD2C00";                 // deep orange A700 (red)
-    const string standardOrange = "#EF6C00";              // orange 800
-    const string standardGreen = "#2E7D32";               // green 800
-    const string standardBlue = "#1E88E5";                // blue 600
-    const string standardPurple = "#8E24AA";              // purple 600
-    const string standardGrayTransparent = "#9E9E9E50";   // gray 500
-    const string darkGray = "#616161CC";                  // gray 600
-    const string darkGrayTransparent = "#61616110";       // gray 600
-
-    // threshold colors (different from indicator colors)
-    const string thresholdRed = "#B71C1C70";              // red 900
-    const string thresholdRedTransparent = "#B71C1C20";   // red 900
-    const string thresholdGrayTransparent = "#42424280";  // gray 800
-    const string thresholdGreen = "#1B5E2070";            // green 900
-    const string thresholdGreenTransparent = "#1B5E2020"; // green 900
-
     public static IEnumerable<IndicatorListing> IndicatorListing(string baseUrl)
     {
-        List<IndicatorListing> listing =
-        [
+        List<IndicatorListing> listing = [
             // Accumulation Distribution Line (ADL)
-            new IndicatorListing {
+            new() {
                 Name = "Accumulation Distribution Line (ADL)",
                 Uiid = "ADL",
                 LegendTemplate = "ADL w/ SMA([P1])",
                 Endpoint = $"{baseUrl}/ADL/",
                 Category = "volume-based",
                 ChartType = "oscillator",
-                Parameters =
-                [
+                Parameters = [
                     new() {
                         DisplayName = "SMA Periods",
                         ParamName = "smaPeriods",
@@ -54,12 +97,12 @@ public static class Metadata
                 ],
                 Results = [
                     new() {
-                        DisplayName = "Accumulation Distribution Line",
+                        DisplayName = "ADL",
                         TooltipTemplate = "ADL",
                         DataName = "adl",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "SMA of ADL",
@@ -67,7 +110,7 @@ public static class Metadata
                         DataName = "adlSma",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -85,12 +128,12 @@ public static class Metadata
                     [
                         new() {
                             Value = 40,
-                            Color = thresholdGrayTransparent,
+                            Color = ChartColors.ThresholdGrayTransparent,
                             Style = "dash"
                         },
                         new() {
                             Value = 20,
-                            Color = thresholdGrayTransparent,
+                            Color = ChartColors.ThresholdGrayTransparent,
                             Style = "dash"
                         }
                     ]
@@ -113,7 +156,7 @@ public static class Metadata
                         DataName = "adx",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "DI+",
@@ -121,7 +164,7 @@ public static class Metadata
                         DataName = "pdi",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardGreen
+                        DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
                         DisplayName = "DI-",
@@ -129,7 +172,7 @@ public static class Metadata
                         DataName = "mdi",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     },
                     new() {
                         DisplayName = "ADX Rating",
@@ -138,7 +181,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 2,
-                        DefaultColor = standardGrayTransparent
+                        DefaultColor = ChartColors.StandardGrayTransparent
                     }
                 ]
             },
@@ -185,7 +228,7 @@ public static class Metadata
                         DataName = "alma",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -206,17 +249,17 @@ public static class Metadata
                     [
                         new() {
                             Value = 70,
-                            Color = thresholdGrayTransparent,
+                            Color = ChartColors.ThresholdGrayTransparent,
                             Style = "solid"
                         },
                         new() {
                             Value = 50,
-                            Color = thresholdGrayTransparent,
+                            Color = ChartColors.ThresholdGrayTransparent,
                             Style = "dash"
                         },
                         new() {
                             Value = 30,
-                            Color = thresholdGrayTransparent,
+                            Color = ChartColors.ThresholdGrayTransparent,
                             Style = "solid"
                         }
                     ]
@@ -239,7 +282,7 @@ public static class Metadata
                         DataName = "aroonUp",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardGreen
+                        DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
                         DisplayName = "Aroon Down",
@@ -247,7 +290,7 @@ public static class Metadata
                         DataName = "aroonDown",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -268,7 +311,7 @@ public static class Metadata
                     [
                         new() {
                             Value = 0,
-                            Color = thresholdGrayTransparent,
+                            Color = ChartColors.ThresholdGrayTransparent,
                             Style = "dash"
                         }
                     ]
@@ -291,7 +334,7 @@ public static class Metadata
                         DataName = "oscillator",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -332,7 +375,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
-                        DefaultColor = standardGreen
+                        DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
                         DisplayName = "Sell Stop",
@@ -341,7 +384,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -382,7 +425,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
-                        DefaultColor = standardGreen
+                        DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
                         DisplayName = "Sell Stop",
@@ -391,7 +434,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -422,7 +465,7 @@ public static class Metadata
                         DataName = "atr",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -453,7 +496,7 @@ public static class Metadata
                         DataName = "atrp",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -471,7 +514,7 @@ public static class Metadata
                     [
                         new() {
                             Value = 1,
-                            Color = thresholdGrayTransparent,
+                            Color = ChartColors.ThresholdGrayTransparent,
                             Style = "dash"
                         }
                     ]
@@ -494,7 +537,7 @@ public static class Metadata
                         DataName = "beta",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "Beta+",
@@ -502,7 +545,7 @@ public static class Metadata
                         DataName = "betaUp",
                         DataType = "number",
                         LineType = "dash",
-                        DefaultColor = standardGreen
+                        DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
                         DisplayName = "Beta-",
@@ -510,7 +553,7 @@ public static class Metadata
                         DataName = "betaDown",
                         DataType = "number",
                         LineType = "dash",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -551,11 +594,11 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
-                        DefaultColor = darkGray,
+                        DefaultColor = ChartColors.DarkGray,
                         Fill = new ChartFill {
                             Target = "+2",
-                            ColorAbove = darkGrayTransparent,
-                            ColorBelow = darkGrayTransparent
+                            ColorAbove = ChartColors.DarkGrayTransparent,
+                            ColorBelow = ChartColors.DarkGrayTransparent
                         }
                     },
                     new() {
@@ -565,7 +608,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
-                        DefaultColor = darkGray
+                        DefaultColor = ChartColors.DarkGray
                     },
                     new() {
                         DisplayName = "Lower Band",
@@ -574,7 +617,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
-                        DefaultColor = darkGray
+                        DefaultColor = ChartColors.DarkGray
                     }
                 ]
             },
@@ -592,21 +635,21 @@ public static class Metadata
                     [
                         new() {
                             Value = 1,
-                            Color = thresholdRed,
+                            Color = ChartColors.ThresholdRed,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+2",
                                 ColorAbove = "transparent",
-                                ColorBelow = thresholdGreen
+                                ColorBelow = ChartColors.ThresholdGreen
                             }
                         },
                         new() {
                             Value = 0,
-                            Color = thresholdGreen,
+                            Color = ChartColors.ThresholdGreen,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+1",
-                                ColorAbove = thresholdRed,
+                                ColorAbove = ChartColors.ThresholdRed,
                                 ColorBelow = "transparent"
                             }
                         }
@@ -638,7 +681,7 @@ public static class Metadata
                         DataName = "percentB",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue,
+                        DefaultColor = ChartColors.StandardBlue,
                     }
                 ]
             },
@@ -656,7 +699,7 @@ public static class Metadata
                     [
                         new() {
                             Value = 0,
-                            Color = thresholdGrayTransparent,
+                            Color = ChartColors.ThresholdGrayTransparent,
                             Style = "dash"
                         }
                     ]
@@ -679,7 +722,7 @@ public static class Metadata
                         DataName = "cmf",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -710,7 +753,7 @@ public static class Metadata
                         DataName = "cmo",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -749,7 +792,7 @@ public static class Metadata
                         DataName = "chandelierExit",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardOrange
+                        DefaultColor = ChartColors.StandardOrange
                     }
                 ]
             },
@@ -788,7 +831,7 @@ public static class Metadata
                         DataName = "chandelierExit",
                         DataType = "number",
                         LineType = "dash",
-                        DefaultColor = standardOrange
+                        DefaultColor = ChartColors.StandardOrange
                     }
                 ]
             },
@@ -809,21 +852,21 @@ public static class Metadata
                     [
                         new() {
                             Value = 61.8,
-                            Color = darkGrayTransparent,
+                            Color = ChartColors.DarkGrayTransparent,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+2",
                                 ColorAbove = "transparent",
-                                ColorBelow = thresholdRed
+                                ColorBelow = ChartColors.ThresholdRed
                             }
                         },
                         new() {
                             Value = 38.2,
-                            Color = darkGrayTransparent,
+                            Color = ChartColors.DarkGrayTransparent,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+1",
-                                ColorAbove = thresholdGreen,
+                                ColorAbove = ChartColors.ThresholdGreen,
                                 ColorBelow = "transparent"
                             }
                         }
@@ -847,7 +890,7 @@ public static class Metadata
                         DataName = "chop",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -868,21 +911,21 @@ public static class Metadata
                     [
                         new() {
                             Value = 90,
-                            Color = thresholdRed,
+                            Color = ChartColors.ThresholdRed,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+2",
                                 ColorAbove = "transparent",
-                                ColorBelow = thresholdGreen
+                                ColorBelow = ChartColors.ThresholdGreen
                             }
                         },
                         new() {
                             Value = 10,
-                            Color = thresholdGreen,
+                            Color = ChartColors.ThresholdGreen,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+1",
-                                ColorAbove = thresholdRed,
+                                ColorAbove = ChartColors.ThresholdRed,
                                 ColorBelow = "transparent"
                             }
                         }
@@ -922,7 +965,7 @@ public static class Metadata
                         DataName = "connorsRsi",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -954,7 +997,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "pointer",
                         LineWidth = 8,
-                        DefaultColor = darkGray
+                        DefaultColor = ChartColors.DarkGray
                     }
                 ]
             },
@@ -977,7 +1020,7 @@ public static class Metadata
                         DataName = "dcPeriods",
                         DataType = "number",
                         LineType = "bar",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -1002,40 +1045,7 @@ public static class Metadata
                         Maximum = 250
                     }
                 ],
-                Results = [
-                    new() {
-                        DisplayName = "Upper Band",
-                        TooltipTemplate = "DONCHIAN([P1]) Upper Band",
-                        DataName = "upperBand",
-                        DataType = "number",
-                        LineType = "solid",
-                        LineWidth = 1,
-                        DefaultColor = standardOrange,
-                        Fill = new ChartFill {
-                            Target = "+2",
-                            ColorAbove = darkGrayTransparent,
-                            ColorBelow = darkGrayTransparent
-                        }
-                    },
-                    new() {
-                        DisplayName = "Centerline",
-                        TooltipTemplate = "DONCHIAN([P1]) Centerline",
-                        DataName = "centerline",
-                        DataType = "number",
-                        LineType = "dash",
-                        LineWidth = 1,
-                        DefaultColor = standardOrange
-                    },
-                    new() {
-                        DisplayName = "Lower Band",
-                        TooltipTemplate = "DONCHIAN([P1]) Lower Band",
-                        DataName = "lowerBand",
-                        DataType = "number",
-                        LineType = "solid",
-                        LineWidth = 1,
-                        DefaultColor = standardOrange
-                    }
-                ]
+                Results = MetadataHelpers.GetPriceBandResults("DONCHIAN", ChartColors.StandardOrange)
             },
 
             // Dynamic, McGinley
@@ -1064,7 +1074,7 @@ public static class Metadata
                         DataName = "dynamic",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -1096,7 +1106,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "bar",
                         Stack = "eray",
-                        DefaultColor = standardGreen
+                        DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
                         DisplayName = "Bear Power",
@@ -1105,7 +1115,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "bar",
                         Stack = "eray",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -1136,7 +1146,7 @@ public static class Metadata
                         DataName = "epma",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -1167,7 +1177,7 @@ public static class Metadata
                         DataName = "ema",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -1198,7 +1208,7 @@ public static class Metadata
                         DataName = "fisher",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "Trigger",
@@ -1206,7 +1216,7 @@ public static class Metadata
                         DataName = "trigger",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -1238,7 +1248,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "dots",
                         LineWidth = 3,
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     },
                     new() {
                         DisplayName = "Fractal Bear",
@@ -1247,7 +1257,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "dots",
                         LineWidth = 3,
-                        DefaultColor = standardGreen
+                        DefaultColor = ChartColors.StandardGreen
                     }
                 ]
             },
@@ -1279,7 +1289,7 @@ public static class Metadata
                         DataName = "upperBand",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardGreen
+                        DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
                         DisplayName = "Lower Band",
@@ -1287,7 +1297,7 @@ public static class Metadata
                         DataName = "lowerBand",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -1307,7 +1317,7 @@ public static class Metadata
                         DataName = "trendline",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "HT Smoothed Price",
@@ -1315,7 +1325,7 @@ public static class Metadata
                         DataName = "smoothPrice",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardOrange
+                        DefaultColor = ChartColors.StandardOrange
                     }
                 ]
             },
@@ -1364,7 +1374,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 2,
-                        DefaultColor = standardBlue,
+                        DefaultColor = ChartColors.StandardBlue,
                     },
                     new() {
                         DisplayName = "Kijun-sen",
@@ -1373,7 +1383,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 2,
-                        DefaultColor = standardPurple,
+                        DefaultColor = ChartColors.StandardPurple,
                     },
                     new() {
                         DisplayName = "Chikou span",
@@ -1382,7 +1392,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 2,
-                        DefaultColor = darkGray,
+                        DefaultColor = ChartColors.DarkGray,
                     },
                     new() {
                         DisplayName = "Senkou span A",
@@ -1391,7 +1401,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 1.5f,
-                        DefaultColor = thresholdGreen,
+                        DefaultColor = ChartColors.ThresholdGreen,
                     },
                     new() {
                         DisplayName = "Senkou span B",
@@ -1400,11 +1410,11 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 1.5f,
-                        DefaultColor = thresholdRed,
+                        DefaultColor = ChartColors.ThresholdRed,
                         Fill = new ChartFill {
                             Target = "-1",
-                            ColorAbove = thresholdRedTransparent,
-                            ColorBelow = thresholdGreenTransparent
+                            ColorAbove = ChartColors.ThresholdRedTransparent,
+                            ColorBelow = ChartColors.ThresholdGreenTransparent
                         }
                     }
                 ]
@@ -1447,40 +1457,7 @@ public static class Metadata
                         Maximum = 250
                     }
                 ],
-                Results = [
-                    new() {
-                        DisplayName = "Upper Band",
-                        TooltipTemplate = "KELTNER([P1],[P2],[P3]) Upper Band",
-                        DataName = "upperBand",
-                        DataType = "number",
-                        LineType = "solid",
-                        LineWidth = 1,
-                        DefaultColor = standardOrange,
-                        Fill = new ChartFill {
-                            Target = "+2",
-                            ColorAbove = darkGrayTransparent,
-                            ColorBelow = darkGrayTransparent
-                        }
-                    },
-                    new() {
-                        DisplayName = "Centerline",
-                        TooltipTemplate = "KELTNER([P1],[P2],[P3]) Centerline",
-                        DataName = "centerline",
-                        DataType = "number",
-                        LineType = "dash",
-                        LineWidth = 1,
-                        DefaultColor = standardOrange
-                    },
-                    new() {
-                        DisplayName = "Lower Band",
-                        TooltipTemplate = "KELTNER([P1],[P2],[P3]) Lower Band",
-                        DataName = "lowerBand",
-                        DataType = "number",
-                        LineType = "solid",
-                        LineWidth = 1,
-                        DefaultColor = standardOrange
-                    }
-                ]
+                Results = MetadataHelpers.GetPriceBandResults("KELTNER", ChartColors.StandardOrange)
             },
 
             // Marubozu
@@ -1510,7 +1487,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "pointer",
                         LineWidth = 8,
-                        DefaultColor = darkGray
+                        DefaultColor = ChartColors.DarkGray
                     }
                 ]
             },
@@ -1531,21 +1508,21 @@ public static class Metadata
                     [
                         new() {
                             Value = 80,
-                            Color = thresholdRed,
+                            Color = ChartColors.ThresholdRed,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+2",
                                 ColorAbove = "transparent",
-                                ColorBelow = thresholdGreen
+                                ColorBelow = ChartColors.ThresholdGreen
                             }
                         },
                         new() {
                             Value = 20,
-                            Color = thresholdGreen,
+                            Color = ChartColors.ThresholdGreen,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+1",
-                                ColorAbove = thresholdRed,
+                                ColorAbove = ChartColors.ThresholdRed,
                                 ColorBelow = "transparent"
                             }
                         }
@@ -1569,7 +1546,7 @@ public static class Metadata
                         DataName = "mfi",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -1587,7 +1564,7 @@ public static class Metadata
                     [
                         new() {
                             Value = 0,
-                            Color = darkGrayTransparent,
+                            Color = ChartColors.DarkGrayTransparent,
                             Style = "dash"
                         }
                     ]
@@ -1626,7 +1603,7 @@ public static class Metadata
                         DataName = "macd",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "Signal",
@@ -1634,7 +1611,7 @@ public static class Metadata
                         DataName = "signal",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     },
                     new() {
                         DisplayName = "Histogram",
@@ -1642,7 +1619,7 @@ public static class Metadata
                         DataName = "histogram",
                         DataType = "number",
                         LineType = "bar",
-                        DefaultColor = standardGrayTransparent
+                        DefaultColor = ChartColors.StandardGrayTransparent
                     }
                 ]
             },
@@ -1683,7 +1660,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
-                        DefaultColor = standardPurple
+                        DefaultColor = ChartColors.StandardPurple
                     }
                 ]
             },
@@ -1722,7 +1699,7 @@ public static class Metadata
                         DataName = "roc",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "SMA of ROC",
@@ -1730,7 +1707,7 @@ public static class Metadata
                         DataName = "rocSma",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -1751,21 +1728,21 @@ public static class Metadata
                     [
                         new() {
                             Value = 70,
-                            Color = thresholdRed,
+                            Color = ChartColors.ThresholdRed,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+2",
                                 ColorAbove = "transparent",
-                                ColorBelow = thresholdGreen
+                                ColorBelow = ChartColors.ThresholdGreen
                             }
                         },
                         new() {
                             Value = 30,
-                            Color = thresholdGreen,
+                            Color = ChartColors.ThresholdGreen,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+1",
-                                ColorAbove = thresholdRed,
+                                ColorAbove = ChartColors.ThresholdRed,
                                 ColorBelow = "transparent"
                             }
                         }
@@ -1789,7 +1766,7 @@ public static class Metadata
                         DataName = "rsi",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -1810,21 +1787,21 @@ public static class Metadata
                     [
                         new() {
                             Value = 75,
-                            Color = thresholdGreen,
+                            Color = ChartColors.ThresholdGreen,
                             Style = "solid",
                             Fill = new ChartFill {
                                 Target = "+2",
                                 ColorAbove = "transparent",
-                                ColorBelow = thresholdGreen
+                                ColorBelow = ChartColors.ThresholdGreen
                             }
                         },
                         new() {
                             Value = 25,
-                            Color = thresholdRed,
+                            Color = ChartColors.ThresholdRed,
                             Style = "solid",
                             Fill = new ChartFill {
                                 Target = "+1",
-                                ColorAbove = thresholdRed,
+                                ColorAbove = ChartColors.ThresholdRed,
                                 ColorBelow = "transparent"
                             }
                         }
@@ -1864,7 +1841,7 @@ public static class Metadata
                         DataName = "stc",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -1895,7 +1872,7 @@ public static class Metadata
                         DataName = "slope",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -1926,7 +1903,7 @@ public static class Metadata
                         DataName = "line",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -1957,7 +1934,7 @@ public static class Metadata
                         DataName = "sma",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -1996,7 +1973,7 @@ public static class Metadata
                         DataName = "stdDev",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "SMA of Standard Deviation",
@@ -2004,7 +1981,7 @@ public static class Metadata
                         DataName = "stdDevSma",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -2035,7 +2012,7 @@ public static class Metadata
                         DataName = "zScore",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -2076,40 +2053,7 @@ public static class Metadata
                         Maximum = 50
                     }
                 ],
-                Results = [
-                    new() {
-                        DisplayName = "Upper Band",
-                        TooltipTemplate = "STARC([P1],[P2],[P3]) Upper Band",
-                        DataName = "upperBand",
-                        DataType = "number",
-                        LineType = "solid",
-                        LineWidth = 1,
-                        DefaultColor = standardOrange,
-                        Fill = new ChartFill {
-                            Target = "+2",
-                            ColorAbove = darkGrayTransparent,
-                            ColorBelow = darkGrayTransparent
-                        }
-                    },
-                    new() {
-                        DisplayName = "Centerline",
-                        TooltipTemplate = "STARC([P1],[P2],[P3]) Centerline",
-                        DataName = "centerline",
-                        DataType = "number",
-                        LineType = "dash",
-                        LineWidth = 1,
-                        DefaultColor = standardOrange
-                    },
-                    new() {
-                        DisplayName = "Lower Band",
-                        TooltipTemplate = "STARC([P1],[P2],[P3]) Lower Band",
-                        DataName = "lowerBand",
-                        DataType = "number",
-                        LineType = "solid",
-                        LineWidth = 1,
-                        DefaultColor = standardOrange
-                    }
-                ]
+                Results = MetadataHelpers.GetPriceBandResults("STARC", ChartColors.StandardOrange)
             },
 
             // Stochastic Momentum Index
@@ -2125,21 +2069,21 @@ public static class Metadata
                     [
                         new() {
                             Value = 40,
-                            Color = thresholdRed,
+                            Color = ChartColors.ThresholdRed,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+2",
                                 ColorAbove = "transparent",
-                                ColorBelow = thresholdGreen
+                                ColorBelow = ChartColors.ThresholdGreen
                             }
                         },
                         new() {
                             Value = -40,
-                            Color = thresholdGreen,
+                            Color = ChartColors.ThresholdGreen,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+1",
-                                ColorAbove = thresholdRed,
+                                ColorAbove = ChartColors.ThresholdRed,
                                 ColorBelow = "transparent"
                             }
                         }
@@ -2187,7 +2131,7 @@ public static class Metadata
                         DataName = "smi",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "Signal",
@@ -2195,7 +2139,7 @@ public static class Metadata
                         DataName = "signal",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -2213,21 +2157,21 @@ public static class Metadata
                     [
                         new() {
                             Value = 80,
-                            Color = thresholdRed,
+                            Color = ChartColors.ThresholdRed,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+2",
                                 ColorAbove = "transparent",
-                                ColorBelow = thresholdGreen
+                                ColorBelow = ChartColors.ThresholdGreen
                             }
                         },
                         new() {
                             Value = 20,
-                            Color = thresholdGreen,
+                            Color = ChartColors.ThresholdGreen,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+1",
-                                ColorAbove = thresholdRed,
+                                ColorAbove = ChartColors.ThresholdRed,
                                 ColorBelow = "transparent"
                             }
                         }
@@ -2259,7 +2203,7 @@ public static class Metadata
                         DataName = "k",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "%D",
@@ -2267,7 +2211,7 @@ public static class Metadata
                         DataName = "d",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -2285,21 +2229,21 @@ public static class Metadata
                     [
                         new() {
                             Value = 80,
-                            Color = thresholdRed,
+                            Color = ChartColors.ThresholdRed,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+2",
                                 ColorAbove = "transparent",
-                                ColorBelow = thresholdGreen
+                                ColorBelow = ChartColors.ThresholdGreen
                             }
                         },
                         new() {
                             Value = 20,
-                            Color = thresholdGreen,
+                            Color = ChartColors.ThresholdGreen,
                             Style = "dash",
                             Fill = new ChartFill {
                                 Target = "+1",
-                                ColorAbove = thresholdRed,
+                                ColorAbove = ChartColors.ThresholdRed,
                                 ColorBelow = "transparent"
                             }
                         }
@@ -2347,7 +2291,7 @@ public static class Metadata
                         DataName = "stochRsi",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "Signal line",
@@ -2355,7 +2299,7 @@ public static class Metadata
                         DataName = "signal",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -2395,7 +2339,7 @@ public static class Metadata
                         DataName = "upperBand",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     },
                     new() {
                         DisplayName = "Lower Band",
@@ -2403,7 +2347,7 @@ public static class Metadata
                         DataName = "lowerBand",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardGreen
+                        DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
                         DisplayName = "Transition line",
@@ -2412,7 +2356,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
-                        DefaultColor = darkGrayTransparent
+                        DefaultColor = ChartColors.DarkGrayTransparent
                     }
                 ]
             },
@@ -2443,7 +2387,7 @@ public static class Metadata
                         DataName = "ui",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
@@ -2474,7 +2418,7 @@ public static class Metadata
                         DataName = "pvi",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardGreen
+                        DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
                         DisplayName = "VI+",
@@ -2482,7 +2426,7 @@ public static class Metadata
                         DataName = "nvi",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -2553,7 +2497,7 @@ public static class Metadata
                         DataName = "jaw",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "Teeth",
@@ -2561,7 +2505,7 @@ public static class Metadata
                         DataName = "teeth",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardRed
+                        DefaultColor = ChartColors.StandardRed
                     },
                     new() {
                         DisplayName = "Lips",
@@ -2569,7 +2513,7 @@ public static class Metadata
                         DataName = "lips",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardGreen
+                        DefaultColor = ChartColors.StandardGreen
                     }
                 ]
             },
@@ -2600,7 +2544,7 @@ public static class Metadata
                         DataName = "zigZag",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "Zig Zag Retrace High",
@@ -2608,7 +2552,7 @@ public static class Metadata
                         DataName = "retraceHigh",
                         DataType = "number",
                         LineType = "dash",
-                        DefaultColor = thresholdGrayTransparent
+                        DefaultColor = ChartColors.ThresholdGrayTransparent
                     },
                     new() {
                         DisplayName = "Zig Zag Retrace Low",
@@ -2616,7 +2560,7 @@ public static class Metadata
                         DataName = "retraceLow",
                         DataType = "number",
                         LineType = "dash",
-                        DefaultColor = thresholdGrayTransparent
+                        DefaultColor = ChartColors.ThresholdGrayTransparent
                     }
                 ]
             },
@@ -2647,7 +2591,7 @@ public static class Metadata
                         DataName = "zigZag",
                         DataType = "number",
                         LineType = "solid",
-                        DefaultColor = standardBlue
+                        DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
                         DisplayName = "Zig Zag Retrace High",
@@ -2655,7 +2599,7 @@ public static class Metadata
                         DataName = "retraceHigh",
                         DataType = "number",
                         LineType = "dash",
-                        DefaultColor = thresholdGrayTransparent
+                        DefaultColor = ChartColors.ThresholdGrayTransparent
                     },
                     new() {
                         DisplayName = "Zig Zag Retrace Low",
@@ -2663,7 +2607,7 @@ public static class Metadata
                         DataName = "retraceLow",
                         DataType = "number",
                         LineType = "dash",
-                        DefaultColor = thresholdGrayTransparent
+                        DefaultColor = ChartColors.ThresholdGrayTransparent
                     }
                 ]
             }

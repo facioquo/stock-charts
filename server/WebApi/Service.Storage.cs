@@ -1,60 +1,95 @@
 namespace WebApi.Services;
 
-public static class Storage
+public interface IStorage
 {
-    private static readonly string containerName = "chart-demo";
-    private static readonly string azureWebJobStorage
-        = Environment.GetEnvironmentVariable("AzureWebJobsStorage")
-            ?? "UseDevelopmentStorage=true"; // failover to Azurite dev storage
+    Task InitializeAsync(CancellationToken cancellationToken = default);
+    Task PutBlobAsync(string blobName, string content);
+    BlobClient GetBlobClient(string blobName);
+}
 
-    /// <summary>
-    /// Initialize Azure services (setup blob storage for quotes)
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    public static async Task Initialize(
-        ILogger logger,
-        CancellationToken cancellationToken)
+public class Storage : IStorage
+{
+    private readonly string _containerName;
+    private readonly BlobContainerClient _blobClient;
+    private readonly ILogger<Storage> _logger;
+
+    public Storage(
+        IConfiguration configuration,
+        ILogger<Storage> logger)
     {
-        logger.LogInformation("API initializing ...");
+        _logger = logger;
 
-        // main blob container
-        BlobContainerClient blobContainer = new(azureWebJobStorage, containerName);
+        _containerName
+            = configuration.GetValue<string>("Storage:ContainerName")
+            ?? "chart-demo";
 
-        Response<BlobContainerInfo> response = await blobContainer
-            .CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+        string connectionString
+            = configuration.GetValue<string>("Storage:ConnectionString")
+            ?? Environment.GetEnvironmentVariable("AzureWebJobsStorage")
+            ?? "UseDevelopmentStorage=true";
 
-        string message = response != null
-            ? $"New `{containerName}` blob container created."
-            : $"Existing `{containerName}` blob container found.";
-
-        logger.LogInformation("Blob container status: {message}", message);
+        _blobClient = new BlobContainerClient(connectionString, _containerName);
     }
 
     /// <summary>
-    /// Upload/save blob item (JSON quotes)
+    /// Initializes the blob storage container
     /// </summary>
-    /// <param name="blobName">Unique name of blob item</param>
-    /// <param name="csv">JSON payload to store</param>
-    public static async Task PutBlob(string blobName, string csv)
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Task representing the async operation</returns>
+    public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        BlobClient blob = GetBlobClient(blobName);
-        BlobHttpHeaders httpHeader = new() {
-            ContentType = "application/json"
-        };
+        try
+        {
+            _logger.LogInformation("Initializing blob storage for container {ContainerName}...", _containerName);
 
-        using MemoryStream ms = new(Encoding.UTF8.GetBytes(csv));
-        ms.Position = 0;
-        await blob.UploadAsync(ms, httpHeader);
+            Response<BlobContainerInfo> response = await _blobClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+            string message = response?.Value != null
+                ? "Created new blob container"
+                : "Using existing blob container";
+
+            _logger.LogInformation("{Message} {ContainerName}", message, _containerName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to initialize blob storage for {ContainerName}", _containerName);
+            throw;
+        }
     }
 
     /// <summary>
-    /// Get Azure Blob client
+    /// Uploads content to a blob with the specified name
     /// </summary>
-    /// <param name="blobName">Unique name of blob item</param>
-    /// <returns cref="BlobClient"></returns>
-    internal static BlobClient GetBlobClient(string blobName)
+    /// <param name="blobName">Name of the blob</param>
+    /// <param name="content">Content to upload</param>
+    /// <returns>Task representing the async operation</returns>
+    public async Task PutBlobAsync(string blobName, string content)
     {
-        BlobContainerClient blobContainer = new(azureWebJobStorage, containerName);
-        return blobContainer.GetBlobClient(blobName);
+        try
+        {
+            BlobClient blob = GetBlobClient(blobName);
+            if (await blob.ExistsAsync())
+            {
+                _logger.LogWarning("Overwriting existing blob {BlobName}", blobName);
+            }
+
+            BlobHttpHeaders httpHeader = new() { ContentType = "application/json" };
+            using MemoryStream ms = new(Encoding.UTF8.GetBytes(content));
+            await blob.UploadAsync(ms, httpHeader);
+
+            _logger.LogInformation("Successfully uploaded blob {BlobName}", blobName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to upload blob {BlobName}", blobName);
+            throw;
+        }
     }
+
+    /// <summary>
+    /// Gets a BlobClient for the specified blob name
+    /// </summary>
+    /// <param name="blobName">Name of the blob</param>
+    /// <returns>BlobClient instance</returns>
+    public BlobClient GetBlobClient(string blobName)
+        => _blobClient.GetBlobClient(blobName);
 }

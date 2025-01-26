@@ -1,8 +1,11 @@
 namespace WebApi.Services;
 
-public class StartupServices(ILoggerFactory loggerFactory) : IHostedService
+public class StartupServices(
+    ILogger<StartupServices> logger,
+    IStorage storage) : IHostedService
 {
-    private readonly ILogger _logger = loggerFactory.CreateLogger<StartupServices>();
+    private readonly ILogger<StartupServices> _logger = logger;
+    private readonly IStorage _storage = storage;
 
     /// <summary>
     /// The code in here will run when the application starts,
@@ -10,7 +13,10 @@ public class StartupServices(ILoggerFactory loggerFactory) : IHostedService
     /// </summary>
     /// <param name="cancellationToken" cref="CancellationToken></param>
     public async Task StartAsync(CancellationToken cancellationToken)
-        => await Storage.Initialize(_logger, cancellationToken);
+    {
+        _logger.LogInformation("Initializing storage service...");
+        await _storage.InitializeAsync(cancellationToken);
+    }
 
     /// <summary>
     /// The code in here will run when the application stops.

@@ -1,19 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Services;
+using WebApi.Models;
 
 namespace WebApi.Controllers;
 
 [ApiController]
 [Route("")]
-public class MainController(QuoteService quoteService) : ControllerBase
+public class Main(QuoteService quoteService) : ControllerBase
 {
     private readonly QuoteService quoteFeed = quoteService;
 
     // GLOBALS
-    internal static readonly int limitLast = 120;
+    private static readonly int limitLast = 120;
 
     [HttpGet]
-    public string Get() => "API is functioning nominally.";
+    public string Get()
+        => "API is functioning nominally.";
 
     [HttpGet("quotes")]
     public async Task<IActionResult> GetQuotes()
@@ -32,214 +34,67 @@ public class MainController(QuoteService quoteService) : ControllerBase
         return Ok(Metadata.IndicatorListing($"{Request.Scheme}://{Request.Host}"));
     }
 
+    private async Task<IActionResult> Get<T>(Func<IEnumerable<Quote>, IEnumerable<T>> indicatorFunc)
+    {
+        try
+        {
+            IEnumerable<Quote> quotes = await quoteFeed.Get();
+            IEnumerable<T> results = indicatorFunc(quotes).TakeLast(limitLast);
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
 
     //////////////////////////////////////////
     // INDICATORS (sorted alphabetically)
 
     [HttpGet("ADL")]
-    public async Task<IActionResult> GetAdl(
-        int smaPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<AdlResult> results =
-                quotes.GetAdl(smaPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetAdl(int smaPeriods)
+        => Get(quotes => quotes.GetAdl(smaPeriods));
 
     [HttpGet("ADX")]
-    public async Task<IActionResult> GetAdx(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<AdxResult> results =
-                quotes.GetAdx(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetAdx(int lookbackPeriods)
+        => Get(quotes => quotes.GetAdx(lookbackPeriods));
 
     [HttpGet("ALMA")]
-    public async Task<IActionResult> GetAlma(
-        int lookbackPeriods,
-        double offset,
-        double sigma)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<AlmaResult> results =
-                quotes.GetAlma(lookbackPeriods, offset, sigma)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetAlma(int lookbackPeriods, double offset, double sigma)
+        => Get(quotes => quotes.GetAlma(lookbackPeriods, offset, sigma));
 
     [HttpGet("ALLIGATOR")]
-    public async Task<IActionResult> GetAlligator(
-        int jawPeriods,
-        int jawOffset,
-        int teethPeriods,
-        int teethOffset,
-        int lipsPeriods,
-        int lipsOffset)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<AlligatorResult> results =
-                quotes.GetAlligator(jawPeriods, jawOffset, teethPeriods, teethOffset, lipsPeriods, lipsOffset)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetAlligator(int jawPeriods, int jawOffset, int teethPeriods, int teethOffset, int lipsPeriods, int lipsOffset)
+        => Get(quotes => quotes.GetAlligator(jawPeriods, jawOffset, teethPeriods, teethOffset, lipsPeriods, lipsOffset));
 
     [HttpGet("AROON")]
-    public async Task<IActionResult> GetAroon(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<AroonResult> results =
-                quotes.GetAroon(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetAroon(int lookbackPeriods)
+        => Get(quotes => quotes.GetAroon(lookbackPeriods));
 
     [HttpGet("ATR")]
-    public async Task<IActionResult> GetAtr(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<AtrResult> results =
-                quotes.GetAtr(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetAtr(int lookbackPeriods)
+        => Get(quotes => quotes.GetAtr(lookbackPeriods));
 
     [HttpGet("ATR-STOP-CLOSE")]
-    public async Task<IActionResult> GetAtrStopClose(
-        int lookbackPeriods,
-        double multiplier)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<AtrStopResult> results =
-                quotes.GetAtrStop(lookbackPeriods, multiplier, EndType.Close)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetAtrStopClose(int lookbackPeriods, double multiplier)
+        => Get(quotes => quotes.GetAtrStop(lookbackPeriods, multiplier, EndType.Close));
 
     [HttpGet("ATR-STOP-HL")]
-    public async Task<IActionResult> GetAtrStopHL(
-        int lookbackPeriods,
-        double multiplier)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<AtrStopResult> results =
-                quotes.GetAtrStop(lookbackPeriods, multiplier, EndType.HighLow)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetAtrStopHL(int lookbackPeriods, double multiplier)
+        => Get(quotes => quotes.GetAtrStop(lookbackPeriods, multiplier, EndType.HighLow));
 
     [HttpGet("BB")]
-    public async Task<IActionResult> GetBollingerBands(
-        int lookbackPeriods,
-        double standardDeviations)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<BollingerBandsResult> results =
-                quotes.GetBollingerBands(lookbackPeriods, standardDeviations)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetBollingerBands(int lookbackPeriods, double standardDeviations)
+        => Get(quotes => quotes.GetBollingerBands(lookbackPeriods, standardDeviations));
 
     [HttpGet("BETA")]
-    public async Task<IActionResult> GetBeta(
-        int lookbackPeriods,
-        BetaType type)
+    public async Task<IActionResult> GetBeta(int lookbackPeriods, BetaType type)
     {
         try
         {
             IEnumerable<Quote> quotes = await quoteFeed.Get();
             IEnumerable<Quote> market = await quoteFeed.Get("SPY");
-
-            IEnumerable<BetaResult> results =
-                quotes.GetBeta(market, lookbackPeriods, type)
-                      .TakeLast(limitLast);
-
+            IEnumerable<BetaResult> results = quotes.GetBeta(market, lookbackPeriods, type).TakeLast(limitLast);
             return Ok(results);
         }
         catch (ArgumentOutOfRangeException rex)
@@ -249,789 +104,154 @@ public class MainController(QuoteService quoteService) : ControllerBase
     }
 
     [HttpGet("CHEXIT-LONG")]
-    public async Task<IActionResult> GetChandelierLong(
-        int lookbackPeriods,
-        double multiplier)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<ChandelierResult> results =
-                quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Long)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetChandelierLong(int lookbackPeriods, double multiplier)
+        => Get(quotes => quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Long));
 
     [HttpGet("CHEXIT-SHORT")]
-    public async Task<IActionResult> GetChandelierShort(
-        int lookbackPeriods,
-        double multiplier)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<ChandelierResult> results =
-                quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Short)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetChandelierShort(int lookbackPeriods, double multiplier)
+        => Get(quotes => quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Short));
 
     [HttpGet("CHOP")]
-    public async Task<IActionResult> GetChop(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<ChopResult> results =
-                quotes.GetChop(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetChop(int lookbackPeriods)
+        => Get(quotes => quotes.GetChop(lookbackPeriods));
 
     [HttpGet("CMF")]
-    public async Task<IActionResult> GetCmf(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<CmfResult> results =
-                quotes.GetCmf(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetCmf(int lookbackPeriods)
+        => Get(quotes => quotes.GetCmf(lookbackPeriods));
 
     [HttpGet("CMO")]
-    public async Task<IActionResult> GetCmo(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<CmoResult> results =
-                quotes.GetCmo(lookbackPeriods)
-                        .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetCmo(int lookbackPeriods)
+        => Get(quotes => quotes.GetCmo(lookbackPeriods));
 
     [HttpGet("CRSI")]
-    public async Task<IActionResult> GetConnorsRsi(
-        int rsiPeriods,
-        int streakPeriods,
-        int rankPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<ConnorsRsiResult> results =
-                quotes.GetConnorsRsi(rsiPeriods, streakPeriods, rankPeriods)
-                        .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetConnorsRsi(int rsiPeriods, int streakPeriods, int rankPeriods)
+        => Get(quotes => quotes.GetConnorsRsi(rsiPeriods, streakPeriods, rankPeriods));
 
     [HttpGet("DOJI")]
-    public async Task<IActionResult> GetDoji(
-        double maxPriceChangePercent)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<CandleResult> results =
-                quotes.GetDoji(maxPriceChangePercent)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetDoji(double maxPriceChangePercent)
+        => Get(quotes => quotes.GetDoji(maxPriceChangePercent));
 
     [HttpGet("DONCHIAN")]
-    public async Task<IActionResult> GetDonchian(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<DonchianResult> results =
-                quotes.GetDonchian(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetDonchian(int lookbackPeriods)
+        => Get(quotes => quotes.GetDonchian(lookbackPeriods));
 
     [HttpGet("DYN")]
-    public async Task<IActionResult> GetDynamic(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<DynamicResult> results =
-                quotes.GetDynamic(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetDynamic(int lookbackPeriods)
+        => Get(quotes => quotes.GetDynamic(lookbackPeriods));
 
     [HttpGet("ELDER-RAY")]
-    public async Task<IActionResult> GetElderRay(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<ElderRayResult> results =
-                quotes.GetElderRay(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetElderRay(int lookbackPeriods)
+        => Get(quotes => quotes.GetElderRay(lookbackPeriods));
 
     [HttpGet("EPMA")]
-    public async Task<IActionResult> GetEpma(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<EpmaResult> results =
-                quotes.GetEpma(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetEpma(int lookbackPeriods)
+        => Get(quotes => quotes.GetEpma(lookbackPeriods));
 
     [HttpGet("EMA")]
-    public async Task<IActionResult> GetEma(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<EmaResult> results =
-                quotes.GetEma(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetEma(int lookbackPeriods)
+        => Get(quotes => quotes.GetEma(lookbackPeriods));
 
     [HttpGet("FCB")]
-    public async Task<IActionResult> GetFcb(
-        int windowSpan)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<FcbResult> results =
-                quotes.GetFcb(windowSpan)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetFcb(int windowSpan)
+        => Get(quotes => quotes.GetFcb(windowSpan));
 
     [HttpGet("FISHER")]
-    public async Task<IActionResult> GetFisher(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<FisherTransformResult> results =
-                quotes.GetFisherTransform(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetFisher(int lookbackPeriods)
+        => Get(quotes => quotes.GetFisherTransform(lookbackPeriods));
 
     [HttpGet("FRACTAL")]
-    public async Task<IActionResult> GetFractal(
-        int windowSpan)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<FractalResult> results =
-                quotes.GetFractal(windowSpan)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetFractal(int windowSpan)
+        => Get(quotes => quotes.GetFractal(windowSpan));
 
     [HttpGet("GATOR")]
-    public async Task<IActionResult> GetGator()
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<GatorResult> results =
-                quotes.GetGator()
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetGator()
+        => Get(quotes => quotes.GetGator());
 
     [HttpGet("HTL")]
-    public async Task<IActionResult> GetHTL()
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<HtlResult> results =
-                quotes.GetHtTrendline()
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetHTL()
+        => Get(quotes => quotes.GetHtTrendline());
 
     [HttpGet("ICHIMOKU")]
-    public async Task<IActionResult> GetIchimoku(
-        int tenkanPeriods,
-        int kijunPeriods,
-        int senkouBPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<IchimokuResult> results =
-                quotes.GetIchimoku(tenkanPeriods, kijunPeriods, senkouBPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetIchimoku(int tenkanPeriods, int kijunPeriods, int senkouBPeriods)
+        => Get(quotes => quotes.GetIchimoku(tenkanPeriods, kijunPeriods, senkouBPeriods));
 
     [HttpGet("KELTNER")]
-    public async Task<IActionResult> GetKeltner(
-        int emaPeriods,
-        double multiplier,
-        int atrPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<KeltnerResult> results =
-                quotes.GetKeltner(emaPeriods, multiplier, atrPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetKeltner(int emaPeriods, double multiplier, int atrPeriods)
+        => Get(quotes => quotes.GetKeltner(emaPeriods, multiplier, atrPeriods));
 
     [HttpGet("MACD")]
-    public async Task<IActionResult> GetMacd(
-        int fastPeriods,
-        int slowPeriods,
-        int signalPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<MacdResult> results =
-                quotes.GetMacd(fastPeriods, slowPeriods, signalPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetMacd(int fastPeriods, int slowPeriods, int signalPeriods)
+        => Get(quotes => quotes.GetMacd(fastPeriods, slowPeriods, signalPeriods));
 
     [HttpGet("MARUBOZU")]
-    public async Task<IActionResult> GetMarubozu(
-        double minBodyPercent)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<CandleResult> results =
-                quotes.GetMarubozu(minBodyPercent)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetMarubozu(double minBodyPercent)
+        => Get(quotes => quotes.GetMarubozu(minBodyPercent));
 
     [HttpGet("MFI")]
-    public async Task<IActionResult> GetMfi(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<MfiResult> results =
-                quotes.GetMfi(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetMfi(int lookbackPeriods)
+        => Get(quotes => quotes.GetMfi(lookbackPeriods));
 
     [HttpGet("PSAR")]
-    public async Task<IActionResult> GetParabolicSar(
-        double accelerationStep,
-        double maxAccelerationFactor)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<ParabolicSarResult> results =
-                quotes.GetParabolicSar(accelerationStep, maxAccelerationFactor)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetParabolicSar(double accelerationStep, double maxAccelerationFactor)
+        => Get(quotes => quotes.GetParabolicSar(accelerationStep, maxAccelerationFactor));
 
     [HttpGet("ROC")]
-    public async Task<IActionResult> GetRoc(
-        int lookbackPeriods,
-        int smaPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<RocResult> results =
-                quotes.GetRoc(lookbackPeriods, smaPeriods)
-                        .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetRoc(int lookbackPeriods, int smaPeriods)
+        => Get(quotes => quotes.GetRoc(lookbackPeriods, smaPeriods));
 
     [HttpGet("RSI")]
-    public async Task<IActionResult> GetRsi(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<RsiResult> results =
-                quotes.GetRsi(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetRsi(int lookbackPeriods)
+        => Get(quotes => quotes.GetRsi(lookbackPeriods));
 
     [HttpGet("SLOPE")]
-    public async Task<IActionResult> GetSlope(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<SlopeResult> results =
-                quotes.GetSlope(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetSlope(int lookbackPeriods)
+        => Get(quotes => quotes.GetSlope(lookbackPeriods));
 
     [HttpGet("SMA")]
-    public async Task<IActionResult> GetSma(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<SmaResult> results =
-                quotes.GetSma(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetSma(int lookbackPeriods)
+        => Get(quotes => quotes.GetSma(lookbackPeriods));
 
     [HttpGet("SMI")]
-    public async Task<IActionResult> GetSmi(
-        int lookbackPeriods,
-        int firstSmoothPeriods,
-        int secondSmoothPeriods,
-        int signalPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<SmiResult> results =
-                quotes.GetSmi(lookbackPeriods, firstSmoothPeriods, secondSmoothPeriods, signalPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetSmi(int lookbackPeriods, int firstSmoothPeriods, int secondSmoothPeriods, int signalPeriods)
+        => Get(quotes => quotes.GetSmi(lookbackPeriods, firstSmoothPeriods, secondSmoothPeriods, signalPeriods));
 
     [HttpGet("STC")]
-    public async Task<IActionResult> GetStc(
-        int cyclePeriods,
-        int fastPeriods,
-        int slowPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<StcResult> results =
-                quotes.GetStc(cyclePeriods, fastPeriods, slowPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetStc(int cyclePeriods, int fastPeriods, int slowPeriods)
+        => Get(quotes => quotes.GetStc(cyclePeriods, fastPeriods, slowPeriods));
 
     [HttpGet("STARC")]
-    public async Task<IActionResult> GetStarc(
-        int smaPeriods,
-        double multiplier,
-        int atrPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<StarcBandsResult> results =
-                quotes.GetStarcBands(smaPeriods, multiplier, atrPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetStarc(int smaPeriods, double multiplier, int atrPeriods)
+        => Get(quotes => quotes.GetStarcBands(smaPeriods, multiplier, atrPeriods));
 
     [HttpGet("STDEV")]
-    public async Task<IActionResult> GetStdDev(
-        int lookbackPeriods,
-        int smaPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            // we don't ask for smaPeriods with Z-Score, handle
-            smaPeriods = smaPeriods == 0 ? 1 : smaPeriods;
-
-            IEnumerable<StdDevResult> results =
-                quotes.GetStdDev(lookbackPeriods, smaPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetStdDev(int lookbackPeriods, int smaPeriods)
+        => Get(quotes => quotes.GetStdDev(lookbackPeriods, smaPeriods == 0 ? 1 : smaPeriods));
 
     [HttpGet("STO")]
-    public async Task<IActionResult> GetStoch(
-        int lookbackPeriods,
-        int signalPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<StochResult> results =
-                quotes.GetStoch(lookbackPeriods, signalPeriods)
-                        .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetStoch(int lookbackPeriods, int signalPeriods)
+        => Get(quotes => quotes.GetStoch(lookbackPeriods, signalPeriods));
 
     [HttpGet("STORSI")]
-    public async Task<IActionResult> GetStochRsi(
-        int rsiPeriods,
-        int stochPeriods,
-        int signalPeriods,
-        int smoothPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<StochRsiResult> results =
-                quotes.GetStochRsi(rsiPeriods, stochPeriods, signalPeriods, smoothPeriods)
-                        .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetStochRsi(int rsiPeriods, int stochPeriods, int signalPeriods, int smoothPeriods)
+        => Get(quotes => quotes.GetStochRsi(rsiPeriods, stochPeriods, signalPeriods, smoothPeriods));
 
     [HttpGet("SUPERTREND")]
-    public async Task<IActionResult> GetSuperTrend(
-        int lookbackPeriods,
-        double multiplier)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<SuperTrendResult> results =
-                quotes.GetSuperTrend(lookbackPeriods, multiplier)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetSuperTrend(int lookbackPeriods, double multiplier)
+        => Get(quotes => quotes.GetSuperTrend(lookbackPeriods, multiplier));
 
     [HttpGet("ULCER")]
-    public async Task<IActionResult> GetUlcer(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<UlcerIndexResult> results =
-                quotes.GetUlcerIndex(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetUlcer(int lookbackPeriods)
+        => Get(quotes => quotes.GetUlcerIndex(lookbackPeriods));
 
     [HttpGet("VORTEX")]
-    public async Task<IActionResult> GetVortex(
-        int lookbackPeriods)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<VortexResult> results =
-                quotes.GetVortex(lookbackPeriods)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetVortex(int lookbackPeriods)
+        => Get(quotes => quotes.GetVortex(lookbackPeriods));
 
     [HttpGet("ZIGZAG-CLOSE")]
-    public async Task<IActionResult> GetZigZagClose(
-        decimal percentChange)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<ZigZagResult> results =
-                quotes.GetZigZag(EndType.Close, percentChange)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetZigZagClose(decimal percentChange)
+        => Get(quotes => quotes.GetZigZag(EndType.Close, percentChange));
 
     [HttpGet("ZIGZAG-HIGHLOW")]
-    public async Task<IActionResult> GetZigZagHighLow(
-        decimal percentChange)
-    {
-        try
-        {
-            IEnumerable<Quote> quotes = await quoteFeed.Get();
-
-            IEnumerable<ZigZagResult> results =
-                quotes.GetZigZag(EndType.HighLow, percentChange)
-                      .TakeLast(limitLast);
-
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
-
+    public Task<IActionResult> GetZigZagHighLow(decimal percentChange)
+        => Get(quotes => quotes.GetZigZag(EndType.HighLow, percentChange));
 }
