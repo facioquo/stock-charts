@@ -5,45 +5,59 @@
   "projects": {
     "app": {
       "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss",
-          "skipTests": true
-        }
-      },
       "architect": {
         "build": {
           "builder": "@angular/build:application",
-          "defaultConfiguration": "production",
           "options": {
-            "browser": "src/main.ts",
-            "index": "src/index.html",
-            "polyfills": ["zone.js"],
-            "tsConfig": "tsconfig.app.json",
+            "aot": true,
             "outputPath": {
               "base": "dist/app"
             },
+            "browser": "src/main.ts",
+            "index": "src/index.html",
+            "polyfills": [
+              "src/polyfills.ts"
+            ],
+            "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/assets",
               "src/_headers",
               "src/robots.txt",
               "src/sitemap.xml"
             ],
-            "styles": ["src/styles.scss"],
+            "styles": [
+              "src/styles.scss"
+            ],
             "stylePreprocessorOptions": {
-              "includePaths": ["node_modules", "src", "src/styles"]
+              "includePaths": [
+                "node_modules",
+                "src",
+                "src/styles"]
             },
             "outputHashing": "all"
           },
+          "defaultConfiguration": "production",
           "configurations": {
+            "development": {
+              "optimization": false,
+              "namedChunks": true,
+              "sourceMap": true
+            },
             "production": {
               "optimization": true,
+              "namedChunks": false,
               "sourceMap": {
                 "scripts": true,
                 "styles": true,
+                "hidden": false,
                 "vendor": false
               },
               "fileReplacements": [
@@ -52,11 +66,6 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ]
-            },
-            "development": {
-              "optimization": false,
-              "sourceMap": true,
-              "namedChunks": true
             }
           }
         },
@@ -64,11 +73,11 @@
           "builder": "@angular/build:dev-server",
           "defaultConfiguration": "development",
           "configurations": {
-            "production": {
-              "buildTarget": "app:build:production"
-            },
             "development": {
               "buildTarget": "app:build:development"
+            },
+            "production": {
+              "buildTarget": "app:build:production"
             }
           }
         },
