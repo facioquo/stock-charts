@@ -6,7 +6,7 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --open --live-reload",
+    "start": "ng serve --open --hmr",
     "build": "ng build --configuration=development",
     "build.prod": "ng build --configuration=production",
     "watch": "ng build --configuration=development --watch"
