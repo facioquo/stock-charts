@@ -73,7 +73,7 @@
           "builder": "@angular/build:dev-server",
           "defaultConfiguration": "development",
           "options": {
-            "hmr": true
+            "hmr": false
           },
           "configurations": {
             "development": {

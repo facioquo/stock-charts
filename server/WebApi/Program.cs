@@ -2,8 +2,8 @@
 
 using System.IO.Compression;
 using Microsoft.AspNetCore.ResponseCompression;
-using WebApi.Services;
 using Microsoft.Extensions.Azure;
+using WebApi.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;

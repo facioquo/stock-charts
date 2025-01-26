@@ -14,8 +14,9 @@ public class StartupServices(
     /// <param name="cancellationToken" cref="CancellationToken></param>
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Initializing storage service...");
+        _logger.LogInformation("Initializing storage service.");
         await _storage.InitializeAsync(cancellationToken);
+        _logger.LogInformation("Done initializing storage.");
     }
 
     /// <summary>
