@@ -31,10 +31,9 @@ main {
 
   h1 {
     font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
-    font-size: 1.25em;
+    font-size: 0.9em;
     font-weight: 600;
     line-height: 1.0 !important;
-    letter-spacing: 0.65px;
 
     a {
       text-decoration: none;
@@ -44,10 +43,11 @@ main {
 
   h2 {
     font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
-    font-size: 0.55em;
+    font-size: 0.6em;
     font-weight: normal;
     line-height: 0.9 !important;
     letter-spacing: 0.55px;
+    padding-left: 1px;
 
     a {
       text-decoration: none;
