@@ -394,7 +394,7 @@ public static class Metadata
                 Name = "ATR Trailing Stop (High/Low offset)",
                 Uiid = "ATR-STOP-HL",
                 LegendTemplate = "ATR-STOP([P1],[P2],HIGH/LOW)",
-                Endpoint = $"{baseUrl}/ATR-STOP-CLOSE/",
+                Endpoint = $"{baseUrl}/ATR-STOP-HL/",
                 Category = "price-trend",
                 ChartType = "overlay",
                 Order = Order.Front,
@@ -827,7 +827,7 @@ public static class Metadata
                 Results = [
                     new() {
                         DisplayName = "Chandelier Exit",
-                        TooltipTemplate = "CHANDELIER([P1],[P2],LONG)",
+                        TooltipTemplate = "CHANDELIER([P1],[P2],SHORT)",
                         DataName = "chandelierExit",
                         DataType = "number",
                         LineType = "dash",
