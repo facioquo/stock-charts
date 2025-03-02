@@ -827,7 +827,7 @@ public static class Metadata
                 Results = [
                     new() {
                         DisplayName = "Chandelier Exit",
-                        TooltipTemplate = "CHANDELIER([P1],[P2],LONG)",
+                        TooltipTemplate = "CHANDELIER([P1],[P2],SHORT)",
                         DataName = "chandelierExit",
                         DataType = "number",
                         LineType = "dash",
