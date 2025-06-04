@@ -2,7 +2,6 @@
 
 [![Build Status](https://github.com/facioquo/stock-charts/actions/workflows/build-website.yml/badge.svg)](https://github.com/facioquo/stock-charts/actions/workflows/build-website.yml)
 [![Deploy Status](https://github.com/facioquo/stock-charts/actions/workflows/deploy-website.yml/badge.svg)](https://github.com/facioquo/stock-charts/actions/workflows/deploy-website.yml)
-[![CodeQL](https://github.com/facioquo/stock-charts/actions/workflows/codeql.yml/badge.svg)](https://github.com/facioquo/stock-charts/actions/workflows/codeql.yml)
 [![License](https://img.shields.io/github/license/facioquo/stock-charts)](LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/facioquo/stock-charts)](https://github.com/facioquo/stock-charts/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/facioquo/stock-charts)](https://github.com/facioquo/stock-charts/pulls)

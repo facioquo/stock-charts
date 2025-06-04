@@ -108,7 +108,7 @@ We use Dependabot to automatically create pull requests for dependency updates:
 ### Handling Dependency PRs
 
 1. Review the changelog/release notes for the updated package
-2. Check for any breaking changes or security updates
+2. Check for any breaking changes
 3. Test the application locally with the updates
 4. Approve and merge if no issues are found
 5. Create an issue if the update causes problems
@@ -123,27 +123,6 @@ We use GitHub Projects to track progress:
 - **Review**: Pull requests awaiting review
 - **Done**: Completed items
 
-## Security and Code Quality
-
-### Code Scanning
-- GitHub Advanced Security scans code automatically on every push
-- Address any security alerts promptly
-- Review scan results in the Security tab
-
-### Secret Scanning
-- Secrets are automatically scanned and flagged
-- Never commit API keys, passwords, or other sensitive data
-- Use environment variables or Azure Key Vault for secrets
-- Report any false positives to maintainers
-
-### Responding to Security Alerts
-
-1. **Immediate Response**: Address critical and high-severity alerts within 24 hours
-2. **Assessment**: Evaluate the impact and create a plan for resolution
-3. **Fix**: Apply patches or implement workarounds
-4. **Testing**: Verify the fix doesn't break functionality
-5. **Documentation**: Update security documentation if needed
-
 ## Access and Permissions
 
 ### Repository Access
@@ -155,7 +134,6 @@ We use GitHub Projects to track progress:
 - Copilot agents can read repository contents and issues
 - Agents can suggest code changes through pull requests
 - All agent-generated PRs require human review before merging
-- Maintain security by not sharing sensitive configuration with agents
 
 ### Requesting Permissions
 
@@ -206,7 +184,6 @@ This repository is optimized for GitHub Copilot Coding Agent usage. Here are the
 - **Standardized Templates**: Issue and PR templates provide structured input formats
 - **Clear Branching Strategy**: Main development branch and naming conventions are documented
 - **Automated Workflows**: CI/CD pipelines provide immediate feedback
-- **Security Scanning**: CodeQL and dependency scanning help maintain code quality
 
 ### Repository Structure for AI Understanding
 ```
