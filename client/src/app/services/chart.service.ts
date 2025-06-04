@@ -727,7 +727,7 @@ export class ChartService {
   selectionTokenReplacement(selection: IndicatorSelection): IndicatorSelection {
 
     selection.params.forEach((param, index) => {
-      if (!param.value) return;
+      if (param.value == null) return;
 
       selection.label = selection.label.replace(`[P${index + 1}]`, param.value.toString());
 
