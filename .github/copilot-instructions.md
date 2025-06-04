@@ -3,8 +3,9 @@
 ## Project Overview
 
 This is a full-stack financial charting application with:
-- **Frontend**: Angular 19 with TypeScript, Angular Material, Chart.js
-- **Backend**: .NET 8 with Azure Functions and Web API
+
+- **Frontend**: Angular LTS with TypeScript, Angular Material, Chart.js
+- **Backend**: .NET LTS with Azure Functions and Web API
 - **Purpose**: Display and analyze stock market data with interactive charts
 
 ## Architecture
@@ -22,14 +23,14 @@ stock-charts/
 ## Key Technologies
 
 ### Frontend Stack
-- **Angular 19**: Modern web framework with standalone components
+- **Angular LTS**: Modern web framework with standalone components
 - **TypeScript**: Primary language for type-safe development
 - **Chart.js**: Data visualization library for financial charts
 - **Angular Material**: UI component library
 - **RxJS**: Reactive programming with observables
 
 ### Backend Stack
-- **C# / .NET 8**: Server-side language and framework
+- **C# / .NET LTS**: Server-side language and framework
 - **Azure Functions**: Serverless compute for data processing
 - **ASP.NET Core**: Web API for REST endpoints
 - **Entity Framework**: Data access and ORM

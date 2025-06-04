@@ -11,7 +11,8 @@
     "build.prod": "ng build --configuration=production",
     "watch": "ng build --configuration=development --watch",
     "lint": "eslint src --ext .ts,.js",
-    "lint:fix": "eslint src --ext .ts,.js --fix"
+    "lint:fix": "eslint src --ext .ts,.js --fix",
+    "lint:md": "markdownlint \"**/*.md\" --ignore node_modules"
   },
   "private": false,
   "dependencies": {
@@ -42,6 +43,10 @@
     "@angular/build": "19.2.10",
     "@angular/cli": "19.1.5",
     "@angular/compiler-cli": "19.1.4",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "markdownlint-cli": "^0.42.0",
     "typescript": "5.5.4"
   }
 }

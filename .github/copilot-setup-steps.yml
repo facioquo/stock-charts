@@ -15,7 +15,7 @@ steps:
   - name: Setup Node.js
     uses: actions/setup-node@v4
     with:
-      node-version: '20'
+      node-version: '22'
       cache: 'npm'
       cache-dependency-path: 'client/package-lock.json'
       
@@ -65,7 +65,6 @@ steps:
       npm install -g @angular/language-server
       
       # Code quality tools
-      npm install -g cspell
       npm install -g markdownlint-cli
       
       # Git tools
@@ -122,69 +121,6 @@ steps:
   - name: Configure VS Code workspace
     run: |
       mkdir -p /workspaces/stock-charts/.vscode
-      
-      # Ensure workspace settings are properly configured
-      cat > /workspaces/stock-charts/.vscode/tasks.json << 'EOF'
-      {
-          "version": "2.0.0",
-          "tasks": [
-              {
-                  "label": "build-client",
-                  "type": "shell",
-                  "command": "npm",
-                  "args": ["run", "build"],
-                  "options": {
-                      "cwd": "${workspaceFolder}/client"
-                  },
-                  "group": "build",
-                  "presentation": {
-                      "echo": true,
-                      "reveal": "always",
-                      "focus": false,
-                      "panel": "shared"
-                  }
-              },
-              {
-                  "label": "build-server",
-                  "type": "shell",
-                  "command": "dotnet",
-                  "args": ["build"],
-                  "options": {
-                      "cwd": "${workspaceFolder}/server"
-                  },
-                  "group": "build",
-                  "presentation": {
-                      "echo": true,
-                      "reveal": "always",
-                      "focus": false,
-                      "panel": "shared"
-                  }
-              },
-              {
-                  "label": "start-client",
-                  "type": "shell",
-                  "command": "npm",
-                  "args": ["start"],
-                  "options": {
-                      "cwd": "${workspaceFolder}/client"
-                  },
-                  "group": "build",
-                  "isBackground": true
-              },
-              {
-                  "label": "start-server",
-                  "type": "shell",
-                  "command": "func",
-                  "args": ["start"],
-                  "options": {
-                      "cwd": "${workspaceFolder}/server/Functions"
-                  },
-                  "group": "build",
-                  "isBackground": true
-              }
-          ]
-      }
-      EOF
       
   # Final environment check
   - name: Environment ready check
