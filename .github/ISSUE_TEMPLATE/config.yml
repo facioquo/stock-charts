@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Stock Indicators Library Documentation
+    url: https://dotnet.stockindicators.dev
+    about: For questions about the underlying Stock.Indicators library, check the official documentation
+  - name: Library GitHub Issues
+    url: https://github.com/DaveSkender/Stock.Indicators/issues
+    about: For issues with the Stock.Indicators library itself (not this demo)
+  - name: Live Demo Site
+    url: https://charts.stockindicators.dev
+    about: Try the live demo to see the application in action

@@ -1,0 +1,59 @@
+version: 2
+updates:
+  # .NET dependencies
+  - package-ecosystem: "nuget"
+    directory: "/server"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "dotnet"
+    reviewers:
+      - "facioquo"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  # Node.js dependencies for client
+  - package-ecosystem: "npm"
+    directory: "/client"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "javascript"
+    reviewers:
+      - "facioquo"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    ignore:
+      # Ignore major version updates for Angular (require manual review)
+      - dependency-name: "@angular/*"
+        update-types: ["version-update:semver-major"]
+      # Ignore major version updates for Chart.js (require manual review)
+      - dependency-name: "chart.js"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "github-actions"
+    reviewers:
+      - "facioquo"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
