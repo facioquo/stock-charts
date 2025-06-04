@@ -9,7 +9,9 @@
     "start": "ng serve --open --hmr",
     "build": "ng build --configuration=development",
     "build.prod": "ng build --configuration=production",
-    "watch": "ng build --configuration=development --watch"
+    "watch": "ng build --configuration=development --watch",
+    "lint": "eslint src --ext .ts,.js",
+    "lint:fix": "eslint src --ext .ts,.js --fix"
   },
   "private": false,
   "dependencies": {

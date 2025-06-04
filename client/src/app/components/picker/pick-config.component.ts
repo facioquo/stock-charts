@@ -110,7 +110,12 @@ export class PickConfigComponent {
 
         // inform user of [validation] error
         error: (e: HttpErrorResponse) => {
-          console.log(e);
+          console.error('Error adding selection to chart:', {
+            status: e.status,
+            statusText: e.statusText,
+            message: e.message,
+            error: e.error
+          });
           this.errorMessage = e.error;
           this.closeButtonLabel = "RETRY";
         }

@@ -17,7 +17,7 @@ export class UserService {
     const settings = localStorage.getItem("settings");
 
     // if not cached, set default
-    if (settings == undefined) {
+    if (settings === undefined) {
 
       this.settings = {
         isDarkTheme: true,

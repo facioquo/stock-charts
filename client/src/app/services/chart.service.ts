@@ -117,7 +117,7 @@ export class ChartService {
               .forEach((result: IndicatorResult) => {
 
                 // initialize dataset
-                const resultConfig = listing.results.find(x => x.dataName == result.dataName);
+                const resultConfig = listing.results.find(x => x.dataName === result.dataName);
                 const dataset = this.cfg.baseDataset(result, resultConfig);
                 const dataPoints: ScatterDataPoint[] = [];
                 const pointColor: string[] = [];
@@ -129,7 +129,7 @@ export class ChartService {
                   let yValue = row[result.dataName];
 
                   // apply candle pointers
-                  if (yValue && listing.category == "candlestick-pattern") {
+                  if (yValue && listing.category === "candlestick-pattern") {
 
                     switch (row["match"]) {
 
@@ -176,7 +176,7 @@ export class ChartService {
                 }
 
                 // custom candlestick pattern points
-                if (listing.category == "candlestick-pattern" && dataset.type != 'bar') {
+                if (listing.category === "candlestick-pattern" && dataset.type !== 'bar') {
                   dataset.pointRotation = pointRotation;
                   dataset.pointBackgroundColor = pointColor;
                   dataset.pointBorderColor = pointColor;
@@ -196,7 +196,12 @@ export class ChartService {
             observer.next();
           },
           error: (e: HttpErrorResponse) => {
-            console.log(e);
+            console.error('Chart Service Error:', {
+              status: e.status,
+              statusText: e.statusText,
+              url: e.url,
+              message: e.message
+            });
             observer.error(e);
           }
         });
@@ -210,7 +215,7 @@ export class ChartService {
   ) {
 
     // lookup config data
-    const listing = this.listings.find(x => x.uiid == selection.uiid);
+    const listing = this.listings.find(x => x.uiid === selection.uiid);
 
     // add to chart
     this.addSelection(selection, listing, false)
@@ -219,7 +224,7 @@ export class ChartService {
 
   defaultSelection(uiid: string): IndicatorSelection {
 
-    const listing = this.listings.find(x => x.uiid == uiid);
+    const listing = this.listings.find(x => x.uiid === uiid);
 
     // initialize selection
     const selection: IndicatorSelection = {
@@ -285,7 +290,7 @@ export class ChartService {
     this.selections.push(selection);
 
     // add needed charts
-    if (listing.chartType == 'overlay') {
+    if (listing.chartType === 'overlay') {
       this.displaySelectionOnOverlayChart(selection, scrollToMe);
     }
     else {
@@ -340,11 +345,11 @@ export class ChartService {
         yAxisID: 'y',
         pointRadius: 0,
         borderWidth: 2.5,
-        borderDash: threshold.style == 'dash' ? [5, 2] : [],
+        borderDash: threshold.style === 'dash' ? [5, 2] : [],
         borderColor: threshold.color,
         backgroundColor: threshold.color,
         spanGaps: true,
-        fill: threshold.fill == null ? false : {
+        fill: threshold.fill === null ? false : {
           target: threshold.fill.target,
           above: threshold.fill.colorAbove,
           below: threshold.fill.colorBelow
@@ -376,7 +381,7 @@ export class ChartService {
 
     // pre-delete, if exists (needed for theme change)
     const existing = document.getElementById(containerId);
-    if (existing != null) {
+    if (existing !== null) {
       body.removeChild(existing);
     }
 
@@ -412,7 +417,7 @@ export class ChartService {
 
     chart.options.plugins.annotation.annotations =
       this.selections
-        .filter(x => x.chartType == 'overlay')
+        .filter(x => x.chartType === 'overlay')
         .sort((a, b) => a.label.localeCompare(b.label))
         .map((selection: IndicatorSelection, index: number) => {
 
@@ -442,12 +447,12 @@ export class ChartService {
 
   deleteSelection(ucid: string) {
 
-    const selection = this.selections.find(x => x.ucid == ucid);
+    const selection = this.selections.find(x => x.ucid === ucid);
 
     const sx = this.selections.indexOf(selection, 0);
     this.selections.splice(sx, 1);
 
-    if (selection.chartType == 'overlay') {
+    if (selection.chartType === 'overlay') {
 
       selection.results.forEach((result: IndicatorResult) => {
         const dx = this.chartOverlay.data.datasets.indexOf(result.dataset, 0);
@@ -532,10 +537,22 @@ export class ChartService {
                 // load indicators
                 this.loadSelections();
               },
-              error: (e: HttpErrorResponse) => { console.log(e); }
+              error: (e: HttpErrorResponse) => { 
+                console.error('Error loading listings:', {
+                  status: e.status,
+                  statusText: e.statusText,
+                  message: e.message
+                });
+              }
             });
         },
-        error: (e: HttpErrorResponse) => { console.log(e); },
+        error: (e: HttpErrorResponse) => { 
+          console.error('Error getting quotes:', {
+            status: e.status,
+            statusText: e.statusText,
+            message: e.message
+          });
+        },
         complete: () => {
           this.loading = false;
         }
@@ -659,14 +676,14 @@ export class ChartService {
 
     // otherwise, load defaults
     const def1 = this.defaultSelection('LINEAR');
-    def1.params.find(x => x.paramName == 'lookbackPeriods').value = 50;
+    def1.params.find(x => x.paramName === 'lookbackPeriods').value = 50;
     this.addSelectionWithoutScroll(def1);
 
     const def2 = this.defaultSelection('BB');
     this.addSelectionWithoutScroll(def2);
 
     const def3 = this.defaultSelection('RSI');
-    def3.params.find(x => x.paramName == 'lookbackPeriods').value = 5;
+    def3.params.find(x => x.paramName === 'lookbackPeriods').value = 5;
     this.addSelectionWithoutScroll(def3);
 
     const def4 = this.defaultSelection('ADX');
