@@ -17,7 +17,7 @@ export class UtilityService {
 
     tags.forEach((tag: MetaDefinition) => {
 
-      if (tag.property == "og:title" && tag.content) {
+      if (tag.property === "og:title" && tag.content) {
         this.title.setTitle(tag.content);
       }
 

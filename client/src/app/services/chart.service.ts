@@ -118,6 +118,7 @@ export class ChartService {
 
                 // initialize dataset
                 const resultConfig = listing.results.find(x => x.dataName === result.dataName);
+                if (!resultConfig) return;
                 const dataset = this.cfg.baseDataset(result, resultConfig);
                 const dataPoints: ScatterDataPoint[] = [];
                 const pointColor: string[] = [];
@@ -216,6 +217,7 @@ export class ChartService {
 
     // lookup config data
     const listing = this.listings.find(x => x.uiid === selection.uiid);
+    if (!listing) return;
 
     // add to chart
     this.addSelection(selection, listing, false)
@@ -225,6 +227,9 @@ export class ChartService {
   defaultSelection(uiid: string): IndicatorSelection {
 
     const listing = this.listings.find(x => x.uiid === uiid);
+    if (!listing) {
+      throw new Error(`Indicator listing not found for uiid: ${uiid}`);
+    }
 
     // initialize selection
     const selection: IndicatorSelection = {
@@ -448,6 +453,7 @@ export class ChartService {
   deleteSelection(ucid: string) {
 
     const selection = this.selections.find(x => x.ucid === ucid);
+    if (!selection) return;
 
     const sx = this.selections.indexOf(selection, 0);
     this.selections.splice(sx, 1);
@@ -664,7 +670,14 @@ export class ChartService {
     // PROBLEM: causing web vitals to be blocked
 
     // get from cache
-    const selections = JSON.parse(localStorage.getItem('selections'));
+    const selectionsString = localStorage.getItem('selections');
+    if (!selectionsString) {
+      // load defaults if no cache found
+      this.loadDefaultSelections();
+      return;
+    }
+
+    const selections = JSON.parse(selectionsString);
 
     if (selections) {
       selections.forEach((selection: IndicatorSelection) => {
@@ -674,16 +687,19 @@ export class ChartService {
       return;
     }
 
-    // otherwise, load defaults
+    this.loadDefaultSelections();
+  }
+
+  private loadDefaultSelections() {
     const def1 = this.defaultSelection('LINEAR');
-    def1.params.find(x => x.paramName === 'lookbackPeriods').value = 50;
+    def1.params.find(x => x.paramName === 'lookbackPeriods')!.value = 50;
     this.addSelectionWithoutScroll(def1);
 
     const def2 = this.defaultSelection('BB');
     this.addSelectionWithoutScroll(def2);
 
     const def3 = this.defaultSelection('RSI');
-    def3.params.find(x => x.paramName === 'lookbackPeriods').value = 5;
+    def3.params.find(x => x.paramName === 'lookbackPeriods')!.value = 5;
     this.addSelectionWithoutScroll(def3);
 
     const def4 = this.defaultSelection('ADX');
@@ -705,6 +721,7 @@ export class ChartService {
   selectionTokenReplacement(selection: IndicatorSelection): IndicatorSelection {
 
     selection.params.forEach((param, index) => {
+      if (!param.value) return;
 
       selection.label = selection.label.replace(`[P${index + 1}]`, param.value.toString());
 

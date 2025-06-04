@@ -39,7 +39,7 @@ export class PickConfigComponent {
 
   selection: IndicatorSelection;
   customPicker: MtxColorpicker;
-  errorMessage: string;
+  errorMessage: string | undefined;
   closeButtonLabel = "ADD";
 
   // Material Design (M2) color palette

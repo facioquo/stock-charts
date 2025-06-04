@@ -274,7 +274,7 @@ export class ChartConfigService {
           borderWidth: r.lineWidth,
           borderColor: r.color,
           backgroundColor: r.color,
-          fill: c.fill == null ? false : {
+          fill: c.fill === null ? false : {
             target: c.fill.target,
             above: c.fill.colorAbove,
             below: c.fill.colorBelow
