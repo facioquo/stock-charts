@@ -376,7 +376,7 @@ export class ChartConfigService {
   ): AnnotationOptions & LabelAnnotationOptions {
 
     const fontColor = this.usr.settings.isDarkTheme ? '#757575' : '#121316';
-    const fillColor = this.usr.settings.isDarkTheme ? '#12131680' : '#FAF9FD90'
+    const fillColor = this.usr.settings.isDarkTheme ? '#12131680' : '#FAF9FD90';
 
     const legendFont: FontSpec = {
       family: this.fontFamily,

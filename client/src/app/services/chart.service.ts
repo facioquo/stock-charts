@@ -166,7 +166,7 @@ export class ChartService {
                 });
 
                 // add extra bars
-                const nextDate = new Date(Math.max.apply(null, dataPoints.map(h => new Date(h.x))));
+                const nextDate = new Date(Math.max(...dataPoints.map(h => new Date(h.x).getTime())));
 
                 for (let i = 1; i < this.extraBars; i++) {
                   nextDate.setDate(nextDate.getDate() + 1);
@@ -456,13 +456,17 @@ export class ChartService {
     if (!selection) return;
 
     const sx = this.selections.indexOf(selection, 0);
-    this.selections.splice(sx, 1);
+    if (sx !== -1) {
+      this.selections.splice(sx, 1);
+    }
 
     if (selection.chartType === 'overlay') {
 
       selection.results.forEach((result: IndicatorResult) => {
         const dx = this.chartOverlay.data.datasets.indexOf(result.dataset, 0);
-        this.chartOverlay.data.datasets.splice(dx, 1);
+        if (dx !== -1) {
+          this.chartOverlay.data.datasets.splice(dx, 1);
+        }
       });
       this.addOverlayLegend();
       this.chartOverlay.update();
@@ -609,7 +613,7 @@ export class ChartService {
     });
 
     // add extra bars
-    const nextDate = new Date(Math.max.apply(null, quotes.map(h => new Date(h.date))));
+    const nextDate = new Date(Math.max(...quotes.map(h => new Date(h.date).getTime())));
 
     for (let i = 1; i < this.extraBars; i++) {
       nextDate.setDate(nextDate.getDate() + 1);
@@ -692,14 +696,16 @@ export class ChartService {
 
   private loadDefaultSelections() {
     const def1 = this.defaultSelection('LINEAR');
-    def1.params.find(x => x.paramName === 'lookbackPeriods')!.value = 50;
+    const def1Param = def1.params.find(x => x.paramName === 'lookbackPeriods');
+    if (def1Param) def1Param.value = 50;
     this.addSelectionWithoutScroll(def1);
 
     const def2 = this.defaultSelection('BB');
     this.addSelectionWithoutScroll(def2);
 
     const def3 = this.defaultSelection('RSI');
-    def3.params.find(x => x.paramName === 'lookbackPeriods')!.value = 5;
+    const def3Param = def3.params.find(x => x.paramName === 'lookbackPeriods');
+    if (def3Param) def3Param.value = 5;
     this.addSelectionWithoutScroll(def3);
 
     const def4 = this.defaultSelection('ADX');
