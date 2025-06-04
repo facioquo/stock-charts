@@ -214,7 +214,7 @@ export class ChartService {
             this.displaySelection(selection, listing, scrollToMe);
 
             // inform caller
-            observer.next();
+            observer.next(true);
           },
           error: (e: HttpErrorResponse) => {
             console.error('Chart Service Error:', {
