@@ -9,9 +9,6 @@
     "github.copilot",
     "github.copilot-chat",
     
-    "johnpapa.angular2",
-    "cyrilletuzi.angular-schematics",
-    
     "ms-vscode.vscode-json",
     "bradlc.vscode-tailwindcss",
     "formulahendry.auto-rename-tag",
@@ -21,8 +18,6 @@
     
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
-    
-    "eamodio.gitlens",
     
     "ms-vscode.vscode-json",
     "redhat.vscode-yaml",
