@@ -63,13 +63,16 @@ import {
   IndicatorResult,
   IndicatorResultConfig,
   IndicatorSelection,
-  Quote
+  Quote,
+  TimeframeOption,
+  TIMEFRAME_OPTIONS
 } from '../pages/chart/chart.models';
 
 // services
 import { ApiService } from './api.service';
 import { ChartConfigService } from './config.service';
 import { UtilityService } from './utility.service';
+import { WindowService } from './window.service';
 
 @Injectable({
   providedIn: 'root'
@@ -81,12 +84,26 @@ export class ChartService {
   chartOverlay: Chart;
   loading = true;
   extraBars = 7;
+  
+  // New properties for window-based sizing
+  currentTimeframe: TimeframeOption = TIMEFRAME_OPTIONS[0]; // Default to daily
+  timeframeOptions = TIMEFRAME_OPTIONS;
+  currentBarCount: number;
 
   constructor(
     private readonly api: ApiService,
     private readonly cfg: ChartConfigService,
-    private readonly util: UtilityService
-  ) { }
+    private readonly util: UtilityService,
+    private readonly window: WindowService
+  ) { 
+    // Calculate initial bar count
+    this.currentBarCount = this.window.calculateOptimalBars();
+    
+    // Subscribe to window resize events
+    this.window.getResizeObservable().subscribe(dimensions => {
+      this.onWindowResize(dimensions);
+    });
+  }
 
   //#region SELECT/DISPLAY OPERATIONS
   addSelection(
@@ -509,11 +526,55 @@ export class ChartService {
   }
   //#endregion
 
+  //#region WINDOW AND TIMEFRAME OPERATIONS
+  
+  onWindowResize(dimensions: { width: number; height: number }) {
+    const newBarCount = this.window.calculateOptimalBars(dimensions.width);
+    
+    // Only reload if bar count changed significantly (avoid unnecessary API calls)
+    if (Math.abs(newBarCount - this.currentBarCount) > 10) {
+      this.currentBarCount = newBarCount;
+      this.reloadChartsWithNewBarCount();
+    }
+  }
+  
+  changeTimeframe(timeframe: TimeframeOption) {
+    if (this.currentTimeframe.value !== timeframe.value) {
+      this.currentTimeframe = timeframe;
+      this.reloadChartsWithNewTimeframe();
+    }
+  }
+  
+  private reloadChartsWithNewBarCount() {
+    // Reload main chart with new bar count
+    this.loadCharts();
+    
+    // Reload all indicator selections
+    this.selections.forEach(selection => {
+      this.addSelectionWithoutScroll(selection);
+    });
+  }
+  
+  private reloadChartsWithNewTimeframe() {
+    // Update chart configuration for new timeframe
+    this.cfg.updateTimeframeConfiguration(this.currentTimeframe);
+    
+    // Reload main chart with new timeframe
+    this.loadCharts();
+    
+    // Reload all indicator selections
+    this.selections.forEach(selection => {
+      this.addSelectionWithoutScroll(selection);
+    });
+  }
+  
+  //#endregion
+
   //#region DATA OPERATIONS
   loadCharts() {
 
     // get data and load charts
-    this.api.getQuotes()
+    this.api.getQuotes(this.currentTimeframe.value, this.currentBarCount)
       .subscribe({
         next: (quotes: Quote[]) => {
 

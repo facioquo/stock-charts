@@ -18,8 +18,12 @@ export class ApiService {
     private readonly http: HttpClient
   ) { }
 
-  getQuotes() {
-    return this.http.get(`${env.api}/quotes`, this.requestHeader());
+  getQuotes(timeframe: string = 'daily', count?: number) {
+    let url = `${env.api}/quotes?timeframe=${timeframe}`;
+    if (count) {
+      url += `&count=${count}`;
+    }
+    return this.http.get(url, this.requestHeader());
   }
 
   getListings() {
