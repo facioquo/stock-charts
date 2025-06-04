@@ -691,6 +691,7 @@ export class ChartService {
       return;
     }
 
+    // Load defaults if no valid selections are found
     this.loadDefaultSelections();
   }
 
