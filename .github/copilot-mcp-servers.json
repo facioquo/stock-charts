@@ -1,0 +1,116 @@
+{
+  "mcpServers": {
+    "typescript-language-server": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"],
+      "description": "TypeScript and JavaScript language support for enhanced code completion and analysis",
+      "capabilities": ["completion", "hover", "diagnostics", "references", "definition"]
+    },
+    "angular-language-server": {
+      "command": "ng-language-server",
+      "args": ["--pipe"],
+      "description": "Angular-specific language support for templates, components, and services",
+      "capabilities": ["completion", "hover", "diagnostics", "references"]
+    },
+    "omnisharp": {
+      "command": "omnisharp",
+      "args": ["-lsp"],
+      "description": "C# and .NET language support for backend development",
+      "capabilities": ["completion", "hover", "diagnostics", "references", "definition", "formatting"]
+    },
+    "json-language-server": {
+      "command": "vscode-json-languageserver",
+      "args": ["--stdio"],
+      "description": "JSON schema validation and completion for configuration files",
+      "capabilities": ["completion", "hover", "diagnostics", "formatting"],
+      "fileTypes": ["json", "jsonc"]
+    },
+    "html-language-server": {
+      "command": "vscode-html-languageserver",
+      "args": ["--stdio"],
+      "description": "HTML support for Angular templates and markup",
+      "capabilities": ["completion", "hover", "diagnostics", "formatting"],
+      "fileTypes": ["html", "htm"]
+    },
+    "css-language-server": {
+      "command": "vscode-css-languageserver",
+      "args": ["--stdio"],
+      "description": "CSS and SCSS support for styling Angular components",
+      "capabilities": ["completion", "hover", "diagnostics", "formatting"],
+      "fileTypes": ["css", "scss", "sass", "less"]
+    },
+    "npm-package-server": {
+      "command": "npm-language-server",
+      "args": ["--stdio"],
+      "description": "NPM package management and dependency analysis",
+      "capabilities": ["completion", "hover", "diagnostics"],
+      "fileTypes": ["package.json", "package-lock.json"]
+    },
+    "git-context-server": {
+      "command": "git-context-server",
+      "args": ["--stdio"],
+      "description": "Git repository context and history for better code understanding",
+      "capabilities": ["context", "history", "blame"]
+    },
+    "filesystem-server": {
+      "command": "filesystem-server",
+      "args": ["--stdio"],
+      "description": "File system operations and project structure analysis",
+      "capabilities": ["read", "write", "list", "search"]
+    },
+    "web-search-server": {
+      "command": "web-search-server",
+      "args": ["--stdio"],
+      "description": "Web search capabilities for documentation and examples",
+      "capabilities": ["search", "documentation"],
+      "domains": [
+        "angular.io",
+        "docs.microsoft.com",
+        "developer.mozilla.org",
+        "stackoverflow.com",
+        "github.com"
+      ]
+    }
+  },
+  "settings": {
+    "enabledServers": [
+      "typescript-language-server",
+      "angular-language-server",
+      "omnisharp",
+      "json-language-server",
+      "html-language-server",
+      "css-language-server",
+      "npm-package-server",
+      "git-context-server",
+      "filesystem-server"
+    ],
+    "autoStart": true,
+    "timeout": 30000,
+    "maxRetries": 3,
+    "logLevel": "info"
+  },
+  "projectContext": {
+    "name": "Stock Charts",
+    "type": "full-stack-web",
+    "technologies": [
+      "Angular",
+      "TypeScript",
+      "C#",
+      ".NET",
+      "Azure Functions",
+      "Chart.js",
+      "Angular Material"
+    ],
+    "primaryLanguages": ["typescript", "csharp", "html", "scss"],
+    "buildCommands": {
+      "frontend": "cd client && npm run build",
+      "backend": "cd server && dotnet build",
+      "test-frontend": "cd client && npm test",
+      "test-backend": "cd server && dotnet test"
+    },
+    "entryPoints": {
+      "frontend": "client/src/main.ts",
+      "backend": "server/Functions/Program.cs"
+    }
+  }
+}
