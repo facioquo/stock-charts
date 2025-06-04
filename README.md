@@ -1,11 +1,5 @@
 # Stock Indicators for .NET demo
 
-[![Build Status](https://github.com/facioquo/stock-charts/actions/workflows/build-website.yml/badge.svg)](https://github.com/facioquo/stock-charts/actions/workflows/build-website.yml)
-[![Deploy Status](https://github.com/facioquo/stock-charts/actions/workflows/deploy-website.yml/badge.svg)](https://github.com/facioquo/stock-charts/actions/workflows/deploy-website.yml)
-[![License](https://img.shields.io/github/license/facioquo/stock-charts)](LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/facioquo/stock-charts)](https://github.com/facioquo/stock-charts/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/facioquo/stock-charts)](https://github.com/facioquo/stock-charts/pulls)
-
 This is a demo of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package.  It is an Angular website with a [Chart.js](https://github.com/chartjs/chartjs-chart-financial) financial/candlestick stock chart, with a .NET Web API backend to generate indicators.  The indicator library can be implemented in any .NET compatible ecosystem (it does not have to be in an API like this).  See the [library documentation](https://dotnet.stockindicators.dev) for [more examples](https://dotnet.stockindicators.dev/examples), the user guide, and a full list of available indicators.
 
 Live demo site: [charts.StockIndicators.dev](https://charts.stockindicators.dev/)
@@ -52,50 +46,6 @@ If you want to host on your local computer and review the source code, follow th
     ```
 
     The web application should launch automatically.
-
-### Building and Testing
-
-#### Backend (.NET)
-
-To build the backend API:
-
-```bash
-# Navigate to the server directory
-cd server
-
-# Restore dependencies
-dotnet restore
-
-# Build the solution
-dotnet build ChartBackend.sln --configuration Release
-
-# Run tests (if any)
-dotnet test
-```
-
-#### Frontend (Angular)
-
-To build the Angular client:
-
-```bash
-# Navigate to the client directory
-cd client
-
-# Install dependencies
-npm install
-
-# Development build
-npm run build
-
-# Production build
-npm run build.prod
-
-# Start development server
-npm start
-
-# Watch mode (rebuild on changes)
-npm run watch
-```
 
 ### Fetching quote data
 
@@ -186,18 +136,3 @@ For local development, you can use User Secrets to store sensitive information s
 ## Contributing
 
 This is an open-source project.  If you want to report bugs, contribute fixes, or add new indicators, please review our [contributing guidelines](docs/CONTRIBUTING.md).
-
-### Development Branch
-
-- **Primary branch**: `main`
-- All pull requests should target the `main` branch
-- The `main` branch is automatically deployed to the live demo site
-
-### Quick Start for Contributors
-
-1. Fork the repository
-2. Clone your fork locally
-3. Create a feature branch from `main`
-4. Make your changes following our [contributing guidelines](docs/CONTRIBUTING.md)
-5. Test your changes locally
-6. Submit a pull request to the `main` branch
