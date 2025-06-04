@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/facioquo/stock-charts/actions/workflows/build-website.yml/badge.svg)](https://github.com/facioquo/stock-charts/actions/workflows/build-website.yml)
 [![Deploy Status](https://github.com/facioquo/stock-charts/actions/workflows/deploy-website.yml/badge.svg)](https://github.com/facioquo/stock-charts/actions/workflows/deploy-website.yml)
+[![CodeQL](https://github.com/facioquo/stock-charts/actions/workflows/codeql.yml/badge.svg)](https://github.com/facioquo/stock-charts/actions/workflows/codeql.yml)
 [![License](https://img.shields.io/github/license/facioquo/stock-charts)](LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/facioquo/stock-charts)](https://github.com/facioquo/stock-charts/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/facioquo/stock-charts)](https://github.com/facioquo/stock-charts/pulls)
@@ -90,11 +91,11 @@ npm run build
 # Production build
 npm run build.prod
 
-# Run tests
-npm test
+# Start development server
+npm start
 
-# Run linting
-npm run lint
+# Watch mode (rebuild on changes)
+npm run watch
 ```
 
 ### Fetching quote data
@@ -186,3 +187,18 @@ For local development, you can use User Secrets to store sensitive information s
 ## Contributing
 
 This is an open-source project.  If you want to report bugs, contribute fixes, or add new indicators, please review our [contributing guidelines](docs/CONTRIBUTING.md).
+
+### Development Branch
+
+- **Primary branch**: `main`
+- All pull requests should target the `main` branch
+- The `main` branch is automatically deployed to the live demo site
+
+### Quick Start for Contributors
+
+1. Fork the repository
+2. Clone your fork locally
+3. Create a feature branch from `main`
+4. Make your changes following our [contributing guidelines](docs/CONTRIBUTING.md)
+5. Test your changes locally
+6. Submit a pull request to the `main` branch

@@ -191,6 +191,42 @@ Submit a Pull Request with a clear list of what you've done (read more about [pu
 
 After a Pull Request is reviewed, accepted, and merged to `main`, we may batch changes before publishing the site. Please be patient with turnaround time.
 
+## GitHub Copilot Coding Agent Optimization
+
+This repository is optimized for GitHub Copilot Coding Agent usage. Here are the key practices we follow:
+
+### For Human Contributors
+- **Clear Issue Descriptions**: Use detailed issue templates with reproduction steps, expected vs actual behavior, and relevant context
+- **Structured Pull Requests**: Follow the PR template with clear descriptions, testing notes, and linked issues
+- **Conventional Commits**: Use standardized commit messages for better AI understanding
+- **Documentation First**: Keep README and CONTRIBUTING.md current and comprehensive
+
+### For AI Agents
+- **Context-Rich Documentation**: All setup, build, and test instructions are in README.md
+- **Standardized Templates**: Issue and PR templates provide structured input formats
+- **Clear Branching Strategy**: Main development branch and naming conventions are documented
+- **Automated Workflows**: CI/CD pipelines provide immediate feedback
+- **Security Scanning**: CodeQL and dependency scanning help maintain code quality
+
+### Repository Structure for AI Understanding
+```
+├── .github/                 # GitHub configuration
+│   ├── ISSUE_TEMPLATE/     # Structured issue templates
+│   ├── workflows/          # CI/CD automation
+│   └── dependabot.yml      # Dependency management
+├── client/                 # Angular frontend
+├── server/                 # .NET backend
+├── docs/                   # Additional documentation
+└── README.md              # Primary project documentation
+```
+
+### Best Practices for AI-Generated PRs
+1. Always reference specific issues or requirements
+2. Include test coverage for new functionality
+3. Follow existing code patterns and architecture
+4. Update documentation for user-facing changes
+5. Ensure all CI checks pass before requesting review
+
 ## Contact us
 
 Contact us through the NuGet [Contact Owners](https://www.nuget.org/packages/Skender.Stock.Indicators) method, privately direct message [@daveskender](https://twitter.com/messages/compose?recipient_id=27475431) on Twitter, or [submit an Issue](https://github.com/facioquo/stock-charts/issues) with your question if it is publicly relevant.
