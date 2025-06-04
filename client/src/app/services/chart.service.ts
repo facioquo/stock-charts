@@ -99,6 +99,9 @@ export class ChartService {
     // Calculate initial bar count
     this.currentBarCount = this.window.calculateOptimalBars();
     
+    // Set initial timeframe configuration
+    this.cfg.updateTimeframeConfiguration(this.currentTimeframe);
+    
     // Subscribe to window resize events
     this.window.getResizeObservable().subscribe(dimensions => {
       this.onWindowResize(dimensions);
@@ -572,6 +575,8 @@ export class ChartService {
 
   //#region DATA OPERATIONS
   loadCharts() {
+
+    console.log(`Loading charts with ${this.currentBarCount} bars for timeframe: ${this.currentTimeframe.label}`);
 
     // get data and load charts
     this.api.getQuotes(this.currentTimeframe.value, this.currentBarCount)
