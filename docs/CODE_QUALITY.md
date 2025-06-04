@@ -10,6 +10,7 @@ This document outlines the code quality enhancements made to address common issu
 **Fix**: Replaced with structured `console.error()` with detailed error information
 
 **Before:**
+
 ```typescript
 error: (e: HttpErrorResponse) => {
   console.log(e);
@@ -18,6 +19,7 @@ error: (e: HttpErrorResponse) => {
 ```
 
 **After:**
+
 ```typescript
 error: (e: HttpErrorResponse) => {
   console.error('API Error fetching selection data:', {
@@ -36,17 +38,20 @@ error: (e: HttpErrorResponse) => {
 **Fix**: Replaced with strict equality operators (`===`, `!==`)
 
 **Files affected:**
+
 - `src/app/services/user.service.ts`
 - `src/app/services/chart.service.ts`
 - `src/app/services/api.service.ts`
 
 **Before:**
+
 ```typescript
 if (settings == undefined) { ... }
 const listing = this.listings.find(x => x.uiid == selection.uiid);
 ```
 
 **After:**
+
 ```typescript
 if (settings === undefined) { ... }
 const listing = this.listings.find(x => x.uiid === selection.uiid);
@@ -57,6 +62,7 @@ const listing = this.listings.find(x => x.uiid === selection.uiid);
 **Addition**: Modern flat config ESLint setup in `client/eslint.config.js`
 
 **Rules implemented:**
+
 - `no-console`: Warning for console usage (allows error/warn)
 - `no-unused-vars`: Error for unused variables
 - `prefer-const`: Error when let can be const
@@ -67,6 +73,7 @@ const listing = this.listings.find(x => x.uiid === selection.uiid);
 - Code formatting rules for consistency
 
 **Scripts added to package.json:**
+
 ```json
 {
   "lint": "eslint src --ext .ts,.js",

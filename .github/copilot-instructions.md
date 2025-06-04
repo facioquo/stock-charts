@@ -10,7 +10,7 @@ This is a full-stack financial charting application with:
 
 ## Architecture
 
-```
+```text
 stock-charts/
 ├── client/          # Angular frontend application
 │   ├── src/         # Angular source code
@@ -23,6 +23,7 @@ stock-charts/
 ## Key Technologies
 
 ### Frontend Stack
+
 - **Angular LTS**: Modern web framework with standalone components
 - **TypeScript**: Primary language for type-safe development
 - **Chart.js**: Data visualization library for financial charts
@@ -30,6 +31,7 @@ stock-charts/
 - **RxJS**: Reactive programming with observables
 
 ### Backend Stack
+
 - **C# / .NET LTS**: Server-side language and framework
 - **Azure Functions**: Serverless compute for data processing
 - **ASP.NET Core**: Web API for REST endpoints
@@ -38,6 +40,7 @@ stock-charts/
 ## Coding Conventions
 
 ### Frontend (Angular)
+
 - Use standalone components (not NgModules)
 - Implement OnPush change detection strategy
 - Follow Angular style guide naming conventions
@@ -46,6 +49,7 @@ stock-charts/
 - Use Angular Material components consistently
 
 ### Backend (.NET)
+
 - Follow Microsoft C# coding conventions
 - Use async/await patterns for I/O operations
 - Implement proper dependency injection
@@ -54,6 +58,7 @@ stock-charts/
 - Implement comprehensive error handling and logging
 
 ### Common Patterns
+
 - Use TypeScript interfaces for data models
 - Implement proper type safety throughout
 - Use descriptive variable and method names
@@ -63,6 +68,7 @@ stock-charts/
 ## File Structure Patterns
 
 ### Angular Components
+
 ```typescript
 // component.ts - Main component logic
 // component.html - Template
@@ -71,6 +77,7 @@ stock-charts/
 ```
 
 ### .NET Structure
+
 ```csharp
 // Controllers/ - API endpoints
 // Services/ - Business logic
@@ -116,12 +123,14 @@ stock-charts/
 ## Common Debugging Patterns
 
 ### Frontend
+
 - Use Angular DevTools for component inspection
 - Console.log for data flow debugging
 - Network tab for API call investigation
 - Use breakpoints in TypeScript code
 
 ### Backend
+
 - Use debugger in Visual Studio/VS Code
 - Implement structured logging
 - Use Application Insights for Azure Functions
@@ -130,6 +139,7 @@ stock-charts/
 ## Context for AI Assistance
 
 When working on this codebase:
+
 - Prioritize type safety and proper error handling
 - Consider the financial data context and accuracy requirements
 - Maintain consistency with existing patterns and conventions
