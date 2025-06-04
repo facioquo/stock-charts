@@ -21,6 +21,50 @@ If you are reporting a bug, please submit an Issue with a detailed description o
 - Since this is just a simple demo project, we basically just want it to pass the build and run without errors.
 - Failed builds will block acceptance of your Pull Request when submitting changes.
 
+### Building and Testing
+
+#### Backend (.NET)
+
+To build the backend API:
+
+```bash
+# Navigate to the server directory
+cd server
+
+# Restore dependencies
+dotnet restore
+
+# Build the solution
+dotnet build ChartBackend.sln --configuration Release
+
+# Run tests (if any)
+dotnet test
+```
+
+#### Frontend (Angular)
+
+To build the Angular client:
+
+```bash
+# Navigate to the client directory
+cd client
+
+# Install dependencies
+npm install
+
+# Development build
+npm run build
+
+# Production build
+npm run build.prod
+
+# Start development server
+npm start
+
+# Watch mode (rebuild on changes)
+npm run watch
+```
+
 ## Submitting changes
 
 Submit a Pull Request with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)).

@@ -10,7 +10,7 @@ globalOpts$2.elements.financial = {
   color: {
     up: 'rgba(80, 160, 115, 1)',
     down: 'rgba(215, 85, 65, 1)',
-    unchanged: 'rgba(90, 90, 90, 1)',
+    unchanged: 'rgba(90, 90, 90, 1)'
   }
 };
 
@@ -136,7 +136,7 @@ OhlcElement.id = 'ohlc';
 OhlcElement.defaults = merge({}, [globalOpts$1.elements.financial, {
   lineWidth: 2,
   armLength: null,
-  armLengthRatio: 0.8,
+  armLengthRatio: 0.8
 }]);
 
 /**
@@ -341,7 +341,7 @@ class OhlcController extends FinancialController {
         lineWidth: dataset.lineWidth,
         armLength: dataset.armLength,
         armLengthRatio: dataset.armLengthRatio,
-        color: dataset.color,
+        color: dataset.color
       };
 
       if (includeOptions) {
@@ -409,7 +409,7 @@ class CandlestickElement extends FinancialElement {
 CandlestickElement.id = 'candlestick';
 CandlestickElement.defaults = merge({}, [globalOpts.elements.financial, {
   borderColor: globalOpts.elements.financial.color.unchanged,
-  borderWidth: 1,
+  borderWidth: 1
 }]);
 
 class CandlestickController extends FinancialController {
@@ -436,7 +436,7 @@ class CandlestickController extends FinancialController {
         // Appearance
         color: dataset.color,
         borderColor: dataset.borderColor,
-        borderWidth: dataset.borderWidth,
+        borderWidth: dataset.borderWidth
       };
 
       if (includeOptions) {

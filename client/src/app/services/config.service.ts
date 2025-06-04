@@ -283,7 +283,7 @@ export class ChartConfigService {
           borderWidth: r.lineWidth,
           borderColor: r.color,
           backgroundColor: r.color,
-          fill: c.fill == null ? false : {
+          fill: c.fill === null ? false : {
             target: c.fill.target,
             above: c.fill.colorAbove,
             below: c.fill.colorBelow
@@ -385,7 +385,7 @@ export class ChartConfigService {
   ): AnnotationOptions & LabelAnnotationOptions {
 
     const fontColor = this.usr.settings.isDarkTheme ? '#757575' : '#121316';
-    const fillColor = this.usr.settings.isDarkTheme ? '#12131680' : '#FAF9FD90'
+    const fillColor = this.usr.settings.isDarkTheme ? '#12131680' : '#FAF9FD90';
 
     const legendFont: FontSpec = {
       family: this.fontFamily,

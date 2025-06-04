@@ -39,7 +39,7 @@ export class ApiService {
       // compose url
       let url = `${listing.endpoint}?`;
       selection.params.forEach((param: IndicatorParam, param_index: number) => {
-        if (param_index != 0) url += "&";
+        if (param_index !== 0) url += "&";
         url += `${param.paramName}=${param.value}`;
       });
 
@@ -52,7 +52,13 @@ export class ApiService {
           },
 
           error: (e: HttpErrorResponse) => {
-            console.log("DATA", e);
+            // Log error details for debugging while preserving error structure
+            console.error('API Error fetching selection data:', {
+              status: e.status,
+              statusText: e.statusText,
+              url: e.url,
+              message: e.message
+            });
             observer.error(e);
           }
         });
