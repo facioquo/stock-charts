@@ -17,7 +17,7 @@ export class UtilityService {
 
     tags.forEach((tag: MetaDefinition) => {
 
-      if (tag.property == "og:title" && tag.content) {
+      if (tag.property === "og:title" && tag.content) {
         this.title.setTitle(tag.content);
       }
 
@@ -36,12 +36,12 @@ export class UtilityService {
 
       // update to replace
       if (exists !== null) {
-        this.meta.updateTag(tag, attrib)
+        this.meta.updateTag(tag, attrib);
       }
 
       // or add if missing
       else {
-        this.meta.addTag(tag)
+        this.meta.addTag(tag);
       }
     });
   }
@@ -64,14 +64,18 @@ export class UtilityService {
   scrollToStart(id: string, offset: number = 200) {
     setTimeout(() => {
       const element = document.getElementById(id);
-      element!.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+      }
     }, offset);
   }
 
   scrollToEnd(id: string, offset: number = 200) {
     setTimeout(() => {
       const element = document.getElementById(id);
-      element!.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });
+      }
     }, offset);
   }
 

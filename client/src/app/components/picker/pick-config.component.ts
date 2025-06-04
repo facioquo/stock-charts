@@ -39,7 +39,7 @@ export class PickConfigComponent {
 
   selection: IndicatorSelection;
   customPicker: MtxColorpicker;
-  errorMessage: string;
+  errorMessage: string | undefined;
   closeButtonLabel = "ADD";
 
   // Material Design (M2) color palette
@@ -110,7 +110,12 @@ export class PickConfigComponent {
 
         // inform user of [validation] error
         error: (e: HttpErrorResponse) => {
-          console.log(e);
+          console.error('Error adding selection to chart:', {
+            status: e.status,
+            statusText: e.statusText,
+            message: e.message,
+            error: e.error
+          });
           this.errorMessage = e.error;
           this.closeButtonLabel = "RETRY";
         }
