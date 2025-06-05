@@ -130,24 +130,24 @@ export class ChartService {
                   let yValue = row[result.dataName];
 
                   // apply candle pointers
-                  if (yValue && listing.category === "candlestick-pattern") {
+                  if (yValue && listing.category === 'candlestick-pattern') {
 
-                    switch (row["match"]) {
+                    switch (row['match']) {
 
                       case -100:
-                        yValue = 1.01 * row["candle"].high;
+                        yValue = 1.01 * row['candle'].high;
                         pointColor.push(red);
                         pointRotation.push(180);
                         break;
 
                       case 100:
-                        yValue = 0.99 * row["candle"].low;
+                        yValue = 0.99 * row['candle'].low;
                         pointColor.push(green);
                         pointRotation.push(0);
                         break;
 
                       default:
-                        yValue = 0.99 * row["candle"].low;
+                        yValue = 0.99 * row['candle'].low;
                         pointColor.push(gray);
                         pointRotation.push(0);
                         break;
@@ -177,7 +177,7 @@ export class ChartService {
                 }
 
                 // custom candlestick pattern points
-                if (listing.category === "candlestick-pattern" && dataset.type !== 'bar') {
+                if (listing.category === 'candlestick-pattern' && dataset.type !== 'bar') {
                   dataset.pointRotation = pointRotation;
                   dataset.pointBackgroundColor = pointColor;
                   dataset.pointBorderColor = pointColor;
@@ -250,7 +250,7 @@ export class ChartService {
         minimum: config.minimum,
         maximum: config.maximum,
         value: config.defaultValue
-      } as IndicatorParam
+      } as IndicatorParam;
 
       selection.params.push(param);
     });
@@ -266,7 +266,7 @@ export class ChartService {
         lineType: config.lineType,
         lineWidth: config.lineWidth,
         order: listing.order
-      } as IndicatorResult
+      } as IndicatorResult;
 
       selection.results.push(result);
     });
@@ -728,7 +728,7 @@ export class ChartService {
   selectionTokenReplacement(selection: IndicatorSelection): IndicatorSelection {
 
     selection.params.forEach((param, index) => {
-      if (param.value == null) return;
+      if (param.value === null || param.value === undefined) return;
 
       selection.label = selection.label.replace(`[P${index + 1}]`, param.value.toString());
 

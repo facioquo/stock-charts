@@ -13,7 +13,7 @@ export class PageNotFoundComponent {
     private readonly util: UtilityService
   ) {
 
-    const description = "This is not a page.  Try again.";
+    const description = 'This is not a page.  Try again.';
 
     this.util.pushMetaTags([
       {
@@ -22,7 +22,7 @@ export class PageNotFoundComponent {
       },
       {
         property: 'og:title',
-        content: "Page not found"
+        content: 'Page not found'
       },
       {
         name: 'description',

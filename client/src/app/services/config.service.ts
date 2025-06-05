@@ -31,7 +31,7 @@ import {
 })
 export class ChartConfigService {
 
-  fontFamily = "'Google Sans', Roboto, Verdana, Helvetica, Arial, sans-serif";
+  fontFamily = '\'Google Sans\', Roboto, Verdana, Helvetica, Arial, sans-serif';
 
   constructor(
     private readonly usr: UserService

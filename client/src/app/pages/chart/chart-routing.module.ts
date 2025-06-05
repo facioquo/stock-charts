@@ -5,7 +5,7 @@ import { ChartComponent } from './chart.component';
 
 const routes: Routes = [
   {
-    path: "", // "" for lazy-loading, see AppRoutingModule
+    path: '', // "" for lazy-loading, see AppRoutingModule
     component: ChartComponent
   }
 ];

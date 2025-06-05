@@ -5,7 +5,7 @@ import { PageNotFoundComponent } from './404.component';
 
 const routes: Routes = [
   {
-    path: "", // "" for lazy-loading, see AppRoutingModule
+    path: '', // "" for lazy-loading, see AppRoutingModule
     component: PageNotFoundComponent
   }
 ];

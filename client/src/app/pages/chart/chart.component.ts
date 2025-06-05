@@ -22,7 +22,7 @@ export class ChartComponent {
   // SETTINGS DIALOG
   openSettingsDialog(): void {
     this.settingsDialog.open(SettingsComponent, {
-      autoFocus: "dialog"
+      autoFocus: 'dialog'
     });
   }
 }

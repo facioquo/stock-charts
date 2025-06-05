@@ -40,7 +40,7 @@ export class PickConfigComponent {
   selection: IndicatorSelection;
   customPicker: MtxColorpicker;
   errorMessage: string | undefined;
-  closeButtonLabel = "ADD";
+  closeButtonLabel = 'ADD';
 
   // Material Design (M2) color palette
   // ref: https://m2.material.io/design/color/the-color-system.html
@@ -70,18 +70,18 @@ export class PickConfigComponent {
   ];
 
   lineWidths: LineWidth[] = [
-    { name: "thin", value: 1 },
-    { name: "normal", value: 1.5 },
-    { name: "thick", value: 2 },
-    { name: "heavy", value: 3 }
+    { name: 'thin', value: 1 },
+    { name: 'normal', value: 1.5 },
+    { name: 'thick', value: 2 },
+    { name: 'heavy', value: 3 }
   ];
 
   lineTypes: LineType[] = [
-    { name: "solid", value: "solid", userWidth: true },
-    { name: "dashes", value: "dash", userWidth: true },
-    { name: "dots", value: "dots", userWidth: true },
-    { name: "bar", value: "bar", userWidth: false },
-    { name: "none", value: "none", userWidth: false }
+    { name: 'solid', value: 'solid', userWidth: true },
+    { name: 'dashes', value: 'dash', userWidth: true },
+    { name: 'dots', value: 'dots', userWidth: true },
+    { name: 'bar', value: 'bar', userWidth: false },
+    { name: 'none', value: 'none', userWidth: false }
   ];
 
   constructor(
@@ -104,7 +104,7 @@ export class PickConfigComponent {
         // successfully added to chart
         next: () => {
           this.errorMessage = undefined;
-          this.closeButtonLabel = "RESOLVED ...";
+          this.closeButtonLabel = 'RESOLVED ...';
           this.dialogRef.close();
         },
 
@@ -117,7 +117,7 @@ export class PickConfigComponent {
             error: e.error
           });
           this.errorMessage = e.error;
-          this.closeButtonLabel = "RETRY";
+          this.closeButtonLabel = 'RETRY';
         }
       });
   }
@@ -140,21 +140,21 @@ export class PickConfigComponent {
 
     const style = (() => {
       switch (r.lineType) {
-        case "dots":
-          return "dotted";
-        case "dash":
-          return "dashed";
+        case 'dots':
+          return 'dotted';
+        case 'dash':
+          return 'dashed';
         default:
-          return "solid";
+          return 'solid';
       }
     })();
 
-    const width = r.lineWidth * ((style === "dotted") ? 2 : 1);
+    const width = r.lineWidth * ((style === 'dotted') ? 2 : 1);
 
     return {
-      "border-bottom-color": r.color,
-      "border-bottom-width": width + "px",
-      "border-bottom-style": style
+      'border-bottom-color': r.color,
+      'border-bottom-width': width + 'px',
+      'border-bottom-style': style
     };
   }
 

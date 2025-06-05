@@ -17,7 +17,7 @@ export class UtilityService {
 
     tags.forEach((tag: MetaDefinition) => {
 
-      if (tag.property === "og:title" && tag.content) {
+      if (tag.property === 'og:title' && tag.content) {
         this.title.setTitle(tag.content);
       }
 
@@ -29,7 +29,7 @@ export class UtilityService {
             ? `property='${tag.property}'`
             : tag.name !== undefined
               ? `name='${tag.name}'`
-              : "UNDEFINED";
+              : 'UNDEFINED';
 
       // check if tag exists
       const exists = this.meta.getTag(attrib);
@@ -48,10 +48,10 @@ export class UtilityService {
 
   titleWithSuffix(
     baseTitle: string,
-    suffix: string = "Stock Indicators for .NET (demo)")
+    suffix: string = 'Stock Indicators for .NET (demo)')
     : string {
     return baseTitle.length > 0
-      ? baseTitle.concat(" | ").concat(suffix)
+      ? baseTitle.concat(' | ').concat(suffix)
       : suffix;
   }
 

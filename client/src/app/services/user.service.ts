@@ -14,7 +14,7 @@ export class UserService {
     // without applying changes to the UI
 
     // get from cache
-    const settings = localStorage.getItem("settings");
+    const settings = localStorage.getItem('settings');
 
     // if not cached, set default
     if (settings === null) {
@@ -22,7 +22,7 @@ export class UserService {
       this.settings = {
         isDarkTheme: true,
         showTooltips: false
-      }
+      };
 
       // store/cache new setting
       this.cacheSettings();
@@ -38,7 +38,7 @@ export class UserService {
   }
 
   cacheSettings() {
-    localStorage.setItem("settings", JSON.stringify(this.settings));
+    localStorage.setItem('settings', JSON.stringify(this.settings));
   }
 
   changeTheme(isDarkTheme: boolean) {

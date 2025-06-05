@@ -58,7 +58,7 @@ export class SettingsComponent {
     // open indicator settings for indicator to add
     this.picker
       .open(PickConfigComponent, {
-        autoFocus: "dialog",
+        autoFocus: 'dialog',
         data: listing
       })
       .afterClosed()
@@ -68,7 +68,7 @@ export class SettingsComponent {
       // TODO: scroll to chart if not reopened
       .subscribe(() => {
         this.listRef.open(SettingsComponent, {
-          autoFocus: "dialog"
+          autoFocus: 'dialog'
         });
       });
   }

@@ -35,7 +35,7 @@ export class ApiService {
       // compose url
       let url = `${listing.endpoint}?`;
       selection.params.forEach((param: IndicatorParam, param_index: number) => {
-        if (param_index !== 0) url += "&";
+        if (param_index !== 0) url += '&';
         url += `${param.paramName}=${param.value}`;
       });
 
