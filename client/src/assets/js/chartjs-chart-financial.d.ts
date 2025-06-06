@@ -7,7 +7,7 @@ import {
   CartesianScaleTypeRegistry,
   Chart,
   ChartComponent
-} from 'chart.js';
+} from "chart.js";
 
 export interface FinancialDataPoint {
   x: number,
@@ -17,7 +17,7 @@ export interface FinancialDataPoint {
   c: number
 }
 
-declare module 'chart.js' {
+declare module "chart.js" {
 
   interface FinancialParsedData {
     _custom?: any

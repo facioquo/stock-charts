@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { Meta, MetaDefinition, Title } from '@angular/platform-browser';
-import { v4 as Guid } from 'uuid';
+import { Injectable } from "@angular/core";
+import { Meta, MetaDefinition, Title } from "@angular/platform-browser";
+import { v4 as Guid } from "uuid";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class UtilityService {
 
@@ -17,7 +17,7 @@ export class UtilityService {
 
     tags.forEach((tag: MetaDefinition) => {
 
-      if (tag.property === 'og:title' && tag.content) {
+      if (tag.property === "og:title" && tag.content) {
         this.title.setTitle(tag.content);
       }
 
@@ -29,7 +29,7 @@ export class UtilityService {
             ? `property='${tag.property}'`
             : tag.name !== undefined
               ? `name='${tag.name}'`
-              : 'UNDEFINED';
+              : "UNDEFINED";
 
       // check if tag exists
       const exists = this.meta.getTag(attrib);
@@ -48,16 +48,16 @@ export class UtilityService {
 
   titleWithSuffix(
     baseTitle: string,
-    suffix: string = 'Stock Indicators for .NET (demo)')
+    suffix: string = "Stock Indicators for .NET (demo)")
     : string {
     return baseTitle.length > 0
-      ? baseTitle.concat(' | ').concat(suffix)
+      ? baseTitle.concat(" | ").concat(suffix)
       : suffix;
   }
 
   // PAGE SCROLLING
 
-  guid(prefix: string = 'chart'): string {
+  guid(prefix: string = "chart"): string {
     return `${prefix}${Guid()}`;
   }
 
@@ -65,7 +65,7 @@ export class UtilityService {
     setTimeout(() => {
       const element = document.getElementById(id);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+        element.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
       }
     }, offset);
   }
@@ -74,7 +74,7 @@ export class UtilityService {
     setTimeout(() => {
       const element = document.getElementById(id);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });
+        element.scrollIntoView({ behavior: "smooth", block: "end", inline: "end" });
       }
     }, offset);
   }

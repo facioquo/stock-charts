@@ -1,16 +1,16 @@
 // chartjs-chart-financial
 // based on https://github.com/chartjs/chartjs-chart-financial
 
-import { Chart, Element, defaults, BarController } from 'chart.js';
-import { merge, valueOrDefault, isNullOrUndef, clipArea, unclipArea } from 'chart.js/helpers';
+import { Chart, Element, defaults, BarController } from "chart.js";
+import { merge, valueOrDefault, isNullOrUndef, clipArea, unclipArea } from "chart.js/helpers";
 
 const globalOpts$2 = Chart.defaults;
 
 globalOpts$2.elements.financial = {
   color: {
-    up: 'rgba(80, 160, 115, 1)',
-    down: 'rgba(215, 85, 65, 1)',
-    unchanged: 'rgba(90, 90, 90, 1)'
+    up: "rgba(80, 160, 115, 1)",
+    down: "rgba(215, 85, 65, 1)",
+    unchanged: "rgba(90, 90, 90, 1)"
   }
 };
 
@@ -22,7 +22,7 @@ globalOpts$2.elements.financial = {
  * @private
  */
 function getBarBounds(bar, useFinalPosition) {
-  const { x, y, base, width, height } = bar.getProps(['x', 'low', 'high', 'width', 'height'], useFinalPosition);
+  const { x, y, base, width, height } = bar.getProps(["x", "low", "high", "width", "height"], useFinalPosition);
 
   let left, right, top, bottom, half;
 
@@ -72,11 +72,11 @@ class FinancialElement extends Element {
   }
 
   getRange(axis) {
-    return axis === 'x' ? this.width / 2 : this.height / 2;
+    return axis === "x" ? this.width / 2 : this.height / 2;
   }
 
   getCenterPoint(useFinalPosition) {
-    const { x, low, high } = this.getProps(['x', 'low', 'high'], useFinalPosition);
+    const { x, low, high } = this.getProps(["x", "low", "high"], useFinalPosition);
     return {
       x,
       y: (high + low) / 2
@@ -84,7 +84,7 @@ class FinancialElement extends Element {
   }
 
   tooltipPosition(useFinalPosition) {
-    const { x, open, close } = this.getProps(['x', 'open', 'close'], useFinalPosition);
+    const { x, open, close } = this.getProps(["x", "open", "close"], useFinalPosition);
     return {
       x,
       y: (open + close) / 2
@@ -132,7 +132,7 @@ class OhlcElement extends FinancialElement {
   }
 }
 
-OhlcElement.id = 'ohlc';
+OhlcElement.id = "ohlc";
 OhlcElement.defaults = merge({}, [globalOpts$1.elements.financial, {
   lineWidth: 2,
   armLength: null,
@@ -281,12 +281,12 @@ class FinancialController extends BarController {
 }
 
 FinancialController.overrides = {
-  label: '',
+  label: "",
 
   parsing: false,
 
   hover: {
-    mode: 'label'
+    mode: "label"
   },
 
   datasets: {
@@ -294,8 +294,8 @@ FinancialController.overrides = {
     barPercentage: 0.9,
     animation: {
       numbers: {
-        type: 'number',
-        properties: ['x', 'y', 'base', 'width', 'open', 'high', 'low', 'close']
+        type: "number",
+        properties: ["x", "y", "base", "width", "open", "high", "low", "close"]
       }
     }
   },
@@ -303,7 +303,7 @@ FinancialController.overrides = {
   plugins: {
     tooltip: {
       intersect: false,
-      mode: 'index',
+      mode: "index",
       callbacks: {
         label(ctx) {
           const point = ctx.parsed;
@@ -334,10 +334,10 @@ class OhlcController extends FinancialController {
     for (let i = 0; i < count; i++) {
       const options = sharedOptions || me.resolveDataElementOptions(i, mode);
 
-      const baseProperties = me.calculateElementProperties(i, ruler, mode === 'reset', options);
+      const baseProperties = me.calculateElementProperties(i, ruler, mode === "reset", options);
       const properties = {
         ...baseProperties,
-        datasetLabel: dataset.label || '',
+        datasetLabel: dataset.label || "",
         lineWidth: dataset.lineWidth,
         armLength: dataset.armLength,
         armLengthRatio: dataset.armLengthRatio,
@@ -353,7 +353,7 @@ class OhlcController extends FinancialController {
 
 }
 
-OhlcController.id = 'ohlc';
+OhlcController.id = "ohlc";
 OhlcController.defaults = merge({
   dataElementType: OhlcElement.id,
   datasets: {
@@ -371,7 +371,7 @@ class CandlestickElement extends FinancialElement {
     const { x, open, high, low, close } = me;
 
     let borderColors = me.borderColor;
-    if (typeof borderColors === 'string') {
+    if (typeof borderColors === "string") {
       borderColors = {
         up: borderColors,
         down: borderColors,
@@ -406,7 +406,7 @@ class CandlestickElement extends FinancialElement {
   }
 }
 
-CandlestickElement.id = 'candlestick';
+CandlestickElement.id = "candlestick";
 CandlestickElement.defaults = merge({}, [globalOpts.elements.financial, {
   borderColor: globalOpts.elements.financial.color.unchanged,
   borderWidth: 1
@@ -427,10 +427,10 @@ class CandlestickController extends FinancialController {
     for (let i = start; i < count; i++) {
       const options = sharedOptions || me.resolveDataElementOptions(i, mode);
 
-      const baseProperties = me.calculateElementProperties(i, ruler, mode === 'reset', options);
+      const baseProperties = me.calculateElementProperties(i, ruler, mode === "reset", options);
       const properties = {
         ...baseProperties,
-        datasetLabel: dataset.label || '',
+        datasetLabel: dataset.label || "",
         // label: '', // to get label value please use dataset.data[index].label
 
         // Appearance
@@ -448,7 +448,7 @@ class CandlestickController extends FinancialController {
 
 }
 
-CandlestickController.id = 'candlestick';
+CandlestickController.id = "candlestick";
 CandlestickController.defaults = merge({
   dataElementType: CandlestickElement.id
 }, Chart.defaults.financial);

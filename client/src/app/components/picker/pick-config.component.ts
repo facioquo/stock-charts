@@ -1,19 +1,19 @@
-import { Component, Inject } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, Inject } from "@angular/core";
+import { HttpErrorResponse } from "@angular/common/http";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
-import { MtxColorpicker } from '@ng-matero/extensions/colorpicker';
-import { ColorEvent } from 'ngx-color';
-import { TinyColor } from '@ctrl/tinycolor';
+import { MtxColorpicker } from "@ng-matero/extensions/colorpicker";
+import { ColorEvent } from "ngx-color";
+import { TinyColor } from "@ctrl/tinycolor";
 
-import { ChartService } from '../../services/chart.service';
+import { ChartService } from "../../services/chart.service";
 
 import {
   IndicatorListing,
   IndicatorParam,
   IndicatorResult,
   IndicatorSelection
-} from '../../pages/chart/chart.models';
+} from "../../pages/chart/chart.models";
 
 interface LineWidth {
   name: string;
@@ -27,9 +27,9 @@ interface LineType {
 }
 
 @Component({
-    selector: 'app-pick-config',
-    templateUrl: 'pick-config.component.html',
-    styleUrls: ['pick-config.component.scss'],
+    selector: "app-pick-config",
+    templateUrl: "pick-config.component.html",
+    styleUrls: ["pick-config.component.scss"],
     standalone: false
 })
 export class PickConfigComponent {
@@ -40,7 +40,7 @@ export class PickConfigComponent {
   selection: IndicatorSelection;
   customPicker: MtxColorpicker;
   errorMessage: string | undefined;
-  closeButtonLabel = 'ADD';
+  closeButtonLabel = "ADD";
 
   // Material Design (M2) color palette
   // ref: https://m2.material.io/design/color/the-color-system.html
@@ -50,38 +50,38 @@ export class PickConfigComponent {
   // background: #121316 / #FAF9FD
 
   presetColors: string[] = [
-    '#DD2C00', // deep orange A700 (red)
-    '#EF6C00', // orange 800
-    '#FDD835', // yellow 600
-    '#C0CA33', // lime 600
-    '#7CB342', // light green 600
-    '#2E7D32', // green 800
-    '#009688', // teal 500
-    '#1E88E5', // blue 600
-    '#1565C0', // blue 800
-    '#3949AB', // indigo 600
-    '#6A1B9A', // purple 800
-    '#8E24AA', // purple 600
-    '#EC407A', // pink 400
-    '#616161', // gray 700 (dark)
-    '#757575', // gray 600
-    '#9E9E9E', // gray 500
-    '#BDBDBD'  // gray 400 (light)
+    "#DD2C00", // deep orange A700 (red)
+    "#EF6C00", // orange 800
+    "#FDD835", // yellow 600
+    "#C0CA33", // lime 600
+    "#7CB342", // light green 600
+    "#2E7D32", // green 800
+    "#009688", // teal 500
+    "#1E88E5", // blue 600
+    "#1565C0", // blue 800
+    "#3949AB", // indigo 600
+    "#6A1B9A", // purple 800
+    "#8E24AA", // purple 600
+    "#EC407A", // pink 400
+    "#616161", // gray 700 (dark)
+    "#757575", // gray 600
+    "#9E9E9E", // gray 500
+    "#BDBDBD"  // gray 400 (light)
   ];
 
   lineWidths: LineWidth[] = [
-    { name: 'thin', value: 1 },
-    { name: 'normal', value: 1.5 },
-    { name: 'thick', value: 2 },
-    { name: 'heavy', value: 3 }
+    { name: "thin", value: 1 },
+    { name: "normal", value: 1.5 },
+    { name: "thick", value: 2 },
+    { name: "heavy", value: 3 }
   ];
 
   lineTypes: LineType[] = [
-    { name: 'solid', value: 'solid', userWidth: true },
-    { name: 'dashes', value: 'dash', userWidth: true },
-    { name: 'dots', value: 'dots', userWidth: true },
-    { name: 'bar', value: 'bar', userWidth: false },
-    { name: 'none', value: 'none', userWidth: false }
+    { name: "solid", value: "solid", userWidth: true },
+    { name: "dashes", value: "dash", userWidth: true },
+    { name: "dots", value: "dots", userWidth: true },
+    { name: "bar", value: "bar", userWidth: false },
+    { name: "none", value: "none", userWidth: false }
   ];
 
   constructor(
@@ -104,20 +104,20 @@ export class PickConfigComponent {
         // successfully added to chart
         next: () => {
           this.errorMessage = undefined;
-          this.closeButtonLabel = 'RESOLVED ...';
+          this.closeButtonLabel = "RESOLVED ...";
           this.dialogRef.close();
         },
 
         // inform user of [validation] error
         error: (e: HttpErrorResponse) => {
-          console.error('Error adding selection to chart:', {
+          console.error("Error adding selection to chart:", {
             status: e.status,
             statusText: e.statusText,
             message: e.message,
             error: e.error
           });
           this.errorMessage = e.error;
-          this.closeButtonLabel = 'RETRY';
+          this.closeButtonLabel = "RETRY";
         }
       });
   }
@@ -140,21 +140,21 @@ export class PickConfigComponent {
 
     const style = (() => {
       switch (r.lineType) {
-        case 'dots':
-          return 'dotted';
-        case 'dash':
-          return 'dashed';
+        case "dots":
+          return "dotted";
+        case "dash":
+          return "dashed";
         default:
-          return 'solid';
+          return "solid";
       }
     })();
 
-    const width = r.lineWidth * ((style === 'dotted') ? 2 : 1);
+    const width = r.lineWidth * ((style === "dotted") ? 2 : 1);
 
     return {
-      'border-bottom-color': r.color,
-      'border-bottom-width': width + 'px',
-      'border-bottom-style': style
+      "border-bottom-color": r.color,
+      "border-bottom-width": width + "px",
+      "border-bottom-style": style
     };
   }
 

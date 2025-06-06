@@ -1,6 +1,6 @@
-import { EnvConfig } from './environment.interface';
+import { EnvConfig } from "./environment.interface";
 
 export const env: EnvConfig = {
   production: true,
-  api: 'https://stock-charts-api.azurewebsites.net'
+  api: "https://stock-charts-api.azurewebsites.net"
 };

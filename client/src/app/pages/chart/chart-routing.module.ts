@@ -1,11 +1,11 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
 
-import { ChartComponent } from './chart.component';
+import { ChartComponent } from "./chart.component";
 
 const routes: Routes = [
   {
-    path: '', // "" for lazy-loading, see AppRoutingModule
+    path: "", // "" for lazy-loading, see AppRoutingModule
     component: ChartComponent
   }
 ];

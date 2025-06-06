@@ -3,7 +3,7 @@
 import {
   Chart,
   ChartDataset
-} from 'chart.js';
+} from "chart.js";
 
 export interface Quote {
   date: Date;

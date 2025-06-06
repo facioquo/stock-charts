@@ -28,7 +28,7 @@ export default [
       'prefer-const': 'error',
       'no-duplicate-imports': 'error',
       'semi': ['error', 'always'],
-      'quotes': ['error', 'single', { allowTemplateLiterals: true }],
+      'quotes': ['error', 'double', { allowTemplateLiterals: true }],
       'eqeqeq': ['error', 'always'],
       'no-undef': 'off', // TypeScript handles this
       'no-unused-vars': 'off' // TypeScript handles this
@@ -57,7 +57,7 @@ export default [
       'no-var': 'error',
       'prefer-const': 'error',
       'semi': ['error', 'always'],
-      'quotes': ['error', 'single', { allowTemplateLiterals: true }]
+      'quotes': ['error', 'double', { allowTemplateLiterals: true }]
     }
   }
 ];

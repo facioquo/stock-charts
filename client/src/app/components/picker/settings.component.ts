@@ -1,20 +1,20 @@
-import { Component } from '@angular/core';
+import { Component } from "@angular/core";
 
-import { MatCheckboxChange } from '@angular/material/checkbox';
-import { MatDialog } from '@angular/material/dialog';
-import { MatListOption, MatSelectionList } from '@angular/material/list';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { MatCheckboxChange } from "@angular/material/checkbox";
+import { MatDialog } from "@angular/material/dialog";
+import { MatListOption, MatSelectionList } from "@angular/material/list";
+import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 
-import { ChartService } from '../../services/chart.service';
-import { UserService } from '../../services/user.service';
+import { ChartService } from "../../services/chart.service";
+import { UserService } from "../../services/user.service";
 
-import { IndicatorListing, IndicatorSelection } from '../../pages/chart/chart.models';
-import { PickConfigComponent } from './pick-config.component';
+import { IndicatorListing, IndicatorSelection } from "../../pages/chart/chart.models";
+import { PickConfigComponent } from "./pick-config.component";
 
 @Component({
-    selector: 'app-listing',
-    templateUrl: 'settings.component.html',
-    styleUrls: ['settings.component.scss'],
+    selector: "app-listing",
+    templateUrl: "settings.component.html",
+    styleUrls: ["settings.component.scss"],
     standalone: false
 })
 export class SettingsComponent {
@@ -58,7 +58,7 @@ export class SettingsComponent {
     // open indicator settings for indicator to add
     this.picker
       .open(PickConfigComponent, {
-        autoFocus: 'dialog',
+        autoFocus: "dialog",
         data: listing
       })
       .afterClosed()
@@ -68,7 +68,7 @@ export class SettingsComponent {
       // TODO: scroll to chart if not reopened
       .subscribe(() => {
         this.listRef.open(SettingsComponent, {
-          autoFocus: 'dialog'
+          autoFocus: "dialog"
         });
       });
   }
