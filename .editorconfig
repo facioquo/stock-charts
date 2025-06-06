@@ -11,6 +11,9 @@ indent_style = space              # Use spaces for indentation
 indent_size = 2                   # Use 2 spaces per indentation level
 tab_width = 2                     # Set tab width to 2 spaces
 
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
 # JSON, XML, and .NET projects
 [*.{json,jsonc,xml,csproj,props,targets,.code-workspace}]
 indent_size = 2
