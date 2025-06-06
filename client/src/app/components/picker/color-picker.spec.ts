@@ -1,7 +1,11 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
-
 // Test the color picker functionality in isolation
+
+interface LineConfig {
+  color: string;
+  lineType: string;
+  lineWidth: number;
+}
+
 describe("Color Picker Functionality", () => {
   // Material Design color palette (same as used in PickConfigComponent)
   const materialDesignColors = [
@@ -108,7 +112,7 @@ describe("Color Picker Functionality", () => {
 
   describe("Line Style Generation", () => {
     // Test the logic from getLineSample method
-    function getLineSample(result: any) {
+    function getLineSample(result: LineConfig) {
       const style = (() => {
         switch (result.lineType) {
           case "dots":
