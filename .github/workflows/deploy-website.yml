@@ -195,10 +195,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_KEY }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: "latest"
-          command: >
-            pages deploy artifacts/web
-            --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
+          command: pages deploy artifacts/web --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
 
       - name: Tag and draft release note
         uses: ncipollo/release-action@v1

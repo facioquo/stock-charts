@@ -1,16 +1,16 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs/internal/Observable';
-import { env } from '../../environments/environment';
+import { Injectable } from "@angular/core";
+import { HttpClient, HttpErrorResponse, HttpHeaders } from "@angular/common/http";
+import { Observable } from "rxjs/internal/Observable";
+import { env } from "../../environments/environment";
 
 import {
   IndicatorListing,
   IndicatorParam,
   IndicatorSelection
-} from '../pages/chart/chart.models';
+} from "../pages/chart/chart.models";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class ApiService {
 
@@ -53,7 +53,7 @@ export class ApiService {
 
           error: (e: HttpErrorResponse) => {
             // Log error details for debugging while preserving error structure
-            console.error('API Error fetching selection data:', {
+            console.error("API Error fetching selection data:", {
               status: e.status,
               statusText: e.statusText,
               url: e.url,
@@ -71,7 +71,7 @@ export class ApiService {
   requestHeader(): { headers?: HttpHeaders } {
 
     const simpleHeaders = new HttpHeaders()
-      .set('Content-Type', 'application/json');
+      .set("Content-Type", "application/json");
 
     return { headers: simpleHeaders };
   }

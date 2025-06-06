@@ -32,12 +32,9 @@ jobs:
       # Install global npm tools
       - name: Install global npm dependencies
         run: |
-          npm install -g @angular/cli@latest
+          npm install -g @angular/cli@latest  # Provides 'ng' command
           npm install -g typescript@latest
-          npm install -g eslint@latest
           npm install -g prettier@latest
-          npm install -g @typescript-eslint/parser@latest
-          npm install -g @typescript-eslint/eslint-plugin@latest
       
       # Install Azure tools
       - name: Install Azure tools
