@@ -13,7 +13,11 @@ tab_width = 2                     # Set tab width to 2 spaces
 
 # Markdown files
 [*.md]
-trim_trailing_whitespace = false  # Allow trailing whitespace for line breaks
+trim_trailing_whitespace = false
+# JSON, XML, and .NET projects
+[*.{json,jsonc,xml,csproj,props,targets,.code-workspace}]
+indent_size = 2
+tab_width = 2
 
 # Batch and command files
 [*.{cmd,bat}]
