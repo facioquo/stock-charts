@@ -1,6 +1,6 @@
-import { EnvConfig } from './environment.interface';
+import { EnvConfig } from "./environment.interface";
 
 export const env: EnvConfig = {
   production: false,
-  api: 'https://localhost:44392'
+  api: "https://localhost:44392"
 };

@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { Meta, MetaDefinition, Title } from '@angular/platform-browser';
-import { v4 as Guid } from 'uuid';
+import { Injectable } from "@angular/core";
+import { Meta, MetaDefinition, Title } from "@angular/platform-browser";
+import { v4 as Guid } from "uuid";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class UtilityService {
 
@@ -57,7 +57,7 @@ export class UtilityService {
 
   // PAGE SCROLLING
 
-  guid(prefix: string = 'chart'): string {
+  guid(prefix: string = "chart"): string {
     return `${prefix}${Guid()}`;
   }
 
@@ -65,7 +65,7 @@ export class UtilityService {
     setTimeout(() => {
       const element = document.getElementById(id);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+        element.scrollIntoView({ behavior: "smooth", block: "start", inline: "start" });
       }
     }, offset);
   }
@@ -74,7 +74,7 @@ export class UtilityService {
     setTimeout(() => {
       const element = document.getElementById(id);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });
+        element.scrollIntoView({ behavior: "smooth", block: "end", inline: "end" });
       }
     }, offset);
   }

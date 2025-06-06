@@ -1,19 +1,19 @@
-import { Component, Inject } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, Inject } from "@angular/core";
+import { HttpErrorResponse } from "@angular/common/http";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
-import { MtxColorpicker } from '@ng-matero/extensions/colorpicker';
-import { ColorEvent } from 'ngx-color';
-import { TinyColor } from '@ctrl/tinycolor';
+import { MtxColorpicker } from "@ng-matero/extensions/colorpicker";
+import { ColorEvent } from "ngx-color";
+import { TinyColor } from "@ctrl/tinycolor";
 
-import { ChartService } from '../../services/chart.service';
+import { ChartService } from "../../services/chart.service";
 
 import {
   IndicatorListing,
   IndicatorParam,
   IndicatorResult,
   IndicatorSelection
-} from '../../pages/chart/chart.models';
+} from "../../pages/chart/chart.models";
 
 interface LineWidth {
   name: string;
@@ -27,9 +27,9 @@ interface LineType {
 }
 
 @Component({
-    selector: 'app-pick-config',
-    templateUrl: 'pick-config.component.html',
-    styleUrls: ['pick-config.component.scss'],
+    selector: "app-pick-config",
+    templateUrl: "pick-config.component.html",
+    styleUrls: ["pick-config.component.scss"],
     standalone: false
 })
 export class PickConfigComponent {
@@ -50,23 +50,23 @@ export class PickConfigComponent {
   // background: #121316 / #FAF9FD
 
   presetColors: string[] = [
-    '#DD2C00', // deep orange A700 (red)
-    '#EF6C00', // orange 800
-    '#FDD835', // yellow 600
-    '#C0CA33', // lime 600
-    '#7CB342', // light green 600
-    '#2E7D32', // green 800
-    '#009688', // teal 500
-    '#1E88E5', // blue 600
-    '#1565C0', // blue 800
-    '#3949AB', // indigo 600
-    '#6A1B9A', // purple 800
-    '#8E24AA', // purple 600
-    '#EC407A', // pink 400
-    '#616161', // gray 700 (dark)
-    '#757575', // gray 600
-    '#9E9E9E', // gray 500
-    '#BDBDBD'  // gray 400 (light)
+    "#DD2C00", // deep orange A700 (red)
+    "#EF6C00", // orange 800
+    "#FDD835", // yellow 600
+    "#C0CA33", // lime 600
+    "#7CB342", // light green 600
+    "#2E7D32", // green 800
+    "#009688", // teal 500
+    "#1E88E5", // blue 600
+    "#1565C0", // blue 800
+    "#3949AB", // indigo 600
+    "#6A1B9A", // purple 800
+    "#8E24AA", // purple 600
+    "#EC407A", // pink 400
+    "#616161", // gray 700 (dark)
+    "#757575", // gray 600
+    "#9E9E9E", // gray 500
+    "#BDBDBD"  // gray 400 (light)
   ];
 
   lineWidths: LineWidth[] = [
@@ -110,7 +110,7 @@ export class PickConfigComponent {
 
         // inform user of [validation] error
         error: (e: HttpErrorResponse) => {
-          console.error('Error adding selection to chart:', {
+          console.error("Error adding selection to chart:", {
             status: e.status,
             statusText: e.statusText,
             message: e.message,

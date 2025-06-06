@@ -3,4 +3,4 @@
  * No other polyfills are needed for modern browsers.
  */
 
-import 'zone.js';
+import "zone.js";

@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
-import { UtilityService } from '../../services/utility.service';
+import { Component } from "@angular/core";
+import { UtilityService } from "../../services/utility.service";
 
 @Component({
-    selector: 'app-404',
-    templateUrl: './404.component.html',
-    styleUrls: ['./404.component.scss'],
+    selector: "app-404",
+    templateUrl: "./404.component.html",
+    styleUrls: ["./404.component.scss"],
     standalone: false
 })
 export class PageNotFoundComponent {
@@ -17,19 +17,19 @@ export class PageNotFoundComponent {
 
     this.util.pushMetaTags([
       {
-        name: 'robots',
-        content: 'noindex, nofollow'
+        name: "robots",
+        content: "noindex, nofollow"
       },
       {
-        property: 'og:title',
+        property: "og:title",
         content: "Page not found"
       },
       {
-        name: 'description',
+        name: "description",
         content: description
       },
       {
-        property: 'og:description',
+        property: "og:description",
         content: description
       },
     ]);

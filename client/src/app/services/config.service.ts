@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
-import { UserService } from './user.service';
+import { Injectable } from "@angular/core";
+import { UserService } from "./user.service";
 
 import {
   IndicatorResult,
   IndicatorResultConfig
-} from '../pages/chart/chart.models';
+} from "../pages/chart/chart.models";
 
 // chart.js
-import 'chartjs-adapter-date-fns';
-import { enUS } from 'date-fns/locale';
+import "chartjs-adapter-date-fns";
+import { enUS } from "date-fns/locale";
 
 import {
   CartesianScaleOptions,
@@ -17,17 +17,17 @@ import {
   ChartOptions,
   FontSpec,
   ScaleOptions
-} from 'chart.js';
+} from "chart.js";
 
 // plugins
 import {
   AnnotationOptions,
   LabelAnnotationOptions,
   ScaleValue
-} from 'chartjs-plugin-annotation';
+} from "chartjs-plugin-annotation";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class ChartConfigService {
 
@@ -42,7 +42,7 @@ export class ChartConfigService {
     // base configuration
     const config: ChartConfiguration = {
 
-      type: 'candlestick',
+      type: "candlestick",
       data: {
         datasets: []
       },
@@ -57,7 +57,7 @@ export class ChartConfigService {
     // base configuration
     const config: ChartConfiguration = {
 
-      type: 'candlestick',  // TODO: should/could this be line or bar?
+      type: "candlestick",  // TODO: should/could this be line or bar?
       data: {
         datasets: []
       },
@@ -106,9 +106,9 @@ export class ChartConfigService {
         y: {
           alignToPixels: true,
           display: true,
-          type: 'linear',
-          axis: 'y',
-          position: 'right',
+          type: "linear",
+          axis: "y",
+          position: "right",
           beginAtZero: false,
           ticks: {
             display: true,
@@ -119,7 +119,7 @@ export class ChartConfigService {
               lineHeight: 1
             },
             showLabelBackdrop: true,
-            backdropColor: this.usr.settings.isDarkTheme ? '#12131680' : '#FAF9FD90',
+            backdropColor: this.usr.settings.isDarkTheme ? "#12131680" : "#FAF9FD90",
             backdropPadding: {
               top: 0,
               left: 5,
@@ -135,7 +135,7 @@ export class ChartConfigService {
             drawOnChartArea: true,
             drawTicks: false,
             lineWidth: 0.5,
-            color: this.usr.settings.isDarkTheme ? '#2E2E2E' : '#E0E0E0'
+            color: this.usr.settings.isDarkTheme ? "#2E2E2E" : "#E0E0E0"
           }
         }
       }
@@ -162,15 +162,15 @@ export class ChartConfigService {
 
       // otherwise, add dollar sign
       else
-        return '$' + value;
+        return "$" + value;
     };
 
     // define secondary y-axis for volume
     options.scales.volumeAxis = {
       display: false,  // hide by default
-      type: 'linear',
-      axis: 'y',
-      position: 'left',
+      type: "linear",
+      axis: "y",
+      position: "left",
       beginAtZero: true,
       padding: 0,
       border: {
@@ -202,11 +202,11 @@ export class ChartConfigService {
 
       // otherwise, condense large/small display values
       else if (v > 10000000000)
-        return Math.trunc(value / 1000000000) + 'B';
+        return Math.trunc(value / 1000000000) + "B";
       else if (v > 10000000)
-        return Math.trunc(value / 1000000) + 'M';
+        return Math.trunc(value / 1000000) + "M";
       else if (v > 10000)
-        return Math.trunc(value / 1000) + 'K';
+        return Math.trunc(value / 1000) + "K";
       else if (v > 10)
         return Math.trunc(value);
       else if (v > 0)
@@ -226,9 +226,9 @@ export class ChartConfigService {
       alignToPixels: true,
       display: false,  // hide by default
       offset: false,   // centers candles/bars
-      type: 'timeseries',
+      type: "timeseries",
       time: {
-        unit: 'day'
+        unit: "day"
       },
       adapters: {
         date: {
@@ -237,7 +237,7 @@ export class ChartConfigService {
       },
       ticks: {
         display: false,
-        source: 'auto',
+        source: "auto",
         padding: 0,
         autoSkip: true,
         maxRotation: 0,
@@ -264,12 +264,12 @@ export class ChartConfigService {
 
     switch (r.lineType) {
 
-      case 'solid':
+      case "solid":
         const lineDataset: ChartDataset = {
           label: r.label,
-          type: 'line',
+          type: "line",
           data: [],
-          yAxisID: 'y',
+          yAxisID: "y",
           pointRadius: 0,
           borderWidth: r.lineWidth,
           borderColor: r.color,
@@ -283,12 +283,12 @@ export class ChartConfigService {
         };
         return lineDataset;
 
-      case 'dash':
+      case "dash":
         const dashDataset: ChartDataset = {
           label: r.label,
-          type: 'line',
+          type: "line",
           data: [],
-          yAxisID: 'y',
+          yAxisID: "y",
           pointRadius: 0,
           borderWidth: r.lineWidth,
           borderDash: [3, 2],
@@ -298,12 +298,12 @@ export class ChartConfigService {
         };
         return dashDataset;
 
-      case 'dots':
+      case "dots":
         const dotsDataset: ChartDataset = {
           label: r.label,
-          type: 'line',
+          type: "line",
           data: [],
-          yAxisID: 'y',
+          yAxisID: "y",
           pointRadius: r.lineWidth,
           pointBorderWidth: 0,
           pointBorderColor: r.color,
@@ -313,12 +313,12 @@ export class ChartConfigService {
         };
         return dotsDataset;
 
-      case 'bar':
+      case "bar":
         const barDataset: ChartDataset = {
           label: r.label,
-          type: 'bar',
+          type: "bar",
           data: [],
-          yAxisID: 'y',
+          yAxisID: "y",
           borderWidth: 0,
           borderColor: r.color,
           backgroundColor: r.color,
@@ -331,31 +331,31 @@ export class ChartConfigService {
         }
         return barDataset;
 
-      case 'pointer':
+      case "pointer":
         const ptDataset: ChartDataset = {
           label: r.label,
-          type: 'line',
+          type: "line",
           data: [],
-          yAxisID: 'y',
+          yAxisID: "y",
           pointRadius: r.lineWidth,
           pointBorderWidth: 0,
           pointBorderColor: r.color,
           pointBackgroundColor: r.color,
-          pointStyle: 'triangle',
+          pointStyle: "triangle",
           pointRotation: 0,
           showLine: false,
           order: r.order
         };
         return ptDataset;
 
-      case 'none':
+      case "none":
         // hide instead of exclude 'none' lines,
         // otherwise, it breaks line offset fill
         const noneDataset: ChartDataset = {
           label: r.label,
-          type: 'line',
+          type: "line",
           data: [],
-          yAxisID: 'y',
+          yAxisID: "y",
           showLine: false,
           pointRadius: 0,
           borderWidth: 0,
@@ -375,29 +375,29 @@ export class ChartConfigService {
     yAdj: number = 0
   ): AnnotationOptions & LabelAnnotationOptions {
 
-    const fontColor = this.usr.settings.isDarkTheme ? '#757575' : '#121316';
-    const fillColor = this.usr.settings.isDarkTheme ? '#12131680' : '#FAF9FD90';
+    const fontColor = this.usr.settings.isDarkTheme ? "#757575" : "#121316";
+    const fillColor = this.usr.settings.isDarkTheme ? "#12131680" : "#FAF9FD90";
 
     const legendFont: FontSpec = {
       family: this.fontFamily,
       size: 13,
-      style: 'normal',
-      weight: 'normal',
+      style: "normal",
+      weight: "normal",
       lineHeight: 1,
     };
 
     const annotation: AnnotationOptions & LabelAnnotationOptions = {
-      id: 'legend',
-      type: 'label',
+      id: "legend",
+      type: "label",
       content: [labelText],
-      textAlign: 'start',
+      textAlign: "start",
       font: legendFont,
       color: fontColor,
       backgroundColor: fillColor,
       padding: 0,
-      position: 'start',
-      xScaleID: 'x',
-      yScaleID: 'y',
+      position: "start",
+      xScaleID: "x",
+      yScaleID: "y",
       xValue: xPos,
       yValue: yPos,
       xAdjust: 0,

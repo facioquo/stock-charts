@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { UserSettings } from '../pages/chart/chart.models';
+import { Injectable } from "@angular/core";
+import { UserSettings } from "../pages/chart/chart.models";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class UserService {
 
@@ -22,7 +22,7 @@ export class UserService {
       this.settings = {
         isDarkTheme: true,
         showTooltips: false
-      }
+      };
 
       // store/cache new setting
       this.cacheSettings();
@@ -49,10 +49,10 @@ export class UserService {
 
     // apply
     const themeClass = isDarkTheme
-      ? 'dark-theme'
-      : 'light-theme';
+      ? "dark-theme"
+      : "light-theme";
 
-    document.body.classList.remove('dark-theme', 'light-theme');
+    document.body.classList.remove("dark-theme", "light-theme");
     document.body.classList.add(themeClass);
   }
 
