@@ -40,7 +40,8 @@
               "includePaths": [
                 "node_modules",
                 "src",
-                "src/styles"]
+                "src/styles"
+              ]
             },
             "outputHashing": "all"
           },
@@ -89,12 +90,24 @@
           "options": {
             "buildTarget": "app:build"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   },
   "schematics": {
     "@schematics/angular:component": {
