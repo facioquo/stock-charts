@@ -24,5 +24,12 @@ module.exports = {
     "!src/**/environment*.ts",
   ],
   coverageDirectory: "coverage",
-  coverageReporters: ["html", "text-summary", "lcov"]
+  coverageReporters: ["html", "text-summary", "lcov"],
+  reporters: [
+    "default",
+    ["jest-junit", {
+      outputDirectory: "test-results",
+      outputName: "junit.xml"
+    }]
+  ]
 };
