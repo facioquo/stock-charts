@@ -10,6 +10,9 @@
     "build": "ng build --configuration=development",
     "build.prod": "ng build --configuration=production",
     "watch": "ng build --configuration=development --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "lint": "eslint src --ext .ts,.js",
     "lint:fix": "eslint src --ext .ts,.js --fix",
     "lint:md": "markdownlint \"**/*.md\" --ignore node_modules"
@@ -49,9 +52,12 @@
     "@angular/cli": "20.0.1",
     "@angular/compiler-cli": "20.0.1",
     "@eslint/js": "^9.28.0",
+    "@types/jest": "^29.5.14",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^9.0.0",
+    "jest": "^29.7.0",
+    "jest-preset-angular": "^14.6.0",
     "markdownlint-cli": "^0.45.0",
     "typescript": "5.8.3"
   }
