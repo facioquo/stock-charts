@@ -83,8 +83,9 @@ export class ChartService {
   loading = true;
   extraBars = 7;
   
-  // Window-based sizing property
+  // Window-based sizing properties
   currentBarCount: number;
+  allQuotes: Quote[] = []; // Store full dataset for dynamic slicing
 
   constructor(
     private readonly api: ApiService,
@@ -544,11 +545,26 @@ export class ChartService {
   onWindowResize(dimensions: { width: number; height: number }) {
     const newBarCount = this.window.calculateOptimalBars(dimensions.width);
     
-    // Only reload if bar count changed significantly (avoid unnecessary API calls)
-    if (Math.abs(newBarCount - this.currentBarCount) > 10) {
+    // Only update if bar count changed significantly and we have data
+    if (Math.abs(newBarCount - this.currentBarCount) > 10 && this.allQuotes.length > 0) {
       this.currentBarCount = newBarCount;
-      this.reloadChartsWithNewBarCount();
+      this.updateChartsWithNewBarCount();
     }
+  }
+  
+  private updateChartsWithNewBarCount() {
+    // Slice existing data to new bar count (keep newest data)
+    const quotes = this.allQuotes.slice(-this.currentBarCount);
+    
+    console.log(`Updating charts with ${this.currentBarCount} bars (dynamic resize)`);
+    
+    // Update main chart with new data slice
+    this.loadOverlayChart(quotes);
+    
+    // Update all indicator selections with new data slice
+    this.selections.forEach(selection => {
+      this.addSelectionWithoutScroll(selection);
+    });
   }
   
   private reloadChartsWithNewBarCount() {
@@ -573,7 +589,10 @@ export class ChartService {
       .subscribe({
         next: (allQuotes: Quote[]) => {
           
-          // Slice array to desired length based on window size
+          // Store full dataset for dynamic slicing
+          this.allQuotes = allQuotes;
+          
+          // Slice array to desired length based on window size (keep newest data)
           const quotes = allQuotes.slice(-this.currentBarCount);
 
           // load base overlay chart
