@@ -1,16 +1,16 @@
-import { Injectable } from "@angular/core";
-import { HttpClient, HttpErrorResponse, HttpHeaders } from "@angular/common/http";
-import { Observable } from "rxjs/internal/Observable";
-import { env } from "../../environments/environment";
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs/internal/Observable';
+import { env } from '../../environments/environment';
 
 import {
   IndicatorListing,
   IndicatorParam,
   IndicatorSelection
-} from "../pages/chart/chart.models";
+} from '../pages/chart/chart.models';
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 export class ApiService {
 
@@ -18,12 +18,8 @@ export class ApiService {
     private readonly http: HttpClient
   ) { }
 
-  getQuotes(timeframe: string = 'daily', count?: number) {
-    let url = `${env.api}/quotes?timeframe=${timeframe}`;
-    if (count) {
-      url += `&count=${count}`;
-    }
-    return this.http.get(url, this.requestHeader());
+  getQuotes() {
+    return this.http.get(`${env.api}/quotes`, this.requestHeader());
   }
 
   getListings() {
@@ -39,7 +35,7 @@ export class ApiService {
       // compose url
       let url = `${listing.endpoint}?`;
       selection.params.forEach((param: IndicatorParam, param_index: number) => {
-        if (param_index !== 0) url += "&";
+        if (param_index != 0) url += "&";
         url += `${param.paramName}=${param.value}`;
       });
 
@@ -52,13 +48,7 @@ export class ApiService {
           },
 
           error: (e: HttpErrorResponse) => {
-            // Log error details for debugging while preserving error structure
-            console.error("API Error fetching selection data:", {
-              status: e.status,
-              statusText: e.statusText,
-              url: e.url,
-              message: e.message
-            });
+            console.log("DATA", e);
             observer.error(e);
           }
         });
@@ -71,7 +61,7 @@ export class ApiService {
   requestHeader(): { headers?: HttpHeaders } {
 
     const simpleHeaders = new HttpHeaders()
-      .set("Content-Type", "application/json");
+      .set('Content-Type', 'application/json');
 
     return { headers: simpleHeaders };
   }

@@ -569,9 +569,12 @@ export class ChartService {
     console.log(`Loading charts with ${this.currentBarCount} bars`);
 
     // get data and load charts
-    this.api.getQuotes('daily', this.currentBarCount)
+    this.api.getQuotes()
       .subscribe({
-        next: (quotes: Quote[]) => {
+        next: (allQuotes: Quote[]) => {
+          
+          // Slice array to desired length based on window size
+          const quotes = allQuotes.slice(-this.currentBarCount);
 
           // load base overlay chart
           this.loadOverlayChart(quotes);
