@@ -17,7 +17,8 @@ import {
   ChartDataset,
   ChartOptions,
   FontSpec,
-  ScaleOptions
+  ScaleOptions,
+  TimeUnit
 } from "chart.js";
 
 // plugins
@@ -237,7 +238,7 @@ export class ChartConfigService {
       offset: false,   // centers candles/bars
       type: "timeseries",
       time: {
-        unit: timeUnit as any
+        unit: timeUnit as TimeUnit
       },
       adapters: {
         date: {

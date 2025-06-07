@@ -299,7 +299,7 @@ export class ChartService {
 
     // deep copy without the chart object
     const selections: IndicatorSelection[]
-      = this.selections.map(({ chart: _chart, ...rest }) => ({
+      = this.selections.map(({ chart: _, ...rest }) => ({
         ...rest
       }));
 
