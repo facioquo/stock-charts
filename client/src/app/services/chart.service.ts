@@ -299,6 +299,7 @@ export class ChartService {
 
     // deep copy without the chart object
     const selections: IndicatorSelection[]
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       = this.selections.map(({ chart: _, ...rest }) => ({
         ...rest
       }));
