@@ -3,7 +3,6 @@ import { MatDialog } from "@angular/material/dialog";
 
 import { ChartService } from "../../services/chart.service";
 import { SettingsComponent } from "../../components/picker/settings.component";
-import { TimeframeOption } from "./chart.models";
 
 @Component({
     selector: "app-chart",
@@ -25,10 +24,5 @@ export class ChartComponent {
     this.settingsDialog.open(SettingsComponent, {
       autoFocus: "dialog"
     });
-  }
-  
-  // TIMEFRAME SELECTION
-  onTimeframeChange(timeframe: TimeframeOption): void {
-    this.cht.changeTimeframe(timeframe);
   }
 }

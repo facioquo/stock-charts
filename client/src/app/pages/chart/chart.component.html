@@ -6,19 +6,8 @@
   </div>
 </div>
 
-<!-- SETTINGS AND TIMEFRAME -->
+<!-- SETTINGS -->
 <div class="button-container">
-  <!-- Timeframe selector -->
-  <mat-form-field appearance="outline" class="timeframe-selector" *ngIf="!cht.loading">
-    <mat-label>Timeframe</mat-label>
-    <mat-select [value]="cht.currentTimeframe" (selectionChange)="onTimeframeChange($event.value)">
-      <mat-option *ngFor="let option of cht.timeframeOptions" [value]="option">
-        {{option.label}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  
-  <!-- Settings button -->
   <button mat-fab color="accent" *ngIf="!cht.loading" (click)="openSettingsDialog()"
     matTooltip="change indicators and settings" aria-label="edit settings">
     <mat-icon color="primary">edit</mat-icon>

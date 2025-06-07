@@ -63,9 +63,7 @@ import {
   IndicatorResult,
   IndicatorResultConfig,
   IndicatorSelection,
-  Quote,
-  TimeframeOption,
-  TIMEFRAME_OPTIONS
+  Quote
 } from "../pages/chart/chart.models";
 
 // services
@@ -85,9 +83,7 @@ export class ChartService {
   loading = true;
   extraBars = 7;
   
-  // New properties for window-based sizing
-  currentTimeframe: TimeframeOption = TIMEFRAME_OPTIONS[0]; // Default to daily
-  timeframeOptions = TIMEFRAME_OPTIONS;
+  // Window-based sizing property
   currentBarCount: number;
 
   constructor(
@@ -98,9 +94,6 @@ export class ChartService {
   ) { 
     // Calculate initial bar count
     this.currentBarCount = this.window.calculateOptimalBars();
-    
-    // Set initial timeframe configuration
-    this.cfg.updateTimeframeConfiguration(this.currentTimeframe);
     
     // Subscribe to window resize events
     this.window.getResizeObservable().subscribe(dimensions => {
@@ -558,28 +551,8 @@ export class ChartService {
     }
   }
   
-  changeTimeframe(timeframe: TimeframeOption) {
-    if (this.currentTimeframe.value !== timeframe.value) {
-      this.currentTimeframe = timeframe;
-      this.reloadChartsWithNewTimeframe();
-    }
-  }
-  
   private reloadChartsWithNewBarCount() {
     // Reload main chart with new bar count
-    this.loadCharts();
-    
-    // Reload all indicator selections
-    this.selections.forEach(selection => {
-      this.addSelectionWithoutScroll(selection);
-    });
-  }
-  
-  private reloadChartsWithNewTimeframe() {
-    // Update chart configuration for new timeframe
-    this.cfg.updateTimeframeConfiguration(this.currentTimeframe);
-    
-    // Reload main chart with new timeframe
     this.loadCharts();
     
     // Reload all indicator selections
@@ -593,10 +566,10 @@ export class ChartService {
   //#region DATA OPERATIONS
   loadCharts() {
 
-    console.log(`Loading charts with ${this.currentBarCount} bars for timeframe: ${this.currentTimeframe.label}`);
+    console.log(`Loading charts with ${this.currentBarCount} bars`);
 
     // get data and load charts
-    this.api.getQuotes(this.currentTimeframe.value, this.currentBarCount)
+    this.api.getQuotes('daily', this.currentBarCount)
       .subscribe({
         next: (quotes: Quote[]) => {
 

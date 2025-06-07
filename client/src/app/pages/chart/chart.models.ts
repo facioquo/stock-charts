@@ -21,19 +21,6 @@ export interface UserSettings {
   showTooltips: boolean;
 }
 
-export interface TimeframeOption {
-  value: string;
-  label: string;
-  unit: string; // Chart.js time unit
-}
-
-export const TIMEFRAME_OPTIONS: TimeframeOption[] = [
-  { value: 'daily', label: 'Daily', unit: 'day' },
-  { value: 'hourly', label: 'Hourly', unit: 'hour' },
-  { value: 'weekly', label: 'Weekly', unit: 'week' },
-  { value: 'monthly', label: 'Monthly', unit: 'month' }
-];
-
 // LISTING
 
 export interface IndicatorListing {

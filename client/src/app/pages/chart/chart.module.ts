@@ -1,5 +1,5 @@
 import { NgModule } from "@angular/core";
-import { NgIf, NgFor } from "@angular/common";
+import { NgIf } from "@angular/common";
 
 import {
   provideHttpClient,
@@ -13,9 +13,7 @@ import {
 
 import { MatButtonModule } from "@angular/material/button";
 import { MatDialogModule } from "@angular/material/dialog";
-import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
-import { MatSelectModule } from "@angular/material/select";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatTooltipModule } from "@angular/material/tooltip";
 
@@ -39,13 +37,10 @@ import { ChartRoutingModule } from "./chart-routing.module";
   ],
   imports: [
     NgIf,
-    NgFor,
     ChartRoutingModule,
     MatButtonModule,
     MatDialogModule,
-    MatFormFieldModule,
     MatIconModule,
-    MatSelectModule,
     MatToolbarModule,
     MatTooltipModule
   ],

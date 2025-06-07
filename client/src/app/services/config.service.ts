@@ -3,8 +3,7 @@ import { UserService } from "./user.service";
 
 import {
   IndicatorResult,
-  IndicatorResultConfig,
-  TimeframeOption
+  IndicatorResultConfig
 } from "../pages/chart/chart.models";
 
 // chart.js
@@ -34,15 +33,10 @@ import {
 export class ChartConfigService {
 
   fontFamily = "'Google Sans', Roboto, Verdana, Helvetica, Arial, sans-serif";
-  private currentTimeframe: TimeframeOption | null = null;
 
   constructor(
     private readonly usr: UserService
   ) { }
-  
-  updateTimeframeConfiguration(timeframe: TimeframeOption) {
-    this.currentTimeframe = timeframe;
-  }
 
   baseOverlayConfig(volumeAxisSize: number): ChartConfiguration {
 
@@ -229,8 +223,8 @@ export class ChartConfigService {
 
   defaultXAxisOptions(): ScaleOptions {
     
-    // Determine time unit based on current timeframe
-    const timeUnit = this.currentTimeframe?.unit || 'day';
+    // Use default time unit for daily data
+    const timeUnit = 'day';
 
     const options: ScaleOptions = {
       alignToPixels: true,
