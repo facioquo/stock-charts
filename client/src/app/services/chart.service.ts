@@ -70,6 +70,7 @@ import {
 import { ApiService } from "./api.service";
 import { ChartConfigService } from "./config.service";
 import { UtilityService } from "./utility.service";
+import { WindowService } from "./window.service";
 
 @Injectable({
   providedIn: "root"
@@ -81,12 +82,25 @@ export class ChartService {
   chartOverlay: Chart;
   loading = true;
   extraBars = 7;
+  
+  // Window-based sizing properties
+  currentBarCount: number;
+  allQuotes: Quote[] = []; // Store full dataset for dynamic slicing
 
   constructor(
     private readonly api: ApiService,
     private readonly cfg: ChartConfigService,
-    private readonly util: UtilityService
-  ) { }
+    private readonly util: UtilityService,
+    private readonly window: WindowService
+  ) { 
+    // Calculate initial bar count
+    this.currentBarCount = this.window.calculateOptimalBars();
+    
+    // Subscribe to window resize events
+    this.window.getResizeObservable().subscribe(dimensions => {
+      this.onWindowResize(dimensions);
+    });
+  }
 
   //#region SELECT/DISPLAY OPERATIONS
   addSelection(
@@ -279,7 +293,8 @@ export class ChartService {
 
     // deep copy without the chart object
     const selections: IndicatorSelection[]
-      = this.selections.map(({ chart, ...rest }) => ({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      = this.selections.map(({ chart: _, ...rest }) => ({
         ...rest
       }));
 
@@ -525,13 +540,60 @@ export class ChartService {
   }
   //#endregion
 
+  //#region WINDOW AND TIMEFRAME OPERATIONS
+  
+  onWindowResize(dimensions: { width: number; height: number }) {
+    const newBarCount = this.window.calculateOptimalBars(dimensions.width);
+    
+    // Only update if bar count changed significantly and we have data
+    if (Math.abs(newBarCount - this.currentBarCount) > 10 && this.allQuotes.length > 0) {
+      this.currentBarCount = newBarCount;
+      this.updateChartsWithNewBarCount();
+    }
+  }
+  
+  private updateChartsWithNewBarCount() {
+    // Slice existing data to new bar count (keep newest data)
+    const quotes = this.allQuotes.slice(-this.currentBarCount);
+    
+    console.log(`Updating charts with ${this.currentBarCount} bars (dynamic resize)`);
+    
+    // Update main chart with new data slice
+    this.loadOverlayChart(quotes);
+    
+    // Update all indicator selections with new data slice
+    this.selections.forEach(selection => {
+      this.addSelectionWithoutScroll(selection);
+    });
+  }
+  
+  private reloadChartsWithNewBarCount() {
+    // Reload main chart with new bar count
+    this.loadCharts();
+    
+    // Reload all indicator selections
+    this.selections.forEach(selection => {
+      this.addSelectionWithoutScroll(selection);
+    });
+  }
+  
+  //#endregion
+
   //#region DATA OPERATIONS
   loadCharts() {
+
+    console.log(`Loading charts with ${this.currentBarCount} bars`);
 
     // get data and load charts
     this.api.getQuotes()
       .subscribe({
-        next: (quotes: Quote[]) => {
+        next: (allQuotes: Quote[]) => {
+          
+          // Store full dataset for dynamic slicing
+          this.allQuotes = allQuotes;
+          
+          // Slice array to desired length based on window size (keep newest data)
+          const quotes = allQuotes.slice(-this.currentBarCount);
 
           // load base overlay chart
           this.loadOverlayChart(quotes);
