@@ -540,7 +540,7 @@ export class ChartService {
   }
   //#endregion
 
-  //#region WINDOW AND TIMEFRAME OPERATIONS
+  //#region WINDOW OPERATIONS
   
   onWindowResize(dimensions: { width: number; height: number }) {
     const newBarCount = this.window.calculateOptimalBars(dimensions.width);
@@ -558,11 +558,17 @@ export class ChartService {
     
     console.log(`Updating charts with ${this.currentBarCount} bars (dynamic resize)`);
     
+    // Store current selections to preserve user choices
+    const currentSelections = [...this.selections];
+    
+    // Clear all selections to avoid duplicates
+    this.clearAllSelections();
+    
     // Update main chart with new data slice
     this.loadOverlayChart(quotes);
     
-    // Update all indicator selections with new data slice
-    this.selections.forEach(selection => {
+    // Restore all indicator selections with new data slice
+    currentSelections.forEach(selection => {
       this.addSelectionWithoutScroll(selection);
     });
   }
@@ -575,6 +581,31 @@ export class ChartService {
     this.selections.forEach(selection => {
       this.addSelectionWithoutScroll(selection);
     });
+  }
+  
+  private clearAllSelections() {
+    // Clear overlay chart datasets (keep only the base candlestick chart)
+    // Base chart is typically at index 0
+    if (this.chartOverlay && this.chartOverlay.data.datasets.length > 1) {
+      this.chartOverlay.data.datasets = [this.chartOverlay.data.datasets[0]];
+    }
+    
+    // Clear oscillator charts
+    const oscillatorsZone = document.getElementById("oscillators-zone");
+    if (oscillatorsZone) {
+      // Remove all oscillator chart containers
+      this.selections.forEach(selection => {
+        if (selection.chartType === "oscillator") {
+          const chartContainer = document.getElementById(`${selection.ucid}-container`);
+          if (chartContainer && chartContainer.parentNode === oscillatorsZone) {
+            oscillatorsZone.removeChild(chartContainer);
+          }
+        }
+      });
+    }
+    
+    // Clear selections array (will be repopulated)
+    this.selections = [];
   }
   
   //#endregion
