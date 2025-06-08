@@ -17,6 +17,26 @@ import {
   Tooltip
 } from "chart.js";
 
+// Type for indicator data returned from API
+interface IndicatorDataRow {
+  date: string | number | Date;
+  match?: number;
+  candle?: {
+    high: number;
+    low: number;
+    open: number;
+    close: number;
+  };
+  [key: string]: unknown; // Allow dynamic properties for different indicators
+}
+
+// Extended dataset interface for candlestick pattern datasets
+type ExtendedChartDataset = ChartDataset & {
+  pointRotation?: number[];
+  pointBackgroundColor?: string[];
+  pointBorderColor?: string[];
+}
+
 // extensions
 import {
   CandlestickController,
@@ -86,7 +106,7 @@ export class ChartService {
   // Window-based sizing properties
   currentBarCount: number;
   allQuotes: Quote[] = []; // Store full dataset for dynamic slicing
-  allSelectionData: Map<string, any[]> = new Map(); // Store full indicator datasets for dynamic slicing
+  allSelectionData: Map<string, IndicatorDataRow[]> = new Map(); // Store full indicator datasets for dynamic slicing
 
   constructor(
     private readonly api: ApiService,
@@ -658,7 +678,7 @@ export class ChartService {
         
         // Recreate data points from sliced data
         slicedData.forEach(row => {
-          let yValue = row[result.dataName];
+          let yValue = Number(row[result.dataName]);
           
           // Apply candle pointers (same logic as original)
           if (yValue && listing.category === "candlestick-pattern") {
@@ -666,19 +686,19 @@ export class ChartService {
             const green = "#2E7D32";
             const gray = "#9E9E9E";
             
-            switch (row["match"]) {
+            switch (row.match) {
               case -100:
-                yValue = 1.01 * row["candle"].high;
+                yValue = 1.01 * (row.candle?.high ?? 0);
                 pointColor.push(red);
                 pointRotation.push(180);
                 break;
               case 100:
-                yValue = 0.99 * row["candle"].low;
+                yValue = 0.99 * (row.candle?.low ?? 0);
                 pointColor.push(green);
                 pointRotation.push(0);
                 break;
               default:
-                yValue = 0.99 * row["candle"].low;
+                yValue = 0.99 * (row.candle?.low ?? 0);
                 pointColor.push(gray);
                 pointRotation.push(0);
                 break;
@@ -709,9 +729,9 @@ export class ChartService {
         
         // Update custom properties for candlestick patterns
         if (listing.category === "candlestick-pattern" && result.dataset.type !== "bar") {
-          (result.dataset as any).pointRotation = pointRotation;
-          (result.dataset as any).pointBackgroundColor = pointColor;
-          (result.dataset as any).pointBorderColor = pointColor;
+          (result.dataset as ExtendedChartDataset).pointRotation = pointRotation;
+          (result.dataset as ExtendedChartDataset).pointBackgroundColor = pointColor;
+          (result.dataset as ExtendedChartDataset).pointBorderColor = pointColor;
         }
       });
       
