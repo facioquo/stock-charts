@@ -34,7 +34,7 @@ jobs:
   build-backend:
     name: Build backend
     runs-on: ubuntu-latest
-    needs: 
+    needs:
       - versioning
     env:
       url: https://charts.stockindicators.dev
@@ -144,14 +144,14 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    needs: 
+    needs:
       - versioning
       - build-backend
       - build-website
 
     environment:
       name: charts.stockindicators.dev
-      url: "https://charts.stockindicators.dev"
+      url: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
 
     steps:
       - name: Download Functions package
@@ -191,11 +191,15 @@ jobs:
           publish-profile: ${{ secrets.PUBLISH_PROFILE_API }}
 
       - name: Publish to Cloudflare Pages
+        id: deploy
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_KEY }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy artifacts/web --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
+          wranglerVersion: "latest"
+          command: >
+            pages deploy artifacts/web
+            --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
 
       - name: Tag and draft release note
         uses: ncipollo/release-action@v1
