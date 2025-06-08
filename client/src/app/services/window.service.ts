@@ -37,7 +37,7 @@ export class WindowService {
    */
   getResizeObservable(): Observable<{ width: number; height: number }> {
     return this.resizeSubject.pipe(
-      debounceTime(300), // 300ms delay to avoid race conditions
+      debounceTime(150), // 150ms delay for responsive UX while avoiding excess recalculations
       distinctUntilChanged((prev, curr) => 
         prev.width === curr.width && prev.height === curr.height
       )
