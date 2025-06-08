@@ -86,6 +86,7 @@ export class ChartService {
   // Window-based sizing properties
   currentBarCount: number;
   allQuotes: Quote[] = []; // Store full dataset for dynamic slicing
+  allSelectionData: Map<string, any[]> = new Map(); // Store full indicator datasets for dynamic slicing
 
   constructor(
     private readonly api: ApiService,
@@ -124,6 +125,9 @@ export class ChartService {
 
           // compose datasets
           next: (data: any[]) => {
+
+            // Store full indicator data for dynamic slicing
+            this.allSelectionData.set(selection.ucid, data);
 
             // compose datasets
             // parse each dataset
@@ -476,6 +480,9 @@ export class ChartService {
       this.selections.splice(sx, 1);
     }
 
+    // Clean up stored indicator data
+    this.allSelectionData.delete(ucid);
+
     if (selection.chartType === "overlay") {
 
       selection.results.forEach((result: IndicatorResult) => {
@@ -553,61 +560,173 @@ export class ChartService {
   }
   
   private updateChartsWithNewBarCount() {
-    // Slice existing data to new bar count (keep newest data)
-    const quotes = this.allQuotes.slice(-this.currentBarCount);
-    
     console.log(`Updating charts with ${this.currentBarCount} bars (dynamic resize)`);
     
-    // Store current selections to preserve user choices
-    const currentSelections = [...this.selections];
-    
-    // Clear all selections to avoid duplicates
-    this.clearAllSelections();
+    // Slice existing quotes data to new bar count (keep newest data)
+    const quotes = this.allQuotes.slice(-this.currentBarCount);
     
     // Update main chart with new data slice
-    this.loadOverlayChart(quotes);
+    this.updateOverlayChartWithSlicedData(quotes);
     
-    // Restore all indicator selections with new data slice
-    currentSelections.forEach(selection => {
-      this.addSelectionWithoutScroll(selection);
-    });
+    // Update all indicator datasets with sliced data
+    this.updateIndicatorDatasetsWithSlicedData();
   }
   
-  private reloadChartsWithNewBarCount() {
-    // Reload main chart with new bar count
-    this.loadCharts();
+  private updateOverlayChartWithSlicedData(quotes: Quote[]) {
+    if (!this.chartOverlay) return;
     
-    // Reload all indicator selections
-    this.selections.forEach(selection => {
-      this.addSelectionWithoutScroll(selection);
-    });
-  }
-  
-  private clearAllSelections() {
-    // Clear overlay chart datasets (keep only the base candlestick chart)
-    // Base chart is typically at index 0
-    if (this.chartOverlay && this.chartOverlay.data.datasets.length > 1) {
-      this.chartOverlay.data.datasets = [this.chartOverlay.data.datasets[0]];
+    // Update price data (candlestick dataset - typically index 0)
+    const priceDataset = this.chartOverlay.data.datasets[0];
+    if (priceDataset && priceDataset.type === 'candlestick') {
+      const price: FinancialDataPoint[] = [];
+      quotes.forEach((q: Quote) => {
+        price.push({
+          x: new Date(q.date).valueOf(),
+          o: q.open,
+          h: q.high,
+          l: q.low,
+          c: q.close
+        });
+      });
+      
+      // Add extra bars
+      const nextDate = new Date(Math.max(...quotes.map(h => new Date(h.date).getTime())));
+      for (let i = 1; i < this.extraBars; i++) {
+        nextDate.setDate(nextDate.getDate() + 1);
+        // Price dataset doesn't get extra bars (gaps covered by volume)
+      }
+      
+      priceDataset.data = price;
     }
     
-    // Clear oscillator charts
-    const oscillatorsZone = document.getElementById("oscillators-zone");
-    if (oscillatorsZone) {
-      // Remove all oscillator chart containers
-      this.selections.forEach(selection => {
-        if (selection.chartType === "oscillator") {
-          const chartContainer = document.getElementById(`${selection.ucid}-container`);
-          if (chartContainer && chartContainer.parentNode === oscillatorsZone) {
-            oscillatorsZone.removeChild(chartContainer);
+    // Update volume data (bar dataset - typically index 1)
+    const volumeDataset = this.chartOverlay.data.datasets[1];
+    if (volumeDataset && volumeDataset.type === 'bar') {
+      const volume: ScatterDataPoint[] = [];
+      const barColor: string[] = [];
+      
+      quotes.forEach((q: Quote) => {
+        volume.push({
+          x: new Date(q.date).valueOf(),
+          y: q.volume
+        });
+        
+        const c = (q.close >= q.open) ? "#1B5E2060" : "#B71C1C60";
+        barColor.push(c);
+      });
+      
+      // Add extra bars
+      const nextDate = new Date(Math.max(...quotes.map(h => new Date(h.date).getTime())));
+      for (let i = 1; i < this.extraBars; i++) {
+        nextDate.setDate(nextDate.getDate() + 1);
+        volume.push({
+          x: new Date(nextDate).valueOf(),
+          y: null
+        });
+      }
+      
+      volumeDataset.data = volume;
+      volumeDataset.backgroundColor = barColor;
+    }
+    
+    // Update overlay chart
+    this.chartOverlay.update("none");
+  }
+  
+  private updateIndicatorDatasetsWithSlicedData() {
+    // Update each selection's datasets with sliced data
+    this.selections.forEach(selection => {
+      const fullData = this.allSelectionData.get(selection.ucid);
+      if (!fullData) return;
+      
+      // Slice the indicator data to match current bar count
+      const slicedData = fullData.slice(-this.currentBarCount);
+      
+      // Update each result dataset for this selection
+      selection.results.forEach((result: IndicatorResult) => {
+        if (!result.dataset) return;
+        
+        const listing = this.listings.find(x => x.uiid === selection.uiid);
+        if (!listing) return;
+        
+        const resultConfig = listing.results.find(x => x.dataName === result.dataName);
+        if (!resultConfig) return;
+        
+        const dataPoints: ScatterDataPoint[] = [];
+        const pointColor: string[] = [];
+        const pointRotation: number[] = [];
+        
+        // Recreate data points from sliced data
+        slicedData.forEach(row => {
+          let yValue = row[result.dataName];
+          
+          // Apply candle pointers (same logic as original)
+          if (yValue && listing.category === "candlestick-pattern") {
+            const red = "#DD2C00";
+            const green = "#2E7D32";
+            const gray = "#9E9E9E";
+            
+            switch (row["match"]) {
+              case -100:
+                yValue = 1.01 * row["candle"].high;
+                pointColor.push(red);
+                pointRotation.push(180);
+                break;
+              case 100:
+                yValue = 0.99 * row["candle"].low;
+                pointColor.push(green);
+                pointRotation.push(0);
+                break;
+              default:
+                yValue = 0.99 * row["candle"].low;
+                pointColor.push(gray);
+                pointRotation.push(0);
+                break;
+            }
+          } else {
+            pointColor.push(resultConfig.defaultColor);
+            pointRotation.push(0);
           }
+          
+          dataPoints.push({
+            x: new Date(row.date).valueOf(),
+            y: yValue
+          });
+        });
+        
+        // Add extra bars
+        const nextDate = new Date(Math.max(...dataPoints.map(h => new Date(h.x).getTime())));
+        for (let i = 1; i < this.extraBars; i++) {
+          nextDate.setDate(nextDate.getDate() + 1);
+          dataPoints.push({
+            x: new Date(nextDate).valueOf(),
+            y: null
+          });
+        }
+        
+        // Update dataset with sliced data
+        result.dataset.data = dataPoints;
+        
+        // Update custom properties for candlestick patterns
+        if (listing.category === "candlestick-pattern" && result.dataset.type !== "bar") {
+          (result.dataset as any).pointRotation = pointRotation;
+          (result.dataset as any).pointBackgroundColor = pointColor;
+          (result.dataset as any).pointBorderColor = pointColor;
         }
       });
-    }
+      
+      // Update the chart if it's an oscillator
+      if (selection.chartType === "oscillator" && selection.chart) {
+        selection.chart.update("none");
+      }
+    });
     
-    // Clear selections array (will be repopulated)
-    this.selections = [];
+    // Update overlay chart legends and final update
+    if (this.chartOverlay) {
+      this.addOverlayLegend();
+      this.chartOverlay.update("none");
+    }
   }
-  
   //#endregion
 
   //#region DATA OPERATIONS
