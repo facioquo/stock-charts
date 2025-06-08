@@ -17,19 +17,6 @@ import {
   Tooltip
 } from "chart.js";
 
-// Type for indicator data returned from API
-interface IndicatorDataRow {
-  date: string | number | Date;
-  match?: number;
-  candle?: {
-    high: number;
-    low: number;
-    open: number;
-    close: number;
-  };
-  [key: string]: unknown; // Allow dynamic properties for different indicators
-}
-
 // Extended dataset interface for candlestick pattern datasets
 type ExtendedChartDataset = ChartDataset & {
   pointRotation?: number[];
@@ -225,9 +212,9 @@ export class ChartService {
             // replace tokens with values
             selection = this.selectionTokenReplacement(selection);
 
-            // Store processed datasets for efficient resizing
+            // Store processed datasets for efficient resizing (deep copy to avoid reference issues)
             this.allProcessedDatasets.set(selection.ucid, 
-              selection.results.map(result => ({ ...result.dataset }))
+              selection.results.map(result => JSON.parse(JSON.stringify(result.dataset)))
             );
 
             // add to chart
@@ -629,6 +616,10 @@ export class ChartService {
   }
   
   private updateIndicatorDatasetsWithSlicedData() {
+    // Use consistent slicing based on allQuotes length for all datasets
+    const totalQuotes = this.allQuotes.length;
+    const startIndex = Math.max(0, totalQuotes - this.currentBarCount);
+    
     // Update each selection's datasets by slicing the processed Chart.js datasets
     this.selections.forEach(selection => {
       const fullDatasets = this.allProcessedDatasets.get(selection.ucid);
@@ -641,12 +632,7 @@ export class ChartService {
         const fullDataset = fullDatasets[resultIndex];
         if (!fullDataset.data || !Array.isArray(fullDataset.data)) return;
         
-        // Slice the dataset data to match current bar count
-        // Keep the newest data (most recent bars)
-        const totalPoints = fullDataset.data.length - this.extraBars; // Exclude extra bars from count
-        const startIndex = Math.max(0, totalPoints - this.currentBarCount);
-        
-        // Slice the data array directly
+        // Slice the dataset data using the same logic as main overlay chart
         result.dataset.data = fullDataset.data.slice(startIndex);
         
         // Also slice any array properties like pointRotation, pointBackgroundColor, etc.
@@ -826,8 +812,8 @@ export class ChartService {
     // add chart data
     chartConfig.data = chartData;
 
-    // Store the complete overlay chart datasets for efficient resizing
-    this.allProcessedDatasets.set('overlay-main', [...chartData.datasets]);
+    // Store the complete overlay chart datasets for efficient resizing (deep copy)
+    this.allProcessedDatasets.set('overlay-main', JSON.parse(JSON.stringify(chartData.datasets)));
 
     // compose chart
     if (this.chartOverlay) this.chartOverlay.destroy();
