@@ -105,8 +105,8 @@ export class ChartService {
   
   // Window-based sizing properties
   currentBarCount: number;
-  allQuotes: Quote[] = []; // Store full dataset for dynamic slicing
-  allSelectionData: Map<string, IndicatorDataRow[]> = new Map(); // Store full indicator datasets for dynamic slicing
+  allQuotes: Quote[] = []; // Store full quotes dataset for dynamic slicing
+  allProcessedDatasets: Map<string, ChartDataset[]> = new Map(); // Store processed Chart.js datasets for efficient slicing
 
   constructor(
     private readonly api: ApiService,
@@ -145,9 +145,6 @@ export class ChartService {
 
           // compose datasets
           next: (data: any[]) => {
-
-            // Store full indicator data for dynamic slicing
-            this.allSelectionData.set(selection.ucid, data);
 
             // compose datasets
             // parse each dataset
@@ -227,6 +224,11 @@ export class ChartService {
 
             // replace tokens with values
             selection = this.selectionTokenReplacement(selection);
+
+            // Store processed datasets for efficient resizing
+            this.allProcessedDatasets.set(selection.ucid, 
+              selection.results.map(result => ({ ...result.dataset }))
+            );
 
             // add to chart
             this.displaySelection(selection, listing, scrollToMe);
@@ -500,8 +502,8 @@ export class ChartService {
       this.selections.splice(sx, 1);
     }
 
-    // Clean up stored indicator data
-    this.allSelectionData.delete(ucid);
+    // Clean up stored processed datasets
+    this.allProcessedDatasets.delete(ucid);
 
     if (selection.chartType === "overlay") {
 
@@ -582,71 +584,44 @@ export class ChartService {
   private updateChartsWithNewBarCount() {
     console.log(`Updating charts with ${this.currentBarCount} bars (dynamic resize)`);
     
-    // Slice existing quotes data to new bar count (keep newest data)
-    const quotes = this.allQuotes.slice(-this.currentBarCount);
-    
-    // Update main chart with new data slice
-    this.updateOverlayChartWithSlicedData(quotes);
+    // Update main overlay chart datasets with new bar count
+    this.updateOverlayChartWithSlicedData();
     
     // Update all indicator datasets with sliced data
     this.updateIndicatorDatasetsWithSlicedData();
   }
   
-  private updateOverlayChartWithSlicedData(quotes: Quote[]) {
+  private updateOverlayChartWithSlicedData() {
     if (!this.chartOverlay) return;
     
-    // Update price data (candlestick dataset - typically index 0)
-    const priceDataset = this.chartOverlay.data.datasets[0];
-    if (priceDataset && priceDataset.type === 'candlestick') {
-      const price: FinancialDataPoint[] = [];
-      quotes.forEach((q: Quote) => {
-        price.push({
-          x: new Date(q.date).valueOf(),
-          o: q.open,
-          h: q.high,
-          l: q.low,
-          c: q.close
-        });
-      });
-      
-      // Add extra bars
-      const nextDate = new Date(Math.max(...quotes.map(h => new Date(h.date).getTime())));
-      for (let i = 1; i < this.extraBars; i++) {
-        nextDate.setDate(nextDate.getDate() + 1);
-        // Price dataset doesn't get extra bars (gaps covered by volume)
-      }
-      
-      priceDataset.data = price;
+    const fullMainDatasets = this.allProcessedDatasets.get('overlay-main');
+    if (!fullMainDatasets) return;
+    
+    // Calculate slice indices for consistent x-axis across all datasets
+    const totalQuotes = this.allQuotes.length;
+    const startIndex = Math.max(0, totalQuotes - this.currentBarCount);
+    
+    // Update price dataset (candlestick dataset - typically index 0)
+    const fullPriceDataset = fullMainDatasets[0];
+    const currentPriceDataset = this.chartOverlay.data.datasets[0];
+    if (fullPriceDataset && currentPriceDataset && fullPriceDataset.type === 'candlestick') {
+      // Slice the price data to match current bar count, plus extra bars
+      const slicedPriceData = fullPriceDataset.data.slice(startIndex);
+      currentPriceDataset.data = slicedPriceData;
     }
     
-    // Update volume data (bar dataset - typically index 1)
-    const volumeDataset = this.chartOverlay.data.datasets[1];
-    if (volumeDataset && volumeDataset.type === 'bar') {
-      const volume: ScatterDataPoint[] = [];
-      const barColor: string[] = [];
+    // Update volume dataset (bar dataset - typically index 1)
+    const fullVolumeDataset = fullMainDatasets[1];
+    const currentVolumeDataset = this.chartOverlay.data.datasets[1];
+    if (fullVolumeDataset && currentVolumeDataset && fullVolumeDataset.type === 'bar') {
+      // Slice the volume data and background colors to match current bar count
+      const slicedVolumeData = fullVolumeDataset.data.slice(startIndex);
+      currentVolumeDataset.data = slicedVolumeData;
       
-      quotes.forEach((q: Quote) => {
-        volume.push({
-          x: new Date(q.date).valueOf(),
-          y: q.volume
-        });
-        
-        const c = (q.close >= q.open) ? "#1B5E2060" : "#B71C1C60";
-        barColor.push(c);
-      });
-      
-      // Add extra bars
-      const nextDate = new Date(Math.max(...quotes.map(h => new Date(h.date).getTime())));
-      for (let i = 1; i < this.extraBars; i++) {
-        nextDate.setDate(nextDate.getDate() + 1);
-        volume.push({
-          x: new Date(nextDate).valueOf(),
-          y: null
-        });
+      // Also slice the background colors array
+      if (fullVolumeDataset.backgroundColor && Array.isArray(fullVolumeDataset.backgroundColor)) {
+        currentVolumeDataset.backgroundColor = fullVolumeDataset.backgroundColor.slice(startIndex);
       }
-      
-      volumeDataset.data = volume;
-      volumeDataset.backgroundColor = barColor;
     }
     
     // Update overlay chart
@@ -654,84 +629,45 @@ export class ChartService {
   }
   
   private updateIndicatorDatasetsWithSlicedData() {
-    // Update each selection's datasets with sliced data
+    // Update each selection's datasets by slicing the processed Chart.js datasets
     this.selections.forEach(selection => {
-      const fullData = this.allSelectionData.get(selection.ucid);
-      if (!fullData) return;
-      
-      // Slice the indicator data to match current bar count
-      const slicedData = fullData.slice(-this.currentBarCount);
+      const fullDatasets = this.allProcessedDatasets.get(selection.ucid);
+      if (!fullDatasets) return;
       
       // Update each result dataset for this selection
-      selection.results.forEach((result: IndicatorResult) => {
-        if (!result.dataset) return;
+      selection.results.forEach((result: IndicatorResult, resultIndex: number) => {
+        if (!result.dataset || !fullDatasets[resultIndex]) return;
         
-        const listing = this.listings.find(x => x.uiid === selection.uiid);
-        if (!listing) return;
+        const fullDataset = fullDatasets[resultIndex];
+        if (!fullDataset.data || !Array.isArray(fullDataset.data)) return;
         
-        const resultConfig = listing.results.find(x => x.dataName === result.dataName);
-        if (!resultConfig) return;
+        // Slice the dataset data to match current bar count
+        // Keep the newest data (most recent bars)
+        const totalPoints = fullDataset.data.length - this.extraBars; // Exclude extra bars from count
+        const startIndex = Math.max(0, totalPoints - this.currentBarCount);
         
-        const dataPoints: ScatterDataPoint[] = [];
-        const pointColor: string[] = [];
-        const pointRotation: number[] = [];
+        // Slice the data array directly
+        result.dataset.data = fullDataset.data.slice(startIndex);
         
-        // Recreate data points from sliced data
-        slicedData.forEach(row => {
-          let yValue = Number(row[result.dataName]);
-          
-          // Apply candle pointers (same logic as original)
-          if (yValue && listing.category === "candlestick-pattern") {
-            const red = "#DD2C00";
-            const green = "#2E7D32";
-            const gray = "#9E9E9E";
-            
-            switch (row.match) {
-              case -100:
-                yValue = 1.01 * (row.candle?.high ?? 0);
-                pointColor.push(red);
-                pointRotation.push(180);
-                break;
-              case 100:
-                yValue = 0.99 * (row.candle?.low ?? 0);
-                pointColor.push(green);
-                pointRotation.push(0);
-                break;
-              default:
-                yValue = 0.99 * (row.candle?.low ?? 0);
-                pointColor.push(gray);
-                pointRotation.push(0);
-                break;
-            }
-          } else {
-            pointColor.push(resultConfig.defaultColor);
-            pointRotation.push(0);
-          }
-          
-          dataPoints.push({
-            x: new Date(row.date).valueOf(),
-            y: yValue
-          });
-        });
+        // Also slice any array properties like pointRotation, pointBackgroundColor, etc.
+        const extendedDataset = fullDataset as ExtendedChartDataset;
+        const resultExtended = result.dataset as ExtendedChartDataset;
         
-        // Add extra bars
-        const nextDate = new Date(Math.max(...dataPoints.map(h => new Date(h.x).getTime())));
-        for (let i = 1; i < this.extraBars; i++) {
-          nextDate.setDate(nextDate.getDate() + 1);
-          dataPoints.push({
-            x: new Date(nextDate).valueOf(),
-            y: null
-          });
+        if (extendedDataset.pointRotation && Array.isArray(extendedDataset.pointRotation)) {
+          resultExtended.pointRotation = extendedDataset.pointRotation.slice(startIndex);
         }
         
-        // Update dataset with sliced data
-        result.dataset.data = dataPoints;
+        if (extendedDataset.pointBackgroundColor && Array.isArray(extendedDataset.pointBackgroundColor)) {
+          resultExtended.pointBackgroundColor = (extendedDataset.pointBackgroundColor as string[]).slice(startIndex);
+        }
         
-        // Update custom properties for candlestick patterns
-        if (listing.category === "candlestick-pattern" && result.dataset.type !== "bar") {
-          (result.dataset as ExtendedChartDataset).pointRotation = pointRotation;
-          (result.dataset as ExtendedChartDataset).pointBackgroundColor = pointColor;
-          (result.dataset as ExtendedChartDataset).pointBorderColor = pointColor;
+        if (extendedDataset.pointBorderColor && Array.isArray(extendedDataset.pointBorderColor)) {
+          resultExtended.pointBorderColor = (extendedDataset.pointBorderColor as string[]).slice(startIndex);
+        }
+        
+        // Handle backgroundColor for bar charts (like volume)
+        if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
+          result.dataset.backgroundColor = fullDataset.backgroundColor.slice(startIndex);
         }
       });
       
@@ -889,6 +825,9 @@ export class ChartService {
 
     // add chart data
     chartConfig.data = chartData;
+
+    // Store the complete overlay chart datasets for efficient resizing
+    this.allProcessedDatasets.set('overlay-main', [...chartData.datasets]);
 
     // compose chart
     if (this.chartOverlay) this.chartOverlay.destroy();
