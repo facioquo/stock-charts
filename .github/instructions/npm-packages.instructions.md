@@ -6,12 +6,12 @@ description: "Guidelines for managing NPM packages"
 - always update packages to their latest compatible versions
 - do not use `^` or `~`
 - start with Angular package updates, use `ng update` CLI because it correctly migrates code
-- use `ncu -u --peer` CLI to determine the latest version of packages
+- use `ncu --peer` CLI to determine the latest version of packages
 - ALWAYS understand and resolve all `npm warn` messages and `npm audit` issues
 
 **Important information and examples**:
 
-We an _npm monorepo using workspaces_ so commands like `npm install` are done at the root of the repository; however, package version updates should be evaluated for all hierarchical subfolder `packages.json` files.
+- use the highest version of Jest compatible with Angular, which may not be the latest Jest package
 
 ```bash
 # from root of repository
