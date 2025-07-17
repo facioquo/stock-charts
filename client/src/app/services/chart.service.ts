@@ -17,6 +17,13 @@ import {
   Tooltip
 } from "chart.js";
 
+// Extended dataset interface for candlestick pattern datasets
+type ExtendedChartDataset = ChartDataset & {
+  pointRotation?: number[];
+  pointBackgroundColor?: string[];
+  pointBorderColor?: string[];
+}
+
 // extensions
 import {
   CandlestickController,
@@ -70,6 +77,7 @@ import {
 import { ApiService } from "./api.service";
 import { ChartConfigService } from "./config.service";
 import { UtilityService } from "./utility.service";
+import { WindowService } from "./window.service";
 
 @Injectable({
   providedIn: "root"
@@ -81,12 +89,26 @@ export class ChartService {
   chartOverlay: Chart;
   loading = true;
   extraBars = 7;
+  
+  // Window-based sizing properties
+  currentBarCount: number;
+  allQuotes: Quote[] = []; // Store full quotes dataset for dynamic slicing
+  allProcessedDatasets: Map<string, ChartDataset[]> = new Map(); // Store processed Chart.js datasets for efficient slicing
 
   constructor(
     private readonly api: ApiService,
     private readonly cfg: ChartConfigService,
-    private readonly util: UtilityService
-  ) { }
+    private readonly util: UtilityService,
+    private readonly window: WindowService
+  ) { 
+    // Calculate initial bar count
+    this.currentBarCount = this.window.calculateOptimalBars();
+    
+    // Subscribe to window resize events
+    this.window.getResizeObservable().subscribe(dimensions => {
+      this.onWindowResize(dimensions);
+    });
+  }
 
   //#region SELECT/DISPLAY OPERATIONS
   addSelection(
@@ -190,6 +212,11 @@ export class ChartService {
             // replace tokens with values
             selection = this.selectionTokenReplacement(selection);
 
+            // Store processed datasets for efficient resizing (deep copy to avoid reference issues)
+            this.allProcessedDatasets.set(selection.ucid, 
+              selection.results.map(result => JSON.parse(JSON.stringify(result.dataset)))
+            );
+
             // add to chart
             this.displaySelection(selection, listing, scrollToMe);
 
@@ -279,7 +306,8 @@ export class ChartService {
 
     // deep copy without the chart object
     const selections: IndicatorSelection[]
-      = this.selections.map(({ chart, ...rest }) => ({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      = this.selections.map(({ chart: _, ...rest }) => ({
         ...rest
       }));
 
@@ -461,6 +489,9 @@ export class ChartService {
       this.selections.splice(sx, 1);
     }
 
+    // Clean up stored processed datasets
+    this.allProcessedDatasets.delete(ucid);
+
     if (selection.chartType === "overlay") {
 
       selection.results.forEach((result: IndicatorResult) => {
@@ -525,13 +556,136 @@ export class ChartService {
   }
   //#endregion
 
+  //#region WINDOW OPERATIONS
+  
+  onWindowResize(dimensions: { width: number; height: number }) {
+    const newBarCount = this.window.calculateOptimalBars(dimensions.width);
+    
+    // Only update if bar count changed significantly and we have data
+    if (Math.abs(newBarCount - this.currentBarCount) > 10 && this.allQuotes.length > 0) {
+      this.currentBarCount = newBarCount;
+      this.updateChartsWithNewBarCount();
+    }
+  }
+  
+  private updateChartsWithNewBarCount() {
+    console.log(`Updating charts with ${this.currentBarCount} bars (dynamic resize)`);
+    
+    // Update main overlay chart datasets with new bar count
+    this.updateOverlayChartWithSlicedData();
+    
+    // Update all indicator datasets with sliced data
+    this.updateIndicatorDatasetsWithSlicedData();
+  }
+  
+  private updateOverlayChartWithSlicedData() {
+    if (!this.chartOverlay) return;
+    
+    const fullMainDatasets = this.allProcessedDatasets.get('overlay-main');
+    if (!fullMainDatasets) return;
+    
+    // Calculate slice indices for consistent x-axis across all datasets
+    const totalQuotes = this.allQuotes.length;
+    const startIndex = Math.max(0, totalQuotes - this.currentBarCount);
+    
+    // Update price dataset (candlestick dataset - typically index 0)
+    const fullPriceDataset = fullMainDatasets[0];
+    const currentPriceDataset = this.chartOverlay.data.datasets[0];
+    if (fullPriceDataset && currentPriceDataset && fullPriceDataset.type === 'candlestick') {
+      // Slice the price data to match current bar count, plus extra bars
+      const slicedPriceData = fullPriceDataset.data.slice(startIndex);
+      currentPriceDataset.data = slicedPriceData;
+    }
+    
+    // Update volume dataset (bar dataset - typically index 1)
+    const fullVolumeDataset = fullMainDatasets[1];
+    const currentVolumeDataset = this.chartOverlay.data.datasets[1];
+    if (fullVolumeDataset && currentVolumeDataset && fullVolumeDataset.type === 'bar') {
+      // Slice the volume data and background colors to match current bar count
+      const slicedVolumeData = fullVolumeDataset.data.slice(startIndex);
+      currentVolumeDataset.data = slicedVolumeData;
+      
+      // Also slice the background colors array
+      if (fullVolumeDataset.backgroundColor && Array.isArray(fullVolumeDataset.backgroundColor)) {
+        currentVolumeDataset.backgroundColor = fullVolumeDataset.backgroundColor.slice(startIndex);
+      }
+    }
+    
+    // Update overlay chart
+    this.chartOverlay.update("none");
+  }
+  
+  private updateIndicatorDatasetsWithSlicedData() {
+    // Use consistent slicing based on allQuotes length for all datasets
+    const totalQuotes = this.allQuotes.length;
+    const startIndex = Math.max(0, totalQuotes - this.currentBarCount);
+    
+    // Update each selection's datasets by slicing the processed Chart.js datasets
+    this.selections.forEach(selection => {
+      const fullDatasets = this.allProcessedDatasets.get(selection.ucid);
+      if (!fullDatasets) return;
+      
+      // Update each result dataset for this selection
+      selection.results.forEach((result: IndicatorResult, resultIndex: number) => {
+        if (!result.dataset || !fullDatasets[resultIndex]) return;
+        
+        const fullDataset = fullDatasets[resultIndex];
+        if (!fullDataset.data || !Array.isArray(fullDataset.data)) return;
+        
+        // Slice the dataset data using the same logic as main overlay chart
+        result.dataset.data = fullDataset.data.slice(startIndex);
+        
+        // Also slice any array properties like pointRotation, pointBackgroundColor, etc.
+        const extendedDataset = fullDataset as ExtendedChartDataset;
+        const resultExtended = result.dataset as ExtendedChartDataset;
+        
+        if (extendedDataset.pointRotation && Array.isArray(extendedDataset.pointRotation)) {
+          resultExtended.pointRotation = extendedDataset.pointRotation.slice(startIndex);
+        }
+        
+        if (extendedDataset.pointBackgroundColor && Array.isArray(extendedDataset.pointBackgroundColor)) {
+          resultExtended.pointBackgroundColor = (extendedDataset.pointBackgroundColor as string[]).slice(startIndex);
+        }
+        
+        if (extendedDataset.pointBorderColor && Array.isArray(extendedDataset.pointBorderColor)) {
+          resultExtended.pointBorderColor = (extendedDataset.pointBorderColor as string[]).slice(startIndex);
+        }
+        
+        // Handle backgroundColor for bar charts (like volume)
+        if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
+          result.dataset.backgroundColor = fullDataset.backgroundColor.slice(startIndex);
+        }
+      });
+      
+      // Update the chart if it's an oscillator
+      if (selection.chartType === "oscillator" && selection.chart) {
+        selection.chart.update("none");
+      }
+    });
+    
+    // Update overlay chart legends and final update
+    if (this.chartOverlay) {
+      this.addOverlayLegend();
+      this.chartOverlay.update("none");
+    }
+  }
+  //#endregion
+
   //#region DATA OPERATIONS
   loadCharts() {
+
+    console.log(`Loading charts with ${this.currentBarCount} bars`);
 
     // get data and load charts
     this.api.getQuotes()
       .subscribe({
-        next: (quotes: Quote[]) => {
+        next: (allQuotes: Quote[]) => {
+          
+          // Store full dataset for dynamic slicing
+          this.allQuotes = allQuotes;
+          
+          // Slice array to desired length based on window size (keep newest data)
+          const quotes = allQuotes.slice(-this.currentBarCount);
 
           // load base overlay chart
           this.loadOverlayChart(quotes);
@@ -657,6 +811,9 @@ export class ChartService {
 
     // add chart data
     chartConfig.data = chartData;
+
+    // Store the complete overlay chart datasets for efficient resizing (deep copy)
+    this.allProcessedDatasets.set('overlay-main', JSON.parse(JSON.stringify(chartData.datasets)));
 
     // compose chart
     if (this.chartOverlay) this.chartOverlay.destroy();
