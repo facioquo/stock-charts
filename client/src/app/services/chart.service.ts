@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
 import { Observable } from "rxjs/internal/Observable";
 
@@ -75,18 +75,16 @@ import { UtilityService } from "./utility.service";
   providedIn: "root"
 })
 export class ChartService {
+  private readonly api = inject(ApiService);
+  private readonly cfg = inject(ChartConfigService);
+  private readonly util = inject(UtilityService);
+
 
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
   chartOverlay: Chart;
   loading = true;
   extraBars = 7;
-
-  constructor(
-    private readonly api: ApiService,
-    private readonly cfg: ChartConfigService,
-    private readonly util: UtilityService
-  ) { }
 
   //#region SELECT/DISPLAY OPERATIONS
   addSelection(

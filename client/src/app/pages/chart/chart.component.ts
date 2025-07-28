@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 
 import { ChartService } from "../../services/chart.service";
@@ -11,11 +11,11 @@ import { SettingsComponent } from "../../components/picker/settings.component";
     standalone: false
 })
 export class ChartComponent {
+  readonly cht = inject(ChartService);
+  private readonly settingsDialog = inject(MatDialog);
 
-  constructor(
-    public readonly cht: ChartService,
-    private readonly settingsDialog: MatDialog
-  ) {
+
+  constructor() {
     this.cht.loadCharts();
   }
 

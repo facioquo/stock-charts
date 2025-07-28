@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 
 import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatDialog } from "@angular/material/dialog";
@@ -18,16 +18,16 @@ import { PickConfigComponent } from "./pick-config.component";
     standalone: false
 })
 export class SettingsComponent {
+  private listRef = inject(MatDialog);
+  private picker = inject(MatDialog);
+  cht = inject(ChartService);
+  usr = inject(UserService);
+
 
   listings: IndicatorListing[];
   selections: IndicatorSelection[];
 
-  constructor(
-    private listRef: MatDialog,
-    private picker: MatDialog,
-    public cht: ChartService,
-    public usr: UserService
-  ) {
+  constructor() {
     this.listings = this.cht.listings;
   }
 

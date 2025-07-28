@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { UtilityService } from "../../services/utility.service";
 
 @Component({
@@ -8,10 +8,10 @@ import { UtilityService } from "../../services/utility.service";
     standalone: false
 })
 export class PageNotFoundComponent {
+  private readonly util = inject(UtilityService);
 
-  constructor(
-    private readonly util: UtilityService
-  ) {
+
+  constructor() {
 
     const description = "This is not a page.  Try again.";
 

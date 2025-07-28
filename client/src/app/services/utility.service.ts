@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { Meta, MetaDefinition, Title } from "@angular/platform-browser";
 import { v4 as Guid } from "uuid";
 
@@ -6,11 +6,9 @@ import { v4 as Guid } from "uuid";
   providedIn: "root"
 })
 export class UtilityService {
+  private meta = inject(Meta);
+  private title = inject(Title);
 
-  constructor(
-    private meta: Meta,
-    private title: Title
-  ) { }
 
   // META
   pushMetaTags(tags: MetaDefinition[]): void {

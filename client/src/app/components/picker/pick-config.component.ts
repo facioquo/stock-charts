@@ -1,4 +1,4 @@
-import { Component, Inject } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
@@ -33,6 +33,10 @@ interface LineType {
     standalone: false
 })
 export class PickConfigComponent {
+  listing = inject<IndicatorListing>(MAT_DIALOG_DATA);
+  private dialogRef = inject<MatDialogRef<PickConfigComponent>>(MatDialogRef);
+  private cht = inject(ChartService);
+
 
   // Uses the MtxColorpicker component to allow users to select a color.
   // ref: https://ng-matero.github.io/extensions/components/colorpicker
@@ -84,12 +88,9 @@ export class PickConfigComponent {
     { name: "none", value: "none", userWidth: false }
   ];
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA)
-    public listing: IndicatorListing,
-    private dialogRef: MatDialogRef<PickConfigComponent>,
-    private cht: ChartService
-  ) {
+  constructor() {
+    const listing = this.listing;
+
 
     // pre-populate selection
     this.selection = this.cht.defaultSelection(listing.uiid);

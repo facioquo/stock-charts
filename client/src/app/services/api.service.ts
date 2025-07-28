@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { HttpClient, HttpErrorResponse, HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs/internal/Observable";
 import { env } from "../../environments/environment";
@@ -13,10 +13,8 @@ import {
   providedIn: "root"
 })
 export class ApiService {
+  private readonly http = inject(HttpClient);
 
-  constructor(
-    private readonly http: HttpClient
-  ) { }
 
   getQuotes() {
     return this.http.get(`${env.api}/quotes`, this.requestHeader());

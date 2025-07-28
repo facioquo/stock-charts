@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { UserService } from "./services/user.service";
 
 @Component({
@@ -8,10 +8,8 @@ import { UserService } from "./services/user.service";
     standalone: false
 })
 export class AppComponent implements OnInit {
+  private readonly usr = inject(UserService);
 
-  constructor(
-    private readonly usr: UserService
-  ) { }
 
   ngOnInit(): void {
 
