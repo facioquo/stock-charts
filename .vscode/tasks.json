@@ -1,59 +1,405 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "build-client",
-            "type": "shell",
-            "command": "npm",
-            "args": ["run", "build"],
-            "options": {
-                "cwd": "${workspaceFolder}/client"
-            },
-            "group": "build",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "build-server",
-            "type": "shell",
-            "command": "dotnet",
-            "args": ["build"],
-            "options": {
-                "cwd": "${workspaceFolder}/server"
-            },
-            "group": "build",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "start-client",
-            "type": "shell",
-            "command": "npm",
-            "args": ["start"],
-            "options": {
-                "cwd": "${workspaceFolder}/client"
-            },
-            "group": "build",
-            "isBackground": true
-        },
-        {
-            "label": "start-server",
-            "type": "shell",
-            "command": "func",
-            "args": ["start"],
-            "options": {
-                "cwd": "${workspaceFolder}/server/Functions"
-            },
-            "group": "build",
-            "isBackground": true
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-client",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "build"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "build-server",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/server"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "start-client",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "start"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "label": "start-server",
+      "type": "shell",
+      "command": "func",
+      "args": [
+        "start"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/server/Functions"
+      },
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "label": "test-client",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "test"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "test-client-watch",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "test:watch"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "group": "test",
+      "isBackground": true
+    },
+    {
+      "label": "test-client-coverage",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "test:coverage"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "lint-client",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "lint"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "lint-client-fix",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "lint:fix"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "lint-markdown",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "lint:md"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "build-client-prod",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "build.prod"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "watch-client",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "watch"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "label": "install-client",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "install"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "restore-server",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "restore"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/server"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "build-server-release",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "ChartBackend.sln",
+        "--configuration",
+        "Release"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/server"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "test-server",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "test"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/server"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "clean-server",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "clean"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/server"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "clean-client",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "ng",
+        "cache",
+        "clean"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/client"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "start-webapi-server",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "run"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/server/WebApi"
+      },
+      "group": "build",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "build-all",
+      "dependsOn": [
+        "build-client",
+        "build-server"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build"
+    },
+    {
+      "label": "build-all-prod",
+      "dependsOn": [
+        "build-client-prod",
+        "build-server-release"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build"
+    },
+    {
+      "label": "test-all",
+      "dependsOn": [
+        "test-client",
+        "test-server"
+      ],
+      "dependsOrder": "parallel",
+      "group": "test"
+    },
+    {
+      "label": "clean-all",
+      "dependsOn": [
+        "clean-client",
+        "clean-server"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build"
+    },
+    {
+      "label": "install-restore-all",
+      "dependsOn": [
+        "install-client",
+        "restore-server"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build"
+    },
+    {
+      "label": "lint-all",
+      "dependsOn": [
+        "lint-client",
+        "lint-markdown"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build"
+    },
+    {
+      "label": "start-full-stack",
+      "dependsOn": [
+        "start-client",
+        "start-webapi-server"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build"
+    }
+  ]
 }
