@@ -1,24 +1,25 @@
 {
   "recommendations": [
     "angular.ng-template",
-    "azurite.azurite", 
+    "azurite.azurite",
     "ms-azuretools.vscode-azurefunctions",
     "ms-azuretools.vscode-azurestorage",
     "ms-dotnettools.csdevkit",
-    
+
     "github.copilot",
     "github.copilot-chat",
-    
+
     "ms-vscode.vscode-json",
     "bradlc.vscode-tailwindcss",
     "formulahendry.auto-rename-tag",
-    
+
     "ms-dotnettools.csharp",
     "ms-dotnettools.vscode-dotnet-runtime",
-    
+
     "dbaeumer.vscode-eslint",
+    "davidanson.vscode-markdownlint",
     "esbenp.prettier-vscode",
-    
+
     "ms-vscode.vscode-json",
     "redhat.vscode-yaml",
     "ms-vscode.vscode-markdown"
