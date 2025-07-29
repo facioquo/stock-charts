@@ -14,6 +14,7 @@ import {
   IndicatorResult,
   IndicatorSelection
 } from "../../pages/chart/chart.models";
+
 import { MatTooltip } from "@angular/material/tooltip";
 import { FormsModule } from "@angular/forms";
 import { CdkScrollable } from "@angular/cdk/scrolling";

@@ -14,6 +14,12 @@ export interface Quote {
   volume: number;
 }
 
+export interface IndicatorDataRow {
+  date: string;
+  candle: Quote;
+  [key: string]: unknown; // For dynamic indicator result values
+}
+
 // SETTINGS
 
 export interface UserSettings {

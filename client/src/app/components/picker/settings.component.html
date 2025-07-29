@@ -24,24 +24,24 @@
 
   <!-- DISPLAYED INDICATORS -->
   @if (cht.selections.length>0) {
-    <mat-selection-list #shown>
-      <mat-toolbar class="dialog-section-header indicators-displayed-toolbar">
-        Displayed indicators
-        <span class="filler"></span>
-        <mat-checkbox (change)="selectDisplayed($event, shown)" />
-      </mat-toolbar>
-      @for (selection of cht.selections; track selection) {
-        <mat-list-option [value]="selection">
-          <span matListItemTitle>{{selection.label}}</span>
-        </mat-list-option>
-      }
-      <div class="action-button-container">
-        <button mat-raised-button color="primary" [disabled]="shown.selectedOptions.selected.length===0"
-          (click)="removeSelections($event, shown.selectedOptions.selected)" matTooltip="remove selected indicators">
-          REMOVE SELECTED
-        </button>
-      </div>
-    </mat-selection-list>
+  <mat-selection-list #shown>
+    <mat-toolbar class="dialog-section-header indicators-displayed-toolbar">
+      Displayed indicators
+      <span class="filler"></span>
+      <mat-checkbox (change)="selectDisplayed($event, shown)" />
+    </mat-toolbar>
+    @for (selection of cht.selections; track selection) {
+    <mat-list-option [value]="selection">
+      <span matListItemTitle>{{selection.label}}</span>
+    </mat-list-option>
+    }
+    <div class="action-button-container">
+      <button mat-raised-button color="primary" [disabled]="shown.selectedOptions.selected.length===0"
+        (click)="removeSelections($event, shown.selectedOptions.selected)" matTooltip="remove selected indicators">
+        REMOVE SELECTED
+      </button>
+    </div>
+  </mat-selection-list>
   }
 
   <!-- AVAILABLE INDICATORS -->
@@ -59,10 +59,11 @@
       </div>
     </mat-toolbar>
     @for (listing of listings; track listing) {
-      <a mat-list-item (click)="openIndicatorSettings(listing)">
-        <span matListItemTitle>{{listing.name}}</span>
-        <span matListItemLine>{{listing.category}}</span>
-      </a>
+    <a mat-list-item (click)="openIndicatorSettings(listing)" (keyup.enter)="openIndicatorSettings(listing)"
+      (keyup.space)="openIndicatorSettings(listing)" tabindex="0">
+      <span matListItemTitle>{{listing.name}}</span>
+      <span matListItemLine>{{listing.category}}</span>
+    </a>
     }
   </mat-nav-list>
 

@@ -19,7 +19,6 @@ export class ChartComponent {
   readonly cht = inject(ChartService);
   private readonly settingsDialog = inject(MatDialog);
 
-
   constructor() {
     this.cht.loadCharts();
   }

@@ -262,7 +262,7 @@ export class ChartConfigService {
 
     switch (r.lineType) {
 
-      case "solid":
+      case "solid": {
         const lineDataset: ChartDataset = {
           label: r.label,
           type: "line",
@@ -280,8 +280,9 @@ export class ChartConfigService {
           order: r.order
         };
         return lineDataset;
+      }
 
-      case "dash":
+      case "dash": {
         const dashDataset: ChartDataset = {
           label: r.label,
           type: "line",
@@ -295,8 +296,9 @@ export class ChartConfigService {
           order: r.order
         };
         return dashDataset;
+      }
 
-      case "dots":
+      case "dots": {
         const dotsDataset: ChartDataset = {
           label: r.label,
           type: "line",
@@ -310,8 +312,9 @@ export class ChartConfigService {
           order: r.order
         };
         return dotsDataset;
+      }
 
-      case "bar":
+      case "bar": {
         const barDataset: ChartDataset = {
           label: r.label,
           type: "bar",
@@ -328,8 +331,9 @@ export class ChartConfigService {
           barDataset.stack = c.stack;
         }
         return barDataset;
+      }
 
-      case "pointer":
+      case "pointer": {
         const ptDataset: ChartDataset = {
           label: r.label,
           type: "line",
@@ -345,8 +349,9 @@ export class ChartConfigService {
           order: r.order
         };
         return ptDataset;
+      }
 
-      case "none":
+      case "none": {
         // hide instead of exclude 'none' lines,
         // otherwise, it breaks line offset fill
         const noneDataset: ChartDataset = {
@@ -363,6 +368,7 @@ export class ChartConfigService {
           order: r.order
         };
         return noneDataset;
+      }
     }
   }
 

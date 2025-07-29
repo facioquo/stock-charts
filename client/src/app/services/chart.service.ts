@@ -63,7 +63,8 @@ import {
   IndicatorResult,
   IndicatorResultConfig,
   IndicatorSelection,
-  Quote
+  Quote,
+  IndicatorDataRow
 } from "../pages/chart/chart.models";
 
 // services
@@ -90,7 +91,7 @@ export class ChartService {
   addSelection(
     selection: IndicatorSelection,
     listing: IndicatorListing,
-    scrollToMe: boolean = false): Observable<any> {
+    scrollToMe: boolean = false): Observable<unknown> {
 
     const green = "#2E7D32";
     const gray = "#9E9E9E";
@@ -107,7 +108,7 @@ export class ChartService {
         .subscribe({
 
           // compose datasets
-          next: (data: any[]) => {
+          next: (data: IndicatorDataRow[]) => {
 
             // compose datasets
             // parse each dataset
@@ -125,27 +126,27 @@ export class ChartService {
                 // populate data
                 data.forEach(row => {
 
-                  let yValue = row[result.dataName];
+                  let yValue = row[result.dataName] as number;
 
                   // apply candle pointers
                   if (yValue && listing.category === "candlestick-pattern") {
 
-                    switch (row["match"]) {
+                    switch ((row["match"] as number)) {
 
                       case -100:
-                        yValue = 1.01 * row["candle"].high;
+                        yValue = 1.01 * (row.candle as Quote).high;
                         pointColor.push(red);
                         pointRotation.push(180);
                         break;
 
                       case 100:
-                        yValue = 0.99 * row["candle"].low;
+                        yValue = 0.99 * (row.candle as Quote).low;
                         pointColor.push(green);
                         pointRotation.push(0);
                         break;
 
                       default:
-                        yValue = 0.99 * row["candle"].low;
+                        yValue = 0.99 * (row.candle as Quote).low;
                         pointColor.push(gray);
                         pointRotation.push(0);
                         break;
@@ -277,7 +278,8 @@ export class ChartService {
 
     // deep copy without the chart object
     const selections: IndicatorSelection[]
-      = this.selections.map(({ chart, ...rest }) => ({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      = this.selections.map(({ chart: _chart, ...rest }) => ({
         ...rest
       }));
 

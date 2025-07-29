@@ -26,7 +26,7 @@ export class ApiService {
 
   getSelectionData(
     selection: IndicatorSelection,
-    listing: IndicatorListing): Observable<any> {
+    listing: IndicatorListing): Observable<unknown> {
 
     const obs = new Observable((observer) => {
 
@@ -41,7 +41,7 @@ export class ApiService {
       this.http.get(url, this.requestHeader())
         .subscribe({
 
-          next: (data: any[]) => {
+          next: (data: unknown[]) => {
             observer.next(data);
           },
 

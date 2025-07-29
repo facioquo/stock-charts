@@ -165,10 +165,12 @@ describe("Color Picker Functionality", () => {
     it("should validate that ngx-color and @ng-matero/extensions are available", () => {
       // These packages should be installed and available
       expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require("ngx-color");
       }).not.toThrow();
 
       expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require("@ng-matero/extensions/colorpicker");
       }).not.toThrow();
     });
