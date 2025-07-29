@@ -1,0 +1,18 @@
+{
+  "servers": {
+    "Angular CLI": {
+      "command": "npx",
+      "args": [
+        "@angular/cli",
+        "mcp"
+      ]
+    },
+    "Playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    }
+  }
+}
