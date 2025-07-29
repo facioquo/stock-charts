@@ -3,138 +3,56 @@ name: Copilot Environment Setup
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   copilot-setup-steps:
     runs-on: ubuntu-latest
     name: Configure Copilot Development Environment
 
-    permissions:
-      contents: read
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "9.x"
           dotnet-quality: "ga"
-      
-      # Node.js and npm setup
+        continue-on-error: true
+
+      - name: Install .NET tools
+        run: |
+          dotnet tool install --global dotnet-format
+          dotnet tool install --global dotnet-outdated-tool
+        continue-on-error: true
+
+      - name: Build .NET Solution
+        working-directory: server
+        run: |
+          dotnet clean
+          dotnet build --no-incremental
+        continue-on-error: true
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: 'client/package-lock.json'
-      
-      # Install global npm tools
-      - name: Install global npm dependencies
+          node-version: ">=22.15.0"
+          cache: "npm"
+          cache-dependency-path: client/package-lock.json
+        continue-on-error: true
+
+      - name: Install client dependencies
+        working-directory: client
         run: |
-          npm install -g @angular/cli@latest  # Provides 'ng' command
-          npm install -g typescript@latest
-          npm install -g prettier@latest
-      
-      # Install Azure tools
-      - name: Install Azure tools
+          npm install
+        continue-on-error: true
+
+      - name: Environment summary
         run: |
-          npm install -g azure-functions-core-tools@4 --unsafe-perm true
-          npm install -g @azure/static-web-apps-cli@latest
-      
-      # Install frontend dependencies
-      - name: Install frontend dependencies
-        run: |
-          cd client
-          npm ci
-      
-      # Install backend dependencies
-      - name: Restore .NET packages
-        run: |
-          cd server
-          dotnet restore
-          dotnet tool restore
-      
-      # Install development tools
-      - name: Install development tools
-        run: |
-          # Language servers for MCP
-          npm install -g typescript-language-server
-          npm install -g vscode-langservers-extracted
-          npm install -g @angular/language-server
-      
-          # Code quality tools
-          npm install -g markdownlint-cli
-      
-          # Git tools
-          sudo apt-get install -y git-extras
-      
-      # Configure Git for better AI assistance
-      - name: Configure Git
-        run: |
-          git config --global init.defaultBranch main
-          git config --global pull.rebase false
-          git config --global core.autocrlf input
-      
-      # Verify installations
-      - name: Verify installations
-        run: |
-          echo "Node.js version: $(node --version)"
-          echo "npm version: $(npm --version)"
-          echo "Angular CLI version: $(ng version --skip-git)"
-          echo ".NET version: $(dotnet --version)"
-          echo "Azure Functions Core Tools version: $(func --version)"
-          echo "TypeScript version: $(tsc --version)"
-      
-      # Pre-build projects to cache dependencies
-      - name: Pre-build projects
-        run: |
-          # Build frontend
-          cd client
-          npm run build --if-present
-      
-          # Build backend
-          cd ../server
-          dotnet build --no-restore
-      
-      # Create useful aliases and scripts
-      - name: Setup development aliases
-        run: |
-          cat >> ~/.bashrc << 'EOF'
-      
-          # Stock Charts Development Aliases
-          alias sc-client='cd /workspaces/stock-charts/client'
-          alias sc-server='cd /workspaces/stock-charts/server'
-          alias sc-start-client='cd /workspaces/stock-charts/client && npm start'
-          alias sc-build-client='cd /workspaces/stock-charts/client && npm run build'
-          alias sc-test-client='cd /workspaces/stock-charts/client && npm test'
-          alias sc-start-server='cd /workspaces/stock-charts/server && func start'
-          alias sc-build-server='cd /workspaces/stock-charts/server && dotnet build'
-          alias sc-test-server='cd /workspaces/stock-charts/server && dotnet test'
-          alias sc-logs='cd /workspaces/stock-charts && git log --oneline -10'
-          alias sc-status='cd /workspaces/stock-charts && git status'
-      
-          EOF
-      
-      # Setup VS Code settings for the workspace
-      - name: Configure VS Code workspace
-        run: |
-          mkdir -p /workspaces/stock-charts/.vscode
-      
-      # Final environment check
-      - name: Environment ready check
-        run: |
-          echo "✅ Copilot environment setup complete!"
-          echo ""
-          echo "Available commands:"
-          echo "  - sc-client: Navigate to client directory"
-          echo "  - sc-server: Navigate to server directory"  
-          echo "  - sc-start-client: Start Angular development server"
-          echo "  - sc-start-server: Start Azure Functions locally"
-          echo "  - sc-build-client: Build Angular application"
-          echo "  - sc-build-server: Build .NET application"
-          echo ""
-          echo "Project structure:"
-          ls -la /workspaces/stock-charts/
-          echo ""
-          echo "Ready for GitHub Copilot development! 🚀"
+          echo "## Copilot environment: Ready" >> $GITHUB_STEP_SUMMARY
+          echo "- Repository: ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "- .NET SDKs: $(dotnet --list-sdks | wc -l) versions available" >> $GITHUB_STEP_SUMMARY
+          echo "- .NET Tools: $(dotnet tool list --global | wc -l) available" >> $GITHUB_STEP_SUMMARY
+        continue-on-error: true

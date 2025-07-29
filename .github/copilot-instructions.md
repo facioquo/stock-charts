@@ -65,26 +65,6 @@ stock-charts/
 - Keep functions small and focused
 - Write unit tests for business logic
 
-## File Structure Patterns
-
-### Angular Components
-
-```typescript
-// component.ts - Main component logic
-// component.html - Template
-// component.scss - Styles
-// component.spec.ts - Unit tests
-```
-
-### .NET Structure
-
-```csharp
-// Controllers/ - API endpoints
-// Services/ - Business logic
-// Models/ - Data models and DTOs
-// Extensions/ - Extension methods
-```
-
 ## Development Workflow
 
 1. **Frontend Development**:
