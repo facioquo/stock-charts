@@ -64,8 +64,8 @@
             <mat-error>Invalid HEX color</mat-error>
             }
             <mtx-colorpicker-toggle matSuffix [for]="customPicker" [ngStyle]="{'color': r.color}"
-              [disabled]="r.lineType==='none'" />
-            <mtx-colorpicker #customPicker [content]="customPickerContent" disabled="false" />
+              [disabled]="r.lineType==='none'"></mtx-colorpicker-toggle>
+            <mtx-colorpicker #customPicker [content]="customPickerContent" disabled="false"></mtx-colorpicker>
             <div [ngStyle]="getLineSample(r)"></div>
           </mat-form-field>
           <ng-template #customPickerContent>

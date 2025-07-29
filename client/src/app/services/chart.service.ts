@@ -126,7 +126,7 @@ export class ChartService {
                 // populate data
                 data.forEach(row => {
 
-                  let yValue = row[result.dataName] as number;
+                  let yValue = typeof row[result.dataName] === "number" ? row[result.dataName] as number : null;
 
                   // apply candle pointers
                   if (yValue && listing.category === "candlestick-pattern") {

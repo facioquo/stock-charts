@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy, OnInit } from "@angular/core";
 
 import { MatDialog } from "@angular/material/dialog";
 import { MatFabButton } from "@angular/material/button";
@@ -15,11 +15,11 @@ import { SettingsComponent } from "../../components/picker/settings.component";
   imports: [MatFabButton, MatIcon, MatTooltip],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ChartComponent {
+export class ChartComponent implements OnInit {
   readonly cht = inject(ChartService);
   private readonly settingsDialog = inject(MatDialog);
 
-  constructor() {
+  ngOnInit(): void {
     this.cht.loadCharts();
   }
 

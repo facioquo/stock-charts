@@ -19,7 +19,7 @@ import { FormsModule } from "@angular/forms";
 
 
 @Component({
-  selector: "app-listing",
+  selector: "app-settings",
   templateUrl: "settings.component.html",
   styleUrls: ["settings.component.scss"],
   imports: [MatToolbar, MatIconButton, MatTooltip, MatIcon, CdkScrollable, MatDialogContent, MatList, MatListItem, MatSlideToggle, FormsModule, MatSelectionList, MatCheckbox, MatListOption, MatListItemTitle, MatButton, MatNavList, MatListItemLine],

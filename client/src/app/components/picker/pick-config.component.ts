@@ -101,11 +101,8 @@ export class PickConfigComponent {
   ];
 
   constructor() {
-    const listing = this.listing;
-
-
     // pre-populate selection
-    this.selection = this.cht.defaultSelection(listing.uiid);
+    this.selection = this.cht.defaultSelection(this.listing.uiid);
   }
 
   onSubmit(): void {
