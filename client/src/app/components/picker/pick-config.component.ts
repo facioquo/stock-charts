@@ -27,10 +27,10 @@ interface LineType {
 }
 
 @Component({
-    selector: "app-pick-config",
-    templateUrl: "pick-config.component.html",
-    styleUrls: ["pick-config.component.scss"],
-    standalone: false
+  selector: "app-pick-config",
+  templateUrl: "pick-config.component.html",
+  styleUrls: ["pick-config.component.scss"],
+  standalone: false
 })
 export class PickConfigComponent {
   listing = inject<IndicatorListing>(MAT_DIALOG_DATA);

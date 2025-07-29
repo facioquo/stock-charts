@@ -546,7 +546,7 @@ export class ChartService {
                 // load indicators
                 this.loadSelections();
               },
-              error: (e: HttpErrorResponse) => { 
+              error: (e: HttpErrorResponse) => {
                 console.error("Error loading listings:", {
                   status: e.status,
                   statusText: e.statusText,
@@ -555,7 +555,7 @@ export class ChartService {
               }
             });
         },
-        error: (e: HttpErrorResponse) => { 
+        error: (e: HttpErrorResponse) => {
           console.error("Error getting quotes:", {
             status: e.status,
             statusText: e.statusText,
