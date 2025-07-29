@@ -1,33 +1,41 @@
-import { Component } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 
-import { MatCheckboxChange } from "@angular/material/checkbox";
-import { MatDialog } from "@angular/material/dialog";
-import { MatListOption, MatSelectionList } from "@angular/material/list";
-import { MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { MatCheckboxChange, MatCheckbox } from "@angular/material/checkbox";
+import { MatDialog, MatDialogContent } from "@angular/material/dialog";
+import { MatListOption, MatSelectionList, MatList, MatListItem, MatListItemTitle, MatNavList, MatListItemLine } from "@angular/material/list";
+import { MatSlideToggleChange, MatSlideToggle } from "@angular/material/slide-toggle";
 
 import { ChartService } from "../../services/chart.service";
 import { UserService } from "../../services/user.service";
 
 import { IndicatorListing, IndicatorSelection } from "../../pages/chart/chart.models";
 import { PickConfigComponent } from "./pick-config.component";
+import { MatToolbar } from "@angular/material/toolbar";
+import { MatIconButton, MatButton } from "@angular/material/button";
+import { MatTooltip } from "@angular/material/tooltip";
+import { MatIcon } from "@angular/material/icon";
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import { FormsModule } from "@angular/forms";
+
 
 @Component({
-    selector: "app-listing",
-    templateUrl: "settings.component.html",
-    styleUrls: ["settings.component.scss"],
-    standalone: false
+  selector: "app-settings",
+  templateUrl: "settings.component.html",
+  styleUrls: ["settings.component.scss"],
+  imports: [MatToolbar, MatIconButton, MatTooltip, MatIcon, CdkScrollable, MatDialogContent, MatList, MatListItem, MatSlideToggle, FormsModule, MatSelectionList, MatCheckbox, MatListOption, MatListItemTitle, MatButton, MatNavList, MatListItemLine],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SettingsComponent {
+  private listRef = inject(MatDialog);
+  private picker = inject(MatDialog);
+  cht = inject(ChartService);
+  usr = inject(UserService);
+
 
   listings: IndicatorListing[];
   selections: IndicatorSelection[];
 
-  constructor(
-    private listRef: MatDialog,
-    private picker: MatDialog,
-    public cht: ChartService,
-    public usr: UserService
-  ) {
+  constructor() {
     this.listings = this.cht.listings;
   }
 

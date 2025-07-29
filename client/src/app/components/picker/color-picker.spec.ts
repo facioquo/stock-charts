@@ -73,7 +73,7 @@ describe("Color Picker Functionality", () => {
   describe("Line Width Configuration", () => {
     it("should provide standard line width options", () => {
       expect(lineWidths.length).toBe(4);
-      
+
       const widthNames = lineWidths.map(w => w.name);
       expect(widthNames).toContain("thin");
       expect(widthNames).toContain("normal");
@@ -92,7 +92,7 @@ describe("Color Picker Functionality", () => {
   describe("Line Type Configuration", () => {
     it("should provide all necessary line types", () => {
       expect(lineTypes.length).toBe(5);
-      
+
       const typeValues = lineTypes.map(t => t.value);
       expect(typeValues).toContain("solid");
       expect(typeValues).toContain("dash");
@@ -136,7 +136,7 @@ describe("Color Picker Functionality", () => {
     it("should generate correct solid line style", () => {
       const result = { color: "#1E88E5", lineType: "solid", lineWidth: 1.5 };
       const style = getLineSample(result);
-      
+
       expect(style["border-bottom-color"]).toBe("#1E88E5");
       expect(style["border-bottom-width"]).toBe("1.5px");
       expect(style["border-bottom-style"]).toBe("solid");
@@ -145,7 +145,7 @@ describe("Color Picker Functionality", () => {
     it("should generate correct dashed line style", () => {
       const result = { color: "#DD2C00", lineType: "dash", lineWidth: 2 };
       const style = getLineSample(result);
-      
+
       expect(style["border-bottom-color"]).toBe("#DD2C00");
       expect(style["border-bottom-width"]).toBe("2px");
       expect(style["border-bottom-style"]).toBe("dashed");
@@ -154,7 +154,7 @@ describe("Color Picker Functionality", () => {
     it("should double width for dotted lines", () => {
       const result = { color: "#009688", lineType: "dots", lineWidth: 1 };
       const style = getLineSample(result);
-      
+
       expect(style["border-bottom-color"]).toBe("#009688");
       expect(style["border-bottom-width"]).toBe("2px"); // 1 * 2
       expect(style["border-bottom-style"]).toBe("dotted");
@@ -165,10 +165,12 @@ describe("Color Picker Functionality", () => {
     it("should validate that ngx-color and @ng-matero/extensions are available", () => {
       // These packages should be installed and available
       expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require("ngx-color");
       }).not.toThrow();
 
       expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require("@ng-matero/extensions/colorpicker");
       }).not.toThrow();
     });
@@ -177,7 +179,7 @@ describe("Color Picker Functionality", () => {
       // Test hex color validation
       const hexRegex = /^#[A-F0-9]{6}$/;
       const hex8Regex = /^#[A-F0-9]{8}$/;
-      
+
       expect("#FF0000").toMatch(hexRegex);
       expect("#FF0000FF").toMatch(hex8Regex);
     });

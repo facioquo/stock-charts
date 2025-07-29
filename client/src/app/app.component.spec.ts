@@ -13,7 +13,7 @@ describe("AppComponent", () => {
     };
 
     await TestBed.configureTestingModule({
-      declarations: [AppComponent],
+      imports: [AppComponent],
       providers: [
         { provide: UserService, useValue: userServiceSpy }
       ],

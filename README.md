@@ -10,51 +10,120 @@ Live demo site: [charts.StockIndicators.dev](https://charts.stockindicators.dev/
 
 This repo and charting tool is primarily intended to demonstrate the [Stock Indicators for .NET](https://dotnet.stockindicators.dev) library.  **It is not meant to be a fully featured charting system** and may not be an architectural model that works for your use case.  If you need a mature charting tool, please explore all of your [charting and visualization options](https://github.com/DaveSkender/Stock.Indicators/discussions/430).
 
-## Running this demo locally
-
-If you want to host on your local computer and review the source code, follow the instructions below.
+## Development Setup
 
 ### Prerequisites
 
-- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/)
-- [Visual Studio](http://visualstudio.com)
+- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (LTS version)
+- [.NET SDK 9](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 
-### Steps to run
+### Quick Start
 
-1. [Clone the repo](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository)
+1. **Clone the repository**
 
-2. Open `\server\ChartBackend.sln` in Visual Studio.  Take note of the URL in the WebApi project properties.
+   ```bash
+   git clone https://github.com/facioquo/stock-charts.git
+   cd stock-charts
+   ```
 
-    ![WebApi Properties ><](client/src/assets/server-port.png)
+2. **Install global dependencies**
 
-3. Select `WebApi` project and run by either `CTRL+F5` or `dotnet run` CLI command.  You can also View from right-click menus.  If you've done this successfully, a browser window will open and say "API is functioning nominally."  Leave the browser window open.
+   ```bash
+   npm install -g @angular/cli azure-functions-core-tools azurite
+   ```
 
-4. Open `client\src\environments\environment.ts` and modify the API URL, if needed, then save file.
+3. **Start the full development stack**
 
-    ```ts
-    export const env: EnvConfig = {
-      production: false,
-      api: 'https://localhost:44392'
-    };
-    ```
+   In VS Code, use `Ctrl+Shift+P` → "Tasks: Run Task" → `start-full-stack`
 
-5. Open `Git Bash` window and navigate to the `\client` folder
+   Or manually start services in order:
 
-    ``` bash
-    npm install
-    npm start
-    ```
+   ```bash
+   # Terminal 1 - Storage emulator (start first)
+   azurite --skipApiVersionCheck --location ./.azurite
+   
+   # Terminal 2 - Azure Functions  
+   cd server/Functions && func start
+   
+   # Terminal 3 - Web API
+   cd server/WebApi && dotnet run
+   
+   # Terminal 4 - Angular website
+   cd client && npm install && npm start
+   ```
 
-    The web application should launch automatically.
+4. **Access the application**
+   - Website: <http://localhost:4200>
+   - Web API: <https://localhost:5001>
+   - Azure Functions: <http://localhost:7071>
 
-### Fetching quote data
+### VS Code Development
 
-Optionally, if you intend to use the local Azure storage emulator to get and store local quote data from the Alpaca API, you'll also need to set some local environment variables and run the ‘Functions.csproj‘ project.  Use your own key and secret values.
+This repository includes optimized VS Code configuration with tasks, problem matchers, and recommended extensions.
 
-``` bash
+**Recommended Extensions** (automatically suggested):
+
+- Azure Functions
+- Azure Storage
+- C# Dev Kit
+- ESLint
+- Angular Language Service
+- Azurite
+
+**Available Tasks** (`Ctrl+Shift+P` → "Tasks: Run Task"):
+
+- `start-full-stack` - Start all services (Azurite + Functions + WebAPI + Website)
+- `build-all` - Build both client and server projects
+- `lint-all` - Run all linting (ESLint + markdownlint)
+- `test-all` - Run all tests
+
+### Local Storage with Azurite
+
+The application uses [Azurite](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite) for local Azure Storage emulation.
+
+**Azurite Configuration:**
+
+- **Blob Service**: <http://127.0.0.1:10000>
+- **Queue Service**: <http://127.0.0.1:10001>
+- **Table Service**: <http://127.0.0.1:10002>
+- **Connection String**: `UseDevelopmentStorage=true`
+- **Data Location**: `./.azurite/` (auto-created, ignored by git)
+
+**Storage Configuration Files:**
+
+- Functions: `server/Functions/local.settings.json`
+- WebAPI: `server/WebApi/appsettings.Development.json`
+
+### Environment Configuration
+
+**Angular Environment** (`client/src/environments/environment.ts`):
+
+```typescript
+export const env: EnvConfig = {
+  production: false,
+  api: "https://localhost:5001"  // WebAPI endpoint
+};
+```
+
+**Azure Functions** (`server/Functions/local.settings.json`):
+
+```json
+{
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
+  }
+}
+```
+
+### Quote Data Configuration (Optional)
+
+To enable quote data fetching from Alpaca API, configure these environment variables:
+
+```bash
 setx ALPACA_KEY "YOUR ALPACA API KEY"
 setx ALPACA_SECRET "YOUR ALPACA SECRET KEY"
-setx AzureWebJobsStorage "UseDevelopmentStorage=true"
 ```
 
 ## Using the Dev Container
@@ -98,41 +167,16 @@ To securely store and manage secrets such as `ALPACA_KEY` and `ALPACA_SECRET`, y
 
 1. Create an Azure Key Vault in your Azure subscription.
 
-2. Add the `ALPACA_KEY` and `ALPACA_SECRET` secrets to the Key Vault.
+2. Add the secrets to the Azure Key Vault.
 
-3. Update the application code to retrieve these secrets from Azure Key Vault during runtime.
+3. Configure the Azure Functions to use the Azure Key Vault.
 
-4. Ensure that the necessary permissions are granted to the application to access the Key Vault.
-
-5. Update the `local.settings.json` file in the `server/Functions` directory to include the `ALPACA_KEY` and `ALPACA_SECRET` environment variables.
-
-6. Update the `README.md` to include instructions for setting up and using Azure Key Vault for storing secrets.
-
-## Using User Secrets for Local Development
-
-For local development, you can use User Secrets to store sensitive information such as `ALPACA_KEY` and `ALPACA_SECRET`. Follow the steps below to set up and use User Secrets for local development.
-
-### Steps
-
-1. In the `server/Functions` directory, run the following command to initialize User Secrets:
-
-    ```bash
-    dotnet user-secrets init
-    ```
-
-2. Add the `ALPACA_KEY` and `ALPACA_SECRET` secrets to User Secrets:
-
-    ```bash
-    dotnet user-secrets set "ALPACA_KEY" "YOUR_ALPACA_API_KEY"
-    dotnet user-secrets set "ALPACA_SECRET" "YOUR_ALPACA_SECRET_KEY"
-    ```
-
-3. Update the application code to retrieve these secrets from User Secrets during runtime.
-
-4. Ensure that the necessary permissions are granted to the application to access the User Secrets.
-
-5. Update the `README.md` to include instructions for setting up and using User Secrets for local development.
+4. Update the Azure Functions code to retrieve the secrets from the Azure Key Vault.
 
 ## Contributing
 
-This is an open-source project.  If you want to report bugs, contribute fixes, or add new indicators, please review our [contributing guidelines](docs/CONTRIBUTING.md).
+Please read [CONTRIBUTING.md](docs/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## License
+
+This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.

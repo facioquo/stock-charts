@@ -1,59 +1,116 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "build-client",
-            "type": "shell",
-            "command": "npm",
-            "args": ["run", "build"],
-            "options": {
-                "cwd": "${workspaceFolder}/client"
-            },
-            "group": "build",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "build-server",
-            "type": "shell",
-            "command": "dotnet",
-            "args": ["build"],
-            "options": {
-                "cwd": "${workspaceFolder}/server"
-            },
-            "group": "build",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "start-client",
-            "type": "shell",
-            "command": "npm",
-            "args": ["start"],
-            "options": {
-                "cwd": "${workspaceFolder}/client"
-            },
-            "group": "build",
-            "isBackground": true
-        },
-        {
-            "label": "start-server",
-            "type": "shell",
-            "command": "func",
-            "args": ["start"],
-            "options": {
-                "cwd": "${workspaceFolder}/server/Functions"
-            },
-            "group": "build",
-            "isBackground": true
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-website",
+      "type": "npm",
+      "script": "build",
+      "path": "client/",
+      "group": "build",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "build-server",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["build"],
+      "options": {
+        "cwd": "${workspaceFolder}/server"
+      },
+      "group": "build",
+      "problemMatcher": ["$msCompile"]
+    },
+    {
+      "label": "start-website",
+      "type": "npm",
+      "script": "start",
+      "path": "client/",
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "label": "start-functions",
+      "type": "shell",
+      "command": "func",
+      "args": ["start"],
+      "options": {
+        "cwd": "${workspaceFolder}/server/Functions"
+      },
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "label": "test-website",
+      "type": "npm",
+      "script": "test",
+      "path": "client/",
+      "group": "test",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "lint-website",
+      "type": "npm",
+      "script": "lint",
+      "path": "client/",
+      "group": "build",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "lint-website-fix",
+      "type": "npm",
+      "script": "lint:fix",
+      "path": "client/",
+      "group": "build",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "lint-markdown",
+      "type": "npm",
+      "script": "lint:md",
+      "path": "client/",
+      "group": "build"
+    },
+    {
+      "label": "start-azurite",
+      "type": "shell",
+      "command": "azurite",
+      "args": ["--skipApiVersionCheck", "--location", "${workspaceFolder}/.azurite"],
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "label": "start-webapi",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["run"],
+      "options": {
+        "cwd": "${workspaceFolder}/server/WebApi"
+      },
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "label": "build-all",
+      "dependsOn": ["build-website", "build-server"],
+      "dependsOrder": "parallel",
+      "group": "build"
+    },
+    {
+      "label": "test-all",
+      "dependsOn": ["test-website"],
+      "group": "test"
+    },
+    {
+      "label": "lint-all",
+      "dependsOn": ["lint-website", "lint-markdown"],
+      "dependsOrder": "sequence",
+      "group": "build"
+    },
+    {
+      "label": "start-full-stack",
+      "dependsOn": ["start-azurite", "start-functions", "start-webapi", "start-website"],
+      "dependsOrder": "parallel",
+      "group": "build"
+    }
+  ]
 }

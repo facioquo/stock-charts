@@ -7,21 +7,21 @@ import {
 const routes: Routes = [
   {
     path: "",
-    loadChildren: () => import("./pages/chart/chart.module")
-      .then(m => m.ChartModule)
+    loadComponent: () => import("./pages/chart/chart.component")
+      .then(m => m.ChartComponent)
   },
 
   {
     path: "settings",
-    loadChildren: () => import("./components/picker/settings.module")
-      .then(m => m.SettingsModule)
+    loadComponent: () => import("./components/picker/settings.component")
+      .then(m => m.SettingsComponent)
   },
 
   // 404 page (route not found)
   {
     path: "**",
-    loadChildren: () => import("./pages/404/404.module")
-      .then(m => m.PageNotFoundModule)
+    loadComponent: () => import("./pages/404/404.component")
+      .then(m => m.PageNotFoundComponent)
   }
 ];
 

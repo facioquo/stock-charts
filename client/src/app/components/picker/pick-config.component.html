@@ -6,75 +6,86 @@
 
     <mat-tab-group animationDuration="0ms" mat-align-tabs="center">
 
-      <mat-tab label="Params" *ngIf="selection.params.length>0">
+      @if (selection.params.length>0) {
+      <mat-tab label="Params">
         <div class="param-container">
-          <div *ngFor="let p of selection.params; index as i">
+          @for (p of selection.params; track p; let i = $index) {
+          <div>
             <mat-form-field class="param-input">
               <mat-label>{{p.displayName}}</mat-label>
               <input matInput #param="ngModel" name="param{{i}}" [(ngModel)]="p.value" type="number" required
                 min="{{p.minimum}}" max="{{p.maximum}}">
-              <mat-error *ngIf="param.invalid">{{paramRangeError(p)}}</mat-error>
+              @if (param.invalid) {
+              <mat-error>{{paramRangeError(p)}}</mat-error>
+              }
             </mat-form-field>
           </div>
+          }
         </div>
       </mat-tab>
+      }
 
-      <mat-tab label="Styles" *ngIf="listing.category !== 'candlestick-pattern'">
-
-        <div class="style-container" *ngFor="let r of selection.results; index as i">
-
+      @if (listing.category !== 'candlestick-pattern') {
+      <mat-tab label="Styles">
+        @for (r of selection.results; track r; let i = $index) {
+        <div class="style-container">
           <h3>{{r.displayName}}</h3>
-
           <!-- line type -->
           <mat-form-field class="style-input">
             <mat-label>Line type</mat-label>
             <mat-select name="linetype{{i}}" [(ngModel)]="r.lineType">
-              <mat-option *ngFor="let type of lineTypes" [value]="type.value">
+              @for (type of lineTypes; track type) {
+              <mat-option [value]="type.value">
                 {{type.name}}
               </mat-option>
+              }
             </mat-select>
             <div [ngStyle]="getLineSample(r)"></div>
           </mat-form-field>
-
           <!-- line width -->
           <mat-form-field class="style-input">
             <mat-label>Line width</mat-label>
             <mat-select name="linewidth{{i}}" [(ngModel)]="r.lineWidth"
               [disabled]="userSpecifiedWidth(r.lineType)===false">
-              <mat-option *ngFor="let width of lineWidths" [value]="width.value">
+              @for (width of lineWidths; track width) {
+              <mat-option [value]="width.value">
                 {{width.name}}
               </mat-option>
+              }
             </mat-select>
             <div [ngStyle]="getLineSample(r)"></div>
           </mat-form-field>
-
           <!-- color -->
           <mat-form-field class="style-input">
             <mat-label>Color</mat-label>
             <input matInput #hexcolor="ngModel" name="color{{i}}" [mtxColorpicker]="customPicker" [(ngModel)]="r.color"
               pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3}|[A-Fa-f0-9]{8})$" [disabled]="r.lineType==='none'">
-            <mat-error *ngIf="hexcolor.invalid">Invalid HEX color</mat-error>
-            <mtx-colorpicker-toggle matSuffix [for]="customPicker" [ngStyle]="{'color': r.color}" [disabled]="r.lineType==='none'">
-            </mtx-colorpicker-toggle>
+            @if (hexcolor.invalid) {
+            <mat-error>Invalid HEX color</mat-error>
+            }
+            <mtx-colorpicker-toggle matSuffix [for]="customPicker" [ngStyle]="{'color': r.color}"
+              [disabled]="r.lineType==='none'"></mtx-colorpicker-toggle>
             <mtx-colorpicker #customPicker [content]="customPickerContent" disabled="false"></mtx-colorpicker>
             <div [ngStyle]="getLineSample(r)"></div>
           </mat-form-field>
-
           <ng-template #customPickerContent>
             <div>
               <color-compact [colors]="presetColors" [color]="customPicker.selected"
-                (onChange)="customPicker.select(getColor($event, customPicker))">
-              </color-compact>
+                (onChange)="customPicker.select(getColor($event, customPicker))" />
             </div>
           </ng-template>
         </div>
+        }
       </mat-tab>
+      }
     </mat-tab-group>
 
-    <div *ngIf="errorMessage">
+    @if (errorMessage) {
+    <div>
       <p><small>Please correct the following error:</small></p>
       <p class="error">{{errorMessage}}</p>
     </div>
+    }
 
   </mat-dialog-content>
 
