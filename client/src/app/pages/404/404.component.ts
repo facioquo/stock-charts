@@ -1,10 +1,11 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { UtilityService } from "../../services/utility.service";
 
 @Component({
-    selector: "app-404",
-    templateUrl: "./404.component.html",
-    styleUrls: ["./404.component.scss"]
+  selector: "app-404",
+  templateUrl: "./404.component.html",
+  styleUrls: ["./404.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PageNotFoundComponent {
   private readonly util = inject(UtilityService);

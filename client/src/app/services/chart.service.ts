@@ -1,4 +1,4 @@
-import { Injectable, inject } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
 import { Observable } from "rxjs/internal/Observable";
 
@@ -83,7 +83,7 @@ export class ChartService {
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
   chartOverlay: Chart;
-  loading = true;
+  loading = signal(true);
   extraBars = 7;
 
   //#region SELECT/DISPLAY OPERATIONS
@@ -563,7 +563,7 @@ export class ChartService {
           });
         },
         complete: () => {
-          this.loading = false;
+          this.loading.set(false);
         }
       });
   }

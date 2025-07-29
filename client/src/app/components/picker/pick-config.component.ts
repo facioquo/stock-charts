@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from "@angular/material/dialog";
 
@@ -18,7 +18,7 @@ import { MatTooltip } from "@angular/material/tooltip";
 import { FormsModule } from "@angular/forms";
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { MatTabGroup, MatTab } from "@angular/material/tabs";
-import { NgIf, NgFor, NgStyle } from "@angular/common";
+import { NgStyle } from "@angular/common";
 import { MatFormField, MatLabel, MatError, MatSuffix } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatSelect, MatOption } from "@angular/material/select";
@@ -37,10 +37,11 @@ interface LineType {
 }
 
 @Component({
-    selector: "app-pick-config",
-    templateUrl: "pick-config.component.html",
-    styleUrls: ["pick-config.component.scss"],
-    imports: [MatDialogTitle, MatTooltip, FormsModule, CdkScrollable, MatDialogContent, MatTabGroup, NgIf, MatTab, NgFor, MatFormField, MatLabel, MatInput, MatError, MatSelect, MatOption, NgStyle, MtxColorpickerInput, MtxColorpickerToggle, MatSuffix, MtxColorpicker, ColorCompactModule, MatDialogActions, MatButton, MatDialogClose]
+  selector: "app-pick-config",
+  templateUrl: "pick-config.component.html",
+  styleUrls: ["pick-config.component.scss"],
+  imports: [MatDialogTitle, MatTooltip, FormsModule, CdkScrollable, MatDialogContent, MatTabGroup, MatTab, MatFormField, MatLabel, MatInput, MatError, MatSelect, MatOption, NgStyle, MtxColorpickerInput, MtxColorpickerToggle, MatSuffix, MtxColorpicker, ColorCompactModule, MatDialogActions, MatButton, MatDialogClose],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PickConfigComponent {
   listing = inject<IndicatorListing>(MAT_DIALOG_DATA);

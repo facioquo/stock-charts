@@ -1,5 +1,5 @@
-import { Component, inject } from "@angular/core";
-import { NgIf } from "@angular/common";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
+
 import { MatDialog } from "@angular/material/dialog";
 import { MatFabButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
@@ -12,7 +12,8 @@ import { SettingsComponent } from "../../components/picker/settings.component";
   selector: "app-chart",
   templateUrl: "./chart.component.html",
   styleUrls: ["./chart.component.scss"],
-  imports: [NgIf, MatFabButton, MatIcon, MatTooltip]
+  imports: [MatFabButton, MatIcon, MatTooltip],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChartComponent {
   readonly cht = inject(ChartService);

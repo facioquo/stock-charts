@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 
 import { MatCheckboxChange, MatCheckbox } from "@angular/material/checkbox";
 import { MatDialog, MatDialogContent } from "@angular/material/dialog";
@@ -16,13 +16,14 @@ import { MatTooltip } from "@angular/material/tooltip";
 import { MatIcon } from "@angular/material/icon";
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { FormsModule } from "@angular/forms";
-import { NgIf, NgFor } from "@angular/common";
+
 
 @Component({
-    selector: "app-listing",
-    templateUrl: "settings.component.html",
-    styleUrls: ["settings.component.scss"],
-    imports: [MatToolbar, MatIconButton, MatTooltip, MatIcon, CdkScrollable, MatDialogContent, MatList, MatListItem, MatSlideToggle, FormsModule, NgIf, MatSelectionList, MatCheckbox, NgFor, MatListOption, MatListItemTitle, MatButton, MatNavList, MatListItemLine]
+  selector: "app-listing",
+  templateUrl: "settings.component.html",
+  styleUrls: ["settings.component.scss"],
+  imports: [MatToolbar, MatIconButton, MatTooltip, MatIcon, CdkScrollable, MatDialogContent, MatList, MatListItem, MatSlideToggle, FormsModule, MatSelectionList, MatCheckbox, MatListOption, MatListItemTitle, MatButton, MatNavList, MatListItemLine],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SettingsComponent {
   private listRef = inject(MatDialog);
