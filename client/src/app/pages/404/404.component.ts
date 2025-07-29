@@ -2,10 +2,9 @@ import { Component, inject } from "@angular/core";
 import { UtilityService } from "../../services/utility.service";
 
 @Component({
-  selector: "app-404",
-  templateUrl: "./404.component.html",
-  styleUrls: ["./404.component.scss"],
-  standalone: false
+    selector: "app-404",
+    templateUrl: "./404.component.html",
+    styleUrls: ["./404.component.scss"]
 })
 export class PageNotFoundComponent {
   private readonly util = inject(UtilityService);

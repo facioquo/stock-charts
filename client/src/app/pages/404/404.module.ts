@@ -4,11 +4,9 @@ import { PageNotFoundRoutingModule } from "./404-routing.module";
 import { PageNotFoundComponent } from "./404.component";
 
 @NgModule({
-  declarations: [
-    PageNotFoundComponent
-  ],
-  imports: [
-    PageNotFoundRoutingModule
-  ]
+    imports: [
+        PageNotFoundRoutingModule,
+        PageNotFoundComponent
+    ]
 })
 export class PageNotFoundModule { }
