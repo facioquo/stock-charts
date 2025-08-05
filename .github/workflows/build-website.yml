@@ -68,7 +68,6 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN || '' }}
 
       - name: Add coverage to summary
         if: github.event_name == 'pull_request' && (success() || failure())
