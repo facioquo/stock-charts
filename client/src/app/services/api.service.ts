@@ -46,13 +46,7 @@ export class ApiService {
           },
 
           error: (e: HttpErrorResponse) => {
-            // Log error details for debugging while preserving error structure
-            console.error("API Error fetching selection data:", {
-              status: e.status,
-              statusText: e.statusText,
-              url: e.url,
-              message: e.message
-            });
+            console.log("DATA", e);
             observer.error(e);
           }
         });

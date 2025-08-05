@@ -16,7 +16,8 @@ import {
   ChartDataset,
   ChartOptions,
   FontSpec,
-  ScaleOptions
+  ScaleOptions,
+  TimeUnit
 } from "chart.js";
 
 // plugins
@@ -219,6 +220,9 @@ export class ChartConfigService {
   }
 
   defaultXAxisOptions(): ScaleOptions {
+    
+    // Use default time unit for daily data
+    const timeUnit = "day";
 
     const options: ScaleOptions = {
       alignToPixels: true,
@@ -226,7 +230,7 @@ export class ChartConfigService {
       offset: false,   // centers candles/bars
       type: "timeseries",
       time: {
-        unit: "day"
+        unit: timeUnit as TimeUnit
       },
       adapters: {
         date: {
