@@ -100,15 +100,33 @@ export class ChartService {
   allQuotes: Quote[] = []; // Store full quotes dataset for dynamic slicing
   allProcessedDatasets: Map<string, ChartDataset[]> = new Map(); // Store processed Chart.js datasets for efficient slicing
 
+export class ChartService {
+  private readonly api = inject(ApiService);
+  private readonly cfg = inject(ChartConfigService);
+  private readonly util = inject(UtilityService);
+  private readonly window = inject(WindowService);
++  private readonly destroy$ = new Subject<void>();
+
+  // ... other properties ...
+
   constructor() { 
     // Calculate initial bar count
     this.currentBarCount = this.window.calculateOptimalBars();
     
     // Subscribe to window resize events
-    this.window.getResizeObservable().subscribe(dimensions => {
+-    this.window.getResizeObservable().subscribe(dimensions => {
++    this.window.getResizeObservable()
++      .pipe(takeUntil(this.destroy$))
++      .subscribe(dimensions => {
       this.onWindowResize(dimensions);
     });
   }
+
++  ngOnDestroy(): void {
++    this.destroy$.next();
++    this.destroy$.complete();
++  }
+}
 
   //#region SELECT/DISPLAY OPERATIONS
   addSelection(
