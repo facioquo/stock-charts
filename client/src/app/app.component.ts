@@ -1,17 +1,18 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject, ChangeDetectionStrategy } from "@angular/core";
 import { UserService } from "./services/user.service";
+import { MatToolbar } from "@angular/material/toolbar";
+import { RouterOutlet } from "@angular/router";
 
 @Component({
-    selector: "app-root",
-    templateUrl: "./app.component.html",
-    styleUrls: ["./app.component.scss"],
-    standalone: false
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.scss"],
+  imports: [MatToolbar, RouterOutlet],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
+  private readonly usr = inject(UserService);
 
-  constructor(
-    private readonly usr: UserService
-  ) { }
 
   ngOnInit(): void {
 

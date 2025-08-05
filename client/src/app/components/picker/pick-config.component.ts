@@ -1,8 +1,8 @@
-import { Component, Inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from "@angular/material/dialog";
 
-import { MtxColorpicker } from "@ng-matero/extensions/colorpicker";
+import { MtxColorpicker, MtxColorpickerInput, MtxColorpickerToggle } from "@ng-matero/extensions/colorpicker";
 import { ColorEvent } from "ngx-color";
 import { TinyColor } from "@ctrl/tinycolor";
 
@@ -14,6 +14,17 @@ import {
   IndicatorResult,
   IndicatorSelection
 } from "../../pages/chart/chart.models";
+
+import { MatTooltip } from "@angular/material/tooltip";
+import { FormsModule } from "@angular/forms";
+import { CdkScrollable } from "@angular/cdk/scrolling";
+import { MatTabGroup, MatTab } from "@angular/material/tabs";
+import { NgStyle } from "@angular/common";
+import { MatFormField, MatLabel, MatError, MatSuffix } from "@angular/material/form-field";
+import { MatInput } from "@angular/material/input";
+import { MatSelect, MatOption } from "@angular/material/select";
+import { ColorCompactModule } from "ngx-color/compact";
+import { MatButton } from "@angular/material/button";
 
 interface LineWidth {
   name: string;
@@ -27,12 +38,17 @@ interface LineType {
 }
 
 @Component({
-    selector: "app-pick-config",
-    templateUrl: "pick-config.component.html",
-    styleUrls: ["pick-config.component.scss"],
-    standalone: false
+  selector: "app-pick-config",
+  templateUrl: "pick-config.component.html",
+  styleUrls: ["pick-config.component.scss"],
+  imports: [MatDialogTitle, MatTooltip, FormsModule, CdkScrollable, MatDialogContent, MatTabGroup, MatTab, MatFormField, MatLabel, MatInput, MatError, MatSelect, MatOption, NgStyle, MtxColorpickerInput, MtxColorpickerToggle, MatSuffix, MtxColorpicker, ColorCompactModule, MatDialogActions, MatButton, MatDialogClose],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PickConfigComponent {
+  listing = inject<IndicatorListing>(MAT_DIALOG_DATA);
+  private dialogRef = inject<MatDialogRef<PickConfigComponent>>(MatDialogRef);
+  private cht = inject(ChartService);
+
 
   // Uses the MtxColorpicker component to allow users to select a color.
   // ref: https://ng-matero.github.io/extensions/components/colorpicker
@@ -84,15 +100,9 @@ export class PickConfigComponent {
     { name: "none", value: "none", userWidth: false }
   ];
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA)
-    public listing: IndicatorListing,
-    private dialogRef: MatDialogRef<PickConfigComponent>,
-    private cht: ChartService
-  ) {
-
+  constructor() {
     // pre-populate selection
-    this.selection = this.cht.defaultSelection(listing.uiid);
+    this.selection = this.cht.defaultSelection(this.listing.uiid);
   }
 
   onSubmit(): void {

@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs/internal/Observable';
-import { env } from '../../environments/environment';
+import { Injectable, inject } from "@angular/core";
+import { HttpClient, HttpErrorResponse, HttpHeaders } from "@angular/common/http";
+import { Observable } from "rxjs/internal/Observable";
+import { env } from "../../environments/environment";
 
 import {
   IndicatorListing,
@@ -13,10 +13,8 @@ import {
   providedIn: 'root'
 })
 export class ApiService {
+  private readonly http = inject(HttpClient);
 
-  constructor(
-    private readonly http: HttpClient
-  ) { }
 
   getQuotes() {
     return this.http.get(`${env.api}/quotes`, this.requestHeader());
@@ -28,7 +26,7 @@ export class ApiService {
 
   getSelectionData(
     selection: IndicatorSelection,
-    listing: IndicatorListing): Observable<any> {
+    listing: IndicatorListing): Observable<unknown> {
 
     const obs = new Observable((observer) => {
 
@@ -43,7 +41,7 @@ export class ApiService {
       this.http.get(url, this.requestHeader())
         .subscribe({
 
-          next: (data: any[]) => {
+          next: (data: unknown[]) => {
             observer.next(data);
           },
 

@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { UserService } from "./user.service";
 
 import {
@@ -31,12 +31,10 @@ import {
   providedIn: "root"
 })
 export class ChartConfigService {
+  private readonly usr = inject(UserService);
+
 
   fontFamily = "'Google Sans', Roboto, Verdana, Helvetica, Arial, sans-serif";
-
-  constructor(
-    private readonly usr: UserService
-  ) { }
 
   baseOverlayConfig(volumeAxisSize: number): ChartConfiguration {
 

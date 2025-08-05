@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
 import { Observable } from "rxjs/internal/Observable";
 
@@ -70,7 +70,8 @@ import {
   IndicatorResult,
   IndicatorResultConfig,
   IndicatorSelection,
-  Quote
+  Quote,
+  IndicatorDataRow
 } from "../pages/chart/chart.models";
 
 // services
@@ -83,11 +84,15 @@ import { WindowService } from "./window.service";
   providedIn: "root"
 })
 export class ChartService {
+  private readonly api = inject(ApiService);
+  private readonly cfg = inject(ChartConfigService);
+  private readonly util = inject(UtilityService);
+  private readonly window = inject(WindowService);
 
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
   chartOverlay: Chart;
-  loading = true;
+  loading = signal(true);
   extraBars = 7;
   
   // Window-based sizing properties
@@ -95,12 +100,7 @@ export class ChartService {
   allQuotes: Quote[] = []; // Store full quotes dataset for dynamic slicing
   allProcessedDatasets: Map<string, ChartDataset[]> = new Map(); // Store processed Chart.js datasets for efficient slicing
 
-  constructor(
-    private readonly api: ApiService,
-    private readonly cfg: ChartConfigService,
-    private readonly util: UtilityService,
-    private readonly window: WindowService
-  ) { 
+  constructor() { 
     // Calculate initial bar count
     this.currentBarCount = this.window.calculateOptimalBars();
     
@@ -114,7 +114,7 @@ export class ChartService {
   addSelection(
     selection: IndicatorSelection,
     listing: IndicatorListing,
-    scrollToMe: boolean = false): Observable<any> {
+    scrollToMe: boolean = false): Observable<unknown> {
 
     const green = "#2E7D32";
     const gray = "#9E9E9E";
@@ -131,7 +131,7 @@ export class ChartService {
         .subscribe({
 
           // compose datasets
-          next: (data: any[]) => {
+          next: (data: IndicatorDataRow[]) => {
 
             // compose datasets
             // parse each dataset
@@ -149,27 +149,27 @@ export class ChartService {
                 // populate data
                 data.forEach(row => {
 
-                  let yValue = row[result.dataName];
+                  let yValue = typeof row[result.dataName] === "number" ? row[result.dataName] as number : null;
 
                   // apply candle pointers
                   if (yValue && listing.category === "candlestick-pattern") {
 
-                    switch (row["match"]) {
+                    switch ((row["match"] as number)) {
 
                       case -100:
-                        yValue = 1.01 * row["candle"].high;
+                        yValue = 1.01 * (row.candle as Quote).high;
                         pointColor.push(red);
                         pointRotation.push(180);
                         break;
 
                       case 100:
-                        yValue = 0.99 * row["candle"].low;
+                        yValue = 0.99 * (row.candle as Quote).low;
                         pointColor.push(green);
                         pointRotation.push(0);
                         break;
 
                       default:
-                        yValue = 0.99 * row["candle"].low;
+                        yValue = 0.99 * (row.candle as Quote).low;
                         pointColor.push(gray);
                         pointRotation.push(0);
                         break;
@@ -702,7 +702,7 @@ export class ChartService {
                 // load indicators
                 this.loadSelections();
               },
-              error: (e: HttpErrorResponse) => { 
+              error: (e: HttpErrorResponse) => {
                 console.error("Error loading listings:", {
                   status: e.status,
                   statusText: e.statusText,
@@ -711,7 +711,7 @@ export class ChartService {
               }
             });
         },
-        error: (e: HttpErrorResponse) => { 
+        error: (e: HttpErrorResponse) => {
           console.error("Error getting quotes:", {
             status: e.status,
             statusText: e.statusText,
@@ -719,7 +719,7 @@ export class ChartService {
           });
         },
         complete: () => {
-          this.loading = false;
+          this.loading.set(false);
         }
       });
   }

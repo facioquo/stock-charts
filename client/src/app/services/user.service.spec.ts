@@ -7,10 +7,10 @@ describe("UserService", () => {
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(UserService);
-    
+
     // Clear localStorage before each test
     localStorage.clear();
-    
+
     // Reset document body classes
     document.body.className = "";
   });
@@ -102,7 +102,7 @@ describe("UserService", () => {
 
     it("should remove previous theme class when switching", () => {
       document.body.classList.add("dark-theme");
-      
+
       service.changeTheme(false);
 
       expect(document.body.classList.contains("light-theme")).toBe(true);
@@ -111,7 +111,7 @@ describe("UserService", () => {
 
     it("should cache settings after theme change", () => {
       jest.spyOn(service, "cacheSettings");
-      
+
       service.changeTheme(false);
 
       expect(service.cacheSettings).toHaveBeenCalled();
@@ -134,7 +134,7 @@ describe("UserService", () => {
 
     it("should cache settings after tooltip change", () => {
       jest.spyOn(service, "cacheSettings");
-      
+
       service.changeTooltips(true);
 
       expect(service.cacheSettings).toHaveBeenCalled();

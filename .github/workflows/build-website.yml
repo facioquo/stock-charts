@@ -62,14 +62,14 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
-          file: ./client/coverage/lcov.info
+          files: ./client/coverage/lcov.info
           directory: ./client/coverage/
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
 
       - name: Coverage Report
-        uses: romeovs/lcov-reporter-action@v0.3.1
+        uses: romeovs/lcov-reporter-action@v0.4.0
         if: success() || failure()
         with:
           lcov-file: ./client/coverage/lcov.info
@@ -83,7 +83,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Metric | Coverage |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|----------|" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ -f "./client/coverage/lcov.info" ]; then
             # Extract coverage data from lcov.info
             STATEMENTS=$(grep -o "LF:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
@@ -92,19 +92,19 @@ jobs:
             HIT_FUNCTIONS=$(grep -o "FNH:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
             BRANCHES=$(grep -o "BRF:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
             HIT_BRANCHES=$(grep -o "BRH:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-            
+
             # Calculate percentages using awk
             STMT_PCT=$(echo "$HIT_STATEMENTS $STATEMENTS" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
             FUNC_PCT=$(echo "$HIT_FUNCTIONS $FUNCTIONS" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
             BRANCH_PCT=$(echo "$HIT_BRANCHES $BRANCHES" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
-            
+
             echo "| Statements | ${STMT_PCT}% (${HIT_STATEMENTS}/${STATEMENTS}) |" >> $GITHUB_STEP_SUMMARY
-            echo "| Functions | ${FUNC_PCT}% (${HIT_FUNCTIONS}/${FUNCTIONS}) |" >> $GITHUB_STEP_SUMMARY  
+            echo "| Functions | ${FUNC_PCT}% (${HIT_FUNCTIONS}/${FUNCTIONS}) |" >> $GITHUB_STEP_SUMMARY
             echo "| Branches | ${BRANCH_PCT}% (${HIT_BRANCHES}/${BRANCHES}) |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| Coverage data | Not available |" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "📁 **Coverage report:** Check the artifacts for detailed HTML coverage report" >> $GITHUB_STEP_SUMMARY
 
