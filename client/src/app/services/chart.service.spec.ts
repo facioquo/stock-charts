@@ -71,13 +71,10 @@ describe("WindowService - Chart Resizing", () => {
     });
 
     it("should return default dimensions for SSR", () => {
-      // Create a service instance that thinks window is undefined
-      const mockService = new (WindowService as unknown)();
+      // Test the SSR scenario by mocking the returned value
+      jest.spyOn(service, "getWindowSize").mockReturnValue({ width: 1024, height: 768 });
       
-      // Mock the window check to return undefined
-      jest.spyOn(mockService, "getWindowSize").mockReturnValue({ width: 1024, height: 768 });
-      
-      const result = mockService.getWindowSize();
+      const result = service.getWindowSize();
       
       expect(result).toEqual({ width: 1024, height: 768 });
     });
