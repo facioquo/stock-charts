@@ -60,6 +60,7 @@ jobs:
           reporter: jest-junit
 
       - name: Upload coverage reports to Codecov
+        if: github.event_name == 'pull_request'
         uses: codecov/codecov-action@v5
         with:
           files: ./client/coverage/lcov.info
@@ -70,7 +71,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN || '' }}
 
       - name: Add coverage to summary
-        if: success() || failure()
+        if: github.event_name == 'pull_request' && (success() || failure())
         run: |
           echo "## 📊 Test Coverage Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -102,8 +103,8 @@ jobs:
           echo "📁 **Coverage report:** Check the artifacts for detailed HTML coverage report" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload coverage artifacts
+        if: github.event_name == 'pull_request' && (success() || failure())
         uses: actions/upload-artifact@v4
-        if: success() || failure()
         with:
           name: coverage-report
           path: |
