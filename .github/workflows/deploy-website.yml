@@ -64,7 +64,6 @@ jobs:
           -warnAsError
 
       - name: Package Web API
-        if: github.ref == 'refs/heads/main'
         working-directory: server
         run: >
           dotnet publish WebApi/WebApi.csproj
@@ -72,7 +71,6 @@ jobs:
           --property:PublishDir="../artifacts/api"
 
       - name: Package Functions
-        if: github.ref == 'refs/heads/main'
         working-directory: server
         run: >
           dotnet publish Functions/Functions.csproj
@@ -80,7 +78,6 @@ jobs:
           --property:PublishDir="../artifacts/fns"
 
       - name: Save Web API
-        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: api
@@ -88,7 +85,6 @@ jobs:
           include-hidden-files: true
 
       - name: Save Functions
-        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: fns
@@ -155,14 +151,12 @@ jobs:
 
     steps:
       - name: Download Functions package
-        if: github.ref == 'refs/heads/main'
         uses: actions/download-artifact@v4
         with:
           name: fns
           path: artifacts/fns
 
       - name: Download API package
-        if: github.ref == 'refs/heads/main'
         uses: actions/download-artifact@v4
         with:
           name: api
@@ -175,7 +169,6 @@ jobs:
           path: artifacts/web
 
       - name: Deploy Functions
-        if: github.ref == 'refs/heads/main'
         uses: Azure/functions-action@v1
         with:
           app-name: stock-charts-functions
@@ -183,7 +176,6 @@ jobs:
           publish-profile: ${{ secrets.PUBLISH_PROFILE_FNS }}
 
       - name: Deploy API
-        if: github.ref == 'refs/heads/main'
         uses: azure/webapps-deploy@v3
         with:
           app-name: stock-charts-api
