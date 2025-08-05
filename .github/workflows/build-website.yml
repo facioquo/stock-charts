@@ -67,15 +67,7 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Coverage Report
-        uses: romeovs/lcov-reporter-action@v0.4.0
-        if: github.event_name == 'pull_request' && (success() || failure())
-        with:
-          lcov-file: ./client/coverage/lcov.info
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          delete-old-comments: true
+          token: ${{ secrets.CODECOV_TOKEN || '' }}
 
       - name: Add coverage to summary
         if: success() || failure()
