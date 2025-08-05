@@ -600,27 +600,25 @@ export class ChartService implements OnDestroy {
     const fullPriceDataset = fullMainDatasets[0];
     const currentPriceDataset = this.chartOverlay.data.datasets[0];
     if (fullPriceDataset && currentPriceDataset && fullPriceDataset.type === "candlestick") {
-      // Slice the price data to match current bar count, plus extra bars
-      const slicedPriceData = fullPriceDataset.data.slice(startIndex);
-      currentPriceDataset.data = slicedPriceData;
+      // Replace the data array entirely (Chart.js better detects this change)
+      currentPriceDataset.data = [...fullPriceDataset.data.slice(startIndex)];
     }
     
     // Update volume dataset (bar dataset - typically index 1)
     const fullVolumeDataset = fullMainDatasets[1];
     const currentVolumeDataset = this.chartOverlay.data.datasets[1];
     if (fullVolumeDataset && currentVolumeDataset && fullVolumeDataset.type === "bar") {
-      // Slice the volume data and background colors to match current bar count
-      const slicedVolumeData = fullVolumeDataset.data.slice(startIndex);
-      currentVolumeDataset.data = slicedVolumeData;
+      // Replace the data array entirely
+      currentVolumeDataset.data = [...fullVolumeDataset.data.slice(startIndex)];
       
       // Also slice the background colors array
       if (fullVolumeDataset.backgroundColor && Array.isArray(fullVolumeDataset.backgroundColor)) {
-        currentVolumeDataset.backgroundColor = fullVolumeDataset.backgroundColor.slice(startIndex);
+        currentVolumeDataset.backgroundColor = [...fullVolumeDataset.backgroundColor.slice(startIndex)];
       }
     }
     
-    // Update overlay chart with resize mode for proper scale recalculation
-    this.chartOverlay.update("resize");
+    // Use default update mode for data changes, not resize mode
+    this.chartOverlay.update();
   }
   
   private updateIndicatorDatasetsWithSlicedData() {
@@ -640,41 +638,41 @@ export class ChartService implements OnDestroy {
         const fullDataset = fullDatasets[resultIndex];
         if (!fullDataset.data || !Array.isArray(fullDataset.data)) return;
         
-        // Slice the dataset data using the same logic as main overlay chart
-        result.dataset.data = fullDataset.data.slice(startIndex);
+        // Replace the dataset data array entirely (Chart.js better detects this change)
+        result.dataset.data = [...fullDataset.data.slice(startIndex)];
         
         // Also slice any array properties like pointRotation, pointBackgroundColor, etc.
         const extendedDataset = fullDataset as ExtendedChartDataset;
         const resultExtended = result.dataset as ExtendedChartDataset;
         
         if (extendedDataset.pointRotation && Array.isArray(extendedDataset.pointRotation)) {
-          resultExtended.pointRotation = extendedDataset.pointRotation.slice(startIndex);
+          resultExtended.pointRotation = [...extendedDataset.pointRotation.slice(startIndex)];
         }
         
         if (extendedDataset.pointBackgroundColor && Array.isArray(extendedDataset.pointBackgroundColor)) {
-          resultExtended.pointBackgroundColor = (extendedDataset.pointBackgroundColor as string[]).slice(startIndex);
+          resultExtended.pointBackgroundColor = [...(extendedDataset.pointBackgroundColor as string[]).slice(startIndex)];
         }
         
         if (extendedDataset.pointBorderColor && Array.isArray(extendedDataset.pointBorderColor)) {
-          resultExtended.pointBorderColor = (extendedDataset.pointBorderColor as string[]).slice(startIndex);
+          resultExtended.pointBorderColor = [...(extendedDataset.pointBorderColor as string[]).slice(startIndex)];
         }
         
         // Handle backgroundColor for bar charts (like volume)
         if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
-          result.dataset.backgroundColor = fullDataset.backgroundColor.slice(startIndex);
+          result.dataset.backgroundColor = [...fullDataset.backgroundColor.slice(startIndex)];
         }
       });
       
-      // Update the chart if it's an oscillator with resize mode
+      // Update the chart if it's an oscillator with default mode for data changes
       if (selection.chartType === "oscillator" && selection.chart) {
-        selection.chart.update("resize");
+        selection.chart.update();
       }
     });
     
-    // Update overlay chart legends and final update with resize mode
+    // Update overlay chart legends and final update
     if (this.chartOverlay) {
       this.addOverlayLegend();
-      this.chartOverlay.update("resize");
+      this.chartOverlay.update();
     }
   }
   //#endregion
