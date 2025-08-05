@@ -619,8 +619,8 @@ export class ChartService implements OnDestroy {
       }
     }
     
-    // Update overlay chart
-    this.chartOverlay.update("none");
+    // Update overlay chart with resize mode for proper scale recalculation
+    this.chartOverlay.update("resize");
   }
   
   private updateIndicatorDatasetsWithSlicedData() {
@@ -665,16 +665,16 @@ export class ChartService implements OnDestroy {
         }
       });
       
-      // Update the chart if it's an oscillator
+      // Update the chart if it's an oscillator with resize mode
       if (selection.chartType === "oscillator" && selection.chart) {
-        selection.chart.update("none");
+        selection.chart.update("resize");
       }
     });
     
-    // Update overlay chart legends and final update
+    // Update overlay chart legends and final update with resize mode
     if (this.chartOverlay) {
       this.addOverlayLegend();
-      this.chartOverlay.update("none");
+      this.chartOverlay.update("resize");
     }
   }
   //#endregion
