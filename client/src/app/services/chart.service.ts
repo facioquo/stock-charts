@@ -584,6 +584,9 @@ export class ChartService implements OnDestroy {
     
     // Update all indicator datasets with sliced data
     this.updateIndicatorDatasetsWithSlicedData();
+    
+    // Force charts to resize after data updates for proper scaling
+    this.forceChartsResize();
   }
   
   private updateOverlayChartWithSlicedData() {
@@ -617,8 +620,8 @@ export class ChartService implements OnDestroy {
       }
     }
     
-    // Use default update mode for data changes, not resize mode
-    this.chartOverlay.update();
+    // Update overlay chart legends after data changes
+    this.addOverlayLegend();
   }
   
   private updateIndicatorDatasetsWithSlicedData() {
@@ -663,17 +666,31 @@ export class ChartService implements OnDestroy {
         }
       });
       
-      // Update the chart if it's an oscillator with default mode for data changes
+      // Update oscillator legends after data changes
       if (selection.chartType === "oscillator" && selection.chart) {
-        selection.chart.update();
+        this.addOscillatorLegend(selection);
       }
     });
-    
-    // Update overlay chart legends and final update
+  }
+  
+  private forceChartsResize() {
+    // Force overlay chart to resize and update with new data
     if (this.chartOverlay) {
-      this.addOverlayLegend();
-      this.chartOverlay.update();
+      // First resize the chart to match new container dimensions
+      this.chartOverlay.resize();
+      // Then update with 'resize' mode for better performance during window resize
+      this.chartOverlay.update("resize");
     }
+    
+    // Force all oscillator charts to resize and update
+    this.selections.forEach(selection => {
+      if (selection.chartType === "oscillator" && selection.chart) {
+        // First resize the chart to match new container dimensions
+        selection.chart.resize();
+        // Then update with 'resize' mode for better performance during window resize
+        selection.chart.update("resize");
+      }
+    });
   }
   //#endregion
 
