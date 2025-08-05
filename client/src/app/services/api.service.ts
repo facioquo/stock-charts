@@ -7,10 +7,10 @@ import {
   IndicatorListing,
   IndicatorParam,
   IndicatorSelection
-} from '../pages/chart/chart.models';
+} from "../pages/chart/chart.models";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class ApiService {
   private readonly http = inject(HttpClient);
@@ -59,7 +59,7 @@ export class ApiService {
   requestHeader(): { headers?: HttpHeaders } {
 
     const simpleHeaders = new HttpHeaders()
-      .set('Content-Type', 'application/json');
+      .set("Content-Type", "application/json");
 
     return { headers: simpleHeaders };
   }

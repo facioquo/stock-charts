@@ -1,16 +1,16 @@
-import { Injectable } from '@angular/core';
-import { Observable, Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { Observable, Subject, debounceTime, distinctUntilChanged } from "rxjs";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class WindowService {
   private resizeSubject = new Subject<{ width: number; height: number }>();
   
   constructor() {
     // Listen for window resize events
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', () => {
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", () => {
         this.resizeSubject.next({
           width: window.innerWidth,
           height: window.innerHeight
@@ -23,7 +23,7 @@ export class WindowService {
    * Get window dimensions
    */
   getWindowSize(): { width: number; height: number } {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       return {
         width: window.innerWidth,
         height: window.innerHeight

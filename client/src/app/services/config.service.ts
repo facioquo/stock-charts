@@ -222,7 +222,7 @@ export class ChartConfigService {
   defaultXAxisOptions(): ScaleOptions {
     
     // Use default time unit for daily data
-    const timeUnit = 'day';
+    const timeUnit = "day";
 
     const options: ScaleOptions = {
       alignToPixels: true,

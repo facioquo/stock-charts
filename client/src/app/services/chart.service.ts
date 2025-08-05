@@ -1,6 +1,6 @@
-import { Injectable, inject, signal } from "@angular/core";
+import { Injectable, inject, signal, OnDestroy } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
-import { Observable } from "rxjs/internal/Observable";
+import { Observable, Subject, takeUntil } from "rxjs";
 
 import {
   BarElement,
@@ -83,11 +83,12 @@ import { WindowService } from "./window.service";
 @Injectable({
   providedIn: "root"
 })
-export class ChartService {
+export class ChartService implements OnDestroy {
   private readonly api = inject(ApiService);
   private readonly cfg = inject(ChartConfigService);
   private readonly util = inject(UtilityService);
   private readonly window = inject(WindowService);
+  private readonly destroy$ = new Subject<void>();
 
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
@@ -100,33 +101,22 @@ export class ChartService {
   allQuotes: Quote[] = []; // Store full quotes dataset for dynamic slicing
   allProcessedDatasets: Map<string, ChartDataset[]> = new Map(); // Store processed Chart.js datasets for efficient slicing
 
-export class ChartService {
-  private readonly api = inject(ApiService);
-  private readonly cfg = inject(ChartConfigService);
-  private readonly util = inject(UtilityService);
-  private readonly window = inject(WindowService);
-+  private readonly destroy$ = new Subject<void>();
-
-  // ... other properties ...
-
   constructor() { 
     // Calculate initial bar count
     this.currentBarCount = this.window.calculateOptimalBars();
     
-    // Subscribe to window resize events
--    this.window.getResizeObservable().subscribe(dimensions => {
-+    this.window.getResizeObservable()
-+      .pipe(takeUntil(this.destroy$))
-+      .subscribe(dimensions => {
-      this.onWindowResize(dimensions);
-    });
+    // Subscribe to window resize events with proper cleanup
+    this.window.getResizeObservable()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(dimensions => {
+        this.onWindowResize(dimensions);
+      });
   }
 
-+  ngOnDestroy(): void {
-+    this.destroy$.next();
-+    this.destroy$.complete();
-+  }
-}
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   //#region SELECT/DISPLAY OPERATIONS
   addSelection(
@@ -599,7 +589,7 @@ export class ChartService {
   private updateOverlayChartWithSlicedData() {
     if (!this.chartOverlay) return;
     
-    const fullMainDatasets = this.allProcessedDatasets.get('overlay-main');
+    const fullMainDatasets = this.allProcessedDatasets.get("overlay-main");
     if (!fullMainDatasets) return;
     
     // Calculate slice indices for consistent x-axis across all datasets
@@ -609,7 +599,7 @@ export class ChartService {
     // Update price dataset (candlestick dataset - typically index 0)
     const fullPriceDataset = fullMainDatasets[0];
     const currentPriceDataset = this.chartOverlay.data.datasets[0];
-    if (fullPriceDataset && currentPriceDataset && fullPriceDataset.type === 'candlestick') {
+    if (fullPriceDataset && currentPriceDataset && fullPriceDataset.type === "candlestick") {
       // Slice the price data to match current bar count, plus extra bars
       const slicedPriceData = fullPriceDataset.data.slice(startIndex);
       currentPriceDataset.data = slicedPriceData;
@@ -618,7 +608,7 @@ export class ChartService {
     // Update volume dataset (bar dataset - typically index 1)
     const fullVolumeDataset = fullMainDatasets[1];
     const currentVolumeDataset = this.chartOverlay.data.datasets[1];
-    if (fullVolumeDataset && currentVolumeDataset && fullVolumeDataset.type === 'bar') {
+    if (fullVolumeDataset && currentVolumeDataset && fullVolumeDataset.type === "bar") {
       // Slice the volume data and background colors to match current bar count
       const slicedVolumeData = fullVolumeDataset.data.slice(startIndex);
       currentVolumeDataset.data = slicedVolumeData;
@@ -831,7 +821,7 @@ export class ChartService {
     chartConfig.data = chartData;
 
     // Store the complete overlay chart datasets for efficient resizing (deep copy)
-    this.allProcessedDatasets.set('overlay-main', JSON.parse(JSON.stringify(chartData.datasets)));
+    this.allProcessedDatasets.set("overlay-main", JSON.parse(JSON.stringify(chartData.datasets)));
 
     // compose chart
     if (this.chartOverlay) this.chartOverlay.destroy();
