@@ -95,16 +95,16 @@ export class ChartService implements OnDestroy {
   chartOverlay: Chart;
   loading = signal(true);
   extraBars = 7;
-  
+
   // Window-based sizing properties
   currentBarCount: number;
   allQuotes: Quote[] = []; // Store full quotes dataset for dynamic slicing
   allProcessedDatasets: Map<string, ChartDataset[]> = new Map(); // Store processed Chart.js datasets for efficient slicing
 
-  constructor() { 
+  constructor() {
     // Calculate initial bar count
     this.currentBarCount = this.window.calculateOptimalBars();
-    
+
     // Subscribe to window resize events with proper cleanup
     this.window.getResizeObservable()
       .pipe(takeUntil(this.destroy$))
@@ -221,7 +221,7 @@ export class ChartService implements OnDestroy {
             selection = this.selectionTokenReplacement(selection);
 
             // Store processed datasets for efficient resizing (deep copy to avoid reference issues)
-            this.allProcessedDatasets.set(selection.ucid, 
+            this.allProcessedDatasets.set(selection.ucid,
               selection.results.map(result => JSON.parse(JSON.stringify(result.dataset)))
             );
 
@@ -565,40 +565,40 @@ export class ChartService implements OnDestroy {
   //#endregion
 
   //#region WINDOW OPERATIONS
-  
+
   onWindowResize(dimensions: { width: number; height: number }) {
     const newBarCount = this.window.calculateOptimalBars(dimensions.width);
-    
+
     // Only update if bar count changed significantly and we have data
     if (Math.abs(newBarCount - this.currentBarCount) > 10 && this.allQuotes.length > 0) {
       this.currentBarCount = newBarCount;
       this.updateChartsWithNewBarCount();
     }
   }
-  
+
   private updateChartsWithNewBarCount() {
     console.log(`Updating charts with ${this.currentBarCount} bars (dynamic resize)`);
-    
+
     // Update main overlay chart datasets with new bar count
     this.updateOverlayChartWithSlicedData();
-    
+
     // Update all indicator datasets with sliced data
     this.updateIndicatorDatasetsWithSlicedData();
-    
+
     // Force charts to resize after data updates for proper scaling
     this.forceChartsResize();
   }
-  
+
   private updateOverlayChartWithSlicedData() {
     if (!this.chartOverlay) return;
-    
+
     const fullMainDatasets = this.allProcessedDatasets.get("overlay-main");
     if (!fullMainDatasets) return;
-    
+
     // Calculate slice indices for consistent x-axis across all datasets
     const totalQuotes = this.allQuotes.length;
     const startIndex = Math.max(0, totalQuotes - this.currentBarCount);
-    
+
     // Update price dataset (candlestick dataset - typically index 0)
     const fullPriceDataset = fullMainDatasets[0];
     const currentPriceDataset = this.chartOverlay.data.datasets[0];
@@ -606,73 +606,73 @@ export class ChartService implements OnDestroy {
       // Replace the data array entirely (Chart.js better detects this change)
       currentPriceDataset.data = [...fullPriceDataset.data.slice(startIndex)];
     }
-    
+
     // Update volume dataset (bar dataset - typically index 1)
     const fullVolumeDataset = fullMainDatasets[1];
     const currentVolumeDataset = this.chartOverlay.data.datasets[1];
     if (fullVolumeDataset && currentVolumeDataset && fullVolumeDataset.type === "bar") {
       // Replace the data array entirely
       currentVolumeDataset.data = [...fullVolumeDataset.data.slice(startIndex)];
-      
+
       // Also slice the background colors array
       if (fullVolumeDataset.backgroundColor && Array.isArray(fullVolumeDataset.backgroundColor)) {
         currentVolumeDataset.backgroundColor = [...fullVolumeDataset.backgroundColor.slice(startIndex)];
       }
     }
-    
+
     // Update overlay chart legends after data changes
     this.addOverlayLegend();
   }
-  
+
   private updateIndicatorDatasetsWithSlicedData() {
     // Use consistent slicing based on allQuotes length for all datasets
     const totalQuotes = this.allQuotes.length;
     const startIndex = Math.max(0, totalQuotes - this.currentBarCount);
-    
+
     // Update each selection's datasets by slicing the processed Chart.js datasets
     this.selections.forEach(selection => {
       const fullDatasets = this.allProcessedDatasets.get(selection.ucid);
       if (!fullDatasets) return;
-      
+
       // Update each result dataset for this selection
       selection.results.forEach((result: IndicatorResult, resultIndex: number) => {
         if (!result.dataset || !fullDatasets[resultIndex]) return;
-        
+
         const fullDataset = fullDatasets[resultIndex];
         if (!fullDataset.data || !Array.isArray(fullDataset.data)) return;
-        
+
         // Replace the dataset data array entirely (Chart.js better detects this change)
         result.dataset.data = [...fullDataset.data.slice(startIndex)];
-        
+
         // Also slice any array properties like pointRotation, pointBackgroundColor, etc.
         const extendedDataset = fullDataset as ExtendedChartDataset;
         const resultExtended = result.dataset as ExtendedChartDataset;
-        
+
         if (extendedDataset.pointRotation && Array.isArray(extendedDataset.pointRotation)) {
           resultExtended.pointRotation = [...extendedDataset.pointRotation.slice(startIndex)];
         }
-        
+
         if (extendedDataset.pointBackgroundColor && Array.isArray(extendedDataset.pointBackgroundColor)) {
           resultExtended.pointBackgroundColor = [...(extendedDataset.pointBackgroundColor as string[]).slice(startIndex)];
         }
-        
+
         if (extendedDataset.pointBorderColor && Array.isArray(extendedDataset.pointBorderColor)) {
           resultExtended.pointBorderColor = [...(extendedDataset.pointBorderColor as string[]).slice(startIndex)];
         }
-        
+
         // Handle backgroundColor for bar charts (like volume)
         if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
           result.dataset.backgroundColor = [...fullDataset.backgroundColor.slice(startIndex)];
         }
       });
-      
+
       // Update oscillator legends after data changes
       if (selection.chartType === "oscillator" && selection.chart) {
         this.addOscillatorLegend(selection);
       }
     });
   }
-  
+
   private forceChartsResize() {
     // Force overlay chart to resize and update with new data
     if (this.chartOverlay) {
@@ -681,7 +681,7 @@ export class ChartService implements OnDestroy {
       // Then update with 'resize' mode for better performance during window resize
       this.chartOverlay.update("resize");
     }
-    
+
     // Force all oscillator charts to resize and update
     this.selections.forEach(selection => {
       if (selection.chartType === "oscillator" && selection.chart) {
@@ -703,10 +703,10 @@ export class ChartService implements OnDestroy {
     this.api.getQuotes()
       .subscribe({
         next: (allQuotes: Quote[]) => {
-          
+
           // Store full dataset for dynamic slicing
           this.allQuotes = allQuotes;
-          
+
           // Slice array to desired length based on window size (keep newest data)
           const quotes = allQuotes.slice(-this.currentBarCount);
 

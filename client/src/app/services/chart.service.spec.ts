@@ -16,25 +16,25 @@ describe("Chart Resize Logic", () => {
     it("should calculate optimal bars based on window width", () => {
       const width = 1000;
       const expectedBars = Math.floor(width / 5); // 200 bars
-      
+
       const result = windowService.calculateOptimalBars(width);
-      
+
       expect(result).toBe(expectedBars);
     });
 
     it("should enforce minimum bar count", () => {
       const smallWidth = 50; // Would give 10 bars
-      
+
       const result = windowService.calculateOptimalBars(smallWidth);
-      
+
       expect(result).toBe(20); // Should use minimum
     });
 
     it("should enforce maximum bar count", () => {
       const largeWidth = 3000; // Would give 600 bars
-      
+
       const result = windowService.calculateOptimalBars(largeWidth);
-      
+
       expect(result).toBe(500); // Should use maximum
     });
 
@@ -45,10 +45,10 @@ describe("Chart Resize Logic", () => {
         configurable: true,
         value: 1200
       });
-      
+
       const result = windowService.calculateOptimalBars();
       const expected = Math.floor(1200 / 5); // 240 bars
-      
+
       expect(result).toBe(expected);
     });
 
@@ -63,9 +63,9 @@ describe("Chart Resize Logic", () => {
         configurable: true,
         value: 1080
       });
-      
+
       const result = windowService.getWindowSize();
-      
+
       expect(result).toEqual({ width: 1920, height: 1080 });
     });
   });
@@ -73,9 +73,9 @@ describe("Chart Resize Logic", () => {
   describe("Resize observable", () => {
     it("should provide resize observable", () => {
       const resizeObservable = windowService.getResizeObservable();
-      
+
       expect(resizeObservable).toBeDefined();
-      
+
       // Test that the observable emits values
       let emittedValue: { width: number; height: number } | undefined;
       resizeObservable.subscribe(value => {
@@ -85,10 +85,10 @@ describe("Chart Resize Logic", () => {
       // Simulate a resize event
       Object.defineProperty(window, "innerWidth", { value: 800 });
       Object.defineProperty(window, "innerHeight", { value: 600 });
-      
+
       const resizeEvent = new Event("resize");
       window.dispatchEvent(resizeEvent);
-      
+
       // Allow time for debounce
       setTimeout(() => {
         expect(emittedValue).toBeDefined();
