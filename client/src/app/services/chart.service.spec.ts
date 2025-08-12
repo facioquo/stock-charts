@@ -8,7 +8,16 @@ describe("WindowService - Chart Resizing", () => {
     TestBed.configureTestingModule({
       providers: [WindowService]
     });
-    service = TestBed.inject(WindowService);
+import { ChartService } from "./chart.service";
+
+describe("ChartService - Chart Resizing", () => {
+  let service: ChartService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [ChartService]
+    });
+    service = TestBed.inject(ChartService);
   });
 
   describe("calculateOptimalBars", () => {
