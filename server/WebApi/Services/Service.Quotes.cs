@@ -1,7 +1,4 @@
 using System.Text.Json;
-using Azure;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 
 namespace WebApi.Services;
 
@@ -62,10 +59,12 @@ public partial class QuoteService(
 
             return quotes.OrderBy(x => x.Date);
         }
+
+        // failover to random quotes
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to retrieve quotes for {Symbol}", symbol);
-            return backupQuotes;
+            return new RandomQuotes(bars: 800, periodSize: PeriodSize.Day);
         }
     }
 }
