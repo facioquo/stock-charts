@@ -43,10 +43,21 @@ jobs:
           cache-dependency-path: client/package-lock.json
         continue-on-error: true
 
-      - name: Install client dependencies
+      - name: Install NPM dependencies
         working-directory: client
         run: |
           npm install
+
+          echo "Installing Angular 'ng' CLI tool ..."
+          npm install --global @angular/cli
+          ng --help
+
+          echo "Installing Azure Functions tools ..."
+          npm install --global azure-functions-core-tools
+
+          echo "Installing 'azurite' tools ..."
+          npm install --global azurite
+          azurite --help
         continue-on-error: true
 
       - name: Environment summary
