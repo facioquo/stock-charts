@@ -569,8 +569,8 @@ export class ChartService implements OnDestroy {
   onWindowResize(dimensions: { width: number; height: number }) {
     const newBarCount = this.window.calculateOptimalBars(dimensions.width);
 
-    // Only update if bar count changed significantly and we have data
-    if (Math.abs(newBarCount - this.currentBarCount) > 10 && this.allQuotes.length > 0) {
+    // Only update if bar count changed and we have data
+    if (newBarCount !== this.currentBarCount && this.allQuotes.length > 0) {
       this.currentBarCount = newBarCount;
       this.updateChartsWithNewBarCount();
     }
