@@ -674,59 +674,30 @@ export class ChartService implements OnDestroy {
   }
 
   private forceChartsResize() {
-  // Allow CSS container changes to take effect before resizing charts
-  // This prevents the race condition between CSS aspect-ratio changes and Chart.js resize detection
-  setTimeout(() => {
-    // Force overlay chart to resize and update with new data
-    if (this.chartOverlay) {
-      // Check if container size has actually changed
-      const canvas = this.chartOverlay.canvas;
-      const container = canvas.parentElement;
-      
-      if (container) {
-        const containerRect = container.getBoundingClientRect();
-        const currentCanvasWidth = this.chartOverlay.width;
-        const currentCanvasHeight = this.chartOverlay.height;
-        
-        // Only resize if container dimensions significantly changed
-        if (Math.abs(containerRect.width - currentCanvasWidth) > 10 || 
-            Math.abs(containerRect.height - currentCanvasHeight) > 10) {
-          
-          // Force Chart.js to recalculate dimensions
-          this.chartOverlay.resize(containerRect.width, containerRect.height);
-          
-          // Update with optimized resize mode
-          this.chartOverlay.update("resize");
-        }
-      }
-    }
+    // Use requestAnimationFrame to ensure DOM changes are applied before resizing
+    requestAnimationFrame(() => {
+      this.resizeOverlayChart();
+      this.resizeOscillatorCharts();
+    });
+  }
 
-    // Force all oscillator charts to resize and update
+  private resizeOverlayChart() {
+    if (this.chartOverlay) {
+      // Let Chart.js automatically detect container dimensions
+      this.chartOverlay.resize();
+      this.chartOverlay.update("resize");
+    }
+  }
+
+  private resizeOscillatorCharts() {
     this.selections.forEach(selection => {
       if (selection.chartType === "oscillator" && selection.chart) {
-        const canvas = selection.chart.canvas;
-        const container = canvas.parentElement;
-        
-        if (container) {
-          const containerRect = container.getBoundingClientRect();
-          const currentCanvasWidth = selection.chart.width;
-          const currentCanvasHeight = selection.chart.height;
-          
-          // Only resize if container dimensions significantly changed
-          if (Math.abs(containerRect.width - currentCanvasWidth) > 10 || 
-              Math.abs(containerRect.height - currentCanvasHeight) > 10) {
-            
-            // Force Chart.js to recalculate dimensions
-            selection.chart.resize(containerRect.width, containerRect.height);
-            
-            // Update with optimized resize mode
-            selection.chart.update("resize");
-          }
-        }
+        // Let Chart.js automatically detect container dimensions
+        selection.chart.resize();
+        selection.chart.update("resize");
       }
     });
-  }, 16); // Single requestAnimationFrame delay to ensure CSS changes are applied
-}
+  }
   //#endregion
 
   //#region DATA OPERATIONS

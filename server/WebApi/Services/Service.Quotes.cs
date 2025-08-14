@@ -60,11 +60,11 @@ public partial class QuoteService(
             return quotes.OrderBy(x => x.Date);
         }
 
-        // failover to random quotes
+        // failover to backup quotes for local development and testing
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to retrieve quotes for {Symbol}", symbol);
-            return new RandomQuotes(bars: 800, periodSize: PeriodSize.Day);
+            return backupQuotes;
         }
     }
 }
