@@ -29,9 +29,6 @@ server
 # Logs
 *.log
 
-# IDE
-.vscode/settings.json
-
 # Test results
 junit.xml
 

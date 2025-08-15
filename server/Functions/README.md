@@ -30,13 +30,17 @@ to override the default UTC timezone; which is okay for our purposes.
 
 Azure App Service server app settings on Linux servers:
 
->`TZ` : `America/New_York` for Linux instance.
+> `TZ` : `America/New_York` for Linux instance.
 
 This is often documented for Windows instances servers as:
 
->`WEBSITE_TIME_ZONE` : `Eastern Standard Time`
+> `WEBSITE_TIME_ZONE` : `Eastern Standard Time`
 
-This is set in the Azure App Service settings online and not in local app settings files.
+ In Azure App Service, the time zone is configured via the WEBSITE_TIME_ZONE app setting (not in local settings).
+
+- Windows: use Windows time-zone names (e.g. “Pacific Standard Time”).
+- Linux: use IANA names (e.g. “America/Los_Angeles”).
+- Note: Linux Consumption/Flex Function Apps may not support this setting.
 
 ## Related documentation
 

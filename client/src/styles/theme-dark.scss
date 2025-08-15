@@ -1,6 +1,9 @@
 @use "@angular/material" as mat;
 @use "themed-parts";
 
+// Shared font stack for brand typography (primary heading font fallback chain)
+$brand-font-stack: Rubik, Roboto, Arial, Helvetica, sans-serif;
+
 // DARK THEME (default)
 // ref: https://material.angular.io/guide/theming
 
@@ -11,7 +14,7 @@ $dark-theme: mat.define-theme(
       primary: mat.$azure-palette
     ),
     typography: (
-      brand-family: "Rubik, Roboto, Arial, Helvetica, sans-serif"
+      brand-family: $brand-font-stack
     ),
     density: (
       scale: 0

@@ -1,6 +1,6 @@
 {
   "servers": {
-    "angular-cli": {
+    "angular": {
       "command": "npx",
       "args": ["@angular/cli", "mcp"],
       "type": "stdio"

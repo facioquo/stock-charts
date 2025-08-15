@@ -2,7 +2,7 @@
   // =============================================================================
   // AZURE FUNCTIONS CONFIGURATION
   // =============================================================================
-  "azureFunctions.projectSubpath": "server\\Functions",
+  "azureFunctions.projectSubpath": "server/Functions",
   "azureFunctions.deploySubpath": "server/Functions/bin/Release/net9.0/publish",
   "azureFunctions.projectLanguage": "C#",
   "azureFunctions.projectRuntime": "~4",
@@ -24,15 +24,12 @@
   "chat.instructionsFilesLocations": {
     ".github/instructions": true
   },
+  "coderabbit.autoReviewMode": "prompt",
   // =============================================================================
   // ESLINT CONFIGURATION
   // =============================================================================
-  "eslint.workingDirectories": [    "client"  ],
-  "eslint.validate": [
-    "javascript",
-    "typescript",
-    "html"
-  ],
+  "eslint.workingDirectories": ["client"],
+  "eslint.validate": ["javascript", "typescript", "html"],
   "eslint.enable": true,
   // =============================================================================
   // TYPESCRIPT/JAVASCRIPT CONFIGURATION
@@ -47,7 +44,7 @@
   "problems.showCurrentInStatus": true,
   "problems.sortOrder": "severity",
   // =============================================================================
-  // PRETTIER EXENTIONS CONFIGURATION
+  // PRETTIER EXTENSIONS CONFIGURATION
   // for VS Code extension: esbenp.prettier-vscode
   // =============================================================================
   "prettier.requireConfig": true,
@@ -111,9 +108,5 @@
     "editor.formatOnSave": false,
     "editor.insertSpaces": true,
     "editor.tabSize": 2
-  },
-  "chat.mcp.assisted.nuget.enabled": true,
-  "chat.mcp.enabled": true,
-  "github.copilot.chat.newWorkspace.useContext7": true
-
+  }
 }

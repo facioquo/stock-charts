@@ -33,7 +33,7 @@
       }
     }
   },
-  "postCreateCommand": "cd client && npm install",
+  "postCreateCommand": "npm install",
   "remoteEnv": {
     "ALPACA_KEY": "${localEnv:ALPACA_KEY}",
     "ALPACA_SECRET": "${localEnv:ALPACA_SECRET}",
