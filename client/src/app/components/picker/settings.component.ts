@@ -1,29 +1,29 @@
-import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 
-import { MatCheckboxChange, MatCheckbox } from "@angular/material/checkbox";
+import { MatCheckbox, MatCheckboxChange } from "@angular/material/checkbox";
 import { MatDialog, MatDialogContent } from "@angular/material/dialog";
 import {
-  MatListOption,
-  MatSelectionList,
-  MatList,
-  MatListItem,
-  MatListItemTitle,
-  MatNavList,
-  MatListItemLine
+    MatList,
+    MatListItem,
+    MatListItemLine,
+    MatListItemTitle,
+    MatListOption,
+    MatNavList,
+    MatSelectionList
 } from "@angular/material/list";
-import { MatSlideToggleChange, MatSlideToggle } from "@angular/material/slide-toggle";
+import { MatSlideToggle, MatSlideToggleChange } from "@angular/material/slide-toggle";
 
 import { ChartService } from "../../services/chart.service";
 import { UserService } from "../../services/user.service";
 
-import { IndicatorListing, IndicatorSelection } from "../../pages/chart/chart.models";
-import { PickConfigComponent } from "./pick-config.component";
-import { MatToolbar } from "@angular/material/toolbar";
-import { MatIconButton, MatButton } from "@angular/material/button";
-import { MatTooltip } from "@angular/material/tooltip";
-import { MatIcon } from "@angular/material/icon";
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { FormsModule } from "@angular/forms";
+import { MatButton, MatIconButton } from "@angular/material/button";
+import { MatIcon } from "@angular/material/icon";
+import { MatToolbar } from "@angular/material/toolbar";
+import { MatTooltip } from "@angular/material/tooltip";
+import { IndicatorListing, IndicatorSelection } from "../../pages/chart/chart.models";
+import { PickConfigComponent } from "./pick-config.component";
 
 @Component({
   selector: "app-settings",
