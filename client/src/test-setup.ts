@@ -35,9 +35,10 @@ if (typeof window.getComputedStyle !== "function") {
   });
 }
 
-// Ensure a doctype to avoid potential quirks-mode code branches.
+// Ensure a real DocumentType to avoid quirks-mode branches & provide proper interface.
 if (!document.doctype) {
-  Object.defineProperty(document, "doctype", { value: "<!DOCTYPE html>" });
+  const realDoctype = document.implementation.createDocumentType("html", "", "");
+  Object.defineProperty(document, "doctype", { value: realDoctype, configurable: true });
 }
 
 // Make body.style.transform writable (some libs set or read it during positioning).
