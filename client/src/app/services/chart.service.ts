@@ -5,6 +5,7 @@ import { Observable, Subject, takeUntil } from "rxjs";
 import {
   BarElement,
   Chart,
+  ChartConfiguration,
   ChartData,
   ChartDataset,
   Filler,
@@ -14,7 +15,8 @@ import {
   PointElement,
   ScatterDataPoint,
   TimeSeriesScale,
-  Tooltip
+  Tooltip,
+  TooltipItem
 } from "chart.js";
 
 // Extended dataset interface for candlestick pattern datasets
@@ -90,11 +92,30 @@ export class ChartService implements OnDestroy {
   private readonly window = inject(WindowService);
   private readonly destroy$ = new Subject<void>();
 
+  // Constants
+  private static readonly EXTRA_BARS = 7;
+  private static readonly CANDLE_HIGH_MULTIPLIER = 1.01;
+  private static readonly CANDLE_LOW_MULTIPLIER = 0.99;
+  private static readonly LEGEND_Y_OFFSET = 15;
+  private static readonly THRESHOLD_ORDER_OFFSET = 100;
+
+  // Color constants
+  private static readonly COLORS = {
+    GREEN: "#2E7D32",
+    GRAY: "#9E9E9E",
+    RED: "#DD2C00",
+    CANDLE_UP: "#1B5E20",
+    CANDLE_DOWN: "#B71C1C",
+    CANDLE_UNCHANGED: "#616161",
+    VOLUME_UP: "#1B5E2060",
+    VOLUME_DOWN: "#B71C1C60"
+  };
+
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
   chartOverlay: Chart;
   loading = signal(true);
-  extraBars = 7;
+  extraBars = ChartService.EXTRA_BARS;
 
   // Window-based sizing properties
   currentBarCount: number;
@@ -124,10 +145,6 @@ export class ChartService implements OnDestroy {
     listing: IndicatorListing,
     scrollToMe: boolean = false): Observable<unknown> {
 
-    const green = "#2E7D32";
-    const gray = "#9E9E9E";
-    const red = "#DD2C00";
-
     // load selection to chart
     const obs = new Observable((observer) => {
 
@@ -140,92 +157,7 @@ export class ChartService implements OnDestroy {
 
           // compose datasets
           next: (data: IndicatorDataRow[]) => {
-
-            // compose datasets
-            // parse each dataset
-            selection.results
-              .forEach((result: IndicatorResult) => {
-
-                // initialize dataset
-                const resultConfig = listing.results.find(x => x.dataName === result.dataName);
-                if (!resultConfig) return;
-                const dataset = this.cfg.baseDataset(result, resultConfig);
-                const dataPoints: ScatterDataPoint[] = [];
-                const pointColor: string[] = [];
-                const pointRotation: number[] = [];
-
-                // populate data
-                data.forEach(row => {
-
-                  let yValue = typeof row[result.dataName] === "number" ? row[result.dataName] as number : null;
-
-                  // apply candle pointers
-                  if (yValue && listing.category === "candlestick-pattern") {
-
-                    switch ((row["match"] as number)) {
-
-                      case -100:
-                        yValue = 1.01 * (row.candle as Quote).high;
-                        pointColor.push(red);
-                        pointRotation.push(180);
-                        break;
-
-                      case 100:
-                        yValue = 0.99 * (row.candle as Quote).low;
-                        pointColor.push(green);
-                        pointRotation.push(0);
-                        break;
-
-                      default:
-                        yValue = 0.99 * (row.candle as Quote).low;
-                        pointColor.push(gray);
-                        pointRotation.push(0);
-                        break;
-                    }
-                  }
-
-                  else {
-                    pointColor.push(resultConfig.defaultColor);
-                    pointRotation.push(0);
-                  }
-
-                  dataPoints.push({
-                    x: new Date(row.date).valueOf(),
-                    y: yValue
-                  });
-                });
-
-                // add extra bars
-                const nextDate = new Date(Math.max(...dataPoints.map(h => new Date(h.x).getTime())));
-
-                for (let i = 1; i < this.extraBars; i++) {
-                  nextDate.setDate(nextDate.getDate() + 1);
-                  dataPoints.push({
-                    x: new Date(nextDate).valueOf(),
-                    y: null
-                  });
-                }
-
-                // custom candlestick pattern points
-                if (listing.category === "candlestick-pattern" && dataset.type !== "bar") {
-                  dataset.pointRotation = pointRotation;
-                  dataset.pointBackgroundColor = pointColor;
-                  dataset.pointBorderColor = pointColor;
-                }
-
-                dataset.data = dataPoints;
-                result.dataset = dataset;
-              });
-
-            // replace tokens with values
-            selection = this.selectionTokenReplacement(selection);
-
-            // Store processed datasets for efficient resizing (deep copy to avoid reference issues)
-            this.allProcessedDatasets.set(selection.ucid,
-              selection.results.map(result => JSON.parse(JSON.stringify(result.dataset)))
-            );
-
-            // add to chart
+            this.processSelectionData(selection, listing, data);
             this.displaySelection(selection, listing, scrollToMe);
 
             // inform caller
@@ -233,18 +165,127 @@ export class ChartService implements OnDestroy {
             observer.complete();
           },
           error: (e: HttpErrorResponse) => {
-            console.error("Chart Service Error:", {
-              status: e.status,
-              statusText: e.statusText,
-              url: e.url,
-              message: e.message
-            });
+            this.logHttpError("Chart Service Error", e);
             observer.error(e);
           }
         });
     });
 
     return obs;
+  }
+
+  private processSelectionData(
+    selection: IndicatorSelection,
+    listing: IndicatorListing,
+    data: IndicatorDataRow[]
+  ): void {
+    // compose datasets
+    // parse each dataset
+    selection.results.forEach((result: IndicatorResult) => {
+      const resultConfig = listing.results.find(x => x.dataName === result.dataName);
+      if (!resultConfig) return;
+
+      const dataset = this.cfg.baseDataset(result, resultConfig);
+      const { dataPoints, pointColor, pointRotation } = this.buildDataPoints(data, result, listing);
+
+      // add extra bars
+      this.addExtraBars(dataPoints);
+
+      // custom candlestick pattern points
+      if (listing.category === "candlestick-pattern" && dataset.type !== "bar") {
+        dataset.pointRotation = pointRotation;
+        dataset.pointBackgroundColor = pointColor;
+        dataset.pointBorderColor = pointColor;
+      }
+
+      dataset.data = dataPoints;
+      result.dataset = dataset;
+    });
+
+    // replace tokens with values
+    selection = this.selectionTokenReplacement(selection);
+
+    // Store processed datasets for efficient resizing (deep copy to avoid reference issues)
+    this.allProcessedDatasets.set(selection.ucid,
+      selection.results.map(result => JSON.parse(JSON.stringify(result.dataset)))
+    );
+  }
+
+  private buildDataPoints(
+    data: IndicatorDataRow[],
+    result: IndicatorResult,
+    listing: IndicatorListing
+  ): { dataPoints: ScatterDataPoint[]; pointColor: string[]; pointRotation: number[] } {
+    const dataPoints: ScatterDataPoint[] = [];
+    const pointColor: string[] = [];
+    const pointRotation: number[] = [];
+
+    data.forEach(row => {
+      let yValue = typeof row[result.dataName] === "number" ? row[result.dataName] as number : null;
+
+      // apply candle pointers
+      if (yValue && listing.category === "candlestick-pattern") {
+        const candleConfig = this.getCandlePointConfiguration(row["match"] as number, row.candle as Quote);
+        yValue = candleConfig.yValue;
+        pointColor.push(candleConfig.color);
+        pointRotation.push(candleConfig.rotation);
+      } else {
+        const resultConfig = listing.results.find(x => x.dataName === result.dataName);
+        pointColor.push(resultConfig?.defaultColor || ChartService.COLORS.GRAY);
+        pointRotation.push(0);
+      }
+
+      dataPoints.push({
+        x: new Date(row.date).valueOf(),
+        y: yValue
+      });
+    });
+
+    return { dataPoints, pointColor, pointRotation };
+  }
+
+  private getCandlePointConfiguration(match: number, candle: Quote): { yValue: number; color: string; rotation: number } {
+    switch (match) {
+      case -100:
+        return {
+          yValue: ChartService.CANDLE_HIGH_MULTIPLIER * candle.high,
+          color: ChartService.COLORS.RED,
+          rotation: 180
+        };
+      case 100:
+        return {
+          yValue: ChartService.CANDLE_LOW_MULTIPLIER * candle.low,
+          color: ChartService.COLORS.GREEN,
+          rotation: 0
+        };
+      default:
+        return {
+          yValue: ChartService.CANDLE_LOW_MULTIPLIER * candle.low,
+          color: ChartService.COLORS.GRAY,
+          rotation: 0
+        };
+    }
+  }
+
+  private addExtraBars(dataPoints: ScatterDataPoint[]): void {
+    const nextDate = new Date(Math.max(...dataPoints.map(h => new Date(h.x).getTime())));
+
+    for (let i = 1; i < this.extraBars; i++) {
+      nextDate.setDate(nextDate.getDate() + 1);
+      dataPoints.push({
+        x: new Date(nextDate).valueOf(),
+        y: null
+      });
+    }
+  }
+
+  private logHttpError(context: string, error: HttpErrorResponse): void {
+    console.error(context, {
+      status: error.status,
+      statusText: error.statusText,
+      url: error.url,
+      message: error.message
+    });
   }
 
   addSelectionWithoutScroll(
@@ -365,58 +406,83 @@ export class ChartService implements OnDestroy {
     // default configuration
     const chartConfig = this.cfg.baseOscillatorConfig();
 
+    // add thresholds and configure chart
+    this.configureOscillatorThresholds(chartConfig, selection, listing);
+    this.configureOscillatorYAxis(chartConfig, listing);
+
+    // add selection datasets
+    selection.results.forEach((r: IndicatorResult) => {
+      chartConfig.data.datasets.push(r.dataset);
+    });
+
+    // create and display chart
+    this.createOscillatorChart(selection, chartConfig, scrollToMe);
+  }
+
+  private configureOscillatorThresholds(
+    chartConfig: ChartConfiguration,
+    selection: IndicatorSelection,
+    listing: IndicatorListing
+  ): void {
+    const qtyThresholds = listing.chartConfig?.thresholds?.length || 0;
+
     // add thresholds (reference lines)
-    const qtyThresholds = listing.chartConfig?.thresholds?.length;
-
-    // currently using random results[0] as basis
     listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold, index: number) => {
-
-      // note: thresholds can't be annotated lines since
-      // offset fill will only work between certain objects.
-      const lineData: ScatterDataPoint[] = [];
-
-      // compose threshold data
-      selection.results[0].dataset.data.forEach((d: ScatterDataPoint) => {
-        lineData.push({ x: d.x, y: threshold.value } as ScatterDataPoint);
-      });
-
-      const thresholdDataset: ChartDataset = {
-        label: "threshold",
-        type: "line",
-        data: lineData,
-        yAxisID: "y",
-        pointRadius: 0,
-        borderWidth: 2.5,
-        borderDash: threshold.style === "dash" ? [5, 2] : [],
-        borderColor: threshold.color,
-        backgroundColor: threshold.color,
-        spanGaps: true,
-        fill: threshold.fill === null ? false : {
-          target: threshold.fill.target,
-          above: threshold.fill.colorAbove,
-          below: threshold.fill.colorBelow
-        },
-        order: index + 100
-      };
-
+      const thresholdDataset = this.createThresholdDataset(threshold, selection.results[0], index);
       chartConfig.data.datasets.push(thresholdDataset);
     });
 
     // hide thresholds from tooltips
     if (qtyThresholds > 0) {
-      chartConfig.options.plugins.tooltip.filter = (tooltipItem) =>
+      chartConfig.options.plugins.tooltip.filter = (tooltipItem: TooltipItem<"line">) =>
         (tooltipItem.datasetIndex > (qtyThresholds - 1));
     }
+  }
 
-    // y-scale
-    chartConfig.options.scales.y.suggestedMin = listing.chartConfig?.minimumYAxis;
-    chartConfig.options.scales.y.suggestedMax = listing.chartConfig?.maximumYAxis;
+  private createThresholdDataset(
+    threshold: ChartThreshold,
+    firstResult: IndicatorResult,
+    index: number
+  ): ChartDataset {
+    // note: thresholds can't be annotated lines since
+    // offset fill will only work between certain objects.
+    const lineData: ScatterDataPoint[] = [];
 
-    // add selection
-    selection.results.forEach((r: IndicatorResult) => {
-      chartConfig.data.datasets.push(r.dataset);
+    // compose threshold data
+    firstResult.dataset.data.forEach((d: ScatterDataPoint) => {
+      lineData.push({ x: d.x, y: threshold.value } as ScatterDataPoint);
     });
 
+    return {
+      label: "threshold",
+      type: "line",
+      data: lineData,
+      yAxisID: "y",
+      pointRadius: 0,
+      borderWidth: 2.5,
+      borderDash: threshold.style === "dash" ? [5, 2] : [],
+      borderColor: threshold.color,
+      backgroundColor: threshold.color,
+      spanGaps: true,
+      fill: threshold.fill === null ? false : {
+        target: threshold.fill.target,
+        above: threshold.fill.colorAbove,
+        below: threshold.fill.colorBelow
+      },
+      order: index + ChartService.THRESHOLD_ORDER_OFFSET
+    };
+  }
+
+  private configureOscillatorYAxis(chartConfig: ChartConfiguration, listing: IndicatorListing): void {
+    chartConfig.options.scales.y.suggestedMin = listing.chartConfig?.minimumYAxis;
+    chartConfig.options.scales.y.suggestedMax = listing.chartConfig?.maximumYAxis;
+  }
+
+  private createOscillatorChart(
+    selection: IndicatorSelection,
+    chartConfig: ChartConfiguration,
+    scrollToMe: boolean
+  ): void {
     // compose html
     const body = document.getElementById("oscillators-zone");
     const containerId = `${selection.ucid}-container`;
@@ -424,7 +490,7 @@ export class ChartService implements OnDestroy {
     // pre-delete, if exists (needed for theme change)
     const existing = document.getElementById(containerId);
     if (existing !== null) {
-      body.removeChild(existing);
+      body?.removeChild(existing);
     }
 
     // create chart container
@@ -436,7 +502,7 @@ export class ChartService implements OnDestroy {
     const myCanvas = document.createElement("canvas") as HTMLCanvasElement;
     myCanvas.id = selection.ucid;
     container.appendChild(myCanvas);
-    body.appendChild(container);
+    body?.appendChild(container);
 
     if (selection.chart) selection.chart.destroy();
     selection.chart = new Chart(myCanvas.getContext("2d"), chartConfig);
@@ -451,29 +517,42 @@ export class ChartService implements OnDestroy {
   }
 
   addOverlayLegend() {
-
     const chart = this.chartOverlay;
     const xPos: ScaleValue = chart.scales["x"].min;
     const yPos: ScaleValue = chart.scales["y"].max;
     let adjY: number = 10; // first position
 
     chart.options.plugins.annotation.annotations =
-      this.selections
-        .filter(x => x.chartType === "overlay")
-        .sort((a, b) => a.label.localeCompare(b.label))
+      this.getOverlaySelections()
         .map((selection: IndicatorSelection, index: number) => {
-
-          // annotation with defaults
-          const annotation: AnnotationOptions & LabelAnnotationOptions =
-            this.cfg.commonLegendAnnotation(selection.label, xPos, yPos, adjY);
-
-          // customize annotation
-          annotation.id = "legend" + (index + 1).toString();
-          annotation.color = selection.results[0].color;
-
-          adjY += 15;
+          const annotation = this.createLegendAnnotation(selection, xPos, yPos, adjY, index);
+          adjY += ChartService.LEGEND_Y_OFFSET;
           return annotation;
         });
+  }
+
+  private getOverlaySelections(): IndicatorSelection[] {
+    return this.selections
+      .filter(x => x.chartType === "overlay")
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  private createLegendAnnotation(
+    selection: IndicatorSelection,
+    xPos: ScaleValue,
+    yPos: ScaleValue,
+    adjY: number,
+    index: number
+  ): AnnotationOptions & LabelAnnotationOptions {
+    // annotation with defaults
+    const annotation: AnnotationOptions & LabelAnnotationOptions =
+      this.cfg.commonLegendAnnotation(selection.label, xPos, yPos, adjY);
+
+    // customize annotation
+    annotation.id = "legend" + (index + 1).toString();
+    annotation.color = selection.results[0].color;
+
+    return annotation;
   }
 
   addOscillatorLegend(selection: IndicatorSelection) {
@@ -702,50 +781,16 @@ export class ChartService implements OnDestroy {
 
   //#region DATA OPERATIONS
   loadCharts() {
-
     console.log(`Loading charts with ${this.currentBarCount} bars`);
 
     // get data and load charts
     this.api.getQuotes()
       .subscribe({
         next: (allQuotes: Quote[]) => {
-
-          // Store full dataset for dynamic slicing
-          this.allQuotes = allQuotes;
-
-          // Slice array to desired length based on window size (keep newest data)
-          const quotes = allQuotes.slice(-this.currentBarCount);
-
-          // load base overlay chart
-          this.loadOverlayChart(quotes);
-
-          // add/load indicators
-          this.api.getListings()
-            .subscribe({
-
-              next: (listings: IndicatorListing[]) => {
-
-                // load catalog
-                this.listings = listings;
-
-                // load indicators
-                this.loadSelections();
-              },
-              error: (e: HttpErrorResponse) => {
-                console.error("Error loading listings:", {
-                  status: e.status,
-                  statusText: e.statusText,
-                  message: e.message
-                });
-              }
-            });
+          this.processQuotes(allQuotes);
         },
         error: (e: HttpErrorResponse) => {
-          console.error("Error getting quotes:", {
-            status: e.status,
-            statusText: e.statusText,
-            message: e.message
-          });
+          this.logHttpError("Error getting quotes", e);
         },
         complete: () => {
           this.loading.set(false);
@@ -753,32 +798,82 @@ export class ChartService implements OnDestroy {
       });
   }
 
+  private processQuotes(allQuotes: Quote[]): void {
+    // Store full dataset for dynamic slicing
+    this.allQuotes = allQuotes;
+
+    // Slice array to desired length based on window size (keep newest data)
+    const quotes = allQuotes.slice(-this.currentBarCount);
+
+    // load base overlay chart
+    this.loadOverlayChart(quotes);
+
+    // add/load indicators
+    this.loadIndicatorListings();
+  }
+
+  private loadIndicatorListings(): void {
+    this.api.getListings()
+      .subscribe({
+        next: (listings: IndicatorListing[]) => {
+          // load catalog
+          this.listings = listings;
+
+          // load indicators
+          this.loadSelections();
+        },
+        error: (e: HttpErrorResponse) => {
+          this.logHttpError("Error loading listings", e);
+        }
+      });
+  }
+
   loadOverlayChart(quotes: Quote[]) {
-
     // loads base with quotes only
+    this.configureCandlestickDefaults();
 
+    const { priceData, volumeData, volumeAxisSize, volumeColors } = this.processQuoteData(quotes);
+
+    // define base datasets
+    const chartData: ChartData = {
+      datasets: [
+        this.createPriceDataset(priceData),
+        this.createVolumeDataset(volumeData, volumeColors)
+      ]
+    };
+
+    // Create and display chart
+    this.createOverlayChart(chartData, volumeAxisSize);
+  }
+
+  private configureCandlestickDefaults(): void {
     const candleOptions = Chart.defaults.elements["candlestick"];
 
     // custom border colors
-    candleOptions.color.up = "#1B5E20";
-    candleOptions.color.down = "#B71C1C";
-    candleOptions.color.unchanged = "#616161";
+    candleOptions.color.up = ChartService.COLORS.CANDLE_UP;
+    candleOptions.color.down = ChartService.COLORS.CANDLE_DOWN;
+    candleOptions.color.unchanged = ChartService.COLORS.CANDLE_UNCHANGED;
 
     candleOptions.borderColor = {
       up: candleOptions.color.up,
       down: candleOptions.color.down,
       unchanged: candleOptions.color.unchanged
     };
+  }
 
-    const price: FinancialDataPoint[] = [];
-    const volume: ScatterDataPoint[] = [];
-    const barColor: string[] = [];
-
+  private processQuoteData(quotes: Quote[]): {
+    priceData: FinancialDataPoint[];
+    volumeData: ScatterDataPoint[];
+    volumeAxisSize: number;
+    volumeColors: string[];
+  } {
+    const priceData: FinancialDataPoint[] = [];
+    const volumeData: ScatterDataPoint[] = [];
+    const volumeColors: string[] = [];
     let sumVol = 0;
 
     quotes.forEach((q: Quote) => {
-
-      price.push({
+      priceData.push({
         x: new Date(q.date).valueOf(),
         o: q.open,
         h: q.high,
@@ -786,55 +881,63 @@ export class ChartService implements OnDestroy {
         c: q.close
       });
 
-      volume.push({
+      volumeData.push({
         x: new Date(q.date).valueOf(),
         y: q.volume
       });
       sumVol += q.volume;
 
-      const c = (q.close >= q.open) ? "#1B5E2060" : "#B71C1C60";
-      barColor.push(c);
+      const color = (q.close >= q.open) ? ChartService.COLORS.VOLUME_UP : ChartService.COLORS.VOLUME_DOWN;
+      volumeColors.push(color);
     });
 
     // add extra bars
-    const nextDate = new Date(Math.max(...quotes.map(h => new Date(h.date).getTime())));
+    this.addExtraVolumeBarsBars(volumeData);
+
+    // volume axis size
+    const volumeAxisSize = 20 * (sumVol / volumeData.length) || 0;
+
+    return { priceData, volumeData, volumeAxisSize, volumeColors };
+  }
+
+  private addExtraVolumeBarsBars(volumeData: ScatterDataPoint[]): void {
+    const nextDate = new Date(Math.max(...volumeData.map(h => new Date(h.x).getTime())));
 
     for (let i = 1; i < this.extraBars; i++) {
       nextDate.setDate(nextDate.getDate() + 1);
-
       // intentionally excluding price (gap covered by volume)
-      volume.push({
+      volumeData.push({
         x: new Date(nextDate).valueOf(),
         y: null
       });
     }
+  }
 
-    // define base datasets
-    const chartData: ChartData = {
-      datasets: [
-        {
-          type: "candlestick",
-          label: "Price",
-          data: price,
-          yAxisID: "y",
-          borderColor: candleOptions.borderColor,
-          order: 75
-        },
-        {
-          type: "bar",
-          label: "Volume",
-          data: volume,
-          yAxisID: "volumeAxis",
-          backgroundColor: barColor,
-          borderWidth: 0,
-          order: 76
-        }
-      ]
+  private createPriceDataset(priceData: FinancialDataPoint[]): ChartDataset {
+    const candleOptions = Chart.defaults.elements["candlestick"];
+    return {
+      type: "candlestick",
+      label: "Price",
+      data: priceData,
+      yAxisID: "y",
+      borderColor: candleOptions.borderColor,
+      order: 75
     };
+  }
 
-    // volume axis size
-    const volumeAxisSize = 20 * (sumVol / volume.length) || 0;
+  private createVolumeDataset(volumeData: ScatterDataPoint[], volumeColors: string[]): ChartDataset {
+    return {
+      type: "bar",
+      label: "Volume",
+      data: volumeData,
+      yAxisID: "volumeAxis",
+      backgroundColor: volumeColors,
+      borderWidth: 0,
+      order: 76
+    };
+  }
 
+  private createOverlayChart(chartData: ChartData, volumeAxisSize: number): void {
     // default overlay chart configuration
     const chartConfig = this.cfg.baseOverlayConfig(volumeAxisSize);
 
