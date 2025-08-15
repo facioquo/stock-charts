@@ -1,4 +1,5 @@
 import { TestBed } from "@angular/core/testing";
+import { afterEach, beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { UserService } from "./user.service";
 
 describe("UserService", () => {
@@ -30,7 +31,7 @@ describe("UserService", () => {
 
       expect(service.settings).toEqual({
         isDarkTheme: true,
-        showTooltips: false
+        showTooltips: false,
       });
       expect(localStorage.getItem("settings")).toBeTruthy();
     });
@@ -38,7 +39,7 @@ describe("UserService", () => {
     it("should load cached settings when they exist", () => {
       const cachedSettings = {
         isDarkTheme: false,
-        showTooltips: true
+        showTooltips: true,
       };
       localStorage.setItem("settings", JSON.stringify(cachedSettings));
 
@@ -50,7 +51,7 @@ describe("UserService", () => {
     it("should apply theme on load", () => {
       const cachedSettings = {
         isDarkTheme: false,
-        showTooltips: true
+        showTooltips: true,
       };
       localStorage.setItem("settings", JSON.stringify(cachedSettings));
 
@@ -65,7 +66,7 @@ describe("UserService", () => {
     it("should store settings in localStorage", () => {
       service.settings = {
         isDarkTheme: true,
-        showTooltips: false
+        showTooltips: false,
       };
 
       service.cacheSettings();
@@ -80,7 +81,7 @@ describe("UserService", () => {
     beforeEach(() => {
       service.settings = {
         isDarkTheme: true,
-        showTooltips: false
+        showTooltips: false,
       };
     });
 
@@ -122,7 +123,7 @@ describe("UserService", () => {
     beforeEach(() => {
       service.settings = {
         isDarkTheme: true,
-        showTooltips: false
+        showTooltips: false,
       };
     });
 

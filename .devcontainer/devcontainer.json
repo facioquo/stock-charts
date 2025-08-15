@@ -19,6 +19,7 @@
         "dbaeumer.vscode-eslint",
         "davidanson.vscode-markdownlint",
         "dotjoshjohnson.xml",
+        "esbenp.prettier-vscode",
         "github.copilot",
         "github.copilot-chat",
         "ms-azuretools.vscode-azurefunctions",

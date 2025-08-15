@@ -1,9 +1,6 @@
 // CHARTS
 
-import {
-  Chart,
-  ChartDataset
-} from "chart.js";
+import { Chart, ChartDataset } from "chart.js";
 
 export interface Quote {
   date: Date;
@@ -36,7 +33,7 @@ export interface IndicatorListing {
   endpoint: string;
   category: string;
   chartType: string;
-  order: number,
+  order: number;
   chartConfig: ChartConfig | null;
   parameters: IndicatorParamConfig[];
   results: IndicatorResultConfig[];
@@ -57,11 +54,11 @@ export interface IndicatorResultConfig {
   dataName: string;
   dataType: string;
   lineType: string;
-  stack: string,
+  stack: string;
   lineWidth: number | null;
   defaultColor: string;
   fill: ChartFill;
-  order: number
+  order: number;
 }
 
 export interface ChartConfig {
@@ -78,39 +75,38 @@ export interface ChartThreshold {
 }
 
 export interface ChartFill {
-  target: string,
-  colorAbove: string,
-  colorBelow: string
+  target: string;
+  colorAbove: string;
+  colorBelow: string;
 }
 
 // SELECTIONS
 
 export interface IndicatorSelection {
-  ucid: string,
-  uiid: string,
-  label: string,
-  chartType: string,
-  params: IndicatorParam[],
-  results: IndicatorResult[],
-  chart?: Chart
+  ucid: string;
+  uiid: string;
+  label: string;
+  chartType: string;
+  params: IndicatorParam[];
+  results: IndicatorResult[];
+  chart?: Chart;
 }
 
 export interface IndicatorParam {
-  paramName: string,
-  displayName: string,
-  minimum: number,
-  maximum: number,
-  value?: number
+  paramName: string;
+  displayName: string;
+  minimum: number;
+  maximum: number;
+  value?: number;
 }
 
 export interface IndicatorResult {
-  label: string,
-  displayName: string,
-  dataName: string,
-  color: string,
-  lineType: string,
-  lineWidth: number,
-  order: number,
-  dataset: ChartDataset
+  label: string;
+  displayName: string;
+  dataName: string;
+  color: string;
+  lineType: string;
+  lineWidth: number;
+  order: number;
+  dataset: ChartDataset;
 }
-

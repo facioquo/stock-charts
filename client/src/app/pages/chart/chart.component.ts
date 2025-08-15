@@ -13,7 +13,7 @@ import { SettingsComponent } from "../../components/picker/settings.component";
   templateUrl: "./chart.component.html",
   styleUrls: ["./chart.component.scss"],
   imports: [MatFabButton, MatIcon, MatTooltip],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChartComponent implements OnInit {
   readonly cht = inject(ChartService);
@@ -26,7 +26,7 @@ export class ChartComponent implements OnInit {
   // SETTINGS DIALOG
   openSettingsDialog(): void {
     this.settingsDialog.open(SettingsComponent, {
-      autoFocus: "dialog"
+      autoFocus: "dialog",
     });
   }
 }

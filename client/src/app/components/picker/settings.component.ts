@@ -2,7 +2,15 @@ import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 
 import { MatCheckboxChange, MatCheckbox } from "@angular/material/checkbox";
 import { MatDialog, MatDialogContent } from "@angular/material/dialog";
-import { MatListOption, MatSelectionList, MatList, MatListItem, MatListItemTitle, MatNavList, MatListItemLine } from "@angular/material/list";
+import {
+  MatListOption,
+  MatSelectionList,
+  MatList,
+  MatListItem,
+  MatListItemTitle,
+  MatNavList,
+  MatListItemLine,
+} from "@angular/material/list";
 import { MatSlideToggleChange, MatSlideToggle } from "@angular/material/slide-toggle";
 
 import { ChartService } from "../../services/chart.service";
@@ -17,20 +25,36 @@ import { MatIcon } from "@angular/material/icon";
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { FormsModule } from "@angular/forms";
 
-
 @Component({
   selector: "app-settings",
   templateUrl: "settings.component.html",
   styleUrls: ["settings.component.scss"],
-  imports: [MatToolbar, MatIconButton, MatTooltip, MatIcon, CdkScrollable, MatDialogContent, MatList, MatListItem, MatSlideToggle, FormsModule, MatSelectionList, MatCheckbox, MatListOption, MatListItemTitle, MatButton, MatNavList, MatListItemLine],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [
+    MatToolbar,
+    MatIconButton,
+    MatTooltip,
+    MatIcon,
+    CdkScrollable,
+    MatDialogContent,
+    MatList,
+    MatListItem,
+    MatSlideToggle,
+    FormsModule,
+    MatSelectionList,
+    MatCheckbox,
+    MatListOption,
+    MatListItemTitle,
+    MatButton,
+    MatNavList,
+    MatListItemLine,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsComponent {
   private listRef = inject(MatDialog);
   private picker = inject(MatDialog);
   cht = inject(ChartService);
   usr = inject(UserService);
-
 
   listings: IndicatorListing[];
   selections: IndicatorSelection[];
@@ -40,7 +64,8 @@ export class SettingsComponent {
   }
 
   selectDisplayed(event: MatCheckboxChange, shown: MatSelectionList): void {
-    if (event.checked) shown.selectAll(); else shown.deselectAll();
+    if (event.checked) shown.selectAll();
+    else shown.deselectAll();
   }
 
   removeSelections(event: MouseEvent, shown: MatListOption[]): void {
@@ -59,7 +84,6 @@ export class SettingsComponent {
   }
 
   openIndicatorSettings(listing: IndicatorListing): void {
-
     // close current settings dialog
     this.listRef.closeAll();
 
@@ -67,7 +91,7 @@ export class SettingsComponent {
     this.picker
       .open(PickConfigComponent, {
         autoFocus: "dialog",
-        data: listing
+        data: listing,
       })
       .afterClosed()
 
@@ -76,7 +100,7 @@ export class SettingsComponent {
       // TODO: scroll to chart if not reopened
       .subscribe(() => {
         this.listRef.open(SettingsComponent, {
-          autoFocus: "dialog"
+          autoFocus: "dialog",
         });
       });
   }

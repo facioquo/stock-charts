@@ -58,7 +58,7 @@ jobs:
 
       - name: Build .NET solution
         run: >
-          dotnet build server/ChartBackend.sln
+          dotnet build Charts.sln
           --configuration Release
           --property:ContinuousIntegrationBuild=true
           -warnAsError
@@ -110,10 +110,9 @@ jobs:
         with:
           node-version: "lts/*"
           cache: "npm"
-          cache-dependency-path: client/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        working-directory: client
         run: npm install
 
       - name: Replace cache markers
@@ -131,8 +130,7 @@ jobs:
           Write-Host "... Done!"
 
       - name: Build site
-        working-directory: client
-        run: npm run build.prod
+        run: npm run build:prod --workspace=@stock-charts/client
 
       - name: Save artifacts
         uses: actions/upload-artifact@v4

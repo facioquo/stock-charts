@@ -1,8 +1,12 @@
-# About Functions
+# Azure Functions - Stock Charts
 
-## ENVIRONMENT VARIABLES for local dev
+This Azure Functions project handles scheduled data fetching and processing for the Stock Charts application.
 
-These can be set as either environment variables or project scoped User Secrets.
+> **Note**: For general development setup, see the [main project README](../../README.md#development-setup).
+
+## Local development environment variables
+
+These can be set as either environment variables or project scoped User Secrets:
 
 ```bash
 setx AzureWebJobsStorage "UseDevelopmentStorage=true"
@@ -10,7 +14,9 @@ setx ALPACA_KEY "YOUR ALPACA API KEY"
 setx ALPACA_SECRET "YOUR ALPACA SECRET KEY"
 ```
 
-## CRON
+**Azure storage**: The project uses [Azurite](../../README.md#local-storage-with-azurite) for local development, which is automatically installed via the main project's npm dependencies.
+
+## CRON configuration
 
 For our demo, we'll generally cache QQQ and SPY daily quotes every minute
 during extended market hours 8am-6pm M-F U.S. eastern time with CRON `"0 */1 08-18 * * 1-5"`.
@@ -20,7 +26,7 @@ during extended market hours 8am-6pm M-F U.S. eastern time with CRON `"0 */1 08-
 To enable use of eastern time zone CRON values, we have configured our Azure Functions
 to override the default UTC timezone; which is okay for our purposes.
 
-## TIME ZONE
+## Time zone configuration
 
 Azure App Service server app settings on Linux servers:
 
@@ -30,5 +36,13 @@ This is often documented for Windows instances servers as:
 
 >`WEBSITE_TIME_ZONE` : `Eastern Standard Time`
 
-This is set in the Azure App Service settings online
-and not in local app settings files.
+This is set in the Azure App Service settings online and not in local app settings files.
+
+## Related documentation
+
+- [Main Project Setup](../../README.md#development-setup) - Complete development environment setup
+- [Environment Configuration](../../README.md#environment-configuration) - Additional configuration details  
+- [Azure Key Vault Setup](../../README.md#setting-up-azure-key-vault-for-storing-secrets) - Secure secret management
+
+---
+Last updated: August 15, 2025

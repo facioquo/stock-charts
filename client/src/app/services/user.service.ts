@@ -2,14 +2,12 @@ import { Injectable } from "@angular/core";
 import { UserSettings } from "../pages/chart/chart.models";
 
 @Injectable({
-  providedIn: "root"
+  providedIn: "root",
 })
 export class UserService {
-
   settings: UserSettings; // initialized in app.component.ts
 
   loadSettings() {
-
     // load user preference settings from cache,
     // without applying changes to the UI
 
@@ -18,10 +16,9 @@ export class UserService {
 
     // if not cached, set default
     if (settings === null) {
-
       this.settings = {
         isDarkTheme: true,
-        showTooltips: false
+        showTooltips: false,
       };
 
       // store/cache new setting
@@ -42,22 +39,18 @@ export class UserService {
   }
 
   changeTheme(isDarkTheme: boolean) {
-
     // store/cache new setting
     this.settings.isDarkTheme = isDarkTheme;
     this.cacheSettings();
 
     // apply
-    const themeClass = isDarkTheme
-      ? "dark-theme"
-      : "light-theme";
+    const themeClass = isDarkTheme ? "dark-theme" : "light-theme";
 
     document.body.classList.remove("dark-theme", "light-theme");
     document.body.classList.add(themeClass);
   }
 
   changeTooltips(showTooltips: boolean) {
-
     // store/cache new setting
     this.settings.showTooltips = showTooltips;
     this.cacheSettings();

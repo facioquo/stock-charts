@@ -1,5 +1,15 @@
 {
+  // =============================================================================
+  // AZURE FUNCTIONS CONFIGURATION
+  // =============================================================================
   "azureFunctions.projectSubpath": "server\\Functions",
+  "azureFunctions.deploySubpath": "server/Functions/bin/Release/net9.0/publish",
+  "azureFunctions.projectLanguage": "C#",
+  "azureFunctions.projectRuntime": "~4",
+  "azureFunctions.preDeployTask": "publish-functions",
+  // =============================================================================
+  // SEARCH AND FILE EXCLUSIONS
+  // =============================================================================
   "search.exclude": {
     "**/node_modules": true,
     "**/bin": true,
@@ -7,22 +17,103 @@
     "**/dist": true,
     "**/package-lock.json": true
   },
+  // =============================================================================
+  // GITHUB COPILOT CONFIGURATION
+  // =============================================================================
   "chat.promptFiles": true,
   "chat.instructionsFilesLocations": {
     ".github/instructions": true
   },
-  "eslint.workingDirectories": [
-    "client"
-  ],
+  // =============================================================================
+  // ESLINT CONFIGURATION
+  // =============================================================================
+  "eslint.workingDirectories": [    "client"  ],
   "eslint.validate": [
     "javascript",
     "typescript",
     "html"
   ],
   "eslint.enable": true,
-  "problems.showCurrentInStatus": true,
-  "problems.sortOrder": "severity",
+  // =============================================================================
+  // TYPESCRIPT/JAVASCRIPT CONFIGURATION
+  // =============================================================================
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.validate.enable": true,
-  "javascript.validate.enable": true
+  "javascript.validate.enable": true,
+  // =============================================================================
+  // DEBUGGING AND PROBLEMS CONFIGURATION
+  // =============================================================================
+  "debug.internalConsoleOptions": "neverOpen",
+  "problems.showCurrentInStatus": true,
+  "problems.sortOrder": "severity",
+  // =============================================================================
+  // PRETTIER EXENTIONS CONFIGURATION
+  // for VS Code extension: esbenp.prettier-vscode
+  // =============================================================================
+  "prettier.requireConfig": true,
+  "prettier.useEditorConfig": true,
+  "prettier.resolveGlobalModules": true,
+  // =============================================================================
+  // JSON FORMATTING CONFIGURATION
+  // =============================================================================
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false
+  },
+  // =============================================================================
+  // TYPESCRIPT/JAVASCRIPT FORMATTING CONFIGURATION
+  // =============================================================================
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    }
+  },
+  // =============================================================================
+  // HTML/TEMPLATE FORMATTING CONFIGURATION
+  // =============================================================================
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2
+  },
+  // =============================================================================
+  // CSS/SCSS FORMATTING CONFIGURATION
+  // =============================================================================
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2
+  },
+  "chat.mcp.assisted.nuget.enabled": true,
+  "chat.mcp.enabled": true,
+  "github.copilot.chat.newWorkspace.useContext7": true
+
 }

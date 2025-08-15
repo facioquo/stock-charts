@@ -13,10 +13,9 @@ if (env.production) {
 }
 
 bootstrapApplication(AppComponent, {
-    providers: [
-        provideAnimations(),
-        provideHttpClient(withInterceptorsFromDi()),
-        provideRouter(routes)
-    ]
-})
-  .catch(err => console.error(err));
+  providers: [
+    provideAnimations(),
+    provideHttpClient(withInterceptorsFromDi()),
+    provideRouter(routes),
+  ],
+}).catch(err => console.error(err));

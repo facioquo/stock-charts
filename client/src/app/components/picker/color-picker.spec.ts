@@ -1,4 +1,5 @@
 // Test the color picker functionality in isolation
+import { describe, expect, it } from "@jest/globals";
 
 interface LineConfig {
   color: string;
@@ -25,14 +26,14 @@ describe("Color Picker Functionality", () => {
     "#616161", // gray 700 (dark)
     "#757575", // gray 600
     "#9E9E9E", // gray 500
-    "#BDBDBD"  // gray 400 (light)
+    "#BDBDBD", // gray 400 (light)
   ];
 
   const lineWidths = [
     { name: "thin", value: 1 },
     { name: "normal", value: 1.5 },
     { name: "thick", value: 2 },
-    { name: "heavy", value: 3 }
+    { name: "heavy", value: 3 },
   ];
 
   const lineTypes = [
@@ -40,7 +41,7 @@ describe("Color Picker Functionality", () => {
     { name: "dashes", value: "dash", userWidth: true },
     { name: "dots", value: "dots", userWidth: true },
     { name: "bar", value: "bar", userWidth: false },
-    { name: "none", value: "none", userWidth: false }
+    { name: "none", value: "none", userWidth: false },
   ];
 
   describe("Material Design Color Palette", () => {
@@ -124,12 +125,12 @@ describe("Color Picker Functionality", () => {
         }
       })();
 
-      const width = result.lineWidth * ((style === "dotted") ? 2 : 1);
+      const width = result.lineWidth * (style === "dotted" ? 2 : 1);
 
       return {
         "border-bottom-color": result.color,
         "border-bottom-width": width + "px",
-        "border-bottom-style": style
+        "border-bottom-style": style,
       };
     }
 
@@ -164,15 +165,13 @@ describe("Color Picker Functionality", () => {
   describe("Color Picker Integration", () => {
     it("should validate that ngx-color and @ng-matero/extensions are available", () => {
       // These packages should be installed and available
-      expect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        require("ngx-color");
-      }).not.toThrow();
-
-      expect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        require("@ng-matero/extensions/colorpicker");
-      }).not.toThrow();
+      // Use dynamic import to verify modules are resolvable without relying on CommonJS require typings
+      return Promise.all([import("ngx-color"), import("@ng-matero/extensions/colorpicker")]).then(
+        mods => {
+          expect(mods[0]).toBeTruthy();
+          expect(mods[1]).toBeTruthy();
+        }
+      );
     });
 
     it("should support both hex and hex8 color formats", () => {

@@ -1,18 +1,15 @@
 {
   "root": true,
-  "ignorePatterns": [
-    "projects/**/*"
-  ],
+  "ignorePatterns": ["projects/**/*"],
   "overrides": [
     {
-      "files": [
-        "*.ts"
-      ],
+      "files": ["*.ts"],
       "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:@angular-eslint/recommended",
-        "plugin:@angular-eslint/template/process-inline-templates"
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:prettier/recommended"
       ],
       "rules": {
         "@angular-eslint/directive-selector": [
@@ -31,24 +28,21 @@
             "style": "kebab-case"
           }
         ],
-        "quotes": [
+        "prettier/prettier": [
           "error",
-          "double",
           {
-            "avoidEscape": true,
-            "allowTemplateLiterals": true
+            "singleQuote": false,
+            "trailingComma": "es5",
+            "bracketSpacing": true,
+            "arrowParens": "avoid"
           }
-        ]
+        ],
+        "quotes": ["error", "double", { "avoidEscape": true }]
       }
     },
     {
-      "files": [
-        "*.html"
-      ],
-      "extends": [
-        "plugin:@angular-eslint/template/recommended",
-        "plugin:@angular-eslint/template/accessibility"
-      ],
+      "files": ["*.html"],
+      "extends": ["plugin:@angular-eslint/template/recommended", "plugin:@angular-eslint/template/accessibility"],
       "rules": {}
     }
   ]

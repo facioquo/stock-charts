@@ -6,21 +6,20 @@ import {
   BarControllerDatasetOptions,
   CartesianScaleTypeRegistry,
   Chart,
-  ChartComponent
+  ChartComponent,
 } from "chart.js";
 
 export interface FinancialDataPoint {
-  x: number,
-  o: number,
-  h: number,
-  l: number,
-  c: number
+  x: number;
+  o: number;
+  h: number;
+  l: number;
+  c: number;
 }
 
 declare module "chart.js" {
-
   interface FinancialParsedData {
-    _custom?: unknown
+    _custom?: unknown;
   }
 
   interface ChartTypeRegistry {
@@ -39,18 +38,18 @@ declare module "chart.js" {
       metaExtensions: Record<string, never>;
       parsedDataType: FinancialParsedData;
       scales: keyof CartesianScaleTypeRegistry;
-    }
+    };
   }
 }
 
 declare const CandlestickController: ChartComponent & {
   prototype: BarController;
-  new(chart: Chart, datasetIndex: number): BarController;
+  new (chart: Chart, datasetIndex: number): BarController;
 };
 
 declare const OhlcController: ChartComponent & {
   prototype: BarController;
-  new(chart: Chart, datasetIndex: number): BarController;
+  new (chart: Chart, datasetIndex: number): BarController;
 };
 
 declare const CandlestickElement: Element;

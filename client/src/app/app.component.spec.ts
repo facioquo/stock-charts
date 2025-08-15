@@ -1,5 +1,6 @@
-import { TestBed } from "@angular/core/testing";
 import { CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+import { TestBed } from "@angular/core/testing";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { AppComponent } from "./app.component";
 import { UserService } from "./services/user.service";
 
@@ -9,15 +10,13 @@ describe("AppComponent", () => {
 
   beforeEach(async () => {
     const userServiceSpy = {
-      loadSettings: jest.fn()
+      loadSettings: jest.fn(),
     };
 
     await TestBed.configureTestingModule({
       imports: [AppComponent],
-      providers: [
-        { provide: UserService, useValue: userServiceSpy }
-      ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA] // Allow unknown elements like mat-toolbar, router-outlet
+      providers: [{ provide: UserService, useValue: userServiceSpy }],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA], // Allow unknown elements like mat-toolbar, router-outlet
     }).compileComponents();
 
     const fixture = TestBed.createComponent(AppComponent);

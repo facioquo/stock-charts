@@ -8,14 +8,12 @@ import { RouterOutlet } from "@angular/router";
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
   imports: [MatToolbar, RouterOutlet],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
   private readonly usr = inject(UserService);
 
-
   ngOnInit(): void {
-
     // load/apply user prefs
     this.usr.loadSettings();
   }
