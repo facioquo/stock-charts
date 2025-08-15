@@ -3,7 +3,7 @@ import { Meta, MetaDefinition, Title } from "@angular/platform-browser";
 import { v4 as Guid } from "uuid";
 
 @Injectable({
-  providedIn: "root",
+  providedIn: "root"
 })
 export class UtilityService {
   private meta = inject(Meta);

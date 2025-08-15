@@ -6,7 +6,7 @@ import { UtilityService } from "../../services/utility.service";
   templateUrl: "./404.component.html",
   styleUrls: ["./404.component.scss"],
   imports: [],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PageNotFoundComponent {
   private readonly util = inject(UtilityService);
@@ -17,20 +17,20 @@ export class PageNotFoundComponent {
     this.util.pushMetaTags([
       {
         name: "robots",
-        content: "noindex, nofollow",
+        content: "noindex, nofollow"
       },
       {
         property: "og:title",
-        content: "Page not found",
+        content: "Page not found"
       },
       {
         name: "description",
-        content: description,
+        content: description
       },
       {
         property: "og:description",
-        content: description,
-      },
+        content: description
+      }
     ]);
   }
 }

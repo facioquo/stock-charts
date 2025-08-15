@@ -5,7 +5,7 @@
   "semi": true,
   "singleQuote": false,
   "quoteProps": "as-needed",
-  "trailingComma": "es5",
+  "trailingComma": "none",
   "bracketSpacing": true,
   "bracketSameLine": false,
   "arrowParens": "avoid",
@@ -34,7 +34,7 @@
       "options": {
         "printWidth": 100,
         "singleQuote": false,
-        "trailingComma": "es5",
+        "trailingComma": "none",
         "bracketSpacing": true,
         "arrowParens": "avoid"
       }

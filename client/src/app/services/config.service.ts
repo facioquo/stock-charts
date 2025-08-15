@@ -14,14 +14,14 @@ import {
   ChartOptions,
   FontSpec,
   ScaleOptions,
-  TimeUnit,
+  TimeUnit
 } from "chart.js";
 
 // plugins
 import { AnnotationOptions, LabelAnnotationOptions, ScaleValue } from "chartjs-plugin-annotation";
 
 @Injectable({
-  providedIn: "root",
+  providedIn: "root"
 })
 export class ChartConfigService {
   private readonly usr = inject(UserService);
@@ -33,9 +33,9 @@ export class ChartConfigService {
     const config: ChartConfiguration = {
       type: "candlestick",
       data: {
-        datasets: [],
+        datasets: []
       },
-      options: this.baseOverlayOptions(volumeAxisSize),
+      options: this.baseOverlayOptions(volumeAxisSize)
     };
 
     return config;
@@ -46,9 +46,9 @@ export class ChartConfigService {
     const config: ChartConfiguration = {
       type: "candlestick", // TODO: should/could this be line or bar?
       data: {
-        datasets: [],
+        datasets: []
       },
-      options: this.baseOscillatorOptions(),
+      options: this.baseOscillatorOptions()
     };
 
     return config;
@@ -58,34 +58,34 @@ export class ChartConfigService {
     const options: ChartOptions = {
       plugins: {
         title: {
-          display: false,
+          display: false
         },
         legend: {
-          display: false,
+          display: false
         },
         tooltip: {
           enabled: this.usr.settings.showTooltips,
-          intersect: false,
+          intersect: false
         },
         annotation: {
           clip: false,
-          annotations: {},
-        },
+          annotations: {}
+        }
       },
       layout: {
         padding: {
           top: 0,
           left: 1,
           bottom: 0,
-          right: 1,
+          right: 1
         },
-        autoPadding: false,
+        autoPadding: false
       },
       responsive: true,
       maintainAspectRatio: false,
       animation: false,
       font: {
-        family: this.fontFamily,
+        family: this.fontFamily
       },
       scales: {
         x: this.defaultXAxisOptions(),
@@ -102,7 +102,7 @@ export class ChartConfigService {
             font: {
               family: this.fontFamily,
               size: 12,
-              lineHeight: 1,
+              lineHeight: 1
             },
             showLabelBackdrop: true,
             backdropColor: this.usr.settings.isDarkTheme ? "#12131680" : "#FAF9FD90",
@@ -110,21 +110,21 @@ export class ChartConfigService {
               top: 0,
               left: 5,
               bottom: 0,
-              right: 0,
+              right: 0
             },
-            padding: 0,
+            padding: 0
           },
           border: {
-            display: false,
+            display: false
           },
           grid: {
             drawOnChartArea: true,
             drawTicks: false,
             lineWidth: 0.5,
-            color: this.usr.settings.isDarkTheme ? "#2E2E2E" : "#E0E0E0",
-          },
-        },
-      },
+            color: this.usr.settings.isDarkTheme ? "#2E2E2E" : "#E0E0E0"
+          }
+        }
+      }
     };
 
     return options;
@@ -156,9 +156,9 @@ export class ChartConfigService {
       beginAtZero: true,
       padding: 0,
       border: {
-        display: false,
+        display: false
       },
-      max: volumeAxisSize,
+      max: volumeAxisSize
     } as ScaleOptions;
 
     return options;
@@ -202,12 +202,12 @@ export class ChartConfigService {
       offset: false, // centers candles/bars
       type: "timeseries",
       time: {
-        unit: timeUnit as TimeUnit,
+        unit: timeUnit as TimeUnit
       },
       adapters: {
         date: {
-          locale: enUS,
-        },
+          locale: enUS
+        }
       },
       ticks: {
         display: false,
@@ -217,16 +217,16 @@ export class ChartConfigService {
         maxRotation: 0,
         minRotation: 0,
         font: {
-          size: 9,
-        },
+          size: 9
+        }
       },
       border: {
-        display: false,
+        display: false
       },
       grid: {
         display: false,
-        drawOnChartArea: false,
-      },
+        drawOnChartArea: false
+      }
     };
 
     return options;
@@ -250,9 +250,9 @@ export class ChartConfigService {
               : {
                   target: c.fill.target,
                   above: c.fill.colorAbove,
-                  below: c.fill.colorBelow,
+                  below: c.fill.colorBelow
                 },
-          order: r.order,
+          order: r.order
         };
         return lineDataset;
       }
@@ -268,7 +268,7 @@ export class ChartConfigService {
           borderDash: [3, 2],
           borderColor: r.color,
           backgroundColor: r.color,
-          order: r.order,
+          order: r.order
         };
         return dashDataset;
       }
@@ -284,7 +284,7 @@ export class ChartConfigService {
           pointBorderColor: r.color,
           pointBackgroundColor: r.color,
           showLine: false,
-          order: r.order,
+          order: r.order
         };
         return dotsDataset;
       }
@@ -298,7 +298,7 @@ export class ChartConfigService {
           borderWidth: 0,
           borderColor: r.color,
           backgroundColor: r.color,
-          order: r.order,
+          order: r.order
         };
 
         // add stack, if specified
@@ -321,7 +321,7 @@ export class ChartConfigService {
           pointStyle: "triangle",
           pointRotation: 0,
           showLine: false,
-          order: r.order,
+          order: r.order
         };
         return ptDataset;
       }
@@ -340,7 +340,7 @@ export class ChartConfigService {
           borderColor: r.color,
           backgroundColor: r.color,
           fill: false,
-          order: r.order,
+          order: r.order
         };
         return noneDataset;
       }
@@ -361,7 +361,7 @@ export class ChartConfigService {
       size: 13,
       style: "normal",
       weight: "normal",
-      lineHeight: 1,
+      lineHeight: 1
     };
 
     const annotation: AnnotationOptions & LabelAnnotationOptions = {
@@ -379,7 +379,7 @@ export class ChartConfigService {
       xValue: xPos,
       yValue: yPos,
       xAdjust: 0,
-      yAdjust: yAdj,
+      yAdjust: yAdj
     };
 
     return annotation;

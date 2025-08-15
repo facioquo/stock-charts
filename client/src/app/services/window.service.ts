@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Observable, Subject, debounceTime, distinctUntilChanged } from "rxjs";
 
 @Injectable({
-  providedIn: "root",
+  providedIn: "root"
 })
 export class WindowService {
   private resizeSubject = new Subject<{ width: number; height: number }>();
@@ -13,7 +13,7 @@ export class WindowService {
       window.addEventListener("resize", () => {
         this.resizeSubject.next({
           width: window.innerWidth,
-          height: window.innerHeight,
+          height: window.innerHeight
         });
       });
     }
@@ -26,7 +26,7 @@ export class WindowService {
     if (typeof window !== "undefined") {
       return {
         width: window.innerWidth,
-        height: window.innerHeight,
+        height: window.innerHeight
       };
     }
     return { width: 1024, height: 768 }; // Default for SSR

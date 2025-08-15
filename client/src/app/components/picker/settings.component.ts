@@ -9,7 +9,7 @@ import {
   MatListItem,
   MatListItemTitle,
   MatNavList,
-  MatListItemLine,
+  MatListItemLine
 } from "@angular/material/list";
 import { MatSlideToggleChange, MatSlideToggle } from "@angular/material/slide-toggle";
 
@@ -46,9 +46,9 @@ import { FormsModule } from "@angular/forms";
     MatListItemTitle,
     MatButton,
     MatNavList,
-    MatListItemLine,
+    MatListItemLine
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SettingsComponent {
   private listRef = inject(MatDialog);
@@ -91,7 +91,7 @@ export class SettingsComponent {
     this.picker
       .open(PickConfigComponent, {
         autoFocus: "dialog",
-        data: listing,
+        data: listing
       })
       .afterClosed()
 
@@ -100,7 +100,7 @@ export class SettingsComponent {
       // TODO: scroll to chart if not reopened
       .subscribe(() => {
         this.listRef.open(SettingsComponent, {
-          autoFocus: "dialog",
+          autoFocus: "dialog"
         });
       });
   }

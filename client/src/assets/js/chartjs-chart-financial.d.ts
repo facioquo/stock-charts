@@ -6,7 +6,7 @@ import {
   BarControllerDatasetOptions,
   CartesianScaleTypeRegistry,
   Chart,
-  ChartComponent,
+  ChartComponent
 } from "chart.js";
 
 export interface FinancialDataPoint {

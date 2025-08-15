@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { UserSettings } from "../pages/chart/chart.models";
 
 @Injectable({
-  providedIn: "root",
+  providedIn: "root"
 })
 export class UserService {
   settings: UserSettings; // initialized in app.component.ts
@@ -18,7 +18,7 @@ export class UserService {
     if (settings === null) {
       this.settings = {
         isDarkTheme: true,
-        showTooltips: false,
+        showTooltips: false
       };
 
       // store/cache new setting

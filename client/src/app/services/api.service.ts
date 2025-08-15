@@ -6,7 +6,7 @@ import { env } from "../../environments/environment";
 import { IndicatorListing, IndicatorParam, IndicatorSelection } from "../pages/chart/chart.models";
 
 @Injectable({
-  providedIn: "root",
+  providedIn: "root"
 })
 export class ApiService {
   private readonly http = inject(HttpClient);
@@ -37,7 +37,7 @@ export class ApiService {
         error: (e: HttpErrorResponse) => {
           console.log("DATA", e);
           observer.error(e);
-        },
+        }
       });
     });
 

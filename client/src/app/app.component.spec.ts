@@ -10,13 +10,13 @@ describe("AppComponent", () => {
 
   beforeEach(async () => {
     const userServiceSpy = {
-      loadSettings: jest.fn(),
+      loadSettings: jest.fn()
     };
 
     await TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [{ provide: UserService, useValue: userServiceSpy }],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA], // Allow unknown elements like mat-toolbar, router-outlet
+      schemas: [CUSTOM_ELEMENTS_SCHEMA] // Allow unknown elements like mat-toolbar, router-outlet
     }).compileComponents();
 
     const fixture = TestBed.createComponent(AppComponent);

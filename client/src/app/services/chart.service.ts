@@ -14,7 +14,7 @@ import {
   PointElement,
   ScatterDataPoint,
   TimeSeriesScale,
-  Tooltip,
+  Tooltip
 } from "chart.js";
 
 // Extended dataset interface for candlestick pattern datasets
@@ -28,14 +28,14 @@ type ExtendedChartDataset = ChartDataset & {
 import {
   CandlestickController,
   CandlestickElement,
-  FinancialDataPoint,
+  FinancialDataPoint
 } from "src/assets/js/chartjs-chart-financial";
 
 // plugins
 import AnnotationPlugin, {
   AnnotationOptions,
   LabelAnnotationOptions,
-  ScaleValue,
+  ScaleValue
 } from "chartjs-plugin-annotation";
 
 // register extensions and plugins
@@ -70,7 +70,7 @@ import {
   IndicatorResultConfig,
   IndicatorSelection,
   Quote,
-  IndicatorDataRow,
+  IndicatorDataRow
 } from "../pages/chart/chart.models";
 
 // services
@@ -80,7 +80,7 @@ import { UtilityService } from "./utility.service";
 import { WindowService } from "./window.service";
 
 @Injectable({
-  providedIn: "root",
+  providedIn: "root"
 })
 export class ChartService implements OnDestroy {
   private readonly api = inject(ApiService);
@@ -181,7 +181,7 @@ export class ChartService implements OnDestroy {
 
               dataPoints.push({
                 x: new Date(row.date).valueOf(),
-                y: yValue,
+                y: yValue
               });
             });
 
@@ -192,7 +192,7 @@ export class ChartService implements OnDestroy {
               nextDate.setDate(nextDate.getDate() + 1);
               dataPoints.push({
                 x: new Date(nextDate).valueOf(),
-                y: null,
+                y: null
               });
             }
 
@@ -228,10 +228,10 @@ export class ChartService implements OnDestroy {
             status: e.status,
             statusText: e.statusText,
             url: e.url,
-            message: e.message,
+            message: e.message
           });
           observer.error(e);
-        },
+        }
       });
     });
 
@@ -260,7 +260,7 @@ export class ChartService implements OnDestroy {
       label: listing.legendTemplate,
       chartType: listing.chartType,
       params: [],
-      results: [],
+      results: []
     };
 
     // load default parameters
@@ -270,7 +270,7 @@ export class ChartService implements OnDestroy {
         displayName: config.displayName,
         minimum: config.minimum,
         maximum: config.maximum,
-        value: config.defaultValue,
+        value: config.defaultValue
       } as IndicatorParam;
 
       selection.params.push(param);
@@ -285,7 +285,7 @@ export class ChartService implements OnDestroy {
         displayName: config.displayName,
         lineType: config.lineType,
         lineWidth: config.lineWidth,
-        order: listing.order,
+        order: listing.order
       } as IndicatorResult;
 
       selection.results.push(result);
@@ -299,7 +299,7 @@ export class ChartService implements OnDestroy {
     const selections: IndicatorSelection[] =
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       this.selections.map(({ chart: _, ...rest }) => ({
-        ...rest,
+        ...rest
       }));
 
     localStorage.setItem("selections", JSON.stringify(selections));
@@ -377,9 +377,9 @@ export class ChartService implements OnDestroy {
             : {
                 target: threshold.fill.target,
                 above: threshold.fill.colorAbove,
-                below: threshold.fill.colorBelow,
+                below: threshold.fill.colorBelow
               },
-        order: index + 100,
+        order: index + 100
       };
 
       chartConfig.data.datasets.push(thresholdDataset);
@@ -585,7 +585,7 @@ export class ChartService implements OnDestroy {
       // Also slice the background colors array
       if (fullVolumeDataset.backgroundColor && Array.isArray(fullVolumeDataset.backgroundColor)) {
         currentVolumeDataset.backgroundColor = [
-          ...fullVolumeDataset.backgroundColor.slice(startIndex),
+          ...fullVolumeDataset.backgroundColor.slice(startIndex)
         ];
       }
     }
@@ -627,13 +627,13 @@ export class ChartService implements OnDestroy {
           Array.isArray(extendedDataset.pointBackgroundColor)
         ) {
           resultExtended.pointBackgroundColor = [
-            ...(extendedDataset.pointBackgroundColor as string[]).slice(startIndex),
+            ...(extendedDataset.pointBackgroundColor as string[]).slice(startIndex)
           ];
         }
 
         if (extendedDataset.pointBorderColor && Array.isArray(extendedDataset.pointBorderColor)) {
           resultExtended.pointBorderColor = [
-            ...(extendedDataset.pointBorderColor as string[]).slice(startIndex),
+            ...(extendedDataset.pointBorderColor as string[]).slice(startIndex)
           ];
         }
 
@@ -686,21 +686,21 @@ export class ChartService implements OnDestroy {
             console.error("Error loading listings:", {
               status: e.status,
               statusText: e.statusText,
-              message: e.message,
+              message: e.message
             });
-          },
+          }
         });
       },
       error: (e: HttpErrorResponse) => {
         console.error("Error getting quotes:", {
           status: e.status,
           statusText: e.statusText,
-          message: e.message,
+          message: e.message
         });
       },
       complete: () => {
         this.loading.set(false);
-      },
+      }
     });
   }
 
@@ -717,7 +717,7 @@ export class ChartService implements OnDestroy {
     candleOptions.borderColor = {
       up: candleOptions.color.up,
       down: candleOptions.color.down,
-      unchanged: candleOptions.color.unchanged,
+      unchanged: candleOptions.color.unchanged
     };
 
     const price: FinancialDataPoint[] = [];
@@ -732,12 +732,12 @@ export class ChartService implements OnDestroy {
         o: q.open,
         h: q.high,
         l: q.low,
-        c: q.close,
+        c: q.close
       });
 
       volume.push({
         x: new Date(q.date).valueOf(),
-        y: q.volume,
+        y: q.volume
       });
       sumVol += q.volume;
 
@@ -754,7 +754,7 @@ export class ChartService implements OnDestroy {
       // intentionally excluding price (gap covered by volume)
       volume.push({
         x: new Date(nextDate).valueOf(),
-        y: null,
+        y: null
       });
     }
 
@@ -767,7 +767,7 @@ export class ChartService implements OnDestroy {
           data: price,
           yAxisID: "y",
           borderColor: candleOptions.borderColor,
-          order: 75,
+          order: 75
         },
         {
           type: "bar",
@@ -776,9 +776,9 @@ export class ChartService implements OnDestroy {
           yAxisID: "volumeAxis",
           backgroundColor: barColor,
           borderWidth: 0,
-          order: 76,
-        },
-      ],
+          order: 76
+        }
+      ]
     };
 
     // volume axis size

@@ -26,14 +26,14 @@ describe("Color Picker Functionality", () => {
     "#616161", // gray 700 (dark)
     "#757575", // gray 600
     "#9E9E9E", // gray 500
-    "#BDBDBD", // gray 400 (light)
+    "#BDBDBD" // gray 400 (light)
   ];
 
   const lineWidths = [
     { name: "thin", value: 1 },
     { name: "normal", value: 1.5 },
     { name: "thick", value: 2 },
-    { name: "heavy", value: 3 },
+    { name: "heavy", value: 3 }
   ];
 
   const lineTypes = [
@@ -41,7 +41,7 @@ describe("Color Picker Functionality", () => {
     { name: "dashes", value: "dash", userWidth: true },
     { name: "dots", value: "dots", userWidth: true },
     { name: "bar", value: "bar", userWidth: false },
-    { name: "none", value: "none", userWidth: false },
+    { name: "none", value: "none", userWidth: false }
   ];
 
   describe("Material Design Color Palette", () => {
@@ -130,7 +130,7 @@ describe("Color Picker Functionality", () => {
       return {
         "border-bottom-color": result.color,
         "border-bottom-width": width + "px",
-        "border-bottom-style": style,
+        "border-bottom-style": style
       };
     }
 
