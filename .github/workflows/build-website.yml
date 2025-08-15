@@ -39,7 +39,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "lts/*"
+          node-version: "22.15.x"
           cache: "npm"
           cache-dependency-path: package-lock.json
 
@@ -109,4 +109,4 @@ jobs:
             client/test-results/
 
       - name: Build site
-        run: npm run build:prod --workspace=@stock-charts/client
+  run: npm run build:prod --workspace=@stock-charts/client

@@ -12,8 +12,9 @@
     "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
-    "typeRoots": ["node_modules/@types"],
-    "lib": ["ES2022", "dom"],
+  // Removed explicit typeRoots to allow default TypeScript + Jest preset type resolution
+  "lib": ["ES2022", "dom"],
+  "types": ["jest", "node"],
     "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
