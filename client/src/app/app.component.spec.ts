@@ -1,39 +1,22 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
-import { beforeEach, describe, expect, it, jest } from "@jest/globals";
+import { RouterOutlet } from "@angular/router";
 import { AppComponent } from "./app.component";
 import { UserService } from "./services/user.service";
 
 describe("AppComponent", () => {
-  let component: AppComponent;
-  let userService: UserService;
-
-  beforeEach(async () => {
-    const userServiceSpy = {
-      loadSettings: jest.fn()
-    };
+  it("should create and call loadSettings on init", async () => {
+    const userServiceSpy = { loadSettings: jest.fn() } as { loadSettings: jest.Mock };
 
     await TestBed.configureTestingModule({
-      imports: [AppComponent],
-      providers: [{ provide: UserService, useValue: userServiceSpy }],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA] // Allow unknown elements like mat-toolbar, router-outlet
+      imports: [AppComponent, RouterOutlet],
+      providers: [{ provide: UserService, useValue: userServiceSpy }]
     }).compileComponents();
 
     const fixture = TestBed.createComponent(AppComponent);
-    component = fixture.componentInstance;
-    userService = TestBed.inject(UserService);
-  });
-
-  it("should create", () => {
+    const component = fixture.componentInstance;
     expect(component).toBeTruthy();
-  });
 
-  it("should load user settings on init", () => {
     component.ngOnInit();
-    expect(userService.loadSettings).toHaveBeenCalled();
-  });
-
-  it("should have correct selector", () => {
-    expect(AppComponent.prototype.constructor.name).toBe("AppComponent");
+    expect(userServiceSpy.loadSettings).toHaveBeenCalled();
   });
 });

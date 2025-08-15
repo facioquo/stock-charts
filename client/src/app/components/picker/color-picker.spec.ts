@@ -1,5 +1,4 @@
 // Test the color picker functionality in isolation
-import { describe, expect, it } from "@jest/globals";
 
 interface LineConfig {
   color: string;

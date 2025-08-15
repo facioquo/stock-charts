@@ -33,6 +33,21 @@ description: 'Project-specific Angular development guidelines'
 - Use `unknown` instead of `any` when type is uncertain
 - Write self-documenting code that expresses intent clearly
 
+### Component structure requirements
+
+**Do not inline component HTML or SCSS** (template or styles properties with large multiline strings) in production/source code. Always use external `*.html` and `*.scss` (or `*.css`) files referenced via `templateUrl` and `styleUrls` to:
+
+- Enable proper editor language tooling (HTML/SCSS intellisense, formatting, diagnostics)
+- Improve readability and separation of concerns
+- Simplify diff reviews and reduce noisy changes when editing markup or styles
+- Allow focused unit testing and potential future template pre-processing
+
+Permitted exceptions (must be justified in a code comment directly above the `@Component`):
+- Tiny presentational components whose template is a single, short line (≤ 80 chars, no structural directives)
+- Temporary experimental spike code (must be removed before merge to main)
+
+If a test environment has issues resolving external resources, adjust the test (e.g., override component or use Angular testing utilities) rather than inlining the production component. Do not commit inline templates/styles to solve test configuration problems.
+
 ## Stock Charts Project-Specific Guidelines
 
 ### Chart.js Integration
