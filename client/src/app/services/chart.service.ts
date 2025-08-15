@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, OnDestroy } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
-import { Observable, Subject, takeUntil } from "rxjs";
+import { Observable, Subject, takeUntil, map, catchError } from "rxjs";
 
 import {
   BarElement,
@@ -99,6 +99,17 @@ export class ChartService implements OnDestroy {
   private static readonly LEGEND_Y_OFFSET = 15;
   private static readonly THRESHOLD_ORDER_OFFSET = 100;
 
+  // Chart type constants
+  private static readonly CHART_TYPES = {
+    OVERLAY: "overlay",
+    OSCILLATOR: "oscillator"
+  } as const;
+
+  // Category constants
+  private static readonly CATEGORIES = {
+    CANDLESTICK_PATTERN: "candlestick-pattern"
+  } as const;
+
   // Color constants
   private static readonly COLORS = {
     GREEN: "#2E7D32",
@@ -143,35 +154,20 @@ export class ChartService implements OnDestroy {
   addSelection(
     selection: IndicatorSelection,
     listing: IndicatorListing,
-    scrollToMe: boolean = false): Observable<unknown> {
+    scrollToMe: boolean = false): Observable<void> {
 
-    // load selection to chart
-    const obs = new Observable((observer) => {
-
-      // TODO: we really only want to return API observable
-      // here to catch backend validation errors only, not more.
-
-      // fetch API data
-      this.api.getSelectionData(selection, listing)
-        .subscribe({
-
-          // compose datasets
-          next: (data: IndicatorDataRow[]) => {
-            this.processSelectionData(selection, listing, data);
-            this.displaySelection(selection, listing, scrollToMe);
-
-            // inform caller
-            observer.next(undefined);
-            observer.complete();
-          },
-          error: (e: HttpErrorResponse) => {
-            this.logHttpError("Chart Service Error", e);
-            observer.error(e);
-          }
-        });
-    });
-
-    return obs;
+    // Fetch API data and process selection
+    return this.api.getSelectionData(selection, listing)
+      .pipe(
+        map((data: IndicatorDataRow[]) => {
+          this.processSelectionData(selection, listing, data);
+          this.displaySelection(selection, listing, scrollToMe);
+        }),
+        catchError((error: HttpErrorResponse) => {
+          this.logHttpError("Chart Service Error", error);
+          throw error;
+        })
+      );
   }
 
   private processSelectionData(
@@ -192,7 +188,7 @@ export class ChartService implements OnDestroy {
       this.addExtraBars(dataPoints);
 
       // custom candlestick pattern points
-      if (listing.category === "candlestick-pattern" && dataset.type !== "bar") {
+      if (listing.category === ChartService.CATEGORIES.CANDLESTICK_PATTERN && dataset.type !== "bar") {
         dataset.pointRotation = pointRotation;
         dataset.pointBackgroundColor = pointColor;
         dataset.pointBorderColor = pointColor;
@@ -224,7 +220,7 @@ export class ChartService implements OnDestroy {
       let yValue = typeof row[result.dataName] === "number" ? row[result.dataName] as number : null;
 
       // apply candle pointers
-      if (yValue && listing.category === "candlestick-pattern") {
+      if (yValue && listing.category === ChartService.CATEGORIES.CANDLESTICK_PATTERN) {
         const candleConfig = this.getCandlePointConfiguration(row["match"] as number, row.candle as Quote);
         yValue = candleConfig.yValue;
         pointColor.push(candleConfig.color);
@@ -373,7 +369,7 @@ export class ChartService implements OnDestroy {
     this.selections.push(selection);
 
     // add needed charts
-    if (listing.chartType === "overlay") {
+    if (listing.chartType === ChartService.CHART_TYPES.OVERLAY) {
       this.displaySelectionOnOverlayChart(selection, scrollToMe);
     }
     else {
@@ -533,7 +529,7 @@ export class ChartService implements OnDestroy {
 
   private getOverlaySelections(): IndicatorSelection[] {
     return this.selections
-      .filter(x => x.chartType === "overlay")
+      .filter(x => x.chartType === ChartService.CHART_TYPES.OVERLAY)
       .sort((a, b) => a.label.localeCompare(b.label));
   }
 
@@ -579,7 +575,7 @@ export class ChartService implements OnDestroy {
     // Clean up stored processed datasets
     this.allProcessedDatasets.delete(ucid);
 
-    if (selection.chartType === "overlay") {
+    if (selection.chartType === ChartService.CHART_TYPES.OVERLAY) {
 
       selection.results.forEach((result: IndicatorResult) => {
         const dx = this.chartOverlay.data.datasets.indexOf(result.dataset, 0);
@@ -624,7 +620,7 @@ export class ChartService implements OnDestroy {
 
     // update oscillator charts
     const charts = this.selections
-      .filter(s => s.chartType === "oscillator");
+      .filter(s => s.chartType === ChartService.CHART_TYPES.OSCILLATOR);
 
     charts.forEach((selection: IndicatorSelection) => {
 
@@ -746,7 +742,7 @@ export class ChartService implements OnDestroy {
       });
 
       // Update oscillator legends after data changes
-      if (selection.chartType === "oscillator" && selection.chart) {
+      if (selection.chartType === ChartService.CHART_TYPES.OSCILLATOR && selection.chart) {
         this.addOscillatorLegend(selection);
       }
     });
@@ -770,7 +766,7 @@ export class ChartService implements OnDestroy {
 
   private resizeOscillatorCharts() {
     this.selections.forEach(selection => {
-      if (selection.chartType === "oscillator" && selection.chart) {
+      if (selection.chartType === ChartService.CHART_TYPES.OSCILLATOR && selection.chart) {
         // Let Chart.js automatically detect container dimensions
         selection.chart.resize();
         selection.chart.update("resize");

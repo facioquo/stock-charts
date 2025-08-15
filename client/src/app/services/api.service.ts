@@ -1,13 +1,15 @@
 import { Injectable, inject } from "@angular/core";
 import { HttpClient, HttpErrorResponse, HttpHeaders } from "@angular/common/http";
-import { Observable } from "rxjs/internal/Observable";
+import { Observable, of, catchError } from "rxjs";
 import { env } from "../../environments/environment";
 
 import {
   IndicatorListing,
   IndicatorParam,
-  IndicatorSelection
+  IndicatorSelection,
+  Quote
 } from "../pages/chart/chart.models";
+import { CLIENT_BACKUP_QUOTES } from "../data/backup-quotes";
 
 @Injectable({
   providedIn: "root"
@@ -16,8 +18,21 @@ export class ApiService {
   private readonly http = inject(HttpClient);
 
 
-  getQuotes() {
-    return this.http.get(`${env.api}/quotes`, this.requestHeader());
+  getQuotes(): Observable<Quote[]> {
+    return this.http.get<Quote[]>(`${env.api}/quotes`, this.requestHeader())
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.warn("Backend API unavailable, using client-side backup quotes", {
+            status: error.status,
+            statusText: error.statusText,
+            url: error.url,
+            message: error.message
+          });
+          
+          // Return client-side backup quotes as failover
+          return of(CLIENT_BACKUP_QUOTES);
+        })
+      );
   }
 
   getListings() {
