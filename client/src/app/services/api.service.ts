@@ -10,6 +10,7 @@ import {
   Quote
 } from "../pages/chart/chart.models";
 import { CLIENT_BACKUP_QUOTES } from "../data/backup-quotes";
+import { CLIENT_BACKUP_INDICATORS } from "../data/backup-indicators";
 
 @Injectable({
   providedIn: "root"
@@ -35,8 +36,21 @@ export class ApiService {
       );
   }
 
-  getListings() {
-    return this.http.get(`${env.api}/indicators`, this.requestHeader());
+  getListings(): Observable<IndicatorListing[]> {
+    return this.http.get<IndicatorListing[]>(`${env.api}/indicators`, this.requestHeader())
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.warn("Backend API unavailable, using client-side backup indicators", {
+            status: error.status,
+            statusText: error.statusText,
+            url: error.url,
+            message: error.message
+          });
+          
+          // Return client-side backup indicators as failover
+          return of(CLIENT_BACKUP_INDICATORS);
+        })
+      );
   }
 
   getSelectionData(

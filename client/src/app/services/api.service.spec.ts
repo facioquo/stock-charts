@@ -2,6 +2,7 @@ import { TestBed } from "@angular/core/testing";
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
 import { ApiService } from "./api.service";
 import { CLIENT_BACKUP_QUOTES } from "../data/backup-quotes";
+import { CLIENT_BACKUP_INDICATORS } from "../data/backup-indicators";
 import { env } from "../../environments/environment";
 
 describe("ApiService", () => {
@@ -90,5 +91,89 @@ describe("ApiService", () => {
     
     // Basic validation that high >= low
     expect(firstQuote.high).toBeGreaterThanOrEqual(firstQuote.low);
+  });
+
+  it("should return indicators from API when available", () => {
+    const mockIndicators = [
+      {
+        name: "Test Indicator",
+        uiid: "TEST",
+        legendTemplate: "TEST([P1])",
+        endpoint: "/TEST/",
+        category: "test",
+        chartType: "overlay",
+        order: 0,
+        chartConfig: null,
+        parameters: [],
+        results: []
+      }
+    ];
+
+    service.getListings().subscribe(indicators => {
+      expect(indicators).toEqual(mockIndicators);
+    });
+
+    const req = httpMock.expectOne(`${env.api}/indicators`);
+    expect(req.request.method).toBe("GET");
+    req.flush(mockIndicators);
+  });
+
+  it("should fallback to client backup indicators when API fails", () => {
+    service.getListings().subscribe(indicators => {
+      expect(indicators).toEqual(CLIENT_BACKUP_INDICATORS);
+      expect(indicators.length).toBeGreaterThan(5); // Verify we have multiple indicators
+    });
+
+    const req = httpMock.expectOne(`${env.api}/indicators`);
+    expect(req.request.method).toBe("GET");
+    
+    // Simulate API failure
+    req.error(new ProgressEvent("Network error"), {
+      status: 0,
+      statusText: "Unknown Error"
+    });
+  });
+
+  it("should fallback to client backup indicators when API returns server error", () => {
+    service.getListings().subscribe(indicators => {
+      expect(indicators).toEqual(CLIENT_BACKUP_INDICATORS);
+      expect(indicators.length).toBeGreaterThan(5);
+    });
+
+    const req = httpMock.expectOne(`${env.api}/indicators`);
+    expect(req.request.method).toBe("GET");
+    
+    // Simulate server error
+    req.error(new ProgressEvent("Server error"), {
+      status: 500,
+      statusText: "Internal Server Error"
+    });
+  });
+
+  it("client backup indicators should have valid data structure", () => {
+    expect(CLIENT_BACKUP_INDICATORS.length).toBeGreaterThan(5);
+    
+    const firstIndicator = CLIENT_BACKUP_INDICATORS[0];
+    expect(firstIndicator).toHaveProperty("name");
+    expect(firstIndicator).toHaveProperty("uiid");
+    expect(firstIndicator).toHaveProperty("legendTemplate");
+    expect(firstIndicator).toHaveProperty("endpoint");
+    expect(firstIndicator).toHaveProperty("category");
+    expect(firstIndicator).toHaveProperty("chartType");
+    expect(firstIndicator).toHaveProperty("parameters");
+    expect(firstIndicator).toHaveProperty("results");
+    
+    expect(typeof firstIndicator.name).toBe("string");
+    expect(typeof firstIndicator.uiid).toBe("string");
+    expect(Array.isArray(firstIndicator.parameters)).toBe(true);
+    expect(Array.isArray(firstIndicator.results)).toBe(true);
+    
+    // Verify we have essential indicators like RSI, MACD, etc.
+    const indicatorNames = CLIENT_BACKUP_INDICATORS.map(i => i.uiid);
+    expect(indicatorNames).toContain("SMA");
+    expect(indicatorNames).toContain("EMA");
+    expect(indicatorNames).toContain("RSI");
+    expect(indicatorNames).toContain("MACD");
+    expect(indicatorNames).toContain("BB");
   });
 });
