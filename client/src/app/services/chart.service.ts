@@ -530,7 +530,7 @@ export class ChartService implements OnDestroy {
         // Remove DOM node after destroying the chart
         if (body) body.removeChild(container);
         // Clear reference
-        (selection as any).chart = undefined;
+        selection.chart = undefined;
       }
     }
 
@@ -580,6 +580,10 @@ export class ChartService implements OnDestroy {
   //#region WINDOW OPERATIONS
 
   onWindowResize(dimensions: { width: number; height: number }) {
+    // TEMP DISABLE (commit 706ec63425eac0a6f4a310e42296f3ed2d2fdb09):
+    // Chart auto-resizing reverted to static dataset length. Early return
+    // prevents dynamic bar count recalculation and slicing until feature is fixed.
+    return; // minimal change to disable auto-resize
     const newBarCount = this.window.calculateOptimalBars(dimensions.width);
 
     // Only update if bar count changed significantly and we have data
