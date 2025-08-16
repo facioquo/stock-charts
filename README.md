@@ -183,6 +183,7 @@ This repository includes optimized VS Code configuration with tasks, problem mat
 - `start-functions` - Start Azure Functions
 - `start-webapi` - Start .NET Web API
 - `start-azurite` - Start Azurite storage emulator (wraps `npm run azure:start`)
+- `start-full-stack` - Start all services (Azurite, Functions, Web API, Website)
 - `lint-website` - Run ESLint on Angular code
 - `lint-website-fix` - Auto-fix ESLint issues
 - `test-website` - Run Angular tests

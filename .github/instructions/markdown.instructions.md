@@ -114,7 +114,7 @@ For complete setup instructions, see [Development Setup](../../README.md).
 
 1. Update the canonical source (usually main README.md)
 2. Verify all cross-references still point to correct sections
-3. Run `npm run lint:md` to check for broken links
+3. Check for broken links (external + internal)
 
 ## Linting and standards
 

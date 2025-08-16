@@ -216,7 +216,7 @@ export class ChartService implements OnDestroy {
           // Store processed datasets for efficient resizing (deep copy to avoid reference issues)
           this.allProcessedDatasets.set(
             selection.ucid,
-            selection.results.map(result => JSON.parse(JSON.stringify(result.dataset)))
+            selection.results.map(result => structuredClone(result.dataset))
           );
 
           // add to chart
@@ -505,9 +505,33 @@ export class ChartService implements OnDestroy {
         overlay.update();
       }
     } else {
+      // Destroy oscillator chart instance (avoid leaking canvases / event handlers)
       const body = document.getElementById("oscillators-zone");
-      const chart = document.getElementById(`${selection.ucid}-container`);
-      if (body && chart) body.removeChild(chart);
+      const container = document.getElementById(`${selection.ucid}-container`);
+      if (container) {
+        // Try to get chart instance via canvas lookup first
+        const canvas = container.querySelector("canvas") as HTMLCanvasElement | null;
+        let instance: Chart | undefined | null = null;
+        if (canvas) {
+          // Chart.getChart returns the existing chart instance for this canvas (Chart.js v4)
+          instance = Chart.getChart(canvas);
+        }
+        // Fallback to stored reference on selection
+        if (!instance && selection.chart) {
+          instance = selection.chart;
+        }
+        if (instance) {
+          try {
+            instance.destroy();
+          } catch (err) {
+            console.warn("Failed to destroy oscillator chart", { ucid: selection.ucid, err });
+          }
+        }
+        // Remove DOM node after destroying the chart
+        if (body) body.removeChild(container);
+        // Clear reference
+        (selection as any).chart = undefined;
+      }
     }
 
     this.cacheSelections();
