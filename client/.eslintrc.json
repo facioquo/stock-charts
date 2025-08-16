@@ -11,6 +11,10 @@
         "plugin:@angular-eslint/template/process-inline-templates",
         "plugin:prettier/recommended"
       ],
+      "parserOptions": {
+        "project": ["./tsconfig.eslint.json"],
+        "sourceType": "module"
+      },
       "rules": {
         "@angular-eslint/directive-selector": [
           "error",
@@ -37,7 +41,19 @@
             "arrowParens": "avoid"
           }
         ],
-        "quotes": ["error", "double", { "avoidEscape": true }]
+        "quotes": ["error", "double", { "avoidEscape": true }],
+        "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+        "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/no-non-null-assertion": "warn",
+        "@typescript-eslint/prefer-nullish-coalescing": [
+          "error",
+          {
+            "ignoreConditionalTests": true,
+            "ignoreTernaryTests": false,
+            "ignoreMixedLogicalExpressions": true
+          }
+        ],
+        "@typescript-eslint/no-floating-promises": "error"
       }
     },
     {

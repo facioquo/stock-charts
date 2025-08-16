@@ -47,7 +47,8 @@ export class WindowService {
    * Using ~5px per bar as specified in requirements
    */
   calculateOptimalBars(containerWidth?: number): number {
-    const width = containerWidth || this.getWindowSize().width;
+    // Use nullish coalescing so 0 is treated as a valid explicit width (if ever passed)
+    const width = containerWidth ?? this.getWindowSize().width;
     const pixelsPerBar = 5;
     const minBars = 20; // Minimum reasonable number of bars
     const maxBars = 500; // Maximum to avoid performance issues

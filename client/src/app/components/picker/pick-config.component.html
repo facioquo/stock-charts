@@ -18,8 +18,8 @@
                     [(ngModel)]="p.value"
                     type="number"
                     required
-                    min="{{ p.minimum }}"
-                    max="{{ p.maximum }}"
+                    [min]="p.minimum"
+                    [max]="p.maximum"
                   />
                   @if (param.invalid) {
                     <mat-error>{{ paramRangeError(p) }}</mat-error>
@@ -85,7 +85,7 @@
                   [ngStyle]="{ color: r.color }"
                   [disabled]="r.lineType === 'none'"
                 ></mtx-colorpicker-toggle>
-                <mtx-colorpicker #customPicker [content]="customPickerContent" disabled="false"></mtx-colorpicker>
+                <mtx-colorpicker #customPicker [content]="customPickerContent"></mtx-colorpicker>
                 <div [ngStyle]="getLineSample(r)"></div>
               </mat-form-field>
               <ng-template #customPickerContent>

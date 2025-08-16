@@ -72,7 +72,9 @@ describe("UserService", () => {
 
       const cached = localStorage.getItem("settings");
       expect(cached).toBeTruthy();
-      expect(JSON.parse(cached!)).toEqual(service.settings);
+      // cached is asserted truthy above; non-null assertion avoided by local variable narrowing
+      const parsed = JSON.parse(cached as string);
+      expect(parsed).toEqual(service.settings);
     });
   });
 

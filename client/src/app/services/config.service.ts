@@ -134,6 +134,7 @@ export class ChartConfigService {
     const options = this.baseChartOptions();
 
     // format y-axis (helper context)
+    if (!options.scales || !options.scales.y) return options; // safety guard
     const y = options.scales.y as CartesianScaleOptions;
 
     // size to data, instead of next tick
@@ -148,7 +149,10 @@ export class ChartConfigService {
     };
 
     // define secondary y-axis for volume
-    options.scales.volumeAxis = {
+    if (!options.scales) {
+      options.scales = {} as ChartOptions["scales"]; // initialize scales object
+    }
+    (options.scales as Record<string, ScaleOptions>).volumeAxis = {
       display: false, // hide by default
       type: "linear",
       axis: "y",
@@ -168,9 +172,12 @@ export class ChartConfigService {
     const options = this.baseChartOptions();
 
     // remove x-axis
-    options.scales.x.display = false;
+    if (options.scales?.x) {
+      options.scales.x.display = false;
+    }
 
     // format y-axis (helper context)
+    if (!options.scales || !options.scales.y) return options; // safety guard
     const y = options.scales.y as CartesianScaleOptions;
 
     // rescale labels

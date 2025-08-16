@@ -14,7 +14,8 @@
     "target": "ES2022",
     "lib": ["ES2022", "dom"],
     "types": ["jest", "node"],
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "strictNullChecks": true
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

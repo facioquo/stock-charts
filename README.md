@@ -71,6 +71,10 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
    - Web API: <https://localhost:5001>
    - Azure Functions: <http://localhost:7071>
 
+### Notes on local hosting
+
+The Web API runs directly on Kestrel instead of IIS Express to simplify cross-platform development and containerization. If you need IIS Express profiles for legacy tooling, you can add a `launchSettings.json` under `server/WebApi/Properties/` but this is not required for the default workflow.
+
 ```bash
 dotnet build Charts.sln
 ```
@@ -199,6 +203,16 @@ The application uses [Azurite](https://docs.microsoft.com/en-us/azure/storage/co
 
 - Functions: `server/Functions/local.settings.json`
 - WebAPI: `server/WebApi/appsettings.Development.json`
+
+#### Azurite data persistence and cleanup
+
+Azurite stores its local data files (blob, queue, table) in the `./.azurite/` directory at the repository root. This folder is git-ignored. If you need to reset local storage to a clean state (for example, removing test blobs or queues):
+
+```bash
+rm -rf ./.azurite   # or manually delete folder in Explorer
+```
+
+Then restart the Azurite task (`start-azurite`) to recreate a fresh store.
 
 ### Environment configuration
 
@@ -337,6 +351,40 @@ To securely store and manage secrets such as `ALPACA_KEY` and `ALPACA_SECRET`, y
 3. Configure the Azure Functions to use the Azure Key Vault.
 
 4. Update the Azure Functions code to retrieve the secrets from the Azure Key Vault.
+
+## Type-aware ESLint (advanced)
+
+Type-aware linting is enabled via `parserOptions.project` in `client/.eslintrc.json` using a dedicated `tsconfig.eslint.json` that includes all source files. This unlocks rules like `@typescript-eslint/prefer-nullish-coalescing` and `@typescript-eslint/no-floating-promises`.
+
+Current settings:
+
+- `tsconfig.eslint.json` includes `src/**/*.ts` with `noEmit`
+- `strictNullChecks` is enabled in `tsconfig.json`
+- `@typescript-eslint/prefer-nullish-coalescing`: ERROR (enforced consistency for nullish fallbacks)
+- `@typescript-eslint/no-floating-promises`: ERROR (ensure async intent explicit)
+
+Performance guidance:
+
+- Type-aware linting can be 2-4x slower. Run `npm run lint --workspace=@stock-charts/client` before commit rather than on every file save.
+- Consider running `npx eslint src/app/services/window.service.ts --fix` for focused fixes while iterating.
+
+Nullish coalescing vs logical OR:
+
+- Use `??` for fallback only when a value is `null | undefined`.
+- Keep `||` for boolean logic, e.g. `if (a || b)` conditions.
+- Avoid changing short-circuit boolean expressions to `??` unless their intent is value fallback, not truthiness.
+
+Suppressing rules (rare):
+
+```ts
+// eslint-disable-next-line @typescript-eslint/no-floating-promises -- intentional fire-and-forget telemetry
+void sendTelemetryAsync(event);
+```
+
+Migration notes:
+
+- Existing `||` fallbacks were audited and updated; passing lint with zero errors.
+- Future: can add `@typescript-eslint/strict-boolean-expressions` after further tightening types.
 
 ## Contributing
 

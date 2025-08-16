@@ -162,15 +162,13 @@ describe("Color Picker Functionality", () => {
   });
 
   describe("Color Picker Integration", () => {
-    it("should validate that ngx-color and @ng-matero/extensions are available", () => {
-      // These packages should be installed and available
-      // Use dynamic import to verify modules are resolvable without relying on CommonJS require typings
-      return Promise.all([import("ngx-color"), import("@ng-matero/extensions/colorpicker")]).then(
-        mods => {
-          expect(mods[0]).toBeTruthy();
-          expect(mods[1]).toBeTruthy();
-        }
-      );
+    it("should validate that ngx-color and @ng-matero/extensions are available", async () => {
+      const [ngxColor, materoColorpicker] = await Promise.all([
+        import("ngx-color"),
+        import("@ng-matero/extensions/colorpicker")
+      ]);
+      expect(ngxColor).toBeTruthy();
+      expect(materoColorpicker).toBeTruthy();
     });
 
     it("should support both hex and hex8 color formats", () => {

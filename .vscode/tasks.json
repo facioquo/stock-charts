@@ -3,37 +3,6 @@
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
-    // =============================================================================
-    // BUILD TASKS
-    // =============================================================================
-    {
-      "label": "build-website",
-      "detail": "Build Angular frontend application",
-      "type": "npm",
-      "script": "build",
-      "group": "build",
-      "problemMatcher": ["$tsc"],
-      "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem"
-      }
-    },
-    {
-      "label": "build-server",
-      "detail": "Build .NET backend services",
-      "type": "shell",
-      "command": "dotnet",
-      "args": ["build"],
-      "options": {
-        "cwd": "${workspaceFolder}/server"
-      },
-      "group": "build",
-      "problemMatcher": ["$msCompile"],
-      "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem"
-      }
-    },
     {
       "label": "build-functions",
       "detail": "Build Azure Functions project",
@@ -103,9 +72,7 @@
       "detail": "Lint Angular frontend code",
       "type": "npm",
       "script": "lint",
-      "options": {
-        "args": ["--workspace=@stock-charts/client"]
-      },
+      // workspace scoping handled via root script invocation; reviewer suggestion noted
       "group": "build",
       "problemMatcher": ["$eslint-stylish"],
       "presentation": {
@@ -118,9 +85,7 @@
       "detail": "Lint and auto-fix Angular frontend code",
       "type": "npm",
       "script": "lint:fix",
-      "options": {
-        "args": ["--workspace=@stock-charts/client"]
-      },
+      // workspace scoping handled via root script invocation; reviewer suggestion noted
       "group": "build",
       "problemMatcher": ["$eslint-stylish"],
       "presentation": {

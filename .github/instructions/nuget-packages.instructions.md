@@ -1,5 +1,5 @@
 ---
-applyTo: '**/*.{csproj,sln},**/Directory.Packages.props'
+applyTo: "**/*.{csproj,sln},**/Directory.Packages.props"
 description: 'Guidelines for managing NuGet packages'
 ---
 

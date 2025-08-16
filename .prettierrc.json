@@ -12,7 +12,7 @@
   "endOfLine": "lf",
   "overrides": [
     {
-      "files": ["*.json", "*.jsonc"],
+      "files": ["**/*.json", "**/*.jsonc"],
       "options": {
         "printWidth": 120,
         "bracketSpacing": true,
@@ -30,7 +30,7 @@
       }
     },
     {
-      "files": ["*.ts"],
+      "files": ["**/*.ts"],
       "options": {
         "printWidth": 100,
         "singleQuote": false,
@@ -40,7 +40,7 @@
       }
     },
     {
-      "files": ["*.html"],
+      "files": ["**/*.html"],
       "options": {
         "printWidth": 120,
         "singleQuote": false,
@@ -49,7 +49,7 @@
       }
     },
     {
-      "files": ["*.scss", "*.css"],
+      "files": ["**/*.scss", "**/*.css"],
       "options": {
         "printWidth": 100,
         "singleQuote": false,
