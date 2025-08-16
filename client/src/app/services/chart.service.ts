@@ -734,6 +734,12 @@ export class ChartService implements OnDestroy {
               statusText: e.statusText,
               message: e.message
             });
+            // ensure loading flag cleared on error
+            this.loading.set(false);
+          },
+          complete: () => {
+            // listings loaded and selections processed
+            this.loading.set(false);
           }
         });
       },
@@ -743,8 +749,7 @@ export class ChartService implements OnDestroy {
           statusText: e.statusText,
           message: e.message
         });
-      },
-      complete: () => {
+        // ensure loading flag cleared on error
         this.loading.set(false);
       }
     });
