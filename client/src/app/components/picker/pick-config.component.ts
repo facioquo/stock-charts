@@ -1,8 +1,19 @@
 import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { HttpErrorResponse } from "@angular/common/http";
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from "@angular/material/dialog";
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogTitle,
+  MatDialogContent,
+  MatDialogActions,
+  MatDialogClose
+} from "@angular/material/dialog";
 
-import { MtxColorpicker, MtxColorpickerInput, MtxColorpickerToggle } from "@ng-matero/extensions/colorpicker";
+import {
+  MtxColorpicker,
+  MtxColorpickerInput,
+  MtxColorpickerToggle
+} from "@ng-matero/extensions/colorpicker";
 import { ColorEvent } from "ngx-color";
 import { TinyColor } from "@ctrl/tinycolor";
 
@@ -34,21 +45,43 @@ interface LineWidth {
 interface LineType {
   name: string;
   value: string;
-  userWidth: boolean;  // user can specify width
+  userWidth: boolean; // user can specify width
 }
 
 @Component({
   selector: "app-pick-config",
   templateUrl: "pick-config.component.html",
   styleUrls: ["pick-config.component.scss"],
-  imports: [MatDialogTitle, MatTooltip, FormsModule, CdkScrollable, MatDialogContent, MatTabGroup, MatTab, MatFormField, MatLabel, MatInput, MatError, MatSelect, MatOption, NgStyle, MtxColorpickerInput, MtxColorpickerToggle, MatSuffix, MtxColorpicker, ColorCompactModule, MatDialogActions, MatButton, MatDialogClose],
+  imports: [
+    MatDialogTitle,
+    MatTooltip,
+    FormsModule,
+    CdkScrollable,
+    MatDialogContent,
+    MatTabGroup,
+    MatTab,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatError,
+    MatSelect,
+    MatOption,
+    NgStyle,
+    MtxColorpickerInput,
+    MtxColorpickerToggle,
+    MatSuffix,
+    MtxColorpicker,
+    ColorCompactModule,
+    MatDialogActions,
+    MatButton,
+    MatDialogClose
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PickConfigComponent {
   listing = inject<IndicatorListing>(MAT_DIALOG_DATA);
   private dialogRef = inject<MatDialogRef<PickConfigComponent>>(MatDialogRef);
   private cht = inject(ChartService);
-
 
   // Uses the MtxColorpicker component to allow users to select a color.
   // ref: https://ng-matero.github.io/extensions/components/colorpicker
@@ -82,7 +115,7 @@ export class PickConfigComponent {
     "#616161", // gray 700 (dark)
     "#757575", // gray 600
     "#9E9E9E", // gray 500
-    "#BDBDBD"  // gray 400 (light)
+    "#BDBDBD" // gray 400 (light)
   ];
 
   lineWidths: LineWidth[] = [
@@ -106,30 +139,27 @@ export class PickConfigComponent {
   }
 
   onSubmit(): void {
-
     // try to add selection to chart
-    this.cht.addSelection(this.selection, this.listing)
-      .subscribe({
+    this.cht.addSelection(this.selection, this.listing).subscribe({
+      // successfully added to chart
+      next: () => {
+        this.errorMessage = undefined;
+        this.closeButtonLabel = "RESOLVED ...";
+        this.dialogRef.close();
+      },
 
-        // successfully added to chart
-        next: () => {
-          this.errorMessage = undefined;
-          this.closeButtonLabel = "RESOLVED ...";
-          this.dialogRef.close();
-        },
-
-        // inform user of [validation] error
-        error: (e: HttpErrorResponse) => {
-          console.error("Error adding selection to chart:", {
-            status: e.status,
-            statusText: e.statusText,
-            message: e.message,
-            error: e.error
-          });
-          this.errorMessage = e.error;
-          this.closeButtonLabel = "RETRY";
-        }
-      });
+      // inform user of [validation] error
+      error: (e: HttpErrorResponse) => {
+        console.error("Error adding selection to chart:", {
+          status: e.status,
+          statusText: e.statusText,
+          message: e.message,
+          error: e.error
+        });
+        this.errorMessage = e.error;
+        this.closeButtonLabel = "RETRY";
+      }
+    });
   }
 
   onNoClick(): void {
@@ -147,7 +177,6 @@ export class PickConfigComponent {
   }
 
   getLineSample(r: IndicatorResult) {
-
     const style = (() => {
       switch (r.lineType) {
         case "dots":
@@ -159,7 +188,7 @@ export class PickConfigComponent {
       }
     })();
 
-    const width = r.lineWidth * ((style === "dotted") ? 2 : 1);
+    const width = r.lineWidth * (style === "dotted" ? 2 : 1);
 
     return {
       "border-bottom-color": r.color,

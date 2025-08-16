@@ -1,10 +1,7 @@
 import { Injectable, inject } from "@angular/core";
 import { UserService } from "./user.service";
 
-import {
-  IndicatorResult,
-  IndicatorResultConfig
-} from "../pages/chart/chart.models";
+import { IndicatorResult, IndicatorResultConfig } from "../pages/chart/chart.models";
 
 // chart.js
 import "chartjs-adapter-date-fns";
@@ -21,11 +18,7 @@ import {
 } from "chart.js";
 
 // plugins
-import {
-  AnnotationOptions,
-  LabelAnnotationOptions,
-  ScaleValue
-} from "chartjs-plugin-annotation";
+import { AnnotationOptions, LabelAnnotationOptions, ScaleValue } from "chartjs-plugin-annotation";
 
 @Injectable({
   providedIn: "root"
@@ -33,14 +26,11 @@ import {
 export class ChartConfigService {
   private readonly usr = inject(UserService);
 
-
   fontFamily = "'Google Sans', Roboto, Verdana, Helvetica, Arial, sans-serif";
 
   baseOverlayConfig(volumeAxisSize: number): ChartConfiguration {
-
     // base configuration
     const config: ChartConfiguration = {
-
       type: "candlestick",
       data: {
         datasets: []
@@ -52,11 +42,9 @@ export class ChartConfigService {
   }
 
   baseOscillatorConfig(): ChartConfiguration {
-
     // base configuration
     const config: ChartConfiguration = {
-
-      type: "candlestick",  // TODO: should/could this be line or bar?
+      type: "candlestick", // TODO: should/could this be line or bar?
       data: {
         datasets: []
       },
@@ -67,7 +55,6 @@ export class ChartConfigService {
   }
 
   baseChartOptions(): ChartOptions {
-
     const options: ChartOptions = {
       plugins: {
         title: {
@@ -144,10 +131,10 @@ export class ChartConfigService {
   }
 
   baseOverlayOptions(volumeAxisSize: number): ChartOptions {
-
     const options = this.baseChartOptions();
 
     // format y-axis (helper context)
+    if (!options.scales || !options.scales.y) return options; // safety guard
     const y = options.scales.y as CartesianScaleOptions;
 
     // size to data, instead of next tick
@@ -155,18 +142,18 @@ export class ChartConfigService {
 
     // format primary y-axis labels
     y.ticks.callback = (value, index, values) => {
-
       // remove first and last y-axis labels
       if (index === 0 || index === values.length - 1) return null;
-
       // otherwise, add dollar sign
-      else
-        return "$" + value;
+      else return "$" + value;
     };
 
     // define secondary y-axis for volume
-    options.scales.volumeAxis = {
-      display: false,  // hide by default
+    if (!options.scales) {
+      options.scales = {} as ChartOptions["scales"]; // initialize scales object
+    }
+    (options.scales as Record<string, ScaleOptions>).volumeAxis = {
+      display: false, // hide by default
       type: "linear",
       axis: "y",
       position: "left",
@@ -182,52 +169,44 @@ export class ChartConfigService {
   }
 
   baseOscillatorOptions(): ChartOptions {
-
     const options = this.baseChartOptions();
 
     // remove x-axis
-    options.scales.x.display = false;
+    if (options.scales?.x) {
+      options.scales.x.display = false;
+    }
 
     // format y-axis (helper context)
+    if (!options.scales || !options.scales.y) return options; // safety guard
     const y = options.scales.y as CartesianScaleOptions;
 
     // rescale labels
     y.ticks.callback = (value: number, index, values) => {
-
       const v = Math.abs(value);
 
       // remove first and last y-axis labels
       if (index === 0 || index === values.length - 1) return null;
-
       // otherwise, condense large/small display values
-      else if (v > 10000000000)
-        return Math.trunc(value / 1000000000) + "B";
-      else if (v > 10000000)
-        return Math.trunc(value / 1000000) + "M";
-      else if (v > 10000)
-        return Math.trunc(value / 1000) + "K";
-      else if (v > 10)
-        return Math.trunc(value);
-      else if (v > 0)
-        return Math.round((value + Number.EPSILON) * 10) / 10;
-      else if (v > 0.001)
-        return Math.round((value + Number.EPSILON) * 100000) / 100000;
-      else
-        return Math.round((value + Number.EPSILON) * 100000000) / 100000000;
+      else if (v > 10000000000) return Math.trunc(value / 1000000000) + "B";
+      else if (v > 10000000) return Math.trunc(value / 1000000) + "M";
+      else if (v > 10000) return Math.trunc(value / 1000) + "K";
+      else if (v > 10) return Math.trunc(value);
+      else if (v > 0) return Math.round((value + Number.EPSILON) * 10) / 10;
+      else if (v > 0.001) return Math.round((value + Number.EPSILON) * 100000) / 100000;
+      else return Math.round((value + Number.EPSILON) * 100000000) / 100000000;
     };
 
     return options;
   }
 
   defaultXAxisOptions(): ScaleOptions {
-    
     // Use default time unit for daily data
     const timeUnit = "day";
 
     const options: ScaleOptions = {
       alignToPixels: true,
-      display: false,  // hide by default
-      offset: false,   // centers candles/bars
+      display: false, // hide by default
+      offset: false, // centers candles/bars
       type: "timeseries",
       time: {
         unit: timeUnit as TimeUnit
@@ -235,7 +214,7 @@ export class ChartConfigService {
       adapters: {
         date: {
           locale: enUS
-        },
+        }
       },
       ticks: {
         display: false,
@@ -260,12 +239,8 @@ export class ChartConfigService {
     return options;
   }
 
-  baseDataset(
-    r: IndicatorResult,
-    c: IndicatorResultConfig) {
-
+  baseDataset(r: IndicatorResult, c: IndicatorResultConfig) {
     switch (r.lineType) {
-
       case "solid": {
         const lineDataset: ChartDataset = {
           label: r.label,
@@ -276,11 +251,14 @@ export class ChartConfigService {
           borderWidth: r.lineWidth,
           borderColor: r.color,
           backgroundColor: r.color,
-          fill: c.fill === null ? false : {
-            target: c.fill.target,
-            above: c.fill.colorAbove,
-            below: c.fill.colorBelow
-          },
+          fill:
+            c.fill === null
+              ? false
+              : {
+                  target: c.fill.target,
+                  above: c.fill.colorAbove,
+                  below: c.fill.colorBelow
+                },
           order: r.order
         };
         return lineDataset;
@@ -382,7 +360,6 @@ export class ChartConfigService {
     yPos: ScaleValue,
     yAdj: number = 0
   ): AnnotationOptions & LabelAnnotationOptions {
-
     const fontColor = this.usr.settings.isDarkTheme ? "#757575" : "#121316";
     const fillColor = this.usr.settings.isDarkTheme ? "#12131680" : "#FAF9FD90";
 
@@ -391,7 +368,7 @@ export class ChartConfigService {
       size: 13,
       style: "normal",
       weight: "normal",
-      lineHeight: 1,
+      lineHeight: 1
     };
 
     const annotation: AnnotationOptions & LabelAnnotationOptions = {

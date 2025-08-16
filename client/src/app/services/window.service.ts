@@ -6,7 +6,7 @@ import { Observable, Subject, debounceTime, distinctUntilChanged } from "rxjs";
 })
 export class WindowService {
   private resizeSubject = new Subject<{ width: number; height: number }>();
-  
+
   constructor() {
     // Listen for window resize events
     if (typeof window !== "undefined") {
@@ -38,9 +38,7 @@ export class WindowService {
   getResizeObservable(): Observable<{ width: number; height: number }> {
     return this.resizeSubject.pipe(
       debounceTime(150), // 150ms delay for responsive UX while avoiding excess recalculations
-      distinctUntilChanged((prev, curr) => 
-        prev.width === curr.width && prev.height === curr.height
-      )
+      distinctUntilChanged((prev, curr) => prev.width === curr.width && prev.height === curr.height)
     );
   }
 
@@ -49,11 +47,12 @@ export class WindowService {
    * Using ~5px per bar as specified in requirements
    */
   calculateOptimalBars(containerWidth?: number): number {
-    const width = containerWidth || this.getWindowSize().width;
+    // Use nullish coalescing so 0 is treated as a valid explicit width (if ever passed)
+    const width = containerWidth ?? this.getWindowSize().width;
     const pixelsPerBar = 5;
     const minBars = 20; // Minimum reasonable number of bars
     const maxBars = 500; // Maximum to avoid performance issues
-    
+
     const calculatedBars = Math.floor(width / pixelsPerBar);
     return Math.max(minBars, Math.min(maxBars, calculatedBars));
   }

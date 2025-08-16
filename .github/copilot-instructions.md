@@ -1,128 +1,180 @@
 # GitHub Copilot Instructions for Stock Charts
 
-## Project Overview
+## Project overview
 
 This is a full-stack financial charting application with:
 
-- **Frontend**: Angular LTS with TypeScript, Angular Material, Chart.js
-- **Backend**: .NET LTS with Azure Functions and Web API
+- **Frontend**: Angular v20+ with TypeScript, Angular Material, Chart.js
+- **Backend**: .NET 9+ with Azure Functions and Web API
+- **Package management**: NPM workspaces for unified dependency management
 - **Purpose**: Display and analyze stock market data with interactive charts
 
 ## Architecture
 
 ```text
 stock-charts/
-├── client/          # Angular frontend application
+├── package.json     # Root workspace configuration
+├── Charts.sln       # .NET solution file
+├── client/          # Angular frontend workspace
 │   ├── src/         # Angular source code
-│   └── package.json # NPM dependencies and scripts
+│   └── package.json # Frontend dependencies
 └── server/          # .NET backend services
     ├── Functions/   # Azure Functions for data processing
-    └── WebApi/      # REST API endpoints
+    ├── WebApi/      # REST API endpoints
+    └── Directory.Packages.props  # Centralized NuGet versions
 ```
 
-## Key Technologies
+## Key technologies
 
-### Frontend Stack
+### Frontend stack
 
-- **Angular LTS**: Modern web framework with standalone components
-- **TypeScript**: Primary language for type-safe development
-- **Chart.js**: Data visualization library for financial charts
-- **Angular Material**: UI component library
-- **RxJS**: Reactive programming with observables
+- **Angular v20+**: Modern web framework with standalone components and signals
+- **TypeScript**: Primary language with strict type checking
+- **Chart.js v4+**: Data visualization for financial charts
+- **Angular Material v20+**: UI component library
+- **Signals**: Modern reactivity for state management
+- **Modern Control Flow**: `@if`, `@for`, `@switch` syntax
 
-### Backend Stack
+### Backend stack
 
-- **C# / .NET LTS**: Server-side language and framework
-- **Azure Functions**: Serverless compute for data processing
+- **C# / .NET 9+**: Server-side language and framework
+- **Azure functions**: Serverless compute for data processing
 - **ASP.NET Core**: Web API for REST endpoints
-- **Entity Framework**: Data access and ORM
+- **Entity framework**: Data access and ORM
 
-## Coding Conventions
+## Development setup
 
-### Frontend (Angular)
+### NPM workspace commands
 
-- Use standalone components (not NgModules)
-- Implement OnPush change detection strategy
-- Follow Angular style guide naming conventions
-- Use reactive forms with typed FormControls
-- Implement proper error handling with try-catch and RxJS operators
-- Use Angular Material components consistently
+```bash
+# Install all dependencies (run from root)
+npm install
+
+# Development server
+npm start  # Starts Angular dev server
+
+# Building
+npm run build     # Build all workspaces
+npm run build:prod  # Production build
+
+# Code quality
+npm run format    # Format all code
+npm run lint      # Lint all workspaces
+npm run test      # Test all workspaces
+
+# Workspace-specific commands
+npm run build --workspace=@stock-charts/client
+npm run test --workspace=@stock-charts/client
+```
+
+### .NET Commands
+
+```bash
+# Build (run from root)
+dotnet build Charts.sln
+
+# Run specific project
+dotnet run --project server/WebApi
+dotnet run --project server/Functions
+```
+
+## Coding conventions
+
+### Frontend (Angular) - Use MCP for Best Practices
+
+- **Always consult**: Use `#mcp_angular-cli_get_best_practices` for latest official guidance
+- **Documentation**: Use `#mcp_angular-cli_search_documentation` for specific topics
+- **Project-specific**: Follow guidelines in `.github/instructions/angular.instructions.md`
 
 ### Backend (.NET)
 
-- Follow Microsoft C# coding conventions
-- Use async/await patterns for I/O operations
-- Implement proper dependency injection
+- Use latest C# language features (.NET 9+)
+- Follow Microsoft coding conventions
+- Implement async/await patterns for I/O operations
 - Use record types for DTOs where appropriate
-- Follow REST API best practices
-- Implement comprehensive error handling and logging
+- Build and test against `Charts.sln` from root directory
 
-### Common Patterns
+### Common patterns
 
-- Use TypeScript interfaces for data models
-- Implement proper type safety throughout
+- Use TypeScript strict mode throughout
+- Implement proper type safety with Angular signals
 - Use descriptive variable and method names
 - Keep functions small and focused
 - Write unit tests for business logic
 
-## Development Workflow
+## Development workflow
 
-1. **Frontend Development**:
-   - Run `npm start` in `/client` for development server
-   - Use `npm run build` for production builds
-   - Follow Angular CLI patterns for generating components
+1. **Setup**:
+   - Run `npm install` from root to install all dependencies
+   - Use VS Code with recommended extensions
 
-2. **Backend Development**:
-   - Use Visual Studio or VS Code with C# extension
-   - Run Azure Functions locally for testing
-   - Follow .NET project structure conventions
+2. **Frontend development**:
+   - Use `npm start` from root for Angular dev server
+   - Use workspace-aware commands for linting/formatting
+   - Consult MCP Angular CLI server for best practices
 
-## Testing Approach
+3. **Backend development**:
+   - Build with `dotnet build Charts.sln` from root
+   - Use centralized package management in `Directory.Packages.props`
 
-- **Frontend**: Jest for unit tests, Angular testing utilities
-- **Backend**: xUnit for unit tests, integration tests for APIs
-- Focus on testing business logic and data transformations
-- Mock external dependencies and API calls
+## Package management
 
-## Performance Considerations
+### NPM workspaces
 
-- Implement OnPush change detection in Angular components
-- Use trackBy functions in *ngFor loops
-- Lazy load Angular modules where appropriate
-- Optimize Chart.js configurations for large datasets
-- Use async/await properly in .NET to avoid blocking
+- **Root workspace**: Shared tools (Prettier, markdownlint)
+- **Client workspace**: Angular-specific packages
+- Follow guidelines in `.github/instructions/npm-packages.instructions.md`
 
-## Security Guidelines
+### NuGet packages
 
-- Validate all inputs on both client and server
-- Use HTTPS for all communications
-- Implement proper CORS policies
-- Follow Angular security best practices
-- Use .NET security features for API protection
+- **Central management**: Use `Directory.Packages.props`
+- **Solution-wide**: Build and update via `Charts.sln`
+- Follow guidelines in `.github/instructions/nuget-packages.instructions.md`
 
-## Common Debugging Patterns
+## VS Code integration
 
-### Frontend
+- **Tasks**: Use VS Code task palette for common operations
+- **Formatting**: Auto-format on save with Prettier
+- **Building**: Use `Ctrl+Shift+P` → "Tasks: Run Task"
+- **Debugging**: Configured launch profiles for both frontend and backend
 
-- Use Angular DevTools for component inspection
-- Console.log for data flow debugging
-- Network tab for API call investigation
-- Use breakpoints in TypeScript code
-
-### Backend
-
-- Use debugger in Visual Studio/VS Code
-- Implement structured logging
-- Use Application Insights for Azure Functions
-- Monitor API performance and errors
-
-## Context for AI Assistance
+## Context for AI assistance
 
 When working on this codebase:
 
-- Prioritize type safety and proper error handling
-- Consider the financial data context and accuracy requirements
-- Maintain consistency with existing patterns and conventions
-- Focus on performance for chart rendering and data processing
-- Ensure responsive design for various screen sizes
-- Consider accessibility requirements for financial applications
+- **Always check MCP server**: Use Angular CLI MCP for latest best practices
+- **Workspace structure**: Commands run from root, leverage npm workspaces
+- **Solution structure**: Use `Charts.sln` for all .NET operations
+- **Type safety**: Prioritize TypeScript strict mode and Angular signals
+- **Financial accuracy**: Consider precision and performance for financial data
+- **Responsive design**: Ensure charts work across device sizes
+- **Performance**: Optimize for Chart.js rendering and data processing
+
+> **IMPORTANT**: _don't be lazy_ about fixing underlying issues. Examples of being lazy:
+>
+> - suppressing code analysis errors, warnings, or recommendations
+> - not adding unit test coverage or not checking for passing tests
+> - skipping, ignoring, or reducing the test scenarios criteria or assertions
+> - not resolving package dependency issues
+
+## Code completion requirements
+
+**Before completing any coding task**, follow the [Code completion checklist](instructions/code-completion-checklist.instructions.md):
+
+- ✅ Format all code: `npm run format`
+- ✅ Lint all code with zero errors
+- ✅ Build all projects successfully
+- ✅ Run and pass all tests
+- ✅ Update documentation as needed
+- ✅ Verify full application integration
+
+## File structure guidelines
+
+- **Configuration files**: Keep at appropriate level (root vs workspace)
+- **Dependencies**: Root for shared tools, workspace for specific needs
+- **Build outputs**: Respect `.gitignore` patterns for node_modules and bin/obj
+- **Documentation**: Update instructions when changing project structure
+
+---
+
+Last updated: August 15, 2025

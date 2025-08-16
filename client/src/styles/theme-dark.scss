@@ -1,28 +1,34 @@
-@use '@angular/material' as mat;
-@use 'themed-parts';
+@use "@angular/material" as mat;
+@use "themed-parts";
+
+// Shared font stack for brand typography (primary heading font fallback chain)
+$brand-font-stack: Rubik, Roboto, Arial, Helvetica, sans-serif;
 
 // DARK THEME (default)
 // ref: https://material.angular.io/guide/theming
 
-$dark-theme: mat.define-theme((
-  color: (
-    theme-type: dark,
-    primary: mat.$azure-palette
-  ),
-  typography: (
-    brand-family: "Rubik, Roboto, Arial, Helvetica, sans-serif",
-  ),
-  density: (
-    scale: 0
-  )));
+$dark-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: dark,
+      primary: mat.$azure-palette
+    ),
+    typography: (
+      brand-family: $brand-font-stack
+    ),
+    density: (
+      scale: 0
+    )
+  )
+);
 
-:root { // default theme (load once)
+:root {
+  // default theme (load once)
   @include mat.all-component-themes($dark-theme);
 }
 
 // theme (applied to body)
 .dark-theme {
-
   // not using mat.all-component-colors()
   @include themed-parts.theme($dark-theme);
 
@@ -35,7 +41,6 @@ $dark-theme: mat.define-theme((
 
   // toolbar
   .main-toolbar {
-
     h1 {
       color: rgba(230, 199, 76, 0.75);
 

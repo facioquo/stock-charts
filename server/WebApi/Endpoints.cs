@@ -10,7 +10,7 @@ public class Main(IQuoteService quoteService) : ControllerBase
     private readonly IQuoteService quoteFeed = quoteService;
 
     // GLOBALS
-    private static readonly int limitLast = 500;
+    private static readonly int limitLast = 120;
 
     [HttpGet]
     public string Get()

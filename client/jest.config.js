@@ -1,35 +1,23 @@
-const { defaults } = require("jest-config");
+const { createCjsPreset } = require('jest-preset-angular/presets');
 
+/** @type {import('jest').Config} */
 module.exports = {
-  preset: "jest-preset-angular",
-  testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>/src/test-setup.ts"],
-  moduleFileExtensions: ["ts", "tsx", "js", "json"],
-  transform: {
-    "^.+\\.(ts|js|html)$": [
-      "jest-preset-angular",
-      {
-        tsconfig: "<rootDir>/tsconfig.spec.json",
-        stringifyContentPathRegex: "\\.html$",
-      },
-    ],
-  },
-  testMatch: ["<rootDir>/src/**/*.spec.ts"],
+  ...createCjsPreset(),
+  setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  // Explicit testMatch retained (Jest 30 auto-detect may suffice, keep for clarity)
+  testMatch: ['<rootDir>/src/**/*.spec.ts'],
   collectCoverageFrom: [
-    "src/**/*.ts",
-    "!src/**/*.d.ts",
-    "!src/main.ts",
-    "!src/polyfills.ts",
-    "!src/**/*.module.ts",
-    "!src/**/environment*.ts",
+    'src/**/*.ts',
+    '!src/**/*.d.ts',
+    '!src/main.ts',
+    '!src/polyfills.ts',
+    '!src/**/*.module.ts',
+    '!src/**/environment*.ts'
   ],
-  coverageDirectory: "coverage",
-  coverageReporters: ["html", "text-summary", "lcov"],
+  coverageDirectory: 'coverage',
+  coverageReporters: ['html', 'text-summary', 'lcov'],
   reporters: [
-    "default",
-    ["jest-junit", {
-      outputDirectory: "test-results",
-      outputName: "junit.xml"
-    }]
+    'default',
+    ['jest-junit', { outputDirectory: 'test-results', outputName: 'junit.xml' }]
   ]
 };

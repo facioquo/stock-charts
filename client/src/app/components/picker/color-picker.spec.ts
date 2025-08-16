@@ -25,7 +25,7 @@ describe("Color Picker Functionality", () => {
     "#616161", // gray 700 (dark)
     "#757575", // gray 600
     "#9E9E9E", // gray 500
-    "#BDBDBD"  // gray 400 (light)
+    "#BDBDBD" // gray 400 (light)
   ];
 
   const lineWidths = [
@@ -124,7 +124,7 @@ describe("Color Picker Functionality", () => {
         }
       })();
 
-      const width = result.lineWidth * ((style === "dotted") ? 2 : 1);
+      const width = result.lineWidth * (style === "dotted" ? 2 : 1);
 
       return {
         "border-bottom-color": result.color,
@@ -162,17 +162,13 @@ describe("Color Picker Functionality", () => {
   });
 
   describe("Color Picker Integration", () => {
-    it("should validate that ngx-color and @ng-matero/extensions are available", () => {
-      // These packages should be installed and available
-      expect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        require("ngx-color");
-      }).not.toThrow();
-
-      expect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        require("@ng-matero/extensions/colorpicker");
-      }).not.toThrow();
+    it("should validate that ngx-color and @ng-matero/extensions are available", async () => {
+      const [ngxColor, materoColorpicker] = await Promise.all([
+        import("ngx-color"),
+        import("@ng-matero/extensions/colorpicker")
+      ]);
+      expect(ngxColor).toBeTruthy();
+      expect(materoColorpicker).toBeTruthy();
     });
 
     it("should support both hex and hex8 color formats", () => {

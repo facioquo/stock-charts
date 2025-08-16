@@ -1,9 +1,8 @@
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 
 main,
 header,
 footer {
-
   display: block;
   position: relative;
 
@@ -13,7 +12,6 @@ footer {
 }
 
 main {
-
   // ensures scrollbar without using overflow-y: scroll
   // since it causes a double scrollbar when dialog opens
   min-height: 100vh;
@@ -21,7 +19,6 @@ main {
 
 // toolbar, colors in theme files
 .main-toolbar {
-
   margin-left: auto;
   margin-right: auto;
   padding: 0 !important;
@@ -33,7 +30,7 @@ main {
     font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
     font-size: 0.9em;
     font-weight: 600;
-    line-height: 1.0 !important;
+    line-height: 1 !important;
 
     a {
       text-decoration: none;
