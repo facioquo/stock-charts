@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { inject, Injectable, OnDestroy, signal } from "@angular/core";
-import { Observable, Subject, takeUntil, map, catchError } from "rxjs";
+import { catchError, map, Observable, Subject, takeUntil } from "rxjs";
 
 import {
   BarElement,
@@ -186,13 +186,16 @@ export class ChartService implements OnDestroy {
       const dataset = this.cfg.baseDataset(result, resultConfig);
       const { dataPoints, pointColor, pointRotation } = this.buildDataPoints(data, result, listing);
       this.addExtraBars(dataPoints);
-      if (listing.category === ChartService.CATEGORIES.CANDLESTICK_PATTERN && dataset.type !== "bar") {
-        (dataset as ExtendedChartDataset).pointRotation = pointRotation;
-        (dataset as ExtendedChartDataset).pointBackgroundColor = pointColor;
-        (dataset as ExtendedChartDataset).pointBorderColor = pointColor;
+      if (listing.category === ChartService.CATEGORIES.CANDLESTICK_PATTERN && dataset && dataset.type !== "bar") {
+        const ext = dataset as ExtendedChartDataset;
+        ext.pointRotation = pointRotation;
+        ext.pointBackgroundColor = pointColor;
+        ext.pointBorderColor = pointColor;
       }
-      dataset.data = dataPoints;
-      result.dataset = dataset;
+      if (dataset) {
+        (dataset as ChartDataset).data = dataPoints;
+        result.dataset = dataset as ChartDataset;
+      }
     });
   }
 
@@ -206,7 +209,7 @@ export class ChartService implements OnDestroy {
     const pointRotation: number[] = [];
 
     data.forEach(row => {
-      let yValue = typeof row[result.dataName] === "number" ? row[result.dataName] as number : null;
+  let yValue = typeof row[result.dataName] === "number" ? (row[result.dataName] as number) : undefined;
 
       // apply candle pointers
       if (yValue && listing.category === ChartService.CATEGORIES.CANDLESTICK_PATTERN) {
@@ -220,10 +223,11 @@ export class ChartService implements OnDestroy {
         pointRotation.push(0);
       }
 
-      dataPoints.push({
-        x: new Date(row.date).valueOf(),
-        y: yValue
-      });
+      if (typeof yValue !== "number") {
+        // skip undefined to satisfy strict typing; patterns with null are handled via addExtraBars
+        yValue = NaN;
+      }
+  dataPoints.push({ x: new Date(row.date).valueOf(), y: yValue });
     });
 
     return { dataPoints, pointColor, pointRotation };
@@ -257,10 +261,7 @@ export class ChartService implements OnDestroy {
 
     for (let i = 1; i < this.extraBars; i++) {
       nextDate.setDate(nextDate.getDate() + 1);
-      dataPoints.push({
-        x: new Date(nextDate).valueOf(),
-        y: null
-      });
+  dataPoints.push({ x: new Date(nextDate).valueOf(), y: Number.NaN });
     }
   }
 
@@ -452,8 +453,8 @@ export class ChartService implements OnDestroy {
   }
 
   private configureOscillatorYAxis(chartConfig: ChartConfiguration, listing: IndicatorListing): void {
-    chartConfig.options.scales.y.suggestedMin = listing.chartConfig?.minimumYAxis;
-    chartConfig.options.scales.y.suggestedMax = listing.chartConfig?.maximumYAxis;
+  chartConfig.options?.scales?.y && (chartConfig.options.scales.y.suggestedMin = listing.chartConfig?.minimumYAxis);
+  chartConfig.options?.scales?.y && (chartConfig.options.scales.y.suggestedMax = listing.chartConfig?.maximumYAxis);
   }
 
   private createOscillatorChart(

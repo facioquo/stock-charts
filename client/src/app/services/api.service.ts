@@ -1,11 +1,11 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { Observable, of, catchError } from "rxjs";
+import { Observable, catchError, of } from "rxjs";
 import { env } from "../../environments/environment";
 
-import { IndicatorListing, IndicatorParam, IndicatorSelection, Quote } from "../pages/chart/chart.models";
-import { CLIENT_BACKUP_QUOTES } from "../data/backup-quotes";
 import { CLIENT_BACKUP_INDICATORS } from "../data/backup-indicators";
+import { CLIENT_BACKUP_QUOTES } from "../data/backup-quotes";
+import { IndicatorListing, IndicatorParam, IndicatorSelection, Quote } from "../pages/chart/chart.models";
 
 @Injectable({
   providedIn: "root"
