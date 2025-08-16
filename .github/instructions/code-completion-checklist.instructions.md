@@ -236,7 +236,9 @@ npm run format
 # Enforce zero warnings explicitly (same as quality gate)
 npm run lint --workspace=@stock-charts/client -- --max-warnings=0
 
-npx eslint client/src --format=detailed --max-warnings=0
+# Use default (stylish) or specify a supported formatter (e.g., 'stylish')
+# List available formatters: npx eslint --help | grep format
+npx eslint client/src --format=stylish --max-warnings=0
 ```
 
 ### Test failures

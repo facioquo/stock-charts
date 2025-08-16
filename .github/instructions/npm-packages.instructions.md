@@ -33,13 +33,16 @@ npm install
 # Install global tools if needed
 npm i -g @angular/cli npm-check-updates
 
-# Check Angular updates first (run from root targeting client workspace)
-npm run ng update --workspace=@stock-charts/client
-
-# Update Angular packages (example - run from client directory for ng CLI)
+# Check and apply Angular updates FIRST (run inside client workspace so migrations run in correct context)
 cd client
-ng update @angular/cli @angular/core @angular/material --allow-dirty
-cd ..
+
+# Option A: Use local Angular CLI via npx (preferred, no global dependency)
+npx ng update @angular/cli @angular/core @angular/material --allow-dirty
+
+# Option B (if Angular CLI installed globally and versions align)
+# ng update @angular/cli @angular/core @angular/material --allow-dirty
+
+cd ..  # return to repo root
 
 # Update all npm packages using workspace-aware commands
 ncu -u --peer --workspace=@stock-charts/client  # Update client workspace

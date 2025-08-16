@@ -54,8 +54,7 @@ if (!transformDescriptor || transformDescriptor.writable === false) {
 // ResizeObserver mock (layout / resize dependent logic, Angular CDK, Chart.js).
 if (!("ResizeObserver" in window)) {
   class ResizeObserver {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    constructor(private _cb: ResizeObserverCallback) {}
+    constructor(private readonly _callback: ResizeObserverCallback) {}
     observe(): void {}
     unobserve(): void {}
     disconnect(): void {}
@@ -66,8 +65,7 @@ if (!("ResizeObserver" in window)) {
 // IntersectionObserver mock (lazy rendering, virtual scroll, sentinel elements).
 if (!("IntersectionObserver" in window)) {
   class IntersectionObserver {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    constructor(private _cb: IntersectionObserverCallback) {}
+    constructor(private readonly _callback: IntersectionObserverCallback) {}
     observe(): void {}
     unobserve(): void {}
     disconnect(): void {}
@@ -78,10 +76,9 @@ if (!("IntersectionObserver" in window)) {
     rootMargin = "0px";
     thresholds = [0];
   }
-  const typedWindow = window as unknown as {
-    IntersectionObserver: typeof IntersectionObserver;
-  };
-  typedWindow.IntersectionObserver = IntersectionObserver;
+  (
+    window as unknown as { IntersectionObserver: typeof IntersectionObserver }
+  ).IntersectionObserver = IntersectionObserver;
 }
 
 // matchMedia mock (responsive breakpoints, theming queries).
@@ -104,14 +101,26 @@ if (!("matchMedia" in window)) {
 }
 
 // Minimal CanvasRenderingContext2D stub for Chart.js or text measuring logic.
+interface TestCanvasRenderingContext2D {
+  canvas: HTMLCanvasElement;
+  measureText: (text: string) => { width: number };
+  save: () => void;
+  restore: () => void;
+  beginPath: () => void;
+  closePath: () => void;
+  fill: () => void;
+  stroke: () => void;
+  arc: () => void;
+  fillRect: () => void;
+  clearRect: () => void;
+  fillText: () => void;
+}
+
 if (!HTMLCanvasElement.prototype.getContext) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  HTMLCanvasElement.prototype.getContext = function (): any {
-    return {
+  const minimal2dFactory = function (this: HTMLCanvasElement): CanvasRenderingContext2D {
+    const ctx: TestCanvasRenderingContext2D = {
       canvas: this,
-      // Extremely naive text width approximation; good enough for layout-less tests.
       measureText: (text: string) => ({ width: text.length * 6 }),
-      // Add methods lazily only when they become necessary to keep surface small.
       save() {},
       restore() {},
       beginPath() {},
@@ -123,6 +132,16 @@ if (!HTMLCanvasElement.prototype.getContext) {
       clearRect() {},
       fillText() {}
     };
+    return ctx as unknown as CanvasRenderingContext2D;
+  };
+  // Cast to any overload set safely without disabling lint rules globally.
+  (
+    HTMLCanvasElement.prototype as unknown as {
+      getContext: (contextId: string) => CanvasRenderingContext2D | null;
+    }
+  ).getContext = function (this: HTMLCanvasElement, contextId: string) {
+    if (contextId === "2d") return minimal2dFactory.call(this);
+    return null;
   };
 }
 

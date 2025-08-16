@@ -300,11 +300,11 @@ export class ChartService implements OnDestroy {
 
   cacheSelections() {
     // deep copy without the chart object
-    const selections: IndicatorSelection[] =
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      this.selections.map(({ chart: _, ...rest }) => ({
-        ...rest
-      }));
+    const selections: IndicatorSelection[] = this.selections.map(sel => {
+      // Omit the runtime-only chart object (do not persist) by destructuring with underscore prefix
+      const { chart: _chart, ...rest } = sel as IndicatorSelection & { chart?: unknown };
+      return rest;
+    });
 
     localStorage.setItem("selections", JSON.stringify(selections));
   }
