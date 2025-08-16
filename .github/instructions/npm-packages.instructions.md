@@ -96,6 +96,7 @@ npm audit --workspace=@stock-charts/client
 - If workspace commands fail, ensure you're in repository root
 - Use `npm ls --workspace=@stock-charts/client` to debug dependency trees
 - Clear node_modules and reinstall if workspace structure seems corrupted:
+
   ```bash
   rm -rf node_modules client/node_modules package-lock.json
   npm install

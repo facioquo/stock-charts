@@ -48,7 +48,7 @@ description: "Guidelines for writing and formatting Markdown files"
 
 ## Content organization and deduplication
 
-**🚫 CRITICAL: Avoid content duplication across documentation files**
+### 🚫 CRITICAL: avoid content duplication across documentation files
 
 This repository maintains multiple documentation files with specific purposes. **Never duplicate content** - use cross-references instead:
 
