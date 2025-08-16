@@ -77,7 +77,9 @@ if (!("IntersectionObserver" in window)) {
     thresholds = [0];
   }
   (
-    window as unknown as { IntersectionObserver: typeof IntersectionObserver }
+    window as unknown as {
+      IntersectionObserver: typeof IntersectionObserver;
+    }
   ).IntersectionObserver = IntersectionObserver;
 }
 

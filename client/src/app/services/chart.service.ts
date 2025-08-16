@@ -301,9 +301,9 @@ export class ChartService implements OnDestroy {
   cacheSelections() {
     // deep copy without the chart object
     const selections: IndicatorSelection[] = this.selections.map(sel => {
-      // Omit the runtime-only chart object (do not persist) by destructuring with underscore prefix
-      const { chart: _chart, ...rest } = sel as IndicatorSelection & { chart?: unknown };
-      return rest;
+      const clone = { ...(sel as IndicatorSelection) } as IndicatorSelection & { chart?: unknown };
+      delete clone.chart; // runtime-only property
+      return clone;
     });
 
     localStorage.setItem("selections", JSON.stringify(selections));
