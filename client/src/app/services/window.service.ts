@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, signal } from "@angular/core";
 import { Observable, Subject, debounceTime, distinctUntilChanged } from "rxjs";
 
 @Injectable({
@@ -6,6 +6,9 @@ import { Observable, Subject, debounceTime, distinctUntilChanged } from "rxjs";
 })
 export class WindowService {
   private resizeSubject = new Subject<{ width: number; height: number }>();
+
+  // Feature flag for dynamic resize functionality
+  private enableDynamicResize = signal<boolean>(false);
 
   constructor() {
     // Listen for window resize events
@@ -17,6 +20,20 @@ export class WindowService {
         });
       });
     }
+  }
+
+  /**
+   * Set whether dynamic resize functionality is enabled
+   */
+  setDynamicResizeEnabled(enabled: boolean): void {
+    this.enableDynamicResize.set(enabled);
+  }
+
+  /**
+   * Get whether dynamic resize functionality is enabled
+   */
+  isDynamicResizeEnabled(): boolean {
+    return this.enableDynamicResize();
   }
 
   /**
