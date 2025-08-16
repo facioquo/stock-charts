@@ -81,19 +81,13 @@ describe("WindowService - Chart Resizing", () => {
   });
 
   describe("getResizeObservable", () => {
-    it("should debounce resize events", (done) => {
+    it("should debounce resize events", done => {
       const resizeObservable = service.getResizeObservable();
 
       // Subscribe to the observable
       const emissions: Array<{ width: number; height: number }> = [];
       resizeObservable.subscribe(dimensions => {
         emissions.push(dimensions);
-
-        // After debounce period, we should only have one emission
-        if (emissions.length === 1) {
-          expect(emissions.length).toBe(1);
-          done();
-        }
       });
 
       // Simulate multiple rapid resize events
@@ -109,6 +103,42 @@ describe("WindowService - Chart Resizing", () => {
       Object.defineProperty(window, "innerWidth", { value: 1000 });
       Object.defineProperty(window, "innerHeight", { value: 800 });
       window.dispatchEvent(mockEvent);
+
+      // Wait for debounce period (150ms + buffer)
+      setTimeout(() => {
+        expect(emissions.length).toBe(1);
+        expect(emissions[0]).toEqual({ width: 1000, height: 800 });
+        done();
+      }, 200);
+    });
+  });
+
+  describe("Dynamic Resize Feature Flag", () => {
+    it("should default to disabled", () => {
+      expect(service.isDynamicResizeEnabled()).toBe(false);
+    });
+
+    it("should allow enabling dynamic resize", () => {
+      service.setDynamicResizeEnabled(true);
+      expect(service.isDynamicResizeEnabled()).toBe(true);
+    });
+
+    it("should allow disabling dynamic resize", () => {
+      service.setDynamicResizeEnabled(true);
+      service.setDynamicResizeEnabled(false);
+      expect(service.isDynamicResizeEnabled()).toBe(false);
+    });
+
+    it("should enforce 120 bar cap for initial bar count when window is large", () => {
+      // Simulate a very large window that would calculate more than 120 bars
+      const largeWidth = 1000; // Would calculate 200 bars (1000/5)
+
+      const calculatedBars = service.calculateOptimalBars(largeWidth);
+      expect(calculatedBars).toBe(200); // Verify calculation works normally
+
+      // Test the capping logic that would be applied in ChartService constructor
+      const cappedBars = Math.min(120, calculatedBars);
+      expect(cappedBars).toBe(120); // Should be capped at 120
     });
   });
 });

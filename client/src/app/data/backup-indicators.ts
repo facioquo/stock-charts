@@ -29,7 +29,7 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
     uiid: "SMA",
     legendTemplate: "SMA([P1])",
     endpoint: "/SMA/",
-    category: "moving-average", 
+    category: "moving-average",
     chartType: "overlay",
     order: 0,
     chartConfig: null,

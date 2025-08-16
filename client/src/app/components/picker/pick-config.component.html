@@ -31,7 +31,7 @@
         </mat-tab>
       }
 
-      @if (listing.category !== 'candlestick-pattern') {
+      @if (listing.category !== "candlestick-pattern") {
         <mat-tab label="Styles">
           @for (r of selection.results; track r; let i = $index) {
             <div class="style-container">

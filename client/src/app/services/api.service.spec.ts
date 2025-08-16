@@ -8,8 +8,12 @@ import { env } from "../../environments/environment";
 describe("ApiService", () => {
   let service: ApiService;
   let httpMock: HttpTestingController;
+  let consoleWarnSpy: jest.SpyInstance;
 
   beforeEach(() => {
+    // Spy on console.warn to prevent noise in test output
+    consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [ApiService]
@@ -20,6 +24,8 @@ describe("ApiService", () => {
 
   afterEach(() => {
     httpMock.verify();
+    // Restore console.warn
+    consoleWarnSpy.mockRestore();
   });
 
   it("should be created", () => {
@@ -43,12 +49,17 @@ describe("ApiService", () => {
   it("should fallback to client backup quotes when API fails", () => {
     service.getQuotes().subscribe(quotes => {
       expect(quotes).toEqual(CLIENT_BACKUP_QUOTES);
-      expect(quotes.length).toBeGreaterThan(1000); // Verify we have 1000+ quotes
+      expect(quotes.length).toBe(1000); // Verify we have exactly 1000 quotes
+      // Verify console.warn was called for failover
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "Backend API unavailable, using client-side backup quotes",
+        expect.any(Object)
+      );
     });
 
     const req = httpMock.expectOne(`${env.api}/quotes`);
     expect(req.request.method).toBe("GET");
-    
+
     // Simulate API failure
     req.error(new ProgressEvent("Network error"), {
       status: 0,
@@ -59,12 +70,17 @@ describe("ApiService", () => {
   it("should fallback to client backup quotes when API returns server error", () => {
     service.getQuotes().subscribe(quotes => {
       expect(quotes).toEqual(CLIENT_BACKUP_QUOTES);
-      expect(quotes.length).toBeGreaterThan(1000);
+      expect(quotes.length).toBe(1000);
+      // Verify console.warn was called for failover
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "Backend API unavailable, using client-side backup quotes",
+        expect.any(Object)
+      );
     });
 
     const req = httpMock.expectOne(`${env.api}/quotes`);
     expect(req.request.method).toBe("GET");
-    
+
     // Simulate server error
     req.error(new ProgressEvent("Server error"), {
       status: 500,
@@ -73,8 +89,8 @@ describe("ApiService", () => {
   });
 
   it("client backup quotes should have realistic data structure", () => {
-    expect(CLIENT_BACKUP_QUOTES.length).toBeGreaterThan(1000);
-    
+    expect(CLIENT_BACKUP_QUOTES.length).toBe(1000);
+
     const firstQuote = CLIENT_BACKUP_QUOTES[0];
     expect(firstQuote).toHaveProperty("date");
     expect(firstQuote).toHaveProperty("open");
@@ -82,13 +98,13 @@ describe("ApiService", () => {
     expect(firstQuote).toHaveProperty("low");
     expect(firstQuote).toHaveProperty("close");
     expect(firstQuote).toHaveProperty("volume");
-    
+
     expect(typeof firstQuote.open).toBe("number");
     expect(typeof firstQuote.high).toBe("number");
     expect(typeof firstQuote.low).toBe("number");
     expect(typeof firstQuote.close).toBe("number");
     expect(typeof firstQuote.volume).toBe("number");
-    
+
     // Basic validation that high >= low
     expect(firstQuote.high).toBeGreaterThanOrEqual(firstQuote.low);
   });
@@ -122,11 +138,16 @@ describe("ApiService", () => {
     service.getListings().subscribe(indicators => {
       expect(indicators).toEqual(CLIENT_BACKUP_INDICATORS);
       expect(indicators.length).toBeGreaterThan(5); // Verify we have multiple indicators
+      // Verify console.warn was called for failover
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "Backend API unavailable, using client-side backup indicators",
+        expect.any(Object)
+      );
     });
 
     const req = httpMock.expectOne(`${env.api}/indicators`);
     expect(req.request.method).toBe("GET");
-    
+
     // Simulate API failure
     req.error(new ProgressEvent("Network error"), {
       status: 0,
@@ -138,11 +159,16 @@ describe("ApiService", () => {
     service.getListings().subscribe(indicators => {
       expect(indicators).toEqual(CLIENT_BACKUP_INDICATORS);
       expect(indicators.length).toBeGreaterThan(5);
+      // Verify console.warn was called for failover
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "Backend API unavailable, using client-side backup indicators",
+        expect.any(Object)
+      );
     });
 
     const req = httpMock.expectOne(`${env.api}/indicators`);
     expect(req.request.method).toBe("GET");
-    
+
     // Simulate server error
     req.error(new ProgressEvent("Server error"), {
       status: 500,
@@ -152,7 +178,7 @@ describe("ApiService", () => {
 
   it("client backup indicators should have valid data structure", () => {
     expect(CLIENT_BACKUP_INDICATORS.length).toBeGreaterThan(5);
-    
+
     const firstIndicator = CLIENT_BACKUP_INDICATORS[0];
     expect(firstIndicator).toHaveProperty("name");
     expect(firstIndicator).toHaveProperty("uiid");
@@ -162,12 +188,12 @@ describe("ApiService", () => {
     expect(firstIndicator).toHaveProperty("chartType");
     expect(firstIndicator).toHaveProperty("parameters");
     expect(firstIndicator).toHaveProperty("results");
-    
+
     expect(typeof firstIndicator.name).toBe("string");
     expect(typeof firstIndicator.uiid).toBe("string");
     expect(Array.isArray(firstIndicator.parameters)).toBe(true);
     expect(Array.isArray(firstIndicator.results)).toBe(true);
-    
+
     // Verify we have essential indicators like RSI, MACD, etc.
     const indicatorNames = CLIENT_BACKUP_INDICATORS.map(i => i.uiid);
     expect(indicatorNames).toContain("SMA");

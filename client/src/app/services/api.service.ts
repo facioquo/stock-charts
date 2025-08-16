@@ -5,7 +5,12 @@ import { env } from "../../environments/environment";
 
 import { CLIENT_BACKUP_INDICATORS } from "../data/backup-indicators";
 import { CLIENT_BACKUP_QUOTES } from "../data/backup-quotes";
-import { IndicatorListing, IndicatorParam, IndicatorSelection, Quote } from "../pages/chart/chart.models";
+import {
+  IndicatorListing,
+  IndicatorParam,
+  IndicatorSelection,
+  Quote
+} from "../pages/chart/chart.models";
 
 @Injectable({
   providedIn: "root"

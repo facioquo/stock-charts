@@ -12,7 +12,7 @@ interface MockChart {
     style: {
       width: string;
       height: string;
-    }
+    };
   };
   chartArea: {
     width: number;
@@ -21,7 +21,7 @@ interface MockChart {
     right: number;
     top: number;
     bottom: number;
-  }
+  };
 }
 
 // Create mock charts with dimension tracking
@@ -50,14 +50,14 @@ const createMockChart = (width: number, height: number): MockChart => ({
 // Chart resize functionality extracted for testing
 class ChartResizeHandler {
   private chartOverlay: MockChart | null = null;
-  private selections: Array<{chart: MockChart, chartType: string}> = [];
+  private selections: Array<{ chart: MockChart; chartType: string }> = [];
 
   setOverlayChart(chart: MockChart): void {
     this.chartOverlay = chart;
   }
 
   addOscillatorChart(chart: MockChart): void {
-    this.selections.push({chart, chartType: "oscillator"});
+    this.selections.push({ chart, chartType: "oscillator" });
   }
 
   forceChartsResize(): void {
@@ -84,14 +84,16 @@ class ChartResizeHandler {
   }
 
   getDimensions(): {
-    overlay: {width: number, height: number} | null;
-    oscillators: Array<{width: number, height: number}>;
+    overlay: { width: number; height: number } | null;
+    oscillators: Array<{ width: number; height: number }>;
   } {
     return {
-      overlay: this.chartOverlay ? {
-        width: this.chartOverlay.canvas.width,
-        height: this.chartOverlay.canvas.height
-      } : null,
+      overlay: this.chartOverlay
+        ? {
+            width: this.chartOverlay.canvas.width,
+            height: this.chartOverlay.canvas.height
+          }
+        : null,
       oscillators: this.selections.map(s => ({
         width: s.chart.canvas.width,
         height: s.chart.canvas.height
@@ -117,13 +119,13 @@ describe("Chart Resize Dimension Testing", () => {
     let overlayChart: MockChart;
     let oscillatorChart1: MockChart;
     let oscillatorChart2: MockChart;
-    
+
     beforeEach(() => {
       // Create mock charts with initial dimensions
       overlayChart = createMockChart(800, 400);
       oscillatorChart1 = createMockChart(600, 300);
       oscillatorChart2 = createMockChart(500, 250);
-      
+
       // Set up charts in resize handler
       resizeHandler.setOverlayChart(overlayChart);
       resizeHandler.addOscillatorChart(oscillatorChart1);
@@ -132,7 +134,7 @@ describe("Chart Resize Dimension Testing", () => {
 
     it("should track overlay chart dimensions before resize", () => {
       const dimensions = resizeHandler.getDimensions();
-      
+
       expect(dimensions.overlay).toEqual({
         width: 800,
         height: 400
@@ -141,14 +143,14 @@ describe("Chart Resize Dimension Testing", () => {
 
     it("should track oscillator chart dimensions before resize", () => {
       const dimensions = resizeHandler.getDimensions();
-      
+
       expect(dimensions.oscillators).toEqual([
         { width: 600, height: 300 },
         { width: 500, height: 250 }
       ]);
     });
 
-    it("should call resize methods when forceChartsResize is triggered", (done) => {
+    it("should call resize methods when forceChartsResize is triggered", done => {
       resizeHandler.forceChartsResize();
 
       requestAnimationFrame(() => {
@@ -166,7 +168,7 @@ describe("Chart Resize Dimension Testing", () => {
       });
     });
 
-    it("should properly track dimension changes during resize", (done) => {
+    it("should properly track dimension changes during resize", done => {
       const beforeResize = resizeHandler.getDimensions();
 
       // Simulate dimension changes that would occur during Chart.js resize
@@ -188,7 +190,7 @@ describe("Chart Resize Dimension Testing", () => {
         // Verify dimensions changed correctly
         expect(beforeResize.overlay).toEqual({ width: 800, height: 400 });
         expect(afterResize.overlay).toEqual({ width: 1000, height: 500 });
-        
+
         expect(beforeResize.oscillators[0]).toEqual({ width: 600, height: 300 });
         expect(afterResize.oscillators[0]).toEqual({ width: 750, height: 375 });
 
@@ -200,15 +202,16 @@ describe("Chart Resize Dimension Testing", () => {
       });
     });
 
-    it("should use requestAnimationFrame for proper DOM synchronization", (done) => {
-      const originalRequestAnimationFrame = window.requestAnimationFrame;
-      let rafCallback: FrameRequestCallback | null = null;
+    it("should use requestAnimationFrame for proper DOM synchronization", done => {
+      let rafCallback: FrameRequestCallback | undefined;
 
       // Mock requestAnimationFrame to capture the callback
-      window.requestAnimationFrame = jest.fn((callback: FrameRequestCallback) => {
-        rafCallback = callback;
-        return 1;
-      });
+      const requestAnimationFrameSpy = jest
+        .spyOn(window, "requestAnimationFrame")
+        .mockImplementation((callback: FrameRequestCallback) => {
+          rafCallback = callback;
+          return 1;
+        });
 
       resizeHandler.forceChartsResize();
 
@@ -216,7 +219,7 @@ describe("Chart Resize Dimension Testing", () => {
       expect(window.requestAnimationFrame).toHaveBeenCalledTimes(1);
 
       // Execute the captured callback manually
-      if (rafCallback) {
+      if (typeof rafCallback === "function") {
         rafCallback(performance.now());
       }
 
@@ -225,8 +228,8 @@ describe("Chart Resize Dimension Testing", () => {
       expect(oscillatorChart1.resize).toHaveBeenCalledTimes(1);
       expect(oscillatorChart2.resize).toHaveBeenCalledTimes(1);
 
-      // Restore original requestAnimationFrame
-      window.requestAnimationFrame = originalRequestAnimationFrame;
+      // Restore spy
+      requestAnimationFrameSpy.mockRestore();
       done();
     });
 
@@ -253,13 +256,13 @@ describe("Chart Resize Dimension Testing", () => {
 
     it("should maintain chart aspect ratios during resize", () => {
       const initialAspectRatio = overlayChart.canvas.width / overlayChart.canvas.height;
-      
+
       // Simulate resize maintaining aspect ratio
       overlayChart.canvas.width = 1200;
       overlayChart.canvas.height = 600; // 2:1 ratio maintained
-      
+
       const newAspectRatio = overlayChart.canvas.width / overlayChart.canvas.height;
-      
+
       expect(initialAspectRatio).toBe(2); // 800/400 = 2
       expect(newAspectRatio).toBe(2); // 1200/600 = 2
     });
@@ -267,13 +270,13 @@ describe("Chart Resize Dimension Testing", () => {
     it("should track chart area dimensions separately from canvas", () => {
       expect(overlayChart.chartArea.width).toBe(780); // canvas width - padding
       expect(overlayChart.chartArea.height).toBe(380); // canvas height - padding
-      
+
       // After resize
       overlayChart.canvas.width = 1000;
       overlayChart.canvas.height = 500;
       overlayChart.chartArea.width = 980;
       overlayChart.chartArea.height = 480;
-      
+
       expect(overlayChart.chartArea.width).toBe(980);
       expect(overlayChart.chartArea.height).toBe(480);
     });
@@ -282,16 +285,16 @@ describe("Chart Resize Dimension Testing", () => {
   describe("Chart Update Optimization", () => {
     let overlayChart: MockChart;
     let oscillatorChart: MockChart;
-    
+
     beforeEach(() => {
       overlayChart = createMockChart(800, 400);
       oscillatorChart = createMockChart(600, 300);
-      
+
       resizeHandler.setOverlayChart(overlayChart);
       resizeHandler.addOscillatorChart(oscillatorChart);
     });
 
-    it("should use 'resize' mode for chart updates during resize", (done) => {
+    it("should use 'resize' mode for chart updates during resize", done => {
       resizeHandler.forceChartsResize();
 
       requestAnimationFrame(() => {
@@ -302,7 +305,7 @@ describe("Chart Resize Dimension Testing", () => {
       });
     });
 
-    it("should call resize before update for proper Chart.js behavior", (done) => {
+    it("should call resize before update for proper Chart.js behavior", done => {
       resizeHandler.forceChartsResize();
 
       requestAnimationFrame(() => {
@@ -321,15 +324,15 @@ describe("Chart Resize Dimension Testing", () => {
     it("should handle responsive dimension changes", () => {
       // Simulate responsive breakpoint change
       const smallScreenDimensions = resizeHandler.getDimensions();
-      
+
       // Resize to mobile dimensions
       overlayChart.canvas.width = 320;
       overlayChart.canvas.height = 240;
       oscillatorChart.canvas.width = 320;
       oscillatorChart.canvas.height = 160;
-      
+
       const mobileScreenDimensions = resizeHandler.getDimensions();
-      
+
       expect(smallScreenDimensions.overlay?.width).toBe(800);
       expect(mobileScreenDimensions.overlay?.width).toBe(320);
       expect(mobileScreenDimensions.oscillators[0].width).toBe(320);
@@ -339,12 +342,12 @@ describe("Chart Resize Dimension Testing", () => {
   describe("Edge Cases and Error Handling", () => {
     it("should handle null charts gracefully", () => {
       // Don't set any charts
-      
+
       // Should not throw error
       expect(() => {
         resizeHandler.forceChartsResize();
       }).not.toThrow();
-      
+
       const dimensions = resizeHandler.getDimensions();
       expect(dimensions.overlay).toBeNull();
       expect(dimensions.oscillators).toEqual([]);
@@ -353,11 +356,11 @@ describe("Chart Resize Dimension Testing", () => {
     it("should handle extreme dimension changes", () => {
       const chart = createMockChart(1, 1); // Minimum size
       resizeHandler.setOverlayChart(chart);
-      
+
       // Resize to maximum size
       chart.canvas.width = 4000;
       chart.canvas.height = 2000;
-      
+
       const dimensions = resizeHandler.getDimensions();
       expect(dimensions.overlay).toEqual({ width: 4000, height: 2000 });
     });
@@ -365,7 +368,7 @@ describe("Chart Resize Dimension Testing", () => {
     it("should maintain precision in dimension calculations", () => {
       const chart = createMockChart(333, 167); // Non-even numbers
       resizeHandler.setOverlayChart(chart);
-      
+
       const dimensions = resizeHandler.getDimensions();
       expect(dimensions.overlay?.width).toBe(333);
       expect(dimensions.overlay?.height).toBe(167);
