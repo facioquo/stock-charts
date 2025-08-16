@@ -1,6 +1,10 @@
+const { createCjsPreset } = require('jest-preset-angular/presets');
+
+/** @type {import('jest').Config} */
 module.exports = {
-  preset: 'jest-preset-angular',
+  ...createCjsPreset(),
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
+  // Explicit testMatch retained (Jest 30 auto-detect may suffice, keep for clarity)
   testMatch: ['<rootDir>/src/**/*.spec.ts'],
   collectCoverageFrom: [
     'src/**/*.ts',

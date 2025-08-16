@@ -8,7 +8,7 @@
     "start": "ng serve --open --hmr",
     "build": "ng build --configuration=development",
     "build.prod": "ng build --configuration=production",
-  "build:prod": "npm run build.prod",
+    "build:prod": "npm run build.prod",
     "watch": "ng build --configuration=development --watch",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -53,15 +53,16 @@
     "@angular/cli": "20.1.6",
     "@angular/compiler-cli": "20.1.7",
     "@eslint/js": "9.33.0",
-    "@types/jest": "29.5.14",
+    "@types/jest": "30.0.0",
     "@typescript-eslint/eslint-plugin": "8.39.1",
     "@typescript-eslint/parser": "8.39.1",
     "eslint": "9.33.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.4",
-    "jest": "29.7.0",
+    "jest": "30.0.5",
     "jest-junit": "16.0.0",
-    "jest-preset-angular": "14.6.1",
-    "typescript": "5.8.2"
+    "jest-preset-angular": "15.0.0",
+    "typescript": "5.8.2",
+    "eslint-plugin-jest": "29.0.1"
   }
 }

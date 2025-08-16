@@ -2,10 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
-  "module": "CommonJS",
-  "types": ["jest"],
+    "module": "CommonJS",
+    "types": ["jest"],
     "esModuleInterop": true,
-  "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*.spec.ts", "jest.globals.d.ts"]
 }

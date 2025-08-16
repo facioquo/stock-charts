@@ -41,6 +41,17 @@
       }
     },
     {
+      "files": ["**/*.spec.ts"],
+      "plugins": ["jest"],
+      "extends": ["plugin:jest/recommended"],
+      "env": { "jest": true },
+      "rules": {
+        "jest/expect-expect": "warn",
+        "jest/valid-expect": "error",
+        "jest/prefer-spy-on": "warn"
+      }
+    },
+    {
       "files": ["*.html"],
       "extends": ["plugin:@angular-eslint/template/recommended", "plugin:@angular-eslint/template/accessibility"],
       "rules": {}

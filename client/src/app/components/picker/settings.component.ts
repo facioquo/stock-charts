@@ -3,13 +3,13 @@ import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { MatCheckbox, MatCheckboxChange } from "@angular/material/checkbox";
 import { MatDialog, MatDialogContent } from "@angular/material/dialog";
 import {
-    MatList,
-    MatListItem,
-    MatListItemLine,
-    MatListItemTitle,
-    MatListOption,
-    MatNavList,
-    MatSelectionList
+  MatList,
+  MatListItem,
+  MatListItemLine,
+  MatListItemTitle,
+  MatListOption,
+  MatNavList,
+  MatSelectionList
 } from "@angular/material/list";
 import { MatSlideToggle, MatSlideToggleChange } from "@angular/material/slide-toggle";
 

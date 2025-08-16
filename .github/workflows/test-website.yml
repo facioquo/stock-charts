@@ -1,4 +1,4 @@
-name: "Build"
+name: "Test"
 
 on:
   push:
@@ -28,6 +28,9 @@ jobs:
           --property:ContinuousIntegrationBuild=true
           -warnAsError
 
+      - name: Verify .NET formatting
+        run: dotnet format Charts.sln --verify-no-changes
+
   build-website:
     name: "Website"
     runs-on: ubuntu-latest
@@ -45,6 +48,12 @@ jobs:
 
       - name: Install packages
         run: npm install
+
+      - name: Check web formatting
+        run: npm run format:web:check
+
+      - name: Lint
+        run: npm run lint --workspace=@stock-charts/client
 
       - name: Run unit tests
         run: npm run test:coverage --workspace=@stock-charts/client
@@ -76,7 +85,6 @@ jobs:
           echo "|--------|----------|" >> $GITHUB_STEP_SUMMARY
 
           if [ -f "./client/coverage/lcov.info" ]; then
-            # Extract coverage data from lcov.info
             STATEMENTS=$(grep -o "LF:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
             HIT_STATEMENTS=$(grep -o "LH:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
             FUNCTIONS=$(grep -o "FNF:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
@@ -84,7 +92,6 @@ jobs:
             BRANCHES=$(grep -o "BRF:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
             HIT_BRANCHES=$(grep -o "BRH:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
 
-            # Calculate percentages using awk
             STMT_PCT=$(echo "$HIT_STATEMENTS $STATEMENTS" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
             FUNC_PCT=$(echo "$HIT_FUNCTIONS $FUNCTIONS" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
             BRANCH_PCT=$(echo "$HIT_BRANCHES $BRANCHES" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
@@ -109,4 +116,4 @@ jobs:
             client/test-results/
 
       - name: Build site
-  run: npm run build:prod --workspace=@stock-charts/client
+        run: npm run build:prod --workspace=@stock-charts/client

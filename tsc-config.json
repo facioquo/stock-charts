@@ -1,43 +1,30 @@
 {
-    "compilerOptions": {
-        "baseUrl": "./",
-        "outDir": "./out-tsc/spec",
-        "sourceMap": true,
-        "esModuleInterop": true,
-        "declaration": false,
-        "experimentalDecorators": true,
-        "module": "es2022",
-        "moduleResolution": "bundler",
-        "importHelpers": true,
-        "target": "es2022",
-        "typeRoots": [
-            "./node_modules/@types"
-        ],
-        "lib": [
-            "es2022",
-            "dom"
-        ],
-        "types": [
-            "jest",
-            "node"
-        ],
-        "useDefineForClassFields": false,
-        "allowSyntheticDefaultImports": true,
-        "resolvePackageJsonExports": true,
-        "resolvePackageJsonImports": true,
-        "resolveJsonModule": true
-    },
-    "files": [
-        "./src/app/app.component.spec.ts",
-        "./src/app/components/picker/color-picker.spec.ts",
-        "./src/app/services/user.service.spec.ts",
-        "./jest.globals.d.ts"
-    ],
-    "include": [
-        "src/**/*.spec.ts",
-        "jest.globals.d.ts"
-    ],
-    "exclude": [
-        "D:/Repos/stock-charts/client/out-tsc/spec"
-    ]
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./out-tsc/spec",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "declaration": false,
+    "experimentalDecorators": true,
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "importHelpers": true,
+    "target": "es2022",
+    "typeRoots": ["./node_modules/@types"],
+    "lib": ["es2022", "dom"],
+    "types": ["jest", "node"],
+    "useDefineForClassFields": false,
+    "allowSyntheticDefaultImports": true,
+    "resolvePackageJsonExports": true,
+    "resolvePackageJsonImports": true,
+    "resolveJsonModule": true
+  },
+  "files": [
+    "./src/app/app.component.spec.ts",
+    "./src/app/components/picker/color-picker.spec.ts",
+    "./src/app/services/user.service.spec.ts",
+    "./jest.globals.d.ts"
+  ],
+  "include": ["src/**/*.spec.ts", "jest.globals.d.ts"],
+  "exclude": ["D:/Repos/stock-charts/client/out-tsc/spec"]
 }
