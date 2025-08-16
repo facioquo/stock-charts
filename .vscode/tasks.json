@@ -328,6 +328,18 @@
         "reveal": "always",
         "panel": "dedicated"
       }
+    },
+    {
+      "label": "clean-azurite",
+      "detail": "Delete local Azurite data (.azurite folder)",
+      "type": "npm",
+      "script": "azure:clean",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated"
+      }
     }
   ]
 }

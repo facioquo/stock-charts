@@ -225,6 +225,15 @@ npm run azure:start
 
 This re-creates a fresh local store with empty blob/queue/table data.
 
+**Quick reset & when to clean:** Delete the whole `./.azurite/` folder (it's git‑ignored) only when you need a fresh slate: stale test data, reproducing environment‑specific issues, or deterministic integration tests. Options:
+
+- VS Code task: `clean-azurite`
+- NPM script: `npm run azure:clean`
+- Manually delete the `./.azurite/` folder
+- Run Azurite without `--location` or with `--inMemoryPersistence` (data auto-discarded)
+
+Use ephemeral mode for one‑off or CI runs where persistence is not required.
+
 ### Environment configuration
 
 **Angular environment** (`client/src/environments/environment.ts`):
