@@ -37,10 +37,13 @@ npm run format:dotnet:check
 
 ```bash
 # Lint TypeScript/Angular code
-npm run lint --workspace=@stock-charts/client
+npm run lint --workspace=@stock-charts/client -- --max-warnings=0  # Fail if any warnings remain
 
 # Auto-fix linting issues where possible
 npm run lint:fix --workspace=@stock-charts/client
+
+# Re‑run lint after auto-fix to ensure zero warnings (required)
+npm run lint --workspace=@stock-charts/client -- --max-warnings=0
 ```
 
 **Requirements:**
@@ -230,7 +233,10 @@ npm run lint:fix --workspace=@stock-charts/client
 npm run format
 
 # Check specific rule violations
-npx eslint client/src --format=detailed
+# Enforce zero warnings explicitly (same as quality gate)
+npm run lint --workspace=@stock-charts/client -- --max-warnings=0
+
+npx eslint client/src --format=detailed --max-warnings=0
 ```
 
 ### Test failures
