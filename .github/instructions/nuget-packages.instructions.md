@@ -1,6 +1,6 @@
 ---
 applyTo: "**/*.{csproj,sln},**/Directory.Packages.props"
-description: 'Guidelines for managing NuGet packages'
+description: "Guidelines for managing NuGet packages"
 ---
 
 ## NuGet package management
@@ -83,4 +83,5 @@ dotnet build Charts.sln --configuration Release
 - Clear caches if needed: `dotnet nuget locals all --clear`
 
 ---
+
 Last updated: August 15, 2025

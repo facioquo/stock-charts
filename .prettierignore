@@ -38,6 +38,3 @@ junit.xml
 # Temporary files
 *.tmp
 *.temp
-
-# Markdown files (handled by markdownlint)
-*.md

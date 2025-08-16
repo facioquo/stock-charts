@@ -32,7 +32,7 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
    ```bash
    # Azure Functions Core Tools (required for local development)
    npm install -g @angular/cli azure-functions-core-tools
-   
+
    # Note: Azurite is installed automatically with npm install
    ```
 
@@ -221,7 +221,7 @@ Then restart the Azurite task (`start-azurite`) to recreate a fresh store.
 ```typescript
 export const env: EnvConfig = {
   production: false,
-  api: 'https://localhost:5001', // WebAPI endpoint
+  api: "https://localhost:5001" // WebAPI endpoint
 };
 ```
 
@@ -400,4 +400,5 @@ We welcome contributions! Please read our [Contributing Guidelines](docs/contrib
 This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
 
 ---
+
 Last updated: August 15, 2025

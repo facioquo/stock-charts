@@ -1,6 +1,6 @@
 ---
-applyTo: 'client/**/*.{ts,html,scss,json}'
-description: 'Project-specific Angular development guidelines'
+applyTo: "client/**/*.{ts,html,scss,json}"
+description: "Project-specific Angular development guidelines"
 ---
 
 ## Angular development guidelines
@@ -20,6 +20,7 @@ description: 'Project-specific Angular development guidelines'
 - ❌ **FORBIDDEN**: Using `// eslint-disable` for any rule without team review
 
 **When you encounter linting errors:**
+
 1. Fix the underlying issue properly
 2. Refactor code to meet type safety requirements
 3. Use proper TypeScript types and Angular patterns
@@ -43,6 +44,7 @@ description: 'Project-specific Angular development guidelines'
 - Allow focused unit testing and potential future template pre-processing
 
 Permitted exceptions (must be justified in a code comment directly above the `@Component`):
+
 - Tiny presentational components whose template is a single, short line (≤ 80 chars, no structural directives)
 - Temporary experimental spike code (must be removed before merge to main)
 
@@ -60,18 +62,21 @@ If a test environment has issues resolving external resources, adjust the test (
 ### Financial Data Architecture
 
 #### API Service Patterns
+
 - Implement failover pattern for multiple stock data APIs with proper error handling
 - Use Angular HTTP interceptors for retry logic and error standardization
 - Cache stock quote data appropriately using Angular's HTTP cache
 - Handle real-time updates with WebSocket services when available
 
 #### Component Structure
+
 - **Chart components**: Keep chart rendering logic separate from data fetching
 - **Configuration components**: Use reactive forms for chart settings and indicators
 - **Data services**: Abstract stock data APIs behind service interfaces
 - **Utility services**: Financial calculations should be pure functions in services
 
 #### Performance for Financial Applications
+
 - Use `OnPush` change detection for chart components (data-driven updates)
 - Implement virtual scrolling for large historical datasets
 - Optimize chart redraws by comparing data changes with signals

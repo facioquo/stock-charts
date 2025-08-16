@@ -79,11 +79,13 @@ This repository maintains multiple documentation files with specific purposes. *
 **Instead of duplicating content:**
 
 ✅ **DO**: Use relative links to reference detailed information
+
 ```markdown
 For complete setup instructions, see [Development Setup](../../README.md).
 ```
 
-✅ **DO**: Provide summary with link to details  
+✅ **DO**: Provide summary with link to details
+
 ```markdown
 1. **Clone and setup** (see [main README](../../README.md) for details)
 ```
@@ -103,11 +105,13 @@ For complete setup instructions, see [Development Setup](../../README.md).
 ### Content update guidelines
 
 **When adding new features or setup steps:**
+
 1. Add comprehensive details to the main README.md
 2. Update cross-references in other files if needed
 3. **Never duplicate** the new content across multiple files
 
 **When updating existing information:**
+
 1. Update the canonical source (usually main README.md)
 2. Verify all cross-references still point to correct sections
 3. Run `npm run lint:md` to check for broken links
@@ -120,6 +124,7 @@ For complete setup instructions, see [Development Setup](../../README.md).
 - We use npm packages `markdownlint` and `markdownlint-cli`
 
 **Current linting rules:**
+
 - `MD013: false` - Line length limit disabled (due to long URLs and code examples)
 - `MD033: false` - HTML allowed (for GitHub features like `<details>`)
 - `MD041: false` - First line doesn't need to be H1 (instruction files have frontmatter)
@@ -127,15 +132,18 @@ For complete setup instructions, see [Development Setup](../../README.md).
 ## Repository-specific rules
 
 **File naming:**
+
 - Use lowercase with hyphens: `contributing.md`, `azure-functions.md`
 - Be descriptive: `npm-packages.instructions.md` not `npm.md`
 
 **Content focus:**
+
 - Each file should have a single, clear purpose
 - Avoid mixing different domains (frontend + backend setup)
 - Keep instruction files focused on their specific technology
 
 **Code examples:**
+
 - Use realistic examples from this project when possible
 - Show actual file paths: `server/Functions/README.md`
 - Include workspace-aware commands: `npm run build --workspace=@stock-charts/client`
@@ -166,4 +174,5 @@ Rules for Mermaid diagrams:
 - Do not use background fill colors like `style AC fill:#e1f5fe`. If colors are needed for differentiation, only color element borders
 
 ---
+
 Last updated: August 15, 2025

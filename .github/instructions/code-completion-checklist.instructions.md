@@ -12,6 +12,7 @@ This checklist ensures all code changes meet quality standards before being comm
 ### 1. Code formatting and style
 
 **All code formatting (recommended):**
+
 ```bash
 # Format and check all code (frontend + backend)
 npm run format
@@ -19,12 +20,13 @@ npm run format:check  # Must pass with no issues
 ```
 
 **Individual formatting:**
+
 ```bash
 # Frontend only (TypeScript, HTML, SCSS files)
 npm run format:web
 npm run format:web:check
 
-# Backend only (C# files) 
+# Backend only (C# files)
 npm run format:dotnet
 npm run format:dotnet:check
 ```
@@ -32,6 +34,7 @@ npm run format:dotnet:check
 ### 2. Code linting and analysis
 
 **Frontend linting:**
+
 ```bash
 # Lint TypeScript/Angular code
 npm run lint --workspace=@stock-charts/client
@@ -41,6 +44,7 @@ npm run lint:fix --workspace=@stock-charts/client
 ```
 
 **Requirements:**
+
 - ✅ Zero ESLint errors
 - ✅ Zero TypeScript compilation errors
 - ✅ Zero Angular template errors
@@ -50,6 +54,7 @@ npm run lint:fix --workspace=@stock-charts/client
 ### 3. Building and compilation
 
 **Frontend build:**
+
 ```bash
 # Build Angular application
 npm run build --workspace=@stock-charts/client
@@ -59,6 +64,7 @@ npm run build:prod --workspace=@stock-charts/client
 ```
 
 **Backend build:**
+
 ```bash
 # Build .NET solution
 dotnet build Charts.sln
@@ -69,6 +75,7 @@ dotnet build Charts.sln
 ```
 
 **Requirements:**
+
 - ✅ All builds complete successfully
 - ✅ Zero compilation errors or warnings
 - ✅ All dependencies resolve correctly
@@ -76,6 +83,7 @@ dotnet build Charts.sln
 ### 4. Testing and validation
 
 **Frontend testing:**
+
 ```bash
 # Run unit tests
 npm run test --workspace=@stock-charts/client
@@ -85,6 +93,7 @@ npm run test:coverage --workspace=@stock-charts/client
 ```
 
 **Backend testing:**
+
 ```bash
 # Run .NET tests
 dotnet test Charts.sln
@@ -94,6 +103,7 @@ dotnet test Charts.sln --verbosity normal
 ```
 
 **Requirements:**
+
 - ✅ All existing tests pass
 - ✅ New functionality has unit tests
 - ✅ Test coverage maintained or improved
@@ -102,18 +112,21 @@ dotnet test Charts.sln --verbosity normal
 ### 5. Documentation requirements
 
 **Inline documentation:**
+
 - ✅ **Public methods**: JSDoc/XML documentation for public APIs
 - ✅ **Complex logic**: Comments explaining business rules and algorithms
 - ✅ **Configuration**: Comments for environment variables and settings
 - ✅ **Type definitions**: Comprehensive interface and type documentation
 
 **File-level documentation:**
+
 - ✅ **New features**: Update relevant README sections
 - ✅ **API changes**: Update endpoint documentation
 - ✅ **Configuration changes**: Update setup instructions
 - ❌ **Avoid duplication**: Reference existing docs instead of copying
 
 **Documentation linting:**
+
 ```bash
 # Lint all markdown files
 npm run lint:md
@@ -125,6 +138,7 @@ npm run lint:md:fix
 ### 6. Integration and system checks
 
 **Local development verification:**
+
 ```bash
 # Start full development stack
 npm start  # Angular dev server
@@ -135,6 +149,7 @@ cd server/WebApi && dotnet run       # Web API
 ```
 
 **Requirements:**
+
 - ✅ All services start without errors
 - ✅ Frontend connects to backend successfully
 - ✅ API endpoints respond correctly
@@ -143,6 +158,7 @@ cd server/WebApi && dotnet run       # Web API
 ### 7. Git and commit preparation
 
 **Pre-commit verification:**
+
 ```bash
 # Check git status
 git status
@@ -158,6 +174,7 @@ git diff --staged
 ```
 
 **Requirements:**
+
 - ✅ All formatting and linting checks pass
 - ✅ No unintended files in commit
 - ✅ Commit message follows conventional commit format
@@ -166,24 +183,28 @@ git diff --staged
 ## Quality gates (all must pass)
 
 ### ✅ Code quality gates
+
 - [ ] Zero linting errors or warnings
 - [ ] Zero compilation errors or warnings
 - [ ] All formatting checks pass
 - [ ] No suppressed linting rules without approval
 
 ### ✅ Build and test gates
+
 - [ ] Frontend builds successfully (dev and prod)
 - [ ] Backend builds successfully
 - [ ] All unit tests pass
 - [ ] Integration tests pass (if applicable)
 
 ### ✅ Documentation gates
+
 - [ ] Inline comments for complex logic
 - [ ] Public API documentation complete
 - [ ] README updated for new features
 - [ ] Markdown linting passes
 
 ### ✅ Integration gates
+
 - [ ] Local development stack runs without errors
 - [ ] API endpoints function correctly
 - [ ] No browser console errors
@@ -192,6 +213,7 @@ git diff --staged
 ## Common troubleshooting
 
 ### Build failures
+
 ```bash
 # Clear caches and reinstall
 npm run clean
@@ -201,6 +223,7 @@ dotnet restore Charts.sln
 ```
 
 ### Linting issues
+
 ```bash
 # Auto-fix what's possible
 npm run lint:fix --workspace=@stock-charts/client
@@ -211,6 +234,7 @@ npx eslint client/src --format=detailed
 ```
 
 ### Test failures
+
 ```bash
 # Run tests in watch mode for debugging
 npm run test:watch --workspace=@stock-charts/client
@@ -222,12 +246,14 @@ npm run test --workspace=@stock-charts/client -- --testNamePattern="ComponentNam
 ## VS Code integration
 
 **Recommended workflow:**
+
 1. Use Command Palette (`Ctrl+Shift+P`) → "Tasks: Run Task"
 2. Available tasks: `build-website`, `build-server`, `lint-website-fix`, etc.
 3. Use integrated terminal for manual commands
 4. Leverage problem panel for error navigation
 
 **Essential extensions:**
+
 - ESLint (code linting)
 - Prettier (code formatting)
 - C# Dev Kit (.NET development)
@@ -236,22 +262,26 @@ npm run test --workspace=@stock-charts/client -- --testNamePattern="ComponentNam
 ## Enforcement and exceptions
 
 **Zero-tolerance items:**
+
 - Build failures
 - Test failures
 - ESLint errors
 - TypeScript compilation errors
 
 **Approval-required exceptions:**
+
 - ESLint rule suppressions
 - TypeScript `any` types
 - Skipped or ignored tests
 - Missing documentation for public APIs
 
 **Automatic rejection criteria:**
+
 - Unformatted code
 - Unresolved merge conflicts
 - Failing CI/CD pipelines
 - Missing or broken documentation links
 
 ---
+
 Last updated: August 15, 2025

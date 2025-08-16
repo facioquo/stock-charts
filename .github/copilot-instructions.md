@@ -150,7 +150,8 @@ When working on this codebase:
 - **Responsive design**: Ensure charts work across device sizes
 - **Performance**: Optimize for Chart.js rendering and data processing
 
-> **IMPORTANT**: _don't be lazy_ about fixing underlying issues.  Examples of being lazy:
+> **IMPORTANT**: _don't be lazy_ about fixing underlying issues. Examples of being lazy:
+>
 > - suppressing code analysis errors, warnings, or recommendations
 > - not adding unit test coverage or not checking for passing tests
 > - skipping, ignoring, or reducing the test scenarios criteria or assertions
@@ -175,4 +176,5 @@ When working on this codebase:
 - **Documentation**: Update instructions when changing project structure
 
 ---
+
 Last updated: August 15, 2025

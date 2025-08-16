@@ -1,6 +1,6 @@
 ---
-applyTo: 'package.json, client/package.json'
-description: 'Guidelines for managing NPM packages in workspace structure'
+applyTo: "package.json, client/package.json"
+description: "Guidelines for managing NPM packages in workspace structure"
 ---
 
 ## NPM workspace package management
@@ -99,4 +99,5 @@ npm audit --workspace=@stock-charts/client
   ```
 
 ---
+
 Last updated: August 15, 2025
