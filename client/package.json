@@ -1,23 +1,24 @@
 {
-  "name": "stock.charts",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/facioquo/stock-charts.git"
-  },
+  "name": "@stock-charts/client",
+  "version": "1.0.0",
+  "description": "Angular frontend for stock charts application",
+  "private": true,
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open --hmr",
     "build": "ng build --configuration=development",
     "build.prod": "ng build --configuration=production",
+    "build:prod": "npm run build.prod",
     "watch": "ng build --configuration=development --watch",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
-    "lint:md": "markdownlint \"**/*.md\" --ignore node_modules"
+    "format": "prettier --write \"src/**/*.{ts,html,scss,css,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,html,scss,css,json}\"",
+    "clean": "rm -rf dist .angular node_modules/.cache"
   },
-  "private": false,
   "dependencies": {
     "@angular/animations": "20.1.7",
     "@angular/cdk": "20.1.6",
@@ -27,6 +28,7 @@
     "@angular/forms": "20.1.7",
     "@angular/material": "20.1.6",
     "@angular/platform-browser": "20.1.7",
+    "@angular/platform-browser-dynamic": "20.1.7",
     "@angular/router": "20.1.7",
     "@angular/service-worker": "20.1.7",
     "@ctrl/tinycolor": "4.1.0",
@@ -51,16 +53,16 @@
     "@angular/cli": "20.1.6",
     "@angular/compiler-cli": "20.1.7",
     "@eslint/js": "9.33.0",
-    "@types/jasmine": "5.1.8",
     "@types/jest": "30.0.0",
     "@typescript-eslint/eslint-plugin": "8.39.1",
     "@typescript-eslint/parser": "8.39.1",
     "eslint": "9.33.0",
-    "jasmine-core": "5.9.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.4",
+    "eslint-plugin-jest": "29.0.1",
     "jest": "30.0.5",
     "jest-junit": "16.0.0",
     "jest-preset-angular": "15.0.0",
-    "markdownlint-cli": "0.45.0",
-    "typescript": "5.8.3"
+    "typescript": "5.8.2"
   }
 }

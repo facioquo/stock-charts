@@ -1,28 +1,53 @@
-import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 
-import { MatCheckboxChange, MatCheckbox } from "@angular/material/checkbox";
+import { MatCheckbox, MatCheckboxChange } from "@angular/material/checkbox";
 import { MatDialog, MatDialogContent } from "@angular/material/dialog";
-import { MatListOption, MatSelectionList, MatList, MatListItem, MatListItemTitle, MatNavList, MatListItemLine } from "@angular/material/list";
-import { MatSlideToggleChange, MatSlideToggle } from "@angular/material/slide-toggle";
+import {
+  MatList,
+  MatListItem,
+  MatListItemLine,
+  MatListItemTitle,
+  MatListOption,
+  MatNavList,
+  MatSelectionList
+} from "@angular/material/list";
+import { MatSlideToggle, MatSlideToggleChange } from "@angular/material/slide-toggle";
 
 import { ChartService } from "../../services/chart.service";
 import { UserService } from "../../services/user.service";
 
-import { IndicatorListing, IndicatorSelection } from "../../pages/chart/chart.models";
-import { PickConfigComponent } from "./pick-config.component";
-import { MatToolbar } from "@angular/material/toolbar";
-import { MatIconButton, MatButton } from "@angular/material/button";
-import { MatTooltip } from "@angular/material/tooltip";
-import { MatIcon } from "@angular/material/icon";
 import { CdkScrollable } from "@angular/cdk/scrolling";
 import { FormsModule } from "@angular/forms";
-
+import { MatButton, MatIconButton } from "@angular/material/button";
+import { MatIcon } from "@angular/material/icon";
+import { MatToolbar } from "@angular/material/toolbar";
+import { MatTooltip } from "@angular/material/tooltip";
+import { IndicatorListing, IndicatorSelection } from "../../pages/chart/chart.models";
+import { PickConfigComponent } from "./pick-config.component";
 
 @Component({
   selector: "app-settings",
   templateUrl: "settings.component.html",
   styleUrls: ["settings.component.scss"],
-  imports: [MatToolbar, MatIconButton, MatTooltip, MatIcon, CdkScrollable, MatDialogContent, MatList, MatListItem, MatSlideToggle, FormsModule, MatSelectionList, MatCheckbox, MatListOption, MatListItemTitle, MatButton, MatNavList, MatListItemLine],
+  imports: [
+    MatToolbar,
+    MatIconButton,
+    MatTooltip,
+    MatIcon,
+    CdkScrollable,
+    MatDialogContent,
+    MatList,
+    MatListItem,
+    MatSlideToggle,
+    FormsModule,
+    MatSelectionList,
+    MatCheckbox,
+    MatListOption,
+    MatListItemTitle,
+    MatButton,
+    MatNavList,
+    MatListItemLine
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SettingsComponent {
@@ -30,7 +55,6 @@ export class SettingsComponent {
   private picker = inject(MatDialog);
   cht = inject(ChartService);
   usr = inject(UserService);
-
 
   listings: IndicatorListing[];
   selections: IndicatorSelection[];
@@ -40,7 +64,8 @@ export class SettingsComponent {
   }
 
   selectDisplayed(event: MatCheckboxChange, shown: MatSelectionList): void {
-    if (event.checked) shown.selectAll(); else shown.deselectAll();
+    if (event.checked) shown.selectAll();
+    else shown.deselectAll();
   }
 
   removeSelections(event: MouseEvent, shown: MatListOption[]): void {
@@ -59,7 +84,6 @@ export class SettingsComponent {
   }
 
   openIndicatorSettings(listing: IndicatorListing): void {
-
     // close current settings dialog
     this.listRef.closeAll();
 

@@ -11,7 +11,6 @@ body {
   padding: 0;
 }
 
-
 // TYPOGRAPHY
 h1,
 h2 {
@@ -51,7 +50,6 @@ a {
   text-align: center;
 }
 
-
 // ANGULAR MATERIALS COMPONENTS
 
 // dialog
@@ -64,7 +62,6 @@ mat-toolbar.dialog-title {
 }
 
 .dialog-section-header {
-
   font-size: 1.3rem !important;
   font-weight: 600 !important;
   cursor: default;
@@ -73,7 +70,6 @@ mat-toolbar.dialog-title {
 }
 
 mat-dialog-content {
-
   padding-top: 1rem !important;
 
   box-shadow:
@@ -87,8 +83,7 @@ mat-dialog-actions {
   padding: 1rem !important;
 }
 
-
 // common controls
 .error {
-  color: #B71C1C;
+  color: #b71c1c;
 }

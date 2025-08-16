@@ -1,18 +1,19 @@
 {
   "servers": {
-    "angular-cli": {
+    "angular": {
       "command": "npx",
-      "args": [
-        "@angular/cli",
-        "mcp"
-      ]
+      "args": ["@angular/cli", "mcp"],
+      "type": "stdio"
     },
     "playwright": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "@playwright/mcp@latest"
-      ]
+      "args": ["@playwright/mcp@latest"]
+    },
+    "microsoft-docs": {
+      "url": "https://learn.microsoft.com/api/mcp",
+      "type": "http"
     }
-  }
+  },
+  "inputs": []
 }

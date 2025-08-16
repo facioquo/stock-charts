@@ -12,14 +12,10 @@
     "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "ES2022",
-      "dom"
-    ],
-    "useDefineForClassFields": false
+    "lib": ["ES2022", "dom"],
+    "types": ["jest", "node"],
+    "useDefineForClassFields": false,
+    "strictNullChecks": true
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

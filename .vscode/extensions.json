@@ -1,4 +1,9 @@
 {
+  // =============================================================================
+  // RECOMMENDED EXTENSIONS FOR STOCK CHARTS PROJECT
+  // =============================================================================
+  // This file provides extension recommendations for the workspace
+  // Extensions help with Angular, .NET, Azure Functions, and code quality
   "recommendations": [
     "angular.ng-template",
     "azurite.azurite",
@@ -6,6 +11,7 @@
     "dbaeumer.vscode-eslint",
     "davidanson.vscode-markdownlint",
     "dotjoshjohnson.xml",
+    "esbenp.prettier-vscode",
     "github.copilot",
     "github.copilot-chat",
     "ms-azuretools.vscode-azurefunctions",

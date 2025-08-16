@@ -1,11 +1,10 @@
-@use '@angular/material' as mat;
-@use 'sass:map';
+@use "@angular/material" as mat;
+@use "sass:map";
 
-@use '../app/components/picker/scrollbar-theme';
+@use "../app/components/picker/scrollbar-theme";
 
 // application core styles that are based on the current theme
 @mixin theme($theme) {
-
   // theme components list
   @include scrollbar-theme.theme($theme);
 }
