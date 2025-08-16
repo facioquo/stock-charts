@@ -182,7 +182,7 @@ This repository includes optimized VS Code configuration with tasks, problem mat
 - `start-website` - Start Angular dev server
 - `start-functions` - Start Azure Functions
 - `start-webapi` - Start .NET Web API
-- `start-azurite` - Start Azurite storage emulator
+- (use npm script) `npm run azure:start` - Start Azurite storage emulator
 - `lint-website` - Run ESLint on Angular code
 - `lint-website-fix` - Auto-fix ESLint issues
 - `test-website` - Run Angular tests
@@ -212,7 +212,13 @@ Azurite stores its local data files (blob, queue, table) in the `./.azurite/` di
 rm -rf ./.azurite   # or manually delete folder in Explorer
 ```
 
-Then restart the Azurite task (`start-azurite`) to recreate a fresh store.
+Then restart the Azurite storage emulator:
+
+```bash
+npm run azure:start
+```
+
+This re-creates a fresh local store with empty blob/queue/table data.
 
 ### Environment configuration
 
