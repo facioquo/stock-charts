@@ -9,12 +9,9 @@ export class UtilityService {
   private meta = inject(Meta);
   private title = inject(Title);
 
-
   // META
   pushMetaTags(tags: MetaDefinition[]): void {
-
     tags.forEach((tag: MetaDefinition) => {
-
       if (tag.property === "og:title" && tag.content) {
         this.title.setTitle(tag.content);
       }
@@ -44,13 +41,8 @@ export class UtilityService {
     });
   }
 
-  titleWithSuffix(
-    baseTitle: string,
-    suffix: string = "Stock Indicators for .NET (demo)")
-    : string {
-    return baseTitle.length > 0
-      ? baseTitle.concat(" | ").concat(suffix)
-      : suffix;
+  titleWithSuffix(baseTitle: string, suffix: string = "Stock Indicators for .NET (demo)"): string {
+    return baseTitle.length > 0 ? baseTitle.concat(" | ").concat(suffix) : suffix;
   }
 
   // PAGE SCROLLING
@@ -76,5 +68,4 @@ export class UtilityService {
       }
     }, offset);
   }
-
 }

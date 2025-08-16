@@ -11,9 +11,7 @@ import { UtilityService } from "../../services/utility.service";
 export class PageNotFoundComponent {
   private readonly util = inject(UtilityService);
 
-
   constructor() {
-
     const description = "This is not a page.  Try again.";
 
     this.util.pushMetaTags([
@@ -32,7 +30,7 @@ export class PageNotFoundComponent {
       {
         property: "og:description",
         content: description
-      },
+      }
     ]);
   }
 }

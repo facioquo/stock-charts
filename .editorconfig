@@ -10,6 +10,7 @@ trim_trailing_whitespace = true   # Remove whitespace at end of lines
 indent_style = space              # Use spaces for indentation
 indent_size = 2                   # Use 2 spaces per indentation level
 tab_width = 2                     # Set tab width to 2 spaces
+double_quote_style = double       # Use double quotes for strings
 
 # Markdown files
 [*.md]
@@ -31,7 +32,9 @@ tab_width = 4                     # Set tab width to 4 spaces
 
 dotnet_sort_system_directives_first = true               # Place System.* usings before others
 dotnet_separate_import_directive_groups = false          # Don't add blank lines between using directives
+dotnet_style_prefer_single_quotes = false:suggestion     # Prefer double quotes
 
+csharp_prefer_trailing_commas = false:suggestion         # No trailing commas on last items
 csharp_style_var_elsewhere = false                       # Use explicit types when type isn't obvious
 csharp_style_var_for_built_in_types = false              # Use explicit types for built-in types
 csharp_style_var_when_type_is_apparent = false           # Use explicit types even when obvious

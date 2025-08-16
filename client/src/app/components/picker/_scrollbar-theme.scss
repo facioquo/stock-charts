@@ -1,11 +1,9 @@
-@use 'sass:map';
-@use '@angular/material' as mat;
+@use "sass:map";
+@use "@angular/material" as mat;
 
 // SCROLLBAR THEME
 @mixin theme($theme) {
-
   @media screen and (width >=800px) {
-
     /* width */
     ::-webkit-scrollbar {
       width: 10px;

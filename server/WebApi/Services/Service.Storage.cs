@@ -32,9 +32,7 @@ public class Storage : IStorage
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the async operation</returns>
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
-    {
-        await _blobClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
-    }
+        => await _blobClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
 
     /// <summary>
     /// Uploads content to a blob with the specified name
@@ -44,7 +42,7 @@ public class Storage : IStorage
     /// <returns>Task representing the async operation</returns>
     public async Task PutBlobAsync(string blobName, string content)
     {
-        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+        using MemoryStream stream = new(Encoding.UTF8.GetBytes(content));
         await _blobClient.GetBlobClient(blobName).UploadAsync(stream, overwrite: true);
     }
 

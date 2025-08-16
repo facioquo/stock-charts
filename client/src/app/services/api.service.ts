@@ -1,20 +1,15 @@
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { HttpClient, HttpErrorResponse, HttpHeaders } from "@angular/common/http";
-import { Observable } from "rxjs/internal/Observable";
+import { Observable } from "rxjs";
 import { env } from "../../environments/environment";
 
-import {
-  IndicatorListing,
-  IndicatorParam,
-  IndicatorSelection
-} from "../pages/chart/chart.models";
+import { IndicatorListing, IndicatorParam, IndicatorSelection } from "../pages/chart/chart.models";
 
 @Injectable({
   providedIn: "root"
 })
 export class ApiService {
   private readonly http = inject(HttpClient);
-
 
   getQuotes() {
     return this.http.get(`${env.api}/quotes`, this.requestHeader());
@@ -26,40 +21,18 @@ export class ApiService {
 
   getSelectionData(
     selection: IndicatorSelection,
-    listing: IndicatorListing): Observable<unknown> {
-
-    const obs = new Observable((observer) => {
-
-      // compose url
-      let url = `${listing.endpoint}?`;
-      selection.params.forEach((param: IndicatorParam, param_index: number) => {
-        if (param_index !== 0) url += "&";
-        url += `${param.paramName}=${param.value}`;
-      });
-
-      // fetch data
-      this.http.get(url, this.requestHeader())
-        .subscribe({
-
-          next: (data: unknown[]) => {
-            observer.next(data);
-          },
-
-          error: (e: HttpErrorResponse) => {
-            console.log("DATA", e);
-            observer.error(e);
-          }
-        });
+    listing: IndicatorListing
+  ): Observable<unknown[]> {
+    let params = new HttpParams();
+    selection.params.forEach((p: IndicatorParam) => {
+      params = params.set(p.paramName, String(p.value));
     });
-
-    return obs;
+    return this.http.get<unknown[]>(listing.endpoint, { ...this.requestHeader(), params });
   }
 
   // HELPERS
   requestHeader(): { headers?: HttpHeaders } {
-
-    const simpleHeaders = new HttpHeaders()
-      .set("Content-Type", "application/json");
+    const simpleHeaders = new HttpHeaders().set("Content-Type", "application/json");
 
     return { headers: simpleHeaders };
   }
