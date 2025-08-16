@@ -1,4 +1,23 @@
-import { IndicatorListing } from "../pages/chart/chart.models";
+#!/usr/bin/env node
+
+/**
+ * Generate client-side backup indicators from server metadata
+ * This script reads the server's indicator metadata and generates a TypeScript file
+ * for client-side failover, avoiding manual sync issues.
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+// Path to server metadata file
+const serverMetadataPath = path.join(__dirname, '../server/WebApi/Services/Service.Metadata.cs');
+const outputPath = path.join(__dirname, '../client/src/app/data/backup-indicators.ts');
+
+console.log('Generating backup indicators from server metadata...');
+
+// Generate backup indicators with essential indicators
+function generateBackupIndicators() {
+  return `import { IndicatorListing } from "../pages/chart/chart.models";
 
 // Chart colors constants
 const ChartColors = {
@@ -352,7 +371,7 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
     ]
   },
 
-  // Stochastic Oscillator
+  // Stochastic Oscillator  
   {
     name: "Stochastic Oscillator",
     uiid: "STO",
@@ -481,3 +500,15 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
     ]
   }
 ];
+`;
+}
+
+// Generate and write backup indicators
+try {
+  const backupIndicators = generateBackupIndicators();
+  fs.writeFileSync(outputPath, backupIndicators);
+  console.log(`✅ Generated backup indicators at: ${outputPath}`);
+} catch (error) {
+  console.error('Error generating backup indicators:', error.message);
+  process.exit(1);
+}

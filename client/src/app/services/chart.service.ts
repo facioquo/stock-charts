@@ -133,9 +133,8 @@ export class ChartService implements OnDestroy {
   allProcessedDatasets: Map<string, ChartDataset[]> = new Map(); // Store processed Chart.js datasets for efficient slicing
 
   constructor() {
-    // Calculate initial bar count with override cap at 120
-    const calculated = this.window.calculateOptimalBars();
-    this.currentBarCount = Math.min(120, calculated);
+    // Calculate initial bar count without arbitrary override
+    this.currentBarCount = this.window.calculateOptimalBars();
 
     // Subscribe to window resize events with proper cleanup
     this.window
@@ -677,14 +676,6 @@ export class ChartService implements OnDestroy {
   //#region WINDOW OPERATIONS
 
   onWindowResize(dimensions: { width: number; height: number }) {
-    // Check if dynamic resize is enabled via feature flag
-    if (!this.window.isDynamicResizeEnabled()) {
-      // TEMP DISABLE (commit 706ec63425eac0a6f4a310e42296f3ed2d2fdb09):
-      // Chart auto-resizing reverted to static dataset length. Early return
-      // prevents dynamic bar count recalculation and slicing until feature is re-enabled.
-      return; // minimal change to disable auto-resize
-    }
-
     const newBarCount = this.window.calculateOptimalBars(dimensions.width);
 
     // Only update if bar count changed and we have data
@@ -692,6 +683,9 @@ export class ChartService implements OnDestroy {
       this.currentBarCount = newBarCount;
       this.updateChartsWithNewBarCount();
     }
+
+    // Force chart resize to handle container dimension changes
+    this.forceChartsResize();
   }
 
   private updateChartsWithNewBarCount() {

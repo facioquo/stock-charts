@@ -58,9 +58,10 @@
     "@typescript-eslint/parser": "8.39.1",
     "eslint": "9.33.0",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-prettier": "5.5.4",
     "eslint-plugin-jest": "29.0.1",
+    "eslint-plugin-prettier": "5.5.4",
     "jest": "30.0.5",
+    "jest-canvas-mock": "^2.5.2",
     "jest-junit": "16.0.0",
     "jest-preset-angular": "15.0.0",
     "typescript": "5.8.2"
