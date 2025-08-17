@@ -21,6 +21,8 @@ async function fetchListings() {
   console.log(`Fetching indicator listings from: ${apiBase}/indicators`);
   try {
     const listings = await fetchListings();
+  // Ensure output directory exists before writing snapshot
+  fs.mkdirSync(dataDir, { recursive: true });
     fs.writeFileSync(jsonPath, JSON.stringify(listings, null, 2), 'utf8');
   console.log('Snapshot refreshed from API:', jsonPath);
   } catch (err) {

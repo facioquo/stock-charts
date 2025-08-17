@@ -819,3 +819,6 @@ FodyWeavers.xsd
 
 # Azurite local storage emulator files
 .azurite/
+
+# Codacy analysis tools and caches
+.codacy/
