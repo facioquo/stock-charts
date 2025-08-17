@@ -27,11 +27,7 @@ type ExtendedChartDataset = ChartDataset & {
 };
 
 // extensions from new financial module
-import {
-  CandlestickController,
-  CandlestickElement,
-  FinancialDataPoint
-} from "src/chartjs/financial";
+import { FinancialDataPoint } from "src/chartjs/financial";
 
 // plugins
 import AnnotationPlugin, {

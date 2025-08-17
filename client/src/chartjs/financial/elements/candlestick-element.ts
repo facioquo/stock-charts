@@ -2,12 +2,12 @@
  * Candlestick element for Chart.js financial charts
  * Based on chartjs-chart-financial plugin
  * Original source: https://github.com/chartjs/chartjs-chart-financial
- * 
+ *
  * Licensed under MIT License
  * Copyright (c) 2018 Chart.js Contributors
  */
 
-import { Chart, ChartComponent } from "chart.js";
+import { Chart } from "chart.js";
 import { valueOrDefault, merge } from "chart.js/helpers";
 import { FinancialElement } from "./financial-element";
 import { FinancialColorConfig } from "../colors";
@@ -17,7 +17,7 @@ import { FinancialColorConfig } from "../colors";
  */
 export class CandlestickElement extends FinancialElement {
   static id = "candlestick";
-  
+
   declare color?: FinancialColorConfig;
   declare borderColor?: string | FinancialColorConfig;
   declare borderWidth?: number;
@@ -40,33 +40,33 @@ export class CandlestickElement extends FinancialElement {
     const globalOpts = Chart.defaults;
     const candlestickDefaults = (globalOpts as any).elements?.candlestick;
     const financialDefaults = (globalOpts as any).elements?.financial;
-    
+
     let borderColor: string;
     if (close < open) {
       borderColor = valueOrDefault(
-        borderColors?.up, 
+        borderColors?.up,
         candlestickDefaults?.borderColor ?? financialDefaults?.color?.up ?? "#000000"
       );
       ctx.fillStyle = valueOrDefault(
-        this.color?.up, 
+        this.color?.up,
         candlestickDefaults?.color?.up ?? financialDefaults?.color?.up ?? "#000000"
       );
     } else if (close > open) {
       borderColor = valueOrDefault(
-        borderColors?.down, 
+        borderColors?.down,
         candlestickDefaults?.borderColor ?? financialDefaults?.color?.down ?? "#000000"
       );
       ctx.fillStyle = valueOrDefault(
-        this.color?.down, 
+        this.color?.down,
         candlestickDefaults?.color?.down ?? financialDefaults?.color?.down ?? "#000000"
       );
     } else {
       borderColor = valueOrDefault(
-        borderColors?.unchanged, 
+        borderColors?.unchanged,
         candlestickDefaults?.borderColor ?? financialDefaults?.color?.unchanged ?? "#000000"
       );
       ctx.fillStyle = valueOrDefault(
-        this.color?.unchanged, 
+        this.color?.unchanged,
         candlestickDefaults?.color?.unchanged ?? financialDefaults?.color?.unchanged ?? "#000000"
       );
     }

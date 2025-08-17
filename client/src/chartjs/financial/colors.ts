@@ -2,7 +2,7 @@
  * Financial chart color theming utilities
  * Based on chartjs-chart-financial plugin
  * Original source: https://github.com/chartjs/chartjs-chart-financial
- * 
+ *
  * Licensed under MIT License
  * Copyright (c) 2018 Chart.js Contributors
  */
@@ -15,12 +15,12 @@ export const FINANCIAL_COLORS = {
    * Color when closing price is higher than opening price (bullish)
    */
   UP: "rgba(80, 160, 115, 1)",
-  
+
   /**
    * Color when closing price is lower than opening price (bearish)
    */
   DOWN: "rgba(215, 85, 65, 1)",
-  
+
   /**
    * Color when closing price equals opening price (neutral)
    */

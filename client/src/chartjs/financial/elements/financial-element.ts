@@ -2,7 +2,7 @@
  * Base financial element for Chart.js financial charts
  * Based on chartjs-chart-financial plugin
  * Original source: https://github.com/chartjs/chartjs-chart-financial
- * 
+ *
  * Licensed under MIT License
  * Copyright (c) 2018 Chart.js Contributors
  */
@@ -59,14 +59,24 @@ function getBarBounds(bar: BoundsProps, useFinalPosition?: boolean): ElementBoun
 /**
  * Helper function to check if coordinates are within element bounds
  */
-function inRange(element: FinancialElement, x: number | null, y: number | null, useFinalPosition?: boolean): boolean {
+function inRange(
+  element: FinancialElement,
+  x: number | null,
+  y: number | null,
+  useFinalPosition?: boolean
+): boolean {
   const skipX = x === null;
   const skipY = y === null;
-  const bounds = !element || (skipX && skipY) ? false : getBarBounds(element as unknown as BoundsProps, useFinalPosition);
+  const bounds =
+    !element || (skipX && skipY)
+      ? false
+      : getBarBounds(element as unknown as BoundsProps, useFinalPosition);
 
-  return Boolean(bounds
-    && (skipX || (x !== null && x >= bounds.left && x <= bounds.right))
-    && (skipY || (y !== null && y >= bounds.top && y <= bounds.bottom)));
+  return Boolean(
+    bounds &&
+      (skipX || (x !== null && x >= bounds.left && x <= bounds.right)) &&
+      (skipY || (y !== null && y >= bounds.top && y <= bounds.bottom))
+  );
 }
 
 /**

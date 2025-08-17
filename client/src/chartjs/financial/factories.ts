@@ -2,14 +2,17 @@
  * Factory utilities for creating financial chart datasets and options
  * Based on chartjs-chart-financial plugin
  * Original source: https://github.com/chartjs/chartjs-chart-financial
- * 
+ *
  * Licensed under MIT License
  * Copyright (c) 2018 Chart.js Contributors
  */
 
 import { ChartConfiguration, ChartDataset } from "chart.js";
 import { FinancialDataPoint } from "./types/financial-data-point";
-import { createDefaultFinancialColors, createFinancialColorCallback, FinancialColorConfig } from "./colors";
+import {
+  createDefaultFinancialColors,
+  FinancialColorConfig
+} from "./colors";
 
 /**
  * Options for creating a candlestick dataset
@@ -36,7 +39,7 @@ export interface VolumeDatasetOptions {
  */
 export function createCandlestickDataset(options: CandlestickDatasetOptions): any {
   const colors = options.colors || createDefaultFinancialColors();
-  
+
   return {
     type: "candlestick",
     label: options.label || "Price",
@@ -50,9 +53,11 @@ export function createCandlestickDataset(options: CandlestickDatasetOptions): an
 /**
  * Creates a volume dataset with dynamic coloring based on price movement
  */
-export function createVolumeDataset(options: VolumeDatasetOptions): ChartDataset<"bar", { x: number; y: number }[]> {
+export function createVolumeDataset(
+  options: VolumeDatasetOptions
+): ChartDataset<"bar", { x: number; y: number }[]> {
   const colors = options.colors || createDefaultFinancialColors();
-  
+
   // Create color callback if OHLC data is provided for comparison
   let backgroundColor: string | ((ctx: any) => string);
   if (options.ohlcData) {
@@ -118,7 +123,7 @@ export function createFinancialChartOptions(): Partial<ChartConfiguration["optio
         intersect: false,
         mode: "index",
         callbacks: {
-          label: (ctx) => {
+          label: ctx => {
             if (ctx.dataset.type === "candlestick") {
               const data = ctx.raw as FinancialDataPoint;
               return `O: ${data.o}  H: ${data.h}  L: ${data.l}  C: ${data.c}`;
@@ -136,17 +141,17 @@ export function createFinancialChartOptions(): Partial<ChartConfiguration["optio
  */
 export function createLargeDatasetChartOptions(): Partial<ChartConfiguration["options"]> {
   const baseOptions = createFinancialChartOptions();
-  
+
   return {
     ...baseOptions,
     animation: false,
     parsing: false,
     scales: {
-      ...baseOptions.scales,
+      ...(baseOptions?.scales || {}),
       x: {
-        ...baseOptions.scales?.x,
+        ...(baseOptions?.scales?.x || {}),
         ticks: {
-          ...baseOptions.scales?.x?.ticks,
+          ...(baseOptions?.scales?.x?.ticks || {}),
           maxTicksLimit: 10
         }
       }

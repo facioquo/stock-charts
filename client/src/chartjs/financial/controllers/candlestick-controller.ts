@@ -2,7 +2,7 @@
  * Candlestick controller for Chart.js financial charts
  * Based on chartjs-chart-financial plugin
  * Original source: https://github.com/chartjs/chartjs-chart-financial
- * 
+ *
  * Licensed under MIT License
  * Copyright (c) 2018 Chart.js Contributors
  */
@@ -22,15 +22,15 @@ export class CandlestickController extends FinancialController {
    */
   updateElements(elements: any[], start: number, count: number, mode: any): void {
     const dataset = this.getDataset();
-    const ruler = this._ruler || this._getRuler();
+    const ruler = this._ruler ?? this._getRuler();
     const firstOpts = this.resolveDataElementOptions(start, mode);
     const sharedOptions = this.getSharedOptions(firstOpts);
-    const includeOptions = this.includeOptions(mode, sharedOptions);
+    const includeOptions = this.includeOptions(mode, sharedOptions ?? {});
 
-    this.updateSharedOptions(sharedOptions, mode, firstOpts);
+    this.updateSharedOptions(sharedOptions ?? {}, mode, firstOpts);
 
     for (let i = start; i < count; i++) {
-      const options = sharedOptions || this.resolveDataElementOptions(i, mode);
+      const options = sharedOptions ?? this.resolveDataElementOptions(i, mode);
 
       const baseProperties = this.calculateElementProperties(i, ruler, mode === "reset", options);
       const properties: any = {
@@ -39,7 +39,7 @@ export class CandlestickController extends FinancialController {
         // label: '', // to get label value please use dataset.data[index].label
 
         // Appearance
-        color: dataset.color,
+        color: (dataset as any).color,
         borderColor: dataset.borderColor,
         borderWidth: dataset.borderWidth
       };

@@ -2,7 +2,7 @@
  * Registration system for financial chart components
  * Based on chartjs-chart-financial plugin
  * Original source: https://github.com/chartjs/chartjs-chart-financial
- * 
+ *
  * Licensed under MIT License
  * Copyright (c) 2018 Chart.js Contributors
  */
@@ -47,7 +47,7 @@ export function ensureFinancialChartsRegistered(): void {
     borderWidth: 1
   };
 
-  // Set up OHLC defaults  
+  // Set up OHLC defaults
   (Chart.defaults as any).elements.ohlc = {
     ...(Chart.defaults as any).elements.financial,
     borderColor: FINANCIAL_COLORS.UNCHANGED,
@@ -91,12 +91,7 @@ export function ensureFinancialChartsRegistered(): void {
   };
 
   // Register all financial chart components
-  Chart.register(
-    CandlestickController,
-    OhlcController,
-    CandlestickElement,
-    OhlcElement
-  );
+  Chart.register(CandlestickController, OhlcController, CandlestickElement, OhlcElement);
 
   isRegistered = true;
 }
