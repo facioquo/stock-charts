@@ -32,6 +32,31 @@ export function buildCandlestickDataset(
 }
 
 /**
+ * Create an OHLC dataset with proper configuration
+ */
+export function buildOhlcDataset(
+  data: FinancialDataPoint[],
+  options: {
+    label?: string;
+    colors?: FinancialColorConfig;
+    lineWidth?: number;
+    armLengthRatio?: number;
+  } = {}
+): ChartDataset {
+  const colors = options.colors ?? getFinancialColors();
+
+  return {
+    type: "ohlc",
+    label: options.label ?? "Price",
+    data,
+    borderColor: colors.unchanged,
+    lineWidth: options.lineWidth ?? 2,
+    armLengthRatio: options.armLengthRatio ?? 0.8,
+    yAxisID: "y"
+  };
+}
+
+/**
  * Create a volume dataset with color-coded bars
  */
 export function buildVolumeDataset(

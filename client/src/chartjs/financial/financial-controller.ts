@@ -13,15 +13,15 @@ import type {
 
 /**
  * Computes the "optimal" sample size to maintain bars equally sized while preventing overlap.
+ * Performance optimization from the reference implementation.
  */
-function computeMinSampleSize(scale: ScaleWithInternals | undefined, pixels: number[]): number {
+function _computeMinSampleSize(scale: ScaleWithInternals | undefined, pixels: number[]): number {
   let min = scale?._length ?? Number.MAX_SAFE_INTEGER;
-  let curr: number, i: number, ilen: number;
+  let curr: number;
 
-  for (i = 1, ilen = pixels.length; i < ilen; ++i) {
+  for (let i = 1, ilen = pixels.length; i < ilen; ++i) {
     curr = Math.abs(pixels[i] - pixels[i - 1]);
     if (curr < min) {
-      // prev = pixels[i - 1]; // Not used, removing assignment
       min = curr;
     }
   }
@@ -31,7 +31,8 @@ function computeMinSampleSize(scale: ScaleWithInternals | undefined, pixels: num
 
 /**
  * Base controller for financial charts (OHLC and Candlestick)
- * This class is based off controller.bar.js from the upstream Chart.js library
+ * This class is based on controller.bar.js from the upstream Chart.js library
+ * with financial-specific optimizations from chartjs-chart-financial
  */
 export class FinancialController extends BarController {
   static overrides = {
@@ -40,14 +41,29 @@ export class FinancialController extends BarController {
     hover: {
       mode: "label"
     },
-    datasets: {
-      categoryPercentage: 0.8,
-      barPercentage: 0.9,
-      animation: {
-        numbers: {
-          type: "number",
-          properties: ["x", "y", "base", "width", "open", "high", "low", "close"]
+    animations: {
+      numbers: {
+        type: "number",
+        properties: ["x", "y", "base", "width", "open", "high", "low", "close"]
+      }
+    },
+    scales: {
+      x: {
+        type: "timeseries",
+        offset: true,
+        ticks: {
+          major: {
+            enabled: true
+          },
+          source: "data",
+          maxRotation: 0,
+          autoSkip: true,
+          autoSkipPadding: 75,
+          sampleSize: 100
         }
+      },
+      y: {
+        type: "linear"
       }
     },
     plugins: {
@@ -73,7 +89,7 @@ export class FinancialController extends BarController {
   };
 
   getLabelAndValue(index: number): { label: string; value: string } {
-    const parsed = this.getParsed(index) as Record<string, number>;
+    const parsed = this.getParsed(index) as FinancialDataPoint;
     const axis = this._cachedMeta.iScale?.axis ?? "x";
 
     const { o, h, l, c } = parsed;
@@ -85,25 +101,34 @@ export class FinancialController extends BarController {
     };
   }
 
-  getAllParsedValues(): number[] {
-    const meta = this._cachedMeta;
-    const axis = meta.iScale?.axis ?? "x";
-    const parsed = meta._parsed as Record<string, number>[];
-    const values: number[] = [];
-    for (let i = 0; i < parsed.length; ++i) {
-      values.push((parsed[i] as Record<string, number>)[axis]);
-    }
-    return values;
+  getUserBounds(scale: {
+    getUserBounds(): { min: number; max: number; minDefined: boolean; maxDefined: boolean };
+  }) {
+    const { min, max, minDefined, maxDefined } = scale.getUserBounds();
+    return {
+      min: minDefined ? min : Number.NEGATIVE_INFINITY,
+      max: maxDefined ? max : Number.POSITIVE_INFINITY
+    };
   }
 
   /**
-   * Implement this ourselves since it doesn't handle high and low values
-   * https://github.com/chartjs/Chart.js/issues/7328
+   * Get the other scale (non-index scale)
+   * @param scale - The current scale
+   * @returns The other scale
    */
+  _getOtherScale(scale: unknown): { getUserBounds(): { min: number; max: number; minDefined: boolean; maxDefined: boolean } } {
+    const meta = this._cachedMeta;
+    if (scale === meta.iScale) {
+      return meta.vScale as { getUserBounds(): { min: number; max: number; minDefined: boolean; maxDefined: boolean } };
+    }
+    return meta.iScale as { getUserBounds(): { min: number; max: number; minDefined: boolean; maxDefined: boolean } };
+  }
   getMinMax(scale: unknown): { min: number; max: number } {
     const meta = this._cachedMeta;
-    const _parsed = meta._parsed as Record<string, number>[];
+    const _parsed = meta._parsed as FinancialDataPoint[];
     const axis = meta.iScale?.axis ?? "x";
+    const otherScale = this._getOtherScale(scale);
+    const { min: otherMin, max: otherMax } = this.getUserBounds(otherScale);
 
     if (_parsed.length < 2) {
       return { min: 0, max: 1 };
@@ -113,42 +138,25 @@ export class FinancialController extends BarController {
       return { min: _parsed[0][axis], max: _parsed[_parsed.length - 1][axis] };
     }
 
+    // Filter data within bounds for performance
+    const filteredData = _parsed.filter(({ x }) => x >= otherMin && x < otherMax);
+
     let min = Number.POSITIVE_INFINITY;
     let max = Number.NEGATIVE_INFINITY;
-    for (let i = 0; i < _parsed.length; i++) {
-      const data = _parsed[i] as Record<string, number>;
+
+    // Optimized loop for min/max calculation
+    for (let i = 0, len = filteredData.length; i < len; i++) {
+      const data = filteredData[i];
       min = Math.min(min, data.l);
       max = Math.max(max, data.h);
     }
-    return { min, max };
-  }
 
-  _getRuler(): Record<string, unknown> {
-    const opts = (this as unknown as ControllerWithInternals).options;
-    const meta = this._cachedMeta;
-    const iScale = meta.iScale;
-    const axis = iScale?.axis ?? "x";
-    const pixels: number[] = [];
-    for (let i = 0; i < meta.data.length; ++i) {
-      pixels.push(
-        iScale?.getPixelForValue((this.getParsed(i) as Record<string, number>)[axis]) ?? 0
-      );
-    }
-    const barThickness = opts.barThickness;
-    const min = computeMinSampleSize(iScale, pixels);
-    return {
-      min,
-      pixels,
-      start: (iScale as ScaleWithInternals)?._startPixel ?? 0,
-      end: (iScale as ScaleWithInternals)?._endPixel ?? 0,
-      stackCount: (this as unknown as ControllerWithInternals)._getStackCount(),
-      scale: iScale,
-      ratio: barThickness ? 1 : opts.categoryPercentage * opts.barPercentage
-    };
+    return { min, max };
   }
 
   /**
    * Calculate element properties for financial data
+   * Performance optimized implementation
    */
   calculateElementProperties(
     index: number,
@@ -174,13 +182,11 @@ export class FinancialController extends BarController {
     const low = vscale.getPixelForValue(data.l);
     const close = vscale.getPixelForValue(data.c);
 
-    const pixelInfo = ipixels as { center: number; size: number };
-
     return {
       base: reset ? base : low,
-      x: pixelInfo.center,
+      x: ipixels.center,
       y: (low + high) / 2,
-      width: pixelInfo.size,
+      width: ipixels.size,
       open,
       high,
       low,
@@ -188,15 +194,23 @@ export class FinancialController extends BarController {
     };
   }
 
+  /**
+   * Performance optimized draw method with clipping
+   */
   draw(): void {
     const chart = this.chart;
     const rects = this._cachedMeta.data;
+
     clipArea(chart.ctx, chart.chartArea);
-    for (let i = 0; i < rects.length; ++i) {
-      if (rects[i] && typeof (rects[i] as unknown as { draw?: unknown }).draw === "function") {
-        (rects[i] as unknown as { draw: (ctx: unknown) => void }).draw(chart.ctx);
+
+    // Optimized rendering loop
+    for (let i = 0, len = rects.length; i < len; ++i) {
+      const rect = rects[i];
+      if (rect && typeof (rect as unknown as { draw?: unknown }).draw === "function") {
+        (rect as unknown as { draw: (ctx: CanvasRenderingContext2D) => void }).draw(chart.ctx);
       }
     }
+
     unclipArea(chart.ctx);
   }
 }

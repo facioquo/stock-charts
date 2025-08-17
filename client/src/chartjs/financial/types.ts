@@ -101,7 +101,26 @@ export interface ControllerWithInternals extends BarController {
     center: number;
     size: number;
   };
+  _getSharedOptions(
+    start: number,
+    mode: string
+  ): {
+    sharedOptions?: Record<string, unknown>;
+    includeOptions: boolean;
+  };
+  resolveDataElementOptions(index: number, mode: string): Record<string, unknown>;
+  updateElement(
+    element: { options?: Record<string, unknown> },
+    index: number,
+    properties: Record<string, unknown>,
+    mode: string
+  ): void;
 }
+
+/**
+ * Generic controller type for type safety
+ */
+export type ControllerType = ControllerWithInternals;
 
 /**
  * Ruler configuration interface

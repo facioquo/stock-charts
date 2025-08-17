@@ -1,67 +1,100 @@
 // chartjs-chart-financial
 // based on https://github.com/chartjs/chartjs-chart-financial
-// CandlestickController implementation
+// CandlestickController - extends FinancialController for candlestick chart types
 
-// Chart import removed - unused
-import { merge } from "chart.js/helpers";
-import type { Element as ChartElement } from "chart.js";
 import { FinancialController } from "./financial-controller";
-import { CandlestickElement } from "./candlestick-element";
+import type { ControllerType, ScaleWithInternals } from "./types";
 
 /**
- * Candlestick chart controller
+ * Candlestick Controller
+ * Specialized controller for candlestick charts
  */
 export class CandlestickController extends FinancialController {
-  static id = "candlestick";
+  static readonly id = "candlestick" as const;
 
-  declare _ruler?: unknown;
+  static override overrides = {
+    ...FinancialController.overrides,
+    datasets: {
+      barPercentage: 0.6,
+      categoryPercentage: 0.8
+    }
+  };
 
+  /**
+   * Update chart elements for candlestick display
+   */
   updateElements(
-    elements: unknown[],
+    elements: Array<{ options?: Record<string, unknown> }>,
     start: number,
     count: number,
-    mode: "default" | "resize" | "reset" | "none" | "hide" | "show" | "active"
+    mode: string
   ): void {
-    const dataset = this.getDataset();
-    const ruler = this._ruler ?? this._getRuler();
-    const firstOpts = this.resolveDataElementOptions(start, mode);
-    const sharedOptions = this.getSharedOptions(firstOpts);
-    const includeOptions = this.includeOptions(mode, sharedOptions ?? {});
+    const reset = mode === "reset";
+    const ruler = (this as any)._getRuler();
+    const sharedOptionsResult = (this as unknown as ControllerType)._getSharedOptions(start, mode);
+    const { sharedOptions, includeOptions } = sharedOptionsResult as {
+      sharedOptions?: Record<string, unknown>;
+      includeOptions: boolean;
+    };
 
-    this.updateSharedOptions(sharedOptions ?? {}, mode, firstOpts);
+    for (let i = start; i < start + count; i++) {
+      const options =
+        sharedOptions ?? (this as unknown as ControllerType).resolveDataElementOptions(i, mode);
 
-    for (let i = start; i < count; i++) {
-      const options = sharedOptions ?? this.resolveDataElementOptions(i, mode);
-
-      const baseProperties = this.calculateElementProperties(
-        i,
-        ruler as Record<string, unknown>,
-        mode === "reset",
-        options as Record<string, unknown>
-      );
-      const properties = {
-        ...baseProperties,
-        datasetLabel: (dataset as unknown as { label?: string }).label ?? "",
-        // label: '', // to get label value please use dataset.data[index].label
-
-        // Appearance
-        color: (dataset as unknown as { color?: unknown }).color,
-        borderColor: (dataset as unknown as { borderColor?: unknown }).borderColor,
-        borderWidth: (dataset as unknown as { borderWidth?: unknown }).borderWidth
-      };
+      const baseProperties = this.calculateElementProperties(i, ruler, reset, options);
 
       if (includeOptions) {
-        (properties as unknown as { options: unknown }).options = options;
+        baseProperties.options = options;
       }
-      this.updateElement(elements[i] as unknown as ChartElement, i, properties, mode);
+
+      (this as unknown as ControllerType).updateElement(elements[i], i, baseProperties, mode);
     }
   }
-}
 
-// Set up defaults
-CandlestickController.defaults = merge(
-  {
-    dataElementType: CandlestickElement.id
-  },
-  {}
-);
+  /**
+   * Get ruler configuration for candlestick charts
+   * Optimized implementation from reference
+   */
+  _getRuler(): Record<string, unknown> {
+    const opts = (this as unknown as ControllerType).options;
+    const meta = this._cachedMeta;
+    const iScale = meta.iScale;
+    const axis = iScale?.axis ?? "x";
+    const pixels: number[] = [];
+
+    // Build pixel array efficiently
+    for (let i = 0, len = meta.data.length; i < len; ++i) {
+      const parsed = this.getParsed(i) as Record<string, number>;
+      pixels.push(iScale?.getPixelForValue(parsed[axis]) ?? 0);
+    }
+
+    const barThickness = opts.barThickness;
+    const min = this._computeMinSampleSize(iScale, pixels);
+
+    return {
+      min,
+      pixels,
+      start: (iScale as ScaleWithInternals)?._startPixel ?? 0,
+      end: (iScale as ScaleWithInternals)?._endPixel ?? 0,
+      stackCount: (this as unknown as ControllerType)._getStackCount(),
+      scale: iScale,
+      ratio: barThickness ? 1 : opts.categoryPercentage * opts.barPercentage
+    };
+  }
+
+  /**
+   * Compute minimum sample size for optimal bar spacing
+   */
+  private _computeMinSampleSize(scale: ScaleWithInternals | undefined, pixels: number[]): number {
+    let min = scale?._length ?? Number.MAX_SAFE_INTEGER;
+
+    for (let i = 1, len = pixels.length; i < len; ++i) {
+      const curr = Math.abs(pixels[i] - pixels[i - 1]);
+      if (curr < min) {
+        min = curr;
+      }
+    }
+
+    return min;
+  }
+}

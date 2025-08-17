@@ -34,8 +34,18 @@ function generateDailyQuote(date, previousClose, dayIndex, rnd){
   const baseVolume = 50000000 + rnd.next() * 100000000;
   const volumeMultiplier = 1 + priceChangePercent * 2;
   const volume = Math.floor(baseVolume * volumeMultiplier);
+  // Create date with hour and minute details for PeriodSize compatibility
+  // Use market open time (9:30 AM) with some variation for intraday realism
+  const marketOpenHour = 9;
+  const marketOpenMinute = 30;
+  const hourVariation = Math.floor(rnd.next() * 7); // 0-6 hours variation during trading day
+  const minuteVariation = Math.floor(rnd.next() * 60); // 0-59 minutes variation
+  
+  const finalDate = new Date(date);
+  finalDate.setHours(marketOpenHour + hourVariation, marketOpenMinute + minuteVariation, 0, 0);
+  
   return {
-    date: new Date(date).toISOString(),
+    date: finalDate.toISOString().slice(0, 16), // YYYY-MM-DDTHH:MM format (no timezone)
     open: +(open.toFixed(2)),
     high: +(high.toFixed(2)),
     low: +(low.toFixed(2)),

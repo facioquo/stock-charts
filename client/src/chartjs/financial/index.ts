@@ -18,6 +18,8 @@ export { FinancialElement } from "./financial-element";
 export { FinancialController } from "./financial-controller";
 export { CandlestickElement } from "./candlestick-element";
 export { CandlestickController } from "./candlestick-controller";
+export { OhlcElement } from "./ohlc-element";
+export { OhlcController } from "./ohlc-controller";
 
 // Color utilities and themes
 export {
@@ -31,6 +33,7 @@ export {
 // Dataset and configuration factories
 export {
   buildCandlestickDataset,
+  buildOhlcDataset,
   buildVolumeDataset,
   buildFinancialChartOptions
 } from "./factories";

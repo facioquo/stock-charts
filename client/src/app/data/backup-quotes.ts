@@ -105,8 +105,18 @@ function generateDailyQuote(
   const volumeMultiplier = 1 + priceChangePercent * 2; // Higher volume on big moves
   const volume = Math.floor(baseVolume * volumeMultiplier);
 
+  // Create date with hour and minute details for PeriodSize compatibility
+  // Use market open time (9:30 AM) with some variation for intraday realism
+  const marketOpenHour = 9;
+  const marketOpenMinute = 30;
+  const hourVariation = Math.floor(random.next() * 7); // 0-6 hours variation during trading day
+  const minuteVariation = Math.floor(random.next() * 60); // 0-59 minutes variation
+
+  const finalDate = new Date(date);
+  finalDate.setHours(marketOpenHour + hourVariation, marketOpenMinute + minuteVariation, 0, 0);
+
   return {
-    date: new Date(date),
+    date: finalDate,
     open: Math.round(open * 100) / 100,
     high: Math.round(high * 100) / 100,
     low: Math.round(low * 100) / 100,

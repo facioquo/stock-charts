@@ -6,11 +6,17 @@ import { Chart } from "chart.js";
 import { FinancialController } from "./financial-controller";
 import { CandlestickController } from "./candlestick-controller";
 import { CandlestickElement } from "./candlestick-element";
-import { DEFAULT_FINANCIAL_COLORS } from "./colors";
+import { OhlcController } from "./ohlc-controller";
+import { OhlcElement } from "./ohlc-element";
 
 // Define financial element types for Chart.js defaults
 interface FinancialElementDefaults {
-  color: {
+  backgroundColors: {
+    up: string;
+    down: string;
+    unchanged: string;
+  };
+  borderColors: {
     up: string;
     down: string;
     unchanged: string;
@@ -18,8 +24,13 @@ interface FinancialElementDefaults {
 }
 
 interface CandlestickElementDefaults extends FinancialElementDefaults {
-  borderColor: string | Record<string, string>;
   borderWidth: number;
+}
+
+interface OhlcElementDefaults extends FinancialElementDefaults {
+  lineWidth: number;
+  armLength: number | null;
+  armLengthRatio: number;
 }
 
 // Type-safe extensions to Chart.js defaults
@@ -27,6 +38,7 @@ declare module "chart.js" {
   interface DefaultsElements {
     financial?: FinancialElementDefaults;
     candlestick?: CandlestickElementDefaults;
+    ohlc?: OhlcElementDefaults;
   }
 
   interface ChartTypeRegistry {
@@ -38,8 +50,38 @@ declare module "chart.js" {
       parsedDataType: unknown;
       scales: "linear";
     };
+    candlestick: {
+      chartOptions: unknown;
+      datasetOptions: unknown;
+      defaultDataPoint: unknown;
+      metaExtensions: Record<string, never>;
+      parsedDataType: unknown;
+      scales: "linear";
+    };
+    ohlc: {
+      chartOptions: unknown;
+      datasetOptions: unknown;
+      defaultDataPoint: unknown;
+      metaExtensions: Record<string, never>;
+      parsedDataType: unknown;
+      scales: "linear";
+    };
   }
 }
+
+// Default color configuration
+const DEFAULT_COLORS = {
+  backgroundColors: {
+    up: "rgba(75, 192, 192, 0.5)",
+    down: "rgba(255, 99, 132, 0.5)",
+    unchanged: "rgba(201, 203, 207, 0.5)"
+  },
+  borderColors: {
+    up: "rgb(75, 192, 192)",
+    down: "rgb(255, 99, 132)",
+    unchanged: "rgb(201, 203, 207)"
+  }
+};
 
 // Registration flag to ensure idempotent registration
 let isRegistered = false;
@@ -47,47 +89,40 @@ let isRegistered = false;
 /**
  * Ensure financial chart components are registered with Chart.js
  * This function is idempotent - it can be called multiple times safely
+ * Based on the reference implementation from chartjs-chart-financial
  */
 export function ensureFinancialChartsRegistered(): void {
   if (isRegistered) {
     return;
   }
 
+  // Register all controllers and elements
+  Chart.register(
+    FinancialController,
+    CandlestickController,
+    CandlestickElement,
+    OhlcController,
+    OhlcElement
+  );
+
   // Set up default financial element configuration
-  (Chart.defaults.elements as unknown as Record<string, unknown>).financial = {
-    color: DEFAULT_FINANCIAL_COLORS
-  };
-
-  // Register controllers and elements
-  Chart.register(FinancialController, CandlestickController, CandlestickElement);
-
-  // Set up Chart.js defaults for financial charts
-  (Chart.defaults as unknown as Record<string, unknown>).financial = {
-    datasets: {
-      categoryPercentage: 0.8,
-      barPercentage: 0.9,
-      animation: {
-        numbers: {
-          type: "number",
-          properties: ["x", "y", "base", "width", "open", "high", "low", "close"]
-        }
-      }
-    },
-    plugins: {
-      tooltip: {
-        intersect: false,
-        mode: "index"
-      }
-    }
-  };
-
-  // Set up candlestick-specific defaults
   const elementsDefaults = Chart.defaults.elements as unknown as Record<string, unknown>;
-  const financialDefaults = elementsDefaults.financial as FinancialElementDefaults;
+
+  // Base financial element defaults
+  elementsDefaults.financial = DEFAULT_COLORS;
+
+  // Candlestick-specific defaults
   elementsDefaults.candlestick = {
-    ...financialDefaults,
-    borderColor: financialDefaults.color.unchanged,
+    ...DEFAULT_COLORS,
     borderWidth: 1
+  };
+
+  // OHLC-specific defaults
+  elementsDefaults.ohlc = {
+    ...DEFAULT_COLORS,
+    lineWidth: 2,
+    armLength: null,
+    armLengthRatio: 0.8
   };
 
   isRegistered = true;

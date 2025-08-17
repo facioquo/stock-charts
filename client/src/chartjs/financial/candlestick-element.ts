@@ -1,27 +1,49 @@
 // chartjs-chart-financial
 // based on https://github.com/chartjs/chartjs-chart-financial
-// CandlestickElement implementation
+// CandlestickElement - visual element for candlestick bars
 
-// Chart import removed - unused
-import { merge, valueOrDefault } from "chart.js/helpers";
+import { Chart } from "chart.js";
+import { valueOrDefault } from "chart.js/helpers";
 import { FinancialElement } from "./financial-element";
 import type { FinancialColorConfig } from "./types";
-import { DEFAULT_FINANCIAL_COLORS } from "./colors";
 
 /**
- * Candlestick chart element for drawing individual candlestick bars
+ * Default configuration for candlestick elements
+ */
+const CANDLESTICK_DEFAULTS = {
+  borderWidth: 1,
+  backgroundColors: {
+    up: "rgba(75, 192, 192, 0.5)",
+    down: "rgba(255, 99, 132, 0.5)",
+    unchanged: "rgba(201, 203, 207, 0.5)"
+  } as FinancialColorConfig,
+  borderColors: {
+    up: "rgb(75, 192, 192)",
+    down: "rgb(255, 99, 132)",
+    unchanged: "rgb(201, 203, 207)"
+  } as FinancialColorConfig
+};
+
+/**
+ * Candlestick Element - renders individual candlestick bars
+ * Extends FinancialElement with candlestick-specific drawing logic
  */
 export class CandlestickElement extends FinancialElement {
-  static id = "candlestick";
+  static readonly id = "candlestick" as const;
 
-  declare borderColor: string | FinancialColorConfig;
-  declare borderWidth: number;
-  declare color: FinancialColorConfig;
+  static defaults = CANDLESTICK_DEFAULTS;
 
+  /**
+   * Draw the candlestick element with optimized rendering
+   */
   draw(ctx: CanvasRenderingContext2D): void {
     const { x, open, high, low, close } = this;
 
-    let borderColors = this.borderColor;
+    // Get defaults with fallback
+    const defaults = CANDLESTICK_DEFAULTS;
+
+    // Handle border colors (can be string or object)
+    let borderColors = (this.options as any)?.borderColors;
     if (typeof borderColors === "string") {
       borderColors = {
         up: borderColors,
@@ -30,55 +52,63 @@ export class CandlestickElement extends FinancialElement {
       };
     }
 
+    // Determine colors based on price movement
     let borderColor: string;
+    let fillColor: string;
+
     if (close < open) {
-      borderColor = valueOrDefault(
-        borderColors ? (borderColors as FinancialColorConfig).up : undefined,
-        DEFAULT_FINANCIAL_COLORS.up
-      );
-      ctx.fillStyle = valueOrDefault(
-        this.color ? this.color.up : undefined,
-        DEFAULT_FINANCIAL_COLORS.up
-      );
+      // Bearish (down) candle
+      borderColor = valueOrDefault(borderColors?.up, defaults.borderColors.up);
+      fillColor = valueOrDefault((this.options as any)?.backgroundColors?.up, defaults.backgroundColors.up);
     } else if (close > open) {
-      borderColor = valueOrDefault(
-        borderColors ? (borderColors as FinancialColorConfig).down : undefined,
-        DEFAULT_FINANCIAL_COLORS.down
-      );
-      ctx.fillStyle = valueOrDefault(
-        this.color ? this.color.down : undefined,
-        DEFAULT_FINANCIAL_COLORS.down
+      // Bullish (up) candle
+      borderColor = valueOrDefault(borderColors?.down, defaults.borderColors.down);
+      fillColor = valueOrDefault(
+        (this.options as any)?.backgroundColors?.down,
+        defaults.backgroundColors.down
       );
     } else {
-      borderColor = valueOrDefault(
-        borderColors ? (borderColors as FinancialColorConfig).unchanged : undefined,
-        DEFAULT_FINANCIAL_COLORS.unchanged
-      );
-      ctx.fillStyle = valueOrDefault(
-        this.color ? this.color.unchanged : undefined,
-        DEFAULT_FINANCIAL_COLORS.unchanged
+      // Unchanged (doji) candle
+      borderColor = valueOrDefault(borderColors?.unchanged, defaults.borderColors.unchanged);
+      fillColor = valueOrDefault(
+        (this.options as any)?.backgroundColors?.unchanged,
+        defaults.backgroundColors.unchanged
       );
     }
 
-    ctx.lineWidth = valueOrDefault((this as unknown as { borderWidth?: number }).borderWidth, 1);
-    ctx.strokeStyle = valueOrDefault(borderColor, DEFAULT_FINANCIAL_COLORS.unchanged);
+    // Set drawing properties
+    ctx.lineWidth = valueOrDefault(
+      (this.options as any)?.borderWidth,
+      defaults.borderWidth
+    );
+    ctx.strokeStyle = borderColor;
+    ctx.fillStyle = fillColor;
 
+    // Calculate candle body dimensions
+    const halfWidth = (this.width ?? 0) / 2;
+    const bodyTop = Math.min(open, close);
+    const bodyBottom = Math.max(open, close);
+    const bodyHeight = bodyBottom - bodyTop;
+
+    // Draw the candlestick
     ctx.beginPath();
+
+    // Upper wick (high to body top)
     ctx.moveTo(x, high);
-    ctx.lineTo(x, Math.min(open, close));
-    ctx.moveTo(x, low);
-    ctx.lineTo(x, Math.max(open, close));
+    ctx.lineTo(x, bodyTop);
+
+    // Lower wick (body bottom to low)
+    ctx.moveTo(x, bodyBottom);
+    ctx.lineTo(x, low);
+
     ctx.stroke();
-    ctx.fillRect(x - this.width / 2, close, this.width, open - close);
-    ctx.strokeRect(x - this.width / 2, close, this.width, open - close);
+
+    // Draw candle body (rectangle)
+    if (bodyHeight > 0) {
+      ctx.fillRect(x - halfWidth, bodyTop, this.width ?? 0, bodyHeight);
+      ctx.strokeRect(x - halfWidth, bodyTop, this.width ?? 0, bodyHeight);
+    }
+
     ctx.closePath();
   }
 }
-
-// Set up defaults
-CandlestickElement.defaults = merge({}, [
-  {
-    borderColor: DEFAULT_FINANCIAL_COLORS.unchanged,
-    borderWidth: 1
-  }
-]);
