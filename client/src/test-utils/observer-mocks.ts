@@ -23,22 +23,24 @@ export interface MockIntersectionObserver {
 export function createMockResizeObserver(): MockResizeObserver {
   let callback: ResizeObserverCallback | null = null;
 
-  const mockObserver = {
+  const mockObserver: MockResizeObserver = {
     observe: jest.fn(),
     unobserve: jest.fn(),
     disconnect: jest.fn(),
     triggerResize: (entries: ResizeObserverEntry[]) => {
       if (callback) {
-        callback(entries, mockObserver as any);
+        callback(entries, mockObserver as unknown as ResizeObserver);
       }
     }
   };
 
-  // Mock the constructor
-  (global as any).ResizeObserver = jest.fn().mockImplementation((cb: ResizeObserverCallback) => {
-    callback = cb;
-    return mockObserver;
-  });
+  // Augment global ResizeObserver constructor with a typed jest mock
+  globalThis.ResizeObserver = jest.fn<ResizeObserver, [ResizeObserverCallback]>(
+    (cb: ResizeObserverCallback) => {
+      callback = cb;
+      return mockObserver as unknown as ResizeObserver;
+    }
+  ) as unknown as typeof globalThis.ResizeObserver;
 
   return mockObserver;
 }
@@ -49,24 +51,24 @@ export function createMockResizeObserver(): MockResizeObserver {
 export function createMockIntersectionObserver(): MockIntersectionObserver {
   let callback: IntersectionObserverCallback | null = null;
 
-  const mockObserver = {
+  const mockObserver: MockIntersectionObserver = {
     observe: jest.fn(),
     unobserve: jest.fn(),
     disconnect: jest.fn(),
     triggerIntersect: (entries: IntersectionObserverEntry[]) => {
       if (callback) {
-        callback(entries, mockObserver as any);
+        callback(entries, mockObserver as unknown as IntersectionObserver);
       }
     }
   };
 
-  // Mock the constructor
-  (global as any).IntersectionObserver = jest
-    .fn()
-    .mockImplementation((cb: IntersectionObserverCallback) => {
+  // Augment global IntersectionObserver constructor with a typed jest mock
+  globalThis.IntersectionObserver = jest.fn<IntersectionObserver, [IntersectionObserverCallback]>(
+    (cb: IntersectionObserverCallback) => {
       callback = cb;
-      return mockObserver;
-    });
+      return mockObserver as unknown as IntersectionObserver;
+    }
+  ) as unknown as typeof globalThis.IntersectionObserver;
 
   return mockObserver;
 }
@@ -81,9 +83,9 @@ export function createMockResizeObserverEntry(
   return {
     target,
     contentRect,
-    borderBoxSize: [] as any,
-    contentBoxSize: [] as any,
-    devicePixelContentBoxSize: [] as any
+    borderBoxSize: [] as unknown as ReadonlyArray<ResizeObserverSize>,
+    contentBoxSize: [] as unknown as ReadonlyArray<ResizeObserverSize>,
+    devicePixelContentBoxSize: [] as unknown as ReadonlyArray<ResizeObserverSize>
   };
 }
 
@@ -112,6 +114,12 @@ export function createMockIntersectionObserverEntry(
  * Reset all observer mocks
  */
 export function resetObserverMocks(): void {
-  delete (global as any).ResizeObserver;
-  delete (global as any).IntersectionObserver;
+  Reflect.deleteProperty(globalThis, "ResizeObserver");
+  Reflect.deleteProperty(globalThis, "IntersectionObserver");
 }
+
+// Global constructor augmentation declarations (test env only)
+// Provide typed augmentation for jest mocked constructors without changing existing lib types.
+// We declare them as already existing (from DOM lib) so no redeclaration with incompatible shape occurs.
+// If running in a Node + jsdom environment they are present; if not, tests will assign them dynamically.
+export {}; // ensure this file is a module to contain the global augmentation

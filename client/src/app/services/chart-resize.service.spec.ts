@@ -150,25 +150,20 @@ describe("Chart Resize Dimension Testing", () => {
       ]);
     });
 
-    it("should call resize methods when forceChartsResize is triggered", done => {
+    it("should call resize methods when forceChartsResize is triggered", async () => {
       resizeHandler.forceChartsResize();
-
-      requestAnimationFrame(() => {
-        // Verify overlay chart resize was called
-        expect(overlayChart.resize).toHaveBeenCalledTimes(1);
-        expect(overlayChart.update).toHaveBeenCalledWith("resize");
-
-        // Verify oscillator charts resize were called
-        expect(oscillatorChart1.resize).toHaveBeenCalledTimes(1);
-        expect(oscillatorChart1.update).toHaveBeenCalledWith("resize");
-        expect(oscillatorChart2.resize).toHaveBeenCalledTimes(1);
-        expect(oscillatorChart2.update).toHaveBeenCalledWith("resize");
-
-        done();
-      });
+      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+      // Verify overlay chart resize was called
+      expect(overlayChart.resize).toHaveBeenCalledTimes(1);
+      expect(overlayChart.update).toHaveBeenCalledWith("resize");
+      // Verify oscillator charts resize were called
+      expect(oscillatorChart1.resize).toHaveBeenCalledTimes(1);
+      expect(oscillatorChart1.update).toHaveBeenCalledWith("resize");
+      expect(oscillatorChart2.resize).toHaveBeenCalledTimes(1);
+      expect(oscillatorChart2.update).toHaveBeenCalledWith("resize");
     });
 
-    it("should properly track dimension changes during resize", done => {
+    it("should properly track dimension changes during resize", async () => {
       const beforeResize = resizeHandler.getDimensions();
 
       // Simulate dimension changes that would occur during Chart.js resize
@@ -183,26 +178,23 @@ describe("Chart Resize Dimension Testing", () => {
       oscillatorChart1.chartArea.height = 355;
 
       resizeHandler.forceChartsResize();
+      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
 
-      requestAnimationFrame(() => {
-        const afterResize = resizeHandler.getDimensions();
+      const afterResize = resizeHandler.getDimensions();
 
-        // Verify dimensions changed correctly
-        expect(beforeResize.overlay).toEqual({ width: 800, height: 400 });
-        expect(afterResize.overlay).toEqual({ width: 1000, height: 500 });
+      // Verify dimensions changed correctly
+      expect(beforeResize.overlay).toEqual({ width: 800, height: 400 });
+      expect(afterResize.overlay).toEqual({ width: 1000, height: 500 });
 
-        expect(beforeResize.oscillators[0]).toEqual({ width: 600, height: 300 });
-        expect(afterResize.oscillators[0]).toEqual({ width: 750, height: 375 });
+      expect(beforeResize.oscillators[0]).toEqual({ width: 600, height: 300 });
+      expect(afterResize.oscillators[0]).toEqual({ width: 750, height: 375 });
 
-        // Verify resize methods were called
-        expect(overlayChart.resize).toHaveBeenCalledTimes(1);
-        expect(oscillatorChart1.resize).toHaveBeenCalledTimes(1);
-
-        done();
-      });
+      // Verify resize methods were called
+      expect(overlayChart.resize).toHaveBeenCalledTimes(1);
+      expect(oscillatorChart1.resize).toHaveBeenCalledTimes(1);
     });
 
-    it("should use requestAnimationFrame for proper DOM synchronization", done => {
+    it("should use requestAnimationFrame for proper DOM synchronization", () => {
       let rafCallback: FrameRequestCallback | undefined;
 
       // Mock requestAnimationFrame to capture the callback
@@ -230,7 +222,6 @@ describe("Chart Resize Dimension Testing", () => {
 
       // Restore spy
       requestAnimationFrameSpy.mockRestore();
-      done();
     });
 
     it("should handle window resize with bar count recalculation", () => {
@@ -294,31 +285,24 @@ describe("Chart Resize Dimension Testing", () => {
       resizeHandler.addOscillatorChart(oscillatorChart);
     });
 
-    it("should use 'resize' mode for chart updates during resize", done => {
+    it("should use 'resize' mode for chart updates during resize", async () => {
       resizeHandler.forceChartsResize();
-
-      requestAnimationFrame(() => {
-        // Verify update was called with 'resize' mode for optimization
-        expect(overlayChart.update).toHaveBeenCalledWith("resize");
-        expect(oscillatorChart.update).toHaveBeenCalledWith("resize");
-        done();
-      });
+      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+      // Verify update was called with 'resize' mode for optimization
+      expect(overlayChart.update).toHaveBeenCalledWith("resize");
+      expect(oscillatorChart.update).toHaveBeenCalledWith("resize");
     });
 
-    it("should call resize before update for proper Chart.js behavior", done => {
+    it("should call resize before update for proper Chart.js behavior", async () => {
       resizeHandler.forceChartsResize();
-
-      requestAnimationFrame(() => {
-        // Verify call order: resize() before update()
-        const overlayResizeCall = overlayChart.resize.mock.invocationCallOrder[0];
-        const overlayUpdateCall = overlayChart.update.mock.invocationCallOrder[0];
-        const oscResizeCall = oscillatorChart.resize.mock.invocationCallOrder[0];
-        const oscUpdateCall = oscillatorChart.update.mock.invocationCallOrder[0];
-
-        expect(overlayResizeCall).toBeLessThan(overlayUpdateCall);
-        expect(oscResizeCall).toBeLessThan(oscUpdateCall);
-        done();
-      });
+      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+      // Verify call order: resize() before update()
+      const overlayResizeCall = overlayChart.resize.mock.invocationCallOrder[0];
+      const overlayUpdateCall = overlayChart.update.mock.invocationCallOrder[0];
+      const oscResizeCall = oscillatorChart.resize.mock.invocationCallOrder[0];
+      const oscUpdateCall = oscillatorChart.update.mock.invocationCallOrder[0];
+      expect(overlayResizeCall).toBeLessThan(overlayUpdateCall);
+      expect(oscResizeCall).toBeLessThan(oscUpdateCall);
     });
 
     it("should handle responsive dimension changes", () => {

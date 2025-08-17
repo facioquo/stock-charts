@@ -81,7 +81,7 @@ describe("WindowService - Chart Resizing", () => {
   });
 
   describe("getResizeObservable", () => {
-    it("should debounce resize events", done => {
+    it("should debounce resize events", async () => {
       const resizeObservable = service.getResizeObservable();
 
       // Subscribe to the observable
@@ -105,11 +105,9 @@ describe("WindowService - Chart Resizing", () => {
       window.dispatchEvent(mockEvent);
 
       // Wait for debounce period (150ms + buffer)
-      setTimeout(() => {
-        expect(emissions.length).toBe(1);
-        expect(emissions[0]).toEqual({ width: 1000, height: 800 });
-        done();
-      }, 200);
+      await new Promise<void>(resolve => setTimeout(resolve, 200));
+      expect(emissions.length).toBe(1);
+      expect(emissions[0]).toEqual({ width: 1000, height: 800 });
     });
   });
 

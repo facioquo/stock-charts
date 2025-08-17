@@ -1,35 +1,44 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { Chart, ChartConfiguration, ChartType } from "chart.js";
-import { Quote, IndicatorListing } from "../app/pages/chart/chart.models";
+import { Chart, ChartConfiguration } from "chart.js";
+import { IndicatorListing, Quote } from "../app/pages/chart/chart.models";
 import { ChartService } from "../app/services/chart.service";
-import { WindowService } from "../app/services/window.service";
 import { MediaQueryService } from "../app/services/media-query.service";
+import { WindowService } from "../app/services/window.service";
 
 /**
  * Chart Test Harness utility for comprehensive chart testing
  * Part of issue #414 - Hardening Chart Testing Strategy
  */
-export class ChartTestHarness {
+// Minimal contract for chart components we interact with in tests
+interface ChartHostLike {
+  chartService?: {
+    allQuotes?: unknown;
+    indicatorListings?: unknown;
+  };
+  onWindowResize?: (dims: { width: number; height: number }) => void;
+}
+
+export class ChartTestHarness<TComponent extends ChartHostLike = ChartHostLike> {
   private chartInstance: Chart | null = null;
   private mockWindowService: Partial<WindowService> = {};
   private mockMediaQueryService: Partial<MediaQueryService> = {};
 
   constructor(
-    private component: any,
-    private fixture: ComponentFixture<any>
+    private component: TComponent,
+    private fixture: ComponentFixture<TComponent>
   ) {}
 
   /**
    * Create a chart component with test data and configuration
    */
-  static async create<T>(
-    componentType: new (...args: any[]) => T,
+  static async create<T extends ChartHostLike>(
+    componentType: new (...args: never[]) => T,
     testData: {
       quotes?: Quote[];
       indicators?: IndicatorListing[];
       windowSize?: { width: number; height: number };
     } = {}
-  ): Promise<ChartTestHarness> {
+  ): Promise<ChartTestHarness<T>> {
     await TestBed.configureTestingModule({
       declarations: [componentType],
       providers: [
@@ -59,8 +68,7 @@ export class ChartTestHarness {
 
     const fixture = TestBed.createComponent(componentType);
     const component = fixture.componentInstance;
-
-    return new ChartTestHarness(component, fixture);
+    return new ChartTestHarness<T>(component, fixture);
   }
 
   /**
@@ -68,10 +76,11 @@ export class ChartTestHarness {
    */
   injectData(data: { quotes?: Quote[]; indicators?: IndicatorListing[] }): this {
     if (data.quotes && this.component.chartService) {
-      this.component.chartService.allQuotes = data.quotes;
+      (this.component.chartService as { allQuotes?: unknown }).allQuotes = data.quotes;
     }
     if (data.indicators && this.component.chartService) {
-      this.component.chartService.indicatorListings = data.indicators;
+      (this.component.chartService as { indicatorListings?: unknown }).indicatorListings =
+        data.indicators;
     }
     return this;
   }
@@ -121,7 +130,8 @@ export class ChartTestHarness {
    */
   getChartConfig(): ChartConfiguration | null {
     const chart = this.getChartInstance();
-    return chart ? chart.config : null;
+    // Chart.js config can be a discriminated union; cast to broad ChartConfiguration
+    return chart ? (chart.config as ChartConfiguration) : null;
   }
 
   /**

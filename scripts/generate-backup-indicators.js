@@ -9,18 +9,32 @@
 const fs = require('fs');
 const path = require('path');
 
-// Path to server metadata file
+// Path to server metadata file (kept for potential future parsing)
 const serverMetadataPath = path.join(__dirname, '../server/WebApi/Services/Service.Metadata.cs');
-const OUTPUT_RELATIVE = '../client/src/app/data/backup-indicators.ts';
-const resolvedOutput = path.resolve(__dirname, OUTPUT_RELATIVE);
 
-// Whitelist: ensure we only write within project client/src/app/data directory
+// Strict, traversal‑safe construction of output path
 const allowedDir = path.resolve(__dirname, '../client/src/app/data');
-if (!resolvedOutput.startsWith(allowedDir)) {
-  console.error('Refusing to write backup indicators outside allowed directory.');
-  process.exit(2);
+// Build the output path without any '..' segments by joining the fixed allowed directory
+const outputPath = path.join(allowedDir, 'backup-indicators.ts');
+
+// Additional hardening: ensure outputPath truly resides inside allowedDir after resolving symlinks
+function ensureInside(baseDir, targetPath) {
+  const baseReal = fs.realpathSync(baseDir);
+  // If target file does not yet exist its parent directory must be resolved
+  const targetParentReal = fs.realpathSync(path.dirname(targetPath));
+  const relative = path.relative(baseReal, targetParentReal);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) {
+    console.error('Refusing to write backup indicators outside allowed directory.');
+    process.exit(2);
+  }
 }
-const outputPath = resolvedOutput;
+
+try {
+  ensureInside(allowedDir, outputPath);
+} catch (e) {
+  console.error('Directory validation failed:', e.message);
+  process.exit(3);
+}
 
 console.log('Generating backup indicators from server metadata...');
 
