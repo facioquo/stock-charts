@@ -12,29 +12,29 @@ const path = require('path');
 // Path to server metadata file (kept for potential future parsing)
 const serverMetadataPath = path.join(__dirname, '../server/WebApi/Services/Service.Metadata.cs');
 
-// Strict, traversal‑safe construction of output path
+// Strict, traversal‑safe construction of output path.
+// NOTE: No user input is incorporated; still validate real path containment defensively.
 const allowedDir = path.resolve(__dirname, '../client/src/app/data');
-// Build the output path without any '..' segments by joining the fixed allowed directory
 const outputPath = path.join(allowedDir, 'backup-indicators.ts');
 
-// Additional hardening: ensure outputPath truly resides inside allowedDir after resolving symlinks
 function ensureInside(baseDir, targetPath) {
   const baseReal = fs.realpathSync(baseDir);
-  // If target file does not yet exist its parent directory must be resolved
-  const targetParentReal = fs.realpathSync(path.dirname(targetPath));
-  const relative = path.relative(baseReal, targetParentReal);
-  if (relative.startsWith('..') || path.isAbsolute(relative)) {
-    console.error('Refusing to write backup indicators outside allowed directory.');
+  const parent = path.dirname(targetPath);
+  // Ensure parent directory exists (should already) before resolving.
+  if (!fs.existsSync(parent)) {
+    console.error('Expected output directory missing:', parent);
     process.exit(2);
   }
-}
-
-try {
-  ensureInside(allowedDir, outputPath);
-} catch (e) {
-  console.error('Directory validation failed:', e.message);
+  const parentReal = fs.realpathSync(parent);
+  const relative = path.relative(baseReal, parentReal);
+  if (relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative))) {
+    return; // inside
+  }
+  console.error('Refusing to write outside allowed directory.');
   process.exit(3);
 }
+
+ensureInside(allowedDir, outputPath);
 
 console.log('Generating backup indicators from server metadata...');
 
@@ -530,7 +530,7 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
 try {
   const backupIndicators = generateBackupIndicators();
   // Write file with explicit UTF-8 encoding and restrictive permissions when possible
-  fs.writeFileSync(outputPath, backupIndicators, { encoding: 'utf8', mode: 0o644 });
+  fs.writeFileSync(outputPath, backupIndicators, { encoding: 'utf8', mode: 0o644, flag: 'w' });
   console.log(`✅ Generated backup indicators at: ${outputPath}`);
 } catch (error) {
   console.error('Error generating backup indicators:', error.message);

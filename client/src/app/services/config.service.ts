@@ -31,7 +31,7 @@ export class ChartConfigService {
   baseOverlayConfig(volumeAxisSize: number): ChartConfiguration {
     // base configuration
     const config: ChartConfiguration = {
-      type: "candlestick",
+      type: "line", // switched from candlestick pending proper financial plugin typings
       data: {
         datasets: []
       },
@@ -44,7 +44,7 @@ export class ChartConfigService {
   baseOscillatorConfig(): ChartConfiguration {
     // base configuration
     const config: ChartConfiguration = {
-      type: "candlestick", // TODO: should/could this be line or bar?
+      type: "line", // previously candlestick; using line for type safety until plugin added
       data: {
         datasets: []
       },
