@@ -1,4 +1,7 @@
-// types for chartjs-chart-financial
+// Ambient type declarations for chartjs-chart-financial plugin.
+// Adds 'candlestick' and 'ohlc' chart types to the Chart.js type registry.
+// Single canonical source (picked up by tsconfig include) – no triple-slash
+// directives or side-effect imports required.
 
 import {
   BarController,
@@ -54,3 +57,5 @@ declare const OhlcController: ChartComponent & {
 
 declare const CandlestickElement: Element;
 declare const OhlcElement: Element;
+
+export { CandlestickController, CandlestickElement, OhlcController, OhlcElement };
