@@ -57,7 +57,8 @@ export interface IndicatorResultConfig {
   stack: string;
   lineWidth: number | null;
   defaultColor: string;
-  fill: ChartFill;
+  // Some backup listings may not include a fill configuration
+  fill?: ChartFill | null;
   order: number;
 }
 
@@ -71,7 +72,8 @@ export interface ChartThreshold {
   value: number;
   color: string;
   style: string;
-  fill: ChartFill;
+  // Optional fill region; absent in most indicators
+  fill?: ChartFill | null;
 }
 
 export interface ChartFill {

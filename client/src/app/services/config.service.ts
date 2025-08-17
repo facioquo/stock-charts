@@ -252,7 +252,7 @@ export class ChartConfigService {
           borderColor: r.color,
           backgroundColor: r.color,
           fill:
-            c.fill === null
+            c.fill == null
               ? false
               : {
                   target: c.fill.target,

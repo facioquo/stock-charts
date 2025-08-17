@@ -6,7 +6,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open --hmr",
+    "prebuild": "node ../scripts/generate-backup-indicators.js",
     "build": "ng build --configuration=development",
+    "prebuild.prod": "node ../scripts/generate-backup-indicators.js",
     "build.prod": "ng build --configuration=production",
     "build:prod": "npm run build.prod",
     "watch": "ng build --configuration=development --watch",

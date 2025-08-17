@@ -14,7 +14,9 @@
   "license": "Apache-2.0",
   "scripts": {
     "clean": "npm run clean --workspaces",
+    "prebuild": "npm run generate:backup-indicators",
     "build": "npm run build --workspaces",
+    "prebuild:prod": "npm run generate:backup-indicators",
     "build:prod": "npm run build.prod --workspaces",
     "start": "npm run start --workspace=@stock-charts/client",
     "test": "npm run test --workspaces",

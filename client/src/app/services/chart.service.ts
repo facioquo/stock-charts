@@ -455,7 +455,7 @@ export class ChartService implements OnDestroy {
       backgroundColor: threshold.color,
       spanGaps: true,
       fill:
-        threshold.fill === null
+        threshold.fill == null
           ? false
           : {
               target: threshold.fill.target,

@@ -1,38 +1,1007 @@
+// GENERATED FILE - DO NOT EDIT DIRECTLY
+// Regenerate with: npm run generate:backup-indicators
+// Source: http://localhost:5000/indicators (fallback server metadata)
+// Purpose: Client-side failover indicator listings when API is unreachable.
+// Any manual changes will be overwritten on regeneration.
+// Trademark: Bollinger Bands® is a registered trademark of John Bollinger.
+//
 import { IndicatorListing } from "../pages/chart/chart.models";
 
-// Chart colors constants
-const ChartColors = {
-  StandardBlue: "#007bff",
-  StandardRed: "#dc3545",
-  StandardGreen: "#28a745",
-  StandardOrange: "#fd7e14",
-  StandardPurple: "#6f42c1",
-  StandardGray: "#6c757d",
-  StandardGrayTransparent: "#6c757d80",
-  DarkGray: "#343a40",
-  DarkGrayTransparent: "#343a4080",
-  ThresholdRed: "#dc354580",
-  ThresholdGreen: "#28a74580",
-  ThresholdGrayTransparent: "#6c757d40",
-  ThresholdRedTransparent: "#dc354520",
-  ThresholdGreenTransparent: "#28a74520"
-};
-
-/**
- * Backup indicator listings for client-side failover when API is unavailable.
- * Generated from server metadata to avoid manual sync issues.
- * Contains essential technical indicators commonly used in financial analysis.
- */
 export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
-  // Simple Moving Average
   {
-    name: "Simple Moving Average (SMA)",
-    uiid: "SMA",
-    legendTemplate: "SMA([P1])",
-    endpoint: "/SMA/",
+    name: "Average Directional Index (ADX)",
+    uiid: "ADX",
+    legendTemplate: "ADX([P1])",
+    endpoint: "/ADX/",
+    category: "price-trend",
+    chartType: "oscillator",
+    order: 0,
+    chartConfig: {
+      minimumYAxis: null,
+      maximumYAxis: null,
+      thresholds: [
+        {
+          value: 40,
+          color: "ChartColors.ThresholdGrayTransparent",
+          style: "dash",
+          fill: null
+        },
+        {
+          value: 20,
+          color: "ChartColors.ThresholdGrayTransparent",
+          style: "dash",
+          fill: null
+        }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 2,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "ADX",
+        tooltipTemplate: "ADX([P1])",
+        dataName: "adx",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "DI+",
+        tooltipTemplate: "DI+([P1])",
+        dataName: "pdi",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardGreen",
+        fill: null,
+        order: 1
+      },
+      {
+        displayName: "DI-",
+        tooltipTemplate: "DI-([P1])",
+        dataName: "mdi",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 2
+      },
+      {
+        displayName: "ADX Rating",
+        tooltipTemplate: "ADXR([P1])",
+        dataName: "adxr",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: 2,
+        defaultColor: "ChartColors.StandardGrayTransparent",
+        fill: null,
+        order: 3
+      }
+    ]
+  },
+  {
+    name: "Arnaud Legoux Moving Average (ALMA)",
+    uiid: "ALMA",
+    legendTemplate: "ALMA([P1],[P2],[P3])",
+    endpoint: "/ALMA/",
     category: "moving-average",
     chartType: "overlay",
-    order: 0,
+    order: 1,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 9,
+        minimum: 2,
+        maximum: 250
+      },
+      {
+        displayName: "Offset",
+        paramName: "offset",
+        dataType: "number",
+        defaultValue: 0.85,
+        minimum: 0,
+        maximum: 1
+      },
+      {
+        displayName: "Sigma",
+        paramName: "sigma",
+        dataType: "number",
+        defaultValue: 6,
+        minimum: 0.1,
+        maximum: 10
+      }
+    ],
+    results: [
+      {
+        displayName: "ALMA",
+        tooltipTemplate: "ALMA([P1],[P2],[P3])",
+        dataName: "alma",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Aroon Up/Down",
+    uiid: "AROON UP/DOWN",
+    legendTemplate: "AROON([P1]) Up/Down",
+    endpoint: "/AROON/",
+    category: "price-trend",
+    chartType: "oscillator",
+    order: 2,
+    chartConfig: {
+      minimumYAxis: 0,
+      maximumYAxis: 100,
+      thresholds: [
+        {
+          value: 70,
+          color: "ChartColors.ThresholdGrayTransparent",
+          style: "solid",
+          fill: null
+        },
+        {
+          value: 50,
+          color: "ChartColors.ThresholdGrayTransparent",
+          style: "dash",
+          fill: null
+        },
+        {
+          value: 30,
+          color: "ChartColors.ThresholdGrayTransparent",
+          style: "solid",
+          fill: null
+        }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 25,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Aroon Up",
+        tooltipTemplate: "Aroon Up",
+        dataName: "aroonUp",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardGreen",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Aroon Down",
+        tooltipTemplate: "Aroon Down",
+        dataName: "aroonDown",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 1
+      }
+    ]
+  },
+  {
+    name: "Aroon Oscillator",
+    uiid: "AROON OSC",
+    legendTemplate: "AROON([P1]) Oscillator",
+    endpoint: "/AROON/",
+    category: "price-trend",
+    chartType: "oscillator",
+    order: 3,
+    chartConfig: {
+      minimumYAxis: null,
+      maximumYAxis: 100,
+      thresholds: [
+        {
+          value: 0,
+          color: "ChartColors.ThresholdGrayTransparent",
+          style: "dash",
+          fill: null
+        }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 25,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Oscillator",
+        tooltipTemplate: "AROON([P1]) Oscillator",
+        dataName: "oscillator",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "ATR Trailing Stop (Close offset)",
+    uiid: "ATR-STOP-CLOSE",
+    legendTemplate: "ATR-STOP([P1],[P2],CLOSE)",
+    endpoint: "/ATR-STOP-CLOSE/",
+    category: "price-trend",
+    chartType: "overlay",
+    order: 4,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 21,
+        minimum: 1,
+        maximum: 50
+      },
+      {
+        displayName: "Multiplier",
+        paramName: "multiplier",
+        dataType: "number",
+        defaultValue: 3,
+        minimum: 0.1,
+        maximum: 10
+      }
+    ],
+    results: [
+      {
+        displayName: "Buy Stop",
+        tooltipTemplate: "ATR-STOP([P1],[P2],CLOSE) Buy Stop",
+        dataName: "buyStop",
+        dataType: "number",
+        lineType: "dots",
+        stack: "",
+        lineWidth: 2,
+        defaultColor: "ChartColors.StandardGreen",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Sell Stop",
+        tooltipTemplate: "ATR-STOP([P1],[P2],CLOSE) Sell Stop",
+        dataName: "sellStop",
+        dataType: "number",
+        lineType: "dots",
+        stack: "",
+        lineWidth: 2,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 1
+      }
+    ]
+  },
+  {
+    name: "ATR Trailing Stop (High/Low offset)",
+    uiid: "ATR-STOP-HL",
+    legendTemplate: "ATR-STOP([P1],[P2],HIGH/LOW)",
+    endpoint: "/ATR-STOP-HL/",
+    category: "price-trend",
+    chartType: "overlay",
+    order: 5,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 21,
+        minimum: 1,
+        maximum: 50
+      },
+      {
+        displayName: "Multiplier",
+        paramName: "multiplier",
+        dataType: "number",
+        defaultValue: 3,
+        minimum: 0.1,
+        maximum: 10
+      }
+    ],
+    results: [
+      {
+        displayName: "Buy Stop",
+        tooltipTemplate: "ATR-STOP([P1],[P2],HIGH/LOW) Buy Stop",
+        dataName: "buyStop",
+        dataType: "number",
+        lineType: "dots",
+        stack: "",
+        lineWidth: 2,
+        defaultColor: "ChartColors.StandardGreen",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Sell Stop",
+        tooltipTemplate: "ATR-STOP([P1],[P2],HIGH/LOW) Sell Stop",
+        dataName: "sellStop",
+        dataType: "number",
+        lineType: "dots",
+        stack: "",
+        lineWidth: 2,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 1
+      }
+    ]
+  },
+  {
+    name: "Average True Range (ATR)",
+    uiid: "ATR",
+    legendTemplate: "ATR([P1])",
+    endpoint: "/ATR/",
+    category: "price-characteristic",
+    chartType: "oscillator",
+    order: 6,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 2,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Average True Range",
+        tooltipTemplate: "ATR([P1])",
+        dataName: "atr",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Average True Range (ATR) Percent",
+    uiid: "ATRP",
+    legendTemplate: "ATR([P1]) %",
+    endpoint: "/ATR/",
+    category: "price-characteristic",
+    chartType: "oscillator",
+    order: 7,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 2,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Average True Range Percent",
+        tooltipTemplate: "ATR([P1]) %",
+        dataName: "atrp",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Beta",
+    uiid: "BETA",
+    legendTemplate: "BETA([P1])",
+    endpoint: "/BETA/",
+    category: "price-characteristic",
+    chartType: "oscillator",
+    order: 8,
+    chartConfig: {
+      minimumYAxis: null,
+      maximumYAxis: null,
+      thresholds: [
+        {
+          value: 1,
+          color: "ChartColors.ThresholdGrayTransparent",
+          style: "dash",
+          fill: null
+        }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 50,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Beta",
+        tooltipTemplate: "Beta",
+        dataName: "beta",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Beta+",
+        tooltipTemplate: "Beta+",
+        dataName: "betaUp",
+        dataType: "number",
+        lineType: "dash",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardGreen",
+        fill: null,
+        order: 1
+      },
+      {
+        displayName: "Beta-",
+        tooltipTemplate: "Beta-",
+        dataName: "betaDown",
+        dataType: "number",
+        lineType: "dash",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 2
+      }
+    ]
+  },
+  {
+    name: "Bollinger Bands®",
+    uiid: "BB",
+    legendTemplate: "BB([P1],[P2])",
+    endpoint: "/BB/",
+    category: "price-channel",
+    chartType: "overlay",
+    order: 9,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 20,
+        minimum: 2,
+        maximum: 250
+      },
+      {
+        displayName: "Standard Deviations",
+        paramName: "standardDeviations",
+        dataType: "number",
+        defaultValue: 2,
+        minimum: 0.01,
+        maximum: 10
+      }
+    ],
+    results: [
+      {
+        displayName: "Upper Band",
+        tooltipTemplate: "BB([P1],[P2]) Upper Band",
+        dataName: "upperBand",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: 1,
+        defaultColor: "ChartColors.DarkGray",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Centerline",
+        tooltipTemplate: "BB([P1],[P2]) Centerline",
+        dataName: "sma",
+        dataType: "number",
+        lineType: "dash",
+        stack: "",
+        lineWidth: 1,
+        defaultColor: "ChartColors.DarkGray",
+        fill: null,
+        order: 1
+      },
+      {
+        displayName: "Lower Band",
+        tooltipTemplate: "BB([P1],[P2]) Lower Band",
+        dataName: "lowerBand",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: 1,
+        defaultColor: "ChartColors.DarkGray",
+        fill: null,
+        order: 2
+      }
+    ]
+  },
+  {
+    name: "Bollinger Bands® %B",
+    uiid: "BB-PCTB",
+    legendTemplate: "BB([P1],[P2]) %B",
+    endpoint: "/BB/",
+    category: "oscillator",
+    chartType: "oscillator",
+    order: 10,
+    chartConfig: {
+      minimumYAxis: null,
+      maximumYAxis: null,
+      thresholds: [
+        {
+          value: 1,
+          color: "ChartColors.ThresholdRed",
+          style: "dash",
+          fill: null
+        },
+        {
+          value: 0,
+          color: "ChartColors.ThresholdGreen",
+          style: "dash",
+          fill: null
+        }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 20,
+        minimum: 2,
+        maximum: 250
+      },
+      {
+        displayName: "Standard Deviations",
+        paramName: "standardDeviations",
+        dataType: "number",
+        defaultValue: 2,
+        minimum: 0.01,
+        maximum: 10
+      }
+    ],
+    results: [
+      {
+        displayName: "%B",
+        tooltipTemplate: "BB([P1],[P2]) %B",
+        dataName: "percentB",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Chaikin Money Flow (CMF)",
+    uiid: "CMF",
+    legendTemplate: "CMF([P1])",
+    endpoint: "/CMF/",
+    category: "volume-based",
+    chartType: "oscillator",
+    order: 11,
+    chartConfig: {
+      minimumYAxis: null,
+      maximumYAxis: null,
+      thresholds: [
+        {
+          value: 0,
+          color: "ChartColors.ThresholdGrayTransparent",
+          style: "dash",
+          fill: null
+        }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 20,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "CMF",
+        tooltipTemplate: "Chaikin Money Flow",
+        dataName: "cmf",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Chande Momentum Oscillator",
+    uiid: "CMO",
+    legendTemplate: "CMO([P1])",
+    endpoint: "/CMO/",
+    category: "oscillator",
+    chartType: "oscillator",
+    order: 12,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Chande Momentum Oscillator",
+        tooltipTemplate: "CMO([P1])",
+        dataName: "cmo",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Chandelier Exit (long)",
+    uiid: "CHEXIT-LONG",
+    legendTemplate: "CHANDELIER([P1],[P2],LONG)",
+    endpoint: "/CHEXIT-LONG/",
+    category: "stop-and-reverse",
+    chartType: "overlay",
+    order: 13,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 22,
+        minimum: 1,
+        maximum: 250
+      },
+      {
+        displayName: "Multiplier",
+        paramName: "multiplier",
+        dataType: "number",
+        defaultValue: 3,
+        minimum: 1,
+        maximum: 10
+      }
+    ],
+    results: [
+      {
+        displayName: "Chandelier Exit",
+        tooltipTemplate: "CHANDELIER([P1],[P2],LONG)",
+        dataName: "chandelierExit",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardOrange",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Chandelier Exit (short)",
+    uiid: "CHEXIT-SHORT",
+    legendTemplate: "CHANDELIER([P1],[P2],SHORT)",
+    endpoint: "/CHEXIT-SHORT/",
+    category: "stop-and-reverse",
+    chartType: "overlay",
+    order: 14,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 22,
+        minimum: 1,
+        maximum: 250
+      },
+      {
+        displayName: "Multiplier",
+        paramName: "multiplier",
+        dataType: "number",
+        defaultValue: 3,
+        minimum: 1,
+        maximum: 10
+      }
+    ],
+    results: [
+      {
+        displayName: "Chandelier Exit",
+        tooltipTemplate: "CHANDELIER([P1],[P2],SHORT)",
+        dataName: "chandelierExit",
+        dataType: "number",
+        lineType: "dash",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardOrange",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Choppiness Index",
+    uiid: "CHOP",
+    legendTemplate: "CHOP([P1])",
+    endpoint: "/CHOP/",
+    category: "oscillator",
+    chartType: "oscillator",
+    order: 15,
+    chartConfig: {
+      minimumYAxis: 0,
+      maximumYAxis: 100,
+      thresholds: [
+        {
+          value: 61.8,
+          color: "ChartColors.DarkGrayTransparent",
+          style: "dash",
+          fill: null
+        },
+        {
+          value: 38.2,
+          color: "ChartColors.DarkGrayTransparent",
+          style: "dash",
+          fill: null
+        }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Choppiness",
+        tooltipTemplate: "Choppiness",
+        dataName: "chop",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "ConnorsRSI (CRSI)",
+    uiid: "CRSI",
+    legendTemplate: "CRSI([P1],[P2],[P3])",
+    endpoint: "/CRSI/",
+    category: "oscillator",
+    chartType: "oscillator",
+    order: 16,
+    chartConfig: {
+      minimumYAxis: 0,
+      maximumYAxis: 100,
+      thresholds: [
+        {
+          value: 90,
+          color: "ChartColors.ThresholdRed",
+          style: "dash",
+          fill: null
+        },
+        {
+          value: 10,
+          color: "ChartColors.ThresholdGreen",
+          style: "dash",
+          fill: null
+        }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "rsiPeriods",
+        dataType: "int",
+        defaultValue: 3,
+        minimum: 2,
+        maximum: 250
+      },
+      {
+        displayName: "Streak Periods",
+        paramName: "streakPeriods",
+        dataType: "int",
+        defaultValue: 2,
+        minimum: 2,
+        maximum: 50
+      },
+      {
+        displayName: "Rank Periods",
+        paramName: "rankPeriods",
+        dataType: "int",
+        defaultValue: 100,
+        minimum: 2,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "CRSI",
+        tooltipTemplate: "CRSI([P1],[P2],[P3])",
+        dataName: "connorsRsi",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Doji",
+    uiid: "DOJI",
+    legendTemplate: "DOJI([P1]%)",
+    endpoint: "/DOJI/",
+    category: "candlestick-pattern",
+    chartType: "overlay",
+    order: 17,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Max Price Change %",
+        paramName: "maxPriceChangePercent",
+        dataType: "number",
+        defaultValue: 0.1,
+        minimum: 0,
+        maximum: 0.5
+      }
+    ],
+    results: [
+      {
+        displayName: "Doji",
+        tooltipTemplate: "DOJI([P1]%)",
+        dataName: "price",
+        dataType: "number",
+        lineType: "pointer",
+        stack: "",
+        lineWidth: 8,
+        defaultColor: "ChartColors.DarkGray",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Dominant Cycle Periods",
+    uiid: "DCPERIOD",
+    legendTemplate: "DC PERIODS",
+    endpoint: "/HTL/",
+    category: "price-characteristic",
+    chartType: "oscillator",
+    order: 18,
+    chartConfig: {
+      minimumYAxis: 0,
+      maximumYAxis: null,
+      thresholds: []
+    },
+    parameters: [],
+    results: [
+      {
+        displayName: "DC PERIODS",
+        tooltipTemplate: "DC PERIODS",
+        dataName: "dcPeriods",
+        dataType: "number",
+        lineType: "bar",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Donchian Channels",
+    uiid: "DONCHIAN",
+    legendTemplate: "DONCHIAN([P1])",
+    endpoint: "/DONCHIAN/",
+    category: "price-channel",
+    chartType: "overlay",
+    order: 19,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 20,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: []
+  },
+  {
+    name: "McGinley Dynamic",
+    uiid: "DYN",
+    legendTemplate: "DYNAMIC([P1])",
+    endpoint: "/DYN/",
+    category: "moving-average",
+    chartType: "overlay",
+    order: 20,
     chartConfig: null,
     parameters: [
       {
@@ -46,25 +1015,99 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
     ],
     results: [
       {
-        displayName: "SMA",
-        tooltipTemplate: "SMA([P1])",
-        dataName: "sma",
+        displayName: "Dynamic",
+        tooltipTemplate: "DYNAMIC([P1])",
+        dataName: "dynamic",
         dataType: "number",
         lineType: "solid",
         stack: "",
         lineWidth: null,
-        defaultColor: ChartColors.StandardBlue,
-        fill: {
-          target: "",
-          colorAbove: "",
-          colorBelow: ""
-        },
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
         order: 0
       }
     ]
   },
-
-  // Exponential Moving Average
+  {
+    name: "Elder-ray Index",
+    uiid: "ELDER-RAY",
+    legendTemplate: "ELDER-RAY([P1])",
+    endpoint: "/ELDER-RAY/",
+    category: "price-trend",
+    chartType: "oscillator",
+    order: 21,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 13,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Bull Power",
+        tooltipTemplate: "Bull Power",
+        dataName: "bullPower",
+        dataType: "number",
+        lineType: "bar",
+        stack: "eray",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardGreen",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Bear Power",
+        tooltipTemplate: "Bear Power",
+        dataName: "bearPower",
+        dataType: "number",
+        lineType: "bar",
+        stack: "eray",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 1
+      }
+    ]
+  },
+  {
+    name: "Endpoint Moving Average (EPMA)",
+    uiid: "EPMA",
+    legendTemplate: "EPMA([P1])",
+    endpoint: "/EPMA/",
+    category: "moving-average",
+    chartType: "overlay",
+    order: 22,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 10,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "EPMA",
+        tooltipTemplate: "EPMA([P1])",
+        dataName: "epma",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
   {
     name: "Exponential Moving Average (EMA)",
     uiid: "EMA",
@@ -72,7 +1115,7 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
     endpoint: "/EMA/",
     category: "moving-average",
     chartType: "overlay",
-    order: 0,
+    order: 23,
     chartConfig: null,
     parameters: [
       {
@@ -93,49 +1136,379 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
         lineType: "solid",
         stack: "",
         lineWidth: null,
-        defaultColor: ChartColors.StandardBlue,
-        fill: {
-          target: "",
-          colorAbove: "",
-          colorBelow: ""
-        },
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
         order: 0
       }
     ]
   },
-
-  // Relative Strength Index
   {
-    name: "Relative Strength Index (RSI)",
-    uiid: "RSI",
-    legendTemplate: "RSI([P1])",
-    endpoint: "/RSI/",
-    category: "oscillator",
+    name: "Ehlers Fisher Transform",
+    uiid: "FISHER",
+    legendTemplate: "FISHER([P1])",
+    endpoint: "/FISHER/",
+    category: "price-transform",
     chartType: "oscillator",
-    order: 0,
+    order: 24,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 10,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Fisher Transform",
+        tooltipTemplate: "Fisher Transform",
+        dataName: "fisher",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Trigger",
+        tooltipTemplate: "Trigger",
+        dataName: "trigger",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 1
+      }
+    ]
+  },
+  {
+    name: "Williams Fractal (high/low)",
+    uiid: "FRACTAL",
+    legendTemplate: "FRACTAL([P1])",
+    endpoint: "/FRACTAL/",
+    category: "price-pattern",
+    chartType: "overlay",
+    order: 25,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Window Span",
+        paramName: "windowSpan",
+        dataType: "int",
+        defaultValue: 2,
+        minimum: 1,
+        maximum: 100
+      }
+    ],
+    results: [
+      {
+        displayName: "Fractal Bull",
+        tooltipTemplate: "Fractal Bull ([P1])",
+        dataName: "fractalBull",
+        dataType: "number",
+        lineType: "dots",
+        stack: "",
+        lineWidth: 3,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Fractal Bear",
+        tooltipTemplate: "Fractal Bear ([P1])",
+        dataName: "fractalBear",
+        dataType: "number",
+        lineType: "dots",
+        stack: "",
+        lineWidth: 3,
+        defaultColor: "ChartColors.StandardGreen",
+        fill: null,
+        order: 1
+      }
+    ]
+  },
+  {
+    name: "Fractal Chaos Bands",
+    uiid: "FCB",
+    legendTemplate: "FCB([P1])",
+    endpoint: "/FCB/",
+    category: "price-channels",
+    chartType: "overlay",
+    order: 26,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Window Span",
+        paramName: "windowSpan",
+        dataType: "int",
+        defaultValue: 2,
+        minimum: 2,
+        maximum: 30
+      }
+    ],
+    results: [
+      {
+        displayName: "FCB([P1]) Upper Band",
+        tooltipTemplate: "Upper Band",
+        dataName: "upperBand",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardGreen",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Lower Band",
+        tooltipTemplate: "FCB([P1]) Lower Band",
+        dataName: "lowerBand",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 1
+      }
+    ]
+  },
+  {
+    name: "Hilbert Transform Instantaneous Trendline",
+    uiid: "HT Trendline",
+    legendTemplate: "HT TRENDLINE",
+    endpoint: "/HTL/",
+    category: "moving-average",
+    chartType: "overlay",
+    order: 27,
+    chartConfig: null,
+    parameters: [],
+    results: [
+      {
+        displayName: "HT Trendline",
+        tooltipTemplate: "HT Trendline",
+        dataName: "trendline",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "HT Smoothed Price",
+        tooltipTemplate: "HT Smooth Price",
+        dataName: "smoothPrice",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardOrange",
+        fill: null,
+        order: 1
+      }
+    ]
+  },
+  {
+    name: "Ichimoku Cloud",
+    uiid: "ICHIMOKU",
+    legendTemplate: "ICHIMOKU([P1],[P2],[P3])",
+    endpoint: "/ICHIMOKU/",
+    category: "price-trend",
+    chartType: "overlay",
+    order: 28,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Tenkan Periods",
+        paramName: "tenkanPeriods",
+        dataType: "int",
+        defaultValue: 9,
+        minimum: 1,
+        maximum: 250
+      },
+      {
+        displayName: "Kijun Periods",
+        paramName: "kijunPeriods",
+        dataType: "int",
+        defaultValue: 26,
+        minimum: 2,
+        maximum: 250
+      },
+      {
+        displayName: "Senkou Periods",
+        paramName: "senkouBPeriods",
+        dataType: "int",
+        defaultValue: 52,
+        minimum: 3,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Tenkan-sen",
+        tooltipTemplate: "ICHIMOKU([P1],[P2],[P3] Tenkan-sen",
+        dataName: "tenkanSen",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: 2,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Kijun-sen",
+        tooltipTemplate: "ICHIMOKU([P1],[P2],[P3] Kijun-sen",
+        dataName: "kijunSen",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: 2,
+        defaultColor: "ChartColors.StandardPurple",
+        fill: null,
+        order: 1
+      },
+      {
+        displayName: "Chikou span",
+        tooltipTemplate: "ICHIMOKU([P1],[P2],[P3] Chikou span",
+        dataName: "chikouSpan",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: 2,
+        defaultColor: "ChartColors.DarkGray",
+        fill: null,
+        order: 2
+      },
+      {
+        displayName: "Senkou span A",
+        tooltipTemplate: "ICHIMOKU([P1],[P2],[P3] Senkou span A",
+        dataName: "senkouSpanA",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: 1.5,
+        defaultColor: "ChartColors.ThresholdGreen",
+        fill: null,
+        order: 3
+      },
+      {
+        displayName: "Senkou span B",
+        tooltipTemplate: "ICHIMOKU([P1],[P2],[P3] Senkou span B",
+        dataName: "senkouSpanB",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: 1.5,
+        defaultColor: "ChartColors.ThresholdRed",
+        fill: null,
+        order: 4
+      }
+    ]
+  },
+  {
+    name: "Keltner Channels",
+    uiid: "KELTNER",
+    legendTemplate: "KELTNER([P1],[P2],[P3])",
+    endpoint: "/KELTNER/",
+    category: "price-channel",
+    chartType: "overlay",
+    order: 29,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "EMA Periods",
+        paramName: "emaPeriods",
+        dataType: "int",
+        defaultValue: 20,
+        minimum: 2,
+        maximum: 250
+      },
+      {
+        displayName: "Multiplier",
+        paramName: "multiplier",
+        dataType: "number",
+        defaultValue: 2,
+        minimum: 0.01,
+        maximum: 10
+      },
+      {
+        displayName: "ATR Periods",
+        paramName: "atrPeriods",
+        dataType: "number",
+        defaultValue: 10,
+        minimum: 2,
+        maximum: 250
+      }
+    ],
+    results: []
+  },
+  {
+    name: "Marubozu",
+    uiid: "MARUBOZU",
+    legendTemplate: "MARUBOZU([P1]%)",
+    endpoint: "/MARUBOZU/",
+    category: "candlestick-pattern",
+    chartType: "overlay",
+    order: 30,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Min Body Percent %",
+        paramName: "minBodyPercent",
+        dataType: "number",
+        defaultValue: 90,
+        minimum: 80,
+        maximum: 100
+      }
+    ],
+    results: [
+      {
+        displayName: "Marubozu",
+        tooltipTemplate: "MARUBOZU([P1]%)",
+        dataName: "price",
+        dataType: "number",
+        lineType: "pointer",
+        stack: "",
+        lineWidth: 8,
+        defaultColor: "ChartColors.DarkGray",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Money Flow Index (MFI)",
+    uiid: "MFI",
+    legendTemplate: "MFI([P1])",
+    endpoint: "/MFI/",
+    category: "volume-based",
+    chartType: "oscillator",
+    order: 31,
     chartConfig: {
       minimumYAxis: 0,
       maximumYAxis: 100,
       thresholds: [
         {
-          value: 70,
-          color: ChartColors.ThresholdRed,
+          value: 80,
+          color: "ChartColors.ThresholdRed",
           style: "dash",
-          fill: {
-            target: "+2",
-            colorAbove: "transparent",
-            colorBelow: ChartColors.ThresholdGreen
-          }
+          fill: null
         },
         {
-          value: 30,
-          color: ChartColors.ThresholdGreen,
+          value: 20,
+          color: "ChartColors.ThresholdGreen",
           style: "dash",
-          fill: {
-            target: "+1",
-            colorAbove: ChartColors.ThresholdRed,
-            colorBelow: "transparent"
-          }
+          fill: null
         }
       ]
     },
@@ -151,25 +1524,19 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
     ],
     results: [
       {
-        displayName: "RSI",
-        tooltipTemplate: "RSI([P1])",
-        dataName: "rsi",
+        displayName: "MFI",
+        tooltipTemplate: "MFI([P1])",
+        dataName: "mfi",
         dataType: "number",
         lineType: "solid",
         stack: "",
         lineWidth: null,
-        defaultColor: ChartColors.StandardBlue,
-        fill: {
-          target: "",
-          colorAbove: "",
-          colorBelow: ""
-        },
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
         order: 0
       }
     ]
   },
-
-  // MACD
   {
     name: "Moving Average Convergence/Divergence (MACD)",
     uiid: "MACD",
@@ -177,20 +1544,16 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
     endpoint: "/MACD/",
     category: "price-trend",
     chartType: "oscillator",
-    order: 0,
+    order: 32,
     chartConfig: {
       minimumYAxis: null,
       maximumYAxis: null,
       thresholds: [
         {
           value: 0,
-          color: ChartColors.DarkGrayTransparent,
+          color: "ChartColors.DarkGrayTransparent",
           style: "dash",
-          fill: {
-            target: "",
-            colorAbove: "",
-            colorBelow: ""
-          }
+          fill: null
         }
       ]
     },
@@ -229,12 +1592,8 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
         lineType: "solid",
         stack: "",
         lineWidth: null,
-        defaultColor: ChartColors.StandardBlue,
-        fill: {
-          target: "",
-          colorAbove: "",
-          colorBelow: ""
-        },
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
         order: 0
       },
       {
@@ -245,12 +1604,8 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
         lineType: "solid",
         stack: "",
         lineWidth: null,
-        defaultColor: ChartColors.StandardRed,
-        fill: {
-          target: "",
-          colorAbove: "",
-          colorBelow: ""
-        },
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
         order: 1
       },
       {
@@ -261,98 +1616,540 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
         lineType: "bar",
         stack: "",
         lineWidth: null,
-        defaultColor: ChartColors.StandardGrayTransparent,
-        fill: {
-          target: "",
-          colorAbove: "",
-          colorBelow: ""
-        },
+        defaultColor: "ChartColors.StandardGrayTransparent",
+        fill: null,
         order: 2
       }
     ]
   },
-
-  // Bollinger Bands
   {
-    name: "Bollinger Bands®",
-    uiid: "BB",
-    legendTemplate: "BB([P1],[P2])",
-    endpoint: "/BB/",
-    category: "price-channel",
+    name: "Parabolic Stop and Reverse (SAR)",
+    uiid: "PSAR",
+    legendTemplate: "PSAR([P1],[P2])",
+    endpoint: "/PSAR/",
+    category: "stop-and-reverse",
     chartType: "overlay",
-    order: 0,
+    order: 33,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Step Size",
+        paramName: "accelerationStep",
+        dataType: "number",
+        defaultValue: 0.02,
+        minimum: 0.000001,
+        maximum: 2500
+      },
+      {
+        displayName: "Max Factor",
+        paramName: "maxAccelerationFactor",
+        dataType: "number",
+        defaultValue: 0.2,
+        minimum: 0.000001,
+        maximum: 2500
+      }
+    ],
+    results: [
+      {
+        displayName: "Parabolic SAR",
+        tooltipTemplate: "PSAR([P1],[P2])",
+        dataName: "sar",
+        dataType: "number",
+        lineType: "dots",
+        stack: "",
+        lineWidth: 2,
+        defaultColor: "ChartColors.StandardPurple",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Rate of Change",
+    uiid: "ROC",
+    legendTemplate: "ROC([P1],[P2])",
+    endpoint: "/ROC/",
+    category: "oscillator",
+    chartType: "oscillator",
+    order: 34,
     chartConfig: null,
     parameters: [
       {
         displayName: "Lookback Periods",
         paramName: "lookbackPeriods",
         dataType: "int",
-        defaultValue: 20,
-        minimum: 2,
+        defaultValue: 14,
+        minimum: 1,
         maximum: 250
       },
       {
-        displayName: "Standard Deviations",
-        paramName: "standardDeviations",
-        dataType: "number",
-        defaultValue: 2,
-        minimum: 0.01,
-        maximum: 10
+        displayName: "SMA Periods",
+        paramName: "smaPeriods",
+        dataType: "int",
+        defaultValue: 3,
+        minimum: 1,
+        maximum: 50
       }
     ],
     results: [
       {
-        displayName: "Upper Band",
-        tooltipTemplate: "BB([P1],[P2]) Upper Band",
-        dataName: "upperBand",
+        displayName: "Rate of Change",
+        tooltipTemplate: "ROC([P1],[P2])",
+        dataName: "roc",
         dataType: "number",
         lineType: "solid",
         stack: "",
-        lineWidth: 1,
-        defaultColor: ChartColors.DarkGray,
-        fill: {
-          target: "+2",
-          colorAbove: ChartColors.DarkGrayTransparent,
-          colorBelow: ChartColors.DarkGrayTransparent
-        },
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
         order: 0
       },
       {
-        displayName: "Centerline",
-        tooltipTemplate: "BB([P1],[P2]) Centerline",
-        dataName: "sma",
-        dataType: "number",
-        lineType: "dash",
-        stack: "",
-        lineWidth: 1,
-        defaultColor: ChartColors.DarkGray,
-        fill: {
-          target: "",
-          colorAbove: "",
-          colorBelow: ""
-        },
-        order: 1
-      },
-      {
-        displayName: "Lower Band",
-        tooltipTemplate: "BB([P1],[P2]) Lower Band",
-        dataName: "lowerBand",
+        displayName: "SMA of ROC",
+        tooltipTemplate: "STO %D([P2])",
+        dataName: "rocSma",
         dataType: "number",
         lineType: "solid",
         stack: "",
-        lineWidth: 1,
-        defaultColor: ChartColors.DarkGray,
-        fill: {
-          target: "",
-          colorAbove: "",
-          colorBelow: ""
-        },
-        order: 2
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 1
       }
     ]
   },
-
-  // Stochastic Oscillator
+  {
+    name: "Relative Strength Index (RSI)",
+    uiid: "RSI",
+    legendTemplate: "RSI([P1])",
+    endpoint: "/RSI/",
+    category: "oscillator",
+    chartType: "oscillator",
+    order: 35,
+    chartConfig: {
+      minimumYAxis: 0,
+      maximumYAxis: 100,
+      thresholds: [
+        {
+          value: 70,
+          color: "ChartColors.ThresholdRed",
+          style: "dash",
+          fill: null
+        },
+        {
+          value: 30,
+          color: "ChartColors.ThresholdGreen",
+          style: "dash",
+          fill: null
+        }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "RSI",
+        tooltipTemplate: "RSI([P1])",
+        dataName: "rsi",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Schaff Trend Cycle (STC)",
+    uiid: "STC",
+    legendTemplate: "STC([P1],[P2],[P3])",
+    endpoint: "/STC/",
+    category: "oscillator",
+    chartType: "oscillator",
+    order: 36,
+    chartConfig: {
+      minimumYAxis: 0,
+      maximumYAxis: 100,
+      thresholds: [
+        {
+          value: 75,
+          color: "ChartColors.ThresholdGreen",
+          style: "solid",
+          fill: null
+        },
+        {
+          value: 25,
+          color: "ChartColors.ThresholdRed",
+          style: "solid",
+          fill: null
+        }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "Cycle Periods",
+        paramName: "cyclePeriods",
+        dataType: "int",
+        defaultValue: 10,
+        minimum: 1,
+        maximum: 250
+      },
+      {
+        displayName: "Fast Periods",
+        paramName: "fastPeriods",
+        dataType: "int",
+        defaultValue: 23,
+        minimum: 1,
+        maximum: 250
+      },
+      {
+        displayName: "Slow Periods",
+        paramName: "slowPeriods",
+        dataType: "int",
+        defaultValue: 50,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Schaff Trend Cycle",
+        tooltipTemplate: "Schaff Trend Cycle",
+        dataName: "stc",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Slope",
+    uiid: "SLOPE",
+    legendTemplate: "SLOPE([P1])",
+    endpoint: "/SLOPE/",
+    category: "price-characteristic",
+    chartType: "oscillator",
+    order: 37,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 2,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Slope",
+        tooltipTemplate: "SLOPE([P1])",
+        dataName: "slope",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Linear Regression",
+    uiid: "LINEAR",
+    legendTemplate: "LINEAR([P1])",
+    endpoint: "/SLOPE/",
+    category: "price-characteristic",
+    chartType: "overlay",
+    order: 38,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Linear Regression",
+        tooltipTemplate: "LINEAR([P1])",
+        dataName: "line",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Simple Moving Average (SMA)",
+    uiid: "SMA",
+    legendTemplate: "SMA([P1])",
+    endpoint: "/SMA/",
+    category: "moving-average",
+    chartType: "overlay",
+    order: 39,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 10,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "SMA",
+        tooltipTemplate: "SMA([P1])",
+        dataName: "sma",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Standard Deviation (absolute)",
+    uiid: "STDEV",
+    legendTemplate: "STDEV([P1])",
+    endpoint: "/STDEV/",
+    category: "price-characteristic",
+    chartType: "oscillator",
+    order: 40,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 1,
+        maximum: 250
+      },
+      {
+        displayName: "SMA Periods",
+        paramName: "smaPeriods",
+        dataType: "int",
+        defaultValue: 3,
+        minimum: 1,
+        maximum: 50
+      }
+    ],
+    results: [
+      {
+        displayName: "Standard Deviation",
+        tooltipTemplate: "STDEV([P1])",
+        dataName: "stdDev",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "SMA of Standard Deviation",
+        tooltipTemplate: "STDEV([P1]) SMA",
+        dataName: "stdDevSma",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 1
+      }
+    ]
+  },
+  {
+    name: "Standard Deviation (Z-Score)",
+    uiid: "STDEV-ZSCORE",
+    legendTemplate: "STDEV-ZSCORE([P1])",
+    endpoint: "/STDEV/",
+    category: "price-characteristic",
+    chartType: "oscillator",
+    order: 41,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Z-Score",
+        tooltipTemplate: "Z-Score([P1])",
+        dataName: "zScore",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "STARC Bands",
+    uiid: "STARC",
+    legendTemplate: "STARC([P1],[P2],[P3])",
+    endpoint: "/STARC/",
+    category: "price-channel",
+    chartType: "overlay",
+    order: 42,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "SMA Periods",
+        paramName: "smaPeriods",
+        dataType: "int",
+        defaultValue: 5,
+        minimum: 1,
+        maximum: 50
+      },
+      {
+        displayName: "Multiplier",
+        paramName: "multiplier",
+        dataType: "number",
+        defaultValue: 2,
+        minimum: 1,
+        maximum: 10
+      },
+      {
+        displayName: "ATR Periods",
+        paramName: "atrPeriods",
+        dataType: "int",
+        defaultValue: 10,
+        minimum: 1,
+        maximum: 50
+      }
+    ],
+    results: []
+  },
+  {
+    name: "Stochastic Momentum Index",
+    uiid: "SMI",
+    legendTemplate: "SMI([P1],[P2],[P3],[P4])",
+    endpoint: "/SMI/",
+    category: "oscillator",
+    chartType: "oscillator",
+    order: 43,
+    chartConfig: {
+      minimumYAxis: null,
+      maximumYAxis: null,
+      thresholds: [
+        {
+          value: 40,
+          color: "ChartColors.ThresholdRed",
+          style: "dash",
+          fill: null
+        },
+        {
+          value: 0,
+          color: "ChartColors.ThresholdGreen",
+          style: "dash",
+          fill: null
+        }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 13,
+        minimum: 1,
+        maximum: 300
+      },
+      {
+        displayName: "First Smooth Periods",
+        paramName: "firstSmoothPeriods",
+        dataType: "int",
+        defaultValue: 25,
+        minimum: 1,
+        maximum: 300
+      },
+      {
+        displayName: "Second Smooth Periods",
+        paramName: "secondSmoothPeriods",
+        dataType: "int",
+        defaultValue: 2,
+        minimum: 1,
+        maximum: 50
+      },
+      {
+        displayName: "Signal Periods",
+        paramName: "signalPeriods",
+        dataType: "int",
+        defaultValue: 9,
+        minimum: 1,
+        maximum: 50
+      }
+    ],
+    results: [
+      {
+        displayName: "SMI",
+        tooltipTemplate: "SMI",
+        dataName: "smi",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Signal",
+        tooltipTemplate: "Signal",
+        dataName: "signal",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 1
+      }
+    ]
+  },
   {
     name: "Stochastic Oscillator",
     uiid: "STO",
@@ -360,30 +2157,22 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
     endpoint: "/STO/",
     category: "oscillator",
     chartType: "oscillator",
-    order: 0,
+    order: 44,
     chartConfig: {
       minimumYAxis: null,
       maximumYAxis: null,
       thresholds: [
         {
           value: 80,
-          color: ChartColors.ThresholdRed,
+          color: "ChartColors.ThresholdRed",
           style: "dash",
-          fill: {
-            target: "+2",
-            colorAbove: "transparent",
-            colorBelow: ChartColors.ThresholdGreen
-          }
+          fill: null
         },
         {
           value: 20,
-          color: ChartColors.ThresholdGreen,
+          color: "ChartColors.ThresholdGreen",
           style: "dash",
-          fill: {
-            target: "+1",
-            colorAbove: ChartColors.ThresholdRed,
-            colorBelow: "transparent"
-          }
+          fill: null
         }
       ]
     },
@@ -414,12 +2203,8 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
         lineType: "solid",
         stack: "",
         lineWidth: null,
-        defaultColor: ChartColors.StandardBlue,
-        fill: {
-          target: "",
-          colorAbove: "",
-          colorBelow: ""
-        },
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
         order: 0
       },
       {
@@ -430,26 +2215,207 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
         lineType: "solid",
         stack: "",
         lineWidth: null,
-        defaultColor: ChartColors.StandardRed,
-        fill: {
-          target: "",
-          colorAbove: "",
-          colorBelow: ""
-        },
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
         order: 1
       }
     ]
   },
-
-  // Average True Range
   {
-    name: "Average True Range (ATR)",
-    uiid: "ATR",
-    legendTemplate: "ATR([P1])",
-    endpoint: "/ATR/",
+    name: "Stochastic RSI",
+    uiid: "STOCHRSI",
+    legendTemplate: "STOCH-RSI ([P1],[P2],[P3],[P4])",
+    endpoint: "/STORSI/",
+    category: "oscillator",
+    chartType: "oscillator",
+    order: 45,
+    chartConfig: {
+      minimumYAxis: null,
+      maximumYAxis: null,
+      thresholds: [
+        {
+          value: 80,
+          color: "ChartColors.ThresholdRed",
+          style: "dash",
+          fill: null
+        },
+        {
+          value: 20,
+          color: "ChartColors.ThresholdGreen",
+          style: "dash",
+          fill: null
+        }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "RSI Periods",
+        paramName: "rsiPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 1,
+        maximum: 250
+      },
+      {
+        displayName: "Stochastic Periods",
+        paramName: "stochPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 1,
+        maximum: 250
+      },
+      {
+        displayName: "Signal Periods",
+        paramName: "signalPeriods",
+        dataType: "int",
+        defaultValue: 3,
+        minimum: 1,
+        maximum: 50
+      },
+      {
+        displayName: "Smooth Periods",
+        paramName: "smoothPeriods",
+        dataType: "int",
+        defaultValue: 1,
+        minimum: 1,
+        maximum: 50
+      }
+    ],
+    results: [
+      {
+        displayName: "Oscillator",
+        tooltipTemplate: "StochRSI Oscillator",
+        dataName: "stochRsi",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Signal line",
+        tooltipTemplate: "Signal line",
+        dataName: "signal",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 1
+      }
+    ]
+  },
+  {
+    name: "SuperTrend",
+    uiid: "SUPERTREND",
+    legendTemplate: "SUPERTREND([P1],[P2])",
+    endpoint: "/SUPERTREND/",
+    category: "price-trend",
+    chartType: "overlay",
+    order: 46,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 10,
+        minimum: 1,
+        maximum: 50
+      },
+      {
+        displayName: "Multiplier",
+        paramName: "multiplier",
+        dataType: "number",
+        defaultValue: 3,
+        minimum: 0.1,
+        maximum: 10
+      }
+    ],
+    results: [
+      {
+        displayName: "Upper Band",
+        tooltipTemplate: "SUPERTREND([P1],[P2]) Upper Band",
+        dataName: "upperBand",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Lower Band",
+        tooltipTemplate: "SUPERTREND([P1],[P2]) Lower Band",
+        dataName: "lowerBand",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardGreen",
+        fill: null,
+        order: 1
+      },
+      {
+        displayName: "Transition line",
+        tooltipTemplate: "SUPERTREND([P1],[P2]) Transition Line",
+        dataName: "superTrend",
+        dataType: "number",
+        lineType: "dash",
+        stack: "",
+        lineWidth: 1,
+        defaultColor: "ChartColors.DarkGrayTransparent",
+        fill: null,
+        order: 2
+      }
+    ]
+  },
+  {
+    name: "Ulcer Index (UI)",
+    uiid: "ULCER",
+    legendTemplate: "ULCER([P1])",
+    endpoint: "/ULCER/",
     category: "price-characteristic",
     chartType: "oscillator",
-    order: 0,
+    order: 47,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback Periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 14,
+        minimum: 1,
+        maximum: 250
+      }
+    ],
+    results: [
+      {
+        displayName: "Ulcer Index",
+        tooltipTemplate: "UI([P1])",
+        dataName: "ui",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      }
+    ]
+  },
+  {
+    name: "Vortex Indicator",
+    uiid: "VORTEX",
+    legendTemplate: "VORTEX([P1])",
+    endpoint: "/VORTEX/",
+    category: "price-trend",
+    chartType: "oscillator",
+    order: 48,
     chartConfig: null,
     parameters: [
       {
@@ -458,26 +2424,248 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
         dataType: "int",
         defaultValue: 14,
         minimum: 2,
-        maximum: 250
+        maximum: 100
       }
     ],
     results: [
       {
-        displayName: "Average True Range",
-        tooltipTemplate: "ATR([P1])",
-        dataName: "atr",
+        displayName: "VI+",
+        tooltipTemplate: "VI+",
+        dataName: "pvi",
         dataType: "number",
         lineType: "solid",
         stack: "",
         lineWidth: null,
-        defaultColor: ChartColors.StandardBlue,
-        fill: {
-          target: "",
-          colorAbove: "",
-          colorBelow: ""
-        },
+        defaultColor: "ChartColors.StandardGreen",
+        fill: null,
         order: 0
+      },
+      {
+        displayName: "VI+",
+        tooltipTemplate: "VI-",
+        dataName: "nvi",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 1
+      }
+    ]
+  },
+  {
+    name: "Williams Alligator",
+    uiid: "ALLIGATOR",
+    legendTemplate: "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6])",
+    endpoint: "/ALLIGATOR/",
+    category: "price-trend",
+    chartType: "overlay",
+    order: 49,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Jaw Periods",
+        paramName: "jawPeriods",
+        dataType: "int",
+        defaultValue: 13,
+        minimum: 1,
+        maximum: 250
+      },
+      {
+        displayName: "Jaw Offset",
+        paramName: "jawOffset",
+        dataType: "int",
+        defaultValue: 8,
+        minimum: 1,
+        maximum: 30
+      },
+      {
+        displayName: "Teeth Periods",
+        paramName: "teethPeriods",
+        dataType: "int",
+        defaultValue: 8,
+        minimum: 1,
+        maximum: 250
+      },
+      {
+        displayName: "Teeth Offset",
+        paramName: "teethOffset",
+        dataType: "int",
+        defaultValue: 5,
+        minimum: 1,
+        maximum: 30
+      },
+      {
+        displayName: "Lips Periods",
+        paramName: "lipsPeriods",
+        dataType: "int",
+        defaultValue: 5,
+        minimum: 1,
+        maximum: 250
+      },
+      {
+        displayName: "Lips Offset",
+        paramName: "lipsOffset",
+        dataType: "int",
+        defaultValue: 3,
+        minimum: 1,
+        maximum: 30
+      }
+    ],
+    results: [
+      {
+        displayName: "Jaw",
+        tooltipTemplate: "Jaw([P1]/[P2])",
+        dataName: "jaw",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Teeth",
+        tooltipTemplate: "Teeth([P3]/[P4])",
+        dataName: "teeth",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardRed",
+        fill: null,
+        order: 1
+      },
+      {
+        displayName: "Lips",
+        tooltipTemplate: "Lips([P4]/[P5])",
+        dataName: "lips",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardGreen",
+        fill: null,
+        order: 2
+      }
+    ]
+  },
+  {
+    name: "Zig Zag (close)",
+    uiid: "ZIGZAG-CL",
+    legendTemplate: "ZIGZAG([P1]% CLOSE)",
+    endpoint: "/ZIGZAG-CLOSE/",
+    category: "price-transform",
+    chartType: "overlay",
+    order: 50,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Percent Change",
+        paramName: "percentChange",
+        dataType: "number",
+        defaultValue: 5,
+        minimum: 1,
+        maximum: 200
+      }
+    ],
+    results: [
+      {
+        displayName: "Zig Zag",
+        tooltipTemplate: "ZIGZAG([P1]% CLOSE)",
+        dataName: "zigZag",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Zig Zag Retrace High",
+        tooltipTemplate: "ZIGZAG([P1]% CLOSE) Retrace High",
+        dataName: "retraceHigh",
+        dataType: "number",
+        lineType: "dash",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.ThresholdGrayTransparent",
+        fill: null,
+        order: 1
+      },
+      {
+        displayName: "Zig Zag Retrace Low",
+        tooltipTemplate: "ZIGZAG([P1]% CLOSE) Retrace Low",
+        dataName: "retraceLow",
+        dataType: "number",
+        lineType: "dash",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.ThresholdGrayTransparent",
+        fill: null,
+        order: 2
+      }
+    ]
+  },
+  {
+    name: "Zig Zag (high/low)",
+    uiid: "ZIGZAG-HL",
+    legendTemplate: "ZIGZAG([P1]% HIGH/LOW)",
+    endpoint: "/ZIGZAG-HIGHLOW/",
+    category: "price-transform",
+    chartType: "overlay",
+    order: 51,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Percent Change",
+        paramName: "percentChange",
+        dataType: "number",
+        defaultValue: 5,
+        minimum: 1,
+        maximum: 200
+      }
+    ],
+    results: [
+      {
+        displayName: "Zig Zag",
+        tooltipTemplate: "ZIGZAG([P1]% HIGH/LOW)",
+        dataName: "zigZag",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.StandardBlue",
+        fill: null,
+        order: 0
+      },
+      {
+        displayName: "Zig Zag Retrace High",
+        tooltipTemplate: "ZIGZAG([P1]% HIGH/LOW) Retrace High",
+        dataName: "retraceHigh",
+        dataType: "number",
+        lineType: "dash",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.ThresholdGrayTransparent",
+        fill: null,
+        order: 1
+      },
+      {
+        displayName: "Zig Zag Retrace Low",
+        tooltipTemplate: "ZIGZAG([P1]% HIGH/LOW) Retrace Low",
+        dataName: "retraceLow",
+        dataType: "number",
+        lineType: "dash",
+        stack: "",
+        lineWidth: null,
+        defaultColor: "ChartColors.ThresholdGrayTransparent",
+        fill: null,
+        order: 2
       }
     ]
   }
-];
+] as IndicatorListing[];
