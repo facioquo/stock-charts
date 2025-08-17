@@ -48,13 +48,13 @@ public class RandomQuotesTests
     public void Constructor_ExcludeWeekends_InvalidFrequency_Throws()
     {
         // Arrange & Act & Assert - frequency too small (under 1 hour)
-        ArgumentException smallFreqException = Assert.Throws<ArgumentException>(() => 
+        ArgumentException smallFreqException = Assert.Throws<ArgumentException>(() =>
             new RandomQuotes(periodSize: PeriodSize.ThirtyMinutes, includeWeekends: false));
         Assert.Equal("includeWeekends", smallFreqException.ParamName);
         Assert.Contains("Weekends can only be excluded for period sizes between OneHour and OneWeek", smallFreqException.Message);
 
         // Test frequency too large (week or more)
-        ArgumentException largeFreqException = Assert.Throws<ArgumentException>(() => 
+        ArgumentException largeFreqException = Assert.Throws<ArgumentException>(() =>
             new RandomQuotes(periodSize: PeriodSize.Week, includeWeekends: false));
         Assert.Equal("includeWeekends", largeFreqException.ParamName);
         Assert.Contains("Weekends can only be excluded for period sizes between OneHour and OneWeek", largeFreqException.Message);
