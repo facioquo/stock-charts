@@ -26,12 +26,14 @@ type ExtendedChartDataset = ChartDataset & {
   pointBorderColor?: string[];
 };
 
-// extensions
+// Financial charts module
 import {
-  CandlestickController,
-  CandlestickElement,
-  FinancialDataPoint
-} from "src/assets/js/chartjs-chart-financial";
+  FinancialDataPoint,
+  createCandlestickDataset,
+  createVolumeDataset,
+  processFinancialData,
+  createFinancialChartOptions
+} from "../../chartjs/financial";
 
 // plugins
 import AnnotationPlugin, {
@@ -40,16 +42,14 @@ import AnnotationPlugin, {
   ScaleValue
 } from "chartjs-plugin-annotation";
 
-// register extensions and plugins
+// register standard Chart.js components and plugins
 Chart.register(
   // controllers
-  CandlestickController,
   LineController,
   Tooltip,
 
   // elements
   BarElement,
-  CandlestickElement,
   LineElement,
   PointElement,
 
@@ -909,15 +909,42 @@ export class ChartService implements OnDestroy {
 
   loadOverlayChart(quotes: Quote[]) {
     // loads base with quotes only
-    this.configureCandlestickDefaults();
+    // No need to configure defaults since the registrar handles this
 
-    const { priceData, volumeData, volumeAxisSize, volumeColors } = this.processQuoteData(quotes);
+    // Use new financial data processing from the factory
+    const { priceData, volumeData } = processFinancialData(
+      quotes.map(q => ({
+        date: q.date,
+        open: q.open,
+        high: q.high,
+        low: q.low,
+        close: q.close,
+        volume: q.volume
+      }))
+    );
 
-    // define base datasets
+    // Add extra bars for better chart visualization
+    this.addExtraVolumeBars(volumeData);
+
+    // Calculate volume axis size
+    const sumVol = quotes.reduce((sum, q) => sum + q.volume, 0);
+    const volumeAxisSize = 20 * (sumVol / volumeData.length) || 0;
+
+    // Use factory functions to create datasets
     const chartData: ChartData = {
       datasets: [
-        this.createPriceDataset(priceData),
-        this.createVolumeDataset(volumeData, volumeColors)
+        createCandlestickDataset(priceData, {
+          label: "Price",
+          colors: {
+            up: ChartService.COLORS.CANDLE_UP,
+            down: ChartService.COLORS.CANDLE_DOWN,
+            unchanged: ChartService.COLORS.CANDLE_UNCHANGED
+          }
+        }),
+        createVolumeDataset(priceData, volumeData, {
+          label: "Volume",
+          yAxisID: "volumeAxis"
+        })
       ]
     };
 
@@ -925,62 +952,11 @@ export class ChartService implements OnDestroy {
     this.createOverlayChart(chartData, volumeAxisSize);
   }
 
-  private configureCandlestickDefaults(): void {
-    const candleOptions = Chart.defaults.elements["candlestick"];
 
-    // custom border colors
-    candleOptions.color.up = ChartService.COLORS.CANDLE_UP;
-    candleOptions.color.down = ChartService.COLORS.CANDLE_DOWN;
-    candleOptions.color.unchanged = ChartService.COLORS.CANDLE_UNCHANGED;
 
-    candleOptions.borderColor = {
-      up: candleOptions.color.up,
-      down: candleOptions.color.down,
-      unchanged: candleOptions.color.unchanged
-    };
-  }
 
-  private processQuoteData(quotes: Quote[]): {
-    priceData: FinancialDataPoint[];
-    volumeData: ScatterDataPoint[];
-    volumeAxisSize: number;
-    volumeColors: string[];
-  } {
-    const priceData: FinancialDataPoint[] = [];
-    const volumeData: ScatterDataPoint[] = [];
-    const volumeColors: string[] = [];
-    let sumVol = 0;
 
-    quotes.forEach((q: Quote) => {
-      priceData.push({
-        x: new Date(q.date).valueOf(),
-        o: q.open,
-        h: q.high,
-        l: q.low,
-        c: q.close
-      });
-
-      volumeData.push({
-        x: new Date(q.date).valueOf(),
-        y: q.volume
-      });
-      sumVol += q.volume;
-
-      const color =
-        q.close >= q.open ? ChartService.COLORS.VOLUME_UP : ChartService.COLORS.VOLUME_DOWN;
-      volumeColors.push(color);
-    });
-
-    // add extra bars
-    this.addExtraVolumeBarsBars(volumeData);
-
-    // volume axis size
-    const volumeAxisSize = 20 * (sumVol / volumeData.length) || 0;
-
-    return { priceData, volumeData, volumeAxisSize, volumeColors };
-  }
-
-  private addExtraVolumeBarsBars(volumeData: ScatterDataPoint[]): void {
+  private addExtraVolumeBars(volumeData: Array<{ x: number; y: number }>): void {
     const nextDate = new Date(Math.max(...volumeData.map(h => new Date(h.x).getTime())));
 
     for (let i = 1; i < this.extraBars; i++) {
@@ -993,32 +969,7 @@ export class ChartService implements OnDestroy {
     }
   }
 
-  private createPriceDataset(priceData: FinancialDataPoint[]): ChartDataset {
-    const candleOptions = Chart.defaults.elements["candlestick"];
-    return {
-      type: "candlestick",
-      label: "Price",
-      data: priceData,
-      yAxisID: "y",
-      borderColor: candleOptions.borderColor,
-      order: 75
-    };
-  }
 
-  private createVolumeDataset(
-    volumeData: ScatterDataPoint[],
-    volumeColors: string[]
-  ): ChartDataset {
-    return {
-      type: "bar",
-      label: "Volume",
-      data: volumeData,
-      yAxisID: "volumeAxis",
-      backgroundColor: volumeColors,
-      borderWidth: 0,
-      order: 76
-    };
-  }
 
   private createOverlayChart(chartData: ChartData, volumeAxisSize: number): void {
     // default overlay chart configuration
