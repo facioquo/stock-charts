@@ -2,7 +2,7 @@
 // based on https://github.com/chartjs/chartjs-chart-financial
 // Color configuration and theming utilities for financial charts
 
-import { FinancialColorConfig } from "./types";
+import type { FinancialColorConfig } from "./types";
 
 /**
  * Default color configuration for financial charts
