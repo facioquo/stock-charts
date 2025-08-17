@@ -20,6 +20,8 @@
     "build:prod": "npm run build.prod --workspaces",
     "start": "npm run start --workspace=@stock-charts/client",
     "test": "npm run test --workspaces",
+    "test:dotnet": "dotnet test Charts.sln --logger trx --logger \"console;verbosity=normal\" --collect:\"XPlat Code Coverage\" --results-directory ./server/test-results -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=lcov",
+    "test:all": "npm run test --workspace=@stock-charts/client && npm run test:dotnet",
     "test:watch": "npm run test:watch --workspaces",
     "test:coverage": "npm run test:coverage --workspaces",
     "lint": "npm run lint --workspaces",

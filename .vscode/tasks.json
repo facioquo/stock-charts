@@ -55,10 +55,24 @@
       }
     },
     {
-      "label": "test-all",
-      "detail": "Run all project tests",
-      "dependsOn": ["test-website"],
+      "label": "test-backend",
+      "detail": "Run .NET backend tests with coverage",
+      "type": "npm",
+      "script": "test:dotnet",
       "group": "test",
+      "problemMatcher": ["$msCompile"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "test-all",
+      "detail": "Run all project tests (frontend + backend)",
+      "type": "npm",
+      "script": "test:all",
+      "group": "test",
+      "problemMatcher": ["$tsc", "$msCompile"],
       "presentation": {
         "reveal": "always",
         "panel": "shared"
