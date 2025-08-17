@@ -5,7 +5,7 @@
 // Chart import removed - unused
 import { merge, valueOrDefault } from "chart.js/helpers";
 import { FinancialElement } from "./financial-element";
-import { FinancialColorConfig } from "./types";
+import type { FinancialColorConfig } from "./types";
 import { DEFAULT_FINANCIAL_COLORS } from "./colors";
 
 /**
