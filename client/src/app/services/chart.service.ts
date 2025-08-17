@@ -26,12 +26,12 @@ type ExtendedChartDataset = ChartDataset & {
   pointBorderColor?: string[];
 };
 
-// extensions
+// extensions from new financial module
 import {
   CandlestickController,
   CandlestickElement,
   FinancialDataPoint
-} from "src/assets/js/chartjs-chart-financial";
+} from "src/chartjs/financial";
 
 // plugins
 import AnnotationPlugin, {
@@ -43,13 +43,11 @@ import AnnotationPlugin, {
 // register extensions and plugins
 Chart.register(
   // controllers
-  CandlestickController,
   LineController,
   Tooltip,
 
   // elements
   BarElement,
-  CandlestickElement,
   LineElement,
   PointElement,
 
