@@ -15,7 +15,7 @@ public class RandomQuotes : List<Quote>
     /// Initializes a new instance of the <see cref="RandomQuotes"/> class.
     /// <code>
     /// Sample usage:
-    /// 
+    ///
     /// RandomGbm data = new(); // generates 1 year (252) list of bars
     /// RandomGbm data = new(Bars: 1000); // generates 1,000 bars
     /// RandomGbm data = new(Bars: 252, Volatility: 0.05, Drift: 0.0005, Seed: 100.0)
@@ -84,7 +84,8 @@ public class RandomQuotes : List<Quote>
     /// <param name="timestamp">The timestamp of the quote.</param>
     public void Add(DateTime timestamp)
     {
-        double open = Price(_seed, _volatility * _volatility, _drift);
+        // Use volatility (sigma) directly; previous implementation incorrectly squared it.
+        double open = Price(_seed, _volatility, _drift);
         double close = Price(open, _volatility, _drift);
 
         double ocMax = Math.Max(open, close);
