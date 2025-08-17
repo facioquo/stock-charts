@@ -13,25 +13,25 @@ describe("Financial Chart Registration", () => {
 
   it("should register financial charts components", () => {
     expect(isFinancialChartsRegistered()).toBe(false);
-    
+
     ensureFinancialChartsRegistered();
-    
+
     expect(isFinancialChartsRegistered()).toBe(true);
   });
 
   it("should be idempotent - multiple calls should not cause issues", () => {
     expect(isFinancialChartsRegistered()).toBe(false);
-    
+
     ensureFinancialChartsRegistered();
     ensureFinancialChartsRegistered();
     ensureFinancialChartsRegistered();
-    
+
     expect(isFinancialChartsRegistered()).toBe(true);
   });
 
   it("should set up Chart.js defaults", () => {
     ensureFinancialChartsRegistered();
-    
+
     // Check that financial defaults exist
     expect((Chart.defaults.elements as any).financial).toBeDefined();
     expect((Chart.defaults.elements as any).financial.color).toBeDefined();

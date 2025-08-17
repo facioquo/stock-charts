@@ -2,7 +2,7 @@
 // based on https://github.com/chartjs/chartjs-chart-financial
 // CandlestickController implementation
 
-import { Chart } from "chart.js";
+// Chart import removed - unused
 import { merge } from "chart.js/helpers";
 import { FinancialController } from "./financial-controller";
 import { CandlestickElement } from "./candlestick-element";
@@ -15,20 +15,19 @@ export class CandlestickController extends FinancialController {
 
   declare _ruler?: any;
 
-  updateElements(elements: any[], start: number, count: number, mode: any): void {
-    const me = this;
-    const dataset = me.getDataset();
-    const ruler = me._ruler || me._getRuler();
-    const firstOpts = me.resolveDataElementOptions(start, mode);
-    const sharedOptions = me.getSharedOptions(firstOpts);
-    const includeOptions = me.includeOptions(mode, sharedOptions || {});
+  updateElements(elements: Element[], start: number, count: number, mode: string): void {
+    const dataset = this.getDataset();
+    const ruler = this._ruler ?? this._getRuler();
+    const firstOpts = this.resolveDataElementOptions(start, mode);
+    const sharedOptions = this.getSharedOptions(firstOpts);
+    const includeOptions = this.includeOptions(mode, sharedOptions ?? {});
 
-    me.updateSharedOptions(sharedOptions || {}, mode, firstOpts);
+    this.updateSharedOptions(sharedOptions ?? {}, mode, firstOpts);
 
     for (let i = start; i < count; i++) {
-      const options = sharedOptions || me.resolveDataElementOptions(i, mode);
+      const options = sharedOptions ?? this.resolveDataElementOptions(i, mode);
 
-      const baseProperties = me.calculateElementProperties(i, ruler, mode === "reset", options);
+      const baseProperties = this.calculateElementProperties(i, ruler, mode === "reset", options);
       const properties = {
         ...baseProperties,
         datasetLabel: dataset.label || "",
@@ -43,7 +42,7 @@ export class CandlestickController extends FinancialController {
       if (includeOptions) {
         properties.options = options;
       }
-      me.updateElement(elements[i], i, properties, mode);
+      this.updateElement(elements[i], i, properties, mode);
     }
   }
 }

@@ -17,15 +17,15 @@ export function buildCandlestickDataset(
     borderWidth?: number;
   } = {}
 ): ChartDataset {
-  const colors = options.colors || getFinancialColors();
+  const colors = options.colors ?? getFinancialColors();
 
   return {
     type: "candlestick",
-    label: options.label || "Price",
+    label: options.label ?? "Price",
     data,
-    color: colors as any,
-    borderColor: colors as any,
-    borderWidth: options.borderWidth || 1,
+    color: colors as FinancialColorConfig,
+    borderColor: colors as FinancialColorConfig,
+    borderWidth: options.borderWidth ?? 1,
     yAxisID: "y"
   } as ChartDataset;
 }
@@ -46,12 +46,12 @@ export function buildVolumeDataset(
 
   return {
     type: "bar",
-    label: options.label || "Volume",
+    label: options.label ?? "Volume",
     data: volumeData,
     backgroundColor: volumeColors,
     borderColor: volumeColors,
     borderWidth: 0,
-    yAxisID: options.yAxisID || "y1"
+    yAxisID: options.yAxisID ?? "y1"
   };
 }
 
@@ -100,16 +100,16 @@ export function buildFinancialChartOptions(
       y1: {
         type: "linear",
         position: "left",
-        max: function (ctx: any) {
+        max: function (ctx: { chart: { data: { datasets: { yAxisID?: string; data: ScatterDataPoint[] }[] } } }) {
           const chart = ctx.chart;
           const maxVolume = Math.max(
             ...chart.data.datasets
-              .filter((d: any) => d.yAxisID === "y1")
-              .flatMap((d: any) => d.data as ScatterDataPoint[])
-              .map((p: any) => (typeof p === "object" && "y" in p ? p.y : 0))
+              .filter((d) => d.yAxisID === "y1")
+              .flatMap((d) => d.data as ScatterDataPoint[])
+              .map((p) => (typeof p === "object" && "y" in p ? p.y : 0))
           );
           return maxVolume * (100 / volumeAxisSize);
-        } as any,
+        },
         display: false,
         grid: {
           display: false

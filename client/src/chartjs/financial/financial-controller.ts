@@ -2,7 +2,7 @@
 // based on https://github.com/chartjs/chartjs-chart-financial
 // FinancialController base class for OHLC and Candlestick controllers
 
-import { BarController, Chart, defaults } from "chart.js";
+import { BarController, defaults } from "chart.js";
 import { clipArea, unclipArea, isNullOrUndef } from "chart.js/helpers";
 import { FinancialDataPoint } from "./types";
 
@@ -16,7 +16,7 @@ function computeMinSampleSize(scale: any, pixels: number[]): number {
   for (i = 1, ilen = pixels.length; i < ilen; ++i) {
     curr = Math.abs(pixels[i] - pixels[i - 1]);
     if (curr < min) {
-      prev = pixels[i - 1];
+      // prev = pixels[i - 1]; // Not used, removing assignment
       min = curr;
     }
   }
@@ -66,15 +66,14 @@ export class FinancialController extends BarController {
   };
 
   getLabelAndValue(index: number): { label: string; value: string } {
-    const me = this;
-    const parsed = me.getParsed(index) as any;
-    const axis = me._cachedMeta.iScale?.axis || "x";
+    const parsed = this.getParsed(index) as Record<string, number>;
+    const axis = this._cachedMeta.iScale?.axis ?? "x";
 
     const { o, h, l, c } = parsed;
     const value = `O: ${o}  H: ${h}  L: ${l}  C: ${c}`;
 
     return {
-      label: `${me._cachedMeta.iScale?.getLabelForValue(parsed[axis]) || ""}`,
+      label: `${this._cachedMeta.iScale?.getLabelForValue(parsed[axis]) ?? ""}`,
       value
     };
   }
@@ -117,24 +116,23 @@ export class FinancialController extends BarController {
     return { min, max };
   }
 
-  _getRuler(): any {
-    const me = this;
-    const opts = (me as any).options;
-    const meta = me._cachedMeta;
+  _getRuler(): Record<string, unknown> {
+    const opts = (this as Record<string, any>).options;
+    const meta = this._cachedMeta;
     const iScale = meta.iScale;
-    const axis = iScale?.axis || "x";
+    const axis = iScale?.axis ?? "x";
     const pixels: number[] = [];
     for (let i = 0; i < meta.data.length; ++i) {
-      pixels.push(iScale?.getPixelForValue((me.getParsed(i) as any)[axis]) || 0);
+      pixels.push(iScale?.getPixelForValue((this.getParsed(i) as Record<string, number>)[axis]) ?? 0);
     }
     const barThickness = opts.barThickness;
     const min = computeMinSampleSize(iScale, pixels);
     return {
       min,
       pixels,
-      start: (iScale as any)?._startPixel || 0,
-      end: (iScale as any)?._endPixel || 0,
-      stackCount: (me as any)._getStackCount(),
+      start: (iScale as Record<string, any>)?._startPixel ?? 0,
+      end: (iScale as Record<string, any>)?._endPixel ?? 0,
+      stackCount: (this as Record<string, any>)._getStackCount(),
       scale: iScale,
       ratio: barThickness ? 1 : opts.categoryPercentage * opts.barPercentage
     };
@@ -143,12 +141,11 @@ export class FinancialController extends BarController {
   /**
    * Calculate element properties for financial data
    */
-  calculateElementProperties(index: number, ruler: any, reset: boolean, options: any): any {
-    const me = this;
-    const vscale = me._cachedMeta.vScale;
-    const base = vscale?.getBasePixel() || 0;
-    const ipixels = (me as any)._calculateBarIndexPixels(index, ruler, options);
-    const data = me.chart.data.datasets[me.index].data[index] as FinancialDataPoint;
+  calculateElementProperties(index: number, ruler: Record<string, unknown>, reset: boolean, options: Record<string, unknown>): Record<string, unknown> {
+    const vscale = this._cachedMeta.vScale;
+    const base = vscale?.getBasePixel() ?? 0;
+    const ipixels = (this as Record<string, any>)._calculateBarIndexPixels(index, ruler, options);
+    const data = this.chart.data.datasets[this.index].data[index] as FinancialDataPoint;
 
     if (!data || !vscale) {
       return {};
@@ -172,13 +169,12 @@ export class FinancialController extends BarController {
   }
 
   draw(): void {
-    const me = this;
-    const chart = me.chart;
-    const rects = me._cachedMeta.data;
+    const chart = this.chart;
+    const rects = this._cachedMeta.data;
     clipArea(chart.ctx, chart.chartArea);
     for (let i = 0; i < rects.length; ++i) {
-      if (rects[i] && typeof (rects[i] as any).draw === "function") {
-        (rects[i] as any).draw(chart.ctx);
+      if (rects[i] && typeof (rects[i] as Record<string, unknown>).draw === "function") {
+        (rects[i] as Record<string, any>).draw(chart.ctx);
       }
     }
     unclipArea(chart.ctx);

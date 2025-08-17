@@ -3,10 +3,6 @@
 // TypeScript port for modular integration
 
 import {
-  BarController,
-  BarControllerChartOptions,
-  BarControllerDatasetOptions,
-  CartesianScaleTypeRegistry,
   ChartComponent,
   Element
 } from "chart.js";

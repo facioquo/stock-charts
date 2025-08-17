@@ -2,7 +2,7 @@
 // based on https://github.com/chartjs/chartjs-chart-financial
 // CandlestickElement implementation
 
-import { Chart } from "chart.js";
+// Chart import removed - unused
 import { merge, valueOrDefault } from "chart.js/helpers";
 import { FinancialElement } from "./financial-element";
 import { FinancialColorConfig } from "./types";
@@ -19,10 +19,9 @@ export class CandlestickElement extends FinancialElement {
   declare color: FinancialColorConfig;
 
   draw(ctx: CanvasRenderingContext2D): void {
-    const me = this;
-    const { x, open, high, low, close } = me;
+    const { x, open, high, low, close } = this;
 
-    let borderColors = me.borderColor;
+    let borderColors = this.borderColor;
     if (typeof borderColors === "string") {
       borderColors = {
         up: borderColors,
@@ -38,7 +37,7 @@ export class CandlestickElement extends FinancialElement {
         DEFAULT_FINANCIAL_COLORS.up
       );
       ctx.fillStyle = valueOrDefault(
-        me.color ? me.color.up : undefined,
+        this.color ? this.color.up : undefined,
         DEFAULT_FINANCIAL_COLORS.up
       );
     } else if (close > open) {
@@ -47,7 +46,7 @@ export class CandlestickElement extends FinancialElement {
         DEFAULT_FINANCIAL_COLORS.down
       );
       ctx.fillStyle = valueOrDefault(
-        me.color ? me.color.down : undefined,
+        this.color ? this.color.down : undefined,
         DEFAULT_FINANCIAL_COLORS.down
       );
     } else {
@@ -56,7 +55,7 @@ export class CandlestickElement extends FinancialElement {
         DEFAULT_FINANCIAL_COLORS.unchanged
       );
       ctx.fillStyle = valueOrDefault(
-        me.color ? me.color.unchanged : undefined,
+        this.color ? this.color.unchanged : undefined,
         DEFAULT_FINANCIAL_COLORS.unchanged
       );
     }
@@ -70,8 +69,8 @@ export class CandlestickElement extends FinancialElement {
     ctx.moveTo(x, low);
     ctx.lineTo(x, Math.max(open, close));
     ctx.stroke();
-    ctx.fillRect(x - me.width / 2, close, me.width, open - close);
-    ctx.strokeRect(x - me.width / 2, close, me.width, open - close);
+    ctx.fillRect(x - this.width / 2, close, this.width, open - close);
+    ctx.strokeRect(x - this.width / 2, close, this.width, open - close);
     ctx.closePath();
   }
 }
