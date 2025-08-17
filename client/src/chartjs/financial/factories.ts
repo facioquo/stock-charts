@@ -100,13 +100,15 @@ export function buildFinancialChartOptions(
       y1: {
         type: "linear",
         position: "left",
-        max: function (ctx: { chart: { data: { datasets: { yAxisID?: string; data: ScatterDataPoint[] }[] } } }) {
+        max: function (ctx: {
+          chart: { data: { datasets: { yAxisID?: string; data: ScatterDataPoint[] }[] } };
+        }) {
           const chart = ctx.chart;
           const maxVolume = Math.max(
             ...chart.data.datasets
-              .filter((d) => d.yAxisID === "y1")
-              .flatMap((d) => d.data as ScatterDataPoint[])
-              .map((p) => (typeof p === "object" && "y" in p ? p.y : 0))
+              .filter(d => d.yAxisID === "y1")
+              .flatMap(d => d.data as ScatterDataPoint[])
+              .map(p => (typeof p === "object" && "y" in p ? p.y : 0))
           );
           return maxVolume * (100 / volumeAxisSize);
         },

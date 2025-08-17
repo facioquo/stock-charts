@@ -30,8 +30,7 @@ type ExtendedChartDataset = ChartDataset & {
 import {
   FinancialDataPoint,
   buildCandlestickDataset,
-  buildVolumeDataset,
-  getFinancialColors
+  buildVolumeDataset
 } from "../../chartjs/financial";
 
 // plugins

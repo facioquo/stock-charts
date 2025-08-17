@@ -2,10 +2,8 @@
 // based on https://github.com/chartjs/chartjs-chart-financial
 // TypeScript port for modular integration
 
-import {
-  ChartComponent,
-  Element
-} from "chart.js";
+import { ChartComponent, Element } from "chart.js";
+import type { BarController, Chart } from "chart.js";
 
 /**
  * Financial data point interface for OHLC data
@@ -53,12 +51,12 @@ export interface FinancialElementProps {
  */
 export type CandlestickControllerType = ChartComponent & {
   prototype: BarController;
-  new (chart: any, datasetIndex: number): BarController;
+  new (chart: Chart, datasetIndex: number): BarController;
 };
 
 export type OhlcControllerType = ChartComponent & {
   prototype: BarController;
-  new (chart: any, datasetIndex: number): BarController;
+  new (chart: Chart, datasetIndex: number): BarController;
 };
 
 export type FinancialElementType = Element;

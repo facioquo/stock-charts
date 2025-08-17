@@ -30,7 +30,7 @@ export class CandlestickController extends FinancialController {
       const baseProperties = this.calculateElementProperties(i, ruler, mode === "reset", options);
       const properties = {
         ...baseProperties,
-        datasetLabel: dataset.label || "",
+        datasetLabel: dataset.label ?? "",
         // label: '', // to get label value please use dataset.data[index].label
 
         // Appearance

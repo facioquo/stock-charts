@@ -10,7 +10,10 @@ import { Element } from "chart.js";
  * @param useFinalPosition whether to use final position
  * @returns bounds of the bar
  */
-function getBarBounds(bar: { getProps: (props: string[], useFinal?: boolean) => Record<string, number> }, useFinalPosition?: boolean) {
+function getBarBounds(
+  bar: { getProps: (props: string[], useFinal?: boolean) => Record<string, number>; horizontal?: boolean },
+  useFinalPosition?: boolean
+) {
   const { x, y, base, width, height } = bar.getProps(
     ["x", "low", "high", "width", "height"],
     useFinalPosition

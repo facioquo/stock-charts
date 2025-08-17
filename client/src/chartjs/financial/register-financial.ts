@@ -8,31 +8,36 @@ import { CandlestickController } from "./candlestick-controller";
 import { CandlestickElement } from "./candlestick-element";
 import { DEFAULT_FINANCIAL_COLORS } from "./colors";
 
-// Extend Chart.js defaults to include financial elements
-declare module "chart.js" {
-  namespace Defaults {
-    interface Elements {
-      financial?: {
-        color: {
-          up: string;
-          down: string;
-          unchanged: string;
-        };
-      };
-      candlestick?: {
-        color: {
-          up: string;
-          down: string;
-          unchanged: string;
-        };
-        borderColor: any;
-        borderWidth: number;
-      };
-    }
+// Define financial element types for Chart.js defaults
+interface FinancialElementDefaults {
+  color: {
+    up: string;
+    down: string;
+    unchanged: string;
+  };
+}
 
-    interface Overrides {
-      financial?: any;
-    }
+interface CandlestickElementDefaults extends FinancialElementDefaults {
+  borderColor: string | Record<string, string>;
+  borderWidth: number;
+}
+
+// Type-safe extensions to Chart.js defaults
+declare module "chart.js" {
+  interface DefaultsElements {
+    financial?: FinancialElementDefaults;
+    candlestick?: CandlestickElementDefaults;
+  }
+
+  interface ChartTypeRegistry {
+    financial: {
+      chartOptions: unknown;
+      datasetOptions: unknown;
+      defaultDataPoint: unknown;
+      metaExtensions: Record<string, never>;
+      parsedDataType: unknown;
+      scales: string;
+    };
   }
 }
 
@@ -49,7 +54,7 @@ export function ensureFinancialChartsRegistered(): void {
   }
 
   // Set up default financial element configuration
-  (Chart.defaults.elements as any).financial = {
+  (Chart.defaults.elements as unknown as Record<string, unknown>).financial = {
     color: DEFAULT_FINANCIAL_COLORS
   };
 
@@ -57,7 +62,7 @@ export function ensureFinancialChartsRegistered(): void {
   Chart.register(FinancialController, CandlestickController, CandlestickElement);
 
   // Set up Chart.js defaults for financial charts
-  (Chart.defaults as any).financial = {
+  (Chart.defaults as unknown as Record<string, unknown>).financial = {
     datasets: {
       categoryPercentage: 0.8,
       barPercentage: 0.9,
@@ -77,9 +82,11 @@ export function ensureFinancialChartsRegistered(): void {
   };
 
   // Set up candlestick-specific defaults
-  (Chart.defaults.elements as any).candlestick = {
-    ...(Chart.defaults.elements as any).financial,
-    borderColor: (Chart.defaults.elements as any).financial.color.unchanged,
+  const elementsDefaults = Chart.defaults.elements as unknown as Record<string, unknown>;
+  const financialDefaults = elementsDefaults.financial as FinancialElementDefaults;
+  elementsDefaults.candlestick = {
+    ...financialDefaults,
+    borderColor: financialDefaults.color.unchanged,
     borderWidth: 1
   };
 

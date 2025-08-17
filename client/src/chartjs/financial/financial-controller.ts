@@ -9,9 +9,9 @@ import { FinancialDataPoint } from "./types";
 /**
  * Computes the "optimal" sample size to maintain bars equally sized while preventing overlap.
  */
-function computeMinSampleSize(scale: any, pixels: number[]): number {
-  let min = scale._length;
-  let prev: number, curr: number, i: number, ilen: number;
+function computeMinSampleSize(scale: unknown, pixels: number[]): number {
+  let min = (scale as Record<string, unknown>)._length as number;
+  let curr: number, i: number, ilen: number;
 
   for (i = 1, ilen = pixels.length; i < ilen; ++i) {
     curr = Math.abs(pixels[i] - pixels[i - 1]);
@@ -80,11 +80,11 @@ export class FinancialController extends BarController {
 
   getAllParsedValues(): number[] {
     const meta = this._cachedMeta;
-    const axis = meta.iScale?.axis || "x";
-    const parsed = meta._parsed as any[];
+    const axis = meta.iScale?.axis ?? "x";
+    const parsed = meta._parsed as Record<string, number>[];
     const values: number[] = [];
     for (let i = 0; i < parsed.length; ++i) {
-      values.push(parsed[i][axis]);
+      values.push((parsed[i] as Record<string, number>)[axis]);
     }
     return values;
   }
@@ -93,10 +93,10 @@ export class FinancialController extends BarController {
    * Implement this ourselves since it doesn't handle high and low values
    * https://github.com/chartjs/Chart.js/issues/7328
    */
-  getMinMax(scale: any): { min: number; max: number } {
+  getMinMax(scale: unknown): { min: number; max: number } {
     const meta = this._cachedMeta;
-    const _parsed = meta._parsed as any[];
-    const axis = meta.iScale?.axis || "x";
+    const _parsed = meta._parsed as Record<string, number>[];
+    const axis = meta.iScale?.axis ?? "x";
 
     if (_parsed.length < 2) {
       return { min: 0, max: 1 };
@@ -123,7 +123,9 @@ export class FinancialController extends BarController {
     const axis = iScale?.axis ?? "x";
     const pixels: number[] = [];
     for (let i = 0; i < meta.data.length; ++i) {
-      pixels.push(iScale?.getPixelForValue((this.getParsed(i) as Record<string, number>)[axis]) ?? 0);
+      pixels.push(
+        iScale?.getPixelForValue((this.getParsed(i) as Record<string, number>)[axis]) ?? 0
+      );
     }
     const barThickness = opts.barThickness;
     const min = computeMinSampleSize(iScale, pixels);
@@ -141,7 +143,12 @@ export class FinancialController extends BarController {
   /**
    * Calculate element properties for financial data
    */
-  calculateElementProperties(index: number, ruler: Record<string, unknown>, reset: boolean, options: Record<string, unknown>): Record<string, unknown> {
+  calculateElementProperties(
+    index: number,
+    ruler: Record<string, unknown>,
+    reset: boolean,
+    options: Record<string, unknown>
+  ): Record<string, unknown> {
     const vscale = this._cachedMeta.vScale;
     const base = vscale?.getBasePixel() ?? 0;
     const ipixels = (this as Record<string, any>)._calculateBarIndexPixels(index, ruler, options);
@@ -173,8 +180,8 @@ export class FinancialController extends BarController {
     const rects = this._cachedMeta.data;
     clipArea(chart.ctx, chart.chartArea);
     for (let i = 0; i < rects.length; ++i) {
-      if (rects[i] && typeof (rects[i] as Record<string, unknown>).draw === "function") {
-        (rects[i] as Record<string, any>).draw(chart.ctx);
+      if (rects[i] && typeof (rects[i] as unknown as { draw?: unknown }).draw === "function") {
+        ((rects[i] as unknown as { draw: (ctx: unknown) => void }).draw)(chart.ctx);
       }
     }
     unclipArea(chart.ctx);
