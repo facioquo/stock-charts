@@ -4,6 +4,7 @@
 
 import { ChartDataset, ChartOptions, ScatterDataPoint } from "chart.js";
 import { FinancialDataPoint, FinancialColorConfig } from "./types";
+import { CandlestickDataset } from "./financial-chart.registry";
 import { getFinancialColors, createVolumeColors } from "./colors";
 
 /**
@@ -16,7 +17,7 @@ export function buildCandlestickDataset(
     colors?: FinancialColorConfig;
     borderWidth?: number;
   } = {}
-): ChartDataset {
+): CandlestickDataset {
   const colors = options.colors ?? getFinancialColors();
 
   return {
@@ -27,7 +28,7 @@ export function buildCandlestickDataset(
     borderColor: colors.unchanged,
     borderWidth: options.borderWidth ?? 1,
     yAxisID: "y"
-  } as ChartDataset;
+  };
 }
 
 /**

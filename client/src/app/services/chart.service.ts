@@ -716,9 +716,15 @@ export class ChartService implements OnDestroy {
     // Update price dataset (candlestick dataset - typically index 0)
     const fullPriceDataset = fullMainDatasets[0];
     const currentPriceDataset = this.chartOverlay.data.datasets[0];
-    if (fullPriceDataset && currentPriceDataset && fullPriceDataset.type === "candlestick") {
+    if (
+      fullPriceDataset && 
+      currentPriceDataset && 
+      (fullPriceDataset as unknown as { type: string }).type === "candlestick"
+    ) {
       // Replace the data array entirely (Chart.js better detects this change)
-      currentPriceDataset.data = [...fullPriceDataset.data.slice(startIndex)];
+      currentPriceDataset.data = [
+        ...(fullPriceDataset as unknown as { data: unknown[] }).data.slice(startIndex)
+      ];
     }
 
     // Update volume dataset (bar dataset - typically index 1)
@@ -1000,7 +1006,7 @@ export class ChartService implements OnDestroy {
       ...dataset,
       yAxisID: "y",
       order: 75
-    };
+    } as unknown as ChartDataset;
   }
 
   private createVolumeDataset(

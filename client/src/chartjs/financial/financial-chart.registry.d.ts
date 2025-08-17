@@ -2,12 +2,6 @@
 // based on https://github.com/chartjs/chartjs-chart-financial
 // Simplified type definitions to avoid conflicts
 
-import type {
-  BarControllerChartOptions,
-  BarControllerDatasetOptions,
-  CartesianScaleTypeRegistry
-} from "chart.js";
-
 // Financial data point interface
 export interface FinancialDataPoint {
   x: number;
@@ -17,24 +11,15 @@ export interface FinancialDataPoint {
   c: number; // close
 }
 
-// Simple module augmentation for candlestick chart type
-// Temporarily commented out to resolve build issues
-/*
-declare module "chart.js" {
-  interface ChartTypeRegistry {
-    candlestick: {
-      chartOptions: BarControllerChartOptions;
-      datasetOptions: BarControllerDatasetOptions & {
-        label?: string;
-        borderColor?: string | string[];
-        borderWidth?: number;
-        backgroundColor?: string | string[];
-      };
-      defaultDataPoint: FinancialDataPoint;
-      metaExtensions: Record<string, never>;
-      parsedDataType: Record<string, unknown>;
-      scales: string; // Change from keyof CartesianScaleTypeRegistry to string
-    };
-  }
-}
-*/
+// Export types but don't augment Chart.js module to avoid type conflicts
+// The financial chart types will be registered at runtime
+export type CandlestickDataset = {
+  type: "candlestick";
+  label?: string;
+  data: FinancialDataPoint[];
+  borderColor?: string | string[];
+  borderWidth?: number;
+  backgroundColor?: string | string[];
+  color?: unknown;
+  yAxisID?: string;
+};
