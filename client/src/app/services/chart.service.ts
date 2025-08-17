@@ -28,10 +28,8 @@ type ExtendedChartDataset = ChartDataset & {
 
 // extensions
 import {
-  CandlestickController,
-  CandlestickElement,
   FinancialDataPoint
-} from "src/assets/js/chartjs-chart-financial";
+} from "../../chartjs/financial";
 
 // plugins
 import AnnotationPlugin, {
@@ -43,13 +41,11 @@ import AnnotationPlugin, {
 // register extensions and plugins
 Chart.register(
   // controllers
-  CandlestickController,
   LineController,
   Tooltip,
 
   // elements
   BarElement,
-  CandlestickElement,
   LineElement,
   PointElement,
 
