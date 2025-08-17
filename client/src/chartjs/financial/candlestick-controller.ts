@@ -4,6 +4,7 @@
 
 // Chart import removed - unused
 import { merge } from "chart.js/helpers";
+import type { Element as ChartElement } from "chart.js";
 import { FinancialController } from "./financial-controller";
 import { CandlestickElement } from "./candlestick-element";
 
@@ -15,7 +16,12 @@ export class CandlestickController extends FinancialController {
 
   declare _ruler?: any;
 
-  updateElements(elements: Element[], start: number, count: number, mode: string): void {
+  updateElements(
+    elements: unknown[], 
+    start: number, 
+    count: number, 
+    mode: "default" | "resize" | "reset" | "none" | "hide" | "show" | "active"
+  ): void {
     const dataset = this.getDataset();
     const ruler = this._ruler ?? this._getRuler();
     const firstOpts = this.resolveDataElementOptions(start, mode);
@@ -30,19 +36,19 @@ export class CandlestickController extends FinancialController {
       const baseProperties = this.calculateElementProperties(i, ruler, mode === "reset", options);
       const properties = {
         ...baseProperties,
-        datasetLabel: dataset.label ?? "",
+        datasetLabel: (dataset as unknown as { label?: string }).label ?? "",
         // label: '', // to get label value please use dataset.data[index].label
 
         // Appearance
-        color: (dataset as any).color,
-        borderColor: dataset.borderColor,
-        borderWidth: dataset.borderWidth
+        color: (dataset as unknown as { color?: unknown }).color,
+        borderColor: (dataset as unknown as { borderColor?: unknown }).borderColor,
+        borderWidth: (dataset as unknown as { borderWidth?: unknown }).borderWidth
       };
 
       if (includeOptions) {
-        properties.options = options;
+        (properties as unknown as { options: unknown }).options = options;
       }
-      this.updateElement(elements[i], i, properties, mode);
+      this.updateElement(elements[i] as unknown as ChartElement, i, properties, mode);
     }
   }
 }

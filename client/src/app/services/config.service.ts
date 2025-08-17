@@ -176,7 +176,7 @@ export class ChartConfigService {
 
     // remove x-axis
     if (options.scales?.x) {
-      options.scales.x.display = false;
+      (options.scales.x as unknown as { display: boolean }).display = false;
     }
 
     // format y-axis (helper context)

@@ -23,8 +23,8 @@ export function buildCandlestickDataset(
     type: "candlestick",
     label: options.label ?? "Price",
     data,
-    color: colors as FinancialColorConfig,
-    borderColor: colors as FinancialColorConfig,
+    color: colors as unknown,
+    borderColor: colors.unchanged,
     borderWidth: options.borderWidth ?? 1,
     yAxisID: "y"
   } as ChartDataset;

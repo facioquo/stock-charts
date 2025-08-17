@@ -60,7 +60,7 @@ export class CandlestickElement extends FinancialElement {
       );
     }
 
-    ctx.lineWidth = valueOrDefault(me.borderWidth, 1);
+    ctx.lineWidth = valueOrDefault((this as unknown as { borderWidth?: number }).borderWidth, 1);
     ctx.strokeStyle = valueOrDefault(borderColor, DEFAULT_FINANCIAL_COLORS.unchanged);
 
     ctx.beginPath();

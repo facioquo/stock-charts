@@ -469,8 +469,12 @@ export class ChartService implements OnDestroy {
     listing: IndicatorListing
   ): void {
     if (chartConfig.options?.scales?.y) {
-      chartConfig.options.scales.y.suggestedMin = listing.chartConfig?.minimumYAxis;
-      chartConfig.options.scales.y.suggestedMax = listing.chartConfig?.maximumYAxis;
+      if (listing.chartConfig?.minimumYAxis != null) {
+        (chartConfig.options.scales.y as unknown as { suggestedMin?: number }).suggestedMin = listing.chartConfig.minimumYAxis;
+      }
+      if (listing.chartConfig?.maximumYAxis != null) {
+        (chartConfig.options.scales.y as unknown as { suggestedMax?: number }).suggestedMax = listing.chartConfig.maximumYAxis;
+      }
     }
   }
 
@@ -725,9 +729,12 @@ export class ChartService implements OnDestroy {
       currentVolumeDataset.data = [...fullVolumeDataset.data.slice(startIndex)];
 
       // Also slice the background colors array
-      if (fullVolumeDataset.backgroundColor && Array.isArray(fullVolumeDataset.backgroundColor)) {
-        currentVolumeDataset.backgroundColor = [
-          ...fullVolumeDataset.backgroundColor.slice(startIndex)
+      if (
+        (fullVolumeDataset as unknown as { backgroundColor?: unknown }).backgroundColor && 
+        Array.isArray((fullVolumeDataset as unknown as { backgroundColor: unknown[] }).backgroundColor)
+      ) {
+        (currentVolumeDataset as unknown as { backgroundColor: unknown[] }).backgroundColor = [
+          ...(fullVolumeDataset as unknown as { backgroundColor: unknown[] }).backgroundColor.slice(startIndex)
         ];
       }
     }
@@ -784,8 +791,13 @@ export class ChartService implements OnDestroy {
         }
 
         // Handle backgroundColor for bar charts (like volume)
-        if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
-          result.dataset.backgroundColor = [...fullDataset.backgroundColor.slice(startIndex)];
+        if (
+          (fullDataset as unknown as { backgroundColor?: unknown }).backgroundColor && 
+          Array.isArray((fullDataset as unknown as { backgroundColor: unknown[] }).backgroundColor)
+        ) {
+          (result.dataset as unknown as { backgroundColor: unknown[] }).backgroundColor = [
+            ...(fullDataset as unknown as { backgroundColor: unknown[] }).backgroundColor.slice(startIndex)
+          ];
         }
       });
 
