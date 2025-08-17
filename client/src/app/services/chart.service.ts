@@ -470,10 +470,12 @@ export class ChartService implements OnDestroy {
   ): void {
     if (chartConfig.options?.scales?.y) {
       if (listing.chartConfig?.minimumYAxis != null) {
-        (chartConfig.options.scales.y as unknown as { suggestedMin?: number }).suggestedMin = listing.chartConfig.minimumYAxis;
+        (chartConfig.options.scales.y as unknown as { suggestedMin?: number }).suggestedMin =
+          listing.chartConfig.minimumYAxis;
       }
       if (listing.chartConfig?.maximumYAxis != null) {
-        (chartConfig.options.scales.y as unknown as { suggestedMax?: number }).suggestedMax = listing.chartConfig.maximumYAxis;
+        (chartConfig.options.scales.y as unknown as { suggestedMax?: number }).suggestedMax =
+          listing.chartConfig.maximumYAxis;
       }
     }
   }
@@ -717,8 +719,8 @@ export class ChartService implements OnDestroy {
     const fullPriceDataset = fullMainDatasets[0];
     const currentPriceDataset = this.chartOverlay.data.datasets[0];
     if (
-      fullPriceDataset && 
-      currentPriceDataset && 
+      fullPriceDataset &&
+      currentPriceDataset &&
       (fullPriceDataset as unknown as { type: string }).type === "candlestick"
     ) {
       // Replace the data array entirely (Chart.js better detects this change)
@@ -736,11 +738,15 @@ export class ChartService implements OnDestroy {
 
       // Also slice the background colors array
       if (
-        (fullVolumeDataset as unknown as { backgroundColor?: unknown }).backgroundColor && 
-        Array.isArray((fullVolumeDataset as unknown as { backgroundColor: unknown[] }).backgroundColor)
+        (fullVolumeDataset as unknown as { backgroundColor?: unknown }).backgroundColor &&
+        Array.isArray(
+          (fullVolumeDataset as unknown as { backgroundColor: unknown[] }).backgroundColor
+        )
       ) {
         (currentVolumeDataset as unknown as { backgroundColor: unknown[] }).backgroundColor = [
-          ...(fullVolumeDataset as unknown as { backgroundColor: unknown[] }).backgroundColor.slice(startIndex)
+          ...(fullVolumeDataset as unknown as { backgroundColor: unknown[] }).backgroundColor.slice(
+            startIndex
+          )
         ];
       }
     }
@@ -798,11 +804,13 @@ export class ChartService implements OnDestroy {
 
         // Handle backgroundColor for bar charts (like volume)
         if (
-          (fullDataset as unknown as { backgroundColor?: unknown }).backgroundColor && 
+          (fullDataset as unknown as { backgroundColor?: unknown }).backgroundColor &&
           Array.isArray((fullDataset as unknown as { backgroundColor: unknown[] }).backgroundColor)
         ) {
           (result.dataset as unknown as { backgroundColor: unknown[] }).backgroundColor = [
-            ...(fullDataset as unknown as { backgroundColor: unknown[] }).backgroundColor.slice(startIndex)
+            ...(fullDataset as unknown as { backgroundColor: unknown[] }).backgroundColor.slice(
+              startIndex
+            )
           ];
         }
       });

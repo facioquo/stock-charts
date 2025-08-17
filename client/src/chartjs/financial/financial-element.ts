@@ -11,7 +11,10 @@ import { Element } from "chart.js";
  * @returns bounds of the bar
  */
 function getBarBounds(
-  bar: { getProps: (props: string[], useFinal?: boolean) => Record<string, number>; horizontal?: boolean },
+  bar: {
+    getProps: (props: string[], useFinal?: boolean) => Record<string, number>;
+    horizontal?: boolean;
+  },
   useFinalPosition?: boolean
 ) {
   const { x, y, base, width, height } = bar.getProps(

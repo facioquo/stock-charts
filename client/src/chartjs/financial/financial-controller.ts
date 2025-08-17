@@ -4,13 +4,18 @@
 
 import { BarController, defaults } from "chart.js";
 import { clipArea, unclipArea, isNullOrUndef } from "chart.js/helpers";
-import type { FinancialDataPoint } from "./types";
+import type {
+  FinancialDataPoint,
+  FinancialTooltipContext,
+  ScaleWithInternals,
+  ControllerWithInternals
+} from "./types";
 
 /**
  * Computes the "optimal" sample size to maintain bars equally sized while preventing overlap.
  */
-function computeMinSampleSize(scale: unknown, pixels: number[]): number {
-  let min = (scale as Record<string, unknown>)._length as number;
+function computeMinSampleSize(scale: ScaleWithInternals | undefined, pixels: number[]): number {
+  let min = scale?._length ?? Number.MAX_SAFE_INTEGER;
   let curr: number, i: number, ilen: number;
 
   for (i = 1, ilen = pixels.length; i < ilen; ++i) {
@@ -50,11 +55,13 @@ export class FinancialController extends BarController {
         intersect: false,
         mode: "index",
         callbacks: {
-          label(ctx: any) {
+          label(ctx: FinancialTooltipContext) {
             const point = ctx.parsed;
 
             if (!isNullOrUndef(point.y)) {
-              return (defaults.plugins.tooltip.callbacks.label as any).call(this, ctx);
+              return (
+                defaults.plugins.tooltip.callbacks.label as (ctx: FinancialTooltipContext) => string
+              ).call(this, ctx);
             }
 
             const { o, h, l, c } = point;
@@ -109,7 +116,7 @@ export class FinancialController extends BarController {
     let min = Number.POSITIVE_INFINITY;
     let max = Number.NEGATIVE_INFINITY;
     for (let i = 0; i < _parsed.length; i++) {
-      const data = _parsed[i] as any;
+      const data = _parsed[i] as Record<string, number>;
       min = Math.min(min, data.l);
       max = Math.max(max, data.h);
     }
@@ -117,7 +124,7 @@ export class FinancialController extends BarController {
   }
 
   _getRuler(): Record<string, unknown> {
-    const opts = (this as Record<string, any>).options;
+    const opts = (this as unknown as ControllerWithInternals).options;
     const meta = this._cachedMeta;
     const iScale = meta.iScale;
     const axis = iScale?.axis ?? "x";
@@ -132,9 +139,9 @@ export class FinancialController extends BarController {
     return {
       min,
       pixels,
-      start: (iScale as Record<string, any>)?._startPixel ?? 0,
-      end: (iScale as Record<string, any>)?._endPixel ?? 0,
-      stackCount: (this as Record<string, any>)._getStackCount(),
+      start: (iScale as ScaleWithInternals)?._startPixel ?? 0,
+      end: (iScale as ScaleWithInternals)?._endPixel ?? 0,
+      stackCount: (this as unknown as ControllerWithInternals)._getStackCount(),
       scale: iScale,
       ratio: barThickness ? 1 : opts.categoryPercentage * opts.barPercentage
     };
@@ -151,7 +158,11 @@ export class FinancialController extends BarController {
   ): Record<string, unknown> {
     const vscale = this._cachedMeta.vScale;
     const base = vscale?.getBasePixel() ?? 0;
-    const ipixels = (this as Record<string, any>)._calculateBarIndexPixels(index, ruler, options);
+    const ipixels = (this as unknown as ControllerWithInternals)._calculateBarIndexPixels(
+      index,
+      ruler,
+      options
+    );
     const data = this.chart.data.datasets[this.index].data[index] as FinancialDataPoint;
 
     if (!data || !vscale) {
@@ -163,11 +174,13 @@ export class FinancialController extends BarController {
     const low = vscale.getPixelForValue(data.l);
     const close = vscale.getPixelForValue(data.c);
 
+    const pixelInfo = ipixels as { center: number; size: number };
+
     return {
       base: reset ? base : low,
-      x: ipixels.center,
+      x: pixelInfo.center,
       y: (low + high) / 2,
-      width: ipixels.size,
+      width: pixelInfo.size,
       open,
       high,
       low,
@@ -181,7 +194,7 @@ export class FinancialController extends BarController {
     clipArea(chart.ctx, chart.chartArea);
     for (let i = 0; i < rects.length; ++i) {
       if (rects[i] && typeof (rects[i] as unknown as { draw?: unknown }).draw === "function") {
-        ((rects[i] as unknown as { draw: (ctx: unknown) => void }).draw)(chart.ctx);
+        (rects[i] as unknown as { draw: (ctx: unknown) => void }).draw(chart.ctx);
       }
     }
     unclipArea(chart.ctx);

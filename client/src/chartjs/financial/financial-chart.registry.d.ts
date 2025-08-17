@@ -6,7 +6,7 @@
 export interface FinancialDataPoint {
   x: number;
   o: number; // open
-  h: number; // high  
+  h: number; // high
   l: number; // low
   c: number; // close
 }

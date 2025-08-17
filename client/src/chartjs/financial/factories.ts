@@ -112,7 +112,7 @@ export function buildFinancialChartOptions(
               .map(p => (typeof p === "object" && "y" in p ? p.y : 0))
           );
           return maxVolume * (100 / volumeAxisSize);
-        },
+        } as unknown as number,
         display: false,
         grid: {
           display: false

@@ -14,12 +14,12 @@ import { CandlestickElement } from "./candlestick-element";
 export class CandlestickController extends FinancialController {
   static id = "candlestick";
 
-  declare _ruler?: any;
+  declare _ruler?: unknown;
 
   updateElements(
-    elements: unknown[], 
-    start: number, 
-    count: number, 
+    elements: unknown[],
+    start: number,
+    count: number,
     mode: "default" | "resize" | "reset" | "none" | "hide" | "show" | "active"
   ): void {
     const dataset = this.getDataset();
@@ -33,7 +33,12 @@ export class CandlestickController extends FinancialController {
     for (let i = start; i < count; i++) {
       const options = sharedOptions ?? this.resolveDataElementOptions(i, mode);
 
-      const baseProperties = this.calculateElementProperties(i, ruler, mode === "reset", options);
+      const baseProperties = this.calculateElementProperties(
+        i,
+        ruler as Record<string, unknown>,
+        mode === "reset",
+        options as Record<string, unknown>
+      );
       const properties = {
         ...baseProperties,
         datasetLabel: (dataset as unknown as { label?: string }).label ?? "",

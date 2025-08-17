@@ -36,7 +36,7 @@ declare module "chart.js" {
       defaultDataPoint: unknown;
       metaExtensions: Record<string, never>;
       parsedDataType: unknown;
-      scales: string;
+      scales: "linear";
     };
   }
 }

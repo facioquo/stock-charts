@@ -10,6 +10,7 @@ import type { BarController, Chart } from "chart.js";
  */
 export interface FinancialDataPoint {
   x: number;
+  y?: number; // optional y coordinate for compatibility
   o: number; // open
   h: number; // high
   l: number; // low
@@ -60,3 +61,57 @@ export type OhlcControllerType = ChartComponent & {
 };
 
 export type FinancialElementType = Element;
+
+/**
+ * Chart.js tooltip context for financial data
+ */
+export interface FinancialTooltipContext {
+  parsed: FinancialDataPoint;
+  datasetIndex: number;
+  dataIndex: number;
+  label: string;
+  formattedValue: string;
+}
+
+/**
+ * Scale with internal properties
+ */
+export interface ScaleWithInternals {
+  _startPixel?: number;
+  _endPixel?: number;
+  _length?: number;
+  axis?: string;
+}
+
+/**
+ * Controller with internal properties
+ */
+export interface ControllerWithInternals extends BarController {
+  _getStackCount(): number;
+  options: {
+    barThickness?: number;
+    categoryPercentage: number;
+    barPercentage: number;
+  };
+  _calculateBarIndexPixels(
+    index: number,
+    ruler: unknown,
+    options: Record<string, unknown>
+  ): {
+    center: number;
+    size: number;
+  };
+}
+
+/**
+ * Ruler configuration interface
+ */
+export interface RulerConfig {
+  min: number;
+  pixels: number[];
+  start: number;
+  end: number;
+  stackCount: number;
+  scale: unknown;
+  ratio: number;
+}

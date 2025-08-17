@@ -33,10 +33,12 @@ describe("Financial Chart Registration", () => {
     ensureFinancialChartsRegistered();
 
     // Check that financial defaults exist
-    expect((Chart.defaults.elements as any).financial).toBeDefined();
-    expect((Chart.defaults.elements as any).financial.color).toBeDefined();
-    expect((Chart.defaults.elements as any).financial.color.up).toBeDefined();
-    expect((Chart.defaults.elements as any).financial.color.down).toBeDefined();
-    expect((Chart.defaults.elements as any).financial.color.unchanged).toBeDefined();
+    const elements = Chart.defaults.elements as unknown as Record<string, unknown>;
+    expect(elements.financial).toBeDefined();
+    const financial = elements.financial as Record<string, Record<string, unknown>>;
+    expect(financial.color).toBeDefined();
+    expect(financial.color.up).toBeDefined();
+    expect(financial.color.down).toBeDefined();
+    expect(financial.color.unchanged).toBeDefined();
   });
 });
