@@ -22,6 +22,8 @@
     "test": "npm run test --workspaces",
     "test:watch": "npm run test:watch --workspaces",
     "test:coverage": "npm run test:coverage --workspaces",
+    "test:dotnet": "dotnet test Charts.sln --logger \"trx;LogFileName=backend-tests.trx\" --results-directory ./server/TestResults /p:CollectCoverage=true /p:CoverletOutput=../coverage/ /p:CoverletOutputFormat=lcov",
+    "test:all": "npm run test --workspace=@stock-charts/client && npm run test:dotnet",
     "lint": "npm run lint --workspaces",
     "lint:fix": "npm run lint:fix --workspaces",
     "generate:backup-indicators": "node scripts/generate-backup-indicators.js",
