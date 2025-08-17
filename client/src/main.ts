@@ -8,9 +8,15 @@ import { provideAnimations } from "@angular/platform-browser/animations";
 import { AppComponent } from "./app/app.component";
 import { routes } from "./app/app.routes";
 
+// Register financial chart components once during application bootstrap
+import { ensureFinancialChartsRegistered } from "./chartjs/financial";
+
 if (env.production) {
   enableProdMode();
 }
+
+// Register financial charts once during bootstrap
+ensureFinancialChartsRegistered();
 
 bootstrapApplication(AppComponent, {
   providers: [
