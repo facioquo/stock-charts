@@ -21,7 +21,7 @@
   "dataGroups": [
     {
       "name": "reference-data",
-      "urls": ["https://stock-charts-api.azurewebsites.net/indicators", "https://localhost:44392/indicators"],
+      "urls": ["https://stock-charts-api.azurewebsites.net/indicators", "https://localhost:5001/indicators"],
       "cacheConfig": {
         "strategy": "performance",
         "maxSize": 10,

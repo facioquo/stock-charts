@@ -15,7 +15,8 @@
     "lib": ["ES2022", "dom"],
     "types": ["jest", "node"],
     "useDefineForClassFields": false,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "resolveJsonModule": true
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

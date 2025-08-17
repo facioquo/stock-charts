@@ -107,6 +107,10 @@ The project maintains high code quality through automated linting, formatting, a
 
 For comprehensive code completion requirements, see the [Code completion checklist](.github/instructions/code-completion-checklist.instructions.md).
 
+### Trademarks and attributions
+
+Bollinger Bands® is a registered trademark of John A. Bollinger. Use in this project is solely for descriptive, educational, and comparative purposes; no affiliation, sponsorship, or endorsement is implied.
+
 **Note**: There are known issues with Angular builds and Jest tests in the npm workspace configuration that don't affect core functionality. Linting, formatting, and .NET builds work perfectly.
 
 ## Project structure
@@ -151,6 +155,7 @@ npm run test:coverage     # With coverage
 # Maintenance
 npm run clean             # Clean all build outputs
 npm run lint:md           # Lint markdown files
+npm run generate:backups  # Refresh both backup-indicators.json and backup-quotes.json (runs prebuild automatically)
 ```
 
 **Workspace-specific commands**:

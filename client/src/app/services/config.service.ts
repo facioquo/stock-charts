@@ -30,13 +30,16 @@ export class ChartConfigService {
 
   baseOverlayConfig(volumeAxisSize: number): ChartConfiguration {
     // base configuration
-    const config: ChartConfiguration = {
+    // Root chart type changed from "line" to "candlestick" so Chart.js
+    // calculates y-axis bounds from OHLC values; using "line" caused empty
+    // overlay (scale collapsed in production build).
+    const config = {
       type: "candlestick",
       data: {
         datasets: []
       },
       options: this.baseOverlayOptions(volumeAxisSize)
-    };
+    } as unknown as ChartConfiguration;
 
     return config;
   }
@@ -44,7 +47,7 @@ export class ChartConfigService {
   baseOscillatorConfig(): ChartConfiguration {
     // base configuration
     const config: ChartConfiguration = {
-      type: "candlestick", // TODO: should/could this be line or bar?
+      type: "line", // previously candlestick; using line for type safety until plugin added
       data: {
         datasets: []
       },
@@ -252,7 +255,7 @@ export class ChartConfigService {
           borderColor: r.color,
           backgroundColor: r.color,
           fill:
-            c.fill === null
+            c.fill == null
               ? false
               : {
                   target: c.fill.target,
