@@ -26,12 +26,15 @@ type ExtendedChartDataset = ChartDataset & {
   pointBorderColor?: string[];
 };
 
-// extensions
+// extensions - use new modular financial charts
 import {
   CandlestickController,
   CandlestickElement,
-  FinancialDataPoint
-} from "src/assets/js/chartjs-chart-financial";
+  FinancialDataPoint,
+  createCandlestickDataset,
+  createVolumeDatasetFromFinancialData,
+  ENHANCED_FINANCIAL_COLORS
+} from "../../chartjs/financial";
 
 // plugins
 import AnnotationPlugin, {
@@ -40,16 +43,14 @@ import AnnotationPlugin, {
   ScaleValue
 } from "chartjs-plugin-annotation";
 
-// register extensions and plugins
+// register Chart.js components (financial charts are registered in main.ts)
 Chart.register(
   // controllers
-  CandlestickController,
   LineController,
   Tooltip,
 
   // elements
   BarElement,
-  CandlestickElement,
   LineElement,
   PointElement,
 
@@ -109,14 +110,14 @@ export class ChartService implements OnDestroy {
     CANDLESTICK_PATTERN: "candlestick-pattern"
   } as const;
 
-  // Color constants
+  // Color constants - using enhanced financial colors
   private static readonly COLORS = {
     GREEN: "#2E7D32",
     GRAY: "#9E9E9E",
     RED: "#DD2C00",
-    CANDLE_UP: "#1B5E20",
-    CANDLE_DOWN: "#B71C1C",
-    CANDLE_UNCHANGED: "#616161",
+    CANDLE_UP: ENHANCED_FINANCIAL_COLORS.up,
+    CANDLE_DOWN: ENHANCED_FINANCIAL_COLORS.down,
+    CANDLE_UNCHANGED: ENHANCED_FINANCIAL_COLORS.unchanged,
     VOLUME_UP: "#1B5E2060",
     VOLUME_DOWN: "#B71C1C60"
   };
@@ -926,18 +927,8 @@ export class ChartService implements OnDestroy {
   }
 
   private configureCandlestickDefaults(): void {
-    const candleOptions = Chart.defaults.elements["candlestick"];
-
-    // custom border colors
-    candleOptions.color.up = ChartService.COLORS.CANDLE_UP;
-    candleOptions.color.down = ChartService.COLORS.CANDLE_DOWN;
-    candleOptions.color.unchanged = ChartService.COLORS.CANDLE_UNCHANGED;
-
-    candleOptions.borderColor = {
-      up: candleOptions.color.up,
-      down: candleOptions.color.down,
-      unchanged: candleOptions.color.unchanged
-    };
+    // Configuration is now handled by the financial chart registration system
+    // Colors and defaults are set up in register-financial.ts
   }
 
   private processQuoteData(quotes: Quote[]): {
@@ -994,15 +985,12 @@ export class ChartService implements OnDestroy {
   }
 
   private createPriceDataset(priceData: FinancialDataPoint[]): ChartDataset {
-    const candleOptions = Chart.defaults.elements["candlestick"];
-    return {
-      type: "candlestick",
+    return createCandlestickDataset({
       label: "Price",
       data: priceData,
       yAxisID: "y",
-      borderColor: candleOptions.borderColor,
       order: 75
-    };
+    });
   }
 
   private createVolumeDataset(
