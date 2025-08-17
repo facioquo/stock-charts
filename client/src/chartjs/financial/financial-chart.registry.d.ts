@@ -9,7 +9,7 @@ import {
   BarControllerChartOptions,
   BarControllerDatasetOptions,
   CartesianScaleTypeRegistry
-} from 'chart.js';
+} from "chart.js";
 
 export interface FinancialDataPoint {
   x: number;
@@ -23,7 +23,7 @@ interface FinancialParsedData {
   _custom?: unknown;
 }
 
-declare module 'chart.js' {
+declare module "chart.js" {
   interface ChartTypeRegistry {
     candlestick: {
       chartOptions: BarControllerChartOptions;

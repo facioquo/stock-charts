@@ -27,9 +27,7 @@ type ExtendedChartDataset = ChartDataset & {
 };
 
 // extensions
-import {
-  FinancialDataPoint
-} from "../../chartjs/financial";
+import { FinancialDataPoint } from "../../chartjs/financial";
 
 // plugins
 import AnnotationPlugin, {

@@ -5,9 +5,9 @@
  * MIT License
  */
 
-import { Chart } from 'chart.js';
-import { merge, valueOrDefault } from 'chart.js/helpers';
-import { FinancialElement } from './financial-element';
+import { Chart } from "chart.js";
+import { merge, valueOrDefault } from "chart.js/helpers";
+import { FinancialElement } from "./financial-element";
 
 interface ColorConfig {
   up?: string;
@@ -30,7 +30,7 @@ export interface CandlestickElementProps {
 }
 
 export class CandlestickElement extends FinancialElement {
-  static id = 'candlestick';
+  static id = "candlestick";
   static defaults = {
     borderWidth: 1
   };
@@ -45,7 +45,7 @@ export class CandlestickElement extends FinancialElement {
     const { x, open, high, low, close } = me;
 
     let borderColors = me.borderColor;
-    if (typeof borderColors === 'string') {
+    if (typeof borderColors === "string") {
       borderColors = {
         up: borderColors,
         down: borderColors,
@@ -53,55 +53,31 @@ export class CandlestickElement extends FinancialElement {
       };
     }
 
-    const defaults = (Chart.defaults as any);
+    const defaults = Chart.defaults as any;
     const financialDefaults = {
       color: {
-        up: 'rgba(80, 160, 115, 1)',
-        down: 'rgba(215, 85, 65, 1)',
-        unchanged: 'rgba(90, 90, 90, 1)'
+        up: "rgba(80, 160, 115, 1)",
+        down: "rgba(215, 85, 65, 1)",
+        unchanged: "rgba(90, 90, 90, 1)"
       },
-      borderColor: 'rgba(90, 90, 90, 1)',
+      borderColor: "rgba(90, 90, 90, 1)",
       borderWidth: 1
     };
 
     let borderColor: string;
     if (close < open) {
-      borderColor = valueOrDefault(
-        borderColors?.up,
-        financialDefaults.borderColor
-      );
-      ctx.fillStyle = valueOrDefault(
-        me.color?.up,
-        financialDefaults.color.up
-      );
+      borderColor = valueOrDefault(borderColors?.up, financialDefaults.borderColor);
+      ctx.fillStyle = valueOrDefault(me.color?.up, financialDefaults.color.up);
     } else if (close > open) {
-      borderColor = valueOrDefault(
-        borderColors?.down,
-        financialDefaults.borderColor
-      );
-      ctx.fillStyle = valueOrDefault(
-        me.color?.down,
-        financialDefaults.color.down
-      );
+      borderColor = valueOrDefault(borderColors?.down, financialDefaults.borderColor);
+      ctx.fillStyle = valueOrDefault(me.color?.down, financialDefaults.color.down);
     } else {
-      borderColor = valueOrDefault(
-        borderColors?.unchanged,
-        financialDefaults.borderColor
-      );
-      ctx.fillStyle = valueOrDefault(
-        me.color?.unchanged,
-        financialDefaults.color.unchanged
-      );
+      borderColor = valueOrDefault(borderColors?.unchanged, financialDefaults.borderColor);
+      ctx.fillStyle = valueOrDefault(me.color?.unchanged, financialDefaults.color.unchanged);
     }
 
-    ctx.lineWidth = valueOrDefault(
-      me.borderWidth,
-      financialDefaults.borderWidth
-    );
-    ctx.strokeStyle = valueOrDefault(
-      borderColor,
-      financialDefaults.borderColor
-    );
+    ctx.lineWidth = valueOrDefault(me.borderWidth, financialDefaults.borderWidth);
+    ctx.strokeStyle = valueOrDefault(borderColor, financialDefaults.borderColor);
 
     ctx.beginPath();
     ctx.moveTo(x, high);

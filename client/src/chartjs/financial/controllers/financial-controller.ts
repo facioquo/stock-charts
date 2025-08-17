@@ -5,8 +5,8 @@
  * MIT License
  */
 
-import { BarController, Chart, Scale } from 'chart.js';
-import { clipArea, unclipArea, isNullOrUndef } from 'chart.js/helpers';
+import { BarController, Chart, Scale } from "chart.js";
+import { clipArea, unclipArea, isNullOrUndef } from "chart.js/helpers";
 
 export interface FinancialDataPoint {
   x: number;
@@ -39,7 +39,10 @@ interface Ruler {
  */
 function computeMinSampleSize(scale: Scale, pixels: number[]): number {
   let min = (scale as any)._length || 100; // fallback if _length not available
-  let prev: number = 0, curr: number, i: number, ilen: number;
+  let prev: number = 0,
+    curr: number,
+    i: number,
+    ilen: number;
 
   for (i = 1, ilen = pixels.length; i < ilen; ++i) {
     min = Math.min(min, Math.abs(pixels[i] - pixels[i - 1]));
@@ -102,9 +105,9 @@ export class FinancialController extends BarController {
     }
 
     if (scale === meta.iScale) {
-      return { 
-        min: _parsed[0][axis as keyof FinancialParsedData] as number, 
-        max: _parsed[_parsed.length - 1][axis as keyof FinancialParsedData] as number 
+      return {
+        min: _parsed[0][axis as keyof FinancialParsedData] as number,
+        max: _parsed[_parsed.length - 1][axis as keyof FinancialParsedData] as number
       };
     }
 
@@ -125,15 +128,15 @@ export class FinancialController extends BarController {
     const iScale = meta.iScale;
     const axis = iScale.axis;
     const pixels: number[] = [];
-    
+
     for (let i = 0; i < meta.data.length; ++i) {
       const parsed = me.getParsed(i) as FinancialParsedData;
       pixels.push(iScale.getPixelForValue(parsed[axis as keyof FinancialParsedData]));
     }
-    
+
     const barThickness = opts.barThickness;
     const min = computeMinSampleSize(iScale, pixels);
-    
+
     return {
       min,
       pixels,
@@ -148,16 +151,14 @@ export class FinancialController extends BarController {
   /**
    * @protected
    */
-  calculateElementProperties(
-    index: number, 
-    ruler: Ruler, 
-    reset: boolean, 
-    options: any
-  ): any {
+  calculateElementProperties(index: number, ruler: Ruler, reset: boolean, options: any): any {
     const me = this;
     const vscale = me._cachedMeta.vScale;
     const base = vscale.getBasePixel();
-    const ipixels = (me as any)._calculateBarIndexPixels?.(index, ruler, options) || { center: 0, size: 10 };
+    const ipixels = (me as any)._calculateBarIndexPixels?.(index, ruler, options) || {
+      center: 0,
+      size: 10
+    };
     const data = me.chart.data.datasets[me.index].data[index] as FinancialDataPoint;
     const open = vscale.getPixelForValue(data.o);
     const high = vscale.getPixelForValue(data.h);
@@ -188,12 +189,12 @@ export class FinancialController extends BarController {
   }
 
   static overrides = {
-    label: '',
+    label: "",
 
     parsing: false,
 
     hover: {
-      mode: 'label'
+      mode: "label"
     },
 
     datasets: {
@@ -201,8 +202,8 @@ export class FinancialController extends BarController {
       barPercentage: 0.9,
       animation: {
         numbers: {
-          type: 'number',
-          properties: ['x', 'y', 'base', 'width', 'open', 'high', 'low', 'close']
+          type: "number",
+          properties: ["x", "y", "base", "width", "open", "high", "low", "close"]
         }
       }
     },
@@ -210,7 +211,7 @@ export class FinancialController extends BarController {
     plugins: {
       tooltip: {
         intersect: false,
-        mode: 'index',
+        mode: "index",
         callbacks: {
           label(ctx: any) {
             const point = ctx.parsed;

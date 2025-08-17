@@ -5,14 +5,14 @@
  * MIT License
  */
 
-import { Element } from 'chart.js';
+import { Element } from "chart.js";
 
 /**
  * Helper function to get the bounds of the bar regardless of the orientation
  */
 function getBarBounds(bar: FinancialElement, useFinalPosition?: boolean) {
-  const { x, y, base, width } = bar.getProps(['x', 'y', 'base', 'width'], useFinalPosition);
-  const { low, high } = bar.getProps(['low', 'high'], useFinalPosition);
+  const { x, y, base, width } = bar.getProps(["x", "y", "base", "width"], useFinalPosition);
+  const { low, high } = bar.getProps(["low", "high"], useFinalPosition);
 
   let left: number, right: number, top: number, bottom: number, half: number;
 
@@ -33,14 +33,21 @@ function getBarBounds(bar: FinancialElement, useFinalPosition?: boolean) {
   return { left, top, right, bottom };
 }
 
-function inRange(bar: FinancialElement | null, x: number | null, y: number | null, useFinalPosition?: boolean): boolean {
+function inRange(
+  bar: FinancialElement | null,
+  x: number | null,
+  y: number | null,
+  useFinalPosition?: boolean
+): boolean {
   const skipX = x === null;
   const skipY = y === null;
   const bounds = !bar || (skipX && skipY) ? false : getBarBounds(bar, useFinalPosition);
 
-  return Boolean(bounds
-    && (skipX || (x !== null && x >= bounds.left && x <= bounds.right))
-    && (skipY || (y !== null && y >= bounds.top && y <= bounds.bottom)));
+  return Boolean(
+    bounds &&
+      (skipX || (x !== null && x >= bounds.left && x <= bounds.right)) &&
+      (skipY || (y !== null && y >= bounds.top && y <= bounds.bottom))
+  );
 }
 
 export interface FinancialElementProps {
@@ -55,7 +62,7 @@ export interface FinancialElementProps {
 }
 
 export class FinancialElement extends Element<FinancialElementProps> {
-  static id = 'financial';
+  static id = "financial";
 
   declare x: number;
   declare y: number;
@@ -82,12 +89,12 @@ export class FinancialElement extends Element<FinancialElementProps> {
     return inRange(this, null, mouseY, useFinalPosition);
   }
 
-  getRange(axis: 'x' | 'y'): number {
-    return axis === 'x' ? this.width / 2 : this.getHeight() / 2;
+  getRange(axis: "x" | "y"): number {
+    return axis === "x" ? this.width / 2 : this.getHeight() / 2;
   }
 
   getCenterPoint(useFinalPosition?: boolean) {
-    const { x, low, high } = this.getProps(['x', 'low', 'high'], useFinalPosition);
+    const { x, low, high } = this.getProps(["x", "low", "high"], useFinalPosition);
     return {
       x,
       y: (high + low) / 2
@@ -95,7 +102,7 @@ export class FinancialElement extends Element<FinancialElementProps> {
   }
 
   tooltipPosition(useFinalPosition?: boolean) {
-    const { x, open, close } = this.getProps(['x', 'open', 'close'], useFinalPosition);
+    const { x, open, close } = this.getProps(["x", "open", "close"], useFinalPosition);
     return {
       x,
       y: (open + close) / 2

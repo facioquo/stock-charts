@@ -5,9 +5,9 @@
  * MIT License
  */
 
-import { Chart } from 'chart.js';
-import { merge, valueOrDefault } from 'chart.js/helpers';
-import { FinancialElement } from './financial-element';
+import { Chart } from "chart.js";
+import { merge, valueOrDefault } from "chart.js/helpers";
+import { FinancialElement } from "./financial-element";
 
 interface ColorConfig {
   up?: string;
@@ -31,7 +31,7 @@ export interface OhlcElementProps {
 }
 
 export class OhlcElement extends FinancialElement {
-  static id = 'ohlc';
+  static id = "ohlc";
   static defaults = {
     lineWidth: 2,
     armLength: null,
@@ -50,24 +50,18 @@ export class OhlcElement extends FinancialElement {
 
     const financialDefaults = {
       color: {
-        up: 'rgba(80, 160, 115, 1)',
-        down: 'rgba(215, 85, 65, 1)',
-        unchanged: 'rgba(90, 90, 90, 1)'
+        up: "rgba(80, 160, 115, 1)",
+        down: "rgba(215, 85, 65, 1)",
+        unchanged: "rgba(90, 90, 90, 1)"
       },
       lineWidth: 2,
       armLength: null,
       armLengthRatio: 0.8
     };
 
-    const armLengthRatio = valueOrDefault(
-      me.armLengthRatio,
-      financialDefaults.armLengthRatio
-    );
-    let armLength = valueOrDefault(
-      me.armLength,
-      financialDefaults.armLength
-    );
-    
+    const armLengthRatio = valueOrDefault(me.armLengthRatio, financialDefaults.armLengthRatio);
+    let armLength = valueOrDefault(me.armLength, financialDefaults.armLength);
+
     if (armLength === null) {
       // The width of an ohlc is affected by barPercentage and categoryPercentage
       // This behavior is caused by extending controller.financial, which extends controller.bar
@@ -79,26 +73,14 @@ export class OhlcElement extends FinancialElement {
     }
 
     if (close < open) {
-      ctx.strokeStyle = valueOrDefault(
-        me.color?.up,
-        financialDefaults.color.up
-      );
+      ctx.strokeStyle = valueOrDefault(me.color?.up, financialDefaults.color.up);
     } else if (close > open) {
-      ctx.strokeStyle = valueOrDefault(
-        me.color?.down,
-        financialDefaults.color.down
-      );
+      ctx.strokeStyle = valueOrDefault(me.color?.down, financialDefaults.color.down);
     } else {
-      ctx.strokeStyle = valueOrDefault(
-        me.color?.unchanged,
-        financialDefaults.color.unchanged
-      );
+      ctx.strokeStyle = valueOrDefault(me.color?.unchanged, financialDefaults.color.unchanged);
     }
-    
-    ctx.lineWidth = valueOrDefault(
-      me.lineWidth,
-      financialDefaults.lineWidth
-    );
+
+    ctx.lineWidth = valueOrDefault(me.lineWidth, financialDefaults.lineWidth);
 
     ctx.beginPath();
     ctx.moveTo(x, high);

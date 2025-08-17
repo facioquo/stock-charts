@@ -5,9 +5,9 @@
  * MIT License
  */
 
-import { ChartConfiguration, ChartDataset, ScatterDataPoint } from 'chart.js';
-import { FinancialDataPoint } from '../financial-chart.registry';
-import { FinancialColorScheme, DEFAULT_FINANCIAL_COLORS, generateVolumeColors } from './colors';
+import { ChartConfiguration, ChartDataset, ScatterDataPoint } from "chart.js";
+import { FinancialDataPoint } from "../financial-chart.registry";
+import { FinancialColorScheme, DEFAULT_FINANCIAL_COLORS, generateVolumeColors } from "./colors";
 
 export interface CandlestickDatasetOptions {
   label?: string;
@@ -40,10 +40,10 @@ export interface FinancialChartOptions {
  */
 export function createCandlestickDataset(options: CandlestickDatasetOptions): ChartDataset {
   const colorScheme = options.colorScheme || DEFAULT_FINANCIAL_COLORS;
-  
+
   return {
-    type: 'candlestick' as any,
-    label: options.label || 'Price',
+    type: "candlestick" as any,
+    label: options.label || "Price",
     data: options.data,
     color: colorScheme as any,
     borderColor: colorScheme as any,
@@ -56,23 +56,23 @@ export function createCandlestickDataset(options: CandlestickDatasetOptions): Ch
  */
 export function createVolumeDataset(options: VolumeDatasetOptions): ChartDataset {
   const colorScheme = options.colorScheme || DEFAULT_FINANCIAL_COLORS;
-  
+
   // Extract OHLC data for color calculation
   const quotes = options.data.map(point => ({
     open: (point as any).o || 0,
     close: (point as any).c || 0
   }));
-  
+
   const volumeColors = generateVolumeColors(quotes, colorScheme);
-  
+
   return {
-    type: 'bar',
-    label: options.label || 'Volume',
+    type: "bar",
+    label: options.label || "Volume",
     data: options.data,
     backgroundColor: volumeColors,
     borderColor: volumeColors,
     borderWidth: 0,
-    yAxisID: options.yAxisID || 'volume'
+    yAxisID: options.yAxisID || "volume"
   };
 }
 
@@ -81,10 +81,10 @@ export function createVolumeDataset(options: VolumeDatasetOptions): ChartDataset
  */
 export function createOhlcDataset(options: CandlestickDatasetOptions): ChartDataset {
   const colorScheme = options.colorScheme || DEFAULT_FINANCIAL_COLORS;
-  
+
   return {
-    type: 'ohlc' as any,
-    label: options.label || 'OHLC',
+    type: "ohlc" as any,
+    label: options.label || "OHLC",
     data: options.data,
     color: colorScheme as any,
     lineWidth: options.borderWidth || 2,
@@ -102,23 +102,25 @@ export function createFinancialChartConfig(
 ): ChartConfiguration {
   const datasets: ChartDataset[] = [
     createCandlestickDataset({
-      label: 'Price',
+      label: "Price",
       data: candlestickData
     })
   ];
 
   if (volumeData) {
-    datasets.push(createVolumeDataset({
-      label: 'Volume',
-      data: volumeData,
-      yAxisID: 'volume'
-    }));
+    datasets.push(
+      createVolumeDataset({
+        label: "Volume",
+        data: volumeData,
+        yAxisID: "volume"
+      })
+    );
   }
 
   const volumeAxisSize = options.volumeAxisSize || 25;
 
   return {
-    type: 'candlestick' as any,
+    type: "candlestick" as any,
     data: {
       datasets
     },
@@ -127,25 +129,25 @@ export function createFinancialChartConfig(
       maintainAspectRatio: options.maintainAspectRatio ?? false,
       scales: {
         x: {
-          type: 'timeseries',
+          type: "timeseries",
           time: {
             displayFormats: {
-              day: 'MMM dd',
-              week: 'MMM dd',
-              month: 'MMM yyyy'
+              day: "MMM dd",
+              week: "MMM dd",
+              month: "MMM yyyy"
             }
           },
           ...options.scales?.x
         },
         y: {
-          type: 'linear',
-          position: 'right',
+          type: "linear",
+          position: "right",
           ...options.scales?.y
         },
         ...(volumeData && {
           volume: {
-            type: 'linear',
-            position: 'left',
+            type: "linear",
+            position: "left",
             max: (context: any) => {
               const max = Math.max(...volumeData.map(d => d.y));
               return max * (100 / volumeAxisSize);
@@ -165,7 +167,7 @@ export function createFinancialChartConfig(
           display: true
         },
         tooltip: {
-          mode: 'index',
+          mode: "index",
           intersect: false
         },
         ...options.plugins

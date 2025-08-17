@@ -15,27 +15,27 @@ export interface FinancialColorScheme {
  * Default financial color scheme
  */
 export const DEFAULT_FINANCIAL_COLORS: FinancialColorScheme = {
-  up: 'rgba(80, 160, 115, 1)',
-  down: 'rgba(215, 85, 65, 1)',
-  unchanged: 'rgba(90, 90, 90, 1)'
+  up: "rgba(80, 160, 115, 1)",
+  down: "rgba(215, 85, 65, 1)",
+  unchanged: "rgba(90, 90, 90, 1)"
 };
 
 /**
  * Alternative green/red color scheme
  */
 export const GREEN_RED_COLORS: FinancialColorScheme = {
-  up: '#00C851',
-  down: '#FF4444',
-  unchanged: '#666666'
+  up: "#00C851",
+  down: "#FF4444",
+  unchanged: "#666666"
 };
 
 /**
  * Dark theme compatible color scheme
  */
 export const DARK_THEME_COLORS: FinancialColorScheme = {
-  up: '#4CAF50',
-  down: '#F44336',
-  unchanged: '#9E9E9E'
+  up: "#4CAF50",
+  down: "#F44336",
+  unchanged: "#9E9E9E"
 };
 
 /**
@@ -65,7 +65,7 @@ export function createCandlestickColorCallback(
   return (ctx: any) => {
     const dataPoint = ctx.parsed;
     if (!dataPoint) return colorScheme.unchanged;
-    
+
     if (dataPoint.c > dataPoint.o) {
       return colorScheme.up;
     } else if (dataPoint.c < dataPoint.o) {

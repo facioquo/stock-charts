@@ -6,24 +6,24 @@
  */
 
 // Controllers
-export { FinancialController } from './controllers/financial-controller';
-export { CandlestickController } from './controllers/candlestick-controller';
-export { OhlcController } from './controllers/ohlc-controller';
+export { FinancialController } from "./controllers/financial-controller";
+export { CandlestickController } from "./controllers/candlestick-controller";
+export { OhlcController } from "./controllers/ohlc-controller";
 
 // Elements
-export { FinancialElement } from './elements/financial-element';
-export { CandlestickElement } from './elements/candlestick-element';
-export { OhlcElement } from './elements/ohlc-element';
+export { FinancialElement } from "./elements/financial-element";
+export { CandlestickElement } from "./elements/candlestick-element";
+export { OhlcElement } from "./elements/ohlc-element";
 
 // Types
-export type { FinancialDataPoint } from './financial-chart.registry';
+export type { FinancialDataPoint } from "./financial-chart.registry";
 
 // Registration
 export {
   ensureFinancialChartsRegistered,
   isFinancialChartsRegistered,
   resetFinancialChartsRegistration
-} from './register-financial';
+} from "./register-financial";
 
 // Utilities
 export {
@@ -34,7 +34,7 @@ export {
   generateVolumeColors,
   createCandlestickColorCallback,
   createFinancialBorderColors
-} from './utils/colors';
+} from "./utils/colors";
 
 export {
   type CandlestickDatasetOptions,
@@ -46,5 +46,4 @@ export {
   createFinancialChartConfig,
   convertToFinancialDataPoints,
   convertToVolumeDataPoints
-} from './utils/factories';
-
+} from "./utils/factories";

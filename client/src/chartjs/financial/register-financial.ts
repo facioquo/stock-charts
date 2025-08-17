@@ -5,11 +5,11 @@
  * MIT License
  */
 
-import { Chart } from 'chart.js';
-import { CandlestickController } from './controllers/candlestick-controller';
-import { OhlcController } from './controllers/ohlc-controller';
-import { CandlestickElement } from './elements/candlestick-element';
-import { OhlcElement } from './elements/ohlc-element';
+import { Chart } from "chart.js";
+import { CandlestickController } from "./controllers/candlestick-controller";
+import { OhlcController } from "./controllers/ohlc-controller";
+import { CandlestickElement } from "./elements/candlestick-element";
+import { OhlcElement } from "./elements/ohlc-element";
 
 let isRegistered = false;
 
@@ -27,9 +27,9 @@ export function ensureFinancialChartsRegistered(): void {
   chartDefaults.elements = chartDefaults.elements || {};
   chartDefaults.elements.financial = {
     color: {
-      up: 'rgba(80, 160, 115, 1)',
-      down: 'rgba(215, 85, 65, 1)',
-      unchanged: 'rgba(90, 90, 90, 1)'
+      up: "rgba(80, 160, 115, 1)",
+      down: "rgba(215, 85, 65, 1)",
+      unchanged: "rgba(90, 90, 90, 1)"
     }
   };
 
@@ -49,12 +49,7 @@ export function ensureFinancialChartsRegistered(): void {
   };
 
   // Register controllers and elements
-  Chart.register(
-    CandlestickController,
-    OhlcController,
-    CandlestickElement,
-    OhlcElement
-  );
+  Chart.register(CandlestickController, OhlcController, CandlestickElement, OhlcElement);
 
   isRegistered = true;
 }

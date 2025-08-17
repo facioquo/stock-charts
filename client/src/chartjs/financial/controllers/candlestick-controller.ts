@@ -5,23 +5,18 @@
  * MIT License
  */
 
-import { Chart } from 'chart.js';
-import { merge } from 'chart.js/helpers';
-import { FinancialController } from './financial-controller';
-import { CandlestickElement } from '../elements/candlestick-element';
+import { Chart } from "chart.js";
+import { merge } from "chart.js/helpers";
+import { FinancialController } from "./financial-controller";
+import { CandlestickElement } from "../elements/candlestick-element";
 
 export class CandlestickController extends FinancialController {
-  static id = 'candlestick';
+  static id = "candlestick";
   static defaults = {
     dataElementType: CandlestickElement.id
   };
 
-  updateElements(
-    elements: any[], 
-    start: number, 
-    count: number, 
-    mode: any
-  ): void {
+  updateElements(elements: any[], start: number, count: number, mode: any): void {
     const me = this;
     const dataset = me.getDataset();
     const ruler = (me as any)._ruler || me._getRuler();
@@ -34,10 +29,10 @@ export class CandlestickController extends FinancialController {
     for (let i = start; i < count; i++) {
       const options = sharedOptions || (me as any).resolveDataElementOptions(i, mode);
 
-      const baseProperties = me.calculateElementProperties(i, ruler, mode === 'reset', options);
+      const baseProperties = me.calculateElementProperties(i, ruler, mode === "reset", options);
       const properties = {
         ...baseProperties,
-        datasetLabel: dataset.label || '',
+        datasetLabel: dataset.label || "",
         // label: '', // to get label value please use dataset.data[index].label
 
         // Appearance
