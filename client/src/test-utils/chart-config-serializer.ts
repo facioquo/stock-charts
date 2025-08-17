@@ -11,83 +11,72 @@ export interface ChartLikeObject {
   [key: string]: unknown;
 }
 
-// Jest snapshot serializer printer signature
-// Using 'any' here to align with Jest's expected plugin types while keeping
-// internal normalization strongly typed.
-// Match Jest Printer signature loosely while avoiding 'any' in our implementation
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Printer = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  val: any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  config: any,
-  indentation: string,
-  depth: number,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  refs: any
-) => string;
+// Import pretty-format types (Jest internally re-exports these for plugin shapes)
+// Using type-only import avoids adding runtime dependency cost.
+import type {
+  NewPlugin,
+  Config as PrettyFormatConfig,
+  Printer as PrettyFormatPrinter
+} from "pretty-format";
 
-export const chartConfigSerializer = {
-  test: (val: unknown) => {
+// Printer type specialized for our normalized chart config structure.
+type Printer = PrettyFormatPrinter;
+
+// Narrow plugin value types we accept (chart-like objects)
+type ChartSerializable = Record<string, unknown> | unknown[];
+
+export const chartConfigSerializer: NewPlugin = {
+  test: (val: unknown): boolean => {
     const obj = val as ChartLikeObject | null;
     return !!(obj && typeof obj === "object" && (obj.type ?? obj.data ?? obj.options));
   },
-
   serialize: (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    val: any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    config: any,
+    val: ChartSerializable,
+    config: PrettyFormatConfig,
     indentation: string,
     depth: number,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    refs: any,
+    refs: unknown[],
     printer: Printer
   ): string => {
-    // Clone the object to avoid mutating the original
-    const sanitized: unknown = JSON.parse(JSON.stringify(val));
+    // Clone via JSON for deterministic deep copy of POJO data.
+    const sanitized: ChartSerializable = JSON.parse(JSON.stringify(val)) as ChartSerializable;
 
-    // Remove or normalize dynamic/unstable values
     const normalize = (obj: unknown): unknown => {
       if (Array.isArray(obj)) return obj.map(normalize);
       if (obj && typeof obj === "object") {
         const source = obj as Record<string, unknown>;
         const normalized: Record<string, unknown> = {};
-        Object.entries(source).forEach(([key, value]) => {
+        for (const [key, value] of Object.entries(source)) {
+          const lower = key.toLowerCase();
           if (key === "id" || key === "guid" || key === "_id") normalized[key] = "[DYNAMIC_ID]";
           else if (typeof value === "function") normalized[key] = "[Function]";
-          else if (key.toLowerCase().includes("time") && typeof value === "number")
+          else if (lower.includes("time") && typeof value === "number")
             normalized[key] = "[TIMESTAMP]";
-          else if (key.toLowerCase().includes("color") && typeof value === "string")
+          else if (lower.includes("color") && typeof value === "string")
             normalized[key] = value.toLowerCase();
           else normalized[key] = normalize(value);
-        });
+        }
         return normalized;
       }
       return obj;
     };
 
-    const normalizedConfig = normalize(sanitized) as unknown;
-
-    // Sort object keys for consistent output
     const sortKeys = (obj: unknown): unknown => {
       if (Array.isArray(obj)) return obj.map(sortKeys);
       if (obj && typeof obj === "object") {
         const source = obj as Record<string, unknown>;
         const sorted: Record<string, unknown> = {};
-        Object.keys(source)
-          .sort()
-          .forEach(k => {
-            sorted[k] = sortKeys(source[k]);
-          });
+        for (const k of Object.keys(source).sort()) {
+          sorted[k] = sortKeys(source[k]);
+        }
         return sorted;
       }
       return obj;
     };
 
+    const normalizedConfig = normalize(sanitized);
     const sortedConfig = sortKeys(normalizedConfig);
-
-    return printer(sortedConfig, config, indentation, depth, refs);
+    return printer(sortedConfig, config, indentation, depth, refs as unknown[]);
   }
 };
 

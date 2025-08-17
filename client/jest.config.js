@@ -16,6 +16,16 @@ module.exports = {
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['html', 'text-summary', 'lcov'],
+  // Minimal baseline thresholds (current overall ~17%); set just below to avoid failing now
+  // and encourage incremental improvement. Increase these as test coverage grows.
+  coverageThreshold: {
+    global: {
+      statements: 15,
+      branches: 15,
+      functions: 15,
+      lines: 15
+    }
+  },
   reporters: [
     'default',
     ['jest-junit', { outputDirectory: 'test-results', outputName: 'junit.xml' }]
