@@ -3,7 +3,7 @@
 // Dataset and configuration factory utilities
 
 import { ChartDataset, ChartOptions, ScatterDataPoint } from "chart.js";
-import { FinancialDataPoint, FinancialColorConfig } from "./types";
+import type { FinancialDataPoint, FinancialColorConfig } from "./types";
 import { CandlestickDataset } from "./financial-chart.registry";
 import { getFinancialColors, createVolumeColors } from "./colors";
 
