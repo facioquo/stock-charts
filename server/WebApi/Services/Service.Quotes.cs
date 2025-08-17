@@ -8,7 +8,7 @@ public interface IQuoteService
     Task<IEnumerable<Quote>> Get(string symbol);
 }
 
-public partial class QuoteService(
+public class QuoteService(
     ILogger<QuoteService> logger,
     IStorage storage) : IQuoteService
 {
@@ -37,7 +37,7 @@ public partial class QuoteService(
             if (!await blob.ExistsAsync())
             {
                 _logger.LogWarning("Blob {BlobName} not found, using backup data", blobName);
-                return backupQuotes;
+                return QuoteBackup.BackupQuotes;
             }
 
             Response<BlobDownloadInfo> response = await blob.DownloadAsync();
@@ -46,7 +46,7 @@ public partial class QuoteService(
             if (stream == null)
             {
                 _logger.LogError("Download stream was null for {BlobName}", blobName);
-                return backupQuotes;
+                return QuoteBackup.BackupQuotes;
             }
 
             List<Quote>? quotes = await JsonSerializer.DeserializeAsync<List<Quote>>(stream);
@@ -54,7 +54,7 @@ public partial class QuoteService(
             if (quotes == null || quotes.Count == 0)
             {
                 _logger.LogWarning("No quotes found in {BlobName}", blobName);
-                return backupQuotes;
+                return QuoteBackup.BackupQuotes;
             }
 
             return quotes.OrderBy(x => x.Date);
@@ -64,7 +64,7 @@ public partial class QuoteService(
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to retrieve quotes for {Symbol}", symbol);
-            return backupQuotes;
+            return QuoteBackup.BackupQuotes;
         }
     }
 }

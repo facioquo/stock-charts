@@ -2,19 +2,19 @@ namespace WebApi.Services;
 
 public interface IStorage
 {
-    Task InitializeAsync(CancellationToken cancellationToken = default);
+    Task InitializeAsync();
+    Task InitializeAsync(CancellationToken cancellationToken);
     Task PutBlobAsync(string blobName, string content);
     BlobClient GetBlobClient(string blobName);
 }
 
 public class Storage : IStorage
 {
-    private readonly string _containerName;
     private readonly BlobContainerClient _blobClient;
 
     public Storage(IConfiguration configuration)
     {
-        _containerName
+        string containerName
             = configuration.GetValue<string>("Storage:ContainerName")
             ?? "chart-demo";
 
@@ -23,7 +23,7 @@ public class Storage : IStorage
             ?? Environment.GetEnvironmentVariable("AzureWebJobsStorage")
             ?? "UseDevelopmentStorage=true";
 
-        _blobClient = new BlobContainerClient(connectionString, _containerName);
+        _blobClient = new BlobContainerClient(connectionString, containerName);
     }
 
     /// <summary>
@@ -31,7 +31,9 @@ public class Storage : IStorage
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the async operation</returns>
-    public async Task InitializeAsync(CancellationToken cancellationToken = default)
+    public Task InitializeAsync() => InitializeAsync(CancellationToken.None);
+
+    public async Task InitializeAsync(CancellationToken cancellationToken)
         => await _blobClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
 
     /// <summary>

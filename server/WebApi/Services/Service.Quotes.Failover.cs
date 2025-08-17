@@ -1,8 +1,9 @@
 namespace WebApi.Services;
 
-public partial class QuoteService
+// Contains large static backup quote dataset used for failover (kept separate for readability)
+internal static class QuoteBackup
 {
-    private static readonly IReadOnlyList<Quote> backupQuotes = GetBackup().OrderBy(x => x.Date).ToList();
+    internal static readonly IReadOnlyList<Quote> BackupQuotes = GetBackup().OrderBy(x => x.Date).ToList();
 
     private static List<Quote> GetBackup() =>
     [
