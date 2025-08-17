@@ -11,7 +11,16 @@ const path = require('path');
 
 // Path to server metadata file
 const serverMetadataPath = path.join(__dirname, '../server/WebApi/Services/Service.Metadata.cs');
-const outputPath = path.join(__dirname, '../client/src/app/data/backup-indicators.ts');
+const OUTPUT_RELATIVE = '../client/src/app/data/backup-indicators.ts';
+const resolvedOutput = path.resolve(__dirname, OUTPUT_RELATIVE);
+
+// Whitelist: ensure we only write within project client/src/app/data directory
+const allowedDir = path.resolve(__dirname, '../client/src/app/data');
+if (!resolvedOutput.startsWith(allowedDir)) {
+  console.error('Refusing to write backup indicators outside allowed directory.');
+  process.exit(2);
+}
+const outputPath = resolvedOutput;
 
 console.log('Generating backup indicators from server metadata...');
 
@@ -371,7 +380,7 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
     ]
   },
 
-  // Stochastic Oscillator  
+  // Stochastic Oscillator
   {
     name: "Stochastic Oscillator",
     uiid: "STO",
@@ -506,7 +515,8 @@ export const CLIENT_BACKUP_INDICATORS: IndicatorListing[] = [
 // Generate and write backup indicators
 try {
   const backupIndicators = generateBackupIndicators();
-  fs.writeFileSync(outputPath, backupIndicators);
+  // Write file with explicit UTF-8 encoding and restrictive permissions when possible
+  fs.writeFileSync(outputPath, backupIndicators, { encoding: 'utf8', mode: 0o644 });
   console.log(`✅ Generated backup indicators at: ${outputPath}`);
 } catch (error) {
   console.error('Error generating backup indicators:', error.message);
