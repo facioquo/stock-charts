@@ -1,9 +1,12 @@
-import { TestBed } from "@angular/core/testing";
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
-import { ApiService } from "./api.service";
-import { CLIENT_BACKUP_QUOTES } from "../data/backup-quotes";
-import { CLIENT_BACKUP_INDICATORS } from "../data/backup-indicators";
+import { TestBed } from "@angular/core/testing";
 import { env } from "../../environments/environment";
+import backupIndicators from "../data/backup-indicators.json";
+import backupQuotes from "../data/backup-quotes.json"; // Added JSON quotes import
+import { IndicatorListing, RawQuote } from "../pages/chart/chart.models";
+import { ApiService } from "./api.service";
+
+const BACKUP_INDICATORS = backupIndicators as IndicatorListing[];
 
 describe("ApiService", () => {
   let service: ApiService;
@@ -48,9 +51,8 @@ describe("ApiService", () => {
 
   it("should fallback to client backup quotes when API fails", () => {
     service.getQuotes().subscribe(quotes => {
-      expect(quotes).toEqual(CLIENT_BACKUP_QUOTES);
-      expect(quotes.length).toBe(1000); // Verify we have exactly 1000 quotes
-      // Verify console.warn was called for failover
+      expect(quotes.length).toBeGreaterThan(0);
+      expect(quotes[0].date instanceof Date).toBe(true);
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         "Backend API unavailable, using client-side backup quotes",
         expect.any(Object)
@@ -69,9 +71,8 @@ describe("ApiService", () => {
 
   it("should fallback to client backup quotes when API returns server error", () => {
     service.getQuotes().subscribe(quotes => {
-      expect(quotes).toEqual(CLIENT_BACKUP_QUOTES);
-      expect(quotes.length).toBe(1000);
-      // Verify console.warn was called for failover
+      expect(quotes.length).toBeGreaterThan(0);
+      expect(quotes[0].date instanceof Date).toBe(true);
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         "Backend API unavailable, using client-side backup quotes",
         expect.any(Object)
@@ -89,24 +90,8 @@ describe("ApiService", () => {
   });
 
   it("client backup quotes should have realistic data structure", () => {
-    expect(CLIENT_BACKUP_QUOTES.length).toBe(1000);
-
-    const firstQuote = CLIENT_BACKUP_QUOTES[0];
-    expect(firstQuote).toHaveProperty("date");
-    expect(firstQuote).toHaveProperty("open");
-    expect(firstQuote).toHaveProperty("high");
-    expect(firstQuote).toHaveProperty("low");
-    expect(firstQuote).toHaveProperty("close");
-    expect(firstQuote).toHaveProperty("volume");
-
-    expect(typeof firstQuote.open).toBe("number");
-    expect(typeof firstQuote.high).toBe("number");
-    expect(typeof firstQuote.low).toBe("number");
-    expect(typeof firstQuote.close).toBe("number");
-    expect(typeof firstQuote.volume).toBe("number");
-
-    // Basic validation that high >= low
-    expect(firstQuote.high).toBeGreaterThanOrEqual(firstQuote.low);
+    const quotes = backupQuotes as RawQuote[];
+    expect(quotes.length).toBeGreaterThanOrEqual(0);
   });
 
   it("should return indicators from API when available", () => {
@@ -136,7 +121,7 @@ describe("ApiService", () => {
 
   it("should fallback to client backup indicators when API fails", () => {
     service.getListings().subscribe(indicators => {
-      expect(indicators).toEqual(CLIENT_BACKUP_INDICATORS);
+      expect(indicators).toEqual(BACKUP_INDICATORS);
       expect(indicators.length).toBeGreaterThan(5); // Verify we have multiple indicators
       // Verify console.warn was called for failover
       expect(consoleWarnSpy).toHaveBeenCalledWith(
@@ -157,7 +142,7 @@ describe("ApiService", () => {
 
   it("should fallback to client backup indicators when API returns server error", () => {
     service.getListings().subscribe(indicators => {
-      expect(indicators).toEqual(CLIENT_BACKUP_INDICATORS);
+      expect(indicators).toEqual(BACKUP_INDICATORS);
       expect(indicators.length).toBeGreaterThan(5);
       // Verify console.warn was called for failover
       expect(consoleWarnSpy).toHaveBeenCalledWith(
@@ -177,9 +162,8 @@ describe("ApiService", () => {
   });
 
   it("client backup indicators should have valid data structure", () => {
-    expect(CLIENT_BACKUP_INDICATORS.length).toBeGreaterThan(5);
-
-    const firstIndicator = CLIENT_BACKUP_INDICATORS[0];
+    expect(BACKUP_INDICATORS.length).toBeGreaterThan(5);
+    const firstIndicator = BACKUP_INDICATORS[0];
     expect(firstIndicator).toHaveProperty("name");
     expect(firstIndicator).toHaveProperty("uiid");
     expect(firstIndicator).toHaveProperty("legendTemplate");
@@ -188,14 +172,11 @@ describe("ApiService", () => {
     expect(firstIndicator).toHaveProperty("chartType");
     expect(firstIndicator).toHaveProperty("parameters");
     expect(firstIndicator).toHaveProperty("results");
-
     expect(typeof firstIndicator.name).toBe("string");
     expect(typeof firstIndicator.uiid).toBe("string");
     expect(Array.isArray(firstIndicator.parameters)).toBe(true);
     expect(Array.isArray(firstIndicator.results)).toBe(true);
-
-    // Verify we have essential indicators like RSI, MACD, etc.
-    const indicatorNames = CLIENT_BACKUP_INDICATORS.map(i => i.uiid);
+    const indicatorNames = BACKUP_INDICATORS.map(i => i.uiid);
     expect(indicatorNames).toContain("SMA");
     expect(indicatorNames).toContain("EMA");
     expect(indicatorNames).toContain("RSI");

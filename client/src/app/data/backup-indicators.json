@@ -13,13 +13,13 @@
       "thresholds": [
         {
           "value": 40,
-          "color": "ChartColors.ThresholdGrayTransparent",
+          "color": "#42424280",
           "style": "dash",
           "fill": null
         },
         {
           "value": 20,
-          "color": "ChartColors.ThresholdGrayTransparent",
+          "color": "#42424280",
           "style": "dash",
           "fill": null
         }
@@ -44,7 +44,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -56,7 +56,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardGreen",
+        "defaultColor": "#2E7D32",
         "fill": null,
         "order": 1
       },
@@ -68,7 +68,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 2
       },
@@ -80,7 +80,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": 2,
-        "defaultColor": "ChartColors.StandardGrayTransparent",
+        "defaultColor": "#9E9E9E50",
         "fill": null,
         "order": 3
       }
@@ -130,7 +130,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -150,19 +150,19 @@
       "thresholds": [
         {
           "value": 70,
-          "color": "ChartColors.ThresholdGrayTransparent",
+          "color": "#42424280",
           "style": "solid",
           "fill": null
         },
         {
           "value": 50,
-          "color": "ChartColors.ThresholdGrayTransparent",
+          "color": "#42424280",
           "style": "dash",
           "fill": null
         },
         {
           "value": 30,
-          "color": "ChartColors.ThresholdGrayTransparent",
+          "color": "#42424280",
           "style": "solid",
           "fill": null
         }
@@ -187,7 +187,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardGreen",
+        "defaultColor": "#2E7D32",
         "fill": null,
         "order": 0
       },
@@ -199,7 +199,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       }
@@ -219,7 +219,7 @@
       "thresholds": [
         {
           "value": 0,
-          "color": "ChartColors.ThresholdGrayTransparent",
+          "color": "#42424280",
           "style": "dash",
           "fill": null
         }
@@ -244,7 +244,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -286,7 +286,7 @@
         "lineType": "dots",
         "stack": "",
         "lineWidth": 2,
-        "defaultColor": "ChartColors.StandardGreen",
+        "defaultColor": "#2E7D32",
         "fill": null,
         "order": 0
       },
@@ -298,7 +298,7 @@
         "lineType": "dots",
         "stack": "",
         "lineWidth": 2,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       }
@@ -340,7 +340,7 @@
         "lineType": "dots",
         "stack": "",
         "lineWidth": 2,
-        "defaultColor": "ChartColors.StandardGreen",
+        "defaultColor": "#2E7D32",
         "fill": null,
         "order": 0
       },
@@ -352,7 +352,7 @@
         "lineType": "dots",
         "stack": "",
         "lineWidth": 2,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       }
@@ -386,7 +386,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -420,7 +420,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -440,7 +440,7 @@
       "thresholds": [
         {
           "value": 1,
-          "color": "ChartColors.ThresholdGrayTransparent",
+          "color": "#42424280",
           "style": "dash",
           "fill": null
         }
@@ -465,7 +465,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -477,7 +477,7 @@
         "lineType": "dash",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardGreen",
+        "defaultColor": "#2E7D32",
         "fill": null,
         "order": 1
       },
@@ -489,7 +489,7 @@
         "lineType": "dash",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 2
       }
@@ -531,7 +531,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": 1,
-        "defaultColor": "ChartColors.DarkGray",
+        "defaultColor": "#616161CC",
         "fill": null,
         "order": 0
       },
@@ -543,7 +543,7 @@
         "lineType": "dash",
         "stack": "",
         "lineWidth": 1,
-        "defaultColor": "ChartColors.DarkGray",
+        "defaultColor": "#616161CC",
         "fill": null,
         "order": 1
       },
@@ -555,7 +555,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": 1,
-        "defaultColor": "ChartColors.DarkGray",
+        "defaultColor": "#616161CC",
         "fill": null,
         "order": 2
       }
@@ -575,13 +575,13 @@
       "thresholds": [
         {
           "value": 1,
-          "color": "ChartColors.ThresholdRed",
+          "color": "#B71C1C70",
           "style": "dash",
           "fill": null
         },
         {
           "value": 0,
-          "color": "ChartColors.ThresholdGreen",
+          "color": "#1B5E2070",
           "style": "dash",
           "fill": null
         }
@@ -614,7 +614,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -634,7 +634,7 @@
       "thresholds": [
         {
           "value": 0,
-          "color": "ChartColors.ThresholdGrayTransparent",
+          "color": "#42424280",
           "style": "dash",
           "fill": null
         }
@@ -659,7 +659,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -693,7 +693,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -735,7 +735,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardOrange",
+        "defaultColor": "#EF6C00",
         "fill": null,
         "order": 0
       }
@@ -777,7 +777,7 @@
         "lineType": "dash",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardOrange",
+        "defaultColor": "#EF6C00",
         "fill": null,
         "order": 0
       }
@@ -797,13 +797,13 @@
       "thresholds": [
         {
           "value": 61.8,
-          "color": "ChartColors.DarkGrayTransparent",
+          "color": "#61616110",
           "style": "dash",
           "fill": null
         },
         {
           "value": 38.2,
-          "color": "ChartColors.DarkGrayTransparent",
+          "color": "#61616110",
           "style": "dash",
           "fill": null
         }
@@ -828,7 +828,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -848,13 +848,13 @@
       "thresholds": [
         {
           "value": 90,
-          "color": "ChartColors.ThresholdRed",
+          "color": "#B71C1C70",
           "style": "dash",
           "fill": null
         },
         {
           "value": 10,
-          "color": "ChartColors.ThresholdGreen",
+          "color": "#1B5E2070",
           "style": "dash",
           "fill": null
         }
@@ -895,7 +895,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -929,7 +929,7 @@
         "lineType": "pointer",
         "stack": "",
         "lineWidth": 8,
-        "defaultColor": "ChartColors.DarkGray",
+        "defaultColor": "#616161CC",
         "fill": null,
         "order": 0
       }
@@ -958,7 +958,7 @@
         "lineType": "bar",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -1013,7 +1013,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -1047,7 +1047,7 @@
         "lineType": "bar",
         "stack": "eray",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardGreen",
+        "defaultColor": "#2E7D32",
         "fill": null,
         "order": 0
       },
@@ -1059,7 +1059,7 @@
         "lineType": "bar",
         "stack": "eray",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       }
@@ -1093,7 +1093,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -1127,7 +1127,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -1161,7 +1161,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -1173,7 +1173,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       }
@@ -1207,7 +1207,7 @@
         "lineType": "dots",
         "stack": "",
         "lineWidth": 3,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 0
       },
@@ -1219,7 +1219,7 @@
         "lineType": "dots",
         "stack": "",
         "lineWidth": 3,
-        "defaultColor": "ChartColors.StandardGreen",
+        "defaultColor": "#2E7D32",
         "fill": null,
         "order": 1
       }
@@ -1253,7 +1253,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardGreen",
+        "defaultColor": "#2E7D32",
         "fill": null,
         "order": 0
       },
@@ -1265,7 +1265,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       }
@@ -1290,7 +1290,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -1302,7 +1302,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardOrange",
+        "defaultColor": "#EF6C00",
         "fill": null,
         "order": 1
       }
@@ -1352,7 +1352,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": 2,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -1364,7 +1364,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": 2,
-        "defaultColor": "ChartColors.StandardPurple",
+        "defaultColor": "#8E24AA",
         "fill": null,
         "order": 1
       },
@@ -1376,7 +1376,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": 2,
-        "defaultColor": "ChartColors.DarkGray",
+        "defaultColor": "#616161CC",
         "fill": null,
         "order": 2
       },
@@ -1388,7 +1388,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": 1.5,
-        "defaultColor": "ChartColors.ThresholdGreen",
+        "defaultColor": "#1B5E2070",
         "fill": null,
         "order": 3
       },
@@ -1400,7 +1400,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": 1.5,
-        "defaultColor": "ChartColors.ThresholdRed",
+        "defaultColor": "#B71C1C70",
         "fill": null,
         "order": 4
       }
@@ -1471,7 +1471,7 @@
         "lineType": "pointer",
         "stack": "",
         "lineWidth": 8,
-        "defaultColor": "ChartColors.DarkGray",
+        "defaultColor": "#616161CC",
         "fill": null,
         "order": 0
       }
@@ -1491,13 +1491,13 @@
       "thresholds": [
         {
           "value": 80,
-          "color": "ChartColors.ThresholdRed",
+          "color": "#B71C1C70",
           "style": "dash",
           "fill": null
         },
         {
           "value": 20,
-          "color": "ChartColors.ThresholdGreen",
+          "color": "#1B5E2070",
           "style": "dash",
           "fill": null
         }
@@ -1522,7 +1522,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -1542,7 +1542,7 @@
       "thresholds": [
         {
           "value": 0,
-          "color": "ChartColors.DarkGrayTransparent",
+          "color": "#61616110",
           "style": "dash",
           "fill": null
         }
@@ -1583,7 +1583,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -1595,7 +1595,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       },
@@ -1607,7 +1607,7 @@
         "lineType": "bar",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardGrayTransparent",
+        "defaultColor": "#9E9E9E50",
         "fill": null,
         "order": 2
       }
@@ -1649,7 +1649,7 @@
         "lineType": "dots",
         "stack": "",
         "lineWidth": 2,
-        "defaultColor": "ChartColors.StandardPurple",
+        "defaultColor": "#8E24AA",
         "fill": null,
         "order": 0
       }
@@ -1691,7 +1691,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -1703,7 +1703,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       }
@@ -1723,13 +1723,13 @@
       "thresholds": [
         {
           "value": 70,
-          "color": "ChartColors.ThresholdRed",
+          "color": "#B71C1C70",
           "style": "dash",
           "fill": null
         },
         {
           "value": 30,
-          "color": "ChartColors.ThresholdGreen",
+          "color": "#1B5E2070",
           "style": "dash",
           "fill": null
         }
@@ -1754,7 +1754,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -1774,13 +1774,13 @@
       "thresholds": [
         {
           "value": 75,
-          "color": "ChartColors.ThresholdGreen",
+          "color": "#1B5E2070",
           "style": "solid",
           "fill": null
         },
         {
           "value": 25,
-          "color": "ChartColors.ThresholdRed",
+          "color": "#B71C1C70",
           "style": "solid",
           "fill": null
         }
@@ -1821,7 +1821,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -1855,7 +1855,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -1889,7 +1889,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -1923,7 +1923,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -1965,7 +1965,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -1977,7 +1977,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       }
@@ -2011,7 +2011,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -2068,13 +2068,13 @@
       "thresholds": [
         {
           "value": 40,
-          "color": "ChartColors.ThresholdRed",
+          "color": "#B71C1C70",
           "style": "dash",
           "fill": null
         },
         {
           "value": 0,
-          "color": "ChartColors.ThresholdGreen",
+          "color": "#1B5E2070",
           "style": "dash",
           "fill": null
         }
@@ -2123,7 +2123,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -2135,7 +2135,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       }
@@ -2155,13 +2155,13 @@
       "thresholds": [
         {
           "value": 80,
-          "color": "ChartColors.ThresholdRed",
+          "color": "#B71C1C70",
           "style": "dash",
           "fill": null
         },
         {
           "value": 20,
-          "color": "ChartColors.ThresholdGreen",
+          "color": "#1B5E2070",
           "style": "dash",
           "fill": null
         }
@@ -2194,7 +2194,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -2206,7 +2206,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       }
@@ -2226,13 +2226,13 @@
       "thresholds": [
         {
           "value": 80,
-          "color": "ChartColors.ThresholdRed",
+          "color": "#B71C1C70",
           "style": "dash",
           "fill": null
         },
         {
           "value": 20,
-          "color": "ChartColors.ThresholdGreen",
+          "color": "#1B5E2070",
           "style": "dash",
           "fill": null
         }
@@ -2281,7 +2281,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -2293,7 +2293,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       }
@@ -2335,7 +2335,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 0
       },
@@ -2347,7 +2347,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardGreen",
+        "defaultColor": "#2E7D32",
         "fill": null,
         "order": 1
       },
@@ -2359,7 +2359,7 @@
         "lineType": "dash",
         "stack": "",
         "lineWidth": 1,
-        "defaultColor": "ChartColors.DarkGrayTransparent",
+        "defaultColor": "#61616110",
         "fill": null,
         "order": 2
       }
@@ -2393,7 +2393,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       }
@@ -2427,7 +2427,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardGreen",
+        "defaultColor": "#2E7D32",
         "fill": null,
         "order": 0
       },
@@ -2439,7 +2439,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       }
@@ -2513,7 +2513,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -2525,7 +2525,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardRed",
+        "defaultColor": "#DD2C00",
         "fill": null,
         "order": 1
       },
@@ -2537,7 +2537,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardGreen",
+        "defaultColor": "#2E7D32",
         "fill": null,
         "order": 2
       }
@@ -2571,7 +2571,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -2583,7 +2583,7 @@
         "lineType": "dash",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.ThresholdGrayTransparent",
+        "defaultColor": "#42424280",
         "fill": null,
         "order": 1
       },
@@ -2595,7 +2595,7 @@
         "lineType": "dash",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.ThresholdGrayTransparent",
+        "defaultColor": "#42424280",
         "fill": null,
         "order": 2
       }
@@ -2629,7 +2629,7 @@
         "lineType": "solid",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.StandardBlue",
+        "defaultColor": "#1E88E5",
         "fill": null,
         "order": 0
       },
@@ -2641,7 +2641,7 @@
         "lineType": "dash",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.ThresholdGrayTransparent",
+        "defaultColor": "#42424280",
         "fill": null,
         "order": 1
       },
@@ -2653,7 +2653,7 @@
         "lineType": "dash",
         "stack": "",
         "lineWidth": null,
-        "defaultColor": "ChartColors.ThresholdGrayTransparent",
+        "defaultColor": "#42424280",
         "fill": null,
         "order": 2
       }

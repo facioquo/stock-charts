@@ -2,19 +2,17 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from "@angular
 import { Injectable, inject } from "@angular/core";
 import { Observable, catchError, of } from "rxjs";
 import { env } from "../../environments/environment";
-
-import { CLIENT_BACKUP_INDICATORS } from "../data/backup-indicators";
-import { CLIENT_BACKUP_QUOTES } from "../data/backup-quotes";
+import backupIndicators from "../data/backup-indicators.json";
+import backupQuotes from "../data/backup-quotes.json";
 import {
   IndicatorListing,
   IndicatorParam,
   IndicatorSelection,
-  Quote
+  Quote,
+  RawQuote
 } from "../pages/chart/chart.models";
 
-@Injectable({
-  providedIn: "root"
-})
+@Injectable({ providedIn: "root" })
 export class ApiService {
   private readonly http = inject(HttpClient);
 
@@ -27,7 +25,15 @@ export class ApiService {
           url: error.url,
           message: error.message
         });
-        return of(CLIENT_BACKUP_QUOTES);
+        const mapped = (backupQuotes as RawQuote[]).map(q => ({
+          date: new Date(q.date),
+          open: q.open,
+          high: q.high,
+          low: q.low,
+          close: q.close,
+          volume: q.volume
+        }));
+        return of(mapped as Quote[]);
       })
     );
   }
@@ -41,7 +47,7 @@ export class ApiService {
           url: error.url,
           message: error.message
         });
-        return of(CLIENT_BACKUP_INDICATORS);
+        return of(backupIndicators as IndicatorListing[]);
       })
     );
   }

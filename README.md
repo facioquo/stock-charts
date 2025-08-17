@@ -155,6 +155,7 @@ npm run test:coverage     # With coverage
 # Maintenance
 npm run clean             # Clean all build outputs
 npm run lint:md           # Lint markdown files
+npm run generate:backups  # Refresh both backup-indicators.json and backup-quotes.json (runs prebuild automatically)
 ```
 
 **Workspace-specific commands**:

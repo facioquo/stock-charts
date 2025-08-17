@@ -11,6 +11,15 @@ export interface Quote {
   volume: number;
 }
 
+export interface RawQuote {
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
 export interface IndicatorDataRow {
   date: string;
   candle: Quote;
