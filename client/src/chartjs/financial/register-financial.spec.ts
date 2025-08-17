@@ -2,7 +2,7 @@ import {
   ensureFinancialChartsRegistered,
   isFinancialChartsRegistered,
   resetFinancialChartsRegistration
-} from "../../../src/chartjs/financial/register-financial";
+} from "./register-financial";
 import { Chart } from "chart.js";
 
 describe("Financial Chart Registration", () => {
