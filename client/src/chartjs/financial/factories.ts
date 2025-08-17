@@ -2,7 +2,7 @@
 // Based on chartjs-chart-financial
 // https://github.com/chartjs/chartjs-chart-financial
 
-import { ChartDataset, ScatterDataPoint } from "chart.js";
+import { ChartDataset } from "chart.js";
 import { FinancialDataPoint } from "./types";
 import { FINANCIAL_COLORS, createFinancialColorCallback, createVolumeColors } from "./colors";
 
@@ -141,7 +141,7 @@ export function createOhlcDataset(
  */
 export function createVolumeDataset(
   priceData: FinancialDataPoint[],
-  volumeData: ScatterDataPoint[],
+  volumeData: Array<{ x: number; y: number }>,
   options: {
     label?: string;
     yAxisID?: string;
@@ -152,7 +152,7 @@ export function createVolumeDataset(
   return {
     type: "bar",
     label: options.label || "Volume",
-    data: volumeData,
+    data: volumeData as any,
     backgroundColor: volumeColors,
     borderColor: volumeColors,
     borderWidth: 0,
@@ -174,10 +174,10 @@ export function processFinancialData(quotes: Array<{
   volume?: number;
 }>): {
   priceData: FinancialDataPoint[];
-  volumeData: ScatterDataPoint[];
+  volumeData: Array<{ x: number; y: number }>;
 } {
   const priceData: FinancialDataPoint[] = [];
-  const volumeData: ScatterDataPoint[] = [];
+  const volumeData: Array<{ x: number; y: number }> = [];
 
   quotes.forEach(quote => {
     const timestamp = new Date(quote.date).getTime();

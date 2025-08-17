@@ -10,8 +10,8 @@ import { FinancialDataPoint, FinancialParsedData, FinancialRuler } from "./types
  * Computes the "optimal" sample size to maintain bars equally sized while preventing overlap.
  */
 function computeMinSampleSize(scale: Scale, pixels: number[]): number {
-  let min = scale._length;
-  let prev: number, curr: number, i: number, ilen: number;
+  let min = (scale as any)._length;
+  let prev: number = 0, curr: number, i: number, ilen: number;
 
   for (i = 1, ilen = pixels.length; i < ilen; ++i) {
     min = Math.min(min, Math.abs(pixels[i] - pixels[i - 1]));
@@ -38,20 +38,31 @@ export class FinancialController extends BarController {
   getLabelAndValue(index: number): { label: string; value: string } {
     const me = this;
     const parsed = me.getParsed(index) as FinancialParsedData;
-    const axis = me._cachedMeta.iScale.axis;
-
+    const iScale = me._cachedMeta.iScale;
+    
+    if (!iScale) {
+      return { label: "", value: "" };
+    }
+    
+    const axis = iScale.axis;
     const { o, h, l, c } = parsed;
     const value = `O: ${o}  H: ${h}  L: ${l}  C: ${c}`;
 
     return {
-      label: `${me._cachedMeta.iScale.getLabelForValue(parsed[axis])}`,
+      label: `${iScale.getLabelForValue(parsed[axis])}`,
       value
     };
   }
 
   getAllParsedValues(): number[] {
     const meta = this._cachedMeta;
-    const axis = meta.iScale.axis;
+    const iScale = meta.iScale;
+    
+    if (!iScale) {
+      return [];
+    }
+    
+    const axis = iScale.axis;
     const parsed = meta._parsed as FinancialParsedData[];
     const values: number[] = [];
     for (let i = 0; i < parsed.length; ++i) {
@@ -67,13 +78,19 @@ export class FinancialController extends BarController {
   getMinMax(scale: Scale): { min: number; max: number } {
     const meta = this._cachedMeta;
     const _parsed = meta._parsed as FinancialParsedData[];
-    const axis = meta.iScale.axis;
+    const iScale = meta.iScale;
+    
+    if (!iScale) {
+      return { min: 0, max: 1 };
+    }
+    
+    const axis = iScale.axis;
 
     if (_parsed.length < 2) {
       return { min: 0, max: 1 };
     }
 
-    if (scale === meta.iScale) {
+    if (scale === iScale) {
       return { min: _parsed[0][axis], max: _parsed[_parsed.length - 1][axis] };
     }
 
@@ -89,9 +106,14 @@ export class FinancialController extends BarController {
 
   _getRuler(): FinancialRuler {
     const me = this;
-    const opts = me.options;
+    const opts = (me as any).options;
     const meta = me._cachedMeta;
     const iScale = meta.iScale;
+    
+    if (!iScale) {
+      throw new Error("Scale not available");
+    }
+    
     const axis = iScale.axis;
     const pixels: number[] = [];
     
@@ -105,9 +127,9 @@ export class FinancialController extends BarController {
     return {
       min,
       pixels,
-      start: iScale._startPixel,
-      end: iScale._endPixel,
-      stackCount: me._getStackCount(),
+      start: (iScale as any)._startPixel,
+      end: (iScale as any)._endPixel,
+      stackCount: (me as any)._getStackCount(),
       scale: iScale,
       ratio: barThickness ? 1 : opts.categoryPercentage * opts.barPercentage
     };
@@ -124,8 +146,13 @@ export class FinancialController extends BarController {
   ): any {
     const me = this;
     const vscale = me._cachedMeta.vScale;
+    
+    if (!vscale) {
+      throw new Error("Value scale not available");
+    }
+    
     const base = vscale.getBasePixel();
-    const ipixels = me._calculateBarIndexPixels(index, ruler, options);
+    const ipixels = (me as any)._calculateBarIndexPixels(index, ruler, options);
     const data = me.chart.data.datasets[me.index].data[index] as FinancialDataPoint;
     const open = vscale.getPixelForValue(data.o);
     const high = vscale.getPixelForValue(data.h);
@@ -150,14 +177,14 @@ export class FinancialController extends BarController {
     const rects = me._cachedMeta.data;
     clipArea(chart.ctx, chart.chartArea);
     for (let i = 0; i < rects.length; ++i) {
-      rects[i].draw(chart.ctx);
+      (rects[i] as any).draw(chart.ctx);
     }
     unclipArea(chart.ctx);
   }
 }
 
 // Set up controller overrides
-FinancialController.overrides = {
+(FinancialController as any).overrides = {
   label: "",
 
   parsing: false,
@@ -186,7 +213,7 @@ FinancialController.overrides = {
           const point = ctx.parsed;
 
           if (!isNullOrUndef(point.y)) {
-            return Chart.defaults.plugins.tooltip.callbacks.label(ctx);
+            return (Chart.defaults.plugins.tooltip.callbacks as any).label(ctx);
           }
 
           const { o, h, l, c } = point;

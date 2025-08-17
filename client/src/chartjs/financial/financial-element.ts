@@ -9,25 +9,27 @@ import { BarBounds, FinancialElementProps } from "./types";
  * Helper function to get the bounds of the bar regardless of the orientation
  */
 function getBarBounds(bar: FinancialElement, useFinalPosition?: boolean): BarBounds {
-  const { x, y, base, width, height } = bar.getProps(
+  const props = bar.getProps(
     ["x", "low", "high", "width", "height"],
     useFinalPosition
-  );
+  ) as any;
+  
+  const { x, y, base, width, height } = props;
 
   let left: number, right: number, top: number, bottom: number, half: number;
 
   if ((bar as any).horizontal) {
-    half = height / 2;
-    left = Math.min(x, base);
-    right = Math.max(x, base);
-    top = y - half;
-    bottom = y + half;
+    half = (height as number) / 2;
+    left = Math.min(x as number, base as number);
+    right = Math.max(x as number, base as number);
+    top = (y as number) - half;
+    bottom = (y as number) + half;
   } else {
-    half = width / 2;
-    left = x - half;
-    right = x + half;
-    top = Math.min(y, base); // use min because 0 pixel at top of screen
-    bottom = Math.max(y, base);
+    half = (width as number) / 2;
+    left = (x as number) - half;
+    right = (x as number) + half;
+    top = Math.min(y as number, base as number); // use min because 0 pixel at top of screen
+    bottom = Math.max(y as number, base as number);
   }
 
   return { left, top, right, bottom };

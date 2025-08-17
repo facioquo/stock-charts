@@ -22,7 +22,7 @@ export class OhlcController extends FinancialController {
     const ruler = me._ruler || me._getRuler();
     const firstOpts = me.resolveDataElementOptions(start, mode);
     const sharedOptions = me.getSharedOptions(firstOpts);
-    const includeOptions = me.includeOptions(mode, sharedOptions);
+    const includeOptions = me.includeOptions(mode, sharedOptions || {});
 
     for (let i = 0; i < count; i++) {
       const options = sharedOptions || me.resolveDataElementOptions(i, mode);

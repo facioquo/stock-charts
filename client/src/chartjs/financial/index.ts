@@ -47,6 +47,3 @@ export type {
   BarBounds,
   FinancialRuler
 } from "./types";
-
-// Type augmentations (import for side effects)
-import "./financial-chart.registry.d";
