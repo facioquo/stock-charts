@@ -30,9 +30,9 @@ public class UtilitiesTests
         PeriodSize unsupportedPeriodSize = (PeriodSize)999;
 
         // Act & Assert
-        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(() => 
+        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(() =>
             unsupportedPeriodSize.ToTimeSpan());
-        
+
         Assert.Equal("periodSize", exception.ParamName);
         Assert.Contains("Unsupported PeriodSize value", exception.Message);
     }

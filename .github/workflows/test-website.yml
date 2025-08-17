@@ -31,6 +31,57 @@ jobs:
       - name: Verify .NET formatting
         run: dotnet format Charts.sln --verify-no-changes
 
+      - name: Run backend unit tests
+        run: >
+          dotnet test Charts.sln
+          --collect:"XPlat Code Coverage"
+          --results-directory ./server/TestResults
+          --logger "trx;LogFileName=backend-tests.trx"
+          --configuration Release
+
+      - name: Publish backend test results
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Backend Tests (.NET)
+          path: server/TestResults/backend-tests.trx
+          reporter: dotnet-trx
+
+      - name: Upload backend coverage artifacts
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-report
+          path: |
+            server/TestResults/
+
+      - name: Add backend coverage to summary
+        if: github.event_name == 'pull_request' && (success() || failure())
+        run: |
+          echo "## 📊 Backend Test Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Statements | Branches |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|------------|----------|" >> $GITHUB_STEP_SUMMARY
+
+          # Process backend coverage if available
+          COVERAGE_FILE=$(find ./server/TestResults -name "coverage.cobertura.xml" | head -1)
+          if [ -f "$COVERAGE_FILE" ]; then
+            # Extract coverage metrics from cobertura XML
+            STATEMENTS_RATE=$(xmllint --xpath "string(//coverage/@line-rate)" "$COVERAGE_FILE" 2>/dev/null || echo "0")
+            BRANCHES_RATE=$(xmllint --xpath "string(//coverage/@branch-rate)" "$COVERAGE_FILE" 2>/dev/null || echo "0")
+            
+            # Convert to percentages
+            STMT_PCT=$(echo "$STATEMENTS_RATE * 100" | bc -l | xargs printf "%.2f")
+            BRANCH_PCT=$(echo "$BRANCHES_RATE * 100" | bc -l | xargs printf "%.2f")
+            
+            echo "| Backend | ${STMT_PCT}% | ${BRANCH_PCT}% |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Backend | Coverage data not available | -- |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📁 **Coverage reports:** Check the artifacts for detailed coverage reports" >> $GITHUB_STEP_SUMMARY
+
   build-website:
     name: "Website"
     runs-on: ubuntu-latest
@@ -79,10 +130,10 @@ jobs:
       - name: Add coverage to summary
         if: github.event_name == 'pull_request' && (success() || failure())
         run: |
-          echo "## 📊 Test Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Frontend Test Coverage Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Metric | Coverage |" >> $GITHUB_STEP_SUMMARY
-          echo "|--------|----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Statements | Functions | Branches |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|------------|-----------|----------|" >> $GITHUB_STEP_SUMMARY
 
           if [ -f "./client/coverage/lcov.info" ]; then
             STATEMENTS=$(grep -o "LF:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
@@ -96,11 +147,9 @@ jobs:
             FUNC_PCT=$(echo "$HIT_FUNCTIONS $FUNCTIONS" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
             BRANCH_PCT=$(echo "$HIT_BRANCHES $BRANCHES" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
 
-            echo "| Statements | ${STMT_PCT}% (${HIT_STATEMENTS}/${STATEMENTS}) |" >> $GITHUB_STEP_SUMMARY
-            echo "| Functions | ${FUNC_PCT}% (${HIT_FUNCTIONS}/${FUNCTIONS}) |" >> $GITHUB_STEP_SUMMARY
-            echo "| Branches | ${BRANCH_PCT}% (${HIT_BRANCHES}/${BRANCHES}) |" >> $GITHUB_STEP_SUMMARY
+            echo "| Frontend | ${STMT_PCT}% (${HIT_STATEMENTS}/${STATEMENTS}) | ${FUNC_PCT}% (${HIT_FUNCTIONS}/${FUNCTIONS}) | ${BRANCH_PCT}% (${HIT_BRANCHES}/${BRANCHES}) |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "| Coverage data | Not available |" >> $GITHUB_STEP_SUMMARY
+            echo "| Frontend | Coverage data not available | -- | -- |" >> $GITHUB_STEP_SUMMARY
           fi
 
           echo "" >> $GITHUB_STEP_SUMMARY

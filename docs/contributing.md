@@ -38,7 +38,10 @@ For complete development setup instructions, see the [main README.md](../README.
    - Make your changes
    - Run linting: `npm run lint:fix`
    - Run formatting: `npm run format`
-   - Test your changes
+   - Test your changes:
+     - Frontend tests: `npm run test --workspace=@stock-charts/client`
+     - Backend tests: `npm run test:dotnet`
+     - All tests: `npm run test:all`
    - Ensure builds pass: `dotnet build Charts.sln`
 
 For detailed information about:
@@ -55,6 +58,7 @@ This project maintains high standards for code quality:
 - ✅ All linting must pass (`npm run lint`)
 - ✅ Code must be properly formatted (`npm run format`)
 - ✅ .NET solution must build (`dotnet build Charts.sln`)
+- ✅ All tests must pass (`npm run test:all`)
 - ✅ No suppression of linting errors without team review
 
 See [Code Quality section](../README.md#code-quality-and-verification) in the main README for current status.

@@ -98,11 +98,14 @@ npm run test:coverage --workspace=@stock-charts/client
 **Backend testing:**
 
 ```bash
-# Run .NET tests
-dotnet test Charts.sln
+# Run .NET unit tests with coverage
+npm run test:dotnet
 
-# With detailed output
-dotnet test Charts.sln --verbosity normal
+# Run all tests (frontend + backend)
+npm run test:all
+
+# Alternative: Direct dotnet command
+dotnet test Charts.sln --collect:"XPlat Code Coverage" --results-directory ./server/TestResults --logger "trx;LogFileName=backend-tests.trx"
 ```
 
 **Requirements:**
@@ -256,7 +259,7 @@ npm run test --workspace=@stock-charts/client -- --testNamePattern="ComponentNam
 **Recommended workflow:**
 
 1. Use Command Palette (`Ctrl+Shift+P`) → "Tasks: Run Task"
-2. Available tasks: `build-website`, `build-server`, `lint-website-fix`, etc.
+2. Available tasks: `build-website`, `build-server`, `test-backend`, `test-all`, `lint-website-fix`, etc.
 3. Use integrated terminal for manual commands
 4. Leverage problem panel for error navigation
 
