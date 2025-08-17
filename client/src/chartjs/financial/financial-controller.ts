@@ -4,7 +4,7 @@
 
 import { BarController, defaults } from "chart.js";
 import { clipArea, unclipArea, isNullOrUndef } from "chart.js/helpers";
-import { FinancialDataPoint } from "./types";
+import type { FinancialDataPoint } from "./types";
 
 /**
  * Computes the "optimal" sample size to maintain bars equally sized while preventing overlap.
