@@ -55,9 +55,33 @@
       }
     },
     {
+      "label": "test-backend",
+      "detail": "Run .NET backend tests with coverage",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "test",
+        "Charts.sln",
+        "--logger",
+        "trx;LogFileName=backend-tests.trx",
+        "--results-directory",
+        "./server/TestResults",
+        "/p:CollectCoverage=true",
+        "/p:CoverletOutput=../coverage/",
+        "/p:CoverletOutputFormat=lcov"
+      ],
+      "group": "test",
+      "problemMatcher": ["$msCompile"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
       "label": "test-all",
       "detail": "Run all project tests",
-      "dependsOn": ["test-website"],
+      "dependsOn": ["test-website", "test-backend"],
+      "dependsOrder": "sequence",
       "group": "test",
       "presentation": {
         "reveal": "always",

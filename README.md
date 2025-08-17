@@ -100,6 +100,7 @@ The project maintains high code quality through automated linting, formatting, a
 **Testing:**
 
 - ⚠️ Jest tests affected by npm workspace configuration
+- ✅ .NET backend unit tests passing (12 tests with xUnit framework)
 - ✅ Application functionality verified through manual testing
 - ✅ API failover and error handling tested
 
@@ -151,6 +152,8 @@ npm run format:vscode     # Format VS Code configs
 npm test                  # Run all tests
 npm run test:watch        # Watch mode
 npm run test:coverage     # With coverage
+npm run test:dotnet       # Run .NET backend tests with coverage
+npm run test:all          # Run frontend and backend tests sequentially
 
 # Maintenance
 npm run clean             # Clean all build outputs
@@ -192,6 +195,8 @@ This repository includes optimized VS Code configuration with tasks, problem mat
 - `lint-website` - Run ESLint on Angular code
 - `lint-website-fix` - Auto-fix ESLint issues
 - `test-website` - Run Angular tests
+- `test-backend` - Run .NET backend tests with coverage
+- `test-all` - Run all project tests
 
 ### Local storage with Azurite
 
