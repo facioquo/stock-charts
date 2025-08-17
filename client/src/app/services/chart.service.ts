@@ -28,10 +28,11 @@ type ExtendedChartDataset = ChartDataset & {
 
 // extensions
 import {
-  CandlestickController,
-  CandlestickElement,
-  FinancialDataPoint
-} from "src/assets/js/chartjs-chart-financial";
+  FinancialDataPoint,
+  buildCandlestickDataset,
+  buildVolumeDataset,
+  getFinancialColors
+} from "../../chartjs/financial";
 
 // plugins
 import AnnotationPlugin, {
@@ -43,13 +44,11 @@ import AnnotationPlugin, {
 // register extensions and plugins
 Chart.register(
   // controllers
-  CandlestickController,
   LineController,
   Tooltip,
 
   // elements
   BarElement,
-  CandlestickElement,
   LineElement,
   PointElement,
 
@@ -909,35 +908,18 @@ export class ChartService implements OnDestroy {
 
   loadOverlayChart(quotes: Quote[]) {
     // loads base with quotes only
-    this.configureCandlestickDefaults();
-
-    const { priceData, volumeData, volumeAxisSize, volumeColors } = this.processQuoteData(quotes);
+    const { priceData, volumeData, volumeAxisSize } = this.processQuoteData(quotes);
 
     // define base datasets
     const chartData: ChartData = {
       datasets: [
         this.createPriceDataset(priceData),
-        this.createVolumeDataset(volumeData, volumeColors)
+        this.createVolumeDataset(volumeData, priceData)
       ]
     };
 
     // Create and display chart
     this.createOverlayChart(chartData, volumeAxisSize);
-  }
-
-  private configureCandlestickDefaults(): void {
-    const candleOptions = Chart.defaults.elements["candlestick"];
-
-    // custom border colors
-    candleOptions.color.up = ChartService.COLORS.CANDLE_UP;
-    candleOptions.color.down = ChartService.COLORS.CANDLE_DOWN;
-    candleOptions.color.unchanged = ChartService.COLORS.CANDLE_UNCHANGED;
-
-    candleOptions.borderColor = {
-      up: candleOptions.color.up,
-      down: candleOptions.color.down,
-      unchanged: candleOptions.color.unchanged
-    };
   }
 
   private processQuoteData(quotes: Quote[]): {
@@ -994,28 +976,33 @@ export class ChartService implements OnDestroy {
   }
 
   private createPriceDataset(priceData: FinancialDataPoint[]): ChartDataset {
-    const candleOptions = Chart.defaults.elements["candlestick"];
-    return {
-      type: "candlestick",
+    const dataset = buildCandlestickDataset(priceData, {
       label: "Price",
-      data: priceData,
+      colors: {
+        up: ChartService.COLORS.CANDLE_UP,
+        down: ChartService.COLORS.CANDLE_DOWN,
+        unchanged: ChartService.COLORS.CANDLE_UNCHANGED
+      }
+    });
+
+    return {
+      ...dataset,
       yAxisID: "y",
-      borderColor: candleOptions.borderColor,
       order: 75
     };
   }
 
   private createVolumeDataset(
     volumeData: ScatterDataPoint[],
-    volumeColors: string[]
+    priceData: FinancialDataPoint[]
   ): ChartDataset {
-    return {
-      type: "bar",
+    const dataset = buildVolumeDataset(volumeData, priceData, {
       label: "Volume",
-      data: volumeData,
-      yAxisID: "volumeAxis",
-      backgroundColor: volumeColors,
-      borderWidth: 0,
+      yAxisID: "volumeAxis"
+    });
+
+    return {
+      ...dataset,
       order: 76
     };
   }
