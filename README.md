@@ -1,6 +1,6 @@
 # Stock Indicators for .NET demo
 
-This is a demo of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package. It is an Angular website with a [Chart.js](https://github.com/chartjs/chartjs-chart-financial) financial/candlestick stock chart, with a .NET Web API backend to generate indicators. The indicator library can be implemented in any .NET compatible ecosystem (it does not have to be in an API like this). See the [library documentation](https://dotnet.stockindicators.dev) for [more examples](https://dotnet.stockindicators.dev/examples), the user guide, and a full list of available indicators.
+This is a demo of the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package. It features an Angular website with TypeScript-based financial/candlestick charts (built on Chart.js), and a .NET Web API backend to generate indicators. The financial chart system includes modular, tree-shakeable TypeScript components with comprehensive theming and factory utilities. The indicator library can be implemented in any .NET compatible ecosystem (it does not have to be in an API like this). See the [library documentation](https://dotnet.stockindicators.dev) for [more examples](https://dotnet.stockindicators.dev/examples), the user guide, and a full list of available indicators.
 
 Live demo site: [charts.StockIndicators.dev](https://charts.stockindicators.dev/)
 
@@ -271,6 +271,123 @@ setx ALPACA_SECRET "YOUR ALPACA SECRET KEY"
 ```
 
 See [Azure Functions documentation](server/Functions/README.md) for more details on Functions-specific configuration.
+
+## Financial Charts
+
+This application uses a modular, TypeScript-based financial chart system built on Chart.js for candlestick and OHLC chart rendering.
+
+### Chart architecture
+
+The financial chart system is organized into TypeScript modules in `client/src/chartjs/financial/`:
+
+```text
+client/src/chartjs/financial/
+├── controllers/              # Chart.js controllers
+│   ├── financial-controller.ts     # Base financial controller
+│   ├── candlestick-controller.ts   # Candlestick chart controller
+│   └── ohlc-controller.ts           # OHLC chart controller
+├── elements/                # Chart.js elements (visual rendering)
+│   ├── financial-element.ts        # Base financial element
+│   ├── candlestick-element.ts      # Candlestick visual element
+│   └── ohlc-element.ts              # OHLC visual element
+├── utils/                   # Utilities and factories
+│   ├── colors.ts                   # Color schemes and theming
+│   └── factories.ts                # Dataset and chart factories
+├── financial-chart.registry.d.ts  # TypeScript type augmentation
+├── register-financial.ts          # Component registration system
+└── index.ts                       # Main exports
+```
+
+### Usage
+
+The financial charts are automatically registered during application bootstrap. Use the factory functions to create chart datasets and configurations:
+
+```typescript
+import {
+  createCandlestickDataset,
+  createVolumeDataset,
+  createFinancialChartConfig,
+  FinancialDataPoint
+} from '../../chartjs/financial';
+
+// Sample financial data
+const priceData: FinancialDataPoint[] = [
+  { x: 1640995200000, o: 100, h: 110, l: 95, c: 105 },
+  { x: 1641081600000, o: 105, h: 115, l: 100, c: 102 }
+];
+
+// Create candlestick dataset
+const priceDataset = createCandlestickDataset({
+  label: 'Stock Price',
+  data: priceData
+});
+
+// Create complete chart configuration
+const chartConfig = createFinancialChartConfig(priceData);
+```
+
+### Data shape
+
+Financial data points follow the OHLC (Open, High, Low, Close) format:
+
+```typescript
+interface FinancialDataPoint {
+  x: number;    // Timestamp (milliseconds since epoch)
+  o: number;    // Open price
+  h: number;    // High price
+  l: number;    // Low price
+  c: number;    // Close price
+}
+```
+
+### Theming and colors
+
+Multiple color schemes are available for different visual preferences:
+
+```typescript
+import {
+  DEFAULT_FINANCIAL_COLORS,  // Green/red traditional
+  GREEN_RED_COLORS,          // Bright green/red
+  DARK_THEME_COLORS,         // Dark theme compatible
+  generateVolumeColors
+} from '../../chartjs/financial';
+
+// Use custom colors
+const dataset = createCandlestickDataset({
+  data: priceData,
+  colorScheme: DARK_THEME_COLORS
+});
+
+// Generate volume bar colors based on price movement
+const volumeColors = generateVolumeColors(quotes, GREEN_RED_COLORS);
+```
+
+### Performance recommendations
+
+For optimal performance with large datasets (5,000-10,000+ candles):
+
+- **Data pagination**: Load data incrementally rather than all at once
+- **Chart updates**: Use `chart.update('none')` for data changes without animation
+- **Canvas optimization**: Consider using `devicePixelRatio` settings for high-DPI displays
+- **Memory management**: Destroy charts when components unmount to prevent memory leaks
+
+### Chart.js integration
+
+The financial chart system extends Chart.js with two new chart types:
+
+- **`candlestick`**: Traditional candlestick charts with filled body and wicks
+- **`ohlc`**: Open-High-Low-Close charts with horizontal tick marks
+
+Both chart types support all standard Chart.js features including:
+- Responsive design and resizing
+- Tooltips and legends  
+- Zoom and pan interactions
+- Animations and transitions
+- Scale configuration and formatting
+
+### License attribution
+
+The financial chart implementation is based on [chartjs-chart-financial v0.2.1](https://github.com/chartjs/chartjs-chart-financial) by Ben McCann, licensed under the MIT License. The original implementation has been ported to TypeScript with additional utilities and type safety improvements.
 
 ## Code formatting and quality
 
