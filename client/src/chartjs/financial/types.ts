@@ -48,6 +48,18 @@ export interface FinancialElementProps {
 }
 
 /**
+ * Financial element options interface
+ */
+export interface FinancialElementOptions {
+  borderColors?: FinancialColorConfig | string;
+  backgroundColors?: FinancialColorConfig;
+  borderWidth?: number;
+  lineWidth?: number;
+  armLength?: number;
+  armLengthRatio?: number;
+}
+
+/**
  * Controller type definitions
  */
 export type CandlestickControllerType = ChartComponent & {
@@ -86,8 +98,9 @@ export interface ScaleWithInternals {
 /**
  * Controller with internal properties
  */
-export interface ControllerWithInternals extends BarController {
+export interface ControllerWithInternals {
   _getStackCount(): number;
+  _getRuler(): RulerConfig;
   options: {
     barThickness?: number;
     categoryPercentage: number;
@@ -110,7 +123,7 @@ export interface ControllerWithInternals extends BarController {
   };
   resolveDataElementOptions(index: number, mode: string): Record<string, unknown>;
   updateElement(
-    element: { options?: Record<string, unknown> },
+    element: { options?: FinancialElementOptions },
     index: number,
     properties: Record<string, unknown>,
     mode: string
@@ -125,7 +138,7 @@ export type ControllerType = ControllerWithInternals;
 /**
  * Ruler configuration interface
  */
-export interface RulerConfig {
+export interface RulerConfig extends Record<string, unknown> {
   min: number;
   pixels: number[];
   start: number;

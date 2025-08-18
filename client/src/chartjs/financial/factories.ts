@@ -28,7 +28,7 @@ export function buildCandlestickDataset(
     borderColor: colors.unchanged,
     borderWidth: options.borderWidth ?? 1,
     yAxisID: "y"
-  };
+  } as CandlestickDataset;
 }
 
 /**
@@ -48,12 +48,12 @@ export function buildOhlcDataset(
   return {
     type: "ohlc",
     label: options.label ?? "Price",
-    data,
+    data: data as unknown[],
     borderColor: colors.unchanged,
     lineWidth: options.lineWidth ?? 2,
     armLengthRatio: options.armLengthRatio ?? 0.8,
     yAxisID: "y"
-  };
+  } as ChartDataset;
 }
 
 /**

@@ -3,6 +3,7 @@
 // OhlcController - extends FinancialController for OHLC chart types
 
 import { FinancialController } from "./financial-controller";
+import type { ControllerWithInternals } from "./types";
 import type { ControllerType } from "./types";
 
 /**
@@ -30,7 +31,7 @@ export class OhlcController extends FinancialController {
     mode: string
   ): void {
     const reset = mode === "reset";
-    const ruler = (this as any)._getRuler();
+    const ruler = (this as unknown as ControllerWithInternals)._getRuler();
     const sharedOptionsResult = (this as unknown as ControllerType)._getSharedOptions(start, mode);
     const { sharedOptions, includeOptions } = sharedOptionsResult as {
       sharedOptions?: Record<string, unknown>;

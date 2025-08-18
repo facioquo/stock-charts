@@ -3,6 +3,7 @@
 // FinancialElement base class for OHLC and Candlestick elements
 
 import { Element } from "chart.js";
+import type { FinancialElementOptions } from "./types";
 
 /**
  * Helper function to get the bounds of the bar regardless of the orientation
@@ -73,6 +74,7 @@ export class FinancialElement extends Element {
   declare high: number;
   declare low: number;
   declare close: number;
+  declare options: FinancialElementOptions;
 
   height(): number {
     return this.base - this.y;

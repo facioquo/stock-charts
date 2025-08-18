@@ -36,9 +36,13 @@ describe("Financial Chart Registration", () => {
     const elements = Chart.defaults.elements as unknown as Record<string, unknown>;
     expect(elements.financial).toBeDefined();
     const financial = elements.financial as Record<string, Record<string, unknown>>;
-    expect(financial.color).toBeDefined();
-    expect(financial.color.up).toBeDefined();
-    expect(financial.color.down).toBeDefined();
-    expect(financial.color.unchanged).toBeDefined();
+    expect(financial.backgroundColors).toBeDefined();
+    expect(financial.backgroundColors.up).toBeDefined();
+    expect(financial.backgroundColors.down).toBeDefined();
+    expect(financial.backgroundColors.unchanged).toBeDefined();
+    expect(financial.borderColors).toBeDefined();
+    expect(financial.borderColors.up).toBeDefined();
+    expect(financial.borderColors.down).toBeDefined();
+    expect(financial.borderColors.unchanged).toBeDefined();
   });
 });

@@ -116,12 +116,18 @@ export class FinancialController extends BarController {
    * @param scale - The current scale
    * @returns The other scale
    */
-  _getOtherScale(scale: unknown): { getUserBounds(): { min: number; max: number; minDefined: boolean; maxDefined: boolean } } {
+  _getOtherScale(scale: unknown): {
+    getUserBounds(): { min: number; max: number; minDefined: boolean; maxDefined: boolean };
+  } {
     const meta = this._cachedMeta;
     if (scale === meta.iScale) {
-      return meta.vScale as { getUserBounds(): { min: number; max: number; minDefined: boolean; maxDefined: boolean } };
+      return meta.vScale as {
+        getUserBounds(): { min: number; max: number; minDefined: boolean; maxDefined: boolean };
+      };
     }
-    return meta.iScale as { getUserBounds(): { min: number; max: number; minDefined: boolean; maxDefined: boolean } };
+    return meta.iScale as {
+      getUserBounds(): { min: number; max: number; minDefined: boolean; maxDefined: boolean };
+    };
   }
   getMinMax(scale: unknown): { min: number; max: number } {
     const meta = this._cachedMeta;

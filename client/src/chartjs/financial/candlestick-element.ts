@@ -2,7 +2,6 @@
 // based on https://github.com/chartjs/chartjs-chart-financial
 // CandlestickElement - visual element for candlestick bars
 
-import { Chart } from "chart.js";
 import { valueOrDefault } from "chart.js/helpers";
 import { FinancialElement } from "./financial-element";
 import type { FinancialColorConfig } from "./types";
@@ -43,7 +42,7 @@ export class CandlestickElement extends FinancialElement {
     const defaults = CANDLESTICK_DEFAULTS;
 
     // Handle border colors (can be string or object)
-    let borderColors = (this.options as any)?.borderColors;
+    let borderColors = this.options?.borderColors;
     if (typeof borderColors === "string") {
       borderColors = {
         up: borderColors,
@@ -59,28 +58,25 @@ export class CandlestickElement extends FinancialElement {
     if (close < open) {
       // Bearish (down) candle
       borderColor = valueOrDefault(borderColors?.up, defaults.borderColors.up);
-      fillColor = valueOrDefault((this.options as any)?.backgroundColors?.up, defaults.backgroundColors.up);
+      fillColor = valueOrDefault(this.options?.backgroundColors?.up, defaults.backgroundColors.up);
     } else if (close > open) {
       // Bullish (up) candle
       borderColor = valueOrDefault(borderColors?.down, defaults.borderColors.down);
       fillColor = valueOrDefault(
-        (this.options as any)?.backgroundColors?.down,
+        this.options?.backgroundColors?.down,
         defaults.backgroundColors.down
       );
     } else {
       // Unchanged (doji) candle
       borderColor = valueOrDefault(borderColors?.unchanged, defaults.borderColors.unchanged);
       fillColor = valueOrDefault(
-        (this.options as any)?.backgroundColors?.unchanged,
+        this.options?.backgroundColors?.unchanged,
         defaults.backgroundColors.unchanged
       );
     }
 
     // Set drawing properties
-    ctx.lineWidth = valueOrDefault(
-      (this.options as any)?.borderWidth,
-      defaults.borderWidth
-    );
+    ctx.lineWidth = valueOrDefault(this.options?.borderWidth, defaults.borderWidth);
     ctx.strokeStyle = borderColor;
     ctx.fillStyle = fillColor;
 
