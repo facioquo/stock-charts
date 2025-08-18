@@ -101,8 +101,18 @@ npm run test:coverage --workspace=@stock-charts/client
 # Run .NET tests
 dotnet test Charts.sln
 
+# Run .NET tests with coverage
+npm run test:dotnet
+
 # With detailed output
 dotnet test Charts.sln --verbosity normal
+```
+
+**All testing:**
+
+```bash
+# Run all tests (frontend and backend)
+npm run test:all
 ```
 
 **Requirements:**
