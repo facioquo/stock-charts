@@ -20,13 +20,20 @@ export function buildCandlestickDataset(
 ): CandlestickDataset {
   const colors = options.colors ?? getFinancialColors();
 
+  // For debugging: convert OHLC data to simple bar data using close price
+  const barData = data.map(point => ({
+    x: point.x,
+    y: point.c // Use close price for bar height
+  }));
+
   return {
-    type: "candlestick",
+    type: "bar", // Temporarily use bar instead of candlestick to debug
     label: options.label ?? "Price",
-    data,
-    color: colors as unknown,
+    data: barData,
     borderColor: colors.unchanged,
-    borderWidth: options.borderWidth ?? 1,
+    backgroundColor: colors.up,
+    // Ensure borderWidth is always a number to avoid Chart.js parsing issues
+    borderWidth: typeof options.borderWidth === "number" ? options.borderWidth : 1,
     yAxisID: "y"
   } as CandlestickDataset;
 }

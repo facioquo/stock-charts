@@ -4,6 +4,7 @@
 
 import { BarController, defaults } from "chart.js";
 import { clipArea, unclipArea, isNullOrUndef } from "chart.js/helpers";
+import { FinancialElement } from "./financial-element";
 import type {
   FinancialDataPoint,
   FinancialTooltipContext,
@@ -35,6 +36,12 @@ function _computeMinSampleSize(scale: ScaleWithInternals | undefined, pixels: nu
  * with financial-specific optimizations from chartjs-chart-financial
  */
 export class FinancialController extends BarController {
+  /**
+   * Default element type for financial controllers
+   * Individual controllers (Candlestick, OHLC) should override this
+   */
+  static dataElementType = FinancialElement;
+
   static overrides = {
     label: "",
     parsing: false,
@@ -201,22 +208,23 @@ export class FinancialController extends BarController {
   }
 
   /**
-   * Performance optimized draw method with clipping
+   * Use Chart.js's default draw behavior instead of custom implementation
+   * This ensures proper element instantiation and drawing
    */
-  draw(): void {
-    const chart = this.chart;
-    const rects = this._cachedMeta.data;
+  // draw(): void {
+  //   const chart = this.chart;
+  //   const rects = this._cachedMeta.data;
 
-    clipArea(chart.ctx, chart.chartArea);
+  //   clipArea(chart.ctx, chart.chartArea);
 
-    // Optimized rendering loop
-    for (let i = 0, len = rects.length; i < len; ++i) {
-      const rect = rects[i];
-      if (rect && typeof (rect as unknown as { draw?: unknown }).draw === "function") {
-        (rect as unknown as { draw: (ctx: CanvasRenderingContext2D) => void }).draw(chart.ctx);
-      }
-    }
+  //   // Optimized rendering loop
+  //   for (let i = 0, len = rects.length; i < len; ++i) {
+  //     const rect = rects[i];
+  //     if (rect && typeof (rect as unknown as { draw?: unknown }).draw === "function") {
+  //       (rect as unknown as { draw: (ctx: CanvasRenderingContext2D) => void }).draw(chart.ctx);
+  //     }
+  //   }
 
-    unclipArea(chart.ctx);
-  }
+  //   unclipArea(chart.ctx);
+  // }
 }

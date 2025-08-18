@@ -11,6 +11,13 @@ export interface FinancialDataPoint {
   c: number; // close
 }
 
+// Financial color configuration
+export interface FinancialColorConfig {
+  up: string;
+  down: string;
+  unchanged: string;
+}
+
 // Export types but don't augment Chart.js module to avoid type conflicts
 // The financial chart types will be registered at runtime
 export type CandlestickDataset = {
@@ -19,7 +26,7 @@ export type CandlestickDataset = {
   data: FinancialDataPoint[];
   borderColor?: string | string[];
   borderWidth?: number;
-  backgroundColor?: string | string[];
-  color?: unknown;
+  backgroundColor?: string | string[] | FinancialColorConfig;
   yAxisID?: string;
+  order?: number;
 };

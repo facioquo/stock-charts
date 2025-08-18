@@ -3,6 +3,7 @@
 // OhlcController - extends FinancialController for OHLC chart types
 
 import { FinancialController } from "./financial-controller";
+import { OhlcElement } from "./ohlc-element";
 import type { ControllerWithInternals } from "./types";
 import type { ControllerType } from "./types";
 
@@ -20,6 +21,11 @@ export class OhlcController extends FinancialController {
       categoryPercentage: 1.0
     }
   };
+
+  /**
+   * Specify which element class to use for OHLC data points
+   */
+  static dataElementType = OhlcElement;
 
   /**
    * Update chart elements for OHLC display

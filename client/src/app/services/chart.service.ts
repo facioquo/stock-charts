@@ -1014,7 +1014,7 @@ export class ChartService implements OnDestroy {
       ...dataset,
       yAxisID: "y",
       order: 75
-    } as unknown as ChartDataset;
+    };
   }
 
   private createVolumeDataset(

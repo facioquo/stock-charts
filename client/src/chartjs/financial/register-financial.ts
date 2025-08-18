@@ -105,6 +105,11 @@ export function ensureFinancialChartsRegistered(): void {
     OhlcElement
   );
 
+  // Explicitly set dataElementType for controllers after registration
+  // This ensures Chart.js uses the correct element classes
+  CandlestickController.dataElementType = CandlestickElement;
+  OhlcController.dataElementType = OhlcElement;
+
   // Set up default financial element configuration
   const elementsDefaults = Chart.defaults.elements as unknown as Record<string, unknown>;
 

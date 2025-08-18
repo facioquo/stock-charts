@@ -3,6 +3,7 @@
 // CandlestickController - extends FinancialController for candlestick chart types
 
 import { FinancialController } from "./financial-controller";
+import { CandlestickElement } from "./candlestick-element";
 import type { ControllerWithInternals } from "./types";
 import type { ControllerType, ScaleWithInternals } from "./types";
 
@@ -20,6 +21,11 @@ export class CandlestickController extends FinancialController {
       categoryPercentage: 0.8
     }
   };
+
+  /**
+   * Specify which element class to use for candlestick data points
+   */
+  static dataElementType = CandlestickElement;
 
   /**
    * Update chart elements for candlestick display
