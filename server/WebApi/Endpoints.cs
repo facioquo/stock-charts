@@ -20,7 +20,20 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public async Task<IActionResult> GetQuotes()
     {
         IEnumerable<Quote> quotes = await quoteFeed.Get();
-        return Ok(quotes.TakeLast(limitLast));
+
+        // optional query parameter ?limit=NNN (default existing behavior 120)
+        if (!int.TryParse(HttpContext.Request.Query["limit"], out int limit) || limit <= 0)
+        {
+            limit = limitLast; // fallback to default
+        }
+
+        // clamp to a reasonable maximum to avoid large payloads; adjust as needed
+        if (limit > 5000)
+        {
+            limit = 5000;
+        }
+
+        return Ok(quotes.TakeLast(limit));
     }
 
     [HttpGet("indicators")]

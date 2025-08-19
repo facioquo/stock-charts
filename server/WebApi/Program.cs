@@ -85,4 +85,9 @@ app.UseResponseCompression();
 
 // Controller endpoints
 app.MapControllers();
+// Simple health endpoint for readiness probes
+app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.Run();
+
+// Expose Program class for WebApplicationFactory integration tests
+public partial class Program { }

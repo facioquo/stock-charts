@@ -36,8 +36,8 @@ public class QuoteService(
 
             if (!await blob.ExistsAsync())
             {
-                _logger.LogWarning("Blob {BlobName} not found, using backup data", blobName);
-                return QuoteBackup.BackupQuotes;
+                _logger.LogWarning("Blob {BlobName} not found, using file/static backup data", blobName);
+                return QuoteFileFallback.Get();
             }
 
             Response<BlobDownloadInfo> response = await blob.DownloadAsync();
@@ -46,7 +46,7 @@ public class QuoteService(
             if (stream == null)
             {
                 _logger.LogError("Download stream was null for {BlobName}", blobName);
-                return QuoteBackup.BackupQuotes;
+                return QuoteFileFallback.Get();
             }
 
             List<Quote>? quotes = await JsonSerializer.DeserializeAsync<List<Quote>>(stream);
@@ -54,7 +54,7 @@ public class QuoteService(
             if (quotes == null || quotes.Count == 0)
             {
                 _logger.LogWarning("No quotes found in {BlobName}", blobName);
-                return QuoteBackup.BackupQuotes;
+                return QuoteFileFallback.Get();
             }
 
             return quotes.OrderBy(x => x.Date);
@@ -63,8 +63,8 @@ public class QuoteService(
         // failover to backup quotes for local development and testing
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to retrieve quotes for {Symbol}", symbol);
-            return QuoteBackup.BackupQuotes;
+            _logger.LogError(ex, "Failed to retrieve quotes for {Symbol}; using file/static backup", symbol);
+            return QuoteFileFallback.Get();
         }
     }
 }

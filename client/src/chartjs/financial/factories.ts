@@ -3,9 +3,9 @@
 // Dataset and configuration factory utilities
 
 import { ChartDataset, ChartOptions, ScatterDataPoint } from "chart.js";
-import type { FinancialDataPoint, FinancialColorConfig } from "./types";
+import { createVolumeColors, getFinancialColors } from "./colors";
 import { CandlestickDataset } from "./financial-chart.registry";
-import { getFinancialColors, createVolumeColors } from "./colors";
+import type { FinancialColorConfig, FinancialDataPoint } from "./types";
 
 /**
  * Create a candlestick dataset with proper configuration
@@ -20,16 +20,10 @@ export function buildCandlestickDataset(
 ): CandlestickDataset {
   const colors = options.colors ?? getFinancialColors();
 
-  // For debugging: convert OHLC data to simple bar data using close price
-  const barData = data.map(point => ({
-    x: point.x,
-    y: point.c // Use close price for bar height
-  }));
-
   return {
-    type: "bar", // Temporarily use bar instead of candlestick to debug
+    type: "candlestick",
     label: options.label ?? "Price",
-    data: barData,
+    data,
     borderColor: colors.unchanged,
     backgroundColor: colors.up,
     // Ensure borderWidth is always a number to avoid Chart.js parsing issues

@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DEFAULT_API_BASE = process.env.BACKUP_INDICATORS_API_BASE || 'http://localhost:5000';
+const DEFAULT_API_BASE = process.env.BACKUP_DATA_API_BASE || process.env.BACKUP_INDICATORS_API_BASE || 'http://localhost:5000';
 const apiBase = process.argv.find(a => a.startsWith('--apiBase='))?.split('=')[1] || DEFAULT_API_BASE;
 const dataDir = path.resolve(__dirname, '../client/src/app/data');
 const jsonPath = path.join(dataDir, 'backup-indicators.json');

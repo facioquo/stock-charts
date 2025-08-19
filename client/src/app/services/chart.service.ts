@@ -28,9 +28,9 @@ type ExtendedChartDataset = ChartDataset & {
 
 // extensions
 import {
-  FinancialDataPoint,
   buildCandlestickDataset,
-  buildVolumeDataset
+  buildVolumeDataset,
+  FinancialDataPoint
 } from "../../chartjs/financial";
 
 // plugins
@@ -1010,11 +1010,7 @@ export class ChartService implements OnDestroy {
       }
     });
 
-    return {
-      ...dataset,
-      yAxisID: "y",
-      order: 75
-    };
+    return { ...dataset, order: 75 } as unknown as ChartDataset;
   }
 
   private createVolumeDataset(

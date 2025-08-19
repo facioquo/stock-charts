@@ -155,8 +155,39 @@ npm run test:coverage     # With coverage
 # Maintenance
 npm run clean             # Clean all build outputs
 npm run lint:md           # Lint markdown files
-npm run generate:backups  # Refresh both backup-indicators.json and backup-quotes.json (runs prebuild automatically)
+npm run generate:backup-indicators  # Refresh backup-indicators.json (quotes are now fully static)
 ```
+
+### Backup data (indicators & quotes)
+
+The project now ships a single, committed deterministic `backup-quotes.json` (1000 trading days) that is treated as **static**.
+It is consumed directly by the frontend and (via `QuoteFileFallback`) by the Web API. A secondary, embedded algorithmic
+fallback (`QuoteBackup`) generates the same deterministic shape if the JSON file is absent (e.g., trimmed deployment).
+
+Only indicators remain generated from the live API. Regenerate indicators when backend indicator logic changes:
+
+```bash
+npm run generate:backup-indicators
+```
+
+How quotes work now:
+
+- `backup-quotes.json` is authoritative and versioned – no generation script required.
+- `QuoteFileFallback` loads the shared JSON; if missing, it falls back to the deterministic in-code generator (`QuoteBackup`).
+- Frontend tests assert invariants (length 1000, midnight timestamps, price bounds) guaranteeing stability.
+
+Notes:
+
+- Quotes no longer depend on network or runtime availability.
+- Indicator generation still honors `BACKUP_DATA_API_BASE` if you want to point at a non-default API URL during regeneration.
+
+Environment variable (indicators only):
+
+| Variable               | Purpose                                           | Default                 |
+| ---------------------- | ------------------------------------------------- | ----------------------- |
+| `BACKUP_DATA_API_BASE` | Base URL used when regenerating indicators backup | `http://localhost:5000` |
+
+Future ideas: integrity checksum for backups, multiple symbols, adjustable horizons.
 
 **Workspace-specific commands**:
 

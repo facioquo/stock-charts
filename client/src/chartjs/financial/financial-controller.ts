@@ -3,13 +3,13 @@
 // FinancialController base class for OHLC and Candlestick controllers
 
 import { BarController, defaults } from "chart.js";
-import { clipArea, unclipArea, isNullOrUndef } from "chart.js/helpers";
+import { isNullOrUndef } from "chart.js/helpers";
 import { FinancialElement } from "./financial-element";
 import type {
+  ControllerWithInternals,
   FinancialDataPoint,
   FinancialTooltipContext,
-  ScaleWithInternals,
-  ControllerWithInternals
+  ScaleWithInternals
 } from "./types";
 
 /**
