@@ -30,11 +30,10 @@ export class ChartConfigService {
 
   baseOverlayConfig(volumeAxisSize: number): ChartConfiguration {
     // base configuration
-    // Root chart type changed from "line" to "candlestick" so Chart.js
-    // calculates y-axis bounds from OHLC values; using "line" caused empty
-    // overlay (scale collapsed in production build).
+    // Temporarily using 'bar' type for main chart while debugging candlestick registration
+    // TODO: Restore to 'candlestick' once Chart.js registration is fixed
     const config = {
-      type: "candlestick",
+      type: "bar",
       data: {
         datasets: []
       },
@@ -176,7 +175,7 @@ export class ChartConfigService {
 
     // remove x-axis
     if (options.scales?.x) {
-      options.scales.x.display = false;
+      (options.scales.x as unknown as { display: boolean }).display = false;
     }
 
     // format y-axis (helper context)

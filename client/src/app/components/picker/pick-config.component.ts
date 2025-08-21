@@ -156,7 +156,27 @@ export class PickConfigComponent {
           message: e.message,
           error: e.error
         });
-        this.errorMessage = e.error;
+
+        // Extract meaningful error message from HttpErrorResponse
+        let errorMessage = "An error occurred while adding the indicator.";
+
+        if (typeof e.error === "string") {
+          errorMessage = e.error;
+        } else if (e.error && typeof e.error === "object") {
+          if (e.error.message) {
+            errorMessage = e.error.message;
+          } else if (e.error.error) {
+            errorMessage = e.error.error;
+          } else {
+            errorMessage = `Error ${e.status}: ${e.statusText || "Unknown error"}`;
+          }
+        } else if (e.message) {
+          errorMessage = e.message;
+        } else if (e.statusText) {
+          errorMessage = `Error ${e.status}: ${e.statusText}`;
+        }
+
+        this.errorMessage = errorMessage;
         this.closeButtonLabel = "RETRY";
       }
     });
