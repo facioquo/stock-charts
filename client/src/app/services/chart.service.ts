@@ -64,7 +64,8 @@ Chart.register(
 );
 
 // Ensure financial chart components are registered
-ensureFinancialChartsRegistered();
+// Temporarily disabled while debugging Chart.js integration issues
+// ensureFinancialChartsRegistered();
 
 // internal models
 import {
@@ -184,6 +185,12 @@ export class ChartService implements OnDestroy {
     listing: IndicatorListing,
     data: IndicatorDataRow[]
   ): void {
+    // Temporarily skip candlestick pattern indicators while debugging Chart.js integration
+    if (listing.category === ChartService.CATEGORIES.CANDLESTICK_PATTERN) {
+      console.log('Skipping candlestick pattern indicator:', listing.endpoint);
+      return;
+    }
+
     selection.results.forEach((result: IndicatorResult) => {
       const resultConfig = listing.results.find(x => x.dataName === result.dataName);
       if (!resultConfig) return;
@@ -873,6 +880,8 @@ export class ChartService implements OnDestroy {
         this.loadOverlayChart(quotes);
 
         // add/load indicators
+        // Temporarily disabled while debugging Chart.js integration
+        /*
         this.api.getListings().subscribe({
           next: (listings: IndicatorListing[]) => {
             // load catalog
@@ -895,6 +904,10 @@ export class ChartService implements OnDestroy {
             this.loading.set(false);
           }
         });
+        */
+        
+        // Just set loading to false since we're not loading indicators
+        this.loading.set(false);
       },
       error: (e: HttpErrorResponse) => {
         console.error("Error getting quotes:", {
