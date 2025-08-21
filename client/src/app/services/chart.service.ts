@@ -33,6 +33,9 @@ import {
   FinancialDataPoint
 } from "../../chartjs/financial";
 
+// financial chart registration
+import { ensureFinancialChartsRegistered } from "../../chartjs/financial/register-financial";
+
 // plugins
 import AnnotationPlugin, {
   AnnotationOptions,
@@ -59,6 +62,9 @@ Chart.register(
   LinearScale,
   TimeSeriesScale
 );
+
+// Ensure financial chart components are registered
+ensureFinancialChartsRegistered();
 
 // internal models
 import {
@@ -933,7 +939,9 @@ export class ChartService implements OnDestroy {
 
   loadOverlayChart(quotes: Quote[]) {
     // loads base with quotes only
+    console.log('loadOverlayChart called with', quotes.length, 'quotes');
     const { priceData, volumeData, volumeAxisSize } = this.processQuoteData(quotes);
+    console.log('Processed data:', { priceDataLength: priceData.length, volumeDataLength: volumeData.length, volumeAxisSize });
 
     // define base datasets
     const chartData: ChartData = {
@@ -942,6 +950,7 @@ export class ChartService implements OnDestroy {
         this.createVolumeDataset(volumeData, priceData)
       ]
     };
+    console.log('Chart data created:', chartData.datasets.map(d => ({ type: d.type, label: d.label, dataLength: d.data?.length })));
 
     // Create and display chart
     this.createOverlayChart(chartData, volumeAxisSize);
@@ -1001,16 +1010,23 @@ export class ChartService implements OnDestroy {
   }
 
   private createPriceDataset(priceData: FinancialDataPoint[]): ChartDataset {
-    const dataset = buildCandlestickDataset(priceData, {
-      label: "Price",
-      colors: {
-        up: ChartService.COLORS.CANDLE_UP,
-        down: ChartService.COLORS.CANDLE_DOWN,
-        unchanged: ChartService.COLORS.CANDLE_UNCHANGED
-      }
-    });
+    // Temporary: Use bar chart for price while debugging candlestick registration
+    // Convert financial data to bar chart format using close prices
+    const barData = priceData.map(point => ({
+      x: point.x,
+      y: point.c // Use close price for bar height
+    }));
 
-    return { ...dataset, order: 75 } as unknown as ChartDataset;
+    return {
+      type: "bar",
+      label: "Price (Close)",
+      data: barData,
+      backgroundColor: ChartService.COLORS.CANDLE_UP,
+      borderColor: ChartService.COLORS.CANDLE_UP,
+      borderWidth: 1,
+      yAxisID: "y",
+      order: 75
+    } as ChartDataset;
   }
 
   private createVolumeDataset(
@@ -1043,7 +1059,11 @@ export class ChartService implements OnDestroy {
     const myCanvas = document.getElementById("chartOverlay") as HTMLCanvasElement;
     const ctx = myCanvas.getContext("2d");
     if (!ctx) return; // cannot create chart without context
+    
+    // Create the chart
     this.chartOverlay = new Chart(ctx, chartConfig);
+    console.log('Chart created successfully with type:', chartConfig.type);
+    console.log('Chart datasets:', chartData.datasets.map(d => ({ type: d.type, label: d.label, dataLength: d.data?.length })));
   }
 
   loadSelections() {

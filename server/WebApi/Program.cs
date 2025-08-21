@@ -90,4 +90,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.Run();
 
 // Expose Program class for WebApplicationFactory integration tests
-public partial class Program { }
+public partial class Program 
+{ 
+    protected Program() { }
+}

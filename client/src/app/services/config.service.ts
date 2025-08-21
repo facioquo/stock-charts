@@ -30,9 +30,10 @@ export class ChartConfigService {
 
   baseOverlayConfig(volumeAxisSize: number): ChartConfiguration {
     // base configuration
-    // Root chart uses custom registered 'candlestick' type for financial data.
+    // Temporarily using 'bar' type for main chart while debugging candlestick registration
+    // TODO: Restore to 'candlestick' once Chart.js registration is fixed
     const config = {
-      type: "candlestick",
+      type: "bar",
       data: {
         datasets: []
       },
