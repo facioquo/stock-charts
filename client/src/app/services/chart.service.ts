@@ -64,8 +64,7 @@ Chart.register(
 );
 
 // Ensure financial chart components are registered
-// Temporarily disabled while debugging Chart.js integration issues
-// ensureFinancialChartsRegistered();
+ensureFinancialChartsRegistered();
 
 // internal models
 import {
@@ -185,12 +184,6 @@ export class ChartService implements OnDestroy {
     listing: IndicatorListing,
     data: IndicatorDataRow[]
   ): void {
-    // Temporarily skip candlestick pattern indicators while debugging Chart.js integration
-    if (listing.category === ChartService.CATEGORIES.CANDLESTICK_PATTERN) {
-      console.log('Skipping candlestick pattern indicator:', listing.endpoint);
-      return;
-    }
-
     selection.results.forEach((result: IndicatorResult) => {
       const resultConfig = listing.results.find(x => x.dataName === result.dataName);
       if (!resultConfig) return;
@@ -905,7 +898,7 @@ export class ChartService implements OnDestroy {
           }
         });
         */
-        
+
         // Just set loading to false since we're not loading indicators
         this.loading.set(false);
       },
@@ -952,9 +945,13 @@ export class ChartService implements OnDestroy {
 
   loadOverlayChart(quotes: Quote[]) {
     // loads base with quotes only
-    console.log('loadOverlayChart called with', quotes.length, 'quotes');
+    console.log("loadOverlayChart called with", quotes.length, "quotes");
     const { priceData, volumeData, volumeAxisSize } = this.processQuoteData(quotes);
-    console.log('Processed data:', { priceDataLength: priceData.length, volumeDataLength: volumeData.length, volumeAxisSize });
+    console.log("Processed data:", {
+      priceDataLength: priceData.length,
+      volumeDataLength: volumeData.length,
+      volumeAxisSize
+    });
 
     // define base datasets
     const chartData: ChartData = {
@@ -963,7 +960,14 @@ export class ChartService implements OnDestroy {
         this.createVolumeDataset(volumeData, priceData)
       ]
     };
-    console.log('Chart data created:', chartData.datasets.map(d => ({ type: d.type, label: d.label, dataLength: d.data?.length })));
+    console.log(
+      "Chart data created:",
+      chartData.datasets.map(d => ({
+        type: d.type,
+        label: (d as { label?: string }).label,
+        dataLength: d.data?.length
+      }))
+    );
 
     // Create and display chart
     this.createOverlayChart(chartData, volumeAxisSize);
@@ -1023,21 +1027,17 @@ export class ChartService implements OnDestroy {
   }
 
   private createPriceDataset(priceData: FinancialDataPoint[]): ChartDataset {
-    // Temporary: Use bar chart for price while debugging candlestick registration
-    // Convert financial data to bar chart format using close prices
-    const barData = priceData.map(point => ({
-      x: point.x,
-      y: point.c // Use close price for bar height
-    }));
+    const dataset = buildCandlestickDataset(priceData, {
+      label: "Price",
+      colors: {
+        up: ChartService.COLORS.CANDLE_UP,
+        down: ChartService.COLORS.CANDLE_DOWN,
+        unchanged: ChartService.COLORS.CANDLE_UNCHANGED
+      }
+    });
 
     return {
-      type: "bar",
-      label: "Price (Close)",
-      data: barData,
-      backgroundColor: ChartService.COLORS.CANDLE_UP,
-      borderColor: ChartService.COLORS.CANDLE_UP,
-      borderWidth: 1,
-      yAxisID: "y",
+      ...dataset,
       order: 75
     } as ChartDataset;
   }
@@ -1072,11 +1072,18 @@ export class ChartService implements OnDestroy {
     const myCanvas = document.getElementById("chartOverlay") as HTMLCanvasElement;
     const ctx = myCanvas.getContext("2d");
     if (!ctx) return; // cannot create chart without context
-    
+
     // Create the chart
     this.chartOverlay = new Chart(ctx, chartConfig);
-    console.log('Chart created successfully with type:', chartConfig.type);
-    console.log('Chart datasets:', chartData.datasets.map(d => ({ type: d.type, label: d.label, dataLength: d.data?.length })));
+    console.log("Chart created successfully with type:", chartConfig.type);
+    console.log(
+      "Chart datasets:",
+      chartData.datasets.map(d => ({
+        type: d.type,
+        label: (d as { label?: string }).label,
+        dataLength: d.data?.length
+      }))
+    );
   }
 
   loadSelections() {

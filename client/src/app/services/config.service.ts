@@ -30,10 +30,11 @@ export class ChartConfigService {
 
   baseOverlayConfig(volumeAxisSize: number): ChartConfiguration {
     // base configuration
-    // Temporarily using 'bar' type for main chart while debugging candlestick registration
-    // TODO: Restore to 'candlestick' once Chart.js registration is fixed
+    // Root chart type changed from "line" to "candlestick" so Chart.js
+    // calculates y-axis bounds from OHLC values; using "line" caused empty
+    // overlay (scale collapsed in production build).
     const config = {
-      type: "bar",
+      type: "candlestick",
       data: {
         datasets: []
       },
