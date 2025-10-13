@@ -81,8 +81,7 @@ export class ChartConfigService {
           left: 1,
           bottom: 0,
           right: 1
-        },
-        autoPadding: false
+        }
       },
       responsive: true,
       maintainAspectRatio: false,
