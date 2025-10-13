@@ -68,7 +68,8 @@ export class ChartConfigService {
         },
         tooltip: {
           enabled: this.usr.settings.showTooltips,
-          intersect: false
+          intersect: false,
+          mode: "index"
         },
         annotation: {
           clip: false,
