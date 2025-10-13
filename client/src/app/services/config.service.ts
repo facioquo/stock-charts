@@ -173,6 +173,12 @@ export class ChartConfigService {
   baseOscillatorOptions(): ChartOptions {
     const options = this.baseChartOptions();
 
+    // Disable autoPadding for oscillator charts to maintain fixed scales
+    // (e.g., 0-100 for percentage-based indicators like RSI, Stochastic)
+    if (options.layout) {
+      options.layout.autoPadding = false;
+    }
+
     // remove x-axis
     if (options.scales?.x) {
       options.scales.x.display = false;
