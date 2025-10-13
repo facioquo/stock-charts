@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "build-functions",
+      "label": "Build: Functions",
       "detail": "Build Azure Functions project",
       "type": "process",
       "command": "dotnet",
@@ -13,7 +13,7 @@
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
-      "dependsOn": "clean-functions",
+      "dependsOn": "Clean: Functions",
       "group": {
         "kind": "build",
         "isDefault": true
@@ -28,9 +28,40 @@
       }
     },
     {
-      "label": "build-all",
+      "label": "Build: Website",
+      "detail": "Build Angular frontend application",
+      "type": "npm",
+      "script": "build",
+      "path": "client/",
+      "group": "build",
+      "problemMatcher": ["$tsc"],
+      "presentation": {
+        "reveal": "silent",
+        "revealProblems": "onProblem"
+      }
+    },
+    {
+      "label": "Build: Server",
+      "detail": "Build .NET backend solution",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "Charts.sln",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "group": "build",
+      "problemMatcher": ["$msCompile"],
+      "presentation": {
+        "reveal": "silent",
+        "revealProblems": "onProblem"
+      }
+    },
+    {
+      "label": "Build: All",
       "detail": "Build all projects in parallel",
-      "dependsOn": ["build-website", "build-server"],
+      "dependsOn": ["Build: Website", "Build: Server"],
       "dependsOrder": "parallel",
       "group": "build",
       "presentation": {
@@ -38,11 +69,8 @@
         "panel": "shared"
       }
     },
-    // =============================================================================
-    // TEST TASKS
-    // =============================================================================
     {
-      "label": "test-website",
+      "label": "Test: Website",
       "detail": "Run Angular frontend tests",
       "type": "npm",
       "script": "test",
@@ -55,7 +83,7 @@
       }
     },
     {
-      "label": "test-backend",
+      "label": "Test: Backend",
       "detail": "Run .NET backend tests with coverage",
       "type": "npm",
       "script": "test:dotnet",
@@ -67,9 +95,9 @@
       }
     },
     {
-      "label": "test-all",
+      "label": "Test: All",
       "detail": "Run all project tests (frontend and backend)",
-      "dependsOn": ["test-website", "test-backend"],
+      "dependsOn": ["Test: Website", "Test: Backend"],
       "dependsOrder": "sequence",
       "group": "test",
       "presentation": {
@@ -77,15 +105,11 @@
         "panel": "shared"
       }
     },
-    // =============================================================================
-    // LINT TASKS
-    // =============================================================================
     {
-      "label": "lint-website",
+      "label": "Lint: Website",
       "detail": "Lint Angular frontend code",
       "type": "npm",
       "script": "lint",
-      // workspace scoping handled via root script invocation; reviewer suggestion noted
       "group": "build",
       "problemMatcher": ["$eslint-stylish"],
       "presentation": {
@@ -94,11 +118,10 @@
       }
     },
     {
-      "label": "lint-website-fix",
+      "label": "Lint: Website (fix)",
       "detail": "Lint and auto-fix Angular frontend code",
       "type": "npm",
       "script": "lint:fix",
-      // workspace scoping handled via root script invocation; reviewer suggestion noted
       "group": "build",
       "problemMatcher": ["$eslint-stylish"],
       "presentation": {
@@ -107,7 +130,7 @@
       }
     },
     {
-      "label": "lint-markdown",
+      "label": "Lint: Markdown",
       "detail": "Lint Markdown files",
       "type": "npm",
       "script": "lint:md",
@@ -118,7 +141,7 @@
       }
     },
     {
-      "label": "lint-markdown-fix",
+      "label": "Lint: Markdown (fix)",
       "detail": "Lint and auto-fix Markdown files",
       "type": "npm",
       "script": "lint:md:fix",
@@ -129,7 +152,7 @@
       }
     },
     {
-      "label": "lint-all",
+      "label": "Lint: All",
       "detail": "Run all linting tasks in sequence",
       "type": "npm",
       "script": "lint",
@@ -140,7 +163,7 @@
       }
     },
     {
-      "label": "format-website",
+      "label": "Format: Website",
       "detail": "Format frontend code with Prettier",
       "type": "npm",
       "script": "format:web",
@@ -151,7 +174,7 @@
       }
     },
     {
-      "label": "format-check-website",
+      "label": "Format: Website (check)",
       "detail": "Check frontend code formatting",
       "type": "npm",
       "script": "format:web:check",
@@ -162,7 +185,7 @@
       }
     },
     {
-      "label": "format-vscode",
+      "label": "Format: VS Code",
       "detail": "Format VS Code configuration files",
       "type": "npm",
       "script": "format:vscode",
@@ -173,7 +196,7 @@
       }
     },
     {
-      "label": "format-all",
+      "label": "Format: All",
       "detail": "Format all project code (frontend + backend)",
       "type": "npm",
       "script": "format",
@@ -184,7 +207,7 @@
       }
     },
     {
-      "label": "format-dotnet",
+      "label": "Format: .NET",
       "detail": "Format .NET backend code",
       "type": "npm",
       "script": "format:dotnet",
@@ -194,11 +217,8 @@
         "panel": "shared"
       }
     },
-    // =============================================================================
-    // START/RUN TASKS
-    // =============================================================================
     {
-      "label": "start-website",
+      "label": "Start: Website",
       "detail": "Start Angular development server",
       "type": "npm",
       "script": "start",
@@ -212,12 +232,12 @@
       "problemMatcher": ["$tsc"]
     },
     {
-      "label": "start-functions",
+      "label": "Start: Functions",
       "detail": "Start Azure Functions host",
       "type": "shell",
       "command": "func",
       "args": ["start"],
-      "dependsOn": "build-functions",
+      "dependsOn": "Build: Functions",
       "options": {
         "cwd": "${workspaceFolder}/server/Functions"
       },
@@ -228,10 +248,10 @@
         "panel": "dedicated",
         "group": "development"
       },
-      "problemMatcher": ["$func-dotnet-watch"]
+      "problemMatcher": ["$msCompile"]
     },
     {
-      "label": "start-webapi",
+      "label": "Start: WebAPI",
       "detail": "Start .NET Web API server",
       "type": "shell",
       "command": "dotnet",
@@ -249,7 +269,7 @@
       "problemMatcher": ["$msCompile"]
     },
     {
-      "label": "start-azurite",
+      "label": "Start: Azurite",
       "detail": "Start Azure Storage Emulator",
       "type": "npm",
       "script": "azure:start",
@@ -262,13 +282,13 @@
       }
     },
     {
-      "label": "start-full-stack",
+      "label": "Start: Full Stack",
       "detail": "Start complete development environment",
       "dependsOn": [
-        "start-azurite",
-        "start-functions",
-        "start-webapi",
-        "start-website"
+        "Start: Azurite",
+        "Start: Functions",
+        "Start: WebAPI",
+        "Start: Website"
       ],
       "dependsOrder": "parallel",
       "group": "build",
@@ -277,11 +297,8 @@
         "panel": "shared"
       }
     },
-    // =============================================================================
-    // UTILITY TASKS
-    // =============================================================================
     {
-      "label": "clean-functions",
+      "label": "Clean: Functions",
       "detail": "Clean Azure Functions build artifacts",
       "type": "process",
       "command": "dotnet",
@@ -300,7 +317,7 @@
       }
     },
     {
-      "label": "clean-functions-release",
+      "label": "Clean: Functions (Release)",
       "detail": "Clean Azure Functions release build artifacts",
       "type": "process",
       "command": "dotnet",
@@ -321,7 +338,7 @@
       }
     },
     {
-      "label": "publish-functions",
+      "label": "Publish: Functions",
       "detail": "Publish Azure Functions for deployment",
       "type": "process",
       "command": "dotnet",
@@ -332,7 +349,7 @@
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
-      "dependsOn": "clean-functions-release",
+      "dependsOn": "Clean: Functions (Release)",
       "problemMatcher": ["$msCompile"],
       "options": {
         "cwd": "${workspaceFolder}/server/Functions"
@@ -343,7 +360,7 @@
       }
     },
     {
-      "label": "clean-azurite",
+      "label": "Clean: Azurite",
       "detail": "Delete local Azurite data (.azurite folder)",
       "type": "npm",
       "script": "azure:clean",
