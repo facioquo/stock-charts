@@ -8,6 +8,7 @@ import {
   ChartConfiguration,
   ChartData,
   ChartDataset,
+  ChartTypeRegistry,
   Filler,
   LinearScale,
   LineController,
@@ -268,7 +269,19 @@ export class ChartService implements OnDestroy {
   }
 
   private addExtraBars(dataPoints: ScatterDataPoint[]): void {
-    const nextDate = new Date(Math.max(...dataPoints.map(h => new Date(h.x).getTime())));
+    const validPoints = dataPoints.filter(h => h.x !== null);
+    if (validPoints.length === 0) return;
+
+    const maxTimestamp = Math.max(
+      ...validPoints.map(h => {
+        if (typeof h.x === "number") {
+          return h.x;
+        }
+        // h.x is guaranteed to be non-null due to filter above
+        return new Date(h.x as unknown as string | Date).getTime();
+      })
+    );
+    const nextDate = new Date(maxTimestamp);
 
     for (let i = 1; i < this.extraBars; i++) {
       nextDate.setDate(nextDate.getDate() + 1);
@@ -424,8 +437,9 @@ export class ChartService implements OnDestroy {
 
     // hide thresholds from tooltips
     if ((qtyThresholds ?? 0) > 0 && chartConfig.options?.plugins?.tooltip) {
-      chartConfig.options.plugins.tooltip.filter = (tooltipItem: TooltipItem<"line">) =>
-        tooltipItem.datasetIndex > (qtyThresholds ?? 0) - 1;
+      chartConfig.options.plugins.tooltip.filter = (
+        tooltipItem: TooltipItem<keyof ChartTypeRegistry>
+      ) => tooltipItem.datasetIndex > (qtyThresholds ?? 0) - 1;
     }
   }
 
@@ -981,7 +995,19 @@ export class ChartService implements OnDestroy {
   }
 
   private addExtraVolumeBarsBars(volumeData: ScatterDataPoint[]): void {
-    const nextDate = new Date(Math.max(...volumeData.map(h => new Date(h.x).getTime())));
+    const validPoints = volumeData.filter(h => h.x !== null);
+    if (validPoints.length === 0) return;
+
+    const maxTimestamp = Math.max(
+      ...validPoints.map(h => {
+        if (typeof h.x === "number") {
+          return h.x;
+        }
+        // h.x is guaranteed to be non-null due to filter above
+        return new Date(h.x as unknown as string | Date).getTime();
+      })
+    );
+    const nextDate = new Date(maxTimestamp);
 
     for (let i = 1; i < this.extraBars; i++) {
       nextDate.setDate(nextDate.getDate() + 1);
