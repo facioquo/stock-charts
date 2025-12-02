@@ -8,8 +8,8 @@
     "cloudflare": {
       "type": "stdio",
       "command": "npx",
-			"args": ["mcp-remote", "https://docs.mcp.cloudflare.com/mcp"]
-		},
+      "args": ["mcp-remote", "https://docs.mcp.cloudflare.com/mcp"]
+    },
     "context7": {
       "type": "stdio",
       "command": "npx",
