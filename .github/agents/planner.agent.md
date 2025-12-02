@@ -3,7 +3,7 @@ name: Planner
 description: Research codebase context and return structured findings for planning multi-phase development tasks
 argument-hint: Research goal or problem statement
 target: vscode
-tools: ['search', 'edit', 'usages', 'problems', 'changes', 'testFailure', 'githubRepo', 'github/*', 'mslearn/*', 'context7/*', `angular/*`]
+tools: ['search', 'edit', 'usages', 'problems', 'changes', 'testFailure', 'githubRepo', 'github/*', 'mslearn/*', 'context7/*', 'angular/*']
 model: Claude Sonnet 4.5
 ---
 
