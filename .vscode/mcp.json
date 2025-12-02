@@ -3,7 +3,7 @@
     "angular-cli": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y","@angular/cli@latest","mcp"]
+      "args": ["-y", "@angular/cli@latest", "mcp"]
     },
     "cloudflare": {
       "type": "stdio",
@@ -13,7 +13,7 @@
     "context7": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y","@upstash/context7-mcp@latest"]
+      "args": ["-y", "@upstash/context7-mcp@latest"]
     },
     "github": {
       "type": "http",
@@ -35,12 +35,12 @@
     "playwright": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y","playwright","run-test-mcp-server"]
+      "args": ["-y", "playwright", "run-test-mcp-server"]
     },
     "primer": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y","@primer/mcp@latest"]
+      "args": ["-y", "@primer/mcp@latest"]
     }
   }
 }
