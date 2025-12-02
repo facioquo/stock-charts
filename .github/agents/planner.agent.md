@@ -2,7 +2,20 @@
 name: Planner
 description: Research codebase context and write a structured plan with multi-phase development tasks
 argument-hint: Feature goal or problem statement
-tools: ['search', 'edit', 'usages', 'problems', 'changes', 'testFailure', 'githubRepo', 'github/*', 'mslearn/*', 'context7/*', 'angular/*']
+tools:
+  [
+    "search",
+    "edit",
+    "usages",
+    "problems",
+    "changes",
+    "testFailure",
+    "githubRepo",
+    "github/*",
+    "mslearn/*",
+    "context7/*",
+    "angular/*"
+  ]
 model: Claude Sonnet 4.5
 ---
 
@@ -50,7 +63,7 @@ Match your research depth to the task—don't over-research simple questions.
      - Each phase represents a complete increment of work product
      - Aim for 3-5 phases of work tasks, each with key validation criteria
    - Include links to official online documentation if helpful
-   - Optionally write supplementary information in Appendix A if needed to clarify implementation tasks.  Do not write verbose code in the plan file; however, brief 5-10 line notional snippets okay for a few critical aspects.
+   - Optionally write supplementary information in Appendix A if needed to clarify implementation tasks. Do not write verbose code in the plan file; however, brief 5-10 line notional snippets okay for a few critical aspects.
 
 ## Research guidelines
 
@@ -111,28 +124,33 @@ Match your research depth to the task—don't over-research simple questions.
 ## Appendix B: Research findings
 
 **Relevant files:**
+
 - {file1}: {purpose}
 - {file2}: {purpose}
 
 **Key functions/classes:**
+
 - {function1} in {file}: {what it does}
 - {class1} in {file}: {what it does}
 
 **Patterns/conventions:**
+
 - {pattern1}
 - {convention1}
 
 **Implementation options:**
+
 1. {Option A}: {pros/cons}
 2. {Option B}: {pros/cons}
 3. {Option C}: {pros/cons}
 
 **Open questions:**
+
 - {What remains unclear}
 
 ---
-Last updated: {current Month day, year}
 
+Last updated: {current Month day, year}
 ```
 
 ## Boundaries
@@ -147,4 +165,5 @@ Last updated: {current Month day, year}
   - Pause for user feedback
 
 ---
+
 Last updated: December 2, 2025
