@@ -145,15 +145,6 @@ Last updated: {current Month day, year}
 - 🚫 **Never do:**
   - Implement code
   - Pause for user feedback
-  - Make decisions for the parent agent
-
-## About maintenance of this file
-
-- Official documentation: <https://code.visualstudio.com/docs/copilot/customization/custom-agents>
-- Inspired by: [ShepAlderson/copilot-orchestra](https://github.com/ShepAlderson/copilot-orchestra)
-- Gold copy: #githubRepo `skenderco/.github-private` file `.github/agents/orchestra-planner.agent.md`
-- Maintenance: Optional sync cohort; sync as a group if desired
-- Customization: Do not customize this file.
 
 ---
-Last updated: November 30, 2025
+Last updated: December 2, 2025
