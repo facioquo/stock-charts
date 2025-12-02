@@ -54,7 +54,7 @@ Match your research depth to the task—don't over-research simple questions.
    - Flag uncertainties or missing information
 
 4. **Write plan info and implementation tasks**:
-   - Write succint problem statement and solution overview
+   - Write succinct problem statement and solution overview
    - Write phase task list in logical implementation order
      - Task names should not exceed 200 characters
      - Each phase represents a complete increment of work product
