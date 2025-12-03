@@ -13,8 +13,9 @@ Submit an Issue with a clear description of the problem, steps to reproduce, cod
 
 ### Prerequisites
 
-- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/)
-- [.NET SDK](https://dotnet.microsoft.com/download/dotnet)
+- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
+- [pnpm](https://pnpm.io/) (v10.24.0 or later) - Install with `npm install -g pnpm@10.24.0`
+- [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 
 ### Quick setup
@@ -23,7 +24,7 @@ Submit an Issue with a clear description of the problem, steps to reproduce, cod
 # Clone and install
 git clone https://github.com/facioquo/stock-charts.git
 cd stock-charts
-npm install
+pnpm install
 ```
 
 ### Start development environment
@@ -42,7 +43,7 @@ Open 4 terminals and run in order:
 
 ```bash
 # Terminal 1: Storage emulator
-npm run azure:start
+pnpm run azure:start
 
 # Terminal 2: Azure Functions
 cd server/Functions && func start
@@ -51,48 +52,49 @@ cd server/Functions && func start
 cd server/WebApi && dotnet run
 
 # Terminal 4: Angular dev server
-npm start
+pnpm start
 ```
 
 Access at: Website <http://localhost:4200>, Web API <https://localhost:5001>, Functions <http://localhost:7071>
 
 ### Project structure
 
-The repository uses **npm workspaces**:
+The repository uses **pnpm workspaces**:
 
 ```text
 stock-charts/          # Root
 ├── package.json       # Workspace config + shared scripts
+├── pnpm-workspace.yaml # pnpm workspace definition
 ├── client/            # Angular frontend
 └── server/            # .NET backend
 ```
 
-Available npm scripts are in `package.json`. Key scripts:
+Available pnpm scripts are in `package.json`. Key scripts:
 
-- `npm run build` / `npm run build:prod` — Build workspaces
-- `npm run lint` / `npm run lint:fix` — Lint and fix
-- `npm run format` — Format all code
-- `npm run test:all` — Run all tests
+- `pnpm run build` / `pnpm run build:prod` — Build workspaces
+- `pnpm run lint` / `pnpm run lint:fix` — Lint and fix
+- `pnpm run format` — Format all code
+- `pnpm run test:all` — Run all tests
 
-Workspace-specific: `npm run build --workspace=@stock-charts/client`
+Workspace-specific: `pnpm --filter @stock-charts/client run build`
 
 ## Development workflow
 
 1. **Make your changes**
 2. **Run checks** (before committing):
-   - Lint: `npm run lint:fix`
-   - Format: `npm run format`
-   - Test: `npm run test:all`
+   - Lint: `pnpm run lint:fix`
+   - Format: `pnpm run format`
+   - Test: `pnpm run test:all`
    - Build: `dotnet build Charts.sln`
 
 ## Code quality requirements
 
 All contributions must pass these checks (required before PR acceptance):
 
-- ✅ **Linting:** `npm run lint` (zero errors)
-- ✅ **Formatting:** `npm run format` (code properly formatted)
+- ✅ **Linting:** `pnpm run lint` (zero errors)
+- ✅ **Formatting:** `pnpm run format` (code properly formatted)
 - ✅ **Build:** `dotnet build Charts.sln` (no errors)
-- ✅ **Tests:** `npm run test:all` (all pass)
+- ✅ **Tests:** `pnpm run test:all` (all pass)
 - ✅ **No linting suppressions** without team review
 
 ## Guidelines for contributions
@@ -117,4 +119,4 @@ Dave Skender
 
 ---
 
-Last updated: August 15, 2025
+Last updated: December 3, 2025

@@ -6,19 +6,25 @@ on:
   pull_request:
     branches: ["main"]
 
+env:
+  NODE_VERSION: "24.11.1"
+  PNPM_VERSION: "10.24.0"
+
 jobs:
   build-backend:
     name: "Backend"
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.x"
+          dotnet-version: "10.x"
           dotnet-quality: "ga"
 
       - name: Build .NET solution
@@ -74,32 +80,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          node-version: "22.15.x"
-          cache: "npm"
-          cache-dependency-path: package-lock.json
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
 
-      - name: Install packages
-        run: npm install
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Check web formatting
-        run: npm run format:web:check
+        run: pnpm run format:web:check
 
       - name: Lint
-        run: npm run lint --workspace=@stock-charts/client
+        run: pnpm --filter @stock-charts/client run lint
 
       - name: Run unit tests
-        run: npm run test:coverage --workspace=@stock-charts/client
-
-      - name: Publish test results
-        uses: dorny/test-reporter@v1
-        if: success() || failure()
-        with:
-          name: Jest Tests
-          path: client/test-results/junit.xml
-          reporter: jest-junit
+        run: pnpm --filter @stock-charts/client run test:coverage
 
       - name: Upload coverage reports to Codecov
         if: github.event_name == 'pull_request'
@@ -165,9 +169,8 @@ jobs:
           name: coverage-report
           path: |
             client/coverage/
-            client/test-results/
             server/coverage/lcov.info
             server/coverage/*.trx
 
       - name: Build site
-        run: npm run build:prod --workspace=@stock-charts/client
+        run: pnpm --filter @stock-charts/client run build.prod

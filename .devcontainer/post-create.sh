@@ -11,8 +11,7 @@ echo "🔧 Running post-create setup..."
 # Git setup
 # ------------------------------------------------------------------------------
 
-# Remove Git LFS hooks if present (this repo doesn't use LFS and hooks can block operations)
-# The hooks may exist even if git-lfs isn't installed, causing push failures
+# Remove Git LFS hooks if present (this repo doesn't use LFS)
 echo "🔧 Removing Git LFS hooks (not used by this repo)..."
 rm -f "${REPO_ROOT}/.git/hooks/pre-push" 2>/dev/null || true
 rm -f "${REPO_ROOT}/.git/hooks/post-checkout" 2>/dev/null || true

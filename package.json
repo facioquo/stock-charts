@@ -1,47 +1,47 @@
 {
   "name": "stock-charts",
-  "version": "1.0.0",
   "description": "Full-stack financial charting application with Angular frontend and .NET backend",
-  "private": true,
-  "workspaces": [
-    "client"
-  ],
+  "author": "facioquo",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@10.24.0",
+  "engines": {
+    "node": ">=24.11.1",
+    "pnpm": ">=10.24.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/facioquo/stock-charts.git"
   },
-  "author": "facioquo",
-  "license": "Apache-2.0",
   "scripts": {
-    "clean": "npm run clean --workspaces",
-    "prebuild": "npm run generate:backups",
-    "build": "npm run build --workspaces",
-    "prebuild:prod": "npm run generate:backups",
-    "build:prod": "npm run build.prod --workspaces",
-    "start": "npm run start --workspace=@stock-charts/client",
-    "test": "npm run test --workspaces",
-    "test:watch": "npm run test:watch --workspaces",
-    "test:coverage": "npm run test:coverage --workspaces",
+    "clean": "pnpm -r run clean",
+    "prebuild": "pnpm run generate:backups",
+    "build": "pnpm -r run build",
+    "prebuild:prod": "pnpm run generate:backups",
+    "build:prod": "pnpm -r run build.prod",
+    "start": "pnpm --filter @stock-charts/client run start",
+    "test": "pnpm -r run test",
+    "test:watch": "pnpm -r run test:watch",
+    "test:coverage": "pnpm -r run test:coverage",
     "pretest:dotnet": "dotnet tool restore",
     "test:dotnet": "dotnet test Charts.sln --collect:\"XPlat Code Coverage\" --results-directory ./server/coverage --logger trx && dotnet tool run reportgenerator -reports:server/coverage/**/coverage.cobertura.xml -targetdir:server/coverage -reporttypes:lcov",
-    "test:all": "npm run test:coverage --workspace=@stock-charts/client && npm run test:dotnet",
-    "lint": "npm run lint --workspaces",
-    "lint:fix": "npm run lint:fix --workspaces",
+    "test:all": "pnpm --filter @stock-charts/client run test:coverage && pnpm run test:dotnet",
+    "lint": "pnpm -r run lint",
+    "lint:fix": "pnpm -r run lint:fix",
     "generate:backup-indicators": "node scripts/generate-backup-indicators.js",
     "generate:backup-quotes": "node scripts/generate-backup-quotes.js",
-    "generate:backups": "npm run generate:backup-indicators && npm run generate:backup-quotes",
+    "generate:backups": "pnpm run generate:backup-indicators && pnpm run generate:backup-quotes",
     "bench:chart-config": "node scripts/bench-chart-config.js",
-    "lint:md": "markdownlint \"**/*.md\" \".github/**/*.md\" --ignore \"**/node_modules/**\" --ignore \".azurite/**\"",
-    "lint:md:fix": "markdownlint \"**/*.md\" \".github/**/*.md\" --ignore \"**/node_modules/**\" --ignore \".azurite/**\" --fix",
-    "format": "npm run format:web && npm run format:dotnet",
-    "format:check": "npm run format:web:check && npm run format:dotnet:check",
+    "lint:md": "markdownlint-cli2",
+    "lint:md:fix": "markdownlint-cli2 --fix",
+    "format": "pnpm run format:web && pnpm run format:dotnet",
+    "format:check": "pnpm run format:web:check && pnpm run format:dotnet:check",
     "format:web": "prettier --write \"**/*.{ts,html,scss,css,json,md}\" --ignore-path .prettierignore",
     "format:web:check": "prettier --check \"**/*.{ts,html,scss,css,json,md}\" --ignore-path .prettierignore",
     "format:dotnet": "dotnet format Charts.sln",
     "format:dotnet:check": "dotnet format Charts.sln --verify-no-changes",
     "format:staged": "prettier --write",
     "format:vscode": "prettier --write --no-ignore \".vscode/*.json\"",
-    "dev": "npm run start --workspace=@stock-charts/client",
+    "dev": "pnpm --filter @stock-charts/client run start",
     "azure:start": "azurite --skipApiVersionCheck --location ./.azurite",
     "azure:functions": "cd server/Functions && func start",
     "azure:check": "func --version && azurite --version",
@@ -49,22 +49,9 @@
   },
   "devDependencies": {
     "azurite": "3.35.0",
-    "markdownlint-cli": "0.45.0",
-    "prettier": "3.6.2",
-    "rimraf": "6.0.1",
-    "typescript": "^5.9.3"
-  },
-  "engines": {
-    "node": ">=22.15.0",
-    "npm": ">=10.9.0"
-  },
-  "keywords": [
-    "angular",
-    "dotnet",
-    "azure-functions",
-    "stock-charts",
-    "financial",
-    "typescript",
-    "chart.js"
-  ]
+    "markdownlint-cli2": "0.19.1",
+    "prettier": "3.7.4",
+    "rimraf": "6.1.2",
+    "typescript": "5.9.3"
+  }
 }

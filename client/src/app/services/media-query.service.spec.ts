@@ -1,13 +1,14 @@
 import { TestBed } from "@angular/core/testing";
+import { Mock, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MediaQueryService } from "./media-query.service";
 
 describe("MediaQueryService", () => {
   let service: MediaQueryService;
-  let mockMatchMedia: jest.Mock;
+  let mockMatchMedia: Mock;
 
   beforeEach(() => {
     // Mock window.matchMedia
-    mockMatchMedia = jest.fn();
+    mockMatchMedia = vi.fn();
     Object.defineProperty(window, "matchMedia", {
       writable: true,
       value: mockMatchMedia
@@ -18,7 +19,7 @@ describe("MediaQueryService", () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("matches", () => {
@@ -55,11 +56,11 @@ describe("MediaQueryService", () => {
     it("should call callback with initial matches value", () => {
       const mockMediaQuery = {
         matches: true,
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn()
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn()
       };
       mockMatchMedia.mockReturnValue(mockMediaQuery);
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       service.listen("(max-width: 768px)", callback);
 
@@ -69,11 +70,11 @@ describe("MediaQueryService", () => {
     it("should register event listener for changes", () => {
       const mockMediaQuery = {
         matches: false,
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn()
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn()
       };
       mockMatchMedia.mockReturnValue(mockMediaQuery);
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       service.listen("(max-width: 768px)", callback);
 
@@ -83,11 +84,11 @@ describe("MediaQueryService", () => {
     it("should return cleanup function that removes event listener", () => {
       const mockMediaQuery = {
         matches: false,
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn()
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn()
       };
       mockMatchMedia.mockReturnValue(mockMediaQuery);
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       const cleanup = service.listen("(max-width: 768px)", callback);
       cleanup();
@@ -101,11 +102,11 @@ describe("MediaQueryService", () => {
     it("should handle media query change events", () => {
       const mockMediaQuery = {
         matches: false,
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn()
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn()
       };
       mockMatchMedia.mockReturnValue(mockMediaQuery);
-      const callback = jest.fn();
+      const callback = vi.fn();
 
       service.listen("(max-width: 768px)", callback);
 

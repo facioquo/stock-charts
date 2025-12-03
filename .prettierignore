@@ -17,6 +17,9 @@ coverage
 # Server files
 server
 
+# GitHub files (configuration and metadata)
+.github
+
 # Generated files
 *.min.js
 *.min.css

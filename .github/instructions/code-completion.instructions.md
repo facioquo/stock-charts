@@ -15,20 +15,20 @@ This checklist ensures all code changes meet quality standards before being comm
 
 ```bash
 # Format and check all code (frontend + backend)
-npm run format
-npm run format:check  # Must pass with no issues
+pnpm run format
+pnpm run format:check  # Must pass with no issues
 ```
 
 **Individual formatting:**
 
 ```bash
 # Frontend only (TypeScript, HTML, SCSS files)
-npm run format:web
-npm run format:web:check
+pnpm run format:web
+pnpm run format:web:check
 
 # Backend only (C# files)
-npm run format:dotnet
-npm run format:dotnet:check
+pnpm run format:dotnet
+pnpm run format:dotnet:check
 ```
 
 ### 2. Code linting and analysis
@@ -37,13 +37,13 @@ npm run format:dotnet:check
 
 ```bash
 # Lint TypeScript/Angular code
-npm run lint --workspace=@stock-charts/client -- --max-warnings=0  # Fail if any warnings remain
+pnpm --filter @stock-charts/client run lint -- --max-warnings=0  # Fail if any warnings remain
 
 # Auto-fix linting issues where possible
-npm run lint:fix --workspace=@stock-charts/client
+pnpm --filter @stock-charts/client run lint:fix
 
 # Re‑run lint after auto-fix to ensure zero warnings (required)
-npm run lint --workspace=@stock-charts/client -- --max-warnings=0
+pnpm --filter @stock-charts/client run lint -- --max-warnings=0
 ```
 
 **Requirements:**
@@ -60,10 +60,10 @@ npm run lint --workspace=@stock-charts/client -- --max-warnings=0
 
 ```bash
 # Build Angular application
-npm run build --workspace=@stock-charts/client
+pnpm --filter @stock-charts/client run build
 
 # Production build test
-npm run build:prod --workspace=@stock-charts/client
+pnpm --filter @stock-charts/client run build.prod
 ```
 
 **Backend build:**
@@ -89,10 +89,10 @@ dotnet build Charts.sln
 
 ```bash
 # Run unit tests
-npm run test --workspace=@stock-charts/client
+pnpm --filter @stock-charts/client run test
 
 # Run with coverage
-npm run test:coverage --workspace=@stock-charts/client
+pnpm --filter @stock-charts/client run test:coverage
 ```
 
 **Backend testing:**
@@ -102,7 +102,7 @@ npm run test:coverage --workspace=@stock-charts/client
 dotnet test Charts.sln
 
 # Run .NET tests with coverage
-npm run test:dotnet
+pnpm run test:dotnet
 
 # With detailed output
 dotnet test Charts.sln --verbosity normal
@@ -112,7 +112,7 @@ dotnet test Charts.sln --verbosity normal
 
 ```bash
 # Run all tests (frontend and backend)
-npm run test:all
+pnpm run test:all
 ```
 
 **Requirements:**
@@ -142,10 +142,10 @@ npm run test:all
 
 ```bash
 # Lint all markdown files
-npm run lint:md
+pnpm run lint:md
 
 # Auto-fix markdown issues
-npm run lint:md:fix
+pnpm run lint:md:fix
 ```
 
 ### 6. Integration and system checks
@@ -154,9 +154,9 @@ npm run lint:md:fix
 
 ```bash
 # Start full development stack
-npm start  # Angular dev server
+pnpm start  # Angular dev server
 # In separate terminals:
-npm run azure:start    # Azurite storage
+pnpm run azure:start    # Azurite storage
 cd server/Functions && func start    # Azure Functions
 cd server/WebApi && dotnet run       # Web API
 ```
@@ -229,8 +229,8 @@ git diff --staged
 
 ```bash
 # Clear caches and reinstall
-npm run clean
-npm install
+pnpm run clean
+pnpm install
 dotnet clean Charts.sln
 dotnet restore Charts.sln
 ```
@@ -239,26 +239,26 @@ dotnet restore Charts.sln
 
 ```bash
 # Auto-fix what's possible
-npm run lint:fix --workspace=@stock-charts/client
-npm run format
+pnpm --filter @stock-charts/client run lint:fix
+pnpm run format
 
 # Check specific rule violations
 # Enforce zero warnings explicitly (same as quality gate)
-npm run lint --workspace=@stock-charts/client -- --max-warnings=0
+pnpm --filter @stock-charts/client run lint -- --max-warnings=0
 
 # Use default (stylish) or specify a supported formatter (e.g., 'stylish')
-# List available formatters: npx eslint --help | grep format
-npx eslint client/src --format=stylish --max-warnings=0
+# List available formatters: pnpm exec eslint --help | grep format
+pnpm exec eslint client/src --format=stylish --max-warnings=0
 ```
 
 ### Test failures
 
 ```bash
 # Run tests in watch mode for debugging
-npm run test:watch --workspace=@stock-charts/client
+pnpm --filter @stock-charts/client run test:watch
 
 # Run specific test files
-npm run test --workspace=@stock-charts/client -- --testNamePattern="ComponentName"
+pnpm --filter @stock-charts/client run test -- --testNamePattern="ComponentName"
 ```
 
 ## VS Code integration
@@ -302,4 +302,4 @@ npm run test --workspace=@stock-charts/client -- --testNamePattern="ComponentNam
 
 ---
 
-Last updated: August 15, 2025
+Last updated: December 3, 2025

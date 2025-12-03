@@ -3,7 +3,7 @@
   // AZURE FUNCTIONS CONFIGURATION
   // =============================================================================
   "azureFunctions.projectSubpath": "server/Functions",
-  "azureFunctions.deploySubpath": "server/Functions/bin/Release/net9.0/publish",
+  "azureFunctions.deploySubpath": "server/Functions/bin/Release/net10.0/publish",
   "azureFunctions.projectLanguage": "C#",
   "azureFunctions.projectRuntime": "~4",
   "azureFunctions.preDeployTask": "publish-functions",

@@ -1,11 +1,11 @@
 ---
-applyTo: "client/**/*.{ts,html,scss,json}"
+applyTo: "client/**/*.{ts,html,scss,json},client/{angular.json,tsconfig*.json})"
 description: "Project-specific Angular development guidelines"
 ---
 
 ## Angular development guidelines
 
-**CRITICAL**: Always use `#mcp_angular-cli_get_best_practices` and `#mcp_angular-cli_search_documentation` for official Angular best practices. Do NOT duplicate official guidance here.
+**CRITICAL**: Always use #tool:angular-cli/* tools for official Angular best practices. Do NOT duplicate official guidance here.
 
 ## Code quality - Non-negotiable rules
 
@@ -24,10 +24,10 @@ description: "Project-specific Angular development guidelines"
 1. Fix the underlying issue properly
 2. Refactor code to meet type safety requirements
 3. Use proper TypeScript types and Angular patterns
-4. Consult `#mcp_angular-cli_get_best_practices` for guidance
+4. Consult MCP Angular CLI tools for best practices and guidance
 5. Only suppress as absolute last resort with detailed justification
 
-### Code Quality Standards
+### Code quality standards
 
 - All code must pass ESLint without suppressions
 - Maintain 100% TypeScript type safety
@@ -50,39 +50,39 @@ Permitted exceptions (must be justified in a code comment directly above the `@C
 
 If a test environment has issues resolving external resources, adjust the test (e.g., override component or use Angular testing utilities) rather than inlining the production component. Do not commit inline templates/styles to solve test configuration problems.
 
-## Stock Charts Project-Specific Guidelines
+## Stock Charts project-specific guidelines
 
-### Chart.js Integration
+### Chart.js integration
 
 - Use Chart.js v4+ with Angular integration via direct canvas manipulation
 - Implement proper cleanup in component `ngOnDestroy()` to prevent memory leaks
 - Use Angular's `ViewChild` to access canvas elements safely
 - Handle chart resizing through Angular's `resize` service or window resize listeners
 
-### Financial Data Architecture
+### Financial data architecture
 
-#### API Service Patterns
+#### API service patterns
 
 - Implement failover pattern for multiple stock data APIs with proper error handling
 - Use Angular HTTP interceptors for retry logic and error standardization
 - Cache stock quote data appropriately using Angular's HTTP cache
 - Handle real-time updates with WebSocket services when available
 
-#### Component Structure
+#### Component structure
 
 - **Chart components**: Keep chart rendering logic separate from data fetching
 - **Configuration components**: Use reactive forms for chart settings and indicators
 - **Data services**: Abstract stock data APIs behind service interfaces
 - **Utility services**: Financial calculations should be pure functions in services
 
-#### Performance for Financial Applications
+#### Performance for financial applications
 
 - Use `OnPush` change detection for chart components (data-driven updates)
 - Implement virtual scrolling for large historical datasets
 - Optimize chart redraws by comparing data changes with signals
 - Use trackBy functions for large lists of financial instruments
 
-### Testing Financial Components
+### Testing financial components
 
 - Mock stock data APIs in unit tests with realistic data shapes
 - Test chart responsiveness and resize behavior across screen sizes
@@ -90,26 +90,25 @@ If a test environment has issues resolving external resources, adjust the test (
 - Test error handling for API failures and data inconsistencies
 - Use Angular Material Component Harnesses for Material component testing
 
-### Development Workflow
+### Development workflow
 
 - Use provided VS Code tasks for consistent formatting and linting
-- Run `npm run format` before commits to maintain code consistency
+- Run `pnpm run format` before commits to maintain code consistency
 - Test chart components across different screen sizes and orientations
 - **Never commit code with linting errors or warnings**
 
-### Angular Material Integration
+### Angular Material integration
 
 - Use [Angular Material](https://material.angular.dev/guide/) for UI components and theming
 - Import only required Material modules for optimal bundle size
 - Use [Component Harnesses](https://material.angular.dev/guide/using-component-harnesses) for testing Material components
 - Follow Material Design guidelines for consistent UX
 
-## Quick Reference - Official Sources
+## Quick reference - official sources
 
 **Always consult these for up-to-date guidance:**
 
-- `#mcp_angular-cli_get_best_practices` - Latest official Angular best practices
-- `#mcp_angular-cli_search_documentation` - Search Angular.dev documentation
+- #tool:angular-cli/* - official Angular best practices
 - [Angular.dev](https://angular.dev/) - Official documentation
 - [Angular Material](https://material.angular.dev/) - Material components and theming
 - [Chart.js Documentation](https://www.chartjs.org/docs) - Chart.js integration guidance

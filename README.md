@@ -14,8 +14,9 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 
 ### Prerequisites
 
-- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/)
-- [.NET SDK](https://dotnet.microsoft.com/download/dotnet)
+- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
+- [pnpm](https://pnpm.io/) (v10.24.0 or later) - Install with `npm install -g pnpm@10.24.0`
+- [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 
 ### Setup and run
@@ -24,17 +25,17 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 # Clone and install
 git clone https://github.com/facioquo/stock-charts.git
 cd stock-charts
-npm install
+pnpm install
 
 # Start development environment
 # Option 1: Use VS Code
 # Ctrl+Shift+P → "Tasks: Run Task" → "start-full-stack"
 
 # Option 2: Manual start in separate terminals
-npm run azure:start  # Terminal 1: Storage emulator
+pnpm run azure:start  # Terminal 1: Storage emulator
 cd server/Functions && func start  # Terminal 2: Azure Functions
 cd server/WebApi && dotnet run  # Terminal 3: Web API
-npm start  # Terminal 4: Angular dev server
+pnpm start  # Terminal 4: Angular dev server
 ```
 
 **Access:** Website at <http://localhost:4200>, Web API at <https://localhost:5001>, Functions at <http://localhost:7071>

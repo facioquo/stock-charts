@@ -1,4 +1,5 @@
 // Test the color picker functionality in isolation
+import { describe, expect, it } from "vitest";
 
 interface LineConfig {
   color: string;

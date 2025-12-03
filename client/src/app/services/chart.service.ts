@@ -8,6 +8,7 @@ import {
   ChartConfiguration,
   ChartData,
   ChartDataset,
+  ChartTypeRegistry,
   Filler,
   LinearScale,
   LineController,
@@ -27,11 +28,8 @@ type ExtendedChartDataset = ChartDataset & {
 };
 
 // extensions
-import {
-  CandlestickController,
-  CandlestickElement,
-  FinancialDataPoint
-} from "src/assets/js/chartjs-chart-financial";
+import { CandlestickController, CandlestickElement } from "../../assets/js/chartjs-chart-financial";
+import type { FinancialDataPoint } from "../../types/chartjs-chart-financial";
 
 // plugins
 import AnnotationPlugin, {
@@ -268,7 +266,13 @@ export class ChartService implements OnDestroy {
   }
 
   private addExtraBars(dataPoints: ScatterDataPoint[]): void {
-    const nextDate = new Date(Math.max(...dataPoints.map(h => new Date(h.x).getTime())));
+    const maxTime = Math.max(
+      ...dataPoints.map(h => {
+        const dateTime = h.x != null ? new Date(h.x).getTime() : 0;
+        return Number.isFinite(dateTime) ? dateTime : 0;
+      })
+    );
+    const nextDate = new Date(maxTime);
 
     for (let i = 1; i < this.extraBars; i++) {
       nextDate.setDate(nextDate.getDate() + 1);
@@ -424,8 +428,9 @@ export class ChartService implements OnDestroy {
 
     // hide thresholds from tooltips
     if ((qtyThresholds ?? 0) > 0 && chartConfig.options?.plugins?.tooltip) {
-      chartConfig.options.plugins.tooltip.filter = (tooltipItem: TooltipItem<"line">) =>
-        tooltipItem.datasetIndex > (qtyThresholds ?? 0) - 1;
+      chartConfig.options.plugins.tooltip.filter = (
+        tooltipItem: TooltipItem<keyof ChartTypeRegistry>
+      ) => tooltipItem.datasetIndex > (qtyThresholds ?? 0) - 1;
     }
   }
 
@@ -981,7 +986,13 @@ export class ChartService implements OnDestroy {
   }
 
   private addExtraVolumeBarsBars(volumeData: ScatterDataPoint[]): void {
-    const nextDate = new Date(Math.max(...volumeData.map(h => new Date(h.x).getTime())));
+    const maxTime = Math.max(
+      ...volumeData.map(h => {
+        const dateTime = h.x != null ? new Date(h.x).getTime() : 0;
+        return Number.isFinite(dateTime) ? dateTime : 0;
+      })
+    );
+    const nextDate = new Date(maxTime);
 
     for (let i = 1; i < this.extraBars; i++) {
       nextDate.setDate(nextDate.getDate() + 1);

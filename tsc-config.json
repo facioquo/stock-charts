@@ -12,7 +12,7 @@
     "target": "es2022",
     "typeRoots": ["./node_modules/@types"],
     "lib": ["es2022", "dom"],
-    "types": ["jest", "node"],
+    "types": ["node"],
     "useDefineForClassFields": false,
     "allowSyntheticDefaultImports": true,
     "resolvePackageJsonExports": true,
@@ -22,9 +22,8 @@
   "files": [
     "./src/app/app.component.spec.ts",
     "./src/app/components/picker/color-picker.spec.ts",
-    "./src/app/services/user.service.spec.ts",
-    "./jest.globals.d.ts"
+    "./src/app/services/user.service.spec.ts"
   ],
-  "include": ["src/**/*.spec.ts", "jest.globals.d.ts"],
+  "include": ["src/**/*.spec.ts"],
   "exclude": ["D:/Repos/stock-charts/client/out-tsc/spec"]
 }

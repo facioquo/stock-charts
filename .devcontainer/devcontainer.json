@@ -1,5 +1,5 @@
 {
-  "name": "Stock Charts Dev Container",
+  "name": "Dev Container",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {},
@@ -22,8 +22,12 @@
         "ms-azuretools.vscode-azurefunctions",
         "ms-azuretools.vscode-azurestorage",
         "ms-dotnettools.csdevkit",
-        "redhat.vscode-yaml"
-      ]
+        "redhat.vscode-yaml",
+        "vitest.explorer"
+      ],
+      "settings": {
+        "dotnet.defaultSolution": "Charts.sln"
+      }
     }
   },
   "remoteEnv": {

@@ -98,7 +98,7 @@ public class RandomQuotesTests
 
         // Verify no weekend dates when weekends are excluded
         Assert.All(quotesWithoutWeekends, quote => {
-            Assert.True(quote.Date.DayOfWeek != DayOfWeek.Saturday && quote.Date.DayOfWeek != DayOfWeek.Sunday,
+            Assert.True(quote.Date.DayOfWeek is not DayOfWeek.Saturday and not DayOfWeek.Sunday,
                 $"Found weekend date {quote.Date:yyyy-MM-dd} ({quote.Date.DayOfWeek}) when weekends should be excluded");
         });
     }

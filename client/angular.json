@@ -83,6 +83,20 @@
           "options": {
             "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "tsconfig.spec.json",
+            "include": ["src/**/*.spec.ts"],
+            "setupFiles": ["src/test-setup.ts"],
+            "coverage": false
+          },
+          "configurations": {
+            "coverage": {
+              "coverage": true
+            }
+          }
         }
       }
     }

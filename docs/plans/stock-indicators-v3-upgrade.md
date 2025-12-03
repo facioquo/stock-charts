@@ -39,7 +39,7 @@ This upgrade involves a multi-phase approach that ensures compatibility at each 
 
 ### Phase 1: Angular v21 upgrade preparation and execution
 
-- [x] 1.1 Review current Angular v20.1.7 configuration and identify breaking changes in v21 release notes
+- [x] 1.1 Review current Angular v20 configuration and identify breaking changes in v21 release notes
 - [x] 1.2 Run Angular CLI update command: `npx ng update @angular/cli @angular/core --allow-dirty` from client directory
 - [x] 1.3 Run Angular Material update: `npx ng update @angular/material --allow-dirty` from client directory
 - [x] 1.4 Update peer dependencies (@ng-matero/extensions, ngx-color) to versions compatible with Angular v21
@@ -235,7 +235,7 @@ ChartConfig = new ChartConfig
 
 **Unit testing:**
 
-- Frontend: Jest tests in `client/src/**/*.spec.ts`
+- Frontend: Vitest tests in `client/src/**/*.spec.ts`
 - Backend: xUnit tests in `server/WebApi.Tests/`
 
 **Integration testing:**

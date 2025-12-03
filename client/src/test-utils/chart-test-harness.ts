@@ -57,10 +57,10 @@ export class ChartTestHarness<TComponent extends ChartHostLike = ChartHostLike> 
         {
           provide: MediaQueryService,
           useValue: {
-            matches: jest.fn().mockReturnValue(false),
-            isMobile: jest.fn().mockReturnValue(false),
-            isTablet: jest.fn().mockReturnValue(false),
-            isDesktop: jest.fn().mockReturnValue(true)
+            matches: () => false,
+            isMobile: () => false,
+            isTablet: () => false,
+            isDesktop: () => true
           }
         }
       ]
