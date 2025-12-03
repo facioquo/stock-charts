@@ -261,4 +261,4 @@ Avoid inline HTML unless no Markdown equivalent exists. Allowed elements are def
 
 ---
 
-Last updated:December 3, 2025
+Last updated: December 3, 2025

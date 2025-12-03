@@ -50,6 +50,13 @@ This upgrade involves a multi-phase approach that ensures compatibility at each 
 - [ ] 1.9 Run linter (`npm run lint --workspace=@stock-charts/client -- --max-warnings=0`) and resolve issues
 - [ ] 1.10 Commit Angular v21 upgrade changes with descriptive message
 
+#### .NET 10 server upgrade (added to Phase 1)
+- [ ] 1.11 Upgrade all server projects (Functions, WebApi) to .NET 10 in their respective .csproj files and solution
+- [ ] 1.12 Update `Directory.Packages.props` to use .NET 10 SDK and compatible package versions
+- [ ] 1.13 Run `dotnet build Charts.sln` and resolve any .NET 10 migration issues
+- [ ] 1.14 Run backend tests (`dotnet test Charts.sln`) to verify .NET 10 compatibility
+- [ ] 1.15 Commit .NET 10 upgrade changes with descriptive message
+
 ### Phase 2: Stock.Indicators NuGet package upgrade to v3
 
 - [ ] 2.1 Check latest Stock.Indicators package version (stable v3 or latest v3 preview) on NuGet.org
