@@ -1,4 +1,4 @@
-# Plan for Angular v21 upgrade and Stock.Indicators v3 implementation
+# Plan for Stock.Indicators v3 implementation
 
 This plan outlines the upgrade of Angular from v20 to v21 and the implementation of DaveSkender/Stock.Indicators v3 branch, as proxy for understanding future Skender.Stock.Indicators package interface, with all missing static series-style indicators.
 
