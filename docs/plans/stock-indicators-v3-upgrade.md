@@ -12,22 +12,22 @@ graph TD
     D --> E["Phase 4: Missing Indicators Implementation"]
     E --> F["Phase 5: Testing & Validation"]
     F --> G["End: Complete Implementation"]
-    
+
     B --> B1["Update Angular packages"]
     B1 --> B2["Update dependencies"]
     B2 --> B3["Apply migrations"]
-    
+
     C --> C1["Update NuGet package"]
     C1 --> C2["Update C# code"]
-    
+
     D --> D1["Update .NET endpoints"]
     D1 --> D2["Update TypeScript models"]
-    
+
     E --> E1["Identify missing indicators"]
     E1 --> E2["Implement backend endpoints"]
     E2 --> E3["Add metadata configurations"]
     E3 --> E4["Update frontend UI"]
-    
+
     F --> F1["Run all tests"]
     F1 --> F2["Verify builds"]
     F2 --> F3["Manual validation"]

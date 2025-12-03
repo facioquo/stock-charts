@@ -62,11 +62,13 @@ Keep Markdown contributions consistent with GitHub Flavored Markdown (GFM) and t
 
 ```markdown
 <!-- good -->
+
 - First item
   - Nested item
 
 <!-- bad -->
-* Wrong bullet
+
+- Wrong bullet
 ```
 
 ### Code blocks
@@ -78,7 +80,7 @@ Keep Markdown contributions consistent with GitHub Flavored Markdown (GFM) and t
 
 Example of hierarchical fencing:
 
-`````markdown
+````markdown
 ## Header in markdown example
 
 Other text **formatted** with markdown syntax. Inner code block:
@@ -89,8 +91,7 @@ int foo = 25;
 
 > [!IMPORTANT]
 > Outer fencing must have more backticks than inner ones for proper termination.
-
-`````
+````
 
 ---
 
@@ -166,10 +167,12 @@ Use `@AgentName` syntax when referencing custom agents or subagents:
 
 ```markdown
 <!-- In documentation or prose -->
+
 Use `@Planner` to create GitHub Issues hierarchies.
 Delegate backend work to `@DotNetDeveloper` or `@NestJsDeveloper`.
 
 <!-- In agent file handoff instructions -->
+
 @Researcher investigate the authentication options
 ```
 
@@ -218,10 +221,9 @@ Prefer a central AGENTS.md file for AI agent context. See [agents.md specificati
 - End with:
 
   ```markdown
-
   ---
-  Last updated: <Month Day, Year>
 
+  Last updated: <Month Day, Year>
   ```
 
 - Do not include change logs here.
@@ -258,4 +260,5 @@ Avoid inline HTML unless no Markdown equivalent exists. Allowed elements are def
 - Document exceptions in `.markdownlint-cli2.jsonc`.
 
 ---
+
 Last updated:December 3, 2025
