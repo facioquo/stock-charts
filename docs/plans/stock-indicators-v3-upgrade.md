@@ -39,24 +39,24 @@ This upgrade involves a multi-phase approach that ensures compatibility at each 
 
 ### Phase 1: Angular v21 upgrade preparation and execution
 
-- [ ] 1.1 Review current Angular v20.1.7 configuration and identify breaking changes in v21 release notes
-- [ ] 1.2 Run Angular CLI update command: `npx ng update @angular/cli @angular/core --allow-dirty` from client directory
-- [ ] 1.3 Run Angular Material update: `npx ng update @angular/material --allow-dirty` from client directory
-- [ ] 1.4 Update peer dependencies (@ng-matero/extensions, ngx-color) to versions compatible with Angular v21
-- [ ] 1.5 Run `npm install` from root to update lockfile and resolve dependency conflicts
-- [ ] 1.6 Apply any Angular v21 automated migrations and review migration output
-- [ ] 1.7 Build frontend (`npm run build --workspace=@stock-charts/client`) and fix any compilation errors
-- [ ] 1.8 Run frontend tests (`npm run test --workspace=@stock-charts/client`) and fix any breaking changes
-- [ ] 1.9 Run linter (`npm run lint --workspace=@stock-charts/client -- --max-warnings=0`) and resolve issues
-- [ ] 1.10 Commit Angular v21 upgrade changes with descriptive message
+- [x] 1.1 Review current Angular v20.1.7 configuration and identify breaking changes in v21 release notes
+- [x] 1.2 Run Angular CLI update command: `npx ng update @angular/cli @angular/core --allow-dirty` from client directory
+- [x] 1.3 Run Angular Material update: `npx ng update @angular/material --allow-dirty` from client directory
+- [x] 1.4 Update peer dependencies (@ng-matero/extensions, ngx-color) to versions compatible with Angular v21
+- [x] 1.5 Run `npm install` from root to update lockfile and resolve dependency conflicts
+- [x] 1.6 Apply any Angular v21 automated migrations and review migration output
+- [x] 1.7 Build frontend (`npm run build --workspace=@stock-charts/client`) and fix any compilation errors
+- [x] 1.8 Run frontend tests (`npm run test --workspace=@stock-charts/client`) and fix any breaking changes
+- [x] 1.9 Run linter (`npm run lint --workspace=@stock-charts/client -- --max-warnings=0`) and resolve issues
+- [x] 1.10 Commit Angular v21 upgrade changes with descriptive message
 
 #### .NET 10 server upgrade
 
-- [ ] 1.11 Upgrade all server projects (Functions, WebApi) to .NET 10 in their respective .csproj files and solution
-- [ ] 1.12 Update `Directory.Packages.props` to use .NET 10 SDK and compatible package versions
-- [ ] 1.13 Run `dotnet build Charts.sln` and resolve any .NET 10 migration issues
-- [ ] 1.14 Run backend tests (`dotnet test Charts.sln`) to verify .NET 10 compatibility
-- [ ] 1.15 Commit .NET 10 upgrade changes with descriptive message
+- [x] 1.11 Upgrade all server projects (Functions, WebApi) to .NET 10 in their respective .csproj files and solution
+- [x] 1.12 Update `Directory.Packages.props` to use .NET 10 SDK and compatible package versions
+- [x] 1.13 Run `dotnet build Charts.sln` and resolve any .NET 10 migration issues
+- [x] 1.14 Run backend tests (`dotnet test Charts.sln`) to verify .NET 10 compatibility
+- [x] 1.15 Commit .NET 10 upgrade changes with descriptive message
 
 ### Phase 2: Stock.Indicators NuGet package upgrade to v3
 
@@ -263,7 +263,7 @@ ChartConfig = new ChartConfig
 
 **Relevant files:**
 
-- `client/package.json`: Contains Angular v20.1.7 and dependency versions
+- `client/package.json`: Contains Angular v21.0.2 and dependency versions
 - `server/Directory.Packages.props`: Contains Stock.Indicators v2.6.1 package reference
 - `server/WebApi/Endpoints.cs`: Implements ~55 indicator endpoints currently
 - `server/WebApi/Services/Service.Metadata.cs`: Large metadata file (~102KB) defining indicator configurations

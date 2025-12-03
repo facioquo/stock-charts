@@ -15,7 +15,7 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 ### Prerequisites
 
 - [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (LTS version)
-- [.NET SDK 9](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET SDK 10](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 
 ### Quick start
