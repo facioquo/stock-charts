@@ -26,10 +26,10 @@
       ]
     }
   },
-  "postCreateCommand": "bash .devcontainer/post-create.sh && npm install",
   "remoteEnv": {
     "ALPACA_KEY": "${localEnv:ALPACA_KEY}",
     "ALPACA_SECRET": "${localEnv:ALPACA_SECRET}",
     "AzureWebJobsStorage": "${localEnv:AzureWebJobsStorage}"
-  }
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh && npm install"
 }
