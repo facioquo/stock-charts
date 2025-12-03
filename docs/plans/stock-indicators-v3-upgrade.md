@@ -50,7 +50,8 @@ This upgrade involves a multi-phase approach that ensures compatibility at each 
 - [ ] 1.9 Run linter (`npm run lint --workspace=@stock-charts/client -- --max-warnings=0`) and resolve issues
 - [ ] 1.10 Commit Angular v21 upgrade changes with descriptive message
 
-#### .NET 10 server upgrade (added to Phase 1)
+#### .NET 10 server upgrade
+
 - [ ] 1.11 Upgrade all server projects (Functions, WebApi) to .NET 10 in their respective .csproj files and solution
 - [ ] 1.12 Update `Directory.Packages.props` to use .NET 10 SDK and compatible package versions
 - [ ] 1.13 Run `dotnet build Charts.sln` and resolve any .NET 10 migration issues
