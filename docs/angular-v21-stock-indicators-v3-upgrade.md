@@ -294,4 +294,4 @@ ChartConfig = new ChartConfig
 
 ---
 
-Last updated: December 2, 2025
+Last updated: December 3, 2025
