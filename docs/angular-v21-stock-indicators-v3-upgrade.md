@@ -1,6 +1,6 @@
 # Plan for Angular v21 upgrade and Stock.Indicators v3 implementation
 
-This plan outlines the upgrade of Angular from v20 to v21 and the implementation of Stock.Indicators v3 package with all missing static series-style indicators.
+This plan outlines the upgrade of Angular from v20 to v21 and the implementation of DaveSkender/Stock.Indicators v3 branch, as proxy for understanding future Skender.Stock.Indicators package interface, with all missing static series-style indicators.
 
 ## Solution to implement
 
@@ -55,7 +55,7 @@ This upgrade involves a multi-phase approach that ensures compatibility at each 
 - [ ] 2.1 Check latest Stock.Indicators package version (stable v3 or latest v3 preview) on NuGet.org
 - [ ] 2.2 Update `server/Directory.Packages.props` to specify Stock.Indicators v3 version (e.g., 3.0.0 or 3.0.0-preview.1)
 - [ ] 2.3 Run `dotnet restore Charts.sln` to download new package version
-- [ ] 2.4 Review Stock.Indicators v3 breaking changes and migration guide at https://dotnet.stockindicators.dev/
+- [ ] 2.4 Review Stock.Indicators v3 breaking changes and migration guide at https://dotnet.stockindicators.dev/ or equivalent from source repo
 - [ ] 2.5 Build backend (`dotnet build Charts.sln`) and identify compilation errors from API changes
 - [ ] 2.6 Update `server/WebApi/GlobalUsings.cs` if namespace changes are required for v3
 - [ ] 2.7 Run backend tests (`dotnet test Charts.sln`) to verify compatibility
