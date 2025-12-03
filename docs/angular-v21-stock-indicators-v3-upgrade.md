@@ -6,31 +6,31 @@ This plan outlines the upgrade of Angular from v20 to v21 and the implementation
 
 ```mermaid
 graph TD
-    A[Start: Current State] --> B[Phase 1: Angular v21 Upgrade]
-    B --> C[Phase 2: Stock.Indicators v3 Upgrade]
-    C --> D[Phase 3: API Compatibility Updates]
-    D --> E[Phase 4: Missing Indicators Implementation]
-    E --> F[Phase 5: Testing & Validation]
-    F --> G[End: Complete Implementation]
+    A["Start: Current State"] --> B["Phase 1: Angular v21 Upgrade"]
+    B --> C["Phase 2: Stock.Indicators v3 Upgrade"]
+    C --> D["Phase 3: API Compatibility Updates"]
+    D --> E["Phase 4: Missing Indicators Implementation"]
+    E --> F["Phase 5: Testing & Validation"]
+    F --> G["End: Complete Implementation"]
     
-    B --> B1[Update Angular packages]
-    B1 --> B2[Update dependencies]
-    B2 --> B3[Apply migrations]
+    B --> B1["Update Angular packages"]
+    B1 --> B2["Update dependencies"]
+    B2 --> B3["Apply migrations"]
     
-    C --> C1[Update NuGet package]
-    C1 --> C2[Update C# code]
+    C --> C1["Update NuGet package"]
+    C1 --> C2["Update C# code"]
     
-    D --> D1[Update .NET endpoints]
-    D1 --> D2[Update TypeScript models]
+    D --> D1["Update .NET endpoints"]
+    D1 --> D2["Update TypeScript models"]
     
-    E --> E1[Identify missing indicators]
-    E1 --> E2[Implement backend endpoints]
-    E2 --> E3[Add metadata configurations]
-    E3 --> E4[Update frontend UI]
+    E --> E1["Identify missing indicators"]
+    E1 --> E2["Implement backend endpoints"]
+    E2 --> E3["Add metadata configurations"]
+    E3 --> E4["Update frontend UI"]
     
-    F --> F1[Run all tests]
-    F1 --> F2[Verify builds]
-    F2 --> F3[Manual validation]
+    F --> F1["Run all tests"]
+    F1 --> F2["Verify builds"]
+    F2 --> F3["Manual validation"]
 ```
 
 This upgrade involves a multi-phase approach that ensures compatibility at each step. We will first upgrade Angular to v21 to leverage the latest framework features, then upgrade the Stock.Indicators package to v3 (using the latest stable version or the most recent preview if stable v3 is not available). Finally, we will implement all missing static series indicators that are available in the library but not yet exposed in the chart options.
