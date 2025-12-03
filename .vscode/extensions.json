@@ -17,7 +17,6 @@
     "ms-azuretools.vscode-azurefunctions",
     "ms-azuretools.vscode-azurestorage",
     "ms-dotnettools.csdevkit",
-    "ms-dotnettools.vscodeintellicode-csharp",
     "redhat.vscode-yaml"
   ]
 }
