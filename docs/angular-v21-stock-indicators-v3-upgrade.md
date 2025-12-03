@@ -55,7 +55,7 @@ This upgrade involves a multi-phase approach that ensures compatibility at each 
 - [ ] 2.1 Check latest Stock.Indicators package version (stable v3 or latest v3 preview) on NuGet.org
 - [ ] 2.2 Update `server/Directory.Packages.props` to specify Stock.Indicators v3 version (e.g., 3.0.0 or 3.0.0-preview.1)
 - [ ] 2.3 Run `dotnet restore Charts.sln` to download new package version
-- [ ] 2.4 Review Stock.Indicators v3 breaking changes and migration guide at https://dotnet.stockindicators.dev/ or equivalent from source repo
+- [ ] 2.4 Review Stock.Indicators v3 breaking changes and migration guide at <https://dotnet.stockindicators.dev/> or equivalent from source repo
 - [ ] 2.5 Build backend (`dotnet build Charts.sln`) and identify compilation errors from API changes
 - [ ] 2.6 Update `server/WebApi/GlobalUsings.cs` if namespace changes are required for v3
 - [ ] 2.7 Run backend tests (`dotnet test Charts.sln`) to verify compatibility
@@ -110,6 +110,7 @@ This upgrade involves a multi-phase approach that ensures compatibility at each 
 ### Angular v21 key changes and migration notes
 
 Angular v21 typically includes:
+
 - Performance improvements and new signal APIs
 - Potential template syntax enhancements
 - Build system optimizations
@@ -117,14 +118,16 @@ Angular v21 typically includes:
 - May require updates to eslint-plugin configurations
 
 **Migration approach:**
+
 - Use `ng update` automated migrations whenever possible
-- Review official Angular v21 release notes at https://angular.dev/
+- Review official Angular v21 release notes at <https://angular.dev/>
 - Check @ng-matero/extensions and ngx-color compatibility
 - Validate with Angular CLI MCP server best practices
 
 ### Stock.Indicators v3 API changes
 
 Based on v3 preview documentation:
+
 - **Static series methods remain available**: `.GetSma()`, `.GetEma()`, etc. continue to work
 - **New streaming APIs**: v3 introduces `Hub` and `BufferList` styles, but these are optional for batch scenarios
 - **Namespace may change**: Confirm if `using Skender.Stock.Indicators;` remains valid
@@ -132,16 +135,18 @@ Based on v3 preview documentation:
 - **Parameters**: Check if any default values or parameter orders changed
 
 **Implementation strategy:**
+
 - Focus on static series methods only (per problem statement scope)
 - Ignore streaming/hub capabilities for this implementation
 - Use v3 stable if available; otherwise use latest preview (3.0.0-preview.1)
-- Refer to https://dotnet.stockindicators.dev/indicators/ for comprehensive indicator list
+- Refer to <https://dotnet.stockindicators.dev/indicators/> for comprehensive indicator list
 
 ### Missing indicator categories (examples)
 
 Based on Stock.Indicators library, common missing indicators may include:
 
 **Moving averages:**
+
 - HMA (Hull Moving Average)
 - WMA (Weighted Moving Average)
 - TEMA (Triple Exponential Moving Average)
@@ -152,6 +157,7 @@ Based on Stock.Indicators library, common missing indicators may include:
 - VIDYA (Variable Index Dynamic Average)
 
 **Oscillators:**
+
 - CCI (Commodity Channel Index)
 - TRIX (Triple Exponential Average)
 - Williams %R
@@ -159,16 +165,19 @@ Based on Stock.Indicators library, common missing indicators may include:
 - Detrended Price Oscillator
 
 **Volatility:**
+
 - Historical Volatility
 - True Range
 - Chaikin Volatility
 
 **Volume:**
+
 - OBV (On Balance Volume)
 - VWAP (Volume Weighted Average Price)
 - PVO (Percentage Volume Oscillator)
 
 **Others:**
+
 - Correlation Coefficient
 - Standard Deviation Channels
 - Linear Regression
@@ -180,6 +189,7 @@ Based on Stock.Indicators library, common missing indicators may include:
 When adding new indicators to `Service.Metadata.cs`, follow these patterns:
 
 **Overlay indicators** (displayed on price chart):
+
 ```csharp
 ChartType = "overlay"
 ChartConfig = new ChartConfig
@@ -191,6 +201,7 @@ ChartConfig = new ChartConfig
 ```
 
 **Oscillator indicators** (displayed in separate panel):
+
 ```csharp
 ChartType = "oscillator"
 ChartConfig = new ChartConfig
@@ -205,6 +216,7 @@ ChartConfig = new ChartConfig
 ```
 
 **Line types:**
+
 - `solid`: Standard line
 - `dash`: Dashed line
 - `dots`: Dotted line
@@ -214,21 +226,25 @@ ChartConfig = new ChartConfig
 ### Testing strategy
 
 **Unit testing:**
+
 - Frontend: Jest tests in `client/src/**/*.spec.ts`
 - Backend: xUnit tests in `server/WebApi.Tests/`
 
 **Integration testing:**
+
 - Start local API: `cd server/WebApi && dotnet run`
 - Start frontend: `npm start`
 - Test indicator API calls in browser Network tab
 - Verify chart rendering with real-time data
 
 **Build validation:**
+
 - Frontend dev build: `npm run build --workspace=@stock-charts/client`
 - Frontend prod build: `npm run build:prod --workspace=@stock-charts/client`
 - Backend: `dotnet build Charts.sln --configuration Release`
 
 **Quality checks:**
+
 - Linting: `npm run lint` (zero warnings required)
 - Formatting: `npm run format:check`
 - Code analysis: Check for any new compiler warnings
