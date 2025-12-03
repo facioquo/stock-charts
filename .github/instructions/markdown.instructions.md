@@ -1,178 +1,264 @@
 ---
-applyTo: "**/*.md"
-description: "Guidelines for writing and formatting Markdown files"
+applyTo: "**/*.md,.markdownlint-cli2.jsonc"
+description: Markdown formatting guide
 ---
 
-# Markdown formatting rules
+# Markdown authoring rules
 
-## Required formatting
+Keep Markdown contributions consistent with GitHub Flavored Markdown (GFM) and the VS Code Markdown language features documented at <https://github.github.com/gfm/> and <https://code.visualstudio.com/docs/languages/markdown> while aligning with repository automation and preview tooling.
 
-**Headers:**
+> [!CRITICAL]
+> **Context loading warning:** In some AI agent environments (GitHub Copilot in VS Code), `#file:` references in auto-loaded files automatically expand their targets into the context window. This can cause exponential context bloat and degrade agent performance. **Entry point files** like `AGENTS.md`, `copilot-instructions.md`, and root instruction files should **NEVER contain `#file:` references** to other instruction or context files. Use plain-text file path mentions instead and let agents fetch files on-demand. See `docs/context-loading-lessons-learned.md` for details.
 
-- ATX-style (`#` not underlines), space after marker (`# Title`)
-- **🚨 CRITICAL: Always use sentence case only** (first word + proper nouns capitalized)
-  - ❌ **DON'T**: `### Workspace Structure`, `## Code Quality Standards`
-  - ✅ **DO**: `### Workspace structure`, `## Code quality standards`
-  - This applies to ALL headers, including subsections and bullet point headers
-- **🚨 CRITICAL: Pseudo-headers (bold text acting as headers) also use sentence case**
-  - ❌ **DON'T**: `**My Pseudo-Thing** (automatically suggested):`
-  - ✅ **DO**: `**My pseudo-thing** (automatically suggested):`
-  - Proper nouns retain title case: `**Notes from Dave Skender**`
-- Sequential hierarchy (no h1→h3 jumps), blank lines before/after
+## Baseline workflow
 
-**Code blocks:**
+- Run `npx markdownlint-cli2 --no-globs {glob} --fix` in the terminal, fix any items not auto-fixed, followed by `npx markdownlint-cli2 --no-globs {glob}` to verify there are no remaining linting issues, before opening a pull request.
+  - **Important:** Always use `--no-globs` when specifying explicit file paths to prevent the tool from expanding globs defined in `.markdownlint-cli2.jsonc`.
+- For continuous linting during large edits, run with `--watch` to surface issues immediately.
+- Preview with VS Code's built-in Markdown preview (`Ctrl+Shift+V`).
+- Never bypass lint warnings; resolve or bracket narrow suppressions with `<!-- markdownlint-disable -->`.
 
-- Language-specified fenced blocks: ````markdown for markdown content
-- Inline code spans for: commands, file paths, variable names
-- Blank lines surrounding code blocks
+## Formatting requirements
 
-**Lists:**
+### Editorial style
 
-- **Always use hyphens (`-`), never asterisks (`*`)**
-- 2-space indentation per nesting level
-- Consistent markers throughout document
-- **🚨 CRITICAL: Bold text in lists also uses sentence case**
-  - ❌ **DON'T**: `- **Root Workspace**: description`
-  - ✅ **DO**: `- **Root workspace**: description`
+- Use present tense and imperative mood.
+- Exclude historical context and migration details.
+- Keep each rule as a current directive.
+- Headings and bold labels follow sentence case: first word + proper nouns only.
 
-**Required elements:**
+### Content reuse and separation of concerns
 
-- Alt text for all images
-- Single blank line at file end
-- No trailing line spaces
+**Do not repeat yourself (DRY):**
 
-**Links:**
+- Maintain a single source of truth per concept.
+- Reference existing documents instead of duplicating content.
+- Consolidate overlapping content when possible.
 
-- Fix all broken internal links
-- Use reference-style for complex documents
+**Separation of concerns:**
 
-## Content organization and deduplication
+- Give each document a single purpose.
+- Keep conceptual, procedural, and configuration guidance distinct.
+- Separate different target audiences clearly.
 
-### 🚫 CRITICAL: avoid content duplication across documentation files
+**Acceptable limited duplication:**
 
-This repository maintains multiple documentation files with specific purposes. **Never duplicate content** - use cross-references instead:
+- Short orienting summaries (2–3 sentences).
+- Critical inline warnings.
+- Code examples for distinct use cases.
+- Cross-references for related but distinct documents.
 
-### Documentation hierarchy
+### Headers and structure
 
-1. **`README.md` (main)** - Primary project documentation
-   - Project overview and live demo
-   - Complete development setup
-   - Technical architecture and configuration
-   - Code quality standards
+- Use ATX (`#`) headers.
+- Sentence case only.
+- Sequential hierarchy with blank lines around headers.
 
-2. **`docs/contributing.md`** - Contributor guidelines only
-   - Contribution process and requirements
-   - Code quality requirements
-   - Cross-references to README.md for technical setup
-   - Contact information
+### Lists
 
-3. **`server/Functions/README.md`** - Azure Functions specifics only
-   - Functions-specific configuration (CRON, environment variables)
-   - Cross-references to main README for general setup
-
-4. **`.github/instructions/*.md`** - Development guidelines
-   - Framework-specific rules (Angular, npm, NuGet)
-   - AI coding assistant instructions
-
-### Cross-referencing rules
-
-**Instead of duplicating content:**
-
-✅ **DO**: Use relative links to reference detailed information
+- Always use hyphens (`-`) for bullets.
+- Indent nested lists with two spaces.
+- Avoid ordered lists unless sequence matters.
 
 ```markdown
-For complete setup instructions, see [Development Setup](../../README.md).
+<!-- good -->
+
+- First item
+  - Nested item
+
+<!-- bad -->
+
+- Wrong bullet
 ```
 
-✅ **DO**: Provide summary with link to details
+### Code blocks
 
-```markdown
-1. **Clone and setup** (see [main README](../../README.md) for details)
+- Use fenced code blocks with a language identifier (use `plaintext` if needed).
+- Include blank lines around fences.
+- Avoid inline comments in fences.
+- Increase fence length when nesting (outer fences need more backticks than inner).
+
+Example of hierarchical fencing:
+
+````markdown
+## Header in markdown example
+
+Other text **formatted** with markdown syntax. Inner code block:
+
+```csharp
+int foo = 25;
 ```
 
-❌ **DON'T**: Copy entire sections between files
-❌ **DON'T**: Duplicate build/setup instructions
-❌ **DON'T**: Repeat code examples or configuration details
-
-### Cross-reference link formats
-
-- **Main README from .github/instructions/**: `../../README.md#section-name`
-- **Main README from docs/**: `../README.md#section-name`
-- **Contributing from main**: `docs/contributing.md`
-- **Functions README from main**: `server/Functions/README.md`
-- **Between instruction files**: `./filename.md` or `../path/filename.md`
-
-### Content update guidelines
-
-**When adding new features or setup steps:**
-
-1. Add comprehensive details to the main README.md
-2. Update cross-references in other files if needed
-3. **Never duplicate** the new content across multiple files
-
-**When updating existing information:**
-
-1. Update the canonical source (usually main README.md)
-2. Verify all cross-references still point to correct sections
-3. Check for broken links (external + internal)
-
-## Linting and standards
-
-- Use `npm run lint:md` to identify non-compliant formatting
-- Use `npm run lint:md:fix` to auto-fix formatting issues
-- Linting configuration is in the `.markdownlint.json` file
-- We use npm packages `markdownlint` and `markdownlint-cli`
-
-**Current linting rules:**
-
-- `MD013: false` - Line length limit disabled (due to long URLs and code examples)
-- `MD033: false` - HTML allowed (for GitHub features like `<details>`)
-- `MD041: false` - First line doesn't need to be H1 (instruction files have frontmatter)
-
-## Repository-specific rules
-
-**File naming:**
-
-- Use lowercase with hyphens: `contributing.md`, `azure-functions.md`
-- Be descriptive: `npm-packages.instructions.md` not `npm.md`
-
-**Content focus:**
-
-- Each file should have a single, clear purpose
-- Avoid mixing different domains (frontend + backend setup)
-- Keep instruction files focused on their specific technology
-
-**Code examples:**
-
-- Use realistic examples from this project when possible
-- Show actual file paths: `server/Functions/README.md`
-- Include workspace-aware commands: `npm run build --workspace=@stock-charts/client`
-
-### Stock Charts specific files
-
-- **`README.md`** - Main project documentation and setup
-- **`docs/contributing.md`** - Contributor guidelines and workflow
-- **`server/Functions/README.md`** - Azure Functions configuration
-- **`.github/instructions/`** - AI assistant and framework-specific guidelines
-- **`.github/copilot-instructions.md`** - GitHub Copilot project context
-
-## GitHub features (when appropriate)
-
-**Collapsible sections:** `<details><summary>Title</summary>Content</details>`
-
-**Task lists:** `- [x] Done` / `- [ ] Todo`
-
-**Alerts:** `> [!NOTE]`, `> [!WARNING]`, `> [!TIP]`
-
-**Tables:** Pipe-delimited with header separators
-
-**Diagrams:** Mermaid code blocks for flowcharts/diagrams
-
-Rules for Mermaid diagrams:
-
-- Use GitHub flavored syntax. For example, you must use `B["POST /user/facts/{factKey}"]` instead of `B[POST /user/facts/{factKey}]`
-- Do not use background fill colors like `style AC fill:#e1f5fe`. If colors are needed for differentiation, only color element borders
+> [!IMPORTANT]
+> Outer fencing must have more backticks than inner ones for proper termination.
+````
 
 ---
 
-Last updated: August 15, 2025
+## File and context references
+
+Choose the appropriate referencing style based on whether the file content is needed for the current task.
+
+### When to use `#file:` context tokens
+
+Use `#file:` when the agent **must read the file content** to complete the task:
+
+- Instruction files that define coding standards for the current work
+- Templates or schemas the agent must follow
+- Configuration files the agent needs to modify or validate against
+- Context files containing data required for the task
+
+```markdown
+Follow conventions from #file:../copilot-instructions.md
+Apply the template in #file:adr-template.md
+```
+
+**Syntax rules for `#file:` and `#folder:` tokens:**
+
+- Tokens are context variables, not clickable links.
+- Do not wrap in backticks.
+- Do not place punctuation immediately after the token.
+- Paths are relative to the current file.
+
+Correct: `See #file:markdown.instructions.md for details`
+
+Incorrect: `See #file:markdown.instructions.md.` (trailing punctuation breaks resolution)
+
+### When to use plain-text mentions
+
+Use plain-text mentions when referencing files **for awareness only** (agent decides if content is needed):
+
+- Pointing users or agents to related documentation
+- Mentioning files that exist but aren't required for the current task
+- Referencing files in informational lists or navigation sections
+
+```markdown
+Refer to the AGENTS.md file for project context.
+See the contributing guide in docs/contributing.md for details.
+```
+
+### Avoiding context window bloat
+
+Root entry points (AGENTS.md, copilot-instructions.md) are auto-loaded in many contexts. To prevent cascading file loads:
+
+- **CRITICAL: Entry point files must NOT use `#file:` references.** Files like `AGENTS.md`, `copilot-instructions.md`, and root-level instruction files are auto-loaded and will cascade their `#file:` references into context, causing bloat. Use plain-text file path mentions instead.
+- **Scoped instruction files may use `#file:` selectively.** Files in `.github/instructions/` with `applyTo` patterns are auto-attached only in their specific domains and can safely use `#file:` for on-demand fetching.
+- **Agent files should use targeted `#file:` references.** Agent files reference instruction files they need; this is intentional and domain-appropriate.
+- **Minimize cascading hierarchies.** Avoid chains like: AGENTS.md → instruction file → context file → another instruction file.
+- **Prefer plain-text mentions in navigational sections.** Let agents decide what to fetch: `See the markdown authoring guidelines in .github/instructions/markdown.instructions.md`
+- **Never use `file:` URI scheme** (e.g., `file:///path/to/doc.md`). These always force auto-loading.
+- **Use standard Markdown links for URLs only**, not for local workspace files.
+
+### Tool references (`#tool:`)
+
+Use `#tool:name` format for tool references. Do not wrap in backticks.
+
+```markdown
+Use #tool:search for locating information
+```
+
+### Agent references (`@AgentName`)
+
+Use `@AgentName` syntax when referencing custom agents or subagents:
+
+- **In documentation**: Wrap in backticks for readability (e.g., `@Planner`, `@DotNetDeveloper`).
+- **In agent files**: Use plain `@AgentName` without backticks for invocation or handoff contexts.
+- **Handoffs**: Reference target agents in YAML front matter `handoffs` section.
+
+```markdown
+<!-- In documentation or prose -->
+
+Use `@Planner` to create GitHub Issues hierarchies.
+Delegate backend work to `@DotNetDeveloper` or `@NestJsDeveloper`.
+
+<!-- In agent file handoff instructions -->
+
+@Researcher investigate the authentication options
+```
+
+---
+
+## File size and organization
+
+- Keep Markdown files under ~500 lines when possible.
+- Split files >800 lines unless they are cohesive.
+- Prefer refactoring for succinctness before splitting.
+- Split by concepts, workflows, or functional areas.
+- Use index files and consistent naming in directories.
+
+**When to split files:**
+
+- Each major section (h2) could stand alone as a separate topic.
+- Document serves multiple distinct audiences or use cases.
+- Navigation becomes difficult due to excessive scrolling.
+
+Example file tree:
+
+```text
+my-repo/
+├── .github/
+│   ├── copilot-instructions.md       # Meta-instructions (optional for downstream repos)
+│   ├── instructions/
+│   │   ├── adr.instructions.md       # ADR format standards
+│   │   ├── markdown.instructions.md  # Markdown formatting rules
+│   │   └── planning.instructions.md  # Planning principles
+│   ├── prompts/
+│   │   ├── adr.prompt.md             # ADR creation workflow
+│   │   └── plan.prompt.md            # Planning session prompt
+│   └── workflows/
+│       └── lint-markdown.yml         # CI linting automation
+├── docs/
+│   └── adr/                          # Architecture Decision Records
+├── src/                              # Source code
+├── AGENTS.md                         # Agent-focused project context
+└── README.md                         # Human-oriented overview
+```
+
+Prefer a central AGENTS.md file for AI agent context. See [agents.md specification](https://agents.md/) for cross-agent compatibility.
+
+### End of file elements
+
+- End with:
+
+  ```markdown
+  ---
+
+  Last updated: <Month Day, Year>
+  ```
+
+- Do not include change logs here.
+
+### HTML elements
+
+Avoid inline HTML unless no Markdown equivalent exists. Allowed elements are defined in `.markdownlint-cli2.jsonc`. Use sparingly and ensure accessibility (e.g., alt text for images).
+
+### GitHub features
+
+- Use `<details>` for collapsible sections (one of few valid HTML use cases).
+- Use GitHub alert blocks (`> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`, `> [!CAUTION]`) sparingly.
+- Use pipe-delimited tables with header separators.
+  - Right-align numeric columns: `| ---: |`
+  - Center-align dates: `| :---: |` with ISO format `YYYY-MM-DD`
+
+## Mermaid diagrams
+
+- Use ` ```mermaid ` fences with a brief preceding description.
+- Quote node labels (e.g., `A["Start"]` not `A[Start]`).
+- Prefer stroke styling over filled colors for better theme compatibility.
+- Validate diagrams render legibly in both dark and light themes.
+- Validate diagrams before committing.
+
+## Math and alerts
+
+- Present LaTeX in fenced blocks (`plaintext` or `math`).
+- Use alert blocks sparingly for execution-critical details.
+
+## Tooling checklist
+
+- Keep `.markdownlint-cli2.jsonc`, `.editorconfig`, and `.vscode/settings.json` aligned.
+- Use the VS Code markdownlint extension.
+- Document exceptions in `.markdownlint-cli2.jsonc`.
+
+---
+
+Last updated: December 3, 2025

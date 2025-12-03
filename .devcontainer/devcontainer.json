@@ -1,11 +1,9 @@
 {
   "name": "Stock Charts Dev Container",
-  "image": "mcr.microsoft.com/dotnet/sdk:9.0",
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "lts"
-    },
-    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/dotnet:2": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/azure-cli:1": {},
     "ghcr.io/devcontainers-extra/features/angular-cli:2": {}
@@ -20,20 +18,15 @@
         "davidanson.vscode-markdownlint",
         "dotjoshjohnson.xml",
         "esbenp.prettier-vscode",
-        "github.copilot",
         "github.copilot-chat",
         "ms-azuretools.vscode-azurefunctions",
         "ms-azuretools.vscode-azurestorage",
         "ms-dotnettools.csdevkit",
-        "ms-dotnettools.vscodeintellicode-csharp",
         "redhat.vscode-yaml"
-      ],
-      "settings": {
-        "terminal.integrated.shell.linux": "/usr/bin/bash"
-      }
+      ]
     }
   },
-  "postCreateCommand": "npm install",
+  "postCreateCommand": "bash .devcontainer/post-create.sh && npm install",
   "remoteEnv": {
     "ALPACA_KEY": "${localEnv:ALPACA_KEY}",
     "ALPACA_SECRET": "${localEnv:ALPACA_SECRET}",
