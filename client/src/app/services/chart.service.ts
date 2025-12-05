@@ -28,10 +28,13 @@ type ExtendedChartDataset = ChartDataset & {
 
 // extensions
 import {
-  CandlestickController,
-  CandlestickElement,
+  buildCandlestickDataset,
+  buildVolumeDataset,
   FinancialDataPoint
-} from "src/assets/js/chartjs-chart-financial";
+} from "../../chartjs/financial";
+
+// financial chart registration
+import { ensureFinancialChartsRegistered } from "../../chartjs/financial/register-financial";
 
 // plugins
 import AnnotationPlugin, {
@@ -43,13 +46,11 @@ import AnnotationPlugin, {
 // register extensions and plugins
 Chart.register(
   // controllers
-  CandlestickController,
   LineController,
   Tooltip,
 
   // elements
   BarElement,
-  CandlestickElement,
   LineElement,
   PointElement,
 
@@ -61,6 +62,9 @@ Chart.register(
   LinearScale,
   TimeSeriesScale
 );
+
+// Ensure financial chart components are registered
+ensureFinancialChartsRegistered();
 
 // internal models
 import {
@@ -471,8 +475,14 @@ export class ChartService implements OnDestroy {
     listing: IndicatorListing
   ): void {
     if (chartConfig.options?.scales?.y) {
-      chartConfig.options.scales.y.suggestedMin = listing.chartConfig?.minimumYAxis;
-      chartConfig.options.scales.y.suggestedMax = listing.chartConfig?.maximumYAxis;
+      if (listing.chartConfig?.minimumYAxis != null) {
+        (chartConfig.options.scales.y as unknown as { suggestedMin?: number }).suggestedMin =
+          listing.chartConfig.minimumYAxis;
+      }
+      if (listing.chartConfig?.maximumYAxis != null) {
+        (chartConfig.options.scales.y as unknown as { suggestedMax?: number }).suggestedMax =
+          listing.chartConfig.maximumYAxis;
+      }
     }
   }
 
@@ -714,9 +724,15 @@ export class ChartService implements OnDestroy {
     // Update price dataset (candlestick dataset - typically index 0)
     const fullPriceDataset = fullMainDatasets[0];
     const currentPriceDataset = this.chartOverlay.data.datasets[0];
-    if (fullPriceDataset && currentPriceDataset && fullPriceDataset.type === "candlestick") {
+    if (
+      fullPriceDataset &&
+      currentPriceDataset &&
+      (fullPriceDataset as unknown as { type: string }).type === "candlestick"
+    ) {
       // Replace the data array entirely (Chart.js better detects this change)
-      currentPriceDataset.data = [...fullPriceDataset.data.slice(startIndex)];
+      currentPriceDataset.data = [
+        ...(fullPriceDataset as unknown as { data: unknown[] }).data.slice(startIndex)
+      ];
     }
 
     // Update volume dataset (bar dataset - typically index 1)
@@ -727,9 +743,16 @@ export class ChartService implements OnDestroy {
       currentVolumeDataset.data = [...fullVolumeDataset.data.slice(startIndex)];
 
       // Also slice the background colors array
-      if (fullVolumeDataset.backgroundColor && Array.isArray(fullVolumeDataset.backgroundColor)) {
-        currentVolumeDataset.backgroundColor = [
-          ...fullVolumeDataset.backgroundColor.slice(startIndex)
+      if (
+        (fullVolumeDataset as unknown as { backgroundColor?: unknown }).backgroundColor &&
+        Array.isArray(
+          (fullVolumeDataset as unknown as { backgroundColor: unknown[] }).backgroundColor
+        )
+      ) {
+        (currentVolumeDataset as unknown as { backgroundColor: unknown[] }).backgroundColor = [
+          ...(fullVolumeDataset as unknown as { backgroundColor: unknown[] }).backgroundColor.slice(
+            startIndex
+          )
         ];
       }
     }
@@ -786,8 +809,15 @@ export class ChartService implements OnDestroy {
         }
 
         // Handle backgroundColor for bar charts (like volume)
-        if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
-          result.dataset.backgroundColor = [...fullDataset.backgroundColor.slice(startIndex)];
+        if (
+          (fullDataset as unknown as { backgroundColor?: unknown }).backgroundColor &&
+          Array.isArray((fullDataset as unknown as { backgroundColor: unknown[] }).backgroundColor)
+        ) {
+          (result.dataset as unknown as { backgroundColor: unknown[] }).backgroundColor = [
+            ...(fullDataset as unknown as { backgroundColor: unknown[] }).backgroundColor.slice(
+              startIndex
+            )
+          ];
         }
       });
 
@@ -843,6 +873,8 @@ export class ChartService implements OnDestroy {
         this.loadOverlayChart(quotes);
 
         // add/load indicators
+        // Temporarily disabled while debugging Chart.js integration
+        /*
         this.api.getListings().subscribe({
           next: (listings: IndicatorListing[]) => {
             // load catalog
@@ -865,6 +897,10 @@ export class ChartService implements OnDestroy {
             this.loading.set(false);
           }
         });
+        */
+
+        // Just set loading to false since we're not loading indicators
+        this.loading.set(false);
       },
       error: (e: HttpErrorResponse) => {
         console.error("Error getting quotes:", {
@@ -909,35 +945,32 @@ export class ChartService implements OnDestroy {
 
   loadOverlayChart(quotes: Quote[]) {
     // loads base with quotes only
-    this.configureCandlestickDefaults();
-
-    const { priceData, volumeData, volumeAxisSize, volumeColors } = this.processQuoteData(quotes);
+    console.log("loadOverlayChart called with", quotes.length, "quotes");
+    const { priceData, volumeData, volumeAxisSize } = this.processQuoteData(quotes);
+    console.log("Processed data:", {
+      priceDataLength: priceData.length,
+      volumeDataLength: volumeData.length,
+      volumeAxisSize
+    });
 
     // define base datasets
     const chartData: ChartData = {
       datasets: [
         this.createPriceDataset(priceData),
-        this.createVolumeDataset(volumeData, volumeColors)
+        this.createVolumeDataset(volumeData, priceData)
       ]
     };
+    console.log(
+      "Chart data created:",
+      chartData.datasets.map(d => ({
+        type: d.type,
+        label: (d as { label?: string }).label,
+        dataLength: d.data?.length
+      }))
+    );
 
     // Create and display chart
     this.createOverlayChart(chartData, volumeAxisSize);
-  }
-
-  private configureCandlestickDefaults(): void {
-    const candleOptions = Chart.defaults.elements["candlestick"];
-
-    // custom border colors
-    candleOptions.color.up = ChartService.COLORS.CANDLE_UP;
-    candleOptions.color.down = ChartService.COLORS.CANDLE_DOWN;
-    candleOptions.color.unchanged = ChartService.COLORS.CANDLE_UNCHANGED;
-
-    candleOptions.borderColor = {
-      up: candleOptions.color.up,
-      down: candleOptions.color.down,
-      unchanged: candleOptions.color.unchanged
-    };
   }
 
   private processQuoteData(quotes: Quote[]): {
@@ -994,28 +1027,32 @@ export class ChartService implements OnDestroy {
   }
 
   private createPriceDataset(priceData: FinancialDataPoint[]): ChartDataset {
-    const candleOptions = Chart.defaults.elements["candlestick"];
-    return {
-      type: "candlestick",
+    const dataset = buildCandlestickDataset(priceData, {
       label: "Price",
-      data: priceData,
-      yAxisID: "y",
-      borderColor: candleOptions.borderColor,
+      colors: {
+        up: ChartService.COLORS.CANDLE_UP,
+        down: ChartService.COLORS.CANDLE_DOWN,
+        unchanged: ChartService.COLORS.CANDLE_UNCHANGED
+      }
+    });
+
+    return {
+      ...dataset,
       order: 75
-    };
+    } as ChartDataset;
   }
 
   private createVolumeDataset(
     volumeData: ScatterDataPoint[],
-    volumeColors: string[]
+    priceData: FinancialDataPoint[]
   ): ChartDataset {
-    return {
-      type: "bar",
+    const dataset = buildVolumeDataset(volumeData, priceData, {
       label: "Volume",
-      data: volumeData,
-      yAxisID: "volumeAxis",
-      backgroundColor: volumeColors,
-      borderWidth: 0,
+      yAxisID: "volumeAxis"
+    });
+
+    return {
+      ...dataset,
       order: 76
     };
   }
@@ -1035,7 +1072,18 @@ export class ChartService implements OnDestroy {
     const myCanvas = document.getElementById("chartOverlay") as HTMLCanvasElement;
     const ctx = myCanvas.getContext("2d");
     if (!ctx) return; // cannot create chart without context
+
+    // Create the chart
     this.chartOverlay = new Chart(ctx, chartConfig);
+    console.log("Chart created successfully with type:", chartConfig.type);
+    console.log(
+      "Chart datasets:",
+      chartData.datasets.map(d => ({
+        type: d.type,
+        label: (d as { label?: string }).label,
+        dataLength: d.data?.length
+      }))
+    );
   }
 
   loadSelections() {
