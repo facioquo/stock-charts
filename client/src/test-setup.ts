@@ -1,11 +1,7 @@
-import { setupZoneTestEnv } from "jest-preset-angular/setup-env/zone";
-
-// Initialize Angular's Zone.js powered testing environment.
-// Required so TestBed async utilities & change detection behave as in a browser.
-setupZoneTestEnv();
-
 /**
- * Global Jest + jsdom environment shims.
+ * Vitest test setup for Angular application.
+ *
+ * Global environment shims for jsdom.
  * Keep this minimal and well-documented. Each mock exists only to satisfy
  * concrete library expectations (Angular, Angular Material, Chart.js, etc.)
  * and reduce flakiness. All overrides are guarded & idempotent so re-runs

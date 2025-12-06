@@ -1,11 +1,12 @@
 import { TestBed } from "@angular/core/testing";
+import { Mock, beforeEach, describe, expect, it, vi } from "vitest";
 import { WindowService } from "./window.service";
 
 // Mock Chart.js interface for dimension tracking
 interface MockChart {
-  resize: jest.Mock;
-  update: jest.Mock;
-  destroy: jest.Mock;
+  resize: Mock;
+  update: Mock;
+  destroy: Mock;
   canvas: {
     width: number;
     height: number;
@@ -26,9 +27,9 @@ interface MockChart {
 
 // Create mock charts with dimension tracking
 const createMockChart = (width: number, height: number): MockChart => ({
-  resize: jest.fn(),
-  update: jest.fn(),
-  destroy: jest.fn(),
+  resize: vi.fn(),
+  update: vi.fn(),
+  destroy: vi.fn(),
   canvas: {
     width,
     height,
@@ -198,7 +199,7 @@ describe("Chart Resize Dimension Testing", () => {
       let rafCallback: FrameRequestCallback | undefined;
 
       // Mock requestAnimationFrame to capture the callback
-      const requestAnimationFrameSpy = jest
+      const requestAnimationFrameSpy = vi
         .spyOn(window, "requestAnimationFrame")
         .mockImplementation((callback: FrameRequestCallback) => {
           rafCallback = callback;

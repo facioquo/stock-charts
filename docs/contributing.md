@@ -1,77 +1,114 @@
 # Contributing guidelines
 
-Thanks for taking the time to contribute!
-
-Before contributing, please be aware that we are accepting these sorts of changes:
+Thanks for taking the time to contribute! We accept:
 
 - Bug reports and fixes
 - Demonstrations of other `Skender.Stock.Indicators` NuGet package features
 
 ## Reporting bugs
 
-If you are reporting a bug, please submit an Issue with a detailed description of the problem. Be sure to include steps to reproduce, code samples, and any reference materials.
+Submit an Issue with a clear description of the problem, steps to reproduce, code samples, and any reference materials.
 
 ## Development setup
 
-For complete development setup instructions, see the [main README.md](../README.md#development-setup).
+### Prerequisites
 
-### Quick start for contributors
+- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
+- [pnpm](https://pnpm.io/) (v10.24.0 or later) - Install with `npm install -g pnpm@10.24.0`
+- [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
+- [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 
-1. **Clone and setup** (see [Development Setup](../README.md#development-setup) for details):
+### Quick setup
 
-   ```bash
-   git clone https://github.com/facioquo/stock-charts.git
-   cd stock-charts
-   npm install
-   ```
+```bash
+# Clone and install
+git clone https://github.com/facioquo/stock-charts.git
+cd stock-charts
+pnpm install
+```
 
-2. **Start full development environment**:
+### Start development environment
 
-   ```bash
-   # Use VS Code Task (recommended)
-   # Ctrl+Shift+P → "Tasks: Run Task" → "start-full-stack"
-   ```
+**Option 1: VS Code Tasks** (recommended)
 
-   This starts all services: Azure Storage emulator, Azure Functions, Web API, and Angular dev server.
+```bash
+# Ctrl+Shift+P → "Tasks: Run Task" → "start-full-stack"
+```
 
-3. **Development workflow**:
-   - Make your changes
-   - Run linting: `npm run lint:fix`
-   - Run formatting: `npm run format`
-   - Test your changes: `npm run test:all`
-   - Ensure builds pass: `dotnet build Charts.sln`
+This starts all services: Azurite storage emulator, Azure Functions, Web API, and Angular dev server.
 
-For detailed information about:
+### Start manually
 
-- [Project structure and scripts](../README.md#project-structure)
-- [VS Code development setup](../README.md#vs-code-development)
-- [Code formatting and quality](../README.md#code-formatting-and-quality)
-- [Environment configuration](../README.md#environment-configuration)
+Open 4 terminals and run in order:
+
+```bash
+# Terminal 1: Storage emulator
+pnpm run azure:start
+
+# Terminal 2: Azure Functions
+cd server/Functions && func start
+
+# Terminal 3: Web API
+cd server/WebApi && dotnet run
+
+# Terminal 4: Angular dev server
+pnpm start
+```
+
+Access at: Website <http://localhost:4200>, Web API <https://localhost:5001>, Functions <http://localhost:7071>
+
+### Project structure
+
+The repository uses **pnpm workspaces**:
+
+```text
+stock-charts/          # Root
+├── package.json       # Workspace config + shared scripts
+├── pnpm-workspace.yaml # pnpm workspace definition
+├── client/            # Angular frontend
+└── server/            # .NET backend
+```
+
+Available pnpm scripts are in `package.json`. Key scripts:
+
+- `pnpm run build` / `pnpm run build:prod` — Build workspaces
+- `pnpm run lint` / `pnpm run lint:fix` — Lint and fix
+- `pnpm run format` — Format all code
+- `pnpm run test:all` — Run all tests
+
+Workspace-specific: `pnpm --filter @stock-charts/client run build`
+
+## Development workflow
+
+1. **Make your changes**
+2. **Run checks** (before committing):
+   - Lint: `pnpm run lint:fix`
+   - Format: `pnpm run format`
+   - Test: `pnpm run test:all`
+   - Build: `dotnet build Charts.sln`
 
 ## Code quality requirements
 
-This project maintains high standards for code quality:
+All contributions must pass these checks (required before PR acceptance):
 
-- ✅ All linting must pass (`npm run lint`)
-- ✅ Code must be properly formatted (`npm run format`)
-- ✅ .NET solution must build (`dotnet build Charts.sln`)
-- ✅ All tests must pass (`npm run test:all`)
-- ✅ No suppression of linting errors without team review
+- ✅ **Linting:** `pnpm run lint` (zero errors)
+- ✅ **Formatting:** `pnpm run format` (code properly formatted)
+- ✅ **Build:** `dotnet build Charts.sln` (no errors)
+- ✅ **Tests:** `pnpm run test:all` (all pass)
+- ✅ **No linting suppressions** without team review
 
-See [Code Quality section](../README.md#code-quality-and-verification) in the main README for current status.
+## Guidelines for contributions
 
-## Development guidelines
-
-- Read this first: [contributing to an open-source GitHub project](https://codeburst.io/a-step-by-step-guide-to-making-your-first-github-contribution-5302260a2940)
-- Do not comingle multiple contributions. Please keep changes small and separate.
-- Since this is a demo project, we want it to pass the build and run without errors.
-- Failed builds will block acceptance of your Pull Request.
+- Read first: [Contributing to open-source GitHub projects](https://codeburst.io/a-step-by-step-guide-to-making-your-first-github-contribution-5302260a2940)
+- **Keep changes small and focused.** Do not comingle multiple contributions in one PR.
+- **Build must pass.** As a demo project, all PRs must build and run without errors.
+- **Failed builds block acceptance.** Ensure all checks pass locally before opening a PR.
 
 ## Submitting changes
 
-Submit a Pull Request with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)).
+Submit a Pull Request with a clear description of what you've done. See [pull requests guide](http://help.github.com/pull-requests/) for details.
 
-After a Pull Request is reviewed, accepted, and merged to `main`, we may batch changes before publishing the site. Please be patient with turnaround time.
+After merge to `main`, changes may be batched before deploying. Turnaround time varies.
 
 ## Contact us
 
@@ -82,4 +119,4 @@ Dave Skender
 
 ---
 
-Last updated: August 15, 2025
+Last updated: December 3, 2025

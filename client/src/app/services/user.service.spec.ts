@@ -1,4 +1,5 @@
 import { TestBed } from "@angular/core/testing";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { UserService } from "./user.service";
 
 describe("UserService", () => {
@@ -112,7 +113,7 @@ describe("UserService", () => {
     });
 
     it("should cache settings after theme change", () => {
-      jest.spyOn(service, "cacheSettings");
+      vi.spyOn(service, "cacheSettings");
 
       service.changeTheme(false);
 
@@ -135,7 +136,7 @@ describe("UserService", () => {
     });
 
     it("should cache settings after tooltip change", () => {
-      jest.spyOn(service, "cacheSettings");
+      vi.spyOn(service, "cacheSettings");
 
       service.changeTooltips(true);
 

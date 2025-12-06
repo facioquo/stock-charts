@@ -17,6 +17,7 @@
     "ms-azuretools.vscode-azurefunctions",
     "ms-azuretools.vscode-azurestorage",
     "ms-dotnettools.csdevkit",
-    "redhat.vscode-yaml"
+    "redhat.vscode-yaml",
+    "vitest.explorer"
   ]
 }

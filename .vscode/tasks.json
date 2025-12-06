@@ -1,358 +1,394 @@
 {
-  // See https://go.microsoft.com/fwlink/?LinkId=733558
-  // for the documentation about the tasks.json format
   "version": "2.0.0",
+  "// See": "https://go.microsoft.com/fwlink/?LinkId=733558",
+  "// Schema": "https://code.visualstudio.com/docs/reference/tasks-appendix",
+
+  // Default presentation applied to all tasks (can be overridden per task)
+  "presentation": {
+    "echo": true,
+    "reveal": "silent",
+    "revealProblems": "onProblem",
+    "focus": false,
+    "panel": "shared",
+    "showReuseMessage": false,
+    "clear": false
+  },
+
   "tasks": [
+    // =========================================================================
+    // INITIALIZE & RESTORE
+    // =========================================================================
     {
-      "label": "build-functions",
-      "detail": "Build Azure Functions project",
-      "type": "process",
-      "command": "dotnet",
-      "args": [
-        "build",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
+      "label": "Initialize: Pull, rebuild, and verify",
+      "detail": "Pull latest, clean, rebuild, format, lint, and run tests",
+      "dependsOn": [
+        "Git: pull",
+        "Clean: all outputs",
+        "Build: all projects (full rebuild)",
+        "Lint: All (fix)",
+        "Test: all tests"
       ],
-      "dependsOn": "clean-functions",
+      "dependsOrder": "sequence",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Git: pull",
+      "detail": "Pull latest changes from Git",
+      "type": "shell",
+      "command": "git pull || echo 'No remote branch'",
+      "problemMatcher": []
+    },
+    {
+      "label": "Restore: pnpm dependencies",
+      "detail": "Restore Node.js packages across workspaces",
+      "type": "shell",
+      "command": "pnpm install",
+      "problemMatcher": []
+    },
+    {
+      "label": "Restore: NuGet packages",
+      "detail": "Restore .NET packages for solution",
+      "type": "shell",
+      "command": "dotnet restore Charts.sln",
+      "problemMatcher": "$msCompile"
+    },
+
+    // =========================================================================
+    // CLEAN & BUILD
+    // =========================================================================
+    {
+      "label": "Clean: all outputs",
+      "detail": "Clean build outputs from all projects",
+      "dependsOn": ["Clean: frontend outputs", "Clean: backend outputs"],
+      "dependsOrder": "parallel",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Clean: frontend outputs",
+      "detail": "Clean Angular build outputs (dist, coverage)",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/client run clean",
+      "problemMatcher": []
+    },
+    {
+      "label": "Clean: backend outputs",
+      "detail": "Clean .NET build outputs (bin, obj)",
+      "type": "shell",
+      "command": "dotnet clean Charts.sln -v minimal --nologo",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Build: all projects (incremental)",
+      "detail": "Incremental build of frontend and backend",
+      "dependsOn": [
+        "Build: frontend (incremental)",
+        "Build: backend (incremental)"
+      ],
+      "dependsOrder": "parallel",
       "group": {
         "kind": "build",
         "isDefault": true
       },
-      "problemMatcher": ["$msCompile"],
-      "options": {
-        "cwd": "${workspaceFolder}/server/Functions"
-      },
-      "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem"
-      }
+      "problemMatcher": ["$tsc", "$msCompile"]
     },
     {
-      "label": "build-all",
-      "detail": "Build all projects in parallel",
-      "dependsOn": ["build-website", "build-server"],
-      "dependsOrder": "parallel",
+      "label": "Build: all projects (full rebuild)",
+      "detail": "Full rebuild without incremental compilation",
+      "dependsOn": [
+        "Clean: all outputs",
+        "Build: frontend (incremental)",
+        "Build: backend (incremental)"
+      ],
+      "dependsOrder": "sequence",
       "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
+      "problemMatcher": ["$tsc", "$msCompile"]
     },
-    // =============================================================================
-    // TEST TASKS
-    // =============================================================================
     {
-      "label": "test-website",
-      "detail": "Run Angular frontend tests",
-      "type": "npm",
-      "script": "test",
-      "path": "client/",
+      "label": "Build: frontend (incremental)",
+      "detail": "Build Angular application",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/client run build",
+      "group": "build",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Build: backend (incremental)",
+      "detail": "Build .NET solution",
+      "type": "shell",
+      "command": "dotnet build Charts.sln -v minimal --nologo",
+      "group": "build",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Build: backend (production)",
+      "detail": "Build .NET solution in Release configuration",
+      "type": "shell",
+      "command": "dotnet build Charts.sln -c Release -v minimal --nologo",
+      "group": "build",
+      "problemMatcher": "$msCompile"
+    },
+
+    // =========================================================================
+    // LINT & FORMAT
+    // =========================================================================
+    {
+      "label": "Lint: All (check)",
+      "detail": "Run all linting checks without fixes",
+      "dependsOn": [
+        "Lint: frontend code (check)",
+        "Lint: backend code (check)",
+        "Lint: markdown files (check)"
+      ],
+      "dependsOrder": "parallel",
       "group": "test",
-      "problemMatcher": ["$tsc"],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
+      "problemMatcher": "$markdownlint"
     },
     {
-      "label": "test-backend",
-      "detail": "Run .NET backend tests with coverage",
-      "type": "npm",
-      "script": "test:dotnet",
+      "label": "Lint: All (fix)",
+      "detail": "Auto-fix all linting issues",
+      "dependsOn": ["Format: all code", "Lint: markdown files (fix)"],
+      "dependsOrder": "sequence",
+      "group": "none",
+      "problemMatcher": "$markdownlint"
+    },
+    {
+      "label": "Lint: frontend code (check)",
+      "detail": "Check Angular code with ESLint",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/client run lint",
       "group": "test",
-      "problemMatcher": ["$msCompile"],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
+      "problemMatcher": "$eslint-stylish"
     },
     {
-      "label": "test-all",
-      "detail": "Run all project tests (frontend and backend)",
-      "dependsOn": ["test-website", "test-backend"],
+      "label": "Lint: backend code (check)",
+      "detail": "Run Roslynator analysis and .NET format check",
+      "type": "shell",
+      "command": "bash tools/scripts/lint-code-check.sh",
+      "dependsOn": ["Build: backend (incremental)"],
       "dependsOrder": "sequence",
       "group": "test",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    // =============================================================================
-    // LINT TASKS
-    // =============================================================================
-    {
-      "label": "lint-website",
-      "detail": "Lint Angular frontend code",
-      "type": "npm",
-      "script": "lint",
-      // workspace scoping handled via root script invocation; reviewer suggestion noted
-      "group": "build",
-      "problemMatcher": ["$eslint-stylish"],
-      "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem"
-      }
+      "problemMatcher": "$msCompile"
     },
     {
-      "label": "lint-website-fix",
-      "detail": "Lint and auto-fix Angular frontend code",
-      "type": "npm",
-      "script": "lint:fix",
-      // workspace scoping handled via root script invocation; reviewer suggestion noted
-      "group": "build",
-      "problemMatcher": ["$eslint-stylish"],
-      "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem"
-      }
-    },
-    {
-      "label": "lint-markdown",
-      "detail": "Lint Markdown files",
-      "type": "npm",
-      "script": "lint:md",
-      "group": "build",
-      "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem"
-      }
-    },
-    {
-      "label": "lint-markdown-fix",
-      "detail": "Lint and auto-fix Markdown files",
-      "type": "npm",
-      "script": "lint:md:fix",
-      "group": "build",
-      "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem"
-      }
-    },
-    {
-      "label": "lint-all",
-      "detail": "Run all linting tasks in sequence",
-      "type": "npm",
-      "script": "lint",
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "format-website",
-      "detail": "Format frontend code with Prettier",
-      "type": "npm",
-      "script": "format:web",
-      "group": "build",
-      "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem"
-      }
-    },
-    {
-      "label": "format-check-website",
-      "detail": "Check frontend code formatting",
-      "type": "npm",
-      "script": "format:web:check",
-      "group": "build",
-      "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem"
-      }
-    },
-    {
-      "label": "format-vscode",
-      "detail": "Format VS Code configuration files",
-      "type": "npm",
-      "script": "format:vscode",
-      "group": "build",
-      "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem"
-      }
-    },
-    {
-      "label": "format-all",
-      "detail": "Format all project code (frontend + backend)",
-      "type": "npm",
-      "script": "format",
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "format-dotnet",
-      "detail": "Format .NET backend code",
-      "type": "npm",
-      "script": "format:dotnet",
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
-    },
-    // =============================================================================
-    // START/RUN TASKS
-    // =============================================================================
-    {
-      "label": "start-website",
-      "detail": "Start Angular development server",
-      "type": "npm",
-      "script": "start",
-      "group": "build",
-      "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "group": "development"
-      },
-      "problemMatcher": ["$tsc"]
-    },
-    {
-      "label": "start-functions",
-      "detail": "Start Azure Functions host",
+      "label": "Lint: markdown files (check)",
+      "detail": "Lint markdown files",
       "type": "shell",
-      "command": "func",
-      "args": ["start"],
-      "dependsOn": "build-functions",
-      "options": {
-        "cwd": "${workspaceFolder}/server/Functions"
-      },
-      "group": "build",
-      "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "group": "development"
-      },
-      "problemMatcher": ["$func-dotnet-watch"]
+      "command": "pnpm run lint:md",
+      "group": "test",
+      "problemMatcher": "$markdownlint"
     },
     {
-      "label": "start-webapi",
-      "detail": "Start .NET Web API server",
+      "label": "Lint: markdown files (fix)",
+      "detail": "Auto-fix markdown formatting issues",
       "type": "shell",
-      "command": "dotnet",
-      "args": ["run"],
-      "options": {
-        "cwd": "${workspaceFolder}/server/WebApi"
-      },
-      "group": "build",
-      "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "group": "development"
-      },
-      "problemMatcher": ["$msCompile"]
+      "command": "pnpm run lint:md:fix",
+      "group": "none",
+      "problemMatcher": "$markdownlint"
     },
     {
-      "label": "start-azurite",
-      "detail": "Start Azure Storage Emulator",
-      "type": "npm",
-      "script": "azure:start",
-      "group": "build",
-      "isBackground": true,
-      "presentation": {
-        "reveal": "never",
-        "panel": "dedicated",
-        "group": "development"
-      }
-    },
-    {
-      "label": "start-full-stack",
-      "detail": "Start complete development environment",
-      "dependsOn": [
-        "start-azurite",
-        "start-functions",
-        "start-webapi",
-        "start-website"
-      ],
+      "label": "Format: all code",
+      "detail": "Format frontend and backend code",
+      "dependsOn": ["Format: frontend code", "Format: backend code"],
       "dependsOrder": "parallel",
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
+      "group": "none",
+      "problemMatcher": ["$tsc", "$markdownlint"]
     },
-    // =============================================================================
-    // UTILITY TASKS
-    // =============================================================================
     {
-      "label": "clean-functions",
-      "detail": "Clean Azure Functions build artifacts",
-      "type": "process",
-      "command": "dotnet",
-      "args": [
-        "clean",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
+      "label": "Format: frontend code",
+      "detail": "Format Angular code with Prettier",
+      "type": "shell",
+      "command": "pnpm run format:web",
+      "group": "none",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Format: backend code",
+      "detail": "Format .NET code with dotnet format and Roslynator",
+      "type": "shell",
+      "command": "bash tools/scripts/lint-code-fix.sh",
+      "group": "none",
+      "problemMatcher": "$msCompile"
+    },
+
+    // =========================================================================
+    // TEST
+    // =========================================================================
+    {
+      "label": "Test: all tests",
+      "detail": "Run frontend and backend unit tests",
+      "dependsOn": ["Test: frontend", "Test: backend"],
+      "dependsOrder": "parallel",
+      "group": "test",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Test: frontend",
+      "detail": "Run Angular unit tests",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/client run test",
+      "group": "test",
+      "problemMatcher": "$tsc",
+      "presentation": { "clear": true }
+    },
+    {
+      "label": "Test: backend",
+      "detail": "Run .NET unit tests",
+      "type": "shell",
+      "command": "pnpm run test:dotnet",
+      "group": "test",
+      "problemMatcher": "$msCompile",
+      "presentation": { "clear": true }
+    },
+
+    // =========================================================================
+    // DEVELOPMENT SERVERS
+    // =========================================================================
+    {
+      "label": "Start: full development stack",
+      "detail": "Start all backend services and frontend dev server",
+      "dependsOn": [
+        "Start: Azure Storage Emulator",
+        "Start: Azure Functions",
+        "Start: Web API",
+        "Start: frontend dev server"
       ],
-      "problemMatcher": ["$msCompile"],
-      "options": {
-        "cwd": "${workspaceFolder}/server/Functions"
-      },
-      "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem"
-      }
-    },
-    {
-      "label": "clean-functions-release",
-      "detail": "Clean Azure Functions release build artifacts",
-      "type": "process",
-      "command": "dotnet",
-      "args": [
-        "clean",
-        "--configuration",
-        "Release",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "problemMatcher": ["$msCompile"],
-      "options": {
-        "cwd": "${workspaceFolder}/server/Functions"
-      },
-      "presentation": {
-        "reveal": "silent",
-        "revealProblems": "onProblem"
-      }
-    },
-    {
-      "label": "publish-functions",
-      "detail": "Publish Azure Functions for deployment",
-      "type": "process",
-      "command": "dotnet",
-      "args": [
-        "publish",
-        "--configuration",
-        "Release",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "dependsOn": "clean-functions-release",
-      "problemMatcher": ["$msCompile"],
-      "options": {
-        "cwd": "${workspaceFolder}/server/Functions"
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      }
-    },
-    {
-      "label": "clean-azurite",
-      "detail": "Delete local Azurite data (.azurite folder)",
-      "type": "npm",
-      "script": "azure:clean",
+      "dependsOrder": "sequence",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Start: Azure Storage Emulator",
+      "detail": "Start Azurite (Azure Storage Emulator)",
+      "type": "shell",
+      "command": "pnpm run azure:start",
+      "isBackground": true,
+      "group": "none",
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^Azurite .* service is starting",
+          "endsPattern": "^Azurite .* service successfully listens"
+        }
+      },
+      "presentation": {
         "reveal": "silent",
         "panel": "dedicated"
       }
+    },
+    {
+      "label": "Start: Azure Functions",
+      "detail": "Start Azure Functions host",
+      "type": "shell",
+      "command": "func start",
+      "dependsOn": "Build: backend (incremental)",
+      "dependsOrder": "sequence",
+      "isBackground": true,
+      "options": {
+        "cwd": "${workspaceFolder}/server/Functions"
+      },
+      "group": "none",
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Worker process started",
+          "endsPattern": "^.*Host started"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Start: Web API",
+      "detail": "Start ASP.NET Core Web API server",
+      "type": "shell",
+      "command": "dotnet run",
+      "options": {
+        "cwd": "${workspaceFolder}/server/WebApi"
+      },
+      "isBackground": true,
+      "group": "none",
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Building",
+          "endsPattern": "^.*Application started"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Start: frontend dev server",
+      "detail": "Start Angular development server (with HMR)",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/client run start",
+      "isBackground": true,
+      "group": "none",
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Compiling",
+          "endsPattern": "^.*Application bundle generation complete"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+
+    // =========================================================================
+    // CLEANUP
+    // =========================================================================
+    {
+      "label": "Clean: temporary caches",
+      "detail": "Delete build caches and lock files",
+      "type": "shell",
+      "command": "pnpm run clean && dotnet clean Charts.sln -v minimal --nologo",
+      "group": "build",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Clean: Azure Storage Emulator data",
+      "detail": "Delete local Azurite data and state",
+      "type": "shell",
+      "command": "pnpm run azure:clean",
+      "group": "none",
+      "problemMatcher": []
     }
   ]
 }

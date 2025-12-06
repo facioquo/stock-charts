@@ -6,18 +6,24 @@ on:
 permissions:
   contents: read
 
+env:
+  NODE_VERSION: "24.11.1"
+  PNPM_VERSION: "10.24.0"
+
 jobs:
   copilot-setup-steps:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.x"
+          dotnet-version: "10.x"
           dotnet-quality: "ga"
         continue-on-error: true
 
@@ -33,17 +39,23 @@ jobs:
           dotnet build Charts.sln --no-incremental
         continue-on-error: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          node-version: "22.15.x"
-          cache: "npm"
-          cache-dependency-path: package-lock.json
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
         continue-on-error: true
 
-      - name: Install dependencies (npm workspaces)
-        run: |
-          npm install
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+        continue-on-error: true
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
         continue-on-error: true
 
       - name: Environment summary

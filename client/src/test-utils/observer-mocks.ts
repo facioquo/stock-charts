@@ -4,16 +4,16 @@
  */
 
 export interface MockResizeObserver {
-  observe: jest.Mock;
-  unobserve: jest.Mock;
-  disconnect: jest.Mock;
+  observe: (...args: unknown[]) => unknown;
+  unobserve: (...args: unknown[]) => unknown;
+  disconnect: (...args: unknown[]) => unknown;
   triggerResize: (entries: ResizeObserverEntry[]) => void;
 }
 
 export interface MockIntersectionObserver {
-  observe: jest.Mock;
-  unobserve: jest.Mock;
-  disconnect: jest.Mock;
+  observe: (...args: unknown[]) => unknown;
+  unobserve: (...args: unknown[]) => unknown;
+  disconnect: (...args: unknown[]) => unknown;
   triggerIntersect: (entries: IntersectionObserverEntry[]) => void;
 }
 
@@ -24,9 +24,9 @@ export function createMockResizeObserver(): MockResizeObserver {
   let callback: ResizeObserverCallback | null = null;
 
   const mockObserver: MockResizeObserver = {
-    observe: jest.fn(),
-    unobserve: jest.fn(),
-    disconnect: jest.fn(),
+    observe: () => undefined,
+    unobserve: () => undefined,
+    disconnect: () => undefined,
     triggerResize: (entries: ResizeObserverEntry[]) => {
       if (callback) {
         callback(entries, mockObserver as unknown as ResizeObserver);
@@ -34,13 +34,11 @@ export function createMockResizeObserver(): MockResizeObserver {
     }
   };
 
-  // Augment global ResizeObserver constructor with a typed jest mock
-  globalThis.ResizeObserver = jest.fn<ResizeObserver, [ResizeObserverCallback]>(
-    (cb: ResizeObserverCallback) => {
-      callback = cb;
-      return mockObserver as unknown as ResizeObserver;
-    }
-  ) as unknown as typeof globalThis.ResizeObserver;
+  // Augment global ResizeObserver constructor with a mock
+  globalThis.ResizeObserver = ((cb: ResizeObserverCallback) => {
+    callback = cb;
+    return mockObserver as unknown as ResizeObserver;
+  }) as unknown as typeof globalThis.ResizeObserver;
 
   return mockObserver;
 }
@@ -52,9 +50,9 @@ export function createMockIntersectionObserver(): MockIntersectionObserver {
   let callback: IntersectionObserverCallback | null = null;
 
   const mockObserver: MockIntersectionObserver = {
-    observe: jest.fn(),
-    unobserve: jest.fn(),
-    disconnect: jest.fn(),
+    observe: () => undefined,
+    unobserve: () => undefined,
+    disconnect: () => undefined,
     triggerIntersect: (entries: IntersectionObserverEntry[]) => {
       if (callback) {
         callback(entries, mockObserver as unknown as IntersectionObserver);
@@ -62,13 +60,11 @@ export function createMockIntersectionObserver(): MockIntersectionObserver {
     }
   };
 
-  // Augment global IntersectionObserver constructor with a typed jest mock
-  globalThis.IntersectionObserver = jest.fn<IntersectionObserver, [IntersectionObserverCallback]>(
-    (cb: IntersectionObserverCallback) => {
-      callback = cb;
-      return mockObserver as unknown as IntersectionObserver;
-    }
-  ) as unknown as typeof globalThis.IntersectionObserver;
+  // Augment global IntersectionObserver constructor with a mock
+  globalThis.IntersectionObserver = ((cb: IntersectionObserverCallback) => {
+    callback = cb;
+    return mockObserver as unknown as IntersectionObserver;
+  }) as unknown as typeof globalThis.IntersectionObserver;
 
   return mockObserver;
 }
@@ -119,7 +115,7 @@ export function resetObserverMocks(): void {
 }
 
 // Global constructor augmentation declarations (test env only)
-// Provide typed augmentation for jest mocked constructors without changing existing lib types.
+// Provide typed augmentation for mocked constructors without changing existing lib types.
 // We declare them as already existing (from DOM lib) so no redeclaration with incompatible shape occurs.
 // If running in a Node + jsdom environment they are present; if not, tests will assign them dynamically.
 export {}; // ensure this file is a module to contain the global augmentation

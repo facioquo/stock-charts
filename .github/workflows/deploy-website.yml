@@ -9,8 +9,11 @@ concurrency:
 permissions:
   contents: write
 
-jobs:
+env:
+  NODE_VERSION: "24.11.1"
+  PNPM_VERSION: "10.24.0"
 
+jobs:
   versioning:
     name: Define version
     runs-on: ubuntu-latest
@@ -18,7 +21,6 @@ jobs:
       version: ${{ steps.marker.outputs.version }}
 
     steps:
-
       - name: Define marker
         id: marker
         run: echo "version=$(date +'%Y.%m.%d')-${{ github.run_number }}" >> $GITHUB_OUTPUT
@@ -40,13 +42,15 @@ jobs:
       url: https://charts.stockindicators.dev
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.x"
+          dotnet-version: "10.x"
           dotnet-quality: "ga"
 
       - name: Replace cache markers
@@ -102,18 +106,26 @@ jobs:
       - versioning
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v6
         with:
-          node-version: "22.15.x"
-          cache: "npm"
-          cache-dependency-path: package-lock.json
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Replace cache markers
         uses: jacobtomlinson/gha-find-replace@v3
@@ -130,7 +142,7 @@ jobs:
           Write-Host "... Done!"
 
       - name: Build site
-        run: npm run build:prod --workspace=@stock-charts/client
+        run: pnpm --filter @stock-charts/client run build.prod
 
       - name: Save artifacts
         uses: actions/upload-artifact@v4

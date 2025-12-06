@@ -1,11 +1,12 @@
 import { TestBed } from "@angular/core/testing";
 import { RouterOutlet } from "@angular/router";
+import { Mock, describe, expect, it, vi } from "vitest";
 import { AppComponent } from "./app.component";
 import { UserService } from "./services/user.service";
 
 describe("AppComponent", () => {
   it("should create and call loadSettings on init", async () => {
-    const userServiceSpy = { loadSettings: jest.fn() } as { loadSettings: jest.Mock };
+    const userServiceSpy = { loadSettings: vi.fn() } as { loadSettings: Mock };
 
     await TestBed.configureTestingModule({
       imports: [AppComponent, RouterOutlet],

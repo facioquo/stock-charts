@@ -4,9 +4,9 @@
 
 This is a full-stack financial charting application with:
 
-- **Frontend**: Angular v20+ with TypeScript, Angular Material, Chart.js
-- **Backend**: .NET 9+ with Azure Functions and Web API
-- **Package management**: NPM workspaces for unified dependency management
+- **Frontend**: Angular v21 with TypeScript, Angular Material, Chart.js
+- **Backend**: .NET 10 with Azure Functions and Web API
+- **Package management**: pnpm workspaces for unified dependency management
 - **Purpose**: Display and analyze stock market data with interactive charts
 
 ## Architecture
@@ -14,6 +14,7 @@ This is a full-stack financial charting application with:
 ```text
 stock-charts/
 ├── package.json     # Root workspace configuration
+├── pnpm-workspace.yaml # pnpm workspace definition
 ├── Charts.sln       # .NET solution file
 ├── client/          # Angular frontend workspace
 │   ├── src/         # Angular source code
@@ -28,43 +29,43 @@ stock-charts/
 
 ### Frontend stack
 
-- **Angular v20+**: Modern web framework with standalone components and signals
+- **Angular v21**: Modern web framework with standalone components and signals
 - **TypeScript**: Primary language with strict type checking
 - **Chart.js v4+**: Data visualization for financial charts
-- **Angular Material v20+**: UI component library
+- **Angular Material v21**: UI component library
 - **Signals**: Modern reactivity for state management
 - **Modern Control Flow**: `@if`, `@for`, `@switch` syntax
 
 ### Backend stack
 
-- **C# / .NET 9+**: Server-side language and framework
+- **C# / .NET 10**: Server-side language and framework
 - **Azure functions**: Serverless compute for data processing
 - **ASP.NET Core**: Web API for REST endpoints
 - **Entity framework**: Data access and ORM
 
 ## Development setup
 
-### NPM workspace commands
+### pnpm workspace commands
 
 ```bash
 # Install all dependencies (run from root)
-npm install
+pnpm install
 
 # Development server
-npm start  # Starts Angular dev server
+pnpm start  # Starts Angular dev server
 
 # Building
-npm run build     # Build all workspaces
-npm run build:prod  # Production build
+pnpm run build     # Build all workspaces
+pnpm run build:prod  # Production build
 
 # Code quality
-npm run format    # Format all code
-npm run lint      # Lint all workspaces
-npm run test      # Test all workspaces
+pnpm run format    # Format all code
+pnpm run lint      # Lint all workspaces
+pnpm run test      # Test all workspaces
 
 # Workspace-specific commands
-npm run build --workspace=@stock-charts/client
-npm run test --workspace=@stock-charts/client
+pnpm --filter @stock-charts/client run build
+pnpm --filter @stock-charts/client run test
 ```
 
 ### .NET Commands
@@ -82,9 +83,8 @@ dotnet run --project server/Functions
 
 ### Frontend (Angular) - Use MCP for Best Practices
 
-- **Always consult**: Use `#mcp_angular-cli_get_best_practices` for latest official guidance
-- **Documentation**: Use `#mcp_angular-cli_search_documentation` for specific topics
-- **Project-specific**: Follow guidelines in `.github/instructions/angular.instructions.md`
+- **Always consult**: Use #tool:angular-cli/* for latest official guidance and documentation
+- **Project-specific**: Follow guidelines in #file:instructions/angular.instructions.md
 
 ### Backend (.NET)
 
@@ -105,11 +105,11 @@ dotnet run --project server/Functions
 ## Development workflow
 
 1. **Setup**:
-   - Run `npm install` from root to install all dependencies
+   - Run `pnpm install` from root to install all dependencies
    - Use VS Code with recommended extensions
 
 2. **Frontend development**:
-   - Use `npm start` from root for Angular dev server
+   - Use `pnpm start` from root for Angular dev server
    - Use workspace-aware commands for linting/formatting
    - Consult MCP Angular CLI server for best practices
 
@@ -119,11 +119,11 @@ dotnet run --project server/Functions
 
 ## Package management
 
-### NPM workspaces
+### pnpm workspaces
 
 - **Root workspace**: Shared tools (Prettier, markdownlint)
 - **Client workspace**: Angular-specific packages
-- Follow guidelines in `.github/instructions/npm-packages.instructions.md`
+- Follow guidelines in `.github/instructions/pnpm-packages.instructions.md`
 
 ### NuGet packages
 
@@ -143,7 +143,7 @@ dotnet run --project server/Functions
 When working on this codebase:
 
 - **Always check MCP server**: Use Angular CLI MCP for latest best practices
-- **Workspace structure**: Commands run from root, leverage npm workspaces
+- **Workspace structure**: Commands run from root, leverage pnpm workspaces
 - **Solution structure**: Use `Charts.sln` for all .NET operations
 - **Type safety**: Prioritize TypeScript strict mode and Angular signals
 - **Financial accuracy**: Consider precision and performance for financial data
@@ -159,9 +159,9 @@ When working on this codebase:
 
 ## Code completion requirements
 
-**Before completing any coding task**, follow the [Code completion checklist](instructions/code-completion-checklist.instructions.md):
+**Before completing any coding task**, follow the #file:instructions/code-completion.instructions.md
 
-- ✅ Format all code: `npm run format`
+- ✅ Format all code: `pnpm run format`
 - ✅ Lint all code with zero errors
 - ✅ Build all projects successfully
 - ✅ Run and pass all tests
@@ -177,4 +177,4 @@ When working on this codebase:
 
 ---
 
-Last updated: August 15, 2025
+Last updated: December 3, 2025

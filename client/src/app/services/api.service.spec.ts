@@ -1,5 +1,6 @@
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
 import { TestBed } from "@angular/core/testing";
+import { MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { env } from "../../environments/environment";
 import backupIndicators from "../data/backup-indicators.json";
 import backupQuotes from "../data/backup-quotes.json"; // Added JSON quotes import
@@ -11,11 +12,11 @@ const BACKUP_INDICATORS = backupIndicators as IndicatorListing[];
 describe("ApiService", () => {
   let service: ApiService;
   let httpMock: HttpTestingController;
-  let consoleWarnSpy: jest.SpyInstance;
+  let consoleWarnSpy: MockInstance;
 
   beforeEach(() => {
     // Spy on console.warn to prevent noise in test output
-    consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+    consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],

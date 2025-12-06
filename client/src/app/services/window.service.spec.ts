@@ -1,4 +1,5 @@
 import { TestBed } from "@angular/core/testing";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { WindowService } from "./window.service";
 
 describe("WindowService - Chart Resizing", () => {
@@ -72,7 +73,7 @@ describe("WindowService - Chart Resizing", () => {
 
     it("should return default dimensions for SSR", () => {
       // Test the SSR scenario by mocking the returned value
-      jest.spyOn(service, "getWindowSize").mockReturnValue({ width: 1024, height: 768 });
+      vi.spyOn(service, "getWindowSize").mockReturnValue({ width: 1024, height: 768 });
 
       const result = service.getWindowSize();
 

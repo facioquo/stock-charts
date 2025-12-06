@@ -218,6 +218,8 @@ Prefer a central AGENTS.md file for AI agent context. See [agents.md specificati
 
 ### End of file elements
 
+**IMPORTANT:** these end of file elements are only to be used on markdown files in the `.github` folder. No other user-facing markdown documents should contain "last updated" information.
+
 - End with:
 
   ```markdown
@@ -226,7 +228,7 @@ Prefer a central AGENTS.md file for AI agent context. See [agents.md specificati
   Last updated: <Month Day, Year>
   ```
 
-- Do not include change logs here.
+- DO NOT include change logs here or anywhere in this repository.
 
 ### HTML elements
 
