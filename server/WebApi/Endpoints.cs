@@ -110,6 +110,10 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public Task<IActionResult> GetChandelierShort(int lookbackPeriods, double multiplier)
         => Get(quotes => quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Short));
 
+    [HttpGet("CCI")]
+    public Task<IActionResult> GetCci(int lookbackPeriods)
+        => Get(quotes => quotes.GetCci(lookbackPeriods));
+
     [HttpGet("CHOP")]
     public Task<IActionResult> GetChop(int lookbackPeriods)
         => Get(quotes => quotes.GetChop(lookbackPeriods));

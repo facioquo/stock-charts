@@ -838,6 +838,68 @@ public static class Metadata
                 ]
             },
 
+            // Commodity Channel Index
+            new IndicatorListing {
+                Name = "Commodity Channel Index (CCI)",
+                Uiid = "CCI",
+                LegendTemplate = "CCI([P1])",
+                Endpoint = $"{baseUrl}/CCI/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 100,
+                            Color = ChartColors.ThresholdRed,
+                            Style = "dash",
+                            Fill = new ChartFill {
+                                Target = "+3",
+                                ColorAbove = "transparent",
+                                ColorBelow = ChartColors.ThresholdGreen
+                            }
+                        },
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.DarkGrayTransparent,
+                            Style = "dash",
+                            Fill = null
+                        },
+                        new() {
+                            Value = -100,
+                            Color = ChartColors.ThresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartFill {
+                                Target = "+1",
+                                ColorAbove = ChartColors.ThresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "CCI",
+                        TooltipTemplate = "CCI([P1])",
+                        DataName = "cci",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
             // Choppiness Index
             new IndicatorListing {
                 Name = "Choppiness Index",
