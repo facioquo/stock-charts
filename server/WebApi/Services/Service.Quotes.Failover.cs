@@ -513,4 +513,3 @@ internal static class QuoteBackup
         new() { Date = DateTime.Parse("2017-01-01"), Open = 212.61m, High = 213.35m, Low = 211.52m, Close = 211.60m, Volume = 86708880 },
     ];
 }
-

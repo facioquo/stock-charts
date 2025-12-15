@@ -1,23 +1,15 @@
 {
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // Schema: https://code.visualstudio.com/docs/reference/tasks-appendix
+  "$schema": "vscode://schemas/tasks",
   "version": "2.0.0",
-  "// See": "https://go.microsoft.com/fwlink/?LinkId=733558",
-  "// Schema": "https://code.visualstudio.com/docs/reference/tasks-appendix",
-
-  // Default presentation applied to all tasks (can be overridden per task)
   "presentation": {
     "echo": true,
-    "reveal": "silent",
-    "revealProblems": "onProblem",
-    "focus": false,
-    "panel": "shared",
-    "showReuseMessage": false,
-    "clear": false
+    "clear": true,
+    "panel": "dedicated",
+    "showReuseMessage": false
   },
-
   "tasks": [
-    // =========================================================================
-    // INITIALIZE & RESTORE
-    // =========================================================================
     {
       "label": "Initialize: Pull, rebuild, and verify",
       "detail": "Pull latest, clean, rebuild, format, lint, and run tests",
@@ -53,10 +45,6 @@
       "command": "dotnet restore Charts.sln",
       "problemMatcher": "$msCompile"
     },
-
-    // =========================================================================
-    // CLEAN & BUILD
-    // =========================================================================
     {
       "label": "Clean: all outputs",
       "detail": "Clean build outputs from all projects",
@@ -129,10 +117,6 @@
       "group": "build",
       "problemMatcher": "$msCompile"
     },
-
-    // =========================================================================
-    // LINT & FORMAT
-    // =========================================================================
     {
       "label": "Lint: All (check)",
       "detail": "Run all linting checks without fixes",
@@ -148,10 +132,18 @@
     {
       "label": "Lint: All (fix)",
       "detail": "Auto-fix all linting issues",
-      "dependsOn": ["Format: all code", "Lint: markdown files (fix)"],
+      "dependsOn": ["Lint: All code (fix)", "Lint: markdown files (fix)"],
       "dependsOrder": "sequence",
       "group": "none",
       "problemMatcher": "$markdownlint"
+    },
+    {
+      "label": "Lint: All code (fix)",
+      "detail": "Format frontend and backend code",
+      "dependsOn": ["Lint: frontend code (fix)", "Lint: backend code (fix)"],
+      "dependsOrder": "parallel",
+      "group": "none",
+      "problemMatcher": ["$tsc", "$markdownlint"]
     },
     {
       "label": "Lint: frontend code (check)",
@@ -162,13 +154,29 @@
       "problemMatcher": "$eslint-stylish"
     },
     {
+      "label": "Lint: frontend code (fix)",
+      "detail": "Format Angular code with Prettier",
+      "type": "shell",
+      "command": "pnpm run format:web",
+      "group": "none",
+      "problemMatcher": "$tsc"
+    },
+    {
       "label": "Lint: backend code (check)",
       "detail": "Run Roslynator analysis and .NET format check",
       "type": "shell",
-      "command": "bash tools/scripts/lint-code-check.sh",
+      "command": "dotnet format --verify-no-changes && roslynator analyze",
       "dependsOn": ["Build: backend (incremental)"],
       "dependsOrder": "sequence",
       "group": "test",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Lint: backend code (fix)",
+      "detail": "Format .NET code with dotnet format and Roslynator",
+      "type": "shell",
+      "command": "roslynator fix && dotnet format",
+      "group": "none",
       "problemMatcher": "$msCompile"
     },
     {
@@ -187,34 +195,6 @@
       "group": "none",
       "problemMatcher": "$markdownlint"
     },
-    {
-      "label": "Format: all code",
-      "detail": "Format frontend and backend code",
-      "dependsOn": ["Format: frontend code", "Format: backend code"],
-      "dependsOrder": "parallel",
-      "group": "none",
-      "problemMatcher": ["$tsc", "$markdownlint"]
-    },
-    {
-      "label": "Format: frontend code",
-      "detail": "Format Angular code with Prettier",
-      "type": "shell",
-      "command": "pnpm run format:web",
-      "group": "none",
-      "problemMatcher": "$tsc"
-    },
-    {
-      "label": "Format: backend code",
-      "detail": "Format .NET code with dotnet format and Roslynator",
-      "type": "shell",
-      "command": "bash tools/scripts/lint-code-fix.sh",
-      "group": "none",
-      "problemMatcher": "$msCompile"
-    },
-
-    // =========================================================================
-    // TEST
-    // =========================================================================
     {
       "label": "Test: all tests",
       "detail": "Run frontend and backend unit tests",
@@ -241,10 +221,6 @@
       "problemMatcher": "$msCompile",
       "presentation": { "clear": true }
     },
-
-    // =========================================================================
-    // DEVELOPMENT SERVERS
-    // =========================================================================
     {
       "label": "Start: full development stack",
       "detail": "Start all backend services and frontend dev server",

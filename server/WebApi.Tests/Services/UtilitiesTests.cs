@@ -47,7 +47,7 @@ public class UtilitiesTests
     public void ToTimeSpan_Unsupported_ThrowsArgumentOutOfRange()
     {
         // Arrange
-        PeriodSize unsupportedPeriod = PeriodSize.Month;
+        const PeriodSize unsupportedPeriod = PeriodSize.Month;
 
         // Act & Assert
         ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(() => unsupportedPeriod.ToTimeSpan());

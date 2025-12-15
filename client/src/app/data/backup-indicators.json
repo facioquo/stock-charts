@@ -496,7 +496,7 @@
     ]
   },
   {
-    "name": "Bollinger Bands\u00ae",
+    "name": "Bollinger Bands®",
     "uiid": "BB",
     "legendTemplate": "BB([P1],[P2])",
     "endpoint": "/BB/",
@@ -562,7 +562,7 @@
     ]
   },
   {
-    "name": "Bollinger Bands\u00ae %B",
+    "name": "Bollinger Bands® %B",
     "uiid": "BB-PCTB",
     "legendTemplate": "BB([P1],[P2]) %B",
     "endpoint": "/BB/",

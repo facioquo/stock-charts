@@ -47,11 +47,15 @@ public class Jobs
             StoreQuoteDaily("SPY"),
             StoreQuoteDaily("QQQ")
         };
+
         await Task.WhenAll(tasks);
 
-        _logger.LogInformation(
-            "Quotes updated on {date and time} for {schedule status}.",
-             DateTime.Now, myTimer.ScheduleStatus);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation(
+                "Quotes updated on {date and time} for {schedule status}.",
+                DateTime.Now, myTimer.ScheduleStatus);
+        }
     }
 
     private (string? key, string? secret) GetAlpacaCredentials()
@@ -116,11 +120,11 @@ public class Jobs
     }
 
     /// <summary>
-    ///   STORE QUOTES: get and store historical quotes to blob storage provider.
+    /// STORE QUOTES: get and store historical quotes to blob storage provider.
     /// </summary>
     /// <param name="symbol">Security symbol</param>
     /// <exception cref="ArgumentNullException">
-    ///   When credentials are missing
+    /// When credentials are missing
     /// </exception>
     private async Task StoreQuoteDaily(string symbol)
     {
@@ -158,6 +162,9 @@ public class Jobs
         string blobName = $"{symbol}-DAILY.json";
         await _storage.PutBlobAsync(blobName, json);
 
-        _logger.LogInformation("Updated {blobName name}.", blobName);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Updated {blobName name}.", blobName);
+        }
     }
 }
