@@ -56,7 +56,7 @@ public class RandomQuotes : List<Quote>
 
         if (!includeWeekends && (frequency < TimeSpan.FromHours(1) || frequency >= TimeSpan.FromDays(7)))
         {
-            throw new ArgumentException("Weekends can only be excluded for period sizes between OneHour and OneWeek.", nameof(includeWeekends));
+            throw new ArgumentException("Weekends can only be excluded for period sizes between OneHour and less than OneWeek.", nameof(includeWeekends));
         }
 
         _seed = seed;
