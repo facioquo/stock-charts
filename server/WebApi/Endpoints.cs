@@ -10,7 +10,7 @@ public class Main(IQuoteService quoteService) : ControllerBase
     private readonly IQuoteService quoteFeed = quoteService;
 
     // GLOBALS
-    private static readonly int limitLast = 120;
+    private const int limitLast = 120;
 
     [HttpGet]
     public string Get()
@@ -109,6 +109,10 @@ public class Main(IQuoteService quoteService) : ControllerBase
     [HttpGet("CHEXIT-SHORT")]
     public Task<IActionResult> GetChandelierShort(int lookbackPeriods, double multiplier)
         => Get(quotes => quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Short));
+
+    [HttpGet("CCI")]
+    public Task<IActionResult> GetCci(int lookbackPeriods)
+        => Get(quotes => quotes.GetCci(lookbackPeriods));
 
     [HttpGet("CHOP")]
     public Task<IActionResult> GetChop(int lookbackPeriods)
