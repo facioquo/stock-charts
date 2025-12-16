@@ -25,5 +25,5 @@
     "./src/app/services/user.service.spec.ts"
   ],
   "include": ["src/**/*.spec.ts"],
-  "exclude": ["D:/Repos/stock-charts/client/out-tsc/spec"]
+  "exclude": ["client/out-tsc/spec"]
 }
