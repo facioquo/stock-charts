@@ -36,22 +36,16 @@ public class QuoteService(
 
             if (!await blob.ExistsAsync())
             {
-                if (_logger.IsEnabled(LogLevel.Warning))
-                {
-                    _logger.LogWarning("Blob {BlobName} not found, using backup data", blobName);
-                }
+                _logger.LogWarning("Blob {BlobName} not found, using backup data", blobName);
                 return QuoteBackup.BackupQuotes;
             }
 
             Response<BlobDownloadInfo> response = await blob.DownloadAsync();
-            await using Stream? stream = response?.Value.Content;
+            using Stream? stream = response?.Value.Content;
 
             if (stream == null)
             {
-                if (_logger.IsEnabled(LogLevel.Error))
-                {
-                    _logger.LogError("Download stream was null for {BlobName}", blobName);
-                }
+                _logger.LogError("Download stream was null for {BlobName}", blobName);
                 return QuoteBackup.BackupQuotes;
             }
 
@@ -59,10 +53,7 @@ public class QuoteService(
 
             if (quotes == null || quotes.Count == 0)
             {
-                if (_logger.IsEnabled(LogLevel.Warning))
-                {
-                    _logger.LogWarning("No quotes found in {BlobName}", blobName);
-                }
+                _logger.LogWarning("No quotes found in {BlobName}", blobName);
                 return QuoteBackup.BackupQuotes;
             }
 
@@ -72,10 +63,7 @@ public class QuoteService(
         // failover to backup quotes for local development and testing
         catch (Exception ex)
         {
-            if (_logger.IsEnabled(LogLevel.Error))
-            {
-                _logger.LogError(ex, "Failed to retrieve quotes for {Symbol}", symbol);
-            }
+            _logger.LogError(ex, "Failed to retrieve quotes for {Symbol}", symbol);
             return QuoteBackup.BackupQuotes;
         }
     }
