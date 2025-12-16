@@ -24,6 +24,6 @@
     "./src/app/components/picker/color-picker.spec.ts",
     "./src/app/services/user.service.spec.ts"
   ],
-  "include": ["src/**/*.spec.ts"],
+  "include": ["**/*.spec.ts"],
   "exclude": ["client/out-tsc/spec"]
 }
