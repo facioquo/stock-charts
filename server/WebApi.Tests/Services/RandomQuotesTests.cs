@@ -71,7 +71,8 @@ public class RandomQuotesTests
 
         // Assert
         Assert.Equal(requestedBars, quotes.Count);
-        Assert.All(quotes, quote => {
+        Assert.All(quotes, quote =>
+        {
             Assert.True(quote.Open > 0);
             Assert.True(quote.High > 0);
             Assert.True(quote.Low > 0);
