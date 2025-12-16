@@ -784,13 +784,78 @@
     ]
   },
   {
+    "name": "Commodity Channel Index (CCI)",
+    "uiid": "CCI",
+    "legendTemplate": "CCI([P1])",
+    "endpoint": "/CCI/",
+    "category": "oscillator",
+    "chartType": "oscillator",
+    "order": 15,
+    "chartConfig": {
+      "minimumYAxis": null,
+      "maximumYAxis": null,
+      "thresholds": [
+        {
+          "value": 100,
+          "color": "#DD2C0080",
+          "style": "dash",
+          "fill": {
+            "target": "+3",
+            "colorAbove": "transparent",
+            "colorBelow": "#2E7D3280"
+          }
+        },
+        {
+          "value": 0,
+          "color": "#61616110",
+          "style": "dash",
+          "fill": null
+        },
+        {
+          "value": -100,
+          "color": "#2E7D3280",
+          "style": "dash",
+          "fill": {
+            "target": "+1",
+            "colorAbove": "#DD2C0080",
+            "colorBelow": "transparent"
+          }
+        }
+      ]
+    },
+    "parameters": [
+      {
+        "displayName": "Lookback Periods",
+        "paramName": "lookbackPeriods",
+        "dataType": "int",
+        "defaultValue": 20,
+        "minimum": 1,
+        "maximum": 250
+      }
+    ],
+    "results": [
+      {
+        "displayName": "CCI",
+        "tooltipTemplate": "CCI([P1])",
+        "dataName": "cci",
+        "dataType": "number",
+        "lineType": "solid",
+        "stack": "",
+        "lineWidth": null,
+        "defaultColor": "#1E88E5",
+        "fill": null,
+        "order": 0
+      }
+    ]
+  },
+  {
     "name": "Choppiness Index",
     "uiid": "CHOP",
     "legendTemplate": "CHOP([P1])",
     "endpoint": "/CHOP/",
     "category": "oscillator",
     "chartType": "oscillator",
-    "order": 15,
+    "order": 16,
     "chartConfig": {
       "minimumYAxis": 0,
       "maximumYAxis": 100,
@@ -841,7 +906,7 @@
     "endpoint": "/CRSI/",
     "category": "oscillator",
     "chartType": "oscillator",
-    "order": 16,
+    "order": 17,
     "chartConfig": {
       "minimumYAxis": 0,
       "maximumYAxis": 100,
@@ -908,7 +973,7 @@
     "endpoint": "/DOJI/",
     "category": "candlestick-pattern",
     "chartType": "overlay",
-    "order": 17,
+    "order": 18,
     "chartConfig": null,
     "parameters": [
       {
@@ -942,7 +1007,7 @@
     "endpoint": "/HTL/",
     "category": "price-characteristic",
     "chartType": "oscillator",
-    "order": 18,
+    "order": 19,
     "chartConfig": {
       "minimumYAxis": 0,
       "maximumYAxis": null,
@@ -971,7 +1036,7 @@
     "endpoint": "/DONCHIAN/",
     "category": "price-channel",
     "chartType": "overlay",
-    "order": 19,
+    "order": 20,
     "chartConfig": null,
     "parameters": [
       {
@@ -992,7 +1057,7 @@
     "endpoint": "/DYN/",
     "category": "moving-average",
     "chartType": "overlay",
-    "order": 20,
+    "order": 21,
     "chartConfig": null,
     "parameters": [
       {
@@ -1026,7 +1091,7 @@
     "endpoint": "/ELDER-RAY/",
     "category": "price-trend",
     "chartType": "oscillator",
-    "order": 21,
+    "order": 22,
     "chartConfig": null,
     "parameters": [
       {
@@ -1072,7 +1137,7 @@
     "endpoint": "/EPMA/",
     "category": "moving-average",
     "chartType": "overlay",
-    "order": 22,
+    "order": 23,
     "chartConfig": null,
     "parameters": [
       {
@@ -1106,7 +1171,7 @@
     "endpoint": "/EMA/",
     "category": "moving-average",
     "chartType": "overlay",
-    "order": 23,
+    "order": 24,
     "chartConfig": null,
     "parameters": [
       {
@@ -1140,7 +1205,7 @@
     "endpoint": "/FISHER/",
     "category": "price-transform",
     "chartType": "oscillator",
-    "order": 24,
+    "order": 25,
     "chartConfig": null,
     "parameters": [
       {
@@ -1186,7 +1251,7 @@
     "endpoint": "/FRACTAL/",
     "category": "price-pattern",
     "chartType": "overlay",
-    "order": 25,
+    "order": 26,
     "chartConfig": null,
     "parameters": [
       {
@@ -1232,7 +1297,7 @@
     "endpoint": "/FCB/",
     "category": "price-channels",
     "chartType": "overlay",
-    "order": 26,
+    "order": 27,
     "chartConfig": null,
     "parameters": [
       {
@@ -1278,7 +1343,7 @@
     "endpoint": "/HTL/",
     "category": "moving-average",
     "chartType": "overlay",
-    "order": 27,
+    "order": 28,
     "chartConfig": null,
     "parameters": [],
     "results": [
@@ -1315,7 +1380,7 @@
     "endpoint": "/ICHIMOKU/",
     "category": "price-trend",
     "chartType": "overlay",
-    "order": 28,
+    "order": 29,
     "chartConfig": null,
     "parameters": [
       {
@@ -1413,7 +1478,7 @@
     "endpoint": "/KELTNER/",
     "category": "price-channel",
     "chartType": "overlay",
-    "order": 29,
+    "order": 30,
     "chartConfig": null,
     "parameters": [
       {
@@ -1450,7 +1515,7 @@
     "endpoint": "/MARUBOZU/",
     "category": "candlestick-pattern",
     "chartType": "overlay",
-    "order": 30,
+    "order": 31,
     "chartConfig": null,
     "parameters": [
       {
@@ -1484,7 +1549,7 @@
     "endpoint": "/MFI/",
     "category": "volume-based",
     "chartType": "oscillator",
-    "order": 31,
+    "order": 32,
     "chartConfig": {
       "minimumYAxis": 0,
       "maximumYAxis": 100,
@@ -1535,7 +1600,7 @@
     "endpoint": "/MACD/",
     "category": "price-trend",
     "chartType": "oscillator",
-    "order": 32,
+    "order": 33,
     "chartConfig": {
       "minimumYAxis": null,
       "maximumYAxis": null,
@@ -1620,7 +1685,7 @@
     "endpoint": "/PSAR/",
     "category": "stop-and-reverse",
     "chartType": "overlay",
-    "order": 33,
+    "order": 34,
     "chartConfig": null,
     "parameters": [
       {
@@ -1628,7 +1693,7 @@
         "paramName": "accelerationStep",
         "dataType": "number",
         "defaultValue": 0.02,
-        "minimum": 0.000001,
+        "minimum": 1e-6,
         "maximum": 2500
       },
       {
@@ -1636,7 +1701,7 @@
         "paramName": "maxAccelerationFactor",
         "dataType": "number",
         "defaultValue": 0.2,
-        "minimum": 0.000001,
+        "minimum": 1e-6,
         "maximum": 2500
       }
     ],
@@ -1662,7 +1727,7 @@
     "endpoint": "/ROC/",
     "category": "oscillator",
     "chartType": "oscillator",
-    "order": 34,
+    "order": 35,
     "chartConfig": null,
     "parameters": [
       {
@@ -1716,7 +1781,7 @@
     "endpoint": "/RSI/",
     "category": "oscillator",
     "chartType": "oscillator",
-    "order": 35,
+    "order": 36,
     "chartConfig": {
       "minimumYAxis": 0,
       "maximumYAxis": 100,
@@ -1767,7 +1832,7 @@
     "endpoint": "/STC/",
     "category": "oscillator",
     "chartType": "oscillator",
-    "order": 36,
+    "order": 37,
     "chartConfig": {
       "minimumYAxis": 0,
       "maximumYAxis": 100,
@@ -1834,7 +1899,7 @@
     "endpoint": "/SLOPE/",
     "category": "price-characteristic",
     "chartType": "oscillator",
-    "order": 37,
+    "order": 38,
     "chartConfig": null,
     "parameters": [
       {
@@ -1868,7 +1933,7 @@
     "endpoint": "/SLOPE/",
     "category": "price-characteristic",
     "chartType": "overlay",
-    "order": 38,
+    "order": 39,
     "chartConfig": null,
     "parameters": [
       {
@@ -1902,7 +1967,7 @@
     "endpoint": "/SMA/",
     "category": "moving-average",
     "chartType": "overlay",
-    "order": 39,
+    "order": 40,
     "chartConfig": null,
     "parameters": [
       {
@@ -1936,7 +2001,7 @@
     "endpoint": "/STDEV/",
     "category": "price-characteristic",
     "chartType": "oscillator",
-    "order": 40,
+    "order": 41,
     "chartConfig": null,
     "parameters": [
       {
@@ -1990,7 +2055,7 @@
     "endpoint": "/STDEV/",
     "category": "price-characteristic",
     "chartType": "oscillator",
-    "order": 41,
+    "order": 42,
     "chartConfig": null,
     "parameters": [
       {
@@ -2024,7 +2089,7 @@
     "endpoint": "/STARC/",
     "category": "price-channel",
     "chartType": "overlay",
-    "order": 42,
+    "order": 43,
     "chartConfig": null,
     "parameters": [
       {
@@ -2061,7 +2126,7 @@
     "endpoint": "/SMI/",
     "category": "oscillator",
     "chartType": "oscillator",
-    "order": 43,
+    "order": 44,
     "chartConfig": {
       "minimumYAxis": null,
       "maximumYAxis": null,
@@ -2148,7 +2213,7 @@
     "endpoint": "/STO/",
     "category": "oscillator",
     "chartType": "oscillator",
-    "order": 44,
+    "order": 45,
     "chartConfig": {
       "minimumYAxis": null,
       "maximumYAxis": null,
@@ -2219,7 +2284,7 @@
     "endpoint": "/STORSI/",
     "category": "oscillator",
     "chartType": "oscillator",
-    "order": 45,
+    "order": 46,
     "chartConfig": {
       "minimumYAxis": null,
       "maximumYAxis": null,
@@ -2306,7 +2371,7 @@
     "endpoint": "/SUPERTREND/",
     "category": "price-trend",
     "chartType": "overlay",
-    "order": 46,
+    "order": 47,
     "chartConfig": null,
     "parameters": [
       {
@@ -2372,7 +2437,7 @@
     "endpoint": "/ULCER/",
     "category": "price-characteristic",
     "chartType": "oscillator",
-    "order": 47,
+    "order": 48,
     "chartConfig": null,
     "parameters": [
       {
@@ -2406,7 +2471,7 @@
     "endpoint": "/VORTEX/",
     "category": "price-trend",
     "chartType": "oscillator",
-    "order": 48,
+    "order": 49,
     "chartConfig": null,
     "parameters": [
       {
@@ -2452,7 +2517,7 @@
     "endpoint": "/ALLIGATOR/",
     "category": "price-trend",
     "chartType": "overlay",
-    "order": 49,
+    "order": 50,
     "chartConfig": null,
     "parameters": [
       {
@@ -2550,7 +2615,7 @@
     "endpoint": "/ZIGZAG-CLOSE/",
     "category": "price-transform",
     "chartType": "overlay",
-    "order": 50,
+    "order": 51,
     "chartConfig": null,
     "parameters": [
       {
@@ -2608,7 +2673,7 @@
     "endpoint": "/ZIGZAG-HIGHLOW/",
     "category": "price-transform",
     "chartType": "overlay",
-    "order": 51,
+    "order": 52,
     "chartConfig": null,
     "parameters": [
       {

@@ -29,7 +29,6 @@ public class Storage : IStorage
     /// <summary>
     /// Initializes the blob storage container
     /// </summary>
-    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the async operation</returns>
     public Task InitializeAsync() => InitializeAsync(CancellationToken.None);
 
@@ -44,7 +43,7 @@ public class Storage : IStorage
     /// <returns>Task representing the async operation</returns>
     public async Task PutBlobAsync(string blobName, string content)
     {
-        using MemoryStream stream = new(Encoding.UTF8.GetBytes(content));
+        await using MemoryStream stream = new(Encoding.UTF8.GetBytes(content));
         await _blobClient.GetBlobClient(blobName).UploadAsync(stream, overwrite: true);
     }
 

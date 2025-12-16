@@ -42,13 +42,11 @@ services.AddResponseCompression(options => {
 });
 
 // Configure compression options
-services.Configure<BrotliCompressionProviderOptions>(options => {
-    options.Level = CompressionLevel.Fastest;
-});
+services.Configure<BrotliCompressionProviderOptions>(
+    options => options.Level = CompressionLevel.Fastest);
 
-services.Configure<GzipCompressionProviderOptions>(options => {
-    options.Level = CompressionLevel.Fastest;
-});
+services.Configure<GzipCompressionProviderOptions>(
+    options => options.Level = CompressionLevel.Fastest);
 
 // Add logging
 services.AddLogging();
