@@ -8,52 +8,52 @@ The following indicators are available in the Stock.Indicators library but not y
 
 ### Moving Averages
 
-- [ ] DEMA - Double Exponential Moving Average
-- [ ] HMA - Hull Moving Average
-- [ ] KAMA - Kaufman Adaptive Moving Average
-- [ ] MAMA - MESA Adaptive Moving Average
-- [ ] SMMA - Smoothed Moving Average
-- [ ] T3 - Tillson T3 Moving Average
-- [ ] TEMA - Triple Exponential Moving Average
-- [ ] WMA - Weighted Moving Average
+- [x] DEMA - Double Exponential Moving Average
+- [x] HMA - Hull Moving Average
+- [x] KAMA - Kaufman Adaptive Moving Average
+- [x] MAMA - MESA Adaptive Moving Average
+- [x] SMMA - Smoothed Moving Average
+- [x] T3 - Tillson T3 Moving Average
+- [x] TEMA - Triple Exponential Moving Average
+- [x] WMA - Weighted Moving Average
 
 ### Oscillators
 
-- [ ] Awesome - Awesome Oscillator
-- [ ] BOP - Balance of Power
-- [ ] ChaikinOsc - Chaikin Oscillator
-- [ ] DPO - Detrended Price Oscillator
-- [ ] PMO - Price Momentum Oscillator
-- [ ] TRIX - Triple Exponential Average Rate of Change
-- [ ] TSI - True Strength Index
-- [ ] Ultimate - Ultimate Oscillator
-- [ ] WilliamsR - Williams %R
+- [x] Awesome - Awesome Oscillator
+- [x] BOP - Balance of Power
+- [x] ChaikinOsc - Chaikin Oscillator
+- [x] DPO - Detrended Price Oscillator
+- [x] PMO - Price Momentum Oscillator
+- [x] TRIX - Triple Exponential Average Rate of Change
+- [x] TSI - True Strength Index
+- [x] Ultimate - Ultimate Oscillator
+- [x] WilliamsR - Williams %R
 
 ### Volume-Based
 
-- [ ] OBV - On-Balance Volume
-- [ ] PVO - Percentage Volume Oscillator
-- [ ] VWAP - Volume Weighted Average Price
-- [ ] VWMA - Volume Weighted Moving Average
-- [ ] KVO - Klinger Volume Oscillator
+- [x] OBV - On-Balance Volume
+- [x] PVO - Percentage Volume Oscillator
+- [x] VWAP - Volume Weighted Average Price
+- [x] VWMA - Volume Weighted Moving Average
+- [x] KVO - Klinger Volume Oscillator
 
 ### Price Channels and Bands
 
-- [ ] MaEnvelopes - Moving Average Envelopes
-- [ ] StdDevChannels - Standard Deviation Channels
+- [x] MaEnvelopes - Moving Average Envelopes
+- [x] StdDevChannels - Standard Deviation Channels
 
 ### Other Indicators
 
-- [ ] Correlation - Correlation Coefficient
-- [ ] ForceIndex - Force Index
-- [ ] HeikinAshi - Heikin-Ashi
-- [ ] Hurst - Hurst Exponent
-- [ ] PivotPoints - Pivot Points
-- [ ] Pivots - Rolling Pivots
-- [ ] PRS - Price Relative Strength
-- [ ] RocWb - Rate of Change with Bands
-- [ ] RollingPivots - Rolling Pivot Points
-- [ ] VolatilityStop - Volatility Stop
+- [ ] Correlation - Correlation Coefficient (requires dual quote comparison)
+- [x] ForceIndex - Force Index
+- [ ] HeikinAshi - Heikin-Ashi (candle transformation, not chart overlay)
+- [x] Hurst - Hurst Exponent
+- [ ] PivotPoints - Pivot Points (static calculations, different structure)
+- [ ] Pivots - Rolling Pivots (different structure)
+- [ ] PRS - Price Relative Strength (requires dual quote comparison)
+- [x] RocWb - Rate of Change with Bands
+- [ ] RollingPivots - Rolling Pivot Points (different structure)
+- [x] VolatilityStop - Volatility Stop
 
 ## Implementation Pattern
 
@@ -66,7 +66,13 @@ For each indicator, the following steps are required:
 
 ## Progress Notes
 
-Implementation will be done one indicator at a time, checking off each indicator as it is completed.
+**Completed:** 30 indicators implemented
+**Remaining:** 6 indicators (most require special handling - dual quote comparison or different data structures)
+
+Indicators not implemented due to complexity:
+- **Correlation, PRS**: Require comparison with another security's quotes (like Beta)
+- **HeikinAshi**: Transforms candlesticks rather than creating overlay/oscillator
+- **PivotPoints, Pivots, RollingPivots**: Return different data structures (pivot levels)
 
 ---
 
