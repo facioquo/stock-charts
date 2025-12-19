@@ -3176,7 +3176,7 @@ public static class Metadata
                 Results = [
                     new() {
                         DisplayName = "TRIX",
-                        TooltipTemplate = "TRIX([P1])",
+                        TooltipTemplate = "TRIX([P1],[P2])",
                         DataName = "trix",
                         DataType = "number",
                         LineType = "solid",
@@ -3256,7 +3256,7 @@ public static class Metadata
                 Results = [
                     new() {
                         DisplayName = "TSI",
-                        TooltipTemplate = "TSI([P1],[P2])",
+                        TooltipTemplate = "TSI([P1],[P2],[P3])",
                         DataName = "tsi",
                         DataType = "number",
                         LineType = "solid",
@@ -3486,7 +3486,7 @@ public static class Metadata
                 Results = [
                     new() {
                         DisplayName = "KVO",
-                        TooltipTemplate = "KVO([P1],[P2])",
+                        TooltipTemplate = "KVO([P1],[P2],[P3])",
                         DataName = "oscillator",
                         DataType = "number",
                         LineType = "solid",
@@ -3662,7 +3662,7 @@ public static class Metadata
                 Results = [
                     new() {
                         DisplayName = "PVO",
-                        TooltipTemplate = "PVO([P1],[P2])",
+                        TooltipTemplate = "PVO([P1],[P2],[P3])",
                         DataName = "pvo",
                         DataType = "number",
                         LineType = "solid",
@@ -3894,7 +3894,7 @@ public static class Metadata
                 Results = [
                     new() {
                         DisplayName = "ROC",
-                        TooltipTemplate = "ROCWB([P1])",
+                        TooltipTemplate = "ROCWB([P1],[P2],[P3])",
                         DataName = "roc",
                         DataType = "number",
                         LineType = "solid",

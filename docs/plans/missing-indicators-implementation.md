@@ -70,6 +70,7 @@ For each indicator, the following steps are required:
 **Remaining:** 6 indicators (most require special handling - dual quote comparison or different data structures)
 
 Indicators not implemented due to complexity:
+
 - **Correlation, PRS**: Require comparison with another security's quotes (like Beta)
 - **HeikinAshi**: Transforms candlesticks rather than creating overlay/oscillator
 - **PivotPoints, Pivots, RollingPivots**: Return different data structures (pivot levels)
