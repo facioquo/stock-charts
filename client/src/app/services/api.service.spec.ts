@@ -184,4 +184,143 @@ describe("ApiService", () => {
     expect(indicatorNames).toContain("MACD");
     expect(indicatorNames).toContain("BB");
   });
+
+  describe("getSelectionData", () => {
+    it("should convert relative endpoint URLs to absolute URLs", () => {
+      const selection = {
+        ucid: "test-ucid",
+        uiid: "ADX",
+        label: "ADX(14)",
+        chartType: "oscillator",
+        params: [
+          {
+            paramName: "lookbackPeriods",
+            displayName: "Lookback",
+            minimum: 2,
+            maximum: 250,
+            value: 14
+          }
+        ],
+        results: []
+      };
+
+      const listing = {
+        name: "ADX",
+        uiid: "ADX",
+        legendTemplate: "ADX([P1])",
+        endpoint: "/ADX/", // Relative path
+        category: "test",
+        chartType: "oscillator",
+        order: 0,
+        chartConfig: null,
+        parameters: [],
+        results: []
+      };
+
+      const mockData = [{ date: "2023-01-01", adx: 25 }];
+
+      service.getSelectionData(selection, listing).subscribe(data => {
+        expect(data).toEqual(mockData);
+      });
+
+      // Should request from absolute URL (env.api + relative path)
+      const req = httpMock.expectOne(`${env.api}/ADX/?lookbackPeriods=14`);
+      expect(req.request.method).toBe("GET");
+      req.flush(mockData);
+    });
+
+    it("should handle absolute endpoint URLs without modification", () => {
+      const selection = {
+        ucid: "test-ucid",
+        uiid: "ADX",
+        label: "ADX(14)",
+        chartType: "oscillator",
+        params: [
+          {
+            paramName: "lookbackPeriods",
+            displayName: "Lookback",
+            minimum: 2,
+            maximum: 250,
+            value: 14
+          }
+        ],
+        results: []
+      };
+
+      const listing = {
+        name: "ADX",
+        uiid: "ADX",
+        legendTemplate: "ADX([P1])",
+        endpoint: "https://api.example.com/ADX/", // Absolute URL
+        category: "test",
+        chartType: "oscillator",
+        order: 0,
+        chartConfig: null,
+        parameters: [],
+        results: []
+      };
+
+      const mockData = [{ date: "2023-01-01", adx: 25 }];
+
+      service.getSelectionData(selection, listing).subscribe(data => {
+        expect(data).toEqual(mockData);
+      });
+
+      // Should request from the absolute URL as-is
+      const req = httpMock.expectOne("https://api.example.com/ADX/?lookbackPeriods=14");
+      expect(req.request.method).toBe("GET");
+      req.flush(mockData);
+    });
+
+    it("should include query parameters in the request", () => {
+      const selection = {
+        ucid: "test-ucid",
+        uiid: "BB",
+        label: "BB(20,2)",
+        chartType: "overlay",
+        params: [
+          {
+            paramName: "lookbackPeriods",
+            displayName: "Lookback",
+            minimum: 2,
+            maximum: 250,
+            value: 20
+          },
+          {
+            paramName: "standardDeviations",
+            displayName: "Std Dev",
+            minimum: 1,
+            maximum: 10,
+            value: 2
+          }
+        ],
+        results: []
+      };
+
+      const listing = {
+        name: "Bollinger Bands",
+        uiid: "BB",
+        legendTemplate: "BB([P1],[P2])",
+        endpoint: "/BB/",
+        category: "test",
+        chartType: "overlay",
+        order: 0,
+        chartConfig: null,
+        parameters: [],
+        results: []
+      };
+
+      const mockData = [{ date: "2023-01-01", upper: 105, middle: 100, lower: 95 }];
+
+      service.getSelectionData(selection, listing).subscribe(data => {
+        expect(data).toEqual(mockData);
+      });
+
+      const req = httpMock.expectOne(`${env.api}/BB/?lookbackPeriods=20&standardDeviations=2`);
+      expect(req.request.method).toBe("GET");
+      expect(req.request.params.get("lookbackPeriods")).toBe("20");
+      expect(req.request.params.get("standardDeviations")).toBe("2");
+      req.flush(mockData);
+    });
+  });
 });
