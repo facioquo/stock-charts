@@ -54,21 +54,17 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public Task<IActionResult> GetAdl(int smaPeriods)
         => Get(quotes => quotes.GetAdl(smaPeriods));
 
-    [HttpGet("AWESOME")]
-    public Task<IActionResult> GetAwesome(int fastPeriods, int slowPeriods)
-        => Get(quotes => quotes.GetAwesome(fastPeriods, slowPeriods));
-
     [HttpGet("ADX")]
     public Task<IActionResult> GetAdx(int lookbackPeriods)
         => Get(quotes => quotes.GetAdx(lookbackPeriods));
 
-    [HttpGet("ALMA")]
-    public Task<IActionResult> GetAlma(int lookbackPeriods, double offset, double sigma)
-        => Get(quotes => quotes.GetAlma(lookbackPeriods, offset, sigma));
-
     [HttpGet("ALLIGATOR")]
     public Task<IActionResult> GetAlligator(int jawPeriods, int jawOffset, int teethPeriods, int teethOffset, int lipsPeriods, int lipsOffset)
         => Get(quotes => quotes.GetAlligator(jawPeriods, jawOffset, teethPeriods, teethOffset, lipsPeriods, lipsOffset));
+
+    [HttpGet("ALMA")]
+    public Task<IActionResult> GetAlma(int lookbackPeriods, double offset, double sigma)
+        => Get(quotes => quotes.GetAlma(lookbackPeriods, offset, sigma));
 
     [HttpGet("AROON")]
     public Task<IActionResult> GetAroon(int lookbackPeriods)
@@ -86,13 +82,13 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public Task<IActionResult> GetAtrStopHL(int lookbackPeriods, double multiplier)
         => Get(quotes => quotes.GetAtrStop(lookbackPeriods, multiplier, EndType.HighLow));
 
+    [HttpGet("AWESOME")]
+    public Task<IActionResult> GetAwesome(int fastPeriods, int slowPeriods)
+        => Get(quotes => quotes.GetAwesome(fastPeriods, slowPeriods));
+
     [HttpGet("BB")]
     public Task<IActionResult> GetBollingerBands(int lookbackPeriods, double standardDeviations)
         => Get(quotes => quotes.GetBollingerBands(lookbackPeriods, standardDeviations));
-
-    [HttpGet("BOP")]
-    public Task<IActionResult> GetBop(int smoothPeriods)
-        => Get(quotes => quotes.GetBop(smoothPeriods));
 
     [HttpGet("BETA")]
     public async Task<IActionResult> GetBeta(int lookbackPeriods, BetaType type)
@@ -110,13 +106,9 @@ public class Main(IQuoteService quoteService) : ControllerBase
         }
     }
 
-    [HttpGet("CHEXIT-LONG")]
-    public Task<IActionResult> GetChandelierLong(int lookbackPeriods, double multiplier)
-        => Get(quotes => quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Long));
-
-    [HttpGet("CHEXIT-SHORT")]
-    public Task<IActionResult> GetChandelierShort(int lookbackPeriods, double multiplier)
-        => Get(quotes => quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Short));
+    [HttpGet("BOP")]
+    public Task<IActionResult> GetBop(int smoothPeriods)
+        => Get(quotes => quotes.GetBop(smoothPeriods));
 
     [HttpGet("CCI")]
     public Task<IActionResult> GetCci(int lookbackPeriods)
@@ -125,6 +117,14 @@ public class Main(IQuoteService quoteService) : ControllerBase
     [HttpGet("CHAIKIN")]
     public Task<IActionResult> GetChaikinOsc(int fastPeriods, int slowPeriods)
         => Get(quotes => quotes.GetChaikinOsc(fastPeriods, slowPeriods));
+
+    [HttpGet("CHEXIT-LONG")]
+    public Task<IActionResult> GetChandelierLong(int lookbackPeriods, double multiplier)
+        => Get(quotes => quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Long));
+
+    [HttpGet("CHEXIT-SHORT")]
+    public Task<IActionResult> GetChandelierShort(int lookbackPeriods, double multiplier)
+        => Get(quotes => quotes.GetChandelier(lookbackPeriods, multiplier, ChandelierType.Short));
 
     [HttpGet("CHOP")]
     public Task<IActionResult> GetChop(int lookbackPeriods)
@@ -166,25 +166,25 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public Task<IActionResult> GetElderRay(int lookbackPeriods)
         => Get(quotes => quotes.GetElderRay(lookbackPeriods));
 
-    [HttpGet("EPMA")]
-    public Task<IActionResult> GetEpma(int lookbackPeriods)
-        => Get(quotes => quotes.GetEpma(lookbackPeriods));
-
     [HttpGet("EMA")]
     public Task<IActionResult> GetEma(int lookbackPeriods)
         => Get(quotes => quotes.GetEma(lookbackPeriods));
+
+    [HttpGet("EPMA")]
+    public Task<IActionResult> GetEpma(int lookbackPeriods)
+        => Get(quotes => quotes.GetEpma(lookbackPeriods));
 
     [HttpGet("FCB")]
     public Task<IActionResult> GetFcb(int windowSpan)
         => Get(quotes => quotes.GetFcb(windowSpan));
 
-    [HttpGet("FORCE")]
-    public Task<IActionResult> GetForceIndex(int lookbackPeriods)
-        => Get(quotes => quotes.GetForceIndex(lookbackPeriods));
-
     [HttpGet("FISHER")]
     public Task<IActionResult> GetFisher(int lookbackPeriods)
         => Get(quotes => quotes.GetFisherTransform(lookbackPeriods));
+
+    [HttpGet("FORCE")]
+    public Task<IActionResult> GetForceIndex(int lookbackPeriods)
+        => Get(quotes => quotes.GetForceIndex(lookbackPeriods));
 
     [HttpGet("FRACTAL")]
     public Task<IActionResult> GetFractal(int windowSpan)
@@ -198,29 +198,33 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public Task<IActionResult> GetHma(int lookbackPeriods)
         => Get(quotes => quotes.GetHma(lookbackPeriods));
 
-    [HttpGet("HURST")]
-    public Task<IActionResult> GetHurst(int lookbackPeriods)
-        => Get(quotes => quotes.GetHurst(lookbackPeriods));
-
     [HttpGet("HTL")]
     public Task<IActionResult> GetHTL()
         => Get(quotes => quotes.GetHtTrendline());
+
+    [HttpGet("HURST")]
+    public Task<IActionResult> GetHurst(int lookbackPeriods)
+        => Get(quotes => quotes.GetHurst(lookbackPeriods));
 
     [HttpGet("ICHIMOKU")]
     public Task<IActionResult> GetIchimoku(int tenkanPeriods, int kijunPeriods, int senkouBPeriods)
         => Get(quotes => quotes.GetIchimoku(tenkanPeriods, kijunPeriods, senkouBPeriods));
 
-    [HttpGet("KELTNER")]
-    public Task<IActionResult> GetKeltner(int emaPeriods, double multiplier, int atrPeriods)
-        => Get(quotes => quotes.GetKeltner(emaPeriods, multiplier, atrPeriods));
-
     [HttpGet("KAMA")]
     public Task<IActionResult> GetKama(int erPeriods, int fastPeriods, int slowPeriods)
         => Get(quotes => quotes.GetKama(erPeriods, fastPeriods, slowPeriods));
 
+    [HttpGet("KELTNER")]
+    public Task<IActionResult> GetKeltner(int emaPeriods, double multiplier, int atrPeriods)
+        => Get(quotes => quotes.GetKeltner(emaPeriods, multiplier, atrPeriods));
+
     [HttpGet("KVO")]
     public Task<IActionResult> GetKvo(int fastPeriods, int slowPeriods, int signalPeriods)
         => Get(quotes => quotes.GetKvo(fastPeriods, slowPeriods, signalPeriods));
+
+    [HttpGet("MA-ENV")]
+    public Task<IActionResult> GetMaEnvelopes(int lookbackPeriods, double percentOffset)
+        => Get(quotes => quotes.GetMaEnvelopes(lookbackPeriods, percentOffset));
 
     [HttpGet("MACD")]
     public Task<IActionResult> GetMacd(int fastPeriods, int slowPeriods, int signalPeriods)
@@ -229,10 +233,6 @@ public class Main(IQuoteService quoteService) : ControllerBase
     [HttpGet("MAMA")]
     public Task<IActionResult> GetMama(double fastLimit, double slowLimit)
         => Get(quotes => quotes.GetMama(fastLimit, slowLimit));
-
-    [HttpGet("MA-ENV")]
-    public Task<IActionResult> GetMaEnvelopes(int lookbackPeriods, double percentOffset)
-        => Get(quotes => quotes.GetMaEnvelopes(lookbackPeriods, percentOffset));
 
     [HttpGet("MARUBOZU")]
     public Task<IActionResult> GetMarubozu(double minBodyPercent)
@@ -250,13 +250,13 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public Task<IActionResult> GetPmo(int timePeriods, int smoothPeriods, int signalPeriods)
         => Get(quotes => quotes.GetPmo(timePeriods, smoothPeriods, signalPeriods));
 
-    [HttpGet("PVO")]
-    public Task<IActionResult> GetPvo(int fastPeriods, int slowPeriods, int signalPeriods)
-        => Get(quotes => quotes.GetPvo(fastPeriods, slowPeriods, signalPeriods));
-
     [HttpGet("PSAR")]
     public Task<IActionResult> GetParabolicSar(double accelerationStep, double maxAccelerationFactor)
         => Get(quotes => quotes.GetParabolicSar(accelerationStep, maxAccelerationFactor));
+
+    [HttpGet("PVO")]
+    public Task<IActionResult> GetPvo(int fastPeriods, int slowPeriods, int signalPeriods)
+        => Get(quotes => quotes.GetPvo(fastPeriods, slowPeriods, signalPeriods));
 
     [HttpGet("ROC")]
     public Task<IActionResult> GetRoc(int lookbackPeriods, int smaPeriods)
@@ -278,21 +278,21 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public Task<IActionResult> GetSma(int lookbackPeriods)
         => Get(quotes => quotes.GetSma(lookbackPeriods));
 
-    [HttpGet("SMMA")]
-    public Task<IActionResult> GetSmma(int lookbackPeriods)
-        => Get(quotes => quotes.GetSmma(lookbackPeriods));
-
     [HttpGet("SMI")]
     public Task<IActionResult> GetSmi(int lookbackPeriods, int firstSmoothPeriods, int secondSmoothPeriods, int signalPeriods)
         => Get(quotes => quotes.GetSmi(lookbackPeriods, firstSmoothPeriods, secondSmoothPeriods, signalPeriods));
 
-    [HttpGet("STC")]
-    public Task<IActionResult> GetStc(int cyclePeriods, int fastPeriods, int slowPeriods)
-        => Get(quotes => quotes.GetStc(cyclePeriods, fastPeriods, slowPeriods));
+    [HttpGet("SMMA")]
+    public Task<IActionResult> GetSmma(int lookbackPeriods)
+        => Get(quotes => quotes.GetSmma(lookbackPeriods));
 
     [HttpGet("STARC")]
     public Task<IActionResult> GetStarc(int smaPeriods, double multiplier, int atrPeriods)
         => Get(quotes => quotes.GetStarcBands(smaPeriods, multiplier, atrPeriods));
+
+    [HttpGet("STC")]
+    public Task<IActionResult> GetStc(int cyclePeriods, int fastPeriods, int slowPeriods)
+        => Get(quotes => quotes.GetStc(cyclePeriods, fastPeriods, slowPeriods));
 
     [HttpGet("STDEV")]
     public Task<IActionResult> GetStdDev(int lookbackPeriods, int smaPeriods)
@@ -338,6 +338,10 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public Task<IActionResult> GetUltimate(int shortPeriods, int middlePeriods, int longPeriods)
         => Get(quotes => quotes.GetUltimate(shortPeriods, middlePeriods, longPeriods));
 
+    [HttpGet("VOL-STOP")]
+    public Task<IActionResult> GetVolatilityStop(int lookbackPeriods, double multiplier)
+        => Get(quotes => quotes.GetVolatilityStop(lookbackPeriods, multiplier));
+
     [HttpGet("VORTEX")]
     public Task<IActionResult> GetVortex(int lookbackPeriods)
         => Get(quotes => quotes.GetVortex(lookbackPeriods));
@@ -349,10 +353,6 @@ public class Main(IQuoteService quoteService) : ControllerBase
     [HttpGet("VWMA")]
     public Task<IActionResult> GetVwma(int lookbackPeriods)
         => Get(quotes => quotes.GetVwma(lookbackPeriods));
-
-    [HttpGet("VOL-STOP")]
-    public Task<IActionResult> GetVolatilityStop(int lookbackPeriods, double multiplier)
-        => Get(quotes => quotes.GetVolatilityStop(lookbackPeriods, multiplier));
 
     [HttpGet("WILLIAMSR")]
     public Task<IActionResult> GetWilliamsR(int lookbackPeriods)
