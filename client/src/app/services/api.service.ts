@@ -2,7 +2,6 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from "@angular
 import { Injectable, inject } from "@angular/core";
 import { Observable, catchError, map, of } from "rxjs";
 import { env } from "../../environments/environment";
-import backupIndicators from "../data/backup-indicators.json";
 import backupQuotes from "../data/backup-quotes.json";
 import {
   IndicatorListing,
@@ -32,17 +31,7 @@ export class ApiService {
   }
 
   getListings(): Observable<IndicatorListing[]> {
-    return this.http.get<IndicatorListing[]>(`${env.api}/indicators`, this.requestHeader()).pipe(
-      catchError((error: HttpErrorResponse) => {
-        console.warn("Backend API unavailable, using client-side backup indicators", {
-          status: error.status,
-          statusText: error.statusText,
-          url: error.url,
-          message: error.message
-        });
-        return of(backupIndicators as IndicatorListing[]);
-      })
-    );
+    return this.http.get<IndicatorListing[]>(`${env.api}/indicators`, this.requestHeader());
   }
 
   getSelectionData(
