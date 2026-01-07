@@ -10,6 +10,9 @@
     "showReuseMessage": false
   },
   "problemMatcher": [],
+  "options": {
+    "cwd": "${workspaceFolder}"
+  },
   "tasks": [
     {
       "label": "Initialize: Pull, rebuild, and verify",
@@ -53,7 +56,11 @@
     {
       "label": "Clean: All outputs",
       "detail": "Clean build outputs from all projects",
-      "dependsOn": ["Clean: Website outputs", "Clean: Backend .NET outputs"],
+      "dependsOn": [
+        "Clean: Root and Azure storage",
+        "Clean: Website outputs",
+        "Clean: Backend .NET outputs"
+      ],
       "dependsOrder": "parallel",
       "group": "build"
     },
@@ -68,6 +75,13 @@
       "detail": "Clean .NET build outputs (bin, obj)",
       "type": "shell",
       "command": "dotnet clean Charts.sln -v minimal --nologo",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Clean: Root and Azure storage",
+      "detail": "Clean Azurite and root level items, including npm packages",
+      "type": "shell",
+      "command": "pnpm run clean",
       "problemMatcher": "$msCompile"
     },
     {
@@ -99,7 +113,9 @@
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client run build",
       "group": "build",
-      "problemMatcher": "$tsc"
+      "problemMatcher": "$tsc",
+      "dependsOn": "Install: Packages (pnpm)",
+      "dependsOrder": "sequence"
     },
     {
       "label": "Build: Backend .NET code (non-incremental)",
@@ -236,41 +252,30 @@
       "label": "Run: Full development stack",
       "detail": "Start all Backend .NET code services and Website dev server",
       "dependsOn": [
-        "Run: Azure Storage Emulator",
+        "Run: Azure Storage",
         "Run: Azure Functions",
         "Run: Web API",
         "Run: Website dev server"
       ],
-      "dependsOrder": "sequence",
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      }
+      "dependsOrder": "sequence"
     },
     {
-      "label": "Run: Azure Storage Emulator",
+      "label": "Run: Azure Storage",
       "detail": "Start Azurite (Azure Storage Emulator)",
       "type": "shell",
       "command": "pnpm run azure:start",
       "isBackground": true,
-      "group": "none",
       "problemMatcher": {
-        "pattern": {
-          "regexp": ".",
-          "file": 1,
-          "location": 2,
-          "message": 3
-        },
+        "owner": "azure-storage",
+        "pattern": { "regexp": "^$" },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^Azurite .* service is starting",
-          "endsPattern": "^Azurite .* service successfully listens"
+          "endsPattern": "^Azurite .* successfully listening"
         }
       },
       "presentation": {
-        "reveal": "silent",
-        "panel": "dedicated"
+        "clear": true
       }
     },
     {
@@ -284,23 +289,14 @@
       "options": {
         "cwd": "${workspaceFolder}/server/Functions"
       },
-      "group": "none",
       "problemMatcher": {
-        "pattern": {
-          "regexp": ".",
-          "file": 1,
-          "location": 2,
-          "message": 3
-        },
+        "owner": "azure-functions",
+        "pattern": { "regexp": "^$" },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "^.*Worker process started",
-          "endsPattern": "^.*Host started"
+          "beginsPattern": "^.*Azure Functions",
+          "endsPattern": "^.*Worker process started"
         }
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
       }
     },
     {
@@ -314,21 +310,13 @@
       "isBackground": true,
       "group": "none",
       "problemMatcher": {
-        "pattern": {
-          "regexp": ".",
-          "file": 1,
-          "location": 2,
-          "message": 3
-        },
+        "owner": "web-api",
+        "pattern": { "regexp": "^$" },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^.*Building",
           "endsPattern": "^.*Application started"
         }
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
       }
     },
     {
@@ -339,21 +327,13 @@
       "isBackground": true,
       "group": "none",
       "problemMatcher": {
-        "pattern": {
-          "regexp": ".",
-          "file": 1,
-          "location": 2,
-          "message": 3
-        },
+        "owner": "website",
+        "pattern": { "regexp": "^$" },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^.*Compiling",
           "endsPattern": "^.*Application bundle generation complete"
         }
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
       }
     },
 

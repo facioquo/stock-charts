@@ -13,7 +13,7 @@
     "url": "https://github.com/facioquo/stock-charts.git"
   },
   "scripts": {
-    "clean": "pnpm -r run clean",
+    "clean": "rm -rf node_modules .azurite .codacy && pnpm -r run clean",
     "prebuild": "pnpm run generate:backups",
     "build": "pnpm -r run build",
     "prebuild:prod": "pnpm run generate:backups",
