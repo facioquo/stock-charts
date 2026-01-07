@@ -20,8 +20,7 @@
         "printWidth": 120,
         "bracketSpacing": true,
         "trailingComma": "none",
-        "singleQuote": false,
-        "arrayExpand": false
+        "singleQuote": false
       }
     },
     {
