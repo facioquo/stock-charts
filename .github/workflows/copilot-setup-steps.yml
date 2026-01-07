@@ -7,8 +7,8 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: "24.11.1"
-  PNPM_VERSION: "10.25.0"
+  NODE_VERSION: "24.12.0"
+  PNPM_VERSION: "10.27.0"
 
 jobs:
   copilot-setup-steps:
@@ -20,11 +20,13 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install .NET SDK
-        uses: actions/setup-dotnet@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "10.x"
           dotnet-quality: "ga"
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
         continue-on-error: true
 
       - name: Install .NET tools
