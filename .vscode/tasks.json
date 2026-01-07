@@ -5,7 +5,7 @@
   "version": "2.0.0",
   "presentation": {
     "echo": true,
-    "clear": true,
+    "clear": false,
     "panel": "dedicated",
     "showReuseMessage": false
   },
@@ -16,13 +16,14 @@
       "detail": "Pull latest, clean, rebuild, format, lint, and run tests",
       "dependsOn": [
         "Git: pull",
-        "Clean: all outputs",
-        "Build: all projects (full rebuild)",
+        "Clean: All outputs",
+        "Build: All projects (full rebuild)",
         "Lint: All (fix)",
-        "Test: all tests"
+        "Test: All tests"
       ],
       "dependsOrder": "sequence",
-      "group": "build"
+      "group": "build",
+      "problemMatcher": ["$tsc", "$msCompile", "$markdownlint"]
     },
     {
       "label": "Git: pull",
@@ -31,51 +32,48 @@
       "command": "git pull || echo 'No remote branch'"
     },
     {
-      "label": "Install: All dependencies",
+      "label": "Install: All package dependencies",
       "detail": "Restore NuGet and Node.js packages across workspaces",
-      "dependsOn": ["Install: NuGet packages", "Install: pnpm dependencies"],
+      "dependsOn": ["Install: Packages (NuGet)", "Install: Packages (pnpm)"],
       "dependsOrder": "parallel"
     },
     {
-      "label": "Install: pnpm dependencies",
+      "label": "Install: Packages (pnpm)",
       "detail": "Restore Node.js packages across workspaces",
       "type": "shell",
       "command": "pnpm install"
     },
     {
-      "label": "Install: NuGet packages",
+      "label": "Install: Packages (NuGet)",
       "detail": "Restore .NET packages for solution",
       "type": "shell",
       "command": "dotnet restore Charts.sln",
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Clean: all outputs",
+      "label": "Clean: All outputs",
       "detail": "Clean build outputs from all projects",
-      "dependsOn": ["Clean: frontend outputs", "Clean: backend outputs"],
+      "dependsOn": ["Clean: Website outputs", "Clean: Backend .NET outputs"],
       "dependsOrder": "parallel",
       "group": "build"
     },
     {
-      "label": "Clean: frontend outputs",
+      "label": "Clean: Website outputs",
       "detail": "Clean Angular build outputs (dist, coverage)",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client run clean"
     },
     {
-      "label": "Clean: backend outputs",
+      "label": "Clean: Backend .NET outputs",
       "detail": "Clean .NET build outputs (bin, obj)",
       "type": "shell",
       "command": "dotnet clean Charts.sln -v minimal --nologo",
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Build: all projects (incremental)",
-      "detail": "Incremental build of frontend and backend",
-      "dependsOn": [
-        "Build: frontend (incremental)",
-        "Build: backend (incremental)"
-      ],
+      "label": "Build: All projects (incremental)",
+      "detail": "Incremental build of Website and Backend .NET code",
+      "dependsOn": ["Build: Backend .NET code (incremental)", "Build: Website"],
       "dependsOrder": "parallel",
       "group": {
         "kind": "build",
@@ -84,19 +82,19 @@
       "problemMatcher": ["$tsc", "$msCompile"]
     },
     {
-      "label": "Build: all projects (full rebuild)",
+      "label": "Build: All projects (full rebuild)",
       "detail": "Full rebuild without incremental compilation",
       "dependsOn": [
-        "Clean: all outputs",
-        "Build: frontend (incremental)",
-        "Build: backend (incremental)"
+        "Clean: All outputs",
+        "Build: Backend .NET code (non-incremental)",
+        "Build: Website"
       ],
       "dependsOrder": "sequence",
       "group": "build",
       "problemMatcher": ["$tsc", "$msCompile"]
     },
     {
-      "label": "Build: frontend (incremental)",
+      "label": "Build: Website",
       "detail": "Build Angular application",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client run build",
@@ -104,7 +102,15 @@
       "problemMatcher": "$tsc"
     },
     {
-      "label": "Build: backend (incremental)",
+      "label": "Build: Backend .NET code (non-incremental)",
+      "detail": "Build .NET solution",
+      "type": "shell",
+      "command": "dotnet build Charts.sln -v minimal --nologo --no-incremental",
+      "group": "build",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Build: Backend .NET code (incremental)",
       "detail": "Build .NET solution",
       "type": "shell",
       "command": "dotnet build Charts.sln -v minimal --nologo",
@@ -112,7 +118,7 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Build: backend (production)",
+      "label": "Build: Backend .NET code (production)",
       "detail": "Build .NET solution in Release configuration",
       "type": "shell",
       "command": "dotnet build Charts.sln -c Release -v minimal --nologo",
@@ -123,9 +129,9 @@
       "label": "Lint: All (check)",
       "detail": "Run all linting checks without fixes",
       "dependsOn": [
-        "Lint: frontend code (check)",
-        "Lint: backend code (check)",
-        "Lint: markdown files (check)"
+        "Lint: Website code (check)",
+        "Lint: Backend .NET code (check)",
+        "Lint: Markdown (check)"
       ],
       "dependsOrder": "parallel",
       "group": "test",
@@ -134,21 +140,24 @@
     {
       "label": "Lint: All (fix)",
       "detail": "Auto-fix all linting issues",
-      "dependsOn": ["Lint: All code (fix)", "Lint: markdown files (fix)"],
+      "dependsOn": ["Lint: All code (fix)", "Lint: Markdown (fix)"],
       "dependsOrder": "sequence",
       "group": "none",
       "problemMatcher": "$markdownlint"
     },
     {
       "label": "Lint: All code (fix)",
-      "detail": "Format frontend and backend code",
-      "dependsOn": ["Lint: frontend code (fix)", "Lint: backend code (fix)"],
+      "detail": "Format Website and Backend .NET code",
+      "dependsOn": [
+        "Lint: Website code (fix)",
+        "Lint: Backend .NET code (fix)"
+      ],
       "dependsOrder": "parallel",
       "group": "none",
       "problemMatcher": ["$tsc", "$markdownlint"]
     },
     {
-      "label": "Lint: frontend code (check)",
+      "label": "Lint: Website code (check)",
       "detail": "Check Angular code with ESLint",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client run lint",
@@ -156,7 +165,7 @@
       "problemMatcher": "$eslint-stylish"
     },
     {
-      "label": "Lint: frontend code (fix)",
+      "label": "Lint: Website code (fix)",
       "detail": "Format Angular code with Prettier",
       "type": "shell",
       "command": "pnpm run format:web",
@@ -164,25 +173,25 @@
       "problemMatcher": "$tsc"
     },
     {
-      "label": "Lint: backend code (check)",
+      "label": "Lint: Backend .NET code (check)",
       "detail": "Run Roslynator analysis and .NET format check",
       "type": "shell",
       "command": "dotnet format --verify-no-changes && roslynator analyze",
-      "dependsOn": ["Build: backend (incremental)"],
+      "dependsOn": ["Build: Backend .NET code (incremental)"],
       "dependsOrder": "sequence",
       "group": "test",
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Lint: backend code (fix)",
-      "detail": "Format .NET code with dotnet format and Roslynator",
+      "label": "Lint: Backend .NET code (fix)",
+      "detail": "Format Backend .NET code with dotnet format and Roslynator",
       "type": "shell",
       "command": "roslynator fix && dotnet format",
       "group": "none",
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Lint: markdown files (check)",
+      "label": "Lint: Markdown (check)",
       "detail": "Lint markdown files",
       "type": "shell",
       "command": "pnpm run lint:md",
@@ -190,7 +199,7 @@
       "problemMatcher": "$markdownlint"
     },
     {
-      "label": "Lint: markdown files (fix)",
+      "label": "Lint: Markdown (fix)",
       "detail": "Auto-fix markdown formatting issues",
       "type": "shell",
       "command": "pnpm run lint:md:fix",
@@ -198,15 +207,15 @@
       "problemMatcher": "$markdownlint"
     },
     {
-      "label": "Test: all tests",
-      "detail": "Run frontend and backend unit tests",
-      "dependsOn": ["Test: frontend", "Test: backend"],
+      "label": "Test: All tests",
+      "detail": "Run Website and Backend .NET code unit tests",
+      "dependsOn": ["Test: Website", "Test: Backend .NET code"],
       "dependsOrder": "parallel",
       "group": "test",
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Test: frontend",
+      "label": "Test: Website",
       "detail": "Run Angular unit tests",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client run test",
@@ -215,7 +224,7 @@
       "presentation": { "clear": true }
     },
     {
-      "label": "Test: backend",
+      "label": "Test: Backend .NET code",
       "detail": "Run .NET unit tests",
       "type": "shell",
       "command": "pnpm run test:dotnet",
@@ -224,13 +233,13 @@
       "presentation": { "clear": true }
     },
     {
-      "label": "Start: full development stack",
-      "detail": "Start all backend services and frontend dev server",
+      "label": "Run: Full development stack",
+      "detail": "Start all Backend .NET code services and Website dev server",
       "dependsOn": [
-        "Start: Azure Storage Emulator",
-        "Start: Azure Functions",
-        "Start: Web API",
-        "Start: frontend dev server"
+        "Run: Azure Storage Emulator",
+        "Run: Azure Functions",
+        "Run: Web API",
+        "Run: Website dev server"
       ],
       "dependsOrder": "sequence",
       "group": "build",
@@ -240,7 +249,7 @@
       }
     },
     {
-      "label": "Start: Azure Storage Emulator",
+      "label": "Run: Azure Storage Emulator",
       "detail": "Start Azurite (Azure Storage Emulator)",
       "type": "shell",
       "command": "pnpm run azure:start",
@@ -265,11 +274,11 @@
       }
     },
     {
-      "label": "Start: Azure Functions",
+      "label": "Run: Azure Functions",
       "detail": "Start Azure Functions host",
       "type": "shell",
       "command": "func start",
-      "dependsOn": "Build: backend (incremental)",
+      "dependsOn": "Build: Backend .NET code (incremental)",
       "dependsOrder": "sequence",
       "isBackground": true,
       "options": {
@@ -295,7 +304,7 @@
       }
     },
     {
-      "label": "Start: Web API",
+      "label": "Run: Web API",
       "detail": "Start ASP.NET Core Web API server",
       "type": "shell",
       "command": "dotnet run",
@@ -323,7 +332,7 @@
       }
     },
     {
-      "label": "Start: frontend dev server",
+      "label": "Run: Website dev server",
       "detail": "Start Angular development server (with HMR)",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client run start",

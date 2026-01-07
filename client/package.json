@@ -2,10 +2,10 @@
   "name": "@stock-charts/client",
   "description": "Angular frontend for stock charts application",
   "type": "module",
-  "packageManager": "pnpm@10.25.0",
+  "packageManager": "pnpm@10.27.0",
   "engines": {
-    "node": ">=24.11.1",
-    "pnpm": ">=10.25.0"
+    "node": ">=24.12.0",
+    "pnpm": ">=10.27.0"
   },
   "scripts": {
     "ng": "ng",

@@ -10,7 +10,7 @@ using WebApi.Services;
 
 namespace Functions;
 
-public class Jobs
+public partial class Jobs
 {
     private readonly ILogger _logger;
     private readonly IConfiguration _configuration;
@@ -34,12 +34,12 @@ public class Jobs
     }
 
     /// <summary>
-    ///   Schedule to get and cache quotes from source feed.
+    /// Schedule to get and cache quotes from source feed.
     /// </summary>
-    /// <param name="myTimer" cref="TimerInfo">CRON-based schedule</param>
+    /// <param name="_" cref="TimerInfo">CRON-based schedule</param>
     /// <remarks>Depends on TZ environment settings for EST time zone</remarks>
     [Function("UpdateQuotes")]
-    public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5")] TimerInfo myTimer)
+    public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5")] TimerInfo _)
     {
         // ~ extended market hours, every minute "0 */1 08-18 * * 1-5"
         // for dev: minutely "0 */1 * * * *"
@@ -49,9 +49,7 @@ public class Jobs
         };
         await Task.WhenAll(tasks);
 
-        _logger.LogInformation(
-            "Quotes updated on {date and time} for {schedule status}.",
-             DateTime.Now, myTimer.ScheduleStatus);
+        LogQuotesUpdated(DateTime.Now);
     }
 
     private (string? key, string? secret) GetAlpacaCredentials()
@@ -116,7 +114,7 @@ public class Jobs
     }
 
     /// <summary>
-    ///   STORE QUOTES: get and store historical quotes to blob storage provider.
+    /// STORE QUOTES: get and store historical quotes to blob storage provider.
     /// </summary>
     /// <param name="symbol">Security symbol</param>
     /// <exception cref="ArgumentNullException">
@@ -157,7 +155,12 @@ public class Jobs
         // store in Azure Blob Storage
         string blobName = $"{symbol}-DAILY.json";
         await _storage.PutBlobAsync(blobName, json);
-
-        _logger.LogInformation("Updated {blobName name}.", blobName);
+        LogBlobUpdated(blobName);
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Quotes updated on {UpdatedDate}.")]
+    private partial void LogQuotesUpdated(DateTime updatedDate);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Updated {BlobName}.")]
+    private partial void LogBlobUpdated(string blobName);
 }
