@@ -9,6 +9,7 @@
     "panel": "dedicated",
     "showReuseMessage": false
   },
+  "problemMatcher": [],
   "tasks": [
     {
       "label": "Initialize: Pull, rebuild, and verify",
@@ -21,25 +22,28 @@
         "Test: all tests"
       ],
       "dependsOrder": "sequence",
-      "group": "build",
-      "problemMatcher": []
+      "group": "build"
     },
     {
       "label": "Git: pull",
       "detail": "Pull latest changes from Git",
       "type": "shell",
-      "command": "git pull || echo 'No remote branch'",
-      "problemMatcher": []
+      "command": "git pull || echo 'No remote branch'"
     },
     {
-      "label": "Restore: pnpm dependencies",
+      "label": "Install: All dependencies",
+      "detail": "Restore NuGet and Node.js packages across workspaces",
+      "dependsOn": ["Install: NuGet packages", "Install: pnpm dependencies"],
+      "dependsOrder": "parallel"
+    },
+    {
+      "label": "Install: pnpm dependencies",
       "detail": "Restore Node.js packages across workspaces",
       "type": "shell",
-      "command": "pnpm install",
-      "problemMatcher": []
+      "command": "pnpm install"
     },
     {
-      "label": "Restore: NuGet packages",
+      "label": "Install: NuGet packages",
       "detail": "Restore .NET packages for solution",
       "type": "shell",
       "command": "dotnet restore Charts.sln",
@@ -50,15 +54,13 @@
       "detail": "Clean build outputs from all projects",
       "dependsOn": ["Clean: frontend outputs", "Clean: backend outputs"],
       "dependsOrder": "parallel",
-      "group": "build",
-      "problemMatcher": []
+      "group": "build"
     },
     {
       "label": "Clean: frontend outputs",
       "detail": "Clean Angular build outputs (dist, coverage)",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run clean",
-      "problemMatcher": []
+      "command": "pnpm --filter @stock-charts/client run clean"
     },
     {
       "label": "Clean: backend outputs",
@@ -232,7 +234,6 @@
       ],
       "dependsOrder": "sequence",
       "group": "build",
-      "problemMatcher": [],
       "presentation": {
         "reveal": "always",
         "panel": "shared"
@@ -363,8 +364,7 @@
       "detail": "Delete local Azurite data and state",
       "type": "shell",
       "command": "pnpm run azure:clean",
-      "group": "none",
-      "problemMatcher": []
+      "group": "none"
     }
   ]
 }
