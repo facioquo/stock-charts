@@ -19,20 +19,10 @@
       "type": "http",
       "url": "https://learn.microsoft.com/api/mcp"
     },
-    "next-devtools": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "next-devtools-mcp@latest"]
-    },
     "playwright": {
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "playwright", "run-test-mcp-server"]
-    },
-    "primer": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@primer/mcp@latest"]
     }
   }
 }

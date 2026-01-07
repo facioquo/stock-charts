@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/prettierrc.json",
   "printWidth": 80,
   "tabWidth": 2,
   "useTabs": false,
@@ -10,6 +11,8 @@
   "bracketSameLine": false,
   "arrowParens": "avoid",
   "endOfLine": "lf",
+  "arrayBracketNewline": false,
+  "proseWrap": "preserve",
   "overrides": [
     {
       "files": ["**/*.json", "**/*.jsonc"],
@@ -17,7 +20,8 @@
         "printWidth": 120,
         "bracketSpacing": true,
         "trailingComma": "none",
-        "singleQuote": false
+        "singleQuote": false,
+        "arrayExpand": false
       }
     },
     {
