@@ -81,8 +81,7 @@
       "label": "Clean: Root and Azure storage",
       "detail": "Clean Azurite and root level items, including npm packages",
       "type": "shell",
-      "command": "pnpm run clean",
-      "problemMatcher": "$msCompile"
+      "command": "pnpm run clean"
     },
     {
       "label": "Build: All projects (incremental)",
