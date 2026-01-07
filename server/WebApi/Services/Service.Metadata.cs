@@ -2600,6 +2600,1381 @@ public static class Metadata
                         DefaultColor = ChartColors.ThresholdGrayTransparent
                     }
                 ]
+            },
+
+            // Awesome Oscillator
+            new IndicatorListing {
+                Name = "Awesome Oscillator (AO)",
+                Uiid = "AO",
+                LegendTemplate = "AO([P1],[P2])",
+                Endpoint = $"{baseUrl}/AWESOME/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Fast Periods",
+                        ParamName = "fastPeriods",
+                        DataType = "int",
+                        DefaultValue = 5,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new() {
+                        DisplayName = "Slow Periods",
+                        ParamName = "slowPeriods",
+                        DataType = "int",
+                        DefaultValue = 34,
+                        Minimum = 2,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Awesome Oscillator",
+                        TooltipTemplate = "AO([P1],[P2])",
+                        DataName = "oscillator",
+                        DataType = "number",
+                        LineType = "bar",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Balance of Power (BOP)
+            new IndicatorListing {
+                Name = "Balance of Power (BOP)",
+                Uiid = "BOP",
+                LegendTemplate = "BOP([P1])",
+                Endpoint = $"{baseUrl}/BOP/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Smooth Periods",
+                        ParamName = "smoothPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Balance of Power",
+                        TooltipTemplate = "BOP([P1])",
+                        DataName = "bop",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Chaikin Oscillator
+            new IndicatorListing {
+                Name = "Chaikin Oscillator",
+                Uiid = "CHAIKIN",
+                LegendTemplate = "CHAIKIN([P1],[P2])",
+                Endpoint = $"{baseUrl}/CHAIKIN/",
+                Category = "volume-based",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Fast Periods",
+                        ParamName = "fastPeriods",
+                        DataType = "int",
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new() {
+                        DisplayName = "Slow Periods",
+                        ParamName = "slowPeriods",
+                        DataType = "int",
+                        DefaultValue = 10,
+                        Minimum = 2,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Chaikin Oscillator",
+                        TooltipTemplate = "CHAIKIN([P1],[P2])",
+                        DataName = "oscillator",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Double Exponential Moving Average (DEMA)
+            new IndicatorListing {
+                Name = "Double Exponential Moving Average (DEMA)",
+                Uiid = "DEMA",
+                LegendTemplate = "DEMA([P1])",
+                Endpoint = $"{baseUrl}/DEMA/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "DEMA",
+                        TooltipTemplate = "DEMA([P1])",
+                        DataName = "dema",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Detrended Price Oscillator (DPO)
+            new IndicatorListing {
+                Name = "Detrended Price Oscillator (DPO)",
+                Uiid = "DPO",
+                LegendTemplate = "DPO([P1])",
+                Endpoint = $"{baseUrl}/DPO/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "DPO",
+                        TooltipTemplate = "DPO([P1])",
+                        DataName = "dpo",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Force Index
+            new IndicatorListing {
+                Name = "Force Index",
+                Uiid = "FORCE",
+                LegendTemplate = "FORCE([P1])",
+                Endpoint = $"{baseUrl}/FORCE/",
+                Category = "volume-based",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 13,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Force Index",
+                        TooltipTemplate = "FORCE([P1])",
+                        DataName = "forceIndex",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Hull Moving Average (HMA)
+            new IndicatorListing {
+                Name = "Hull Moving Average (HMA)",
+                Uiid = "HMA",
+                LegendTemplate = "HMA([P1])",
+                Endpoint = $"{baseUrl}/HMA/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 2,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "HMA",
+                        TooltipTemplate = "HMA([P1])",
+                        DataName = "hma",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Kaufman Adaptive Moving Average (KAMA)
+            new IndicatorListing {
+                Name = "Kaufman Adaptive Moving Average (KAMA)",
+                Uiid = "KAMA",
+                LegendTemplate = "KAMA([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/KAMA/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "ER Periods",
+                        ParamName = "erPeriods",
+                        DataType = "int",
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new() {
+                        DisplayName = "Fast Periods",
+                        ParamName = "fastPeriods",
+                        DataType = "int",
+                        DefaultValue = 2,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new() {
+                        DisplayName = "Slow Periods",
+                        ParamName = "slowPeriods",
+                        DataType = "int",
+                        DefaultValue = 30,
+                        Minimum = 2,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "KAMA",
+                        TooltipTemplate = "KAMA([P1],[P2],[P3])",
+                        DataName = "kama",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // On-Balance Volume (OBV)
+            new IndicatorListing {
+                Name = "On-Balance Volume (OBV)",
+                Uiid = "OBV",
+                LegendTemplate = "OBV w/ SMA([P1])",
+                Endpoint = $"{baseUrl}/OBV/",
+                Category = "volume-based",
+                ChartType = "oscillator",
+                Parameters = [
+                    new() {
+                        DisplayName = "SMA Periods",
+                        ParamName = "smaPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 0,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "OBV",
+                        TooltipTemplate = "OBV",
+                        DataName = "obv",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "SMA of OBV",
+                        TooltipTemplate = "OBV SMA([P1])",
+                        DataName = "obvSma",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardRed
+                    }
+                ]
+            },
+
+            // Price Momentum Oscillator (PMO)
+            new IndicatorListing {
+                Name = "Price Momentum Oscillator (PMO)",
+                Uiid = "PMO",
+                LegendTemplate = "PMO([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/PMO/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Time Periods",
+                        ParamName = "timePeriods",
+                        DataType = "int",
+                        DefaultValue = 35,
+                        Minimum = 2,
+                        Maximum = 250
+                    },
+                    new() {
+                        DisplayName = "Smooth Periods",
+                        ParamName = "smoothPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 100
+                    },
+                    new() {
+                        DisplayName = "Signal Periods",
+                        ParamName = "signalPeriods",
+                        DataType = "int",
+                        DefaultValue = 10,
+                        Minimum = 1,
+                        Maximum = 50
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "PMO",
+                        TooltipTemplate = "PMO([P1],[P2],[P3])",
+                        DataName = "pmo",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "Signal",
+                        TooltipTemplate = "PMO Signal",
+                        DataName = "signal",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardRed
+                    }
+                ]
+            },
+
+            // Smoothed Moving Average (SMMA)
+            new IndicatorListing {
+                Name = "Smoothed Moving Average (SMMA)",
+                Uiid = "SMMA",
+                LegendTemplate = "SMMA([P1])",
+                Endpoint = $"{baseUrl}/SMMA/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "SMMA",
+                        TooltipTemplate = "SMMA([P1])",
+                        DataName = "smma",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Tillson T3 Moving Average
+            new IndicatorListing {
+                Name = "Tillson T3 Moving Average",
+                Uiid = "T3",
+                LegendTemplate = "T3([P1],[P2])",
+                Endpoint = $"{baseUrl}/T3/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 5,
+                        Minimum = 1,
+                        Maximum = 63
+                    },
+                    new() {
+                        DisplayName = "Volume Factor",
+                        ParamName = "volumeFactor",
+                        DataType = "number",
+                        DefaultValue = 0.7,
+                        Minimum = 0.1,
+                        Maximum = 2
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "T3",
+                        TooltipTemplate = "T3([P1],[P2])",
+                        DataName = "t3",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Triple Exponential Moving Average (TEMA)
+            new IndicatorListing {
+                Name = "Triple Exponential Moving Average (TEMA)",
+                Uiid = "TEMA",
+                LegendTemplate = "TEMA([P1])",
+                Endpoint = $"{baseUrl}/TEMA/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "TEMA",
+                        TooltipTemplate = "TEMA([P1])",
+                        DataName = "tema",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // TRIX Oscillator
+            new IndicatorListing {
+                Name = "TRIX Oscillator",
+                Uiid = "TRIX",
+                LegendTemplate = "TRIX([P1],[P2])",
+                Endpoint = $"{baseUrl}/TRIX/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new() {
+                        DisplayName = "Signal Periods",
+                        ParamName = "signalPeriods",
+                        DataType = "int",
+                        DefaultValue = 9,
+                        Minimum = 0,
+                        Maximum = 50
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "TRIX",
+                        TooltipTemplate = "TRIX([P1],[P2])",
+                        DataName = "trix",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "Signal",
+                        TooltipTemplate = "TRIX Signal",
+                        DataName = "signal",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardRed
+                    }
+                ]
+            },
+
+            // True Strength Index (TSI)
+            new IndicatorListing {
+                Name = "True Strength Index (TSI)",
+                Uiid = "TSI",
+                LegendTemplate = "TSI([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/TSI/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 25,
+                            Color = ChartColors.ThresholdRed,
+                            Style = "dash",
+                            Fill = new ChartFill {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = ChartColors.ThresholdGreen
+                            }
+                        },
+                        new() {
+                            Value = -25,
+                            Color = ChartColors.ThresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartFill {
+                                Target = "+1",
+                                ColorAbove = ChartColors.ThresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 25,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new() {
+                        DisplayName = "Smooth Periods",
+                        ParamName = "smoothPeriods",
+                        DataType = "int",
+                        DefaultValue = 13,
+                        Minimum = 1,
+                        Maximum = 100
+                    },
+                    new() {
+                        DisplayName = "Signal Periods",
+                        ParamName = "signalPeriods",
+                        DataType = "int",
+                        DefaultValue = 7,
+                        Minimum = 0,
+                        Maximum = 50
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "TSI",
+                        TooltipTemplate = "TSI([P1],[P2],[P3])",
+                        DataName = "tsi",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "Signal",
+                        TooltipTemplate = "TSI Signal",
+                        DataName = "signal",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardRed
+                    }
+                ]
+            },
+
+            // Ultimate Oscillator
+            new IndicatorListing {
+                Name = "Ultimate Oscillator",
+                Uiid = "ULTIMATE",
+                LegendTemplate = "ULTIMATE([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/ULTIMATE/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    MinimumYAxis = 0,
+                    MaximumYAxis = 100,
+
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 70,
+                            Color = ChartColors.ThresholdRed,
+                            Style = "dash",
+                            Fill = new ChartFill {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = ChartColors.ThresholdGreen
+                            }
+                        },
+                        new() {
+                            Value = 30,
+                            Color = ChartColors.ThresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartFill {
+                                Target = "+1",
+                                ColorAbove = ChartColors.ThresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Short Periods",
+                        ParamName = "shortPeriods",
+                        DataType = "int",
+                        DefaultValue = 7,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new() {
+                        DisplayName = "Middle Periods",
+                        ParamName = "middlePeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 2,
+                        Maximum = 100
+                    },
+                    new() {
+                        DisplayName = "Long Periods",
+                        ParamName = "longPeriods",
+                        DataType = "int",
+                        DefaultValue = 28,
+                        Minimum = 3,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Ultimate Oscillator",
+                        TooltipTemplate = "ULTIMATE([P1],[P2],[P3])",
+                        DataName = "ultimate",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Williams %R
+            new IndicatorListing {
+                Name = "Williams %R",
+                Uiid = "WILLIAMSR",
+                LegendTemplate = "Williams %R([P1])",
+                Endpoint = $"{baseUrl}/WILLIAMSR/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    MinimumYAxis = -100,
+                    MaximumYAxis = 0,
+
+                    Thresholds =
+                    [
+                        new() {
+                            Value = -20,
+                            Color = ChartColors.ThresholdRed,
+                            Style = "dash",
+                            Fill = new ChartFill {
+                                Target = "+2",
+                                ColorAbove = "transparent",
+                                ColorBelow = ChartColors.ThresholdGreen
+                            }
+                        },
+                        new() {
+                            Value = -80,
+                            Color = ChartColors.ThresholdGreen,
+                            Style = "dash",
+                            Fill = new ChartFill {
+                                Target = "+1",
+                                ColorAbove = ChartColors.ThresholdRed,
+                                ColorBelow = "transparent"
+                            }
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Williams %R",
+                        TooltipTemplate = "Williams %R([P1])",
+                        DataName = "williamsR",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Weighted Moving Average (WMA)
+            new IndicatorListing {
+                Name = "Weighted Moving Average (WMA)",
+                Uiid = "WMA",
+                LegendTemplate = "WMA([P1])",
+                Endpoint = $"{baseUrl}/WMA/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "WMA",
+                        TooltipTemplate = "WMA([P1])",
+                        DataName = "wma",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Klinger Volume Oscillator (KVO)
+            new IndicatorListing {
+                Name = "Klinger Volume Oscillator (KVO)",
+                Uiid = "KVO",
+                LegendTemplate = "KVO([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/KVO/",
+                Category = "volume-based",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Fast Periods",
+                        ParamName = "fastPeriods",
+                        DataType = "int",
+                        DefaultValue = 34,
+                        Minimum = 3,
+                        Maximum = 100
+                    },
+                    new() {
+                        DisplayName = "Slow Periods",
+                        ParamName = "slowPeriods",
+                        DataType = "int",
+                        DefaultValue = 55,
+                        Minimum = 4,
+                        Maximum = 200
+                    },
+                    new() {
+                        DisplayName = "Signal Periods",
+                        ParamName = "signalPeriods",
+                        DataType = "int",
+                        DefaultValue = 13,
+                        Minimum = 1,
+                        Maximum = 50
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "KVO",
+                        TooltipTemplate = "KVO([P1],[P2],[P3])",
+                        DataName = "oscillator",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "Signal",
+                        TooltipTemplate = "KVO Signal",
+                        DataName = "signal",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardRed
+                    }
+                ]
+            },
+
+            // MESA Adaptive Moving Average (MAMA)
+            new IndicatorListing {
+                Name = "MESA Adaptive Moving Average (MAMA)",
+                Uiid = "MAMA",
+                LegendTemplate = "MAMA([P1],[P2])",
+                Endpoint = $"{baseUrl}/MAMA/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Fast Limit",
+                        ParamName = "fastLimit",
+                        DataType = "number",
+                        DefaultValue = 0.5,
+                        Minimum = 0.1,
+                        Maximum = 0.99
+                    },
+                    new() {
+                        DisplayName = "Slow Limit",
+                        ParamName = "slowLimit",
+                        DataType = "number",
+                        DefaultValue = 0.05,
+                        Minimum = 0.01,
+                        Maximum = 0.5
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "MAMA",
+                        TooltipTemplate = "MAMA([P1],[P2])",
+                        DataName = "mama",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "FAMA",
+                        TooltipTemplate = "FAMA([P1],[P2])",
+                        DataName = "fama",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardRed
+                    }
+                ]
+            },
+
+            // Moving Average Envelopes
+            new IndicatorListing {
+                Name = "Moving Average Envelopes",
+                Uiid = "MA-ENV",
+                LegendTemplate = "MA-ENV([P1],[P2]%)",
+                Endpoint = $"{baseUrl}/MA-ENV/",
+                Category = "price-channel",
+                ChartType = "overlay",
+                Order = Order.BehindPrice,
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 2,
+                        Maximum = 250
+                    },
+                    new() {
+                        DisplayName = "Percent Offset",
+                        ParamName = "percentOffset",
+                        DataType = "number",
+                        DefaultValue = 2.5,
+                        Minimum = 0.1,
+                        Maximum = 25
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Upper Envelope",
+                        TooltipTemplate = "MA-ENV([P1],[P2]%) Upper",
+                        DataName = "upperEnvelope",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1,
+                        DefaultColor = ChartColors.StandardOrange,
+                        Fill = new ChartFill {
+                            Target = "+2",
+                            ColorAbove = ChartColors.DarkGrayTransparent,
+                            ColorBelow = ChartColors.DarkGrayTransparent
+                        }
+                    },
+                    new() {
+                        DisplayName = "Centerline",
+                        TooltipTemplate = "MA-ENV([P1],[P2]%) Center",
+                        DataName = "centerline",
+                        DataType = "number",
+                        LineType = "dash",
+                        LineWidth = 1,
+                        DefaultColor = ChartColors.StandardOrange
+                    },
+                    new() {
+                        DisplayName = "Lower Envelope",
+                        TooltipTemplate = "MA-ENV([P1],[P2]%) Lower",
+                        DataName = "lowerEnvelope",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1,
+                        DefaultColor = ChartColors.StandardOrange
+                    }
+                ]
+            },
+
+            // Percentage Volume Oscillator (PVO)
+            new IndicatorListing {
+                Name = "Percentage Volume Oscillator (PVO)",
+                Uiid = "PVO",
+                LegendTemplate = "PVO([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/PVO/",
+                Category = "volume-based",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Fast Periods",
+                        ParamName = "fastPeriods",
+                        DataType = "int",
+                        DefaultValue = 12,
+                        Minimum = 1,
+                        Maximum = 100
+                    },
+                    new() {
+                        DisplayName = "Slow Periods",
+                        ParamName = "slowPeriods",
+                        DataType = "int",
+                        DefaultValue = 26,
+                        Minimum = 2,
+                        Maximum = 250
+                    },
+                    new() {
+                        DisplayName = "Signal Periods",
+                        ParamName = "signalPeriods",
+                        DataType = "int",
+                        DefaultValue = 9,
+                        Minimum = 0,
+                        Maximum = 50
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "PVO",
+                        TooltipTemplate = "PVO([P1],[P2],[P3])",
+                        DataName = "pvo",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "Signal",
+                        TooltipTemplate = "PVO Signal",
+                        DataName = "signal",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardRed
+                    },
+                    new() {
+                        DisplayName = "Histogram",
+                        TooltipTemplate = "PVO Histogram",
+                        DataName = "histogram",
+                        DataType = "number",
+                        LineType = "bar",
+                        DefaultColor = ChartColors.StandardGrayTransparent
+                    }
+                ]
+            },
+
+            // Standard Deviation Channels
+            new IndicatorListing {
+                Name = "Standard Deviation Channels",
+                Uiid = "STDEV-CH",
+                LegendTemplate = "STDEV-CH([P1],[P2])",
+                Endpoint = $"{baseUrl}/STDEV-CH/",
+                Category = "price-channel",
+                ChartType = "overlay",
+                Order = Order.BehindPrice,
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 2,
+                        Maximum = 250
+                    },
+                    new() {
+                        DisplayName = "Standard Deviations",
+                        ParamName = "standardDeviations",
+                        DataType = "number",
+                        DefaultValue = 2,
+                        Minimum = 0.1,
+                        Maximum = 10
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Upper Channel",
+                        TooltipTemplate = "STDEV-CH Upper",
+                        DataName = "upperChannel",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1,
+                        DefaultColor = ChartColors.StandardOrange,
+                        Fill = new ChartFill {
+                            Target = "+2",
+                            ColorAbove = ChartColors.DarkGrayTransparent,
+                            ColorBelow = ChartColors.DarkGrayTransparent
+                        }
+                    },
+                    new() {
+                        DisplayName = "Centerline",
+                        TooltipTemplate = "STDEV-CH Centerline",
+                        DataName = "centerline",
+                        DataType = "number",
+                        LineType = "dash",
+                        LineWidth = 1,
+                        DefaultColor = ChartColors.StandardOrange
+                    },
+                    new() {
+                        DisplayName = "Lower Channel",
+                        TooltipTemplate = "STDEV-CH Lower",
+                        DataName = "lowerChannel",
+                        DataType = "number",
+                        LineType = "solid",
+                        LineWidth = 1,
+                        DefaultColor = ChartColors.StandardOrange
+                    }
+                ]
+            },
+
+            // Volume Weighted Average Price (VWAP)
+            new IndicatorListing {
+                Name = "Volume Weighted Average Price (VWAP)",
+                Uiid = "VWAP",
+                LegendTemplate = "VWAP",
+                Endpoint = $"{baseUrl}/VWAP/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "VWAP",
+                        TooltipTemplate = "VWAP",
+                        DataName = "vwap",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Volume Weighted Moving Average (VWMA)
+            new IndicatorListing {
+                Name = "Volume Weighted Moving Average (VWMA)",
+                Uiid = "VWMA",
+                LegendTemplate = "VWMA([P1])",
+                Endpoint = $"{baseUrl}/VWMA/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "VWMA",
+                        TooltipTemplate = "VWMA([P1])",
+                        DataName = "vwma",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Hurst Exponent
+            new IndicatorListing {
+                Name = "Hurst Exponent",
+                Uiid = "HURST",
+                LegendTemplate = "HURST([P1])",
+                Endpoint = $"{baseUrl}/HURST/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    MinimumYAxis = 0,
+                    MaximumYAxis = 1,
+
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 0.5,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 100,
+                        Minimum = 21,
+                        Maximum = 500
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Hurst Exponent",
+                        TooltipTemplate = "HURST([P1])",
+                        DataName = "hurstExponent",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // ROC with Bands
+            new IndicatorListing {
+                Name = "Rate of Change with Bands",
+                Uiid = "ROCWB",
+                LegendTemplate = "ROCWB([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/ROCWB/",
+                Category = "oscillator",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new() {
+                        DisplayName = "EMA Periods",
+                        ParamName = "emaPeriods",
+                        DataType = "int",
+                        DefaultValue = 3,
+                        Minimum = 1,
+                        Maximum = 50
+                    },
+                    new() {
+                        DisplayName = "StdDev Periods",
+                        ParamName = "stdDevPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "ROC",
+                        TooltipTemplate = "ROCWB([P1],[P2],[P3])",
+                        DataName = "roc",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "ROC EMA",
+                        TooltipTemplate = "ROCWB EMA",
+                        DataName = "rocEma",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardOrange
+                    },
+                    new() {
+                        DisplayName = "Upper Band",
+                        TooltipTemplate = "ROCWB Upper Band",
+                        DataName = "upperBand",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardRed
+                    },
+                    new() {
+                        DisplayName = "Lower Band",
+                        TooltipTemplate = "ROCWB Lower Band",
+                        DataName = "lowerBand",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardGreen
+                    }
+                ]
+            },
+
+            // Volatility Stop
+            new IndicatorListing {
+                Name = "Volatility Stop",
+                Uiid = "VOL-STOP",
+                LegendTemplate = "VOL-STOP([P1],[P2])",
+                Endpoint = $"{baseUrl}/VOL-STOP/",
+                Category = "stop-and-reverse",
+                ChartType = "overlay",
+                Order = Order.Front,
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 7,
+                        Minimum = 2,
+                        Maximum = 100
+                    },
+                    new() {
+                        DisplayName = "Multiplier",
+                        ParamName = "multiplier",
+                        DataType = "number",
+                        DefaultValue = 3,
+                        Minimum = 0.5,
+                        Maximum = 10
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Upper Band",
+                        TooltipTemplate = "VOL-STOP([P1],[P2]) Upper Band",
+                        DataName = "upperBand",
+                        DataType = "number",
+                        LineType = "dots",
+                        LineWidth = 2,
+                        DefaultColor = ChartColors.StandardRed
+                    },
+                    new() {
+                        DisplayName = "Lower Band",
+                        TooltipTemplate = "VOL-STOP([P1],[P2]) Lower Band",
+                        DataName = "lowerBand",
+                        DataType = "number",
+                        LineType = "dots",
+                        LineWidth = 2,
+                        DefaultColor = ChartColors.StandardGreen
+                    }
+                ]
             }
         ];
 
