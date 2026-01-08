@@ -2,12 +2,9 @@ import { HttpClientTestingModule, HttpTestingController } from "@angular/common/
 import { TestBed } from "@angular/core/testing";
 import { MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { env } from "../../environments/environment";
-import backupIndicators from "../data/backup-indicators.json";
 import backupQuotes from "../data/backup-quotes.json"; // Added JSON quotes import
-import { IndicatorListing, RawQuote } from "../pages/chart/chart.models";
+import { RawQuote } from "../pages/chart/chart.models";
 import { ApiService } from "./api.service";
-
-const BACKUP_INDICATORS = backupIndicators as IndicatorListing[];
 
 describe("ApiService", () => {
   let service: ApiService;
@@ -120,68 +117,142 @@ describe("ApiService", () => {
     req.flush(mockIndicators);
   });
 
-  it("should fallback to client backup indicators when API fails", () => {
-    service.getListings().subscribe(indicators => {
-      expect(indicators).toEqual(BACKUP_INDICATORS);
-      expect(indicators.length).toBeGreaterThan(5); // Verify we have multiple indicators
-      // Verify console.warn was called for failover
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        "Backend API unavailable, using client-side backup indicators",
-        expect.any(Object)
-      );
+  describe("getSelectionData", () => {
+    it("should convert relative endpoint URLs to absolute URLs", () => {
+      const selection = {
+        ucid: "test-ucid",
+        uiid: "ADX",
+        label: "ADX(14)",
+        chartType: "oscillator",
+        params: [
+          {
+            paramName: "lookbackPeriods",
+            displayName: "Lookback",
+            minimum: 2,
+            maximum: 250,
+            value: 14
+          }
+        ],
+        results: []
+      };
+
+      const listing = {
+        name: "ADX",
+        uiid: "ADX",
+        legendTemplate: "ADX([P1])",
+        endpoint: "/ADX/", // Relative path
+        category: "test",
+        chartType: "oscillator",
+        order: 0,
+        chartConfig: null,
+        parameters: [],
+        results: []
+      };
+
+      const mockData = [{ date: "2023-01-01", adx: 25 }];
+
+      service.getSelectionData(selection, listing).subscribe(data => {
+        expect(data).toEqual(mockData);
+      });
+
+      // Should request from absolute URL (env.api + relative path)
+      const req = httpMock.expectOne(`${env.api}/ADX/?lookbackPeriods=14`);
+      expect(req.request.method).toBe("GET");
+      req.flush(mockData);
     });
 
-    const req = httpMock.expectOne(`${env.api}/indicators`);
-    expect(req.request.method).toBe("GET");
+    it("should handle absolute endpoint URLs without modification", () => {
+      const selection = {
+        ucid: "test-ucid",
+        uiid: "ADX",
+        label: "ADX(14)",
+        chartType: "oscillator",
+        params: [
+          {
+            paramName: "lookbackPeriods",
+            displayName: "Lookback",
+            minimum: 2,
+            maximum: 250,
+            value: 14
+          }
+        ],
+        results: []
+      };
 
-    // Simulate API failure
-    req.error(new ProgressEvent("Network error"), {
-      status: 0,
-      statusText: "Unknown Error"
+      const listing = {
+        name: "ADX",
+        uiid: "ADX",
+        legendTemplate: "ADX([P1])",
+        endpoint: "https://api.example.com/ADX/", // Absolute URL
+        category: "test",
+        chartType: "oscillator",
+        order: 0,
+        chartConfig: null,
+        parameters: [],
+        results: []
+      };
+
+      const mockData = [{ date: "2023-01-01", adx: 25 }];
+
+      service.getSelectionData(selection, listing).subscribe(data => {
+        expect(data).toEqual(mockData);
+      });
+
+      // Should request from the absolute URL as-is
+      const req = httpMock.expectOne("https://api.example.com/ADX/?lookbackPeriods=14");
+      expect(req.request.method).toBe("GET");
+      req.flush(mockData);
     });
-  });
 
-  it("should fallback to client backup indicators when API returns server error", () => {
-    service.getListings().subscribe(indicators => {
-      expect(indicators).toEqual(BACKUP_INDICATORS);
-      expect(indicators.length).toBeGreaterThan(5);
-      // Verify console.warn was called for failover
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        "Backend API unavailable, using client-side backup indicators",
-        expect.any(Object)
-      );
+    it("should include query parameters in the request", () => {
+      const selection = {
+        ucid: "test-ucid",
+        uiid: "BB",
+        label: "BB(20,2)",
+        chartType: "overlay",
+        params: [
+          {
+            paramName: "lookbackPeriods",
+            displayName: "Lookback",
+            minimum: 2,
+            maximum: 250,
+            value: 20
+          },
+          {
+            paramName: "standardDeviations",
+            displayName: "Std Dev",
+            minimum: 1,
+            maximum: 10,
+            value: 2
+          }
+        ],
+        results: []
+      };
+
+      const listing = {
+        name: "Bollinger Bands",
+        uiid: "BB",
+        legendTemplate: "BB([P1],[P2])",
+        endpoint: "/BB/",
+        category: "test",
+        chartType: "overlay",
+        order: 0,
+        chartConfig: null,
+        parameters: [],
+        results: []
+      };
+
+      const mockData = [{ date: "2023-01-01", upper: 105, middle: 100, lower: 95 }];
+
+      service.getSelectionData(selection, listing).subscribe(data => {
+        expect(data).toEqual(mockData);
+      });
+
+      const req = httpMock.expectOne(`${env.api}/BB/?lookbackPeriods=20&standardDeviations=2`);
+      expect(req.request.method).toBe("GET");
+      expect(req.request.params.get("lookbackPeriods")).toBe("20");
+      expect(req.request.params.get("standardDeviations")).toBe("2");
+      req.flush(mockData);
     });
-
-    const req = httpMock.expectOne(`${env.api}/indicators`);
-    expect(req.request.method).toBe("GET");
-
-    // Simulate server error
-    req.error(new ProgressEvent("Server error"), {
-      status: 500,
-      statusText: "Internal Server Error"
-    });
-  });
-
-  it("client backup indicators should have valid data structure", () => {
-    expect(BACKUP_INDICATORS.length).toBeGreaterThan(5);
-    const firstIndicator = BACKUP_INDICATORS[0];
-    expect(firstIndicator).toHaveProperty("name");
-    expect(firstIndicator).toHaveProperty("uiid");
-    expect(firstIndicator).toHaveProperty("legendTemplate");
-    expect(firstIndicator).toHaveProperty("endpoint");
-    expect(firstIndicator).toHaveProperty("category");
-    expect(firstIndicator).toHaveProperty("chartType");
-    expect(firstIndicator).toHaveProperty("parameters");
-    expect(firstIndicator).toHaveProperty("results");
-    expect(typeof firstIndicator.name).toBe("string");
-    expect(typeof firstIndicator.uiid).toBe("string");
-    expect(Array.isArray(firstIndicator.parameters)).toBe(true);
-    expect(Array.isArray(firstIndicator.results)).toBe(true);
-    const indicatorNames = BACKUP_INDICATORS.map(i => i.uiid);
-    expect(indicatorNames).toContain("SMA");
-    expect(indicatorNames).toContain("EMA");
-    expect(indicatorNames).toContain("RSI");
-    expect(indicatorNames).toContain("MACD");
-    expect(indicatorNames).toContain("BB");
   });
 });
