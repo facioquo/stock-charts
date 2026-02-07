@@ -7,8 +7,8 @@ on:
     branches: ["main"]
 
 env:
-  NODE_VERSION: "24.12.0"
-  PNPM_VERSION: "10.27.0"
+  NODE_VERSION: "24.13.0"
+  PNPM_VERSION: "10.28.2"
 
 jobs:
   test-backend:
@@ -56,6 +56,15 @@ jobs:
             -reports:"server/coverage/**/coverage.cobertura.xml" \
             -targetdir:"server/coverage" \
             -reporttypes:"lcov"
+
+      - name: Upload backend coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./server/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+          fail_ci_if_error: false
 
       - name: Publish backend test results
         uses: dorny/test-reporter@v2
@@ -114,15 +123,6 @@ jobs:
           files: ./client/coverage/lcov.info
           flags: frontend
           name: frontend-coverage
-          fail_ci_if_error: false
-
-      - name: Upload backend coverage to Codecov
-        if: always()
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./server/coverage/lcov.info
-          flags: backend
-          name: backend-coverage
           fail_ci_if_error: false
 
       - name: Upload coverage artifacts
