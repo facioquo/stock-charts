@@ -37,5 +37,5 @@
     "ALPACA_SECRET": "${localEnv:ALPACA_SECRET}",
     "AzureWebJobsStorage": "${localEnv:AzureWebJobsStorage}"
   },
-  "postCreateCommand": "bash .devcontainer/post-create.sh && pnpm install"
+  "postCreateCommand": "bash .devcontainer/post-create.sh"
 }
