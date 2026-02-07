@@ -7,7 +7,7 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 echo "Cleaning .NET project artifacts ..."
 
 echo "→ Removing all 'bin' and 'obj' directories under ${ROOT_DIR}..."
-find "$ROOT_DIR" -type d \( -name bin -o -name obj \) -prune -print0 | while IFS= read -r -d $'\0' dir; do
+find "$ROOT_DIR" -type d \( -name node_modules -o -name .git \) -prune -o -type d \( -name bin -o -name obj \) -print0 | while IFS= read -r -d $'\0' dir; do
   echo "  rm -rf $dir"
   rm -rf "$dir"
 done
