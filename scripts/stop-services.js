@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { exec } = require("child_process");
+const { spawn } = require("child_process");
 const os = require("os");
 
 const isWindows = os.platform() === "win32";
@@ -16,8 +16,9 @@ if (isWindows) {
     "taskkill /F /IM dotnet.exe",
   ];
   cmds.forEach(cmd => {
-    const child = exec(cmd, () => {});
-    child.on("error", () => {});
+    // Split command and args for spawn
+    const [command, ...args] = cmd.split(" ");
+    const child = spawn(command, args, { detached: true, stdio: "ignore" });
     child.unref();
   });
   console.log("✅ Windows termination commands sent");
@@ -28,8 +29,9 @@ if (isWindows) {
     "pkill -TERM -f dotnet",
   ];
   cmds.forEach(cmd => {
-    const child = exec(cmd, () => {});
-    child.on("error", () => {});
+    // Split command and args for spawn
+    const [command, ...args] = cmd.split(" ");
+    const child = spawn(command, args, { detached: true, stdio: "ignore" });
     child.unref();
   });
   console.log("✅ Unix termination commands sent");
