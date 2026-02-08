@@ -45,9 +45,9 @@ if (isWindows) {
   console.log("✅ Windows targeted termination commands sent");
 } else {
   const cmds = [
-    "lsof -ti:4200,5000,5001,7071,10000 | xargs -r kill -TERM",
+    "lsof -ti:4200,5000,5001,7071,10000 | xargs kill -TERM 2>/dev/null",
     "pkill -TERM -x func",
-    "pkill -TERM -x dotnet",
+    "pkill -TERM -x dotnet"
   ];
   cmds.forEach(runCmd);
   console.log("✅ Unix termination commands sent");

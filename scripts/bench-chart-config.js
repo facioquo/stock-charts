@@ -6,10 +6,7 @@
  * Micro-benchmark large dataset config building
  */
 
-import fs from 'fs';
-import path from 'path';
 import { randomInt } from 'crypto';
-import { fileURLToPath } from 'url';
 
 // Mock required modules for Node.js environment
 global.window = {

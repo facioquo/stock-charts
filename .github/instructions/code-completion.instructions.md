@@ -244,7 +244,6 @@ pnpm run format
 
 # Check specific rule violations
 # Enforce zero warnings explicitly (same as quality gate)
-# Enforce zero warnings explicitly (same as quality gate)
 pnpm --filter @stock-charts/client run lint --max-warnings=0
 
 # Use default (stylish) or specify a supported formatter (e.g., 'stylish')

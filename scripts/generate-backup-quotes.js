@@ -73,6 +73,6 @@ function main(){
   console.log(`Wrote ${data.length} backup quotes to ${outPath}`);
 }
 
-if (process.argv[1] === __filename) {
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
   main();
 }
