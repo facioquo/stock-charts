@@ -1,7 +1,8 @@
 #!/usr/bin/env node
+/* global console, process, setImmediate, setTimeout */
 
-const { spawn } = require("child_process");
-const os = require("os");
+import { spawn } from "child_process";
+import os from "os";
 
 const isWindows = os.platform() === "win32";
 
@@ -11,12 +12,15 @@ console.log("🛑 Stopping all development services...");
 function runCmd(cmd) {
   if (Array.isArray(cmd)) {
     const [command, ...args] = cmd;
+    // Note: All commands are hardcoded; no user-controllable input
+    // nosemgrep: javascript.lang.security.detect-child-process
     const child = spawn(command, args, { detached: true, stdio: "ignore" });
     child.unref();
     return;
   }
   // string fallback: split on spaces (keeps previous behavior)
   const [command, ...args] = cmd.split(" ");
+  // nosemgrep: javascript.lang.security.detect-child-process
   const child = spawn(command, args, { detached: true, stdio: "ignore" });
   child.unref();
 }

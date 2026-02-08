@@ -15,7 +15,7 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 ### Prerequisites
 
 - [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
-- [pnpm](https://pnpm.io/) (v10.28.2 or later) - Install with `npm install -g pnpm@10.28.2`
+- [pnpm](https://pnpm.io/) (v10.29.1 or later) - Install with `npm install -g pnpm@10.29.1`
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 

@@ -3,10 +3,11 @@
   "description": "Full-stack financial charting application with Angular frontend and .NET backend",
   "author": "facioquo",
   "license": "Apache-2.0",
-  "packageManager": "pnpm@10.28.2",
+  "type": "module",
+  "packageManager": "pnpm@10.29.1",
   "engines": {
     "node": ">=24.13.0",
-    "pnpm": ">=10.28.2"
+    "pnpm": ">=10.29.1"
   },
   "repository": {
     "type": "git",

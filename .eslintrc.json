@@ -1,0 +1,25 @@
+{
+  "env": {
+    "node": true,
+    "es2024": true
+  },
+  "globals": {
+    "console": "readonly",
+    "process": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2024,
+    "sourceType": "module"
+  },
+  "overrides": [
+    {
+      "files": ["scripts/**/*.js"],
+      "env": {
+        "node": true
+      },
+      "parserOptions": {
+        "sourceType": "module"
+      }
+    }
+  ]
+}

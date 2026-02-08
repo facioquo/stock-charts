@@ -2,7 +2,7 @@
 set -euo pipefail
 
 NODE_VERSION="24.13.0"
-PNPM_VERSION="10.28.2"
+PNPM_VERSION="10.29.1"
 
 NODE_INSTALL_DIR="/usr/local/lib/nodejs/node-v${NODE_VERSION}"
 PROFILE_SNIPPET="/etc/profile.d/node.sh"
