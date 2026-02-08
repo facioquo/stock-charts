@@ -31,3 +31,6 @@ dotnet tool list --global
 # Install Node dependencies
 echo "📦 Installing Node dependencies..."
 pnpm install --frozen-lockfile --loglevel=error --config.confirmModulesPurge=false
+
+# cleanup
+sudo apt-get autoremove --purge -y
