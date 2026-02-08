@@ -11,9 +11,6 @@ import path from 'path';
 import { randomInt } from 'crypto';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 // Mock required modules for Node.js environment
 global.window = {
   innerWidth: 1920,

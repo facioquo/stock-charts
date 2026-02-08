@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* global console, process, setImmediate, setTimeout */
+/* global process, setImmediate, setTimeout */
 
 import { spawn } from "child_process";
 import os from "os";
