@@ -15,6 +15,9 @@ if (isWindows) {
     "taskkill /F /IM func.exe",
     "taskkill /F /IM dotnet.exe",
   ];
+  // WARNING: The following taskkill commands will terminate ALL func.exe and dotnet.exe processes system-wide.
+  // This is destructive and may affect unrelated .NET or Azure Function processes.
+  // Consider tracking PIDs for more targeted kills in future improvements.
   cmds.forEach(cmd => {
     // Split command and args for spawn
     const [command, ...args] = cmd.split(" ");
@@ -25,8 +28,8 @@ if (isWindows) {
 } else {
   const cmds = [
     "lsof -ti:4200,5000,5001,7071,10000 | xargs -r kill -TERM",
-    "pkill -TERM -f func",
-    "pkill -TERM -f dotnet",
+    "pkill -TERM -x func",
+    "pkill -TERM -x dotnet",
   ];
   cmds.forEach(cmd => {
     // Split command and args for spawn
