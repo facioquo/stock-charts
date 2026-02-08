@@ -21,7 +21,7 @@ async function fetchListings() {
   return res.json();
 }
 
-if (process.argv[1] === __filename) {
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
   (async () => {
     console.log(`Fetching indicator listings from: ${apiBase}/indicators`);
     try {

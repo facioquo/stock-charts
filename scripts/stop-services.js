@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* global setImmediate, setTimeout */
+/* global setTimeout */
 
 import { spawn } from "child_process";
 import os from "os";
@@ -45,7 +45,7 @@ if (isWindows) {
   console.log("✅ Windows targeted termination commands sent");
 } else {
   const cmds = [
-    "lsof -ti:4200,5000,5001,7071,10000 | xargs kill -TERM 2>/dev/null",
+    "lsof -ti:4200,5000,5001,7071,10000 | xargs -r kill -TERM 2>/dev/null || true",
     "pkill -TERM -x func",
     "pkill -TERM -x dotnet"
   ];
