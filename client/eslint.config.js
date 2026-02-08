@@ -18,6 +18,9 @@ export default tseslint.config(
       prettier
     ],
     languageOptions: {
+      globals: {
+        console: "readonly"
+      },
       parserOptions: {
         project: ["./tsconfig.eslint.json"],
         sourceType: "module"
