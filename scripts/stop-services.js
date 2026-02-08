@@ -18,10 +18,10 @@ function runCmd(cmd) {
     child.unref();
     return;
   }
-  // string fallback: split on spaces (keeps previous behavior)
-  const [command, ...args] = cmd.split(" ");
+  // string: use shell=true for pipes, redirects, and complex syntax
+  // Note: All commands are hardcoded; no user-controllable input
   // nosemgrep: javascript.lang.security.detect-child-process
-  const child = spawn(command, args, { detached: true, stdio: "ignore" });
+  const child = spawn(cmd, [], { shell: true, detached: true, stdio: "ignore" });
   child.unref();
 }
 

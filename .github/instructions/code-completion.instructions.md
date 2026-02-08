@@ -37,7 +37,6 @@ pnpm run format:dotnet:check
 
 ```bash
 # Lint TypeScript/Angular code
-# Lint TypeScript/Angular code
 pnpm --filter @stock-charts/client run lint --max-warnings=0  # Fail if any warnings remain
 
 # Auto-fix linting issues where possible

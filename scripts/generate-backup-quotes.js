@@ -2,8 +2,12 @@
 /*
  * Generates a deterministic set of backup quotes (same logic as original TS) and writes to JSON.
  */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class SeededRandom {
   constructor(seed) { this.seed = seed; }
@@ -69,4 +73,6 @@ function main(){
   console.log(`Wrote ${data.length} backup quotes to ${outPath}`);
 }
 
-if (require.main === module) main();
+if (process.argv[1] === __filename) {
+  main();
+}

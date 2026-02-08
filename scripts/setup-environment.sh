@@ -115,7 +115,7 @@ cleanup() {
 
   if command -v pnpm >/dev/null 2>&1; then
     pnpm store prune --loglevel=error || true
-    pnpm cache clean --force || true
+
     rm -rf "${HOME}/.local/share/pnpm/store" || true
   fi
 
