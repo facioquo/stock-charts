@@ -1,64 +1,48 @@
 #!/usr/bin/env node
-/* global setTimeout */
+/**
+ * Simple cross-platform script to stop development services
+ *
+ * For VS Code developers:
+ *   - Use: pnpm run stop:services
+ *   - Or: Press Ctrl+C in the terminal running services (preferred)
+ *
+ * This script force-kills known service processes.
+ * For graceful shutdown, press Ctrl+C in the terminal where services are running.
+ */
 
-import { spawn } from "child_process";
+import { execSync } from "child_process";
 import os from "os";
 
 const isWindows = os.platform() === "win32";
 
-console.log("🛑 Stopping all development services...");
+console.log("🛑 Stopping development services...\n");
 
-// Helper to run a command (string or array) via spawn without waiting
-function runCmd(cmd) {
-  if (Array.isArray(cmd)) {
-    const [command, ...args] = cmd;
-    // Note: All commands are hardcoded; no user-controllable input
-    // nosemgrep: javascript.lang.security.detect-child-process
-    const child = spawn(command, args, { detached: true, stdio: "ignore" });
-    child.unref();
-    return;
+/**
+ * Execute command, silently ignore if no processes found
+ * (some commands may fail if no matching processes exist, which is expected)
+ */
+function tryKill(cmd, description) {
+  try {
+    execSync(cmd, { stdio: "pipe" });
+    console.log(`✅ ${description}`);
+  } catch {
+    // Silently ignore errors (expected if service isn't running)
+    console.log(`ℹ️  ${description} (no running processes)`);
   }
-  // string: use shell=true for pipes, redirects, and complex syntax
-  // Note: All commands are hardcoded; no user-controllable input
-  // nosemgrep: javascript.lang.security.detect-child-process
-  const child = spawn(cmd, [], { shell: true, detached: true, stdio: "ignore" });
-  child.unref();
 }
 
-// Fire off all termination commands without waiting
 if (isWindows) {
-  const currentPid = process.pid;
-  // Use a targeted PowerShell query to only stop func/dotnet processes
-  // whose command line references this repository (reduces blast radius).
-  // Falls back to killing node.exe (excluding the current process) as before.
-  const repoMarker = "stock-charts";
-  const nodeKill = `taskkill /F /IM node.exe /FI "PID ne ${currentPid}"`;
-  const targetedKill = [
-    "powershell",
-    "-NoProfile",
-    "-Command",
-    `Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -and $_.CommandLine -like "*${repoMarker}*" -and ($_.Name -in @("func.exe", "dotnet.exe")) } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }`,
-  ];
-
-  runCmd(nodeKill);
-  runCmd(targetedKill);
-  console.log("✅ Windows targeted termination commands sent");
+  // Windows: Simple taskkill with exact process names
+  tryKill("taskkill /F /IM node.exe 2>nul", "Killed node.exe processes");
+  tryKill("taskkill /F /IM func.exe 2>nul", "Killed func.exe (Azure Functions)");
+  tryKill("taskkill /F /IM dotnet.exe 2>nul", "Killed dotnet.exe (.NET)");
 } else {
-  const cmds = [
-    "lsof -ti:4200,5000,5001,7071,10000 | xargs -r kill -TERM 2>/dev/null || true",
-    "pkill -TERM -x func",
-    "pkill -TERM -x dotnet"
-  ];
-  cmds.forEach(runCmd);
-  console.log("✅ Unix termination commands sent");
+  // Unix/macOS: pkill with exact-name matching (-x flag)
+  // Simple, reliable, and works on both Linux and macOS
+  tryKill("pkill -TERM -x node || true", "Terminated node processes");
+  tryKill("pkill -TERM -x func || true", "Terminated func (Azure Functions)");
+  tryKill("pkill -TERM -x dotnet || true", "Terminated dotnet (.NET)");
 }
 
-console.log("⏳ Waiting 2 seconds for graceful shutdown...");
-
-// Use setImmediate to ensure other events process, then exit
-setImmediate(() => {
-  setTimeout(() => {
-    console.log("✨ Done");
-    process.exit(0);
-  }, 2000);
-});
+console.log("\n✨ Development services stopped\n");
+console.log("💡 Tip: For graceful shutdown, press Ctrl+C in service terminals\n");
