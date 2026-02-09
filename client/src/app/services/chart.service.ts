@@ -3,20 +3,12 @@ import { inject, Injectable, OnDestroy, signal } from "@angular/core";
 import { catchError, map, Observable, Subject, takeUntil } from "rxjs";
 
 import {
-  BarElement,
   Chart,
   ChartConfiguration,
   ChartData,
   ChartDataset,
   ChartTypeRegistry,
-  Filler,
-  LinearScale,
-  LineController,
-  LineElement,
-  PointElement,
   ScatterDataPoint,
-  TimeSeriesScale,
-  Tooltip,
   TooltipItem
 } from "chart.js";
 
@@ -27,38 +19,17 @@ type ExtendedChartDataset = ChartDataset & {
   pointBorderColor?: string[];
 };
 
-// extensions
-import { CandlestickController, CandlestickElement } from "../../assets/js/chartjs-chart-financial";
-import type { FinancialDataPoint } from "../../types/chartjs-chart-financial";
+import {
+  applyFinancialElementTheme,
+  buildCandlestickDataset,
+  buildFinancialChartOptions,
+  buildVolumeDataset,
+  FinancialDataPoint,
+  getFinancialPalette
+} from "../../chartjs/financial";
 
 // plugins
-import AnnotationPlugin, {
-  AnnotationOptions,
-  LabelAnnotationOptions,
-  ScaleValue
-} from "chartjs-plugin-annotation";
-
-// register extensions and plugins
-Chart.register(
-  // controllers
-  CandlestickController,
-  LineController,
-  Tooltip,
-
-  // elements
-  BarElement,
-  CandlestickElement,
-  LineElement,
-  PointElement,
-
-  // plugins
-  AnnotationPlugin,
-  Filler,
-
-  // scales
-  LinearScale,
-  TimeSeriesScale
-);
+import { AnnotationOptions, LabelAnnotationOptions, ScaleValue } from "chartjs-plugin-annotation";
 
 // internal models
 import {
@@ -76,6 +47,7 @@ import {
 // services
 import { ApiService } from "./api.service";
 import { ChartConfigService } from "./config.service";
+import { UserService } from "./user.service";
 import { UtilityService } from "./utility.service";
 import { WindowService } from "./window.service";
 
@@ -85,6 +57,7 @@ import { WindowService } from "./window.service";
 export class ChartService implements OnDestroy {
   private readonly api = inject(ApiService);
   private readonly cfg = inject(ChartConfigService);
+  private readonly usr = inject(UserService);
   private readonly util = inject(UtilityService);
   private readonly window = inject(WindowService);
   private readonly destroy$ = new Subject<void>();
@@ -111,12 +84,7 @@ export class ChartService implements OnDestroy {
   private static readonly COLORS = {
     GREEN: "#2E7D32",
     GRAY: "#9E9E9E",
-    RED: "#DD2C00",
-    CANDLE_UP: "#1B5E20",
-    CANDLE_DOWN: "#B71C1C",
-    CANDLE_UNCHANGED: "#616161",
-    VOLUME_UP: "#1B5E2060",
-    VOLUME_DOWN: "#B71C1C60"
+    RED: "#DD2C00"
   };
 
   listings: IndicatorListing[] = [];
@@ -641,6 +609,9 @@ export class ChartService implements OnDestroy {
   onSettingsChange() {
     // strategically update chart theme
     // without destroying and re-creating charts
+    applyFinancialElementTheme(
+      getFinancialPalette(this.usr.settings.isDarkTheme ? "dark" : "light")
+    );
 
     // update overlay chart
     if (this.chartOverlay) {
@@ -913,16 +884,16 @@ export class ChartService implements OnDestroy {
   }
 
   loadOverlayChart(quotes: Quote[]) {
-    // loads base with quotes only
-    this.configureCandlestickDefaults();
+    const palette = getFinancialPalette(this.usr.settings.isDarkTheme ? "dark" : "light");
+    applyFinancialElementTheme(palette);
 
-    const { priceData, volumeData, volumeAxisSize, volumeColors } = this.processQuoteData(quotes);
+    const { priceData, volumeAxisSize } = this.processQuoteData(quotes);
 
     // define base datasets
     const chartData: ChartData = {
       datasets: [
-        this.createPriceDataset(priceData),
-        this.createVolumeDataset(volumeData, volumeColors)
+        buildCandlestickDataset(priceData, palette.candleBorder),
+        buildVolumeDataset(quotes, this.extraBars, palette)
       ]
     };
 
@@ -930,30 +901,11 @@ export class ChartService implements OnDestroy {
     this.createOverlayChart(chartData, volumeAxisSize);
   }
 
-  private configureCandlestickDefaults(): void {
-    const candleOptions = Chart.defaults.elements["candlestick"];
-
-    // custom border colors
-    candleOptions.color.up = ChartService.COLORS.CANDLE_UP;
-    candleOptions.color.down = ChartService.COLORS.CANDLE_DOWN;
-    candleOptions.color.unchanged = ChartService.COLORS.CANDLE_UNCHANGED;
-
-    candleOptions.borderColor = {
-      up: candleOptions.color.up,
-      down: candleOptions.color.down,
-      unchanged: candleOptions.color.unchanged
-    };
-  }
-
   private processQuoteData(quotes: Quote[]): {
     priceData: FinancialDataPoint[];
-    volumeData: ScatterDataPoint[];
     volumeAxisSize: number;
-    volumeColors: string[];
   } {
     const priceData: FinancialDataPoint[] = [];
-    const volumeData: ScatterDataPoint[] = [];
-    const volumeColors: string[] = [];
     let sumVol = 0;
 
     quotes.forEach((q: Quote) => {
@@ -965,75 +917,19 @@ export class ChartService implements OnDestroy {
         c: q.close
       });
 
-      volumeData.push({
-        x: new Date(q.date).valueOf(),
-        y: q.volume
-      });
       sumVol += q.volume;
-
-      const color =
-        q.close >= q.open ? ChartService.COLORS.VOLUME_UP : ChartService.COLORS.VOLUME_DOWN;
-      volumeColors.push(color);
     });
 
-    // add extra bars
-    this.addExtraVolumeBarsBars(volumeData);
-
     // volume axis size
-    const volumeAxisSize = 20 * (sumVol / volumeData.length) || 0;
+    const volumeAxisSize = 20 * (sumVol / Math.max(1, quotes.length)) || 0;
 
-    return { priceData, volumeData, volumeAxisSize, volumeColors };
-  }
-
-  private addExtraVolumeBarsBars(volumeData: ScatterDataPoint[]): void {
-    const maxTime = Math.max(
-      ...volumeData.map(h => {
-        const dateTime = h.x != null ? new Date(h.x).getTime() : 0;
-        return Number.isFinite(dateTime) ? dateTime : 0;
-      })
-    );
-    const nextDate = new Date(maxTime);
-
-    for (let i = 1; i < this.extraBars; i++) {
-      nextDate.setDate(nextDate.getDate() + 1);
-      // intentionally excluding price (gap covered by volume)
-      volumeData.push({
-        x: new Date(nextDate).valueOf(),
-        y: Number.NaN
-      });
-    }
-  }
-
-  private createPriceDataset(priceData: FinancialDataPoint[]): ChartDataset {
-    const candleOptions = Chart.defaults.elements["candlestick"];
-    return {
-      type: "candlestick",
-      label: "Price",
-      data: priceData,
-      yAxisID: "y",
-      borderColor: candleOptions.borderColor,
-      order: 75
-    };
-  }
-
-  private createVolumeDataset(
-    volumeData: ScatterDataPoint[],
-    volumeColors: string[]
-  ): ChartDataset {
-    return {
-      type: "bar",
-      label: "Volume",
-      data: volumeData,
-      yAxisID: "volumeAxis",
-      backgroundColor: volumeColors,
-      borderWidth: 0,
-      order: 76
-    };
+    return { priceData, volumeAxisSize };
   }
 
   private createOverlayChart(chartData: ChartData, volumeAxisSize: number): void {
     // default overlay chart configuration
     const chartConfig = this.cfg.baseOverlayConfig(volumeAxisSize);
+    chartConfig.options = buildFinancialChartOptions(chartConfig.options ?? {});
 
     // add chart data
     chartConfig.data = chartData;

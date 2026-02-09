@@ -1,0 +1,59 @@
+import { FinancialPalette, FinancialThemeMode } from "../types/financial.types";
+
+export const COLORS = {
+  GREEN: "#2E7D32",
+  GRAY: "#9E9E9E",
+  RED: "#DD2C00",
+  CANDLE_UP: "#1B5E20",
+  CANDLE_DOWN: "#B71C1C",
+  CANDLE_UNCHANGED: "#616161",
+  VOLUME_UP: "#1B5E2060",
+  VOLUME_DOWN: "#B71C1C60",
+  VOLUME_UNCHANGED: "#61616160"
+} as const;
+
+const LIGHT_PALETTE: FinancialPalette = {
+  candle: {
+    up: COLORS.CANDLE_UP,
+    down: COLORS.CANDLE_DOWN,
+    unchanged: COLORS.CANDLE_UNCHANGED
+  },
+  candleBorder: {
+    up: COLORS.CANDLE_UP,
+    down: COLORS.CANDLE_DOWN,
+    unchanged: COLORS.CANDLE_UNCHANGED
+  },
+  volume: {
+    up: COLORS.VOLUME_UP,
+    down: COLORS.VOLUME_DOWN,
+    unchanged: COLORS.VOLUME_UNCHANGED
+  }
+};
+
+const DARK_PALETTE: FinancialPalette = {
+  candle: {
+    up: COLORS.CANDLE_UP,
+    down: COLORS.CANDLE_DOWN,
+    unchanged: COLORS.CANDLE_UNCHANGED
+  },
+  candleBorder: {
+    up: COLORS.CANDLE_UP,
+    down: COLORS.CANDLE_DOWN,
+    unchanged: COLORS.CANDLE_UNCHANGED
+  },
+  volume: {
+    up: COLORS.VOLUME_UP,
+    down: COLORS.VOLUME_DOWN,
+    unchanged: COLORS.VOLUME_UNCHANGED
+  }
+};
+
+export function getFinancialPalette(mode: FinancialThemeMode): FinancialPalette {
+  return mode === "dark" ? DARK_PALETTE : LIGHT_PALETTE;
+}
+
+export function getVolumeColor(open: number, close: number, palette: FinancialPalette): string {
+  if (close > open) return palette.volume.up;
+  if (close < open) return palette.volume.down;
+  return palette.volume.unchanged;
+}

@@ -8,7 +8,7 @@ permissions:
 
 env:
   NODE_VERSION: "24.13.0"
-  PNPM_VERSION: "10.29.1"
+  PNPM_VERSION: "10.29.2"
 
 jobs:
   copilot-setup-steps:

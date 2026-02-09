@@ -6,5 +6,5 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src/**/*.spec.ts", "src/types/**/*.d.ts"]
+  "include": ["src/**/*.spec.ts", "src/test-setup.ts", "src/polyfills.ts", "src/types/**/*.d.ts"]
 }

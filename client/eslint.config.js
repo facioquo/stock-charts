@@ -6,7 +6,12 @@ import vitest from "@vitest/eslint-plugin";
 
 export default tseslint.config(
   {
-    ignores: ["projects/**/*", "dist/**/*", ".angular/**/*", "node_modules/**/*"]
+    ignores: [
+      "projects/**/*",
+      "dist/**/*",
+      ".angular/**/*",
+      "node_modules/**/*"
+    ]
   },
   // TypeScript files
   {
@@ -61,7 +66,16 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-non-null-assertion": "warn",
       "@typescript-eslint/prefer-nullish-coalescing": "error",
-      "@typescript-eslint/no-floating-promises": "error"
+      "@typescript-eslint/no-floating-promises": "error",
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            "**/assets/js/chartjs-chart-financial",
+            "**/assets/js/chartjs-chart-financial.js"
+          ]
+        }
+      ]
     }
   },
   // Test files - relaxed rules
@@ -78,7 +92,10 @@ export default tseslint.config(
   // HTML templates
   {
     files: ["**/*.html"],
-    extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
+    extends: [
+      ...angular.configs.templateRecommended,
+      ...angular.configs.templateAccessibility
+    ],
     rules: {}
   }
 );
