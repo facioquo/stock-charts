@@ -3,10 +3,11 @@
   "description": "Full-stack financial charting application with Angular frontend and .NET backend",
   "author": "facioquo",
   "license": "Apache-2.0",
-  "packageManager": "pnpm@10.27.0",
+  "type": "module",
+  "packageManager": "pnpm@10.29.1",
   "engines": {
-    "node": ">=24.12.0",
-    "pnpm": ">=10.27.0"
+    "node": ">=24.13.0",
+    "pnpm": ">=10.29.1"
   },
   "repository": {
     "type": "git",
@@ -45,13 +46,14 @@
     "azure:start": "azurite --skipApiVersionCheck --location ./.azurite",
     "azure:functions": "cd server/Functions && func start",
     "azure:check": "func --version && azurite --version",
-    "azure:clean": "rimraf ./.azurite"
+    "azure:clean": "rimraf ./.azurite",
+    "stop:services": "node scripts/stop-services.js"
   },
   "devDependencies": {
-    "azurite": "3.35.0",
-    "markdownlint-cli2": "0.20.0",
-    "prettier": "3.7.4",
-    "rimraf": "6.1.2",
-    "typescript": "5.9.3"
+    "azurite": "^3.35.0",
+    "markdownlint-cli2": "^0.20.0",
+    "prettier": "^3.8.1",
+    "rimraf": "^6.1.2",
+    "typescript": "^5.9.3"
   }
 }

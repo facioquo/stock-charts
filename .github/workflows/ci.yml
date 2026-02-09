@@ -7,8 +7,8 @@ on:
     branches: ["main"]
 
 env:
-  NODE_VERSION: "24.12.0"
-  PNPM_VERSION: "10.27.0"
+  NODE_VERSION: "24.13.0"
+  PNPM_VERSION: "10.29.1"
 
 jobs:
   test-backend:
@@ -56,6 +56,15 @@ jobs:
             -reports:"server/coverage/**/coverage.cobertura.xml" \
             -targetdir:"server/coverage" \
             -reporttypes:"lcov"
+
+      - name: Upload backend coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./server/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+          fail_ci_if_error: false
 
       - name: Publish backend test results
         uses: dorny/test-reporter@v2
@@ -107,68 +116,20 @@ jobs:
       - name: Run unit tests
         run: pnpm --filter @stock-charts/client run test:coverage
 
-      - name: Upload coverage reports to Codecov
-        if: github.event_name == 'pull_request'
+      - name: Upload frontend coverage to Codecov
+        if: always()
         uses: codecov/codecov-action@v5
         with:
           files: ./client/coverage/lcov.info
-          directory: ./client/coverage/
-          flags: unittests
-          name: codecov-umbrella
+          flags: frontend
+          name: frontend-coverage
           fail_ci_if_error: false
 
-      - name: Add coverage to summary
-        if: github.event_name == 'pull_request' && (success() || failure())
-        run: |
-          echo "## 📊 Test Coverage Report" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Component | Statements | Branches | Functions |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|------------|----------|-----------|" >> $GITHUB_STEP_SUMMARY
-
-          # Frontend coverage
-          if [ -f "./client/coverage/lcov.info" ]; then
-            STATEMENTS=$(grep -o "LF:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-            HIT_STATEMENTS=$(grep -o "LH:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-            FUNCTIONS=$(grep -o "FNF:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-            HIT_FUNCTIONS=$(grep -o "FNH:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-            BRANCHES=$(grep -o "BRF:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-            HIT_BRANCHES=$(grep -o "BRH:[0-9]*" ./client/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-
-            STMT_PCT=$(echo "$HIT_STATEMENTS $STATEMENTS" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
-            FUNC_PCT=$(echo "$HIT_FUNCTIONS $FUNCTIONS" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
-            BRANCH_PCT=$(echo "$HIT_BRANCHES $BRANCHES" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
-
-            echo "| Frontend | ${STMT_PCT}% (${HIT_STATEMENTS}/${STATEMENTS}) | ${BRANCH_PCT}% (${HIT_BRANCHES}/${BRANCHES}) | ${FUNC_PCT}% (${HIT_FUNCTIONS}/${FUNCTIONS}) |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| Frontend | Not available | Not available | Not available |" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          # Backend coverage
-          if [ -f "./server/coverage/lcov.info" ]; then
-            BACKEND_STATEMENTS=$(grep -o "LF:[0-9]*" ./server/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-            BACKEND_HIT_STATEMENTS=$(grep -o "LH:[0-9]*" ./server/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-            BACKEND_FUNCTIONS=$(grep -o "FNF:[0-9]*" ./server/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-            BACKEND_HIT_FUNCTIONS=$(grep -o "FNH:[0-9]*" ./server/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-            BACKEND_BRANCHES=$(grep -o "BRF:[0-9]*" ./server/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-            BACKEND_HIT_BRANCHES=$(grep -o "BRH:[0-9]*" ./server/coverage/lcov.info | awk -F: '{sum+=$2} END {print sum}')
-
-            BACKEND_STMT_PCT=$(echo "$BACKEND_HIT_STATEMENTS $BACKEND_STATEMENTS" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
-            BACKEND_FUNC_PCT=$(echo "$BACKEND_HIT_FUNCTIONS $BACKEND_FUNCTIONS" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
-            BACKEND_BRANCH_PCT=$(echo "$BACKEND_HIT_BRANCHES $BACKEND_BRANCHES" | awk '{if($2>0) printf "%.2f", $1*100/$2; else print "0"}')
-
-            echo "| Backend | ${BACKEND_STMT_PCT}% (${BACKEND_HIT_STATEMENTS}/${BACKEND_STATEMENTS}) | ${BACKEND_BRANCH_PCT}% (${BACKEND_HIT_BRANCHES}/${BACKEND_BRANCHES}) | ${BACKEND_FUNC_PCT}% (${BACKEND_HIT_FUNCTIONS}/${BACKEND_FUNCTIONS}) |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| Backend | Not available | Not available | Not available |" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "📁 **Coverage reports:** Check the artifacts for detailed HTML coverage reports" >> $GITHUB_STEP_SUMMARY
-
       - name: Upload coverage artifacts
-        if: github.event_name == 'pull_request' && (success() || failure())
+        if: github.event_name == 'pull_request' && always()
         uses: actions/upload-artifact@v6
         with:
-          name: coverage-report
+          name: code-coverage-reports
           path: |
             client/coverage/
             server/coverage/lcov.info

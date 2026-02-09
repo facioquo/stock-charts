@@ -10,8 +10,8 @@ permissions:
   contents: write
 
 env:
-  NODE_VERSION: "24.12.0"
-  PNPM_VERSION: "10.27.0"
+  NODE_VERSION: "24.13.0"
+  PNPM_VERSION: "10.29.1"
 
 jobs:
   versioning:

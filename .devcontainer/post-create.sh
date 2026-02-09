@@ -7,10 +7,6 @@ REPO_ROOT="/workspaces/stock-charts"
 
 echo "🔧 Running post-create setup..."
 
-# ------------------------------------------------------------------------------
-# Git setup
-# ------------------------------------------------------------------------------
-
 # Remove Git LFS hooks if present (this repo doesn't use LFS)
 echo "🔧 Removing Git LFS hooks (not used by this repo)..."
 rm -f "${REPO_ROOT}/.git/hooks/pre-push" 2>/dev/null || true
@@ -25,3 +21,16 @@ git config pull.rebase false
 
 echo "🔐 Trusting .NET dev certificates..."
 dotnet dev-certs https --trust 2>/dev/null || echo "  (dev-certs trust may require manual action on some systems)"
+
+echo "🧰 Installing .NET-based tools..."
+dotnet tool install --global dotnet-format
+dotnet tool install --global roslynator.dotnet.cli@0.11.0  # bug in 0.12.0
+dotnet tool install --global dotnet-outdated-tool
+dotnet tool list --global
+
+# Install Node dependencies
+echo "📦 Installing Node dependencies..."
+pnpm install --frozen-lockfile --loglevel=error --config.confirmModulesPurge=false
+
+# cleanup
+sudo apt-get autoremove --purge -y

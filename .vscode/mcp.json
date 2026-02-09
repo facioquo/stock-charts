@@ -10,6 +10,14 @@
       "command": "npx",
       "args": ["mcp-remote", "https://docs.mcp.cloudflare.com/mcp"]
     },
+    "codacy": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@codacy/codacy-mcp@latest"],
+      "env": {
+        "CODACY_ACCOUNT_TOKEN": "${input:codacy_account_token}"
+      }
+    },
     "context7": {
       "type": "stdio",
       "command": "npx",
@@ -24,5 +32,13 @@
       "command": "npx",
       "args": ["-y", "playwright", "run-test-mcp-server"]
     }
-  }
+  },
+  "inputs": [
+    {
+      "id": "codacy_account_token",
+      "type": "promptString",
+      "description": "Your personal Codacy Account API token (from app.codacy.com → Account). Required.",
+      "password": true
+    }
+  ]
 }

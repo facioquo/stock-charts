@@ -78,6 +78,14 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "Clean: Backend solution (hard reset)",
+      "detail": "Deletes all bin/obj folders and runs dotnet clean command (hard clean)",
+      "type": "shell",
+      "command": "bash scripts/dotnet-clean.sh",
+      "group": "build",
+      "problemMatcher": "$msCompile"
+    },
+    {
       "label": "Clean: Root and Azure storage",
       "detail": "Clean Azurite and root level items, including npm packages",
       "type": "shell",
@@ -334,6 +342,18 @@
           "endsPattern": "^.*Application bundle generation complete"
         }
       }
+    },
+    {
+      "label": "Stop: All services",
+      "detail": "Gracefully stop all running Backend and Website services (cross-platform)",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "stop:services"],
+      "presentation": {
+        "clear": true,
+        "reveal": "always"
+      },
+      "group": "none"
     },
 
     // =========================================================================

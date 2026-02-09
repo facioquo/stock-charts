@@ -7,6 +7,7 @@
       "version": "10.0"
     },
     "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/copilot-cli:1": {},
     "ghcr.io/devcontainers/features/azure-cli:1": {},
     "ghcr.io/devcontainers-extra/features/angular-cli:2": {}
   },
@@ -37,5 +38,6 @@
     "ALPACA_SECRET": "${localEnv:ALPACA_SECRET}",
     "AzureWebJobsStorage": "${localEnv:AzureWebJobsStorage}"
   },
-  "postCreateCommand": "bash .devcontainer/post-create.sh && pnpm install"
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "remoteUser": "vscode"
 }

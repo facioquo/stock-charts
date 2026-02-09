@@ -37,13 +37,13 @@ pnpm run format:dotnet:check
 
 ```bash
 # Lint TypeScript/Angular code
-pnpm --filter @stock-charts/client run lint -- --max-warnings=0  # Fail if any warnings remain
+pnpm --filter @stock-charts/client run lint --max-warnings=0  # Fail if any warnings remain
 
 # Auto-fix linting issues where possible
 pnpm --filter @stock-charts/client run lint:fix
 
 # Re‑run lint after auto-fix to ensure zero warnings (required)
-pnpm --filter @stock-charts/client run lint -- --max-warnings=0
+pnpm --filter @stock-charts/client run lint --max-warnings=0
 ```
 
 **Requirements:**
@@ -244,11 +244,11 @@ pnpm run format
 
 # Check specific rule violations
 # Enforce zero warnings explicitly (same as quality gate)
-pnpm --filter @stock-charts/client run lint -- --max-warnings=0
+pnpm --filter @stock-charts/client run lint --max-warnings=0
 
 # Use default (stylish) or specify a supported formatter (e.g., 'stylish')
 # List available formatters: pnpm exec eslint --help | grep format
-pnpm exec eslint client/src --format=stylish --max-warnings=0
+pnpm --filter @stock-charts/client run lint --max-warnings=0 --format=stylish
 ```
 
 ### Test failures
