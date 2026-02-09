@@ -6,8 +6,9 @@
  *   - Use: pnpm run stop:services
  *   - Or: Press Ctrl+C in the terminal running services (preferred)
  *
- * This script force-kills known service processes.
- * For graceful shutdown, press Ctrl+C in the terminal where services are running.
+ * This script force-kills Azure Functions and .NET processes.
+ * Node processes are NOT killed to avoid terminating this script itself.
+ * For Node services, press Ctrl+C in their terminal for graceful shutdown.
  */
 
 import { execSync } from "child_process";
@@ -23,25 +24,26 @@ console.log("🛑 Stopping development services...\n");
  */
 function tryKill(cmd, description) {
   try {
-    execSync(cmd, { stdio: "pipe" });
+    execSync(cmd, { stdio: "ignore" });
     console.log(`✅ ${description}`);
-  } catch {
+  } catch (error) {
     // Silently ignore errors (expected if service isn't running)
     console.log(`ℹ️  ${description} (no running processes)`);
   }
 }
 
 if (isWindows) {
-  // Windows: Simple taskkill with exact process names
-  tryKill("taskkill /F /IM node.exe 2>nul", "Killed node.exe processes");
-  tryKill("taskkill /F /IM func.exe 2>nul", "Killed func.exe (Azure Functions)");
-  tryKill("taskkill /F /IM dotnet.exe 2>nul", "Killed dotnet.exe (.NET)");
+  // Windows: Simple task kill with exact process names
+  // Note: Skipping node.exe to avoid killing this script itself
+  // Users should use Ctrl+C in terminals running Node services
+  tryKill("taskkill /F /IM func.exe", "Killed func.exe (Azure Functions)");
+  tryKill("taskkill /F /IM dotnet.exe", "Killed dotnet.exe (.NET)");
 } else {
   // Unix/macOS: pkill with exact-name matching (-x flag)
-  // Simple, reliable, and works on both Linux and macOS
-  tryKill("pkill -TERM -x node || true", "Terminated node processes");
-  tryKill("pkill -TERM -x func || true", "Terminated func (Azure Functions)");
-  tryKill("pkill -TERM -x dotnet || true", "Terminated dotnet (.NET)");
+  // Note: Skipping node to avoid killing this script itself
+  // Users should use Ctrl+C in terminals running Node services
+  tryKill("pkill -TERM -x func", "Terminated func (Azure Functions)");
+  tryKill("pkill -TERM -x dotnet", "Terminated dotnet (.NET)");
 }
 
 console.log("\n✨ Development services stopped\n");
