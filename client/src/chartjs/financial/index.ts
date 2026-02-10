@@ -13,9 +13,9 @@ export {
 } from "./factories/datasets";
 export { applyFinancialElementTheme, buildFinancialChartOptions } from "./factories/options";
 
-export { ensureFinancialChartsRegistered, financialRegisterables } from "./register-financial";
+export { financialRegisterables, registerFinancialCharts } from "./register-financial";
 
-export { COLORS, getFinancialPalette, getVolumeColor } from "./theme/colors";
+export { COLORS, getCandleColor, getFinancialPalette, getVolumeColor } from "./theme/colors";
 
 export type {
   FinancialColorSet,

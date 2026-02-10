@@ -24,6 +24,7 @@ import {
   buildCandlestickDataset,
   buildFinancialChartOptions,
   buildVolumeDataset,
+  COLORS,
   FinancialDataPoint,
   getFinancialPalette
 } from "../../chartjs/financial";
@@ -79,13 +80,6 @@ export class ChartService implements OnDestroy {
   private static readonly CATEGORIES = {
     CANDLESTICK_PATTERN: "candlestick-pattern"
   } as const;
-
-  // Color constants
-  private static readonly COLORS = {
-    GREEN: "#2E7D32",
-    GRAY: "#9E9E9E",
-    RED: "#DD2C00"
-  };
 
   listings: IndicatorListing[] = [];
   selections: IndicatorSelection[] = [];
@@ -193,7 +187,7 @@ export class ChartService implements OnDestroy {
         pointRotation.push(candleConfig.rotation);
       } else {
         const resultConfig = listing.results.find(x => x.dataName === result.dataName);
-        pointColor.push(resultConfig?.defaultColor ?? ChartService.COLORS.GRAY);
+        pointColor.push(resultConfig?.defaultColor ?? COLORS.GRAY);
         pointRotation.push(0);
       }
 
@@ -215,19 +209,19 @@ export class ChartService implements OnDestroy {
       case -100:
         return {
           yValue: ChartService.CANDLE_HIGH_MULTIPLIER * candle.high,
-          color: ChartService.COLORS.RED,
+          color: COLORS.RED,
           rotation: 180
         };
       case 100:
         return {
           yValue: ChartService.CANDLE_LOW_MULTIPLIER * candle.low,
-          color: ChartService.COLORS.GREEN,
+          color: COLORS.GREEN,
           rotation: 0
         };
       default:
         return {
           yValue: ChartService.CANDLE_LOW_MULTIPLIER * candle.low,
-          color: ChartService.COLORS.GRAY,
+          color: COLORS.GRAY,
           rotation: 0
         };
     }

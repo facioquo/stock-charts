@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   __resetFinancialChartsRegistrationForTests,
-  ensureFinancialChartsRegistered,
+  registerFinancialCharts,
   financialRegisterables
 } from "./register-financial";
 
@@ -15,9 +15,9 @@ describe("financial registration", () => {
   it("registers exactly once when called repeatedly", () => {
     const registerSpy = vi.spyOn(Chart, "register");
 
-    ensureFinancialChartsRegistered();
+    registerFinancialCharts();
     const callsAfterFirstEnsure = registerSpy.mock.calls.length;
-    ensureFinancialChartsRegistered();
+    registerFinancialCharts();
 
     expect(callsAfterFirstEnsure).toBeGreaterThan(0);
     expect(registerSpy.mock.calls.length).toBe(callsAfterFirstEnsure);

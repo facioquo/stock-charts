@@ -52,6 +52,12 @@ export function getFinancialPalette(mode: FinancialThemeMode): FinancialPalette 
   return mode === "dark" ? DARK_PALETTE : LIGHT_PALETTE;
 }
 
+export function getCandleColor(open: number, close: number, palette: FinancialPalette): string {
+  if (close > open) return palette.candle.up;
+  if (close < open) return palette.candle.down;
+  return palette.candle.unchanged;
+}
+
 export function getVolumeColor(open: number, close: number, palette: FinancialPalette): string {
   if (close > open) return palette.volume.up;
   if (close < open) return palette.volume.down;
