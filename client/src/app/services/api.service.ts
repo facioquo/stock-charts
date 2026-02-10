@@ -2,7 +2,6 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from "@angular
 import { Injectable, inject } from "@angular/core";
 import { Observable, catchError, map, of } from "rxjs";
 import { env } from "../../environments/environment";
-import backupIndicators from "../data/backup-indicators.json";
 import backupQuotes from "../data/backup-quotes.json";
 import {
   IndicatorListing,
@@ -32,17 +31,7 @@ export class ApiService {
   }
 
   getListings(): Observable<IndicatorListing[]> {
-    return this.http.get<IndicatorListing[]>(`${env.api}/indicators`, this.requestHeader()).pipe(
-      catchError((error: HttpErrorResponse) => {
-        console.warn("Backend API unavailable, using client-side backup indicators", {
-          status: error.status,
-          statusText: error.statusText,
-          url: error.url,
-          message: error.message
-        });
-        return of(backupIndicators as IndicatorListing[]);
-      })
-    );
+    return this.http.get<IndicatorListing[]>(`${env.api}/indicators`, this.requestHeader());
   }
 
   getSelectionData(
@@ -53,7 +42,9 @@ export class ApiService {
     selection.params.forEach((p: IndicatorParam) => {
       params = params.set(p.paramName, String(p.value));
     });
-    return this.http.get<unknown[]>(listing.endpoint, { ...this.requestHeader(), params });
+    // Ensure endpoint is absolute URL - prepend API base if relative
+    const endpoint = this.getAbsoluteUrl(listing.endpoint);
+    return this.http.get<unknown[]>(endpoint, { ...this.requestHeader(), params });
   }
 
   // HELPERS
@@ -61,6 +52,23 @@ export class ApiService {
     const simpleHeaders = new HttpHeaders().set("Content-Type", "application/json");
 
     return { headers: simpleHeaders };
+  }
+
+  /**
+   * Converts a potentially relative URL to an absolute URL using the API base.
+   * @param url - The URL that may be relative or absolute
+   * @returns An absolute URL
+   */
+  private getAbsoluteUrl(url: string): string {
+    // If already absolute (starts with http:// or https://), return as-is
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+    // Otherwise, prepend the API base URL
+    // Remove trailing slash from base and leading slash from url to avoid double slashes
+    const base = env.api.replace(/\/$/, "");
+    const path = url.startsWith("/") ? url : `/${url}`;
+    return `${base}${path}`;
   }
 
   private toQuotes(raw: RawQuote[]): Quote[] {
