@@ -60,46 +60,21 @@ export class CandlestickElement extends FinancialElement {
         valueOrDefault(me.color?.unchanged, candleDefaults.color?.unchanged) ?? "#000000";
     }
 
-    const borderWidth = valueOrDefault(me.borderWidth, candleDefaults.borderWidth ?? 1);
-    ctx.lineWidth = borderWidth;
+    ctx.lineWidth = valueOrDefault(me.borderWidth, candleDefaults.borderWidth ?? 1);
     const resolvedStroke = valueOrDefault(borderColor, candleDefaults.borderColor);
     ctx.strokeStyle =
       typeof resolvedStroke === "string"
         ? resolvedStroke
         : (resolvedStroke?.unchanged ?? "#000000");
 
-    // Draw high-low wicks (vertical lines)
     ctx.beginPath();
     ctx.moveTo(x, high);
     ctx.lineTo(x, Math.min(open, close));
     ctx.moveTo(x, low);
     ctx.lineTo(x, Math.max(open, close));
     ctx.stroke();
-
-    // Calculate rectangle bounds for pixel-perfect rendering
-    // For borders, we need to account for the stroke being drawn centered on the path
-    const halfWidth = me.width / 2;
-    const rectX = x - halfWidth;
-    const rectY = close;
-    const rectWidth = me.width;
-    const rectHeight = open - close;
-
-    // Fill the candlestick body
-    ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
-
-    // Draw border using a path for precise control
-    // This ensures the border doesn't extend outside the intended dimensions
-    if (borderWidth > 0) {
-      const halfBorder = borderWidth / 2;
-      ctx.beginPath();
-      // Draw border path inside the rectangle bounds to avoid expansion
-      ctx.rect(
-        rectX + halfBorder,
-        rectY + halfBorder,
-        rectWidth - borderWidth,
-        rectHeight - borderWidth
-      );
-      ctx.stroke();
-    }
+    ctx.fillRect(x - me.width / 2, close, me.width, open - close);
+    ctx.strokeRect(x - me.width / 2, close, me.width, open - close);
+    ctx.closePath();
   }
 }
