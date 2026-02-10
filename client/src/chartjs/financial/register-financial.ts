@@ -15,7 +15,7 @@ import { CandlestickController } from "./controllers/candlestick.controller";
 import { OhlcController } from "./controllers/ohlc.controller";
 import { CandlestickElement } from "./elements/candlestick.element";
 import { OhlcElement } from "./elements/ohlc.element";
-import { ensureFinancialDefaults } from "./helpers/defaults";
+import { setFinancialDefaults } from "./helpers/defaults";
 
 export const financialRegisterables = [
   CandlestickController,
@@ -40,10 +40,10 @@ let registered = false;
  *
  * Derived from chartjs-chart-financial and adapted for Chart.js v4 + TypeScript.
  */
-export function ensureFinancialChartsRegistered(): void {
+export function registerFinancialCharts(): void {
   if (registered) return;
 
-  ensureFinancialDefaults();
+  setFinancialDefaults();
   Chart.register(...financialRegisterables);
   registered = true;
 }

@@ -1,7 +1,7 @@
 import { Chart, ChartOptions } from "chart.js";
 
 import { FinancialPalette } from "../types/financial.types";
-import { ensureFinancialDefaults } from "../helpers/defaults";
+import { setFinancialDefaults } from "../helpers/defaults";
 
 interface CandlestickElementDefaults {
   color: FinancialPalette["candle"];
@@ -9,7 +9,7 @@ interface CandlestickElementDefaults {
 }
 
 export function applyFinancialElementTheme(palette: FinancialPalette): void {
-  ensureFinancialDefaults(palette);
+  setFinancialDefaults(palette);
 
   const candleDefaults = Chart.defaults.elements as unknown as {
     candlestick: CandlestickElementDefaults;

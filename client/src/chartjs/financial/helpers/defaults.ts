@@ -50,7 +50,7 @@ interface FinancialElementDefaults {
   };
 }
 
-export function ensureFinancialDefaults(palette: FinancialPalette = defaultPalette): void {
+export function setFinancialDefaults(palette: FinancialPalette = defaultPalette): void {
   const chartDefaults = Chart.defaults as unknown as FinancialChartDefaults;
   const elementDefaults = Chart.defaults.elements as unknown as FinancialElementDefaults;
 

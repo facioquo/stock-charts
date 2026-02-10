@@ -1,7 +1,7 @@
 import { Chart } from "chart.js";
 import { describe, expect, it } from "vitest";
 
-import { ensureFinancialChartsRegistered } from "./register-financial";
+import { registerFinancialCharts } from "./register-financial";
 
 function createCanvasContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   const base = {
@@ -52,7 +52,7 @@ function createCanvasContext(canvas: HTMLCanvasElement): CanvasRenderingContext2
 
 describe("financial integration", () => {
   it("renders a minimal candlestick chart", () => {
-    ensureFinancialChartsRegistered();
+    registerFinancialCharts();
 
     const canvas = document.createElement("canvas");
     Object.defineProperty(canvas, "getContext", {
