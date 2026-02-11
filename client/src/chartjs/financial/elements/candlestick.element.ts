@@ -73,8 +73,20 @@ export class CandlestickElement extends FinancialElement {
     ctx.moveTo(x, low);
     ctx.lineTo(x, Math.max(open, close));
     ctx.stroke();
+
+    // Draw candle body
     ctx.fillRect(x - me.width / 2, close, me.width, open - close);
-    ctx.strokeRect(x - me.width / 2, close, me.width, open - close);
+
+    // Apply pixel-alignment for crisp 1px borders
+    // Offset by half the line width to align stroke to pixel boundaries
+    const halfBorder = ctx.lineWidth / 2;
+    ctx.strokeRect(
+      x - me.width / 2 + halfBorder,
+      close + halfBorder,
+      me.width - ctx.lineWidth,
+      open - close - ctx.lineWidth
+    );
+
     ctx.closePath();
   }
 }
