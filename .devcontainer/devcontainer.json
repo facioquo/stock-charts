@@ -33,7 +33,9 @@
         "vitest.explorer"
       ],
       "settings": {
-        "dotnet.defaultSolution": "Charts.sln"
+        "dotnet.defaultSolution": "Charts.sln",
+        "editor.formatOnSave": true,
+        "chat.tools.global.autoApprove": true
       }
     }
   },
