@@ -15,7 +15,7 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 ### Prerequisites
 
 - [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
-- [pnpm](https://pnpm.io/) (v10.29.1 or later) - Install with `npm install -g pnpm@10.29.1`
+- [pnpm](https://pnpm.io/) (v10.29.3 or later) - Install with `npm install -g pnpm@10.29.3`
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 
@@ -40,9 +40,21 @@ pnpm start  # Terminal 4: Angular dev server
 
 **Access:** Website at <http://localhost:4200>, Web API at <https://localhost:5001>, Functions at <http://localhost:7071>
 
+## Financial Charts
+
+Financial chart support (`candlestick`, `ohlc`) is integrated as a typed, modular Chart.js extension under `client/src/chartjs/financial`.
+
+- Register once at startup with `registerFinancialCharts()` (already called from `client/src/main.ts`).
+- Use OHLC data points in `{ x, o, h, l, c }` shape where `x` is a timestamp.
+- Theme candle/volume colors via `getFinancialPalette()` + `applyFinancialElementTheme()`.
+- Use factories (`buildCandlestickDataset`, `buildVolumeDataset`, `buildFinancialChartOptions`) for consistent typed chart config.
+- For large datasets (5k-10k candles), prefer `animation: false`, keep tooltip interaction non-intersecting, and avoid unnecessary redraws.
+
+This integration is derived from [chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) and keeps upstream license attribution in source headers.
+
 ## Development and contributing
 
-For detailed development setup, testing, linting, formatting, and contribution workflow, see [Contributing Guidelines](docs/contributing.md).
+For detailed development setup, testing, linting, formatting, and contribution workflow, see [Contributing Guidelines](docs/CONTRIBUTING.md).
 
 ## License
 

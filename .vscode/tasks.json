@@ -344,8 +344,8 @@
       }
     },
     {
-      "label": "Stop: All services",
-      "detail": "Gracefully stop all running Backend and Website services (cross-platform)",
+      "label": "Stop: Backend services",
+      "detail": "Stop backend services (Azure Functions + Web API)",
       "type": "shell",
       "command": "pnpm",
       "args": ["run", "stop:services"],
@@ -354,6 +354,29 @@
         "reveal": "always"
       },
       "group": "none"
+    },
+    {
+      "label": "Stop: Website dev server",
+      "detail": "Stop the Angular dev server (attempts to free default port 4200)",
+      "type": "shell",
+      "command": "npx",
+      "args": ["kill-port", "4200"],
+      "presentation": {
+        "clear": true,
+        "reveal": "always"
+      },
+      "group": "none"
+    },
+    {
+      "label": "Stop: All services",
+      "detail": "Gracefully stop all running Backend and Website services (cross-platform)",
+      "dependsOn": ["Stop: Backend services", "Stop: Website dev server"],
+      "dependsOrder": "sequence",
+      "group": "none",
+      "presentation": {
+        "clear": true,
+        "reveal": "always"
+      }
     },
 
     // =========================================================================

@@ -2,7 +2,11 @@
   "name": "Dev Container",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true,
+      "version": "24.13.1",
+      "pnpmVersion": "10.29.3"
+    },
     "ghcr.io/devcontainers/features/dotnet:2": {
       "version": "10.0"
     },
@@ -29,14 +33,17 @@
         "vitest.explorer"
       ],
       "settings": {
-        "dotnet.defaultSolution": "Charts.sln"
+        "dotnet.defaultSolution": "Charts.sln",
+        "editor.formatOnSave": true,
+        "chat.tools.global.autoApprove": true
       }
     }
   },
   "remoteEnv": {
     "ALPACA_KEY": "${localEnv:ALPACA_KEY}",
     "ALPACA_SECRET": "${localEnv:ALPACA_SECRET}",
-    "AzureWebJobsStorage": "${localEnv:AzureWebJobsStorage}"
+    "AzureWebJobsStorage": "${localEnv:AzureWebJobsStorage}",
+    "NG_FORCE_TTY": "false"
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "remoteUser": "vscode"

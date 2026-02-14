@@ -84,11 +84,7 @@
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": false,
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit",
-      "source.organizeImports": "explicit"
-    }
+    "editor.formatOnSave": false
   },
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.validate.enable": true
