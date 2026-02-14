@@ -28,6 +28,9 @@ dotnet tool install --global roslynator.dotnet.cli@0.11.0  # bug in 0.12.0
 dotnet tool install --global dotnet-outdated-tool
 dotnet tool list --global
 
+# Disable Angular auto-completion
+ng config -g cli.completion.prompted true
+
 # Install Node dependencies
 echo "📦 Installing Node dependencies..."
 pnpm install --frozen-lockfile --loglevel=error --config.confirmModulesPurge=false

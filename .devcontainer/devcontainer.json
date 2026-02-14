@@ -36,7 +36,8 @@
   "remoteEnv": {
     "ALPACA_KEY": "${localEnv:ALPACA_KEY}",
     "ALPACA_SECRET": "${localEnv:ALPACA_SECRET}",
-    "AzureWebJobsStorage": "${localEnv:AzureWebJobsStorage}"
+    "AzureWebJobsStorage": "${localEnv:AzureWebJobsStorage}",
+    "NG_FORCE_TTY": "false"
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "remoteUser": "vscode"
