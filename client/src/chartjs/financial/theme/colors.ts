@@ -30,6 +30,9 @@ const LIGHT_PALETTE: FinancialPalette = {
   }
 };
 
+// TODO: DARK_PALETTE currently uses the same colors as LIGHT_PALETTE.
+// Future work should define distinct dark-mode variants with appropriate contrast
+// adjustments for borders and volume colors to improve visibility in dark themes.
 const DARK_PALETTE: FinancialPalette = {
   candle: {
     up: COLORS.CANDLE_UP,

@@ -62,10 +62,17 @@ export class CandlestickElement extends FinancialElement {
 
     ctx.lineWidth = valueOrDefault(me.borderWidth, candleDefaults.borderWidth ?? 1);
     const resolvedStroke = valueOrDefault(borderColor, candleDefaults.borderColor);
-    ctx.strokeStyle =
-      typeof resolvedStroke === "string"
-        ? resolvedStroke
-        : (resolvedStroke?.unchanged ?? "#000000");
+
+    // Use state-specific stroke color based on candle direction
+    if (typeof resolvedStroke === "string") {
+      ctx.strokeStyle = resolvedStroke;
+    } else if (isUp && resolvedStroke?.up) {
+      ctx.strokeStyle = resolvedStroke.up;
+    } else if (isDown && resolvedStroke?.down) {
+      ctx.strokeStyle = resolvedStroke.down;
+    } else {
+      ctx.strokeStyle = resolvedStroke?.unchanged ?? "#000000";
+    }
 
     ctx.beginPath();
     ctx.moveTo(x, high);

@@ -205,7 +205,30 @@ export class FinancialController extends BarController {
     const vScale = controller._cachedMeta.vScale;
     const base = vScale.getBasePixel();
     const iPixels = controller._calculateBarIndexPixels(index, ruler, options);
-    const data = controller.chart.data.datasets[controller.index].data[index];
+
+    // Defensive check for data access
+    const data = controller.chart?.data?.datasets?.[controller.index]?.data?.[index];
+    if (
+      !data ||
+      typeof data.o !== "number" ||
+      typeof data.h !== "number" ||
+      typeof data.l !== "number" ||
+      typeof data.c !== "number"
+    ) {
+      // Return safe defaults if data is missing or invalid
+      return {
+        base,
+        x: iPixels.center,
+        y: base,
+        width: iPixels.size,
+        open: base,
+        high: base,
+        low: base,
+        close: base,
+        direction: "unchanged" as const
+      };
+    }
+
     const open = vScale.getPixelForValue(data.o);
     const high = vScale.getPixelForValue(data.h);
     const low = vScale.getPixelForValue(data.l);

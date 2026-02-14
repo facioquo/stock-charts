@@ -44,7 +44,7 @@ pnpm start  # Terminal 4: Angular dev server
 
 Financial chart support (`candlestick`, `ohlc`) is integrated as a typed, modular Chart.js extension under `client/src/chartjs/financial`.
 
-- Register once at startup with `ensureFinancialChartsRegistered()` (already called from `client/src/main.ts`).
+- Register once at startup with `registerFinancialCharts()` (already called from `client/src/main.ts`).
 - Use OHLC data points in `{ x, o, h, l, c }` shape where `x` is a timestamp.
 - Theme candle/volume colors via `getFinancialPalette()` + `applyFinancialElementTheme()`.
 - Use factories (`buildCandlestickDataset`, `buildVolumeDataset`, `buildFinancialChartOptions`) for consistent typed chart config.

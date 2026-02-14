@@ -2,7 +2,11 @@
   "name": "Dev Container",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true,
+      "version": "24.13.1",
+      "pnpmVersion": "10.29.2"
+    },
     "ghcr.io/devcontainers/features/dotnet:2": {
       "version": "10.0"
     },

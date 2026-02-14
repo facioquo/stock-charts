@@ -86,7 +86,6 @@ applyFinancialElementTheme(palette);
 ### Functions
 
 - `registerFinancialCharts()` - Register candlestick and OHLC chart types with Chart.js
-- `setFinancialDefaults(palette?)` - Configure default colors and styles
 - `buildCandlestickDataset(data, borderColor)` - Helper to create typed candlestick datasets
 - `buildVolumeDataset(quotes, extraBars, palette)` - Helper to create volume bar datasets
 - `getFinancialPalette(mode)` - Get predefined color palette ('light' or 'dark')

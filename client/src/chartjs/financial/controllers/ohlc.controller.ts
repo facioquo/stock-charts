@@ -21,6 +21,7 @@ interface OhlcControllerInternals {
   };
   resolveDataElementOptions: (index: number, mode: string) => unknown;
   getSharedOptions: (options: unknown) => unknown;
+  updateSharedOptions: (sharedOptions: unknown, mode: string, firstOptions: unknown) => void;
   includeOptions: (mode: string, sharedOptions: unknown) => boolean;
   calculateElementProperties: (
     index: number,
@@ -52,6 +53,8 @@ export class OhlcController extends FinancialController {
     const firstOptions = controller.resolveDataElementOptions(start, mode);
     const sharedOptions = controller.getSharedOptions(firstOptions);
     const includeOptions = controller.includeOptions(mode, sharedOptions);
+
+    controller.updateSharedOptions(sharedOptions, mode, firstOptions);
 
     for (let i = 0; i < count; i++) {
       const dataIndex = start + i;
