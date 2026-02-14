@@ -13,8 +13,8 @@ Submit an Issue with a clear description of the problem, steps to reproduce, cod
 
 ### Prerequisites
 
-- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24.13.0 LTS or later)
-- [pnpm](https://pnpm.io/) (v10.29.2 or later) - Install with `npm install -g pnpm@10.29.2`
+- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24.13.1 LTS or later)
+- [pnpm](https://pnpm.io/) (v10.29.3 or later) - Install with `npm install -g pnpm@10.29.3`
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 
