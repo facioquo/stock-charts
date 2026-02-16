@@ -15,6 +15,14 @@
   },
   "tasks": [
     {
+      "label": "Setup: Dev environment",
+      "detail": "Install all development prerequisites (Node, .NET, Azure Functions Core Tools, pnpm)",
+      "type": "shell",
+      "command": "bash scripts/setup-environment.sh",
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
       "label": "Initialize: Pull, rebuild, and verify",
       "detail": "Pull latest, clean, rebuild, format, lint, and run tests",
       "dependsOn": [
@@ -66,52 +74,6 @@
       "type": "shell",
       "command": "pnpm run deps:update",
       "problemMatcher": []
-    },
-    {
-      "label": "Setup: Dev environment",
-      "detail": "Install all development prerequisites (Node, .NET, Azure Functions Core Tools, pnpm)",
-      "type": "shell",
-      "command": "bash scripts/setup-environment.sh",
-      "group": "none",
-      "problemMatcher": []
-    },
-    {
-      "label": "Clean: All outputs",
-      "detail": "Clean build outputs from all projects",
-      "dependsOn": [
-        "Clean: Root and Azure storage",
-        "Clean: Website outputs",
-        "Clean: Backend .NET outputs"
-      ],
-      "dependsOrder": "parallel",
-      "group": "build"
-    },
-    {
-      "label": "Clean: Website outputs",
-      "detail": "Clean Angular build outputs (dist, coverage)",
-      "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run clean"
-    },
-    {
-      "label": "Clean: Backend .NET outputs",
-      "detail": "Clean .NET build outputs (bin, obj)",
-      "type": "shell",
-      "command": "dotnet clean Charts.sln -v minimal --nologo",
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "Clean: Backend solution (hard reset)",
-      "detail": "Deletes all bin/obj folders and runs dotnet clean command (hard clean)",
-      "type": "shell",
-      "command": "bash scripts/dotnet-clean.sh",
-      "group": "build",
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "Clean: Root and Azure storage",
-      "detail": "Clean Azurite and root level items, including npm packages",
-      "type": "shell",
-      "command": "pnpm run clean"
     },
     {
       "label": "Build: All projects (incremental)",
@@ -404,6 +366,44 @@
     // =========================================================================
     // CLEANUP
     // =========================================================================
+    {
+      "label": "Clean: All outputs",
+      "detail": "Clean build outputs from all projects",
+      "dependsOn": [
+        "Clean: Root and Azure storage",
+        "Clean: Website outputs",
+        "Clean: Backend .NET outputs"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build"
+    },
+    {
+      "label": "Clean: Website outputs",
+      "detail": "Clean Angular build outputs (dist, coverage)",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/client run clean"
+    },
+    {
+      "label": "Clean: Backend .NET outputs",
+      "detail": "Clean .NET build outputs (bin, obj)",
+      "type": "shell",
+      "command": "dotnet clean Charts.sln -v minimal --nologo",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Clean: Backend solution (hard reset)",
+      "detail": "Deletes all bin/obj folders and runs dotnet clean command (hard clean)",
+      "type": "shell",
+      "command": "bash scripts/dotnet-clean.sh",
+      "group": "build",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Clean: Root and Azure storage",
+      "detail": "Clean Azurite and root level items, including npm packages",
+      "type": "shell",
+      "command": "pnpm run clean"
+    },
     {
       "label": "Clean: temporary caches",
       "detail": "Delete build caches and lock files",
