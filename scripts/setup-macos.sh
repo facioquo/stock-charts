@@ -35,6 +35,14 @@ else
   brew install "node@24"
 fi
 
+# Ensure node@24 is available immediately after install/upgrade
+# (Homebrew uses keg-only formula that isn't on PATH by default)
+if [ -d "$(brew --prefix node@24 2>/dev/null || echo '')" ]; then
+  node_path="$(brew --prefix node@24)/bin"
+  export PATH="${node_path}:$PATH"
+  log "Added node@24 to PATH: $node_path"
+fi
+
 log "Node: $(node --version)"
 log "npm:  $(npm --version)"
 
@@ -42,7 +50,9 @@ log "npm:  $(npm --version)"
 log "Installing .NET SDK v${DOTNET_VERSION}..."
 if command -v dotnet >/dev/null 2>&1; then
   current="$(dotnet --version | cut -d. -f1)"
-  if [[ "$current" == "10" ]]; then
+  # Derive target major version from DOTNET_VERSION constant for consistency
+  target_major="${DOTNET_VERSION%%.*}"
+  if [[ "$current" == "$target_major" ]]; then
     log ".NET SDK v${current}.x already installed; skipping"
   else
     log "Current .NET SDK version: ${current} (target: ${DOTNET_VERSION})"
