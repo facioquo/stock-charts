@@ -134,7 +134,7 @@
     },
     {
       "label": "Lint: All (check)",
-      "detail": "Run all linting checks without fixes",
+      "detail": "Run all linting and formatting checks (ESLint, Prettier, Roslynator, dotnet format, markdownlint)",
       "dependsOn": [
         "Lint: Website code (check)",
         "Lint: Backend .NET code (check)",
@@ -146,7 +146,7 @@
     },
     {
       "label": "Lint: All (fix)",
-      "detail": "Auto-fix all linting issues",
+      "detail": "Auto-fix all linting and formatting (ESLint, Prettier, Roslynator, dotnet format, markdownlint)",
       "dependsOn": ["Lint: All code (fix)", "Lint: Markdown (fix)"],
       "dependsOrder": "sequence",
       "group": "none",
@@ -154,7 +154,7 @@
     },
     {
       "label": "Lint: All code (fix)",
-      "detail": "Format Website and Backend .NET code",
+      "detail": "Auto-fix Website (ESLint + Prettier) and Backend (Roslynator + dotnet format) code",
       "dependsOn": [
         "Lint: Website code (fix)",
         "Lint: Backend .NET code (fix)"
@@ -165,17 +165,17 @@
     },
     {
       "label": "Lint: Website code (check)",
-      "detail": "Check Angular code with ESLint",
+      "detail": "Check Angular code with ESLint and Prettier",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run lint",
+      "command": "pnpm --filter @stock-charts/client run lint && pnpm run format:web:check",
       "group": "test",
       "problemMatcher": "$eslint-stylish"
     },
     {
       "label": "Lint: Website code (fix)",
-      "detail": "Format Angular code with Prettier",
+      "detail": "Auto-fix Angular code with ESLint and format with Prettier",
       "type": "shell",
-      "command": "pnpm run format:web",
+      "command": "pnpm --filter @stock-charts/client run lint:fix && pnpm run format:web",
       "group": "none",
       "problemMatcher": "$tsc"
     },
