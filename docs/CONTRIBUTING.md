@@ -43,6 +43,14 @@ bash scripts/setup-environment.sh
 
 Or use VS Code: `Ctrl+Shift+P` → "Tasks: Run Task" → "Setup: Dev environment"
 
+#### Clone and install
+
+```bash
+git clone https://github.com/facioquo/stock-charts.git
+cd stock-charts
+pnpm install
+```
+
 #### Platform-specific scripts
 
 **macOS** - `scripts/setup-macos.sh`

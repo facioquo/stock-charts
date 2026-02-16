@@ -8,7 +8,7 @@ description: Markdown formatting guide
 Keep Markdown contributions consistent with GitHub Flavored Markdown (GFM) and the VS Code Markdown language features documented at <https://github.github.com/gfm/> and <https://code.visualstudio.com/docs/languages/markdown> while aligning with repository automation and preview tooling.
 
 > [!CRITICAL]
-> **Context loading warning:** In some AI agent environments (GitHub Copilot in VS Code), #file: references in auto-loaded files automatically expand their targets into the context window. This can cause exponential context bloat and degrade agent performance. **Entry point files** like AGENTS.md and root instruction files should **NEVER contain #file: references** to other instruction or context files. Use plain-text file path mentions instead and let agents fetch files on-demand. See `docs/context-loading-lessons-learned.md` for details.
+> **Context loading warning:** In some AI agent environments (GitHub Copilot in VS Code), #file: references in auto-loaded files automatically expand their targets into the context window. This can cause exponential context bloat and degrade agent performance. **Entry point files** like AGENTS.md and root instruction files should **NEVER contain #file: references** to other instruction or context files. Use plain-text file path mentions instead and let agents fetch files on-demand. See `docs/CONTRIBUTING.md` for examples of effective documentation structure.
 
 ## Baseline workflow
 

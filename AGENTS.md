@@ -89,20 +89,22 @@ pnpm --filter @stock-charts/client run <command>   # Run command in client works
 
 ```typescript
 // ✅ Signals-based reactive state, strict types, standalone component
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed } from "@angular/core";
 
 @Component({
-  selector: 'app-chart',
+  selector: "app-chart",
   standalone: true,
-  templateUrl: './chart.component.html'
+  templateUrl: "./chart.component.html"
 })
 export class ChartComponent {
   readonly data = signal<OhlcData[]>([]);
   readonly isLoading = signal(false);
-  readonly chartReady = computed(() => this.data().length > 0 && !this.isLoading());
+  readonly chartReady = computed(
+    () => this.data().length > 0 && !this.isLoading()
+  );
 
   async loadData(symbol: string): Promise<void> {
-    if (!symbol) throw new Error('Symbol required');
+    if (!symbol) throw new Error("Symbol required");
     this.isLoading.set(true);
     try {
       const response = await this.api.getQuotes(symbol);
@@ -124,7 +126,7 @@ export class Chart {
 
   load(s) {
     this.loading = true;
-    this.api.get('/data/' + s).subscribe(r => {
+    this.api.get("/data/" + s).subscribe(r => {
       this.data = r;
       this.loading = false;
     });
@@ -145,20 +147,20 @@ public class ChartService
     private readonly IQuoteService _quoteService;
 
     public async Task<IEnumerable<OhlcData>> GetChartDataAsync(
-        ChartDataRequest request, 
+        ChartDataRequest request,
         CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        
+
         if (string.IsNullOrWhiteSpace(request.Symbol))
             throw new ArgumentException("Symbol is required", nameof(request));
 
         var quotes = await _quoteService.GetQuotesAsync(
-            request.Symbol, 
-            request.StartDate, 
-            request.EndDate, 
+            request.Symbol,
+            request.StartDate,
+            request.EndDate,
             ct);
-            
+
         return quotes.Select(q => new OhlcData(q.Date, q.Open, q.High, q.Low, q.Close));
     }
 }
@@ -222,7 +224,7 @@ Financial chart types (`candlestick`, `ohlc`, `volume`) are integrated as typed 
 
 ### ✅ Always do
 
-- Run full code completion checklist before marking work complete (see #file:instructions/code-completion.instructions.md)
+- Run full code completion checklist before marking work complete (see `.github/instructions/code-completion.instructions.md`)
 - Format all code: `pnpm run format` (zero warnings required)
 - Lint with zero errors: `pnpm run lint` (fix before commit)
 - Build successfully: `pnpm run build` and `dotnet build Charts.sln`

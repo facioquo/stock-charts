@@ -342,9 +342,10 @@
     },
     {
       "label": "Stop: Azurite",
-      "detail": "Stop Azurite storage emulator",
+      "detail": "Stop Azurite storage emulator (cross-platform)",
       "type": "shell",
-      "command": "pkill -TERM azurite || echo 'No Azurite process running'",
+      "command": "npx",
+      "args": ["kill-port", "10000", "10001", "10002"],
       "presentation": {
         "clear": false,
         "reveal": "silent"
@@ -366,7 +367,11 @@
     {
       "label": "Stop: All services",
       "detail": "Gracefully stop all running Backend and Website services (cross-platform)",
-      "dependsOn": ["Stop: Azurite", "Stop: Backend services", "Stop: Website dev server"],
+      "dependsOn": [
+        "Stop: Azurite",
+        "Stop: Backend services",
+        "Stop: Website dev server"
+      ],
       "dependsOrder": "sequence",
       "group": "none",
       "presentation": {

@@ -50,8 +50,9 @@ if command -v node >/dev/null 2>&1; then
 else
   log "Installing Node.js v24 LTS..."
   winget.exe install --id OpenJS.NodeJS.LTS --version 24.13.1 --silent --accept-package-agreements --accept-source-agreements
-  # Reload PATH (may require new shell)
-  log "Node.js installed. You may need to restart Git Bash for PATH changes to take effect."
+  # Refresh command hash to pick up newly installed binaries
+  hash -r 2>/dev/null || true
+  log "Node.js installed."
 fi
 
 # Verify Node.js
@@ -59,7 +60,10 @@ if command -v node >/dev/null 2>&1; then
   log "Node: $(node --version)"
   log "npm:  $(npm --version)"
 else
-  err "Node.js not found in PATH. Please restart Git Bash and run this script again."
+  log "Node.js not found in PATH after installation."
+  log "Please restart Git Bash and run this script again to complete setup."
+  log ""
+  log "To restart: Close this window and open a new Git Bash terminal."
   exit 1
 fi
 
@@ -71,14 +75,17 @@ if command -v dotnet.exe >/dev/null 2>&1 || command -v dotnet >/dev/null 2>&1; t
 
   current="$($dotnet_cmd --version | cut -d. -f1)"
   log ".NET SDK v$($dotnet_cmd --version) already installed"
-  if [[ "$current" != "10" ]]; then
-    log "Warning: Expected .NET SDK v10.x, found v$($dotnet_cmd --version)"
+  dotnet_major_version="$(echo "${DOTNET_VERSION}" | cut -d. -f1)"
+  if [[ "$current" != "$dotnet_major_version" ]]; then
+    log "Warning: Expected .NET SDK v${DOTNET_VERSION}, found v$($dotnet_cmd --version)"
     log "Consider upgrading to v${DOTNET_VERSION}"
   fi
 else
-  log "Installing .NET SDK v10..."
+  log "Installing .NET SDK v${DOTNET_VERSION}..."
   winget.exe install --id Microsoft.DotNet.SDK.10 --silent --accept-package-agreements --accept-source-agreements
-  log ".NET SDK installed. You may need to restart Git Bash for PATH changes to take effect."
+  # Refresh command hash
+  hash -r 2>/dev/null || true
+  log ".NET SDK installed."
 fi
 
 # Verify .NET SDK
@@ -88,7 +95,10 @@ if command -v dotnet.exe >/dev/null 2>&1 || command -v dotnet >/dev/null 2>&1; t
   log ".NET SDK: $($dotnet_cmd --version)"
   $dotnet_cmd --list-sdks
 else
-  err ".NET SDK not found in PATH. Please restart Git Bash and run this script again."
+  log ".NET SDK not found in PATH after installation."
+  log "Please restart Git Bash and run this script again to complete setup."
+  log ""
+  log "To restart: Close this window and open a new Git Bash terminal."
   exit 1
 fi
 
@@ -101,7 +111,9 @@ if command -v func >/dev/null 2>&1 || command -v func.exe >/dev/null 2>&1; then
 else
   log "Installing Azure Functions Core Tools v4..."
   winget.exe install --id Microsoft.Azure.FunctionsCoreTools --silent --accept-package-agreements --accept-source-agreements
-  log "Azure Functions Core Tools installed. You may need to restart Git Bash for PATH changes to take effect."
+  # Refresh command hash
+  hash -r 2>/dev/null || true
+  log "Azure Functions Core Tools installed."
 fi
 
 # Verify Azure Functions Core Tools
@@ -110,18 +122,28 @@ if command -v func >/dev/null 2>&1 || command -v func.exe >/dev/null 2>&1; then
   command -v func.exe >/dev/null 2>&1 && func_cmd="func.exe"
   log "Azure Functions Core Tools: $($func_cmd --version)"
 else
-  err "Azure Functions Core Tools not found in PATH. Please restart Git Bash and run this script again."
+  log "Azure Functions Core Tools not found in PATH after installation."
+  log "Please restart Git Bash and run this script again to complete setup."
+  log ""
+  log "To restart: Close this window and open a new Git Bash terminal."
   exit 1
 fi
 
 # Install pnpm via winget
 log "Installing pnpm..."
 if command -v pnpm >/dev/null 2>&1; then
-  log "pnpm already installed: $(pnpm --version)"
+  current="$(pnpm --version)"
+  log "pnpm v${current} already installed"
+  if [[ "$current" != "$PNPM_VERSION" ]]; then
+    log "Warning: Expected pnpm v${PNPM_VERSION}, found v${current}"
+    log "Consider upgrading to v${PNPM_VERSION}"
+  fi
 else
   log "Installing pnpm via winget..."
   winget.exe install --id pnpm.pnpm --silent --accept-package-agreements --accept-source-agreements
-  log "pnpm installed. You may need to restart Git Bash for PATH changes to take effect."
+  # Refresh command hash
+  hash -r 2>/dev/null || true
+  log "pnpm installed."
 fi
 
 # Configure pnpm global directory
@@ -131,7 +153,10 @@ if command -v pnpm >/dev/null 2>&1; then
   export PATH="${PNPM_HOME}:${PATH}"
   pnpm config set store-dir "${LOCALAPPDATA}/.pnpm-store" --global 2>/dev/null || true
 else
-  err "pnpm not found in PATH. Please restart Git Bash and run this script again."
+  log "pnpm not found in PATH after installation."
+  log "Please restart Git Bash and run this script again to complete setup."
+  log ""
+  log "To restart: Close this window and open a new Git Bash terminal."
   exit 1
 fi
 

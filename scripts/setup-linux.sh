@@ -21,6 +21,21 @@ log "Installing base APT packages"
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends ca-certificates curl git gnupg xz-utils
 
+log "Configuring Microsoft package repository for .NET SDK"
+# Get Ubuntu version
+source /etc/os-release
+ubuntu_version="${VERSION_ID}"
+
+# Download and install Microsoft package signing key
+curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+
+# Add Microsoft package repository
+echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-${ubuntu_version}-prod ${VERSION_CODENAME} main" \
+  | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
+
+# Update package index
+sudo apt-get update
+
 log "Installing .NET SDK"
 sudo apt-get install -y dotnet-sdk-10.0
 dotnet --info
@@ -88,11 +103,11 @@ log "Enabling Corepack and pnpm@${PNPM_VERSION}"
 # Try to enable corepack (may need sudo on some systems)
 if corepack enable 2>/dev/null; then
   log "Corepack enabled system-wide"
+  # Only run prepare if corepack enable succeeded
+  corepack prepare "pnpm@${PNPM_VERSION}" --activate || log "Corepack prepare failed, will use npx fallback"
 else
   log "Corepack enable requires elevated permissions - will use via npx instead"
 fi
-
-corepack prepare "pnpm@${PNPM_VERSION}" --activate
 
 # Configure pnpm global directory first
 log "Configuring pnpm global directory..."

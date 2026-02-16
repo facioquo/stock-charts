@@ -10,7 +10,7 @@ This Azure Functions project handles scheduled data fetching and processing for 
 
 For local development, Azure Functions reads configuration from:
 
-1. **local.settings.json** - Local development settings (gitignored, empty values committed)
+1. **local.settings.json** - Local development settings (gitignored, placeholder values provided in `local.settings.example.json`)
 2. **Environment variables** - System or shell environment
 3. **User Secrets** - .NET User Secrets (secure local development)
 4. **Azure Key Vault** - Production secret management (when KEY_VAULT_URL configured)
