@@ -30,7 +30,7 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 **Quick setup (all platforms):**
 
 ```bash
-bash scripts/setup-dev-environment.sh
+bash scripts/setup-environment.sh
 ```
 
 This script automatically detects your OS and runs the appropriate platform-specific setup.

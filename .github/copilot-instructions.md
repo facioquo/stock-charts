@@ -57,7 +57,7 @@ stock-charts/
 
 **Platform-specific installation:**
 
-- **Universal**: Use [scripts/setup-dev-environment.sh](../scripts/setup-dev-environment.sh) (auto-detects OS)
+- **Universal**: Use [scripts/setup-environment.sh](../scripts/setup-environment.sh) (auto-detects OS)
 - **macOS**: Use [scripts/setup-macos.sh](../scripts/setup-macos.sh) (Homebrew-based)
 - **Linux**: Use [scripts/setup-linux.sh](../scripts/setup-linux.sh) (apt-get-based)
 - **Windows**: Use [scripts/setup-windows.sh](../scripts/setup-windows.sh) (Git Bash with winget)

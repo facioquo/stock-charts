@@ -34,7 +34,7 @@ Submit an Issue with a clear description of the problem, steps to reproduce, cod
 Use the universal setup script that automatically detects your OS:
 
 ```bash
-bash scripts/setup-dev-environment.sh
+bash scripts/setup-environment.sh
 ```
 
 Or use VS Code: `Ctrl+Shift+P` → "Tasks: Run Task" → "Setup: Dev environment"
@@ -93,7 +93,7 @@ Use [Windows Subsystem for Linux 2](https://learn.microsoft.com/windows/wsl/inst
 ```bash
 wsl --install
 # After WSL setup, run the universal script
-bash scripts/setup-dev-environment.sh
+bash scripts/setup-environment.sh
 ```
 
 ### Verify installation
