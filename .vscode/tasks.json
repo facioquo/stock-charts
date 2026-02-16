@@ -422,14 +422,6 @@
       "command": "pnpm run clean"
     },
     {
-      "label": "Clean: temporary caches",
-      "detail": "Delete build caches and lock files",
-      "type": "shell",
-      "command": "pnpm run clean && dotnet clean Charts.sln -v minimal --nologo",
-      "group": "build",
-      "problemMatcher": "$msCompile"
-    },
-    {
       "label": "Clean: Azure Storage Emulator data",
       "detail": "Delete local Azurite data and state",
       "type": "shell",

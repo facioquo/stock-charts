@@ -149,8 +149,8 @@ if command -v ng >/dev/null 2>&1; then
 fi
 
 # Check if Azurite is available
-if pnpm exec azurite --version >/dev/null 2>&1; then
-  log "✓ Azurite:  $(pnpm exec azurite --version)"
+if pnpm exec -- azurite -- --version >/dev/null 2>&1; then
+  log "✓ Azurite:  $(pnpm exec -- azurite -- --version)"
 else
   err "Azurite verification failed"
   exit 1

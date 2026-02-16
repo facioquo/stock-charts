@@ -35,19 +35,19 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
 
 #### Quick setup (all platforms)
 
-Use the universal setup script that automatically detects your OS:
+Clone the repository and run the universal setup script that automatically detects your OS:
 
 ```bash
+git clone https://github.com/facioquo/stock-charts.git
+cd stock-charts
 bash scripts/setup-environment.sh
 ```
 
 Or use VS Code: `Ctrl+Shift+P` → "Tasks: Run Task" → "Setup: Dev environment"
 
-#### Clone and install
+Manually install dependencies (alternative if not using the setup script):
 
 ```bash
-git clone https://github.com/facioquo/stock-charts.git
-cd stock-charts
 pnpm install
 ```
 
@@ -220,4 +220,4 @@ Dave Skender
 
 ---
 
-Last updated: December 3, 2025
+Last updated: February 16, 2026

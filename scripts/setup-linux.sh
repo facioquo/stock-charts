@@ -11,6 +11,14 @@ PROFILE_SNIPPET="/etc/profile.d/node.sh"
 log() { printf '\n[setup] %s\n' "$*"; }
 err() { printf '\n[error] %s\n' "$*" >&2; }
 
+# Architecture mapping for package repositories and downloads
+arch="$(uname -m)"
+case "$arch" in
+  x86_64) MS_ARCH="amd64" ;;
+  aarch64|arm64) MS_ARCH="arm64" ;;
+  *) err "Unsupported architecture: $arch"; exit 1 ;;
+esac
+
 # Retry args for curl (works fine even if you don't need it)
 RETRY_CURL_ARGS=(--fail --show-error --location --retry 5 --retry-delay 1 --retry-all-errors)
 
@@ -40,7 +48,7 @@ fi
 curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
 
 # Add Microsoft package repository for Ubuntu
-echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-${distro_version}-prod ${VERSION_CODENAME} main" \
+echo "deb [arch=${MS_ARCH}] https://packages.microsoft.com/repos/microsoft-ubuntu-${distro_version}-prod ${VERSION_CODENAME} main" \
   | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
 
 # Update package index
@@ -215,6 +223,8 @@ cleanup() {
 
 # Ensure cleanup runs on script exit to keep images smaller
 trap cleanup EXIT
+
+# Begin environment setup after defining cleanup handler
 
 # Install CodeRabbit CLI
 log "🐇 Installing CodeRabbit CLI"
