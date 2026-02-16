@@ -226,7 +226,7 @@ Prefer a central AGENTS.md file for AI agent context. See [agents.md specificati
   ```
 
 - DO NOT include change logs here or anywhere in this repository.
-- Except: do not add last updated sections to AGENTS.md or in the .github folder.
+- Except: do not add last updated sections to `AGENTS.md` or `.github/**/*.md` files
 
 ### HTML elements
 
