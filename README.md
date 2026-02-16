@@ -78,6 +78,16 @@ Financial chart support (`candlestick`, `ohlc`) is integrated as a typed, modula
 
 This integration is derived from [chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) and keeps upstream license attribution in source headers.
 
+## AI agents
+
+For AI coding agents (GitHub Copilot, Claude, etc.), see [AGENTS.md](AGENTS.md) for comprehensive project context including:
+
+- Primary and secondary directives
+- Repository structure with permissions
+- Commands and code style patterns
+- Technology conventions and boundaries
+- Development workflow
+
 ## Development and contributing
 
 For detailed development setup, testing, linting, formatting, and contribution workflow, see [Contributing Guidelines](docs/CONTRIBUTING.md).

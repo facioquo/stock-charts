@@ -9,6 +9,10 @@ Thanks for taking the time to contribute! We accept:
 
 Submit an Issue with a clear description of the problem, steps to reproduce, code samples, and any reference materials.
 
+## AI agents
+
+If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENTS.md](../AGENTS.md) for comprehensive project context including directives, structure, commands, and boundaries.
+
 ## Development setup
 
 ### Prerequisites

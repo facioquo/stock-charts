@@ -81,7 +81,3 @@ dotnet build Charts.sln --configuration Release
 - Use `dotnet list package` to view installed packages
 - For version conflicts: `dotnet list package --include-transitive`
 - Clear caches if needed: `dotnet nuget locals all --clear`
-
----
-
-Last updated: August 15, 2025

@@ -69,7 +69,7 @@ pnpm install
 #### Important Version Compatibility
 
 - **Vitest**: Use highest version compatible with Angular, may not be latest Vitest
-- **Angular**: Keep all @angular/\* packages at same version for compatibility
+- **Angular**: Keep all Angular packages at same version for compatibility
 - **Node**: Ensure all packages support same Node.js version (see engines in package.json)
 
 ### Commands reference
@@ -101,7 +101,3 @@ pnpm audit --filter @stock-charts/client
 rm -rf node_modules client/node_modules pnpm-lock.yaml
 pnpm install
 ```
-
----
-
-Last updated: December 3, 2025
