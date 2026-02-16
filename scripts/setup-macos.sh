@@ -67,20 +67,14 @@ fi
 log "Azure Functions Core Tools: $(func --version)"
 
 # Install pnpm via Homebrew
-log "Installing pnpm@${PNPM_VERSION}..."
+log "Installing pnpm...\n"
 if command -v pnpm >/dev/null 2>&1; then
-  current="$(pnpm --version)"
-  if [[ "$current" == "$PNPM_VERSION" ]]; then
-    log "pnpm v${current} already installed; skipping"
-  else
-    log "Current pnpm version: v${current} (target: v${PNPM_VERSION})"
-    brew upgrade pnpm || brew install pnpm
-  fi
+  log \"pnpm already installed: $(pnpm --version)\"
 else
   brew install pnpm
 fi
 
-log "pnpm: $(pnpm --version)"
+log \"pnpm: $(pnpm --version)"
 
 # Configure pnpm global directory
 log "Configuring pnpm global directory..."
