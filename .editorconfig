@@ -44,4 +44,5 @@ csharp_style_expression_bodied_methods = true:silent     # Allow expression-bodi
 csharp_style_expression_bodied_properties = true:silent  # Allow expression-bodied properties
 
 # Diagnostic overrides
-dotnet_diagnostic.IDE0058.severity = none    # Disable "use '_' discard" value warnings
+dotnet_diagnostic.IDE0058.severity = none     # Disable "use '_' discard" value warnings
+dotnet_diagnostic.CA1873.severity = warning   # Avoid potentially expensive logging

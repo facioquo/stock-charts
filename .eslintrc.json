@@ -1,0 +1,30 @@
+{
+  "env": {
+    "node": true,
+    "es2024": true
+  },
+  "extends": ["eslint:recommended"],
+  "globals": {
+    "console": "readonly",
+    "process": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2024,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-console": "off",
+    "no-constant-condition": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["scripts/**/*.js"],
+      "env": {
+        "node": true
+      },
+      "parserOptions": {
+        "sourceType": "module"
+      }
+    }
+  ]
+}

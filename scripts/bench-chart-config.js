@@ -6,9 +6,7 @@
  * Micro-benchmark large dataset config building
  */
 
-const fs = require('fs');
-const path = require('path');
-const { randomInt, randomBytes } = require('crypto');
+import { randomInt } from 'crypto';
 
 // Mock required modules for Node.js environment
 global.window = {

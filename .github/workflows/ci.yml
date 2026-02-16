@@ -1,0 +1,139 @@
+name: "CI"
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+env:
+  NODE_VERSION: "24.13.1"
+  PNPM_VERSION: "10.29.3"
+
+jobs:
+  test-backend:
+    name: "Backend"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.x"
+          dotnet-quality: "ga"
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Build .NET solution
+        run: >
+          dotnet build Charts.sln
+          --configuration Release
+          --property:ContinuousIntegrationBuild=true
+          -warnAsError
+
+      - name: Verify .NET formatting
+        run: dotnet format Charts.sln --verify-no-changes
+
+      - name: Run backend tests with coverage
+        run: |
+          dotnet tool restore
+          dotnet test Charts.sln \
+            --collect:"XPlat Code Coverage" \
+            --results-directory:./server/coverage \
+            --logger:trx \
+            --configuration Release \
+            --property:ContinuousIntegrationBuild=true \
+            -warnAsError
+
+      - name: Convert coverage to lcov format
+        run: |
+          dotnet tool run reportgenerator \
+            -reports:"server/coverage/**/coverage.cobertura.xml" \
+            -targetdir:"server/coverage" \
+            -reporttypes:"lcov"
+
+      - name: Upload backend coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./server/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+          fail_ci_if_error: false
+
+      - name: Publish backend test results
+        uses: dorny/test-reporter@v2
+        if: success() || failure()
+        with:
+          name: xUnit Tests
+          path: server/coverage/*.trx
+          reporter: dotnet-trx
+
+      - name: Upload backend coverage artifacts
+        if: github.event_name == 'pull_request' && (success() || failure())
+        uses: actions/upload-artifact@v6
+        with:
+          name: backend-coverage-report
+          path: |
+            server/coverage/*.trx
+            server/coverage/lcov.info
+
+  test-website:
+    name: "Website"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check web formatting
+        run: pnpm run format:web:check
+
+      - name: Lint
+        run: pnpm --filter @stock-charts/client run lint
+
+      - name: Run unit tests
+        run: pnpm --filter @stock-charts/client run test:coverage
+
+      - name: Upload frontend coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./client/coverage/lcov.info
+          flags: frontend
+          name: frontend-coverage
+          fail_ci_if_error: false
+
+      - name: Upload coverage artifacts
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: code-coverage-reports
+          path: |
+            client/coverage/
+            server/coverage/lcov.info
+            server/coverage/*.trx
+
+      - name: Build site
+        run: pnpm --filter @stock-charts/client run build.prod

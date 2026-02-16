@@ -20,7 +20,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  title:
+  lint:
     runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.draft }}
 

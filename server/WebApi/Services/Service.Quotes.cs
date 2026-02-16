@@ -8,7 +8,7 @@ public interface IQuoteService
     Task<IEnumerable<Quote>> Get(string symbol);
 }
 
-public class QuoteService(
+public partial class QuoteService(
     ILogger<QuoteService> logger,
     IStorage storage) : IQuoteService
 {
@@ -36,16 +36,16 @@ public class QuoteService(
 
             if (!await blob.ExistsAsync())
             {
-                _logger.LogWarning("Blob {BlobName} not found, using backup data", blobName);
+                LogBlobNotFound(blobName);
                 return QuoteBackup.BackupQuotes;
             }
 
             Response<BlobDownloadInfo> response = await blob.DownloadAsync();
-            using Stream? stream = response?.Value.Content;
+            await using Stream? stream = response?.Value.Content;
 
             if (stream == null)
             {
-                _logger.LogError("Download stream was null for {BlobName}", blobName);
+                LogDownloadStreamNull(blobName);
                 return QuoteBackup.BackupQuotes;
             }
 
@@ -53,7 +53,7 @@ public class QuoteService(
 
             if (quotes == null || quotes.Count == 0)
             {
-                _logger.LogWarning("No quotes found in {BlobName}", blobName);
+                LogNoQuotesFound(blobName);
                 return QuoteBackup.BackupQuotes;
             }
 
@@ -63,8 +63,20 @@ public class QuoteService(
         // failover to backup quotes for local development and testing
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to retrieve quotes for {Symbol}", symbol);
+            LogRetrieveQuotesFailed(ex, symbol);
             return QuoteBackup.BackupQuotes;
         }
     }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Blob {BlobName} not found, using backup data")]
+    private partial void LogBlobNotFound(string blobName);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Download stream was null for {BlobName}")]
+    private partial void LogDownloadStreamNull(string blobName);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "No quotes found in {BlobName}")]
+    private partial void LogNoQuotesFound(string blobName);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Failed to retrieve quotes for {Symbol}")]
+    private partial void LogRetrieveQuotesFailed(Exception exception, string symbol);
 }

@@ -1,0 +1,40 @@
+{
+  "name": "chartjs-chart-financial",
+  "version": "1.0.0",
+  "description": "Financial charting extension for Chart.js v4.5+ (candlestick and OHLC charts)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Build configured in parent project'",
+    "test": "echo 'Tests configured in parent project'"
+  },
+  "keywords": [
+    "chart.js",
+    "chartjs",
+    "financial",
+    "candlestick",
+    "ohlc",
+    "stock",
+    "trading",
+    "charts",
+    "typescript"
+  ],
+  "author": "Chart.js Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/facioquo/stock-charts.git",
+    "directory": "client/src/chartjs/financial"
+  },
+  "bugs": {
+    "url": "https://github.com/facioquo/stock-charts/issues"
+  },
+  "homepage": "https://github.com/facioquo/stock-charts#readme",
+  "peerDependencies": {
+    "chart.js": "^4.5.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=24.13.1"
+  }
+}

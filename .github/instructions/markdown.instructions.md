@@ -134,7 +134,7 @@ Use plain-text mentions when referencing files **for awareness only** (agent dec
 
 ```markdown
 Refer to the AGENTS.md file for project context.
-See the contributing guide in docs/contributing.md for details.
+See the contributing guide in docs/CONTRIBUTING.md for details.
 ```
 
 ### Avoiding context window bloat

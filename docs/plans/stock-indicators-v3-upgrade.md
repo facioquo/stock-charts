@@ -106,7 +106,7 @@ This upgrade involves a multi-phase approach that ensures compatibility at each 
 - [ ] 5.7 Verify no console errors in browser developer tools
 - [ ] 5.8 Test chart responsiveness and rendering across different screen sizes
 - [ ] 5.9 Update `README.md` with Angular v21 and Stock.Indicators v3 version numbers
-- [ ] 5.10 Update `docs/contributing.md` if development workflow changes
+- [ ] 5.10 Update `docs/CONTRIBUTING.md` if development workflow changes
 - [ ] 5.11 Run formatters: `npm run format` and verify no changes needed
 - [ ] 5.12 Run final lint check: `npm run lint` with zero warnings
 - [ ] 5.13 Commit final documentation updates
