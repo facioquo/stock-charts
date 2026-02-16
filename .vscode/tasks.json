@@ -243,6 +243,7 @@
       "label": "Run: Full development stack",
       "detail": "Start all Backend .NET code services and Website dev server",
       "dependsOn": [
+        "Stop: All services",
         "Run: Azure Storage",
         "Run: Azure Functions",
         "Run: Web API",
@@ -340,6 +341,17 @@
       "group": "none"
     },
     {
+      "label": "Stop: Azurite",
+      "detail": "Stop Azurite storage emulator",
+      "type": "shell",
+      "command": "pkill -TERM azurite || echo 'No Azurite process running'",
+      "presentation": {
+        "clear": false,
+        "reveal": "silent"
+      },
+      "group": "none"
+    },
+    {
       "label": "Stop: Website dev server",
       "detail": "Stop the Angular dev server (attempts to free default port 4200)",
       "type": "shell",
@@ -354,7 +366,7 @@
     {
       "label": "Stop: All services",
       "detail": "Gracefully stop all running Backend and Website services (cross-platform)",
-      "dependsOn": ["Stop: Backend services", "Stop: Website dev server"],
+      "dependsOn": ["Stop: Azurite", "Stop: Backend services", "Stop: Website dev server"],
       "dependsOrder": "sequence",
       "group": "none",
       "presentation": {

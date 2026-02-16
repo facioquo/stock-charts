@@ -286,8 +286,9 @@ Typical lifecycle:
 
 - **Tasks**: `Ctrl+Shift+P` → "Tasks: Run Task" for common operations
 - **Formatting**: Auto-format on save (Prettier for frontend, dotnet format for backend)
-- **Extensions**: ESLint, Prettier, C# Dev Kit, Angular Language Service
-- **Debugging**: Configured launch profiles for frontend and backend
+- **Extensions**: ESLint, Prettier, C# Dev Kit, Angular Language Service, Azure Storage (for viewing data), Azure Functions (for debugging)
+- **Extension conflicts**: Do NOT install Azurite extension (azurite.azurite) - it conflicts with npm-based emulator (`pnpm run azure:start`). Use Azure Storage extension to view blob/queue/table data.
+- **Debugging**: Press F5 to attach debugger to running Azure Functions (start Functions task first). Configured launch profiles for frontend and backend.
 - **Problem panel**: Navigate errors and warnings efficiently
 
 ## Context for AI assistance

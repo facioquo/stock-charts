@@ -65,7 +65,9 @@ dotnet user-secrets set "ALPACA_SECRET" "your-alpaca-secret-here"
 - WebAPI automatically serves backup quote data
 - Full application functionality available for demo purposes
 
-**Azure storage**: The project uses [Azurite](../../README.md#local-storage-with-azurite) for local development, which is automatically installed via the main project's npm dependencies.
+**Azure storage**: The project uses Azurite for local development, installed via npm (`azurite` package). Start with `pnpm run azure:start` or VS Code task "Run: Azure Storage".
+
+⚠️ **Important**: Do NOT install the Azurite VS Code extension (`azurite.azurite`). It conflicts with the npm-based emulator by trying to use the same port (10000). Use the Azure Storage extension (`ms-azuretools.vscode-azurestorage`) to view storage data.
 
 ## CRON configuration
 
