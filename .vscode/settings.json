@@ -14,6 +14,7 @@
   "chat.useAgentSkills": true,
   "chat.useAgentsMdFile": true,
   "chat.useNestedAgentsMdFiles": true,
+  "dotnet.defaultSolution": "Charts.sln",
   "github.copilot.chat.agentCustomizationSkill.enabled": true,
   "github.copilot.chat.copilotMemory.enabled": true,
   "github.copilot.chat.githubMcpServer.enabled": true,

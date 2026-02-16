@@ -54,6 +54,20 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "Check: Node packages",
+      "detail": "Check for dependency updates in root and all workspace packages",
+      "type": "shell",
+      "command": "pnpm run deps:check",
+      "problemMatcher": []
+    },
+    {
+      "label": "Update: Node packages",
+      "detail": "Update dependencies in root and all workspace packages to latest versions",
+      "type": "shell",
+      "command": "pnpm run deps:update",
+      "problemMatcher": []
+    },
+    {
       "label": "Setup: Dev environment",
       "detail": "Install all development prerequisites (Node, .NET, Azure Functions Core Tools, pnpm)",
       "type": "shell",
