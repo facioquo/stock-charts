@@ -54,8 +54,8 @@ echo "deb [arch=${MS_ARCH}] https://packages.microsoft.com/repos/microsoft-ubunt
 # Update package index
 sudo apt-get update
 
-log "Installing .NET SDK"
-sudo apt-get install -y dotnet-sdk-10.0
+log "Installing .NET SDK v${DOTNET_VERSION}"
+sudo apt-get install -y "dotnet-sdk-${DOTNET_VERSION}"
 dotnet --info
 dotnet --list-sdks
 
