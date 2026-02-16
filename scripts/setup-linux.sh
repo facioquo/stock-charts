@@ -85,15 +85,46 @@ log "npm:  $(npm --version)"
 
 # Install pnpm (via Corepack)
 log "Enabling Corepack and pnpm@${PNPM_VERSION}"
-corepack enable || true
+# Try to enable corepack (may need sudo on some systems)
+if corepack enable 2>/dev/null; then
+  log "Corepack enabled system-wide"
+else
+  log "Corepack enable requires elevated permissions - will use via npx instead"
+fi
+
 corepack prepare "pnpm@${PNPM_VERSION}" --activate
 
-if ! command -v pnpm >/dev/null 2>&1; then
-  err "pnpm not found after Corepack activation"
+# Configure pnpm global directory first
+log "Configuring pnpm global directory..."
+export PNPM_HOME="${HOME}/.local/share/pnpm"
+export PATH="${PNPM_HOME}:${PATH}"
+
+# Use npx to run pnpm setup (works even without symlinks)
+npx --yes pnpm@${PNPM_VERSION} setup --force 2>/dev/null || true
+
+# Verify pnpm is available (via npx if symlink doesn't exist)
+if command -v pnpm >/dev/null 2>&1; then
+  log "pnpm: $(pnpm --version)"
+elif npx --yes pnpm@${PNPM_VERSION} --version >/dev/null 2>&1; then
+  log "pnpm: $(npx --yes pnpm@${PNPM_VERSION} --version) (via npx)"
+  # Create a shell function to use pnpm via npx
+  pnpm() { npx --yes pnpm@${PNPM_VERSION} "$@"; }
+  export -f pnpm
+else
+  err "pnpm not available"
   exit 1
 fi
 
-log "pnpm: $(pnpm --version)"
+# Install Angular CLI globally
+log "Installing Angular CLI globally..."
+if command -v ng >/dev/null 2>&1; then
+  ng_version=$(ng version 2>&1 | sed -n 's/^Angular CLI[[:space:]]*:[[:space:]]*\([0-9.]*\).*/\1/p' || echo "unknown")
+  log "Angular CLI already installed: ${ng_version}"
+else
+  pnpm add -g @angular/cli
+  ng_version=$(ng version 2>&1 | sed -n 's/^Angular CLI[[:space:]]*:[[:space:]]*\([0-9.]*\).*/\1/p' || echo "unknown")
+  log "Angular CLI installed: ${ng_version}"
+fi
 
 # Install Node dependencies
 log "📦 Installing Node dependencies..."

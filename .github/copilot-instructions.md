@@ -45,6 +45,28 @@ stock-charts/
 
 ## Development setup
 
+### System requirements
+
+**All platforms:**
+
+- Node.js v24.13.1 LTS or later
+- pnpm v10.29.3 or later (via Homebrew on macOS, winget on Windows, Corepack on Linux)
+- .NET SDK v10.0 or later
+- **Azure Functions Core Tools v4** - Required for backend development (`func start`)
+- Git
+
+**Platform-specific installation:**
+
+- **Universal**: Use [scripts/setup-dev-environment.sh](../scripts/setup-dev-environment.sh) (auto-detects OS)
+- **macOS**: Use [scripts/setup-macos.sh](../scripts/setup-macos.sh) (Homebrew-based)
+- **Linux**: Use [scripts/setup-linux.sh](../scripts/setup-linux.sh) (apt-get-based)
+- **Windows**: Use [scripts/setup-windows.sh](../scripts/setup-windows.sh) (Git Bash with winget)
+- **VS Code**: Task "Setup: Dev environment"
+
+**Note:** All setup scripts automatically install Node.js, .NET SDK, Azure Functions Core Tools, pnpm, and Angular CLI.
+
+**Critical note:** Azure Functions Core Tools is not bundled with Node.js or .NET SDK and must be installed separately. Without it, the Azure Functions backend (`func start`) will fail.
+
 ### pnpm workspace commands
 
 ```bash
@@ -83,7 +105,7 @@ dotnet run --project server/Functions
 
 ### Frontend (Angular) - Use MCP for Best Practices
 
-- **Always consult**: Use #tool:angular-cli/* for latest official guidance and documentation
+- **Always consult**: Use Angular CLI MCP server `angular-cli` for latest official guidance and documentation
 - **Project-specific**: Follow guidelines in #file:instructions/angular.instructions.md
 
 ### Backend (.NET)

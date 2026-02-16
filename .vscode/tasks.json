@@ -54,6 +54,14 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "Setup: Dev environment",
+      "detail": "Install all development prerequisites (Node, .NET, Azure Functions Core Tools, pnpm)",
+      "type": "shell",
+      "command": "bash scripts/setup-dev-environment.sh",
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
       "label": "Clean: All outputs",
       "detail": "Clean build outputs from all projects",
       "dependsOn": [
