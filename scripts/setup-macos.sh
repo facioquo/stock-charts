@@ -66,15 +66,35 @@ fi
 
 log "Azure Functions Core Tools: $(func --version)"
 
+# Install Roslynator dotnet tool
+log "Installing Roslynator dotnet tool..."
+if dotnet tool list -g | grep -q "roslynator.dotnet.cli"; then
+  log "Roslynator already installed"
+  dotnet tool update -g roslynator.dotnet.cli --version 0.11.0 --no-cache >/dev/null 2>&1 || true
+else
+  dotnet tool install -g roslynator.dotnet.cli --version 0.11.0 --no-cache
+  log "Roslynator installed"
+fi
+
+# Configure .NET tools PATH (add to both .zshrc and .zprofile for all contexts)
+log "Configuring .NET tools PATH..."
+for profile in ~/.zshrc ~/.zprofile; do
+  if [ -f "$profile" ] && ! grep -qF '.dotnet/tools' "$profile"; then
+    echo 'export PATH="$HOME/.dotnet/tools:$PATH"' >> "$profile"
+    log "Added .NET tools to PATH in $profile"
+  fi
+done
+export PATH="$HOME/.dotnet/tools:$PATH"
+
 # Install pnpm via Homebrew
-log "Installing pnpm...\n"
+log "Installing pnpm..."
 if command -v pnpm >/dev/null 2>&1; then
-  log \"pnpm already installed: $(pnpm --version)\"
+  log "pnpm already installed: $(pnpm --version)"
 else
   brew install pnpm
 fi
 
-log \"pnpm: $(pnpm --version)"
+log "pnpm: $(pnpm --version)"
 
 # Configure pnpm global directory
 log "Configuring pnpm global directory..."

@@ -41,6 +41,24 @@ sudo apt-get install -y dotnet-sdk-10.0
 dotnet --info
 dotnet --list-sdks
 
+# Install Roslynator dotnet tool
+log "Installing Roslynator dotnet tool..."
+if dotnet tool list -g | grep -q "roslynator.dotnet.cli"; then
+  log "Roslynator already installed"
+  dotnet tool update -g roslynator.dotnet.cli --version 0.11.0 --no-cache >/dev/null 2>&1 || true
+else
+  dotnet tool install -g roslynator.dotnet.cli --version 0.11.0 --no-cache
+  log "Roslynator installed"
+fi
+
+# Configure .NET tools PATH
+log "Configuring .NET tools PATH..."
+if [ -f ~/.bashrc ] && ! grep -qF '.dotnet/tools' ~/.bashrc; then
+  echo 'export PATH=$HOME/.dotnet/tools:$PATH' >> ~/.bashrc
+  log "Added .NET tools to PATH in ~/.bashrc"
+fi
+export PATH="$HOME/.dotnet/tools:$PATH"
+
 # --- Install Node (no nvm) ---
 log "Installing Node v${NODE_VERSION} (no nvm)"
 

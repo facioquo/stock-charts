@@ -129,6 +129,28 @@ else
   exit 1
 fi
 
+# Install Roslynator dotnet tool
+log "Installing Roslynator dotnet tool..."
+dotnet_cmd="dotnet"
+command -v dotnet.exe >/dev/null 2>&1 && dotnet_cmd="dotnet.exe"
+if $dotnet_cmd tool list -g | grep -q "roslynator.dotnet.cli"; then
+  log "Roslynator already installed"
+  $dotnet_cmd tool update -g roslynator.dotnet.cli --version 0.11.0 --no-cache >/dev/null 2>&1 || true
+else
+  $dotnet_cmd tool install -g roslynator.dotnet.cli --version 0.11.0 --no-cache
+  log "Roslynator installed"
+fi
+
+# Configure .NET tools PATH (Git Bash on Windows)
+log "Configuring .NET tools PATH..."
+profile="${HOME}/.bash_profile"
+[ ! -f "$profile" ] && [ -f "${HOME}/.bashrc" ] && profile="${HOME}/.bashrc"
+if [ -f "$profile" ] && ! grep -qF '.dotnet/tools' "$profile"; then
+  echo 'export PATH="$HOME/.dotnet/tools:$PATH"' >> "$profile"
+  log "Added .NET tools to PATH in $profile"
+fi
+export PATH="$HOME/.dotnet/tools:$PATH"
+
 # Install pnpm via winget
 log "Installing pnpm..."
 if command -v pnpm >/dev/null 2>&1; then
