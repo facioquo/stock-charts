@@ -22,15 +22,24 @@ sudo apt-get update
 sudo apt-get install -y --no-install-recommends ca-certificates curl git gnupg xz-utils
 
 log "Configuring Microsoft package repository for .NET SDK"
-# Get Ubuntu version
+# Get distro info
 source /etc/os-release
-ubuntu_version="${VERSION_ID}"
+distro_id="${ID}"
+distro_version="${VERSION_ID}"
+
+# Only Ubuntu is supported by this script at the moment
+if [[ "$distro_id" != "ubuntu" ]]; then
+  err "This script currently only supports Ubuntu. Detected: $distro_id"
+  err "For non-Ubuntu systems, please use the Microsoft .NET install script:"
+  err "  curl -sSL https://dot.net/v1/dotnet-install.sh | bash"
+  exit 1
+fi
 
 # Download and install Microsoft package signing key
 curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
 
-# Add Microsoft package repository
-echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-${ubuntu_version}-prod ${VERSION_CODENAME} main" \
+# Add Microsoft package repository for Ubuntu
+echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-${distro_version}-prod ${VERSION_CODENAME} main" \
   | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
 
 # Update package index
@@ -54,7 +63,7 @@ fi
 # Configure .NET tools PATH
 log "Configuring .NET tools PATH..."
 if [ -f ~/.bashrc ] && ! grep -qF '.dotnet/tools' ~/.bashrc; then
-  echo 'export PATH=$HOME/.dotnet/tools:$PATH' >> ~/.bashrc
+  echo "export PATH=\$HOME/.dotnet/tools:\$PATH" >> ~/.bashrc
   log "Added .NET tools to PATH in ~/.bashrc"
 fi
 export PATH="$HOME/.dotnet/tools:$PATH"
@@ -159,6 +168,10 @@ else
   log "Angular CLI installed: ${ng_version}"
 fi
 
+# Change to repository root
+log "Changing to repository root..."
+cd "$(dirname "$0")/.." || exit 1
+
 # Install Node dependencies
 log "📦 Installing Node dependencies..."
 pnpm install --frozen-lockfile --loglevel=error --config.confirmModulesPurge=false
@@ -179,7 +192,10 @@ cleanup() {
 
   if command -v pnpm >/dev/null 2>&1; then
     pnpm store prune --loglevel=error || true
-    rm -rf "${HOME}/.local/share/pnpm/store" || true
+    # Only remove full store in CI/container environments
+    if [ "${CI:-}" = "true" ] || [ "${CONTAINER:-}" = "1" ]; then
+      rm -rf "${HOME}/.local/share/pnpm/store" || true
+    fi
   fi
 
   if command -v npm >/dev/null 2>&1; then

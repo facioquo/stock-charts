@@ -80,7 +80,7 @@ fi
 log "Configuring .NET tools PATH..."
 for profile in ~/.zshrc ~/.zprofile; do
   if [ -f "$profile" ] && ! grep -qF '.dotnet/tools' "$profile"; then
-    echo 'export PATH="$HOME/.dotnet/tools:$PATH"' >> "$profile"
+    echo "export PATH=\"\$HOME/.dotnet/tools:\$PATH\"" >> "$profile"
     log "Added .NET tools to PATH in $profile"
   fi
 done
@@ -89,12 +89,16 @@ export PATH="$HOME/.dotnet/tools:$PATH"
 # Install pnpm via Homebrew
 log "Installing pnpm..."
 if command -v pnpm >/dev/null 2>&1; then
-  log "pnpm already installed: $(pnpm --version)"
+  current="$(pnpm --version)"
+  log "pnpm v${current} already installed"
 else
-  brew install pnpm
+  brew install pnpm 2>/dev/null || {
+    log "Homebrew pnpm installation may have version differences from ${PNPM_VERSION}"
+    log "Installing pnpm globally via npm..."
+    npm install -g pnpm
+  }
+  log "pnpm installed"
 fi
-
-log "pnpm: $(pnpm --version)"
 
 # Configure pnpm global directory
 log "Configuring pnpm global directory..."
@@ -112,6 +116,10 @@ else
   ng_version=$(ng version 2>&1 | sed -n 's/^Angular CLI[[:space:]]*:[[:space:]]*\([0-9.]*\).*/\1/p')
   log "Angular CLI installed: ${ng_version}"
 fi
+
+# Change to repository root
+log "Changing to repository root..."
+cd "$(dirname "$0")/.." || exit 1
 
 # Install Node dependencies
 log "📦 Installing Node dependencies (including Azurite)..."

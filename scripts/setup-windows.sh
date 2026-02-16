@@ -48,8 +48,8 @@ if command -v node >/dev/null 2>&1; then
     log "Consider upgrading to v${NODE_VERSION}"
   fi
 else
-  log "Installing Node.js v24 LTS..."
-  winget.exe install --id OpenJS.NodeJS.LTS --version 24.13.1 --silent --accept-package-agreements --accept-source-agreements
+  log "Installing Node.js v${NODE_VERSION} LTS..."
+  winget.exe install --id OpenJS.NodeJS.LTS --version "${NODE_VERSION}" --silent --accept-package-agreements --accept-source-agreements
   # Refresh command hash to pick up newly installed binaries
   hash -r 2>/dev/null || true
   log "Node.js installed."
@@ -146,7 +146,7 @@ log "Configuring .NET tools PATH..."
 profile="${HOME}/.bash_profile"
 [ ! -f "$profile" ] && [ -f "${HOME}/.bashrc" ] && profile="${HOME}/.bashrc"
 if [ -f "$profile" ] && ! grep -qF '.dotnet/tools' "$profile"; then
-  echo 'export PATH="$HOME/.dotnet/tools:$PATH"' >> "$profile"
+  echo "export PATH=\"\$HOME/.dotnet/tools:\$PATH\"" >> "$profile"
   log "Added .NET tools to PATH in $profile"
 fi
 export PATH="$HOME/.dotnet/tools:$PATH"
@@ -193,6 +193,10 @@ else
   log "Angular CLI installed: ${ng_version}"
 fi
 
+# Change to repository root
+log "Changing to repository root..."
+cd "$(dirname "$0")/.." || exit 1
+
 # Install Node dependencies
 log "📦 Installing Node dependencies (including Azurite)..."
 pnpm install --frozen-lockfile --loglevel=error --config.confirmModulesPurge=false
@@ -220,9 +224,9 @@ if command -v ng >/dev/null 2>&1; then
   log "✓ Angular CLI: ${ng_version}"
 fi
 
-# Check Azurite
-if pnpm exec azurite --version >/dev/null 2>&1; then
-  log "✓ Azurite:  $(pnpm exec azurite --version)"
+# Check Azurite (use proper argument forwarding)
+if pnpm exec -- azurite -- --version >/dev/null 2>&1; then
+  log "✓ Azurite:  $(pnpm exec -- azurite -- --version)"
 else
   err "Azurite verification failed"
   exit 1
