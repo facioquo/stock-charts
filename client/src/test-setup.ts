@@ -8,6 +8,23 @@
  * (watch mode) do not throw or mask real browser APIs if they become available.
  */
 
+// ========================================================================
+// Angular Testing Infrastructure
+// ========================================================================
+import { getTestBed } from "@angular/core/testing";
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from "@angular/platform-browser-dynamic/testing";
+
+// Initialize Angular TestBed environment.
+// This must be called once before any tests that use TestBed APIs.
+getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
+
+// ========================================================================
+// Browser API Shims for jsdom
+// ========================================================================
+
 // Some libraries probe for the CSS object; jsdom may not define it.
 if (!("CSS" in window)) {
   Object.defineProperty(window, "CSS", { value: null });

@@ -66,7 +66,7 @@ pnpm start  # Terminal 4: Angular dev server
 
 **Access:** Website at <http://localhost:4200>, Web API at <https://localhost:5001>, Functions at <http://localhost:7071>
 
-## Financial Charts
+## Financial charts
 
 Financial chart support (`candlestick`, `ohlc`) is integrated as a typed, modular Chart.js extension under `client/src/chartjs/financial`.
 

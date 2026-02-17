@@ -425,8 +425,13 @@
       "label": "Clean: Azure Storage Emulator data",
       "detail": "Delete local Azurite data and state",
       "type": "shell",
-      "command": "pnpm run azure:clean",
-      "group": "none"
+      "command": "pnpm run azure:clean"
+    },
+    {
+      "label": "Delete: Claude temporary files",
+      "detail": "Delete all tmpclaude-*.cwd files bug workaround",
+      "type": "shell",
+      "command": "find . -maxdepth 25 -type f -name 'tmpclaude-*-cwd' -delete"
     }
   ]
 }

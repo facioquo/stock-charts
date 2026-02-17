@@ -50,6 +50,12 @@ Supporting information:
 - [x] [Task 7](task-07.md): Create VitePress Integration Documentation and Examples ✅
 - [x] [Task 8](task-08.md): Validate, Remove Old Code, and Publish Library ✅
 
+Follow-on tasks:
+
+- [ ] Task 9: Refactor restore `client/src/chartjs/financial/` as a standalone charts.js plugin in a new libs/chartjs-financial directory (a modernized version of GitHub repo chartjs/chartjs-chart-financial). This is a standalone pnpm workspace `@facioquo/chartjs-chart-financial`. This essentially reflects the state of that plugin prior to this branch's changes.
+- [ ] Task 10: Refactor separate the `@stock-charts/financial` library to be the componentized npm package in folder libs/indy-charts as standalone pnpm workspace `@facioquo/indy-charts`
+- [ ] Task 11: add new pnpm workspace tests/vitepress to have a standalone VitePress minimal sample depicting a real working integration of the indy-charts
+
 ## Implementation summary
 
 All tasks completed successfully. The `@stock-charts/financial` library has been extracted from the Angular application and is now available at `client/src/chartjs/financial/`.
