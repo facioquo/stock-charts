@@ -112,6 +112,7 @@ nul
 logs/
 *.vspscc
 *.vssscc
+tmpclaude-*
 
 # ========================================
 # LOGS & DIAGNOSTICS
