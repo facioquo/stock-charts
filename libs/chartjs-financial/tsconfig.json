@@ -1,5 +1,4 @@
 {
-  "extends": "../../tsc-config.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": ".",
@@ -16,7 +15,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "**/*.ts"

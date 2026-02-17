@@ -9,7 +9,6 @@ import {
   TimeSeriesScale,
   Tooltip
 } from "chart.js";
-import AnnotationPlugin from "chartjs-plugin-annotation";
 
 import { CandlestickController } from "./controllers/candlestick.controller";
 import { OhlcController } from "./controllers/ohlc.controller";
@@ -17,7 +16,9 @@ import { CandlestickElement } from "./elements/candlestick.element";
 import { OhlcElement } from "./elements/ohlc.element";
 import { setFinancialDefaults } from "./helpers/defaults";
 
-export const financialRegisterables = [
+import type { ChartComponent } from "chart.js";
+
+export const financialRegisterables: ReadonlyArray<ChartComponent> = [
   CandlestickController,
   OhlcController,
   LineController,
@@ -27,11 +28,10 @@ export const financialRegisterables = [
   OhlcElement,
   LineElement,
   PointElement,
-  AnnotationPlugin,
   Filler,
   LinearScale,
   TimeSeriesScale
-] as const;
+];
 
 let registered = false;
 

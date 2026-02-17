@@ -1,7 +1,7 @@
 import { ChartDataset, ScatterDataPoint } from "chart.js";
 
-import { FinancialDataPoint, FinancialPalette } from "./types/financial.types";
-import { getVolumeColor } from "./theme/colors";
+import { FinancialDataPoint, FinancialPalette } from "../types/financial.types";
+import { getVolumeColor } from "../theme/colors";
 
 interface QuoteLike {
   date: Date;
@@ -26,7 +26,7 @@ export function toFinancialDataPoint(quote: QuoteLike): FinancialDataPoint {
 export function buildCandlestickDataset(
   priceData: FinancialDataPoint[],
   borderColor: FinancialPalette["candleBorder"]
-): ChartDataset {
+): ChartDataset<"candlestick", FinancialDataPoint[]> {
   return {
     type: "candlestick",
     label: "Price",
@@ -34,7 +34,7 @@ export function buildCandlestickDataset(
     yAxisID: "y",
     borderColor: borderColor as unknown as string,
     order: 75
-  } as unknown as ChartDataset;
+  } as unknown as ChartDataset<"candlestick", FinancialDataPoint[]>;
 }
 
 /** Builds a typed volume dataset with up/down/unchanged candle coloring. */

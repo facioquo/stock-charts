@@ -28,6 +28,29 @@ export {
   FONT_FAMILY
 } from "./config";
 
+// Factory functions
+export {
+  buildCandlestickDataset,
+  buildVolumeDataset,
+  toFinancialDataPoint
+} from "./factories/datasets";
+
+export { applyFinancialElementTheme, buildFinancialChartOptions } from "./factories/options";
+
+// Theme and colors
+export { COLORS, getCandleColor, getFinancialPalette, getVolumeColor } from "./theme/colors";
+
+// Types
+export type {
+  FinancialColorSet,
+  FinancialDataPoint,
+  FinancialDatasetOptions,
+  FinancialPalette,
+  FinancialParsedData,
+  FinancialThemeMode,
+  OhlcDatasetOptions
+} from "./types/financial.types";
+
 // Data transformers
 export {
   addExtraBars,
