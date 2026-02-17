@@ -1,0 +1,24 @@
+{
+  "name": "@stock-charts/vitepress-example",
+  "version": "1.0.0",
+  "description": "VitePress example demonstrating @facioquo/indy-charts integration",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "dependencies": {
+    "@facioquo/chartjs-chart-financial": "workspace:*",
+    "@facioquo/indy-charts": "workspace:*",
+    "chart.js": "4.5.1",
+    "chartjs-adapter-date-fns": "3.0.0",
+    "chartjs-plugin-annotation": "3.1.0",
+    "date-fns": "4.1.0"
+  },
+  "devDependencies": {
+    "vitepress": "1.5.0",
+    "vue": "3.5.13"
+  }
+}

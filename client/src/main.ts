@@ -7,7 +7,7 @@ import { env } from "./environments/environment";
 import { provideAnimations } from "@angular/platform-browser/animations";
 import { AppComponent } from "./app/app.component";
 import { routes } from "./app/app.routes";
-import { registerFinancialCharts } from "@stock-charts/financial";
+import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
 
 if (env.production) {
   enableProdMode();

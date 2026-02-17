@@ -1,0 +1,62 @@
+{
+  "name": "@facioquo/indy-charts",
+  "version": "1.0.0",
+  "description": "Framework-agnostic financial charting library with technical indicators and stock market data visualization",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write \"**/*.{ts,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,json,md}\"",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
+  },
+  "keywords": [
+    "charts",
+    "financial",
+    "indicators",
+    "stock",
+    "trading",
+    "technical-analysis",
+    "candlestick",
+    "ohlc",
+    "typescript",
+    "chart.js"
+  ],
+  "author": "Facioquo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/facioquo/stock-charts.git",
+    "directory": "libs/indy-charts"
+  },
+  "bugs": {
+    "url": "https://github.com/facioquo/stock-charts/issues"
+  },
+  "homepage": "https://github.com/facioquo/stock-charts#readme",
+  "peerDependencies": {
+    "chart.js": "^4.5.1",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "chartjs-plugin-annotation": "^3.1.0",
+    "date-fns": "^4.1.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=24.13.1"
+  }
+}
