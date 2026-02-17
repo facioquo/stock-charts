@@ -29,7 +29,7 @@ export function baseOscillatorOptions(settings: ChartSettings): ChartOptions {
 
   // rescale labels
   y.ticks.callback = (value: string | number, index, values) => {
-    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    const numValue = typeof value === "string" ? parseFloat(value) : value;
     const v = Math.abs(numValue);
 
     // remove first and last y-axis labels

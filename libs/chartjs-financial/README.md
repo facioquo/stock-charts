@@ -22,8 +22,8 @@ npm install @facioquo/chartjs-chart-financial chart.js
 ## Quick Start
 
 ```typescript
-import { Chart, registerables } from 'chart.js';
-import { registerFinancialCharts } from '@facioquo/chartjs-chart-financial';
+import { Chart, registerables } from "chart.js";
+import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
 
 // Register Chart.js and financial chart types
 Chart.register(...registerables);
@@ -31,16 +31,18 @@ registerFinancialCharts();
 
 // Create a candlestick chart
 const chart = new Chart(ctx, {
-  type: 'candlestick',
+  type: "candlestick",
   data: {
-    datasets: [{
-      label: 'Stock Price',
-      data: [
-        { x: '2024-01-01', o: 100, h: 110, l: 95, c: 105 },
-        { x: '2024-01-02', o: 105, h: 115, l: 103, c: 112 },
-        // ... more data points
-      ]
-    }]
+    datasets: [
+      {
+        label: "Stock Price",
+        data: [
+          { x: "2024-01-01", o: 100, h: 110, l: 95, c: 105 },
+          { x: "2024-01-02", o: 105, h: 115, l: 103, c: 112 }
+          // ... more data points
+        ]
+      }
+    ]
   }
 });
 ```
@@ -51,8 +53,12 @@ const chart = new Chart(ctx, {
 
 ```typescript
 const chart = new Chart(ctx, {
-  type: 'candlestick',
-  data: { datasets: [/* ... */] }
+  type: "candlestick",
+  data: {
+    datasets: [
+      /* ... */
+    ]
+  }
 });
 ```
 
@@ -60,8 +66,12 @@ const chart = new Chart(ctx, {
 
 ```typescript
 const chart = new Chart(ctx, {
-  type: 'ohlc',
-  data: { datasets: [/* ... */] }
+  type: "ohlc",
+  data: {
+    datasets: [
+      /* ... */
+    ]
+  }
 });
 ```
 

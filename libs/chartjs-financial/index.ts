@@ -9,11 +9,7 @@ export { FinancialElement } from "./elements/financial.element";
 export { OhlcElement } from "./elements/ohlc.element";
 
 // Factory functions for datasets and options
-export {
-  buildCandlestickDataset,
-  buildVolumeDataset,
-  toFinancialDataPoint
-} from "./datasets";
+export { buildCandlestickDataset, buildVolumeDataset, toFinancialDataPoint } from "./datasets";
 
 export { applyFinancialElementTheme, buildFinancialChartOptions } from "./options";
 

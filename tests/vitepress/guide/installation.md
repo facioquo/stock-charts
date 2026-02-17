@@ -44,6 +44,7 @@ yarn add @facioquo/indy-charts \
 ### @facioquo/indy-charts
 
 The main library providing:
+
 - Chart abstractions (ChartManager, OverlayChart, OscillatorChart)
 - Configuration builders
 - Data transformers
@@ -52,6 +53,7 @@ The main library providing:
 ### @facioquo/chartjs-chart-financial
 
 Chart.js plugin providing:
+
 - Candlestick chart type
 - OHLC chart type
 - Financial data elements

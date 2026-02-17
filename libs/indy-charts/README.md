@@ -21,9 +21,9 @@ npm install @facioquo/indy-charts @facioquo/chartjs-chart-financial chart.js cha
 ## Quick Start
 
 ```typescript
-import { Chart, registerables } from 'chart.js';
-import { registerFinancialCharts } from '@facioquo/chartjs-chart-financial';
-import { ChartManager, createApiClient } from '@facioquo/indy-charts';
+import { Chart, registerables } from "chart.js";
+import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
+import { ChartManager, createApiClient } from "@facioquo/indy-charts";
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -31,21 +31,21 @@ registerFinancialCharts();
 
 // Create API client
 const apiClient = createApiClient({
-  baseUrl: 'https://api.example.com',
+  baseUrl: "https://api.example.com",
   cacheEnabled: true
 });
 
 // Create chart manager
 const manager = new ChartManager({
-  mainCanvas: document.getElementById('main-chart'),
-  volumeCanvas: document.getElementById('volume-chart'),
-  oscillatorCanvas: document.getElementById('oscillator-chart'),
+  mainCanvas: document.getElementById("main-chart"),
+  volumeCanvas: document.getElementById("volume-chart"),
+  oscillatorCanvas: document.getElementById("oscillator-chart"),
   apiClient
 });
 
 // Load data and render charts
-await manager.loadQuotes('AAPL');
-manager.renderMainChart('candlestick');
+await manager.loadQuotes("AAPL");
+manager.renderMainChart("candlestick");
 manager.renderVolumeChart();
 ```
 
@@ -77,16 +77,16 @@ Pre-built configuration objects for common chart types:
 
 ```typescript
 const apiClient = createApiClient({
-  baseUrl: 'https://api.example.com',
+  baseUrl: "https://api.example.com",
   cacheEnabled: true,
   cacheTTL: 3600000 // 1 hour
 });
 
 // Fetch quotes
-const quotes = await apiClient.getQuotes('AAPL');
+const quotes = await apiClient.getQuotes("AAPL");
 
 // Load static data (for demo/testing)
-const staticQuotes = await loadStaticQuotes('AAPL');
+const staticQuotes = await loadStaticQuotes("AAPL");
 ```
 
 ## Usage with VitePress

@@ -73,8 +73,8 @@ VitePress uses Vue 3, so you can use Vue components directly in markdown:
 
 ```vue
 <script setup>
-import { onMounted, ref } from 'vue';
-import { ChartManager } from '@facioquo/indy-charts';
+import { onMounted, ref } from "vue";
+import { ChartManager } from "@facioquo/indy-charts";
 
 const canvasRef = ref(null);
 
@@ -105,8 +105,8 @@ VitePress theme can be customized in `.vitepress/theme/`:
 
 ```typescript
 // .vitepress/theme/index.ts
-import DefaultTheme from 'vitepress/theme';
-import './custom.css';
+import DefaultTheme from "vitepress/theme";
+import "./custom.css";
 
 export default DefaultTheme;
 ```

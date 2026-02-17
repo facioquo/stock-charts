@@ -45,12 +45,12 @@ onMounted(async () => {
 
 ```vue
 <script setup>
-import { onMounted, ref } from 'vue';
-import { Chart, registerables } from 'chart.js';
-import 'chartjs-adapter-date-fns';
-import annotationPlugin from 'chartjs-plugin-annotation';
-import { registerFinancialCharts } from '@facioquo/chartjs-chart-financial';
-import { ChartManager, loadStaticQuotes } from '@facioquo/indy-charts';
+import { onMounted, ref } from "vue";
+import { Chart, registerables } from "chart.js";
+import "chartjs-adapter-date-fns";
+import annotationPlugin from "chartjs-plugin-annotation";
+import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
+import { ChartManager, loadStaticQuotes } from "@facioquo/indy-charts";
 
 const mainCanvasRef = ref(null);
 const volumeCanvasRef = ref(null);
@@ -64,10 +64,10 @@ onMounted(async () => {
     volumeCanvas: volumeCanvasRef.value
   });
 
-  const quotes = await loadStaticQuotes('AAPL');
+  const quotes = await loadStaticQuotes("AAPL");
   manager.setQuotes(quotes);
 
-  manager.renderMainChart('candlestick');
+  manager.renderMainChart("candlestick");
   manager.renderVolumeChart();
 });
 </script>
@@ -102,9 +102,9 @@ canvas {
 You can customize the chart appearance:
 
 ```typescript
-manager.renderMainChart('candlestick', {
-  theme: 'dark',
-  title: 'AAPL Stock Price'
+manager.renderMainChart("candlestick", {
+  theme: "dark",
+  title: "AAPL Stock Price"
 });
 ```
 

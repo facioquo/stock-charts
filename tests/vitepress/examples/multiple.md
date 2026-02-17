@@ -5,6 +5,7 @@ Example showing how to manage multiple independent charts.
 ## Overview
 
 This example demonstrates:
+
 - Creating multiple chart managers
 - Comparing different stocks
 - Synchronizing chart interactions
@@ -12,11 +13,11 @@ This example demonstrates:
 ## Basic Multiple Charts
 
 ```typescript
-import { Chart, registerables } from 'chart.js';
-import 'chartjs-adapter-date-fns';
-import annotationPlugin from 'chartjs-plugin-annotation';
-import { registerFinancialCharts } from '@facioquo/chartjs-chart-financial';
-import { ChartManager, loadStaticQuotes } from '@facioquo/indy-charts';
+import { Chart, registerables } from "chart.js";
+import "chartjs-adapter-date-fns";
+import annotationPlugin from "chartjs-plugin-annotation";
+import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
+import { ChartManager, loadStaticQuotes } from "@facioquo/indy-charts";
 
 // Register components
 Chart.register(...registerables, annotationPlugin);
@@ -24,27 +25,27 @@ registerFinancialCharts();
 
 // Create first chart manager
 const manager1 = new ChartManager({
-  mainCanvas: document.getElementById('chart1-main'),
-  volumeCanvas: document.getElementById('chart1-volume')
+  mainCanvas: document.getElementById("chart1-main"),
+  volumeCanvas: document.getElementById("chart1-volume")
 });
 
 // Create second chart manager
 const manager2 = new ChartManager({
-  mainCanvas: document.getElementById('chart2-main'),
-  volumeCanvas: document.getElementById('chart2-volume')
+  mainCanvas: document.getElementById("chart2-main"),
+  volumeCanvas: document.getElementById("chart2-volume")
 });
 
 // Load different stocks
-const aaplQuotes = await loadStaticQuotes('AAPL');
-const msftQuotes = await loadStaticQuotes('MSFT');
+const aaplQuotes = await loadStaticQuotes("AAPL");
+const msftQuotes = await loadStaticQuotes("MSFT");
 
 // Render charts
 manager1.setQuotes(aaplQuotes);
-manager1.renderMainChart('candlestick');
+manager1.renderMainChart("candlestick");
 manager1.renderVolumeChart();
 
 manager2.setQuotes(msftQuotes);
-manager2.renderMainChart('candlestick');
+manager2.renderMainChart("candlestick");
 manager2.renderVolumeChart();
 ```
 
@@ -57,7 +58,7 @@ manager2.renderVolumeChart();
     <canvas id="chart1-main"></canvas>
     <canvas id="chart1-volume"></canvas>
   </div>
-  
+
   <div class="chart-panel">
     <h2>MSFT</h2>
     <canvas id="chart2-main"></canvas>
@@ -66,23 +67,23 @@ manager2.renderVolumeChart();
 </div>
 
 <style>
-.charts-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 20px;
-}
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
 
-.chart-panel {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
-}
+  .chart-panel {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+  }
 
-canvas {
-  width: 100%;
-  margin-bottom: 10px;
-}
+  canvas {
+    width: 100%;
+    margin-bottom: 10px;
+  }
 </style>
 ```
 
@@ -93,9 +94,9 @@ Create a side-by-side comparison with synchronized date ranges:
 ```typescript
 // Load quotes for multiple symbols
 const quotes = await Promise.all([
-  loadStaticQuotes('AAPL'),
-  loadStaticQuotes('MSFT'),
-  loadStaticQuotes('GOOGL')
+  loadStaticQuotes("AAPL"),
+  loadStaticQuotes("MSFT"),
+  loadStaticQuotes("GOOGL")
 ]);
 
 // Find common date range
@@ -103,7 +104,7 @@ const startDate = Math.max(...quotes.map(q => q[0].date));
 const endDate = Math.min(...quotes.map(q => q[q.length - 1].date));
 
 // Filter quotes to common range
-const filteredQuotes = quotes.map(q => 
+const filteredQuotes = quotes.map(q =>
   q.filter(quote => quote.date >= startDate && quote.date <= endDate)
 );
 
@@ -113,11 +114,11 @@ const managers = filteredQuotes.map((quotes, index) => {
     mainCanvas: document.getElementById(`chart${index}-main`),
     volumeCanvas: document.getElementById(`chart${index}-volume`)
   });
-  
+
   manager.setQuotes(quotes);
-  manager.renderMainChart('candlestick');
+  manager.renderMainChart("candlestick");
   manager.renderVolumeChart();
-  
+
   return manager;
 });
 ```
@@ -145,12 +146,12 @@ Update all charts when new data arrives:
 
 ```typescript
 async function updateAllCharts() {
-  const symbols = ['AAPL', 'MSFT', 'GOOGL'];
-  
+  const symbols = ["AAPL", "MSFT", "GOOGL"];
+
   const updates = await Promise.all(
     symbols.map(symbol => loadStaticQuotes(symbol))
   );
-  
+
   managers.forEach((manager, index) => {
     manager.setQuotes(updates[index]);
     manager.refresh();
