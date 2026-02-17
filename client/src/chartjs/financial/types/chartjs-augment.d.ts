@@ -11,7 +11,7 @@ import {
   CartesianScaleTypeRegistry
 } from "chart.js";
 
-import type { FinancialDataPoint, FinancialParsedData } from "../chartjs/financial";
+import type { FinancialDataPoint, FinancialParsedData } from "./financial.types";
 
 declare module "chart.js" {
   interface ChartTypeRegistry {

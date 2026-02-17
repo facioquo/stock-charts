@@ -27,7 +27,7 @@ import {
   COLORS,
   FinancialDataPoint,
   getFinancialPalette
-} from "../../chartjs/financial";
+} from "@stock-charts/financial";
 
 // plugins
 import { AnnotationOptions, LabelAnnotationOptions, ScaleValue } from "chartjs-plugin-annotation";

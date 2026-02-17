@@ -23,6 +23,7 @@
     "lint:fix": "ng lint --fix",
     "format": "prettier --write \"src/**/*.{ts,html,scss,css,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,scss,css,json}\"",
+    "build:lib": "tsc -p src/chartjs/financial/tsconfig.lib.json",
     "clean": "rm -rf .angular coverage dist node_modules test-results"
   },
   "dependencies": {

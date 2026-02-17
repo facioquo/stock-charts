@@ -1,129 +1,229 @@
-# chartjs-chart-financial
+# @stock-charts/financial
 
-Financial charting extension for Chart.js v4.5+
-
-This module provides candlestick and OHLC (Open-High-Low-Close) chart types for Chart.js, designed for displaying financial/stock market data.
+Financial charting extension for [Chart.js](https://www.chartjs.org/) v4.5+.
+Provides candlestick/OHLC controllers, indicator chart configuration,
+data transformation utilities, and a high-level `ChartManager` class
+for building interactive stock chart dashboards.
 
 ## Features
 
-- **Candlestick charts**: Visual representation of price movements with filled/hollow candles
-- **OHLC charts**: Traditional bar charts showing open, high, low, and close prices
-- **Typed for TypeScript**: Full TypeScript support with comprehensive type definitions
-- **Modern Chart.js v4.5+ API**: Built specifically for Chart.js v4.5.1, no legacy code
-- **Themeable**: Configurable color palettes for up/down/unchanged states
-- **Optimized rendering**: Efficient canvas drawing with proper pixel alignment
+- **Candlestick and OHLC charts**: Visual representations of price movements
+- **Indicator support**: Overlay and oscillator indicator configurations
+  with 6 line types (solid, dash, dots, bar, pointer, none)
+- **ChartManager**: High-level coordinator for multi-chart dashboards
+- **Framework-agnostic**: No Angular, React, or Vue dependencies
+- **Static data loading**: Synchronous functions for SSG/build-time rendering
+- **API client**: Fetch-based client for retrieving quote and indicator data
+- **Themeable**: Light and dark mode with configurable color palettes
+- **TypeScript**: Full type definitions included
 
 ## Installation
 
 ```bash
-npm install chartjs-chart-financial chart.js@^4.5.1
+npm install @stock-charts/financial chart.js chartjs-adapter-date-fns date-fns chartjs-plugin-annotation
 ```
 
-## Usage
+All peer dependencies must be installed alongside the library.
 
-### Basic Candlestick Chart
+## Quick start
 
-```typescript
-import { Chart } from "chart.js";
+```ts
 import {
   registerFinancialCharts,
-  FinancialDataPoint
-} from "chartjs-chart-financial";
+  ChartManager,
+  ChartSettings,
+  Quote
+} from "@stock-charts/financial";
 
-// Register the financial chart types
+// Register Chart.js controllers and elements (once, at app startup)
 registerFinancialCharts();
 
-// Prepare your data
-const data: FinancialDataPoint[] = [
-  { x: Date.now(), o: 100, h: 110, l: 95, c: 105 },
-  { x: Date.now() + 86400000, o: 105, h: 115, l: 100, c: 112 }
-];
+// Configure settings
+const settings: ChartSettings = {
+  isDarkTheme: false,
+  showTooltips: true
+};
 
-// Create the chart
-const chart = new Chart(ctx, {
-  type: "candlestick",
-  data: {
-    datasets: [
-      {
-        label: "Stock Price",
-        data: data
-      }
-    ]
+// Create a chart manager
+const manager = new ChartManager({ settings });
+
+// Initialize with quote data and a canvas element
+const canvas = document.getElementById("overlay") as HTMLCanvasElement;
+manager.initializeOverlay(canvas, quotes, 250);
+```
+
+## API reference
+
+### Registration
+
+- **`registerFinancialCharts()`** — registers `CandlestickController`,
+  `OhlcController`, `CandlestickElement`, and `OhlcElement` with Chart.js.
+  Call once at application startup.
+
+### ChartManager
+
+High-level coordinator that manages an overlay chart (candlestick + volume)
+and multiple oscillator charts.
+
+```ts
+const manager = new ChartManager({ settings, extraBars: 7 });
+```
+
+| Method | Description |
+|---|---|
+| `initializeOverlay(ctx, quotes, barCount)` | Create the candlestick + volume overlay chart |
+| `processSelectionData(selection, listing, data)` | Prepare indicator datasets |
+| `displaySelection(selection, listing)` | Display indicator on overlay chart |
+| `createOscillator(ctx, selection, listing)` | Create an oscillator chart |
+| `removeSelection(ucid)` | Remove an indicator and its chart |
+| `updateTheme(settings)` | Update theme across all charts |
+| `setBarCount(barCount)` | Resize all charts to show N bars |
+| `resize()` | Force all charts to resize |
+| `destroy()` | Destroy all charts and clean up |
+
+### OverlayChart and OscillatorChart
+
+Lower-level chart wrappers used internally by `ChartManager`.
+Use `ChartManager` unless you need fine-grained control.
+
+### Config builders
+
+Pure functions for building Chart.js configurations:
+
+- `baseOverlayConfig(volumeAxisSize, settings)` — candlestick chart config
+- `baseOscillatorConfig(settings)` — line chart config for oscillators
+- `baseDataset(result, resultConfig)` — dataset for indicators
+- `createThresholdDataset(threshold, firstResult, index)` — threshold lines
+- `commonLegendAnnotation(label, x, y, yAdj, settings)` — legend labels
+
+### Data transformers
+
+- `processQuoteData(quotes)` — converts quotes to `FinancialDataPoint[]`
+  and calculates `volumeAxisSize`
+- `buildDataPoints(data, result, listing)` — converts indicator data to
+  scatter data points with optional candlestick pattern coloring
+- `addExtraBars(dataPoints, count)` — adds NaN padding bars on right edge
+
+### Financial chart primitives
+
+- `buildCandlestickDataset(data, borderColor)` — create typed candlestick datasets
+- `buildVolumeDataset(quotes, extraBars, palette)` — create volume bar datasets
+- `getFinancialPalette(mode)` — get predefined color palette (`"light"` or `"dark"`)
+- `applyFinancialElementTheme(palette)` — apply theme to chart elements
+
+### API client
+
+```ts
+import { createApiClient } from "@stock-charts/financial";
+
+const api = createApiClient({
+  baseUrl: "https://your-api.example.com",
+  onError: (context, error) => console.error(context, error)
+});
+
+const quotes = await api.getQuotes();
+const listings = await api.getListings();
+```
+
+### Static data loading
+
+For build-time rendering (VitePress SSG, static sites):
+
+```ts
+import { loadStaticQuotes } from "@stock-charts/financial";
+import rawQuotes from "./data/quotes.json";
+
+const quotes = loadStaticQuotes(rawQuotes);
+```
+
+## VitePress integration
+
+Since Chart.js requires a DOM canvas, charts must render client-side.
+Use Vue's `onMounted` lifecycle hook:
+
+```vue
+<script setup>
+import { onMounted, ref, watch } from "vue";
+import { useData } from "vitepress";
+
+const { isDark } = useData();
+const canvasRef = ref(null);
+let manager = null;
+
+onMounted(async () => {
+  const {
+    registerFinancialCharts,
+    ChartManager,
+    loadStaticQuotes
+  } = await import("@stock-charts/financial");
+
+  registerFinancialCharts();
+
+  const quotes = loadStaticQuotes(rawQuotesData);
+
+  manager = new ChartManager({
+    settings: { isDarkTheme: isDark.value, showTooltips: true }
+  });
+
+  manager.initializeOverlay(canvasRef.value, quotes, 250);
+});
+
+// Sync theme with VitePress dark mode toggle
+watch(isDark, (dark) => {
+  if (manager) {
+    manager.updateTheme({ isDarkTheme: dark, showTooltips: true });
   }
 });
+</script>
+
+<template>
+  <canvas ref="canvasRef" />
+</template>
 ```
 
-### OHLC Chart
+### SSR safety
 
-```typescript
-const chart = new Chart(ctx, {
-  type: "ohlc",
-  data: {
-    datasets: [
-      {
-        label: "Stock Price",
-        data: data
-      }
-    ]
-  }
-});
+All Chart.js operations require a browser DOM. When using SSR:
+
+1. Use dynamic `import()` inside `onMounted()` (shown above)
+2. Or wrap components with `<ClientOnly>`:
+
+```vue
+<ClientOnly>
+  <StockChart :quotes="quotes" />
+</ClientOnly>
 ```
 
-### With Custom Colors
+## Types
 
-```typescript
-import {
-  getFinancialPalette,
-  applyFinancialElementTheme
-} from "chartjs-chart-financial";
+All TypeScript types are exported from the main entry point:
 
-const palette = getFinancialPalette("dark");
-applyFinancialElementTheme(palette);
+```ts
+import type {
+  ChartSettings,
+  Quote,
+  RawQuote,
+  IndicatorListing,
+  IndicatorSelection,
+  IndicatorResult,
+  ChartConfig,
+  ChartThreshold,
+  ChartFill,
+  FinancialDataPoint,
+  FinancialPalette,
+  ApiClient,
+  ApiClientConfig,
+  ChartManagerConfig
+} from "@stock-charts/financial";
 ```
 
-## API Reference
-
-### Functions
-
-- `registerFinancialCharts()` - Register candlestick and OHLC chart types with Chart.js
-- `buildCandlestickDataset(data, borderColor)` - Helper to create typed candlestick datasets
-- `buildVolumeDataset(quotes, extraBars, palette)` - Helper to create volume bar datasets
-- `getFinancialPalette(mode)` - Get predefined color palette ('light' or 'dark')
-- `getCandleColor(open, close, palette)` - Determine candle color based on price movement
-- `getVolumeColor(open, close, palette)` - Determine volume bar color based on price movement
-
-### Types
-
-- `FinancialDataPoint` - Data point for OHLC data: `{ x, o, h, l, c }`
-- `FinancialPalette` - Color palette configuration
-- `FinancialThemeMode` - 'light' | 'dark'
-
-### Controllers
-
-- `CandlestickController` - Chart controller for candlestick charts
-- `OhlcController` - Chart controller for OHLC charts
-
-### Elements
-
-- `CandlestickElement` - Visual element for rendering candlesticks
-- `OhlcElement` - Visual element for rendering OHLC bars
-
-## Chart.js v4.5+ Compatibility
-
-This library is built specifically for Chart.js v4.5.1 and follows the latest API conventions:
-
-- Extends `DatasetController` for custom chart types
-- Uses proper element registration via `Chart.register()`
-- Implements `updateElements(elements, start, count, mode)` pattern
-- TypeScript declarations compatible with Chart.js v4.5+ types
-
-## Data Format
+## Data format
 
 Financial data points use the following structure:
 
-```typescript
+```ts
 interface FinancialDataPoint {
-  x: number; // Timestamp or x-axis value
+  x: number; // Timestamp (milliseconds)
   o: number; // Open price
   h: number; // High price
   l: number; // Low price
@@ -135,11 +235,5 @@ interface FinancialDataPoint {
 
 MIT License
 
-Derived from [chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) (MIT License)
+Derived from [chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) (MIT License).
 Adapted for Chart.js v4.5+ with TypeScript and modern API patterns.
-
-## Credits
-
-- Original chartjs-chart-financial by Chart.js contributors
-- Refactored and modernized for Chart.js v4.5.1
-- TypeScript definitions and optimization

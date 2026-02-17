@@ -15,7 +15,10 @@
     "types": ["node"],
     "useDefineForClassFields": false,
     "strictNullChecks": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "@stock-charts/financial": ["./src/chartjs/financial/index.ts"]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
