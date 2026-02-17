@@ -7,11 +7,6 @@
     "outDir": "../../../dist/financial",
     "rootDir": "."
   },
-  "include": [
-    "./**/*.ts"
-  ],
-  "exclude": [
-    "**/*.spec.ts",
-    "dist"
-  ]
+  "include": ["./**/*.ts"],
+  "exclude": ["**/*.spec.ts", "dist"]
 }

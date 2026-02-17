@@ -69,17 +69,17 @@ and multiple oscillator charts.
 const manager = new ChartManager({ settings, extraBars: 7 });
 ```
 
-| Method | Description |
-|---|---|
-| `initializeOverlay(ctx, quotes, barCount)` | Create the candlestick + volume overlay chart |
-| `processSelectionData(selection, listing, data)` | Prepare indicator datasets |
-| `displaySelection(selection, listing)` | Display indicator on overlay chart |
-| `createOscillator(ctx, selection, listing)` | Create an oscillator chart |
-| `removeSelection(ucid)` | Remove an indicator and its chart |
-| `updateTheme(settings)` | Update theme across all charts |
-| `setBarCount(barCount)` | Resize all charts to show N bars |
-| `resize()` | Force all charts to resize |
-| `destroy()` | Destroy all charts and clean up |
+| Method                                           | Description                                   |
+| ------------------------------------------------ | --------------------------------------------- |
+| `initializeOverlay(ctx, quotes, barCount)`       | Create the candlestick + volume overlay chart |
+| `processSelectionData(selection, listing, data)` | Prepare indicator datasets                    |
+| `displaySelection(selection, listing)`           | Display indicator on overlay chart            |
+| `createOscillator(ctx, selection, listing)`      | Create an oscillator chart                    |
+| `removeSelection(ucid)`                          | Remove an indicator and its chart             |
+| `updateTheme(settings)`                          | Update theme across all charts                |
+| `setBarCount(barCount)`                          | Resize all charts to show N bars              |
+| `resize()`                                       | Force all charts to resize                    |
+| `destroy()`                                      | Destroy all charts and clean up               |
 
 ### OverlayChart and OscillatorChart
 
@@ -151,11 +151,8 @@ const canvasRef = ref(null);
 let manager = null;
 
 onMounted(async () => {
-  const {
-    registerFinancialCharts,
-    ChartManager,
-    loadStaticQuotes
-  } = await import("@stock-charts/financial");
+  const { registerFinancialCharts, ChartManager, loadStaticQuotes } =
+    await import("@stock-charts/financial");
 
   registerFinancialCharts();
 
@@ -169,7 +166,7 @@ onMounted(async () => {
 });
 
 // Sync theme with VitePress dark mode toggle
-watch(isDark, (dark) => {
+watch(isDark, dark => {
   if (manager) {
     manager.updateTheme({ isDarkTheme: dark, showTooltips: true });
   }
