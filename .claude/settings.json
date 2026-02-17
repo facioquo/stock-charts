@@ -5,6 +5,6 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "plansDirectory": "docs/plans",
-  "agentsDirectories": [".github/agents"],
-  "skillsDirectory": ".github/skills"
+  "agentsDirectories": [".github/agents", "../skenderco.github-private/agents"],
+  "skillsDirectory": "../skenderco.github-private/.github/skills"
 }
