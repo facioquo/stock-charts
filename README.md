@@ -18,10 +18,10 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 
 - [Git](https://git-scm.com/)
 - [Node.js](https://nodejs.org/) (v24.13.1 LTS or later)
-- [pnpm](https://pnpm.io/) (v10.29.3 or later) - Installed via platform package managers:
+- [pnpm](https://pnpm.io/) (v10.30.0 or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
-  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.29.3 --activate`)
+  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.30.0 --activate`)
 - [Angular CLI](https://angular.dev/tools/cli) - Installed globally during setup
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**

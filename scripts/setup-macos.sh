@@ -2,7 +2,7 @@
 set -euo pipefail
 
 NODE_VERSION="24.13.1"
-PNPM_VERSION="10.29.3"
+PNPM_VERSION="10.30.0"
 DOTNET_VERSION="10.0"
 
 log() { printf '\n[setup] %s\n' "$*"; }

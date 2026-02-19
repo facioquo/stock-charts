@@ -20,10 +20,10 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
 **All platforms:**
 
 - [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24.13.1 LTS or later)
-- [pnpm](https://pnpm.io/) (v10.29.3 or later) - Installed via platform package managers:
+- [pnpm](https://pnpm.io/) (v10.30.0 or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
-  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.29.3 --activate`)
+  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.30.0 --activate`)
 - [Angular CLI](https://angular.dev/cli) - Installed globally during setup
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
@@ -60,7 +60,7 @@ Installs all prerequisites via [Homebrew](https://brew.sh/):
 - Node.js v24
 - .NET SDK v10
 - Azure Functions Core Tools v4
-- pnpm v10.29.3 (via Homebrew)
+- pnpm v10.30.0 (via Homebrew)
 - Angular CLI (global via pnpm)
 
 ```bash
@@ -73,7 +73,7 @@ Installs all prerequisites via apt-get:
 
 - Node.js v24.13.1
 - .NET SDK v10.0
-- pnpm v10.29.3 (via Corepack)
+- pnpm v10.30.0 (via Corepack)
 - Angular CLI (global)
 
 ```bash
@@ -89,7 +89,7 @@ Installs all prerequisites via winget (requires Git Bash for Windows):
 - Node.js v24.13.1 LTS
 - .NET SDK v10.0
 - Azure Functions Core Tools v4
-- pnpm v10.29.3 (via winget)
+- pnpm v10.30.0 (via winget)
 - Angular CLI (global via pnpm)
 
 ```bash
@@ -114,7 +114,7 @@ After running the setup script or manual installation, verify all tools:
 
 ```bash
 node --version    # Should be v24.13.1+
-pnpm --version    # Should be 10.29.3+
+pnpm --version    # Should be 10.30.0+
 dotnet --version  # Should be 10.0+
 func --version    # Should be 4.x
 ```
