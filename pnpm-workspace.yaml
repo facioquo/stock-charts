@@ -1,5 +1,8 @@
 packages:
   - client
+  - libs/chartjs-financial
+  - libs/indy-charts
+  - tests/vitepress
 
 ignoredBuiltDependencies:
   - '@parcel/watcher'

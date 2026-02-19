@@ -17,6 +17,8 @@
     "strictNullChecks": true,
     "resolveJsonModule": true,
     "paths": {
+      "@facioquo/chartjs-chart-financial": ["../libs/chartjs-financial/index.ts"],
+      "@facioquo/indy-charts": ["../libs/indy-charts/index.ts"],
       "@stock-charts/financial": ["./src/chartjs/financial/index.ts"]
     }
   },

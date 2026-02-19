@@ -3,7 +3,7 @@ import { Chart } from "chart.js";
 import { beforeEach, describe, expect, it, vi, afterEach } from "vitest";
 import { of, Subject } from "rxjs";
 
-import { registerFinancialCharts } from "@stock-charts/financial";
+import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
 import { ChartService } from "./chart.service";
 import { ApiService } from "./api.service";
 import { ChartConfigService } from "./config.service";

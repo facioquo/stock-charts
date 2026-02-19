@@ -1,0 +1,58 @@
+{
+  "name": "@facioquo/chartjs-chart-financial",
+  "version": "0.1.0",
+  "description": "Financial charting extension for Chart.js v4.5+ (candlestick, OHLC, volume charts)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write \"**/*.{ts,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,json,md}\"",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
+  },
+  "keywords": [
+    "chart.js",
+    "chartjs",
+    "financial",
+    "candlestick",
+    "ohlc",
+    "stock",
+    "trading",
+    "charts",
+    "typescript"
+  ],
+  "author": "Chart.js Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/facioquo/stock-charts.git",
+    "directory": "libs/chartjs-financial"
+  },
+  "bugs": {
+    "url": "https://github.com/facioquo/stock-charts/issues"
+  },
+  "homepage": "https://github.com/facioquo/stock-charts#readme",
+  "peerDependencies": {
+    "chart.js": "^4.5.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}

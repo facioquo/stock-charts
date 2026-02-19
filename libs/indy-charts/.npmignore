@@ -1,0 +1,11 @@
+src
+*.spec.ts
+*.test.ts
+tsconfig.json
+vitest.config.ts
+.DS_Store
+node_modules
+coverage
+.vscode
+.idea
+*.log
