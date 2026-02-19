@@ -36,26 +36,44 @@ source /etc/os-release
 distro_id="${ID}"
 distro_version="${VERSION_ID}"
 
-# Only Ubuntu is supported by this script at the moment
-if [[ "$distro_id" != "ubuntu" ]]; then
-  err "This script currently only supports Ubuntu. Detected: $distro_id"
-  err "For non-Ubuntu systems, please use the Microsoft .NET install script:"
+# Supported distros: ubuntu, debian
+if [[ "$distro_id" != "ubuntu" && "$distro_id" != "debian" ]]; then
+  err "This script supports Ubuntu and Debian. Detected: $distro_id"
+  err "For other systems, use the Microsoft .NET install script:"
   err "  curl -sSL https://dot.net/v1/dotnet-install.sh | bash"
   exit 1
 fi
 
-# Download and install Microsoft package signing key
-curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+# Check if the required .NET SDK is already installed; skip apt repo setup if so.
+dotnet_installed_version="$(dotnet --version 2>/dev/null | cut -d. -f1 || echo "")"
+dotnet_major_required="$(echo "${DOTNET_VERSION}" | cut -d. -f1)"
 
-# Add Microsoft package repository for Ubuntu
-echo "deb [arch=${MS_ARCH}] https://packages.microsoft.com/repos/microsoft-ubuntu-${distro_version}-prod ${VERSION_CODENAME} main" \
-  | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
+if [[ "$dotnet_installed_version" == "$dotnet_major_required" ]]; then
+  log ".NET SDK v${DOTNET_VERSION} already satisfied (installed: $(dotnet --version)); skipping apt repo setup"
+else
+  # Download and install Microsoft package signing key
+  curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
 
-# Update package index
-sudo apt-get update
+  # Build the correct repo URL for the detected distro
+  if [[ "$distro_id" == "ubuntu" ]]; then
+    ms_repo_url="https://packages.microsoft.com/repos/microsoft-ubuntu-${distro_version}-prod"
+    ms_repo_suite="${VERSION_CODENAME}"
+  else
+    # Debian: uses packages.microsoft.com/debian/<VERSION_ID>/prod
+    ms_repo_url="https://packages.microsoft.com/debian/${distro_version}/prod"
+    ms_repo_suite="${VERSION_CODENAME}"
+  fi
 
-log "Installing .NET SDK v${DOTNET_VERSION}"
-sudo apt-get install -y "dotnet-sdk-${DOTNET_VERSION}"
+  echo "deb [arch=${MS_ARCH}] ${ms_repo_url} ${ms_repo_suite} main" \
+    | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
+
+  # Update package index
+  sudo apt-get update
+
+  log "Installing .NET SDK v${DOTNET_VERSION}"
+  sudo apt-get install -y "dotnet-sdk-${DOTNET_VERSION}"
+fi
+
 dotnet --info
 dotnet --list-sdks
 
