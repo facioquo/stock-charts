@@ -1,6 +1,6 @@
 {
   "name": "@facioquo/indy-charts",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Framework-agnostic financial charting library with technical indicators and stock market data visualization",
   "type": "module",
   "main": "./dist/index.js",
@@ -57,6 +57,6 @@
   },
   "devDependencies": {},
   "engines": {
-    "node": ">=24.13.1"
+    "node": ">=24.0.0"
   }
 }
