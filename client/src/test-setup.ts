@@ -21,8 +21,17 @@ import {
 // Initialize Angular TestBed environment.
 // Destroy any existing platform first to prevent NG0400 errors in watch/re-run mode.
 // This must be called once before any tests that use TestBed APIs.
-destroyPlatform();
-getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
+// Use try-catch to handle cases where TestBed is already initialized in Vitest worker pools.
+try {
+  destroyPlatform();
+  getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
+} catch (error) {
+  // If initTestEnvironment was already called, that's fine - just continue.
+  // This can happen when Vitest reuses worker pools across test files.
+  if (!(error as Error).message?.includes("Cannot set base providers")) {
+    throw error;
+  }
+}
 
 // ========================================================================
 // Browser API Shims for jsdom
