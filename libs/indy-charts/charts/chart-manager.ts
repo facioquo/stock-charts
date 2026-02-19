@@ -125,6 +125,7 @@ export class ChartManager {
    * Display a processed selection on the appropriate chart.
    */
   displaySelection(selection: IndicatorSelection, listing: IndicatorListing): void {
+    if (this.selections.some(s => s.ucid === selection.ucid)) return;
     this.selections.push(selection);
 
     if (listing.chartType === CHART_TYPES.OVERLAY) {
