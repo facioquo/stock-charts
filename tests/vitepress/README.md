@@ -49,7 +49,7 @@ pnpm run preview
 
 ## Project Structure
 
-```
+```text
 tests/vitepress/
 ├── .vitepress/
 │   └── config.ts          # VitePress configuration
@@ -142,13 +142,13 @@ See [VitePress deployment guide](https://vitepress.dev/guide/deploy)
 
 Configure build command:
 
-```
+```bash
 pnpm run build
 ```
 
 Output directory:
 
-```
+```text
 .vitepress/dist
 ```
 

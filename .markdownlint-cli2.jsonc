@@ -37,7 +37,10 @@
         "abbr",
         "a",
         "img",
-        "workflow"
+        "workflow",
+        "script",
+        "div",
+        "canvas"
       ]
     },
     "MD041": false,
