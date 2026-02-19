@@ -2,8 +2,15 @@
   "name": "Dev Container",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
   "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true,
+      "username": "vscode",
+      "userUid": "automatic",
+      "userGid": "automatic"
+    },
     "ghcr.io/devcontainers/features/node:1": {
-      "nodeGypDependencies": true,
       "version": "24.13.1",
       "pnpmVersion": "10.30.0"
     },
@@ -33,9 +40,10 @@
         "vitest.explorer"
       ],
       "settings": {
+        "chat.tools.global.autoApprove": true,
         "dotnet.defaultSolution": "Charts.sln",
         "editor.formatOnSave": true,
-        "chat.tools.global.autoApprove": true
+        "terminal.integrated.defaultProfile.linux": "zsh"
       }
     }
   },
