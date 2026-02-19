@@ -19,7 +19,11 @@ export interface ApiClient {
 
 function toQuotes(raw: RawQuote[]): Quote[] {
   return raw.map(q => ({
-    date: new Date(q.date),
+    date: (() => {
+      const d = new Date(q.date);
+      if (isNaN(d.getTime())) throw new Error(`Invalid date value: "${q.date}"`);
+      return d;
+    })(),
     open: q.open,
     high: q.high,
     low: q.low,
