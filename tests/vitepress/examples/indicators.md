@@ -127,13 +127,25 @@ Display multiple oscillators:
 const rsiCanvas = document.getElementById("rsi-chart");
 const macdCanvas = document.getElementById("macd-chart");
 
-// Render different oscillators
-manager.renderOscillatorChart("RSI", rsiData, { canvas: rsiCanvas });
-manager.renderOscillatorChart("MACD", macdData, { canvas: macdCanvas });
+// Process data for each selection
+manager.processSelectionData(rsiSelection, rsiListing, rsiData);
+manager.processSelectionData(macdSelection, macdListing, macdData);
+
+// Create oscillator charts with the canvas elements
+const rsiOscillator = manager.createOscillator(
+  rsiCanvas,
+  rsiSelection,
+  rsiListing
+);
+const macdOscillator = manager.createOscillator(
+  macdCanvas,
+  macdSelection,
+  macdListing
+);
 ```
 
 ## Next Steps
 
 - Learn about [multiple charts](/examples/multiple)
-- Configure [API client](/guide/api-client)
-- Explore [chart customization](/guide/customization)
+- Read the [quick-start guide](/guide/quick-start)
+- Explore [installation options](/guide/installation)

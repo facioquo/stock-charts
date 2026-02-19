@@ -31,14 +31,10 @@ function toQuotes(raw: RawQuote[]): Quote[] {
 export function createApiClient(config: ApiClientConfig): ApiClient {
   const { baseUrl, onError } = config;
 
-  const headers = {
-    "Content-Type": "application/json"
-  };
-
   return {
     async getQuotes(): Promise<Quote[]> {
       try {
-        const response = await fetch(`${baseUrl}/quotes`, { headers });
+        const response = await fetch(`${baseUrl}/quotes`);
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
@@ -52,11 +48,12 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
 
     async getListings(): Promise<IndicatorListing[]> {
       try {
-        const response = await fetch(`${baseUrl}/indicators`, { headers });
+        const response = await fetch(`${baseUrl}/indicators`);
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        return response.json();
+        const data: IndicatorListing[] = await response.json();
+        return data;
       } catch (error) {
         onError?.("Error fetching listings", error);
         throw error;
@@ -77,11 +74,12 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
       const url = params.toString() ? `${listing.endpoint}?${params.toString()}` : listing.endpoint;
 
       try {
-        const response = await fetch(url, { headers });
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        return response.json();
+        const data: unknown[] = await response.json();
+        return data;
       } catch (error) {
         onError?.("Error fetching selection data", error);
         throw error;

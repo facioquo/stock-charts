@@ -178,6 +178,6 @@ manager.destroy();
 
 ## Next Steps
 
-- Learn about [API client](/guide/api-client)
-- Explore [chart customization](/guide/customization)
-- See [performance tips](/guide/performance)
+- Learn about [installation](/guide/installation)
+- Read the [quick-start guide](/guide/quick-start)
+- Return to [guide index](/guide/)

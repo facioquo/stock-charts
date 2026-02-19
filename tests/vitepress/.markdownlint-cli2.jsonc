@@ -2,5 +2,6 @@
   // extends base
   "config": {
     // html required in vitepress
-    "MD003": false
+    "MD033": false
+  }
 }

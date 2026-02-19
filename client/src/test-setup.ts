@@ -11,6 +11,7 @@
 // ========================================================================
 // Angular Testing Infrastructure
 // ========================================================================
+import { destroyPlatform } from "@angular/core";
 import { getTestBed } from "@angular/core/testing";
 import {
   BrowserDynamicTestingModule,
@@ -18,7 +19,9 @@ import {
 } from "@angular/platform-browser-dynamic/testing";
 
 // Initialize Angular TestBed environment.
+// Destroy any existing platform first to prevent NG0400 errors in watch/re-run mode.
 // This must be called once before any tests that use TestBed APIs.
+destroyPlatform();
 getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
 
 // ========================================================================
@@ -36,7 +39,7 @@ if (typeof window.getComputedStyle !== "function") {
   Object.defineProperty(window, "getComputedStyle", {
     value: (elt: Element) => ({
       display: "block",
-      appearance: ["-webkit-appearance"],
+      appearance: "-webkit-appearance",
       position: "static",
       getPropertyValue: (prop: string) => {
         if (prop === "transform") {

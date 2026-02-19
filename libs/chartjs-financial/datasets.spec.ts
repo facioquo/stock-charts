@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { buildCandlestickDataset, buildVolumeDataset, toFinancialDataPoint } from "./datasets";
-import { getFinancialPalette } from "../theme/colors";
+import { getFinancialPalette } from "./theme/colors";
 
 describe("financial dataset factories", () => {
   it("converts quote to OHLC point shape", () => {

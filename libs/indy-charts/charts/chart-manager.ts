@@ -66,11 +66,16 @@ export class ChartManager {
     this.allQuotes = allQuotes;
     this.currentBarCount = barCount;
 
-    const quotes = allQuotes.slice(-barCount);
-
     this.overlayChart = new OverlayChart(ctx, this.settings);
-    const fullDatasets = this.overlayChart.render(quotes, this.extraBars);
+
+    // Render with full allQuotes so stored datasets cover complete history,
+    // enabling correct slicing when setBarCount() is called later.
+    const fullDatasets = this.overlayChart.render(allQuotes, this.extraBars);
     this.allProcessedDatasets.set("overlay-main", fullDatasets);
+
+    // Apply initial barCount slice for display.
+    const startIndex = Math.max(0, allQuotes.length - barCount);
+    this.overlayChart.applySlicedData(fullDatasets, startIndex);
   }
 
   /**
