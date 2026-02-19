@@ -1,6 +1,6 @@
 {
   "name": "@facioquo/chartjs-chart-financial",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Financial charting extension for Chart.js v4.5+ (candlestick, OHLC, volume charts)",
   "type": "module",
   "main": "./dist/index.js",
@@ -53,6 +53,6 @@
   },
   "devDependencies": {},
   "engines": {
-    "node": ">=24.13.1"
+    "node": ">=24.0.0"
   }
 }
