@@ -14,10 +14,36 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 
 ### Prerequisites
 
-- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
-- [pnpm](https://pnpm.io/) (v10.29.3 or later) - Install with `npm install -g pnpm@10.29.3`
+**All platforms:**
+
+- [Git](https://git-scm.com/)
+- [Node.js](https://nodejs.org/) (v24.13.1 LTS or later)
+- [pnpm](https://pnpm.io/) (v10.29.3 or later) - Installed via platform package managers:
+  - **macOS**: Homebrew (`brew install pnpm`)
+  - **Windows**: winget (`winget install pnpm.pnpm`)
+  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.29.3 --activate`)
+- [Angular CLI](https://angular.dev/tools/cli) - Installed globally during setup
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
+- [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
+
+**Quick setup (all platforms):**
+
+```bash
+bash scripts/setup-environment.sh
+```
+
+This script automatically detects your OS and runs the appropriate platform-specific setup.
+
+**Platform-specific setup scripts:**
+
+- **macOS**: `scripts/setup-macos.sh` (Homebrew-based)
+- **Linux**: `scripts/setup-linux.sh` (apt-get-based)
+- **Windows**: `scripts/setup-windows.sh` (Git Bash with winget)
+
+**Note:** All setup scripts automatically install Node.js, .NET SDK, pnpm, and Angular CLI. Azure Functions Core Tools is installed automatically on macOS and Windows, but must be [installed manually on Linux](https://learn.microsoft.com/azure/azure-functions/functions-run-local#linux).
+
+**Note:** Azure Functions Core Tools is essential for running the backend Azure Functions locally (`func start` command). It is not installed automatically with Node or .NET SDK.
 
 ### Setup and run
 
@@ -51,6 +77,16 @@ Financial chart support (`candlestick`, `ohlc`) is integrated as a typed, modula
 - For large datasets (5k-10k candles), prefer `animation: false`, keep tooltip interaction non-intersecting, and avoid unnecessary redraws.
 
 This integration is derived from [chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) and keeps upstream license attribution in source headers.
+
+## AI agents
+
+For AI coding agents (GitHub Copilot, Claude, etc.), see [AGENTS.md](AGENTS.md) for comprehensive project context including:
+
+- Primary and secondary directives
+- Repository structure with permissions
+- Commands and code style patterns
+- Technology conventions and boundaries
+- Development workflow
 
 ## Development and contributing
 

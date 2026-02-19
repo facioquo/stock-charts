@@ -8,7 +8,7 @@ description: Markdown formatting guide
 Keep Markdown contributions consistent with GitHub Flavored Markdown (GFM) and the VS Code Markdown language features documented at <https://github.github.com/gfm/> and <https://code.visualstudio.com/docs/languages/markdown> while aligning with repository automation and preview tooling.
 
 > [!CRITICAL]
-> **Context loading warning:** In some AI agent environments (GitHub Copilot in VS Code), `#file:` references in auto-loaded files automatically expand their targets into the context window. This can cause exponential context bloat and degrade agent performance. **Entry point files** like `AGENTS.md`, `copilot-instructions.md`, and root instruction files should **NEVER contain `#file:` references** to other instruction or context files. Use plain-text file path mentions instead and let agents fetch files on-demand. See `docs/context-loading-lessons-learned.md` for details.
+> **Context loading warning:** In some AI agent environments (GitHub Copilot in VS Code), #file: references in auto-loaded files automatically expand their targets into the context window. This can cause exponential context bloat and degrade agent performance. **Entry point files** like AGENTS.md and root instruction files should **NEVER contain #file: references** to other instruction or context files. Use plain-text file path mentions instead and let agents fetch files on-demand. See `docs/CONTRIBUTING.md` for examples of effective documentation structure.
 
 ## Baseline workflow
 
@@ -99,9 +99,9 @@ int foo = 25;
 
 Choose the appropriate referencing style based on whether the file content is needed for the current task.
 
-### When to use `#file:` context tokens
+### When to use #file: context tokens
 
-Use `#file:` when the agent **must read the file content** to complete the task:
+Use #file: when the agent **must read the file content** to complete the task:
 
 - Instruction files that define coding standards for the current work
 - Templates or schemas the agent must follow
@@ -109,11 +109,11 @@ Use `#file:` when the agent **must read the file content** to complete the task:
 - Context files containing data required for the task
 
 ```markdown
-Follow conventions from #file:../copilot-instructions.md
-Apply the template in #file:adr-template.md
+Follow conventions from AGENTS.md and project-specific instruction files.
+Apply the template in #file:markdown.instructions.md
 ```
 
-**Syntax rules for `#file:` and `#folder:` tokens:**
+**Syntax rules for #file: and `#folder:` tokens:**
 
 - Tokens are context variables, not clickable links.
 - Do not wrap in backticks.
@@ -139,11 +139,11 @@ See the contributing guide in docs/CONTRIBUTING.md for details.
 
 ### Avoiding context window bloat
 
-Root entry points (AGENTS.md, copilot-instructions.md) are auto-loaded in many contexts. To prevent cascading file loads:
+Root entry points (AGENTS.md) are auto-loaded in many contexts. To prevent cascading file loads:
 
-- **CRITICAL: Entry point files must NOT use `#file:` references.** Files like `AGENTS.md`, `copilot-instructions.md`, and root-level instruction files are auto-loaded and will cascade their `#file:` references into context, causing bloat. Use plain-text file path mentions instead.
-- **Scoped instruction files may use `#file:` selectively.** Files in `.github/instructions/` with `applyTo` patterns are auto-attached only in their specific domains and can safely use `#file:` for on-demand fetching.
-- **Agent files should use targeted `#file:` references.** Agent files reference instruction files they need; this is intentional and domain-appropriate.
+- **CRITICAL: Entry point files must NOT use #file: references.** Files like AGENTS.md and root-level instruction files are auto-loaded and will cascade their #file: references into context, causing bloat. Use plain-text file path mentions instead.
+- **Scoped instruction files may use #file: selectively.** Files in `.github/instructions/` with `applyTo` patterns are auto-attached only in their specific domains and can safely use #file: for on-demand fetching.
+- **Agent files should use targeted #file: references.** Agent files reference instruction files they need; this is intentional and domain-appropriate.
 - **Minimize cascading hierarchies.** Avoid chains like: AGENTS.md → instruction file → context file → another instruction file.
 - **Prefer plain-text mentions in navigational sections.** Let agents decide what to fetch: `See the markdown authoring guidelines in .github/instructions/markdown.instructions.md`
 - **Never use `file:` URI scheme** (e.g., `file:///path/to/doc.md`). These always force auto-loading.
@@ -197,18 +197,15 @@ Example file tree:
 ```text
 my-repo/
 ├── .github/
-│   ├── copilot-instructions.md       # Meta-instructions (optional for downstream repos)
 │   ├── instructions/
-│   │   ├── adr.instructions.md       # ADR format standards
 │   │   ├── markdown.instructions.md  # Markdown formatting rules
 │   │   └── planning.instructions.md  # Planning principles
 │   ├── prompts/
-│   │   ├── adr.prompt.md             # ADR creation workflow
 │   │   └── plan.prompt.md            # Planning session prompt
 │   └── workflows/
 │       └── lint-markdown.yml         # CI linting automation
 ├── docs/
-│   └── adr/                          # Architecture Decision Records
+│   └── api/                          # API reference documentation
 ├── src/                              # Source code
 ├── AGENTS.md                         # Agent-focused project context
 └── README.md                         # Human-oriented overview
@@ -229,6 +226,7 @@ Prefer a central AGENTS.md file for AI agent context. See [agents.md specificati
   ```
 
 - DO NOT include change logs here or anywhere in this repository.
+- Except: do not add last updated sections to `AGENTS.md` or `.github/**/*.md` files
 
 ### HTML elements
 
@@ -260,7 +258,3 @@ Avoid inline HTML unless no Markdown equivalent exists. Allowed elements are def
 - Keep `.markdownlint-cli2.jsonc`, `.editorconfig`, and `.vscode/settings.json` aligned.
 - Use the VS Code markdownlint extension.
 - Document exceptions in `.markdownlint-cli2.jsonc`.
-
----
-
-Last updated: December 3, 2025

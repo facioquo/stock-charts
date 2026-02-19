@@ -4,9 +4,12 @@
   // =============================================================================
   // This file provides extension recommendations for the workspace
   // Extensions help with Angular, .NET, Azure Functions, and code quality
+  //
+  // NOTE: Azurite emulator is run via npm package (pnpm run azure:start)
+  // The Azurite VS Code extension is UNWANTED due to port conflicts
+  // Use Azure Storage extension (ms-azuretools.vscode-azurestorage) to VIEW data
   "recommendations": [
     "angular.ng-template",
-    "azurite.azurite",
     "christian-kohler.npm-intellisense",
     "dbaeumer.vscode-eslint",
     "davidanson.vscode-markdownlint",
@@ -20,5 +23,23 @@
     "ms-vscode-remote.remote-containers",
     "redhat.vscode-yaml",
     "vitest.explorer"
+  ],
+
+  // =============================================================================
+  // UNWANTED EXTENSIONS (CONFLICTS WITH CODE-BASED APPROACH)
+  // =============================================================================
+  "unwantedRecommendations": [
+    // ❌ DO NOT INSTALL: Azurite extension runs its own emulator instance
+    // This conflicts with our npm-based approach: pnpm run azure:start
+    //
+    // Why unwanted:
+    // - Both npm azurite and extension try to bind to port 10000
+    // - npm approach is consistent across team and CI/CD pipelines
+    // - Extension auto-start can interfere with task-based workflow
+    // - Code-based solution works in all contexts (no extension dependency)
+    //
+    // To VIEW storage data: Use Azure Storage extension (recommended above)
+    // To RUN emulator: Use pnpm run azure:start or VS Code task
+    "azurite.azurite"
   ]
 }

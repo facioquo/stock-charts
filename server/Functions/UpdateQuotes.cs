@@ -41,6 +41,13 @@ public partial class Jobs
     [Function("UpdateQuotes")]
     public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5")] TimerInfo _)
     {
+        // Check if Alpaca credentials are available
+        if (string.IsNullOrEmpty(_alpacaKey) || string.IsNullOrEmpty(_alpacaSecret))
+        {
+            LogAlpacaCredentialsMissing();
+            return; // Skip update - API will use backup data
+        }
+
         // ~ extended market hours, every minute "0 */1 08-18 * * 1-5"
         // for dev: minutely "0 */1 * * * *"
         List<Task> tasks = new() {
@@ -117,16 +124,21 @@ public partial class Jobs
     /// STORE QUOTES: get and store historical quotes to blob storage provider.
     /// </summary>
     /// <param name="symbol">Security symbol</param>
-    /// <exception cref="ArgumentNullException">
-    ///   When credentials are missing
-    /// </exception>
+    /// <remarks>
+    /// Assumes credentials have been validated before calling this method
+    /// </remarks>
     private async Task StoreQuoteDaily(string symbol)
     {
-        (string key, string secret) = await GetValidAlpacaCredentials();
+        // Credentials are pre-validated in Run method
+        if (string.IsNullOrEmpty(_alpacaKey) || string.IsNullOrEmpty(_alpacaSecret))
+        {
+            LogSkippingSymbol(symbol, "Missing credentials");
+            return;
+        }
 
         // fetch from Alpaca paper trading API
         IAlpacaDataClient alpacaDataClient = Environments.Paper
-            .GetAlpacaDataClient(new SecretKey(key, secret));
+            .GetAlpacaDataClient(new SecretKey(_alpacaKey, _alpacaSecret));
 
         DateTime into = DateTime.Now.Subtract(TimeSpan.FromMinutes(16));
         DateTime from = into.Subtract(TimeSpan.FromDays(800));
@@ -158,9 +170,15 @@ public partial class Jobs
         LogBlobUpdated(blobName);
     }
 
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Alpaca API credentials not configured. Quote updates skipped - API will use backup data. Set ALPACA_KEY and ALPACA_SECRET environment variables or configure Azure Key Vault.")]
+    private partial void LogAlpacaCredentialsMissing();
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Skipping {Symbol}: {Reason}")]
+    private partial void LogSkippingSymbol(string symbol, string reason);
+
     [LoggerMessage(Level = LogLevel.Information, Message = "Quotes updated on {UpdatedDate}.")]
     private partial void LogQuotesUpdated(DateTime updatedDate);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Updated {BlobName}.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Updated blob: {BlobName}")]
     private partial void LogBlobUpdated(string blobName);
 }

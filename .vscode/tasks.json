@@ -15,6 +15,14 @@
   },
   "tasks": [
     {
+      "label": "Setup: Dev environment",
+      "detail": "Install all development prerequisites (Node, .NET, Azure Functions Core Tools, pnpm)",
+      "type": "shell",
+      "command": "bash scripts/setup-environment.sh",
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
       "label": "Initialize: Pull, rebuild, and verify",
       "detail": "Pull latest, clean, rebuild, format, lint, and run tests",
       "dependsOn": [
@@ -54,42 +62,18 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Clean: All outputs",
-      "detail": "Clean build outputs from all projects",
-      "dependsOn": [
-        "Clean: Root and Azure storage",
-        "Clean: Website outputs",
-        "Clean: Backend .NET outputs"
-      ],
-      "dependsOrder": "parallel",
-      "group": "build"
+      "label": "Check: Node packages",
+      "detail": "Check for dependency updates in root and all workspace packages",
+      "type": "shell",
+      "command": "pnpm run deps:check",
+      "problemMatcher": []
     },
     {
-      "label": "Clean: Website outputs",
-      "detail": "Clean Angular build outputs (dist, coverage)",
+      "label": "Update: Node packages",
+      "detail": "Update dependencies in root and all workspace packages to latest versions",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run clean"
-    },
-    {
-      "label": "Clean: Backend .NET outputs",
-      "detail": "Clean .NET build outputs (bin, obj)",
-      "type": "shell",
-      "command": "dotnet clean Charts.sln -v minimal --nologo",
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "Clean: Backend solution (hard reset)",
-      "detail": "Deletes all bin/obj folders and runs dotnet clean command (hard clean)",
-      "type": "shell",
-      "command": "bash scripts/dotnet-clean.sh",
-      "group": "build",
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "Clean: Root and Azure storage",
-      "detail": "Clean Azurite and root level items, including npm packages",
-      "type": "shell",
-      "command": "pnpm run clean"
+      "command": "pnpm run deps:update",
+      "problemMatcher": []
     },
     {
       "label": "Build: All projects (incremental)",
@@ -150,7 +134,7 @@
     },
     {
       "label": "Lint: All (check)",
-      "detail": "Run all linting checks without fixes",
+      "detail": "Run all linting and formatting checks (ESLint, Prettier, Roslynator, dotnet format, markdownlint)",
       "dependsOn": [
         "Lint: Website code (check)",
         "Lint: Backend .NET code (check)",
@@ -162,7 +146,7 @@
     },
     {
       "label": "Lint: All (fix)",
-      "detail": "Auto-fix all linting issues",
+      "detail": "Auto-fix all linting and formatting (ESLint, Prettier, Roslynator, dotnet format, markdownlint)",
       "dependsOn": ["Lint: All code (fix)", "Lint: Markdown (fix)"],
       "dependsOrder": "sequence",
       "group": "none",
@@ -170,7 +154,7 @@
     },
     {
       "label": "Lint: All code (fix)",
-      "detail": "Format Website and Backend .NET code",
+      "detail": "Auto-fix Website (ESLint + Prettier) and Backend (Roslynator + dotnet format) code",
       "dependsOn": [
         "Lint: Website code (fix)",
         "Lint: Backend .NET code (fix)"
@@ -181,17 +165,17 @@
     },
     {
       "label": "Lint: Website code (check)",
-      "detail": "Check Angular code with ESLint",
+      "detail": "Check Angular code with ESLint and Prettier",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run lint",
+      "command": "pnpm --filter @stock-charts/client run lint && pnpm run format:web:check",
       "group": "test",
       "problemMatcher": "$eslint-stylish"
     },
     {
       "label": "Lint: Website code (fix)",
-      "detail": "Format Angular code with Prettier",
+      "detail": "Auto-fix Angular code with ESLint and format with Prettier",
       "type": "shell",
-      "command": "pnpm run format:web",
+      "command": "pnpm --filter @stock-charts/client run lint:fix && pnpm run format:web",
       "group": "none",
       "problemMatcher": "$tsc"
     },
@@ -259,6 +243,7 @@
       "label": "Run: Full development stack",
       "detail": "Start all Backend .NET code services and Website dev server",
       "dependsOn": [
+        "Stop: All services",
         "Run: Azure Storage",
         "Run: Azure Functions",
         "Run: Web API",
@@ -356,6 +341,18 @@
       "group": "none"
     },
     {
+      "label": "Stop: Azurite",
+      "detail": "Stop Azurite storage emulator (cross-platform)",
+      "type": "shell",
+      "command": "npx",
+      "args": ["kill-port", "10000", "10001", "10002"],
+      "presentation": {
+        "clear": false,
+        "reveal": "silent"
+      },
+      "group": "none"
+    },
+    {
       "label": "Stop: Website dev server",
       "detail": "Stop the Angular dev server (attempts to free default port 4200)",
       "type": "shell",
@@ -370,7 +367,11 @@
     {
       "label": "Stop: All services",
       "detail": "Gracefully stop all running Backend and Website services (cross-platform)",
-      "dependsOn": ["Stop: Backend services", "Stop: Website dev server"],
+      "dependsOn": [
+        "Stop: Azurite",
+        "Stop: Backend services",
+        "Stop: Website dev server"
+      ],
       "dependsOrder": "sequence",
       "group": "none",
       "presentation": {
@@ -383,12 +384,42 @@
     // CLEANUP
     // =========================================================================
     {
-      "label": "Clean: temporary caches",
-      "detail": "Delete build caches and lock files",
+      "label": "Clean: All outputs",
+      "detail": "Clean build outputs from all projects",
+      "dependsOn": [
+        "Clean: Root and Azure storage",
+        "Clean: Website outputs",
+        "Clean: Backend .NET outputs"
+      ],
+      "dependsOrder": "parallel",
+      "group": "build"
+    },
+    {
+      "label": "Clean: Website outputs",
+      "detail": "Clean Angular build outputs (dist, coverage)",
       "type": "shell",
-      "command": "pnpm run clean && dotnet clean Charts.sln -v minimal --nologo",
+      "command": "pnpm --filter @stock-charts/client run clean"
+    },
+    {
+      "label": "Clean: Backend .NET outputs",
+      "detail": "Clean .NET build outputs (bin, obj)",
+      "type": "shell",
+      "command": "dotnet clean Charts.sln -v minimal --nologo",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Clean: Backend solution (hard reset)",
+      "detail": "Deletes all bin/obj folders and runs dotnet clean command (hard clean)",
+      "type": "shell",
+      "command": "bash scripts/dotnet-clean.sh",
       "group": "build",
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Clean: Root and Azure storage",
+      "detail": "Clean Azurite and root level items, including npm packages",
+      "type": "shell",
+      "command": "pnpm run clean"
     },
     {
       "label": "Clean: Azure Storage Emulator data",

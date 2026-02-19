@@ -1,4 +1,5 @@
 {
+  "$schema": "vscode://schemas/settings/default",
   // ==============================
   // AZURE
   "azureFunctions.projectSubpath": "server/Functions",
@@ -8,18 +9,27 @@
   "azureFunctions.preDeployTask": "publish-functions",
   // ==============================
   // GITHUB COPILOT
-  "github.copilot.chat.customAgents.showOrganizationAndEnterpriseAgents": true,
+  "chat.customAgentInSubagent.enabled": true,
+  "chat.mcp.assisted.nuget.enabled": true,
+  "chat.useAgentSkills": true,
+  "chat.useAgentsMdFile": true,
+  "chat.useNestedAgentsMdFiles": true,
+  "dotnet.defaultSolution": "Charts.sln",
+  "github.copilot.chat.agentCustomizationSkill.enabled": true,
+  "github.copilot.chat.copilotMemory.enabled": true,
   "github.copilot.chat.githubMcpServer.enabled": true,
-  "github.copilot.chat.githubMcpServer.readonly": true,
+  "github.copilot.chat.githubMcpServer.readonly": false,
   "github.copilot.chat.githubMcpServer.toolsets": [
+    // ref: https://github.com/github/github-mcp-server?tab=readme-ov-file#tools
     "default", // default: context, repos, issues, pull_requests, users
     "actions",
     "projects",
+    "git",
     "copilot",
     "github_support_docs_search",
     "web_search"
   ],
-  "github.copilot.chat.tools.memory.enabled": true,
+  "github.copilot.chat.switchAgent.enabled": true,
   // ==============================
   // LINTERS
   "eslint.workingDirectories": ["client"],
@@ -75,6 +85,10 @@
     "editor.insertSpaces": true,
     "editor.tabSize": 2,
     "editor.detectIndentation": false
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+    "editor.formatOnSave": true
   },
   "[scss]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",

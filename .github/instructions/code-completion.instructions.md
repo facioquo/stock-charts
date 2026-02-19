@@ -299,7 +299,3 @@ pnpm --filter @stock-charts/client run test -- --testNamePattern="ComponentName"
 - Unresolved merge conflicts
 - Failing CI/CD pipelines
 - Missing or broken documentation links
-
----
-
-Last updated: December 3, 2025
