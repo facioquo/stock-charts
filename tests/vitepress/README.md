@@ -174,8 +174,8 @@ Check:
 ## Resources
 
 - [VitePress Documentation](https://vitepress.dev/)
-- [Indy Charts API Reference](../../libs/indy-charts/README.md)
-- [Chart.js Financial Plugin](../../libs/chartjs-financial/README.md)
+- [Indy Charts API Reference](https://github.com/facioquo/stock-charts/tree/main/libs/indy-charts)
+- [Chart.js Financial Plugin](https://github.com/facioquo/stock-charts/tree/main/libs/chartjs-financial)
 
 ## License
 
