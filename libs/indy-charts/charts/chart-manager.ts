@@ -2,6 +2,7 @@ import { ChartDataset } from "chart.js";
 
 import {
   ChartSettings,
+  IndicatorDataRow,
   IndicatorListing,
   IndicatorResult,
   IndicatorResultConfig,
@@ -38,14 +39,39 @@ export interface ChartManagerConfig {
 }
 
 export class ChartManager {
-  overlayChart: OverlayChart | undefined;
-  oscillators = new Map<string, OscillatorChart>();
-  selections: IndicatorSelection[] = [];
-  allQuotes: Quote[] = [];
-  allProcessedDatasets = new Map<string, ChartDataset[]>();
-  currentBarCount = 250;
+  private _overlayChart: OverlayChart | undefined;
+  private _oscillators = new Map<string, OscillatorChart>();
+  private _selections: IndicatorSelection[] = [];
+  private _allQuotes: Quote[] = [];
+  private _allProcessedDatasets = new Map<string, ChartDataset[]>();
+  private _currentBarCount = 250;
   settings: ChartSettings;
   private extraBars: number;
+
+  /** Read-only access to the overlay chart instance. */
+  get overlayChart(): OverlayChart | undefined {
+    return this._overlayChart;
+  }
+
+  /** Read-only view of registered oscillator charts keyed by ucid. */
+  get oscillators(): ReadonlyMap<string, OscillatorChart> {
+    return this._oscillators;
+  }
+
+  /** Read-only view of registered indicator selections. */
+  get selections(): ReadonlyArray<IndicatorSelection> {
+    return this._selections;
+  }
+
+  /** Read-only view of the full quote dataset. */
+  get allQuotes(): ReadonlyArray<Quote> {
+    return this._allQuotes;
+  }
+
+  /** Current number of bars being displayed. */
+  get currentBarCount(): number {
+    return this._currentBarCount;
+  }
 
   constructor(config: ChartManagerConfig) {
     this.settings = config.settings;
@@ -63,19 +89,19 @@ export class ChartManager {
     allQuotes: Quote[],
     barCount: number
   ): void {
-    this.allQuotes = allQuotes;
-    this.currentBarCount = barCount;
+    this._allQuotes = allQuotes;
+    this._currentBarCount = barCount;
 
-    this.overlayChart = new OverlayChart(ctx, this.settings);
+    this._overlayChart = new OverlayChart(ctx, this.settings);
 
     // Render with full allQuotes so stored datasets cover complete history,
     // enabling correct slicing when setBarCount() is called later.
-    const fullDatasets = this.overlayChart.render(allQuotes, this.extraBars);
-    this.allProcessedDatasets.set("overlay-main", fullDatasets);
+    const fullDatasets = this._overlayChart.render(allQuotes, this.extraBars);
+    this._allProcessedDatasets.set("overlay-main", fullDatasets);
 
     // Apply initial barCount slice for display.
     const startIndex = Math.max(0, allQuotes.length - barCount);
-    this.overlayChart.applySlicedData(fullDatasets, startIndex);
+    this._overlayChart.applySlicedData(fullDatasets, startIndex);
   }
 
   /**
@@ -85,7 +111,7 @@ export class ChartManager {
   processSelectionData(
     selection: IndicatorSelection,
     listing: IndicatorListing,
-    data: import("../config/types").IndicatorDataRow[]
+    data: IndicatorDataRow[]
   ): void {
     selection.results.forEach((result: IndicatorResult) => {
       const resultConfig = listing.results.find(
@@ -114,10 +140,12 @@ export class ChartManager {
       }
     });
 
-    // Store deep copy for efficient resizing
-    this.allProcessedDatasets.set(
+    // Store deep copy for efficient resizing.
+    // structuredClone is used instead of JSON.parse/stringify to safely preserve
+    // NaN values and avoid crashes on undefined fields.
+    this._allProcessedDatasets.set(
       selection.ucid,
-      selection.results.map(result => JSON.parse(JSON.stringify(result.dataset)))
+      selection.results.map(result => structuredClone(result.dataset))
     );
   }
 
@@ -125,8 +153,8 @@ export class ChartManager {
    * Display a processed selection on the appropriate chart.
    */
   displaySelection(selection: IndicatorSelection, listing: IndicatorListing): void {
-    if (this.selections.some(s => s.ucid === selection.ucid)) return;
-    this.selections.push(selection);
+    if (this._selections.some(s => s.ucid === selection.ucid)) return;
+    this._selections.push(selection);
 
     if (listing.chartType === CHART_TYPES.OVERLAY) {
       this.displayOnOverlay(selection);
@@ -137,25 +165,55 @@ export class ChartManager {
 
   /**
    * Display indicator on the overlay chart.
+   * Slices datasets to currentBarCount before adding so overlay indicators
+   * are aligned with the windowed x-axis from the start.
    */
   private displayOnOverlay(selection: IndicatorSelection): void {
-    if (!this.overlayChart) return;
-    this.overlayChart.addIndicatorDatasets(selection.results);
-    this.overlayChart.updateLegends(this.selections);
+    if (!this._overlayChart) return;
+
+    // Slice indicator datasets to currentBarCount before adding to the windowed chart.
+    const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
+    if (fullDatasets) {
+      const startIndex = Math.max(0, this._allQuotes.length - this._currentBarCount);
+      selection.results.forEach((result, i) => {
+        const full = fullDatasets[i];
+        if (full) {
+          result.dataset.data = [...full.data.slice(startIndex)];
+        }
+      });
+    }
+
+    this._overlayChart.addIndicatorDatasets(selection.results);
+    this._overlayChart.updateLegends(this._selections);
   }
 
   /**
    * Create an oscillator chart for a selection.
-   * Consumer must provide the canvas context and call this after processSelectionData().
+   * Consumer must provide the canvas context and call this after processSelectionData()
+   * AND after displaySelection() so the selection is registered in this.selections.
+   *
+   * @throws {Error} if displaySelection() has not been called for this selection,
+   *   because setBarCount() iterates this.selections and will silently skip any
+   *   oscillator whose ucid is not present there.
    */
   createOscillator(
     ctx: CanvasRenderingContext2D | HTMLCanvasElement,
     selection: IndicatorSelection,
     listing: IndicatorListing
   ): OscillatorChart {
+    // Guard: selection must be registered via displaySelection() first, otherwise
+    // setBarCount() (which iterates this._selections) will never update this oscillator.
+    if (!this._selections.some(s => s.ucid === selection.ucid)) {
+      throw new Error(
+        `createOscillator: selection "${selection.ucid}" has not been registered. ` +
+          `Call displaySelection() before createOscillator() to ensure setBarCount() ` +
+          `can update this oscillator when the window changes.`
+      );
+    }
+
     const oscillator = new OscillatorChart(ctx, this.settings);
     oscillator.render(selection, listing);
-    this.oscillators.set(selection.ucid, oscillator);
+    this._oscillators.set(selection.ucid, oscillator);
     return oscillator;
   }
 
@@ -163,27 +221,24 @@ export class ChartManager {
    * Remove an indicator selection and its chart.
    */
   removeSelection(ucid: string): void {
-    const selection = this.selections.find(x => x.ucid === ucid);
-    if (!selection) return;
+    // Use findIndex for a single O(n) pass instead of find + indexOf.
+    const sx = this._selections.findIndex(x => x.ucid === ucid);
+    if (sx === -1) return;
 
-    const sx = this.selections.indexOf(selection, 0);
-    if (sx !== -1) {
-      this.selections.splice(sx, 1);
-    }
-
-    this.allProcessedDatasets.delete(ucid);
+    const [selection] = this._selections.splice(sx, 1);
+    this._allProcessedDatasets.delete(ucid);
 
     if (selection.chartType === CHART_TYPES.OVERLAY) {
-      if (this.overlayChart) {
-        this.overlayChart.removeIndicatorDatasets(selection.results);
-        this.overlayChart.updateLegends(this.selections);
-        this.overlayChart.chart?.update();
+      if (this._overlayChart) {
+        this._overlayChart.removeIndicatorDatasets(selection.results);
+        this._overlayChart.updateLegends(this._selections);
+        this._overlayChart.chart?.update();
       }
     } else {
-      const oscillator = this.oscillators.get(ucid);
+      const oscillator = this._oscillators.get(ucid);
       if (oscillator) {
         oscillator.destroy();
-        this.oscillators.delete(ucid);
+        this._oscillators.delete(ucid);
       }
     }
   }
@@ -194,15 +249,15 @@ export class ChartManager {
   updateTheme(settings: ChartSettings): void {
     this.settings = settings;
 
-    if (this.overlayChart) {
-      this.overlayChart.updateTheme(settings);
-      this.overlayChart.updateLegends(this.selections);
-      this.overlayChart.chart?.update("none");
+    if (this._overlayChart) {
+      this._overlayChart.updateTheme(settings);
+      this._overlayChart.updateLegends(this._selections);
+      this._overlayChart.chart?.update("none");
     }
 
-    this.oscillators.forEach((oscillator, ucid) => {
+    this._oscillators.forEach((oscillator, ucid) => {
       oscillator.updateTheme(settings);
-      const selection = this.selections.find(s => s.ucid === ucid);
+      const selection = this._selections.find(s => s.ucid === ucid);
       if (selection) {
         oscillator.updateLegend(selection);
       }
@@ -214,25 +269,49 @@ export class ChartManager {
    * Update all charts with a new bar count (for window resize).
    */
   setBarCount(barCount: number): void {
-    if (barCount === this.currentBarCount || this.allQuotes.length === 0) return;
-    this.currentBarCount = barCount;
+    if (barCount === this._currentBarCount || this._allQuotes.length === 0) return;
+    this._currentBarCount = barCount;
 
-    const totalQuotes = this.allQuotes.length;
+    const totalQuotes = this._allQuotes.length;
     const startIndex = Math.max(0, totalQuotes - barCount);
 
-    // Update overlay
-    const fullMainDatasets = this.allProcessedDatasets.get("overlay-main");
-    if (this.overlayChart && fullMainDatasets) {
-      this.overlayChart.applySlicedData(fullMainDatasets, startIndex);
-      this.overlayChart.updateLegends(this.selections);
+    // Update overlay main datasets (candlestick + volume)
+    const fullMainDatasets = this._allProcessedDatasets.get("overlay-main");
+    if (this._overlayChart && fullMainDatasets) {
+      this._overlayChart.applySlicedData(fullMainDatasets, startIndex);
+      this._overlayChart.updateLegends(this._selections);
+    }
+
+    // Update overlay indicator datasets to stay aligned with the windowed x-axis.
+    // Mirror the oscillator loop below but for OVERLAY selections: retrieve each
+    // indicator's full dataset from allProcessedDatasets and slice to startIndex.
+    let overlayIndicatorsUpdated = false;
+    this._selections.forEach(selection => {
+      if (selection.chartType !== CHART_TYPES.OVERLAY) return;
+
+      const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
+      if (!fullDatasets) return;
+
+      selection.results.forEach((result, i) => {
+        const full = fullDatasets[i];
+        if (full && result.dataset) {
+          result.dataset.data = [...full.data.slice(startIndex)];
+        }
+      });
+      overlayIndicatorsUpdated = true;
+    });
+
+    // Trigger a single chart refresh after all overlay indicator data has been sliced.
+    if (overlayIndicatorsUpdated && this._overlayChart) {
+      this._overlayChart.chart?.update("none");
     }
 
     // Update oscillators
-    this.selections.forEach(selection => {
+    this._selections.forEach(selection => {
       if (selection.chartType !== CHART_TYPES.OSCILLATOR) return;
 
-      const fullDatasets = this.allProcessedDatasets.get(selection.ucid);
-      const oscillator = this.oscillators.get(selection.ucid);
+      const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
+      const oscillator = this._oscillators.get(selection.ucid);
       if (!fullDatasets || !oscillator) return;
 
       oscillator.applySlicedData(selection, fullDatasets, startIndex);
@@ -241,24 +320,28 @@ export class ChartManager {
 
   /**
    * Force all charts to resize.
+   * Defers one animation frame so CSS layout has settled before Chart.js reads
+   * container dimensions, avoiding race conditions on immediate resize calls.
    */
   resize(): void {
-    this.overlayChart?.resize();
-    this.oscillators.forEach(oscillator => oscillator.resize());
+    requestAnimationFrame(() => {
+      this._overlayChart?.resize();
+      this._oscillators.forEach(oscillator => oscillator.resize());
+    });
   }
 
   /**
    * Destroy all charts and clean up.
    */
   destroy(): void {
-    this.overlayChart?.destroy();
-    this.overlayChart = undefined;
+    this._overlayChart?.destroy();
+    this._overlayChart = undefined;
 
-    this.oscillators.forEach(oscillator => oscillator.destroy());
-    this.oscillators.clear();
+    this._oscillators.forEach(oscillator => oscillator.destroy());
+    this._oscillators.clear();
 
-    this.selections = [];
-    this.allProcessedDatasets.clear();
-    this.allQuotes = [];
+    this._selections = [];
+    this._allProcessedDatasets.clear();
+    this._allQuotes = [];
   }
 }
