@@ -5,7 +5,7 @@
   "version": "2.0.0",
   "presentation": {
     "echo": true,
-    "clear": false,
+    "clear": true,
     "focus": true,
     "panel": "dedicated",
     "showReuseMessage": false
@@ -225,8 +225,7 @@
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client run test",
       "group": "test",
-      "problemMatcher": "$tsc",
-      "presentation": { "clear": true }
+      "problemMatcher": "$tsc"
     },
     {
       "label": "Test: Backend .NET",
@@ -234,40 +233,35 @@
       "type": "shell",
       "command": "pnpm run test:dotnet",
       "group": "test",
-      "problemMatcher": "$msCompile",
-      "presentation": { "clear": true }
+      "problemMatcher": "$msCompile"
     },
     {
       "label": "Review: CodeRabbit CLI (plain)",
       "detail": "Perform a full code review with CodeRabbit CLI in plain text response mode",
       "type": "shell",
       "command": "coderabbit",
-      "args": ["--plain"],
-      "presentation": { "clear": true }
+      "args": ["--plain"]
     },
     {
       "label": "Review: CodeRabbit CLI (prompt-only)",
       "detail": "Perform a full code review with CodeRabbit CLI in prompt-only response mode",
       "type": "shell",
       "command": "coderabbit",
-      "args": ["--prompt-only"],
-      "presentation": { "clear": true }
+      "args": ["--prompt-only"]
     },
     {
       "label": "Review: CodeRabbit CLI (uncommitted, plain)",
       "detail": "Perform a code review on uncommitted with CodeRabbit CLI in plain text response mode",
       "type": "shell",
       "command": "coderabbit",
-      "args": ["--plain", "--type", "uncommitted"],
-      "presentation": { "clear": true }
+      "args": ["--plain", "--type", "uncommitted"]
     },
     {
       "label": "Review: CodeRabbit CLI (uncommitted, prompt-only)",
       "detail": "Perform a code review on uncommitted with CodeRabbit CLI in prompt-only response mode",
       "type": "shell",
       "command": "coderabbit",
-      "args": ["--prompt-only", "--type", "uncommitted"],
-      "presentation": { "clear": true }
+      "args": ["--prompt-only", "--type", "uncommitted"]
     },
     {
       "label": "Run: Full development stack",
@@ -460,7 +454,7 @@
     },
     {
       "label": "Delete: Claude temporary files",
-      "detail": "Delete all tmpclaude-*.cwd files bug workaround",
+      "detail": "Delete all tmpclaude-*-cwd files (bug workaround)",
       "type": "shell",
       "command": "find . -maxdepth 25 -type f -name 'tmpclaude-*-cwd' -delete"
     }

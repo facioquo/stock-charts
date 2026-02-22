@@ -102,7 +102,7 @@ Update `StockChart.vue` to respond to VitePress theme changes:
 
 ```vue
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useData } from "vitepress";
 import type { Quote } from "@stock-charts/financial";
 
@@ -145,6 +145,17 @@ watch(isDark, dark => {
       showTooltips: true
     });
   }
+});
+
+onBeforeUnmount(() => {
+  if (manager?.destroyOverlay) {
+    manager.destroyOverlay();
+  }
+  if (manager?.destroy) {
+    manager.destroy();
+  }
+  manager = null;
+  canvasRef.value = null;
 });
 </script>
 
@@ -414,7 +425,8 @@ let manager = null
 const handleResize = () => {
   if (manager) {
     // Recalculate bar count based on chart width
-    const chartWidth = /* calculate chart container width */;
+    const container = document.querySelector('.stock-chart') ?? document.body;
+    const chartWidth = container.getBoundingClientRect().width || container.clientWidth || window.innerWidth || 600;
     const barWidth = 6; // approximate bar width in pixels
     const newBarCount = Math.floor(chartWidth / barWidth);
 

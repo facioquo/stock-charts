@@ -2,6 +2,12 @@
   "name": "@facioquo/indy-charts",
   "version": "0.1.0",
   "description": "Framework-agnostic financial charting library with technical indicators and stock market data visualization",
+  "author": "facioquo",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=24 <25"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -14,9 +20,7 @@
   },
   "files": [
     "dist",
-    "README.md",
-    "LICENSE",
-    "NOTICE"
+    "README.md"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -27,37 +31,11 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix"
   },
-  "keywords": [
-    "charts",
-    "financial",
-    "indicators",
-    "stock",
-    "trading",
-    "technical-analysis",
-    "candlestick",
-    "ohlc",
-    "typescript",
-    "chart.js"
-  ],
-  "author": "Facioquo",
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/facioquo/stock-charts.git",
-    "directory": "libs/indy-charts"
-  },
-  "bugs": {
-    "url": "https://github.com/facioquo/stock-charts/issues"
-  },
-  "homepage": "https://github.com/facioquo/stock-charts#readme",
   "peerDependencies": {
     "chart.js": "^4.5.1",
     "chartjs-adapter-date-fns": "^3.0.0",
     "chartjs-plugin-annotation": "^3.1.0",
-    "date-fns": "^4.1.0"
+    "date-fns": "^2.19.0"
   },
-  "devDependencies": {},
-  "engines": {
-    "node": ">=24.0.0"
-  }
+  "devDependencies": {}
 }

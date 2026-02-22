@@ -144,15 +144,19 @@ setup_dotnet_tools() {
   if dotnet tool restore; then
     log "Dotnet tools restored successfully"
 
-    # Verify critical tools are available
-    if command -v dotnet-format &>/dev/null; then
-      log "✓ dotnet format is available (primary linting tool)"
-    fi
+    # Verify critical tools are available via dotnet tool list
+    if command -v dotnet &>/dev/null; then
+      if dotnet tool list --global 2>/dev/null | grep -q "dotnet-format" || \
+         dotnet tool list 2>/dev/null | grep -q "dotnet-format"; then
+        log "✓ dotnet format is available (primary linting tool)"
+      fi
 
-    if command -v roslynator &>/dev/null; then
-      log "✓ roslynator is available (optional analyzer)"
-      warn "Note: roslynator may have compatibility issues with your .NET SDK version"
-      warn "See scripts/dotnet-lint.sh for recommended linting approach"
+      if dotnet tool list --global 2>/dev/null | grep -qiE "roslynator|dotnet-roslynator" || \
+         dotnet tool list 2>/dev/null | grep -qiE "roslynator|dotnet-roslynator"; then
+        log "✓ roslynator is available (optional analyzer)"
+        warn "Note: roslynator may have compatibility issues with your .NET SDK version"
+        warn "See scripts/dotnet-lint.sh for recommended linting approach"
+      fi
     fi
   else
     warn "dotnet tool restore completed with warnings (some tools may be unavailable)"

@@ -19,17 +19,35 @@ warn() { printf '\n[warning] %s\n' "$*"; }
 
 mode="${1:-check}"  # "check" or "fix"
 
-# Get MSBuild path - find the latest SDK
+# Get MSBuild path - find the latest SDK's version-specific toolset
 get_msbuild_path() {
-  # Find the latest .NET SDK directory
-  local sdk_path
-  sdk_path=$(dotnet --list-sdks | tail -1 | awk '{print $NF}' | sed 's/\[//;s/\]//')
+  # Parse SDK version and bracketed base path from `dotnet --list-sdks` last line
+  # Example line: "8.0.100 [/usr/share/dotnet/sdk]"
+  local sdk_line sdk_version base_path candidate
+  sdk_line=$(dotnet --list-sdks | tail -1)
 
-  if [ -z "$sdk_path" ] || [ ! -d "$sdk_path" ]; then
+  sdk_version=$(echo "$sdk_line" | awk '{print $1}')
+  base_path=$(echo "$sdk_line" | awk '{print $NF}' | sed 's/\[//;s/\]//')
+
+  if [ -z "$sdk_version" ] || [ -z "$base_path" ]; then
     return 1
   fi
 
-  echo "$sdk_path"
+  # Try version-specific MSBuild toolset path first
+  candidate="${base_path}/${sdk_version}/MSBuild/Current/Bin"
+  if [ -d "$candidate" ]; then
+    echo "$candidate"
+    return 0
+  fi
+
+  # Fall back to base MSBuild path
+  candidate="${base_path}/MSBuild/Current/Bin"
+  if [ -d "$candidate" ]; then
+    echo "$candidate"
+    return 0
+  fi
+
+  return 1
 }
 
 # Test if roslynator is available and functional

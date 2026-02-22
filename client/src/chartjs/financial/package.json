@@ -1,5 +1,5 @@
 {
-  "name": "@stock-charts/financial",
+  "name": "@facioquo/chartjs-chart-financial",
   "version": "1.0.0",
   "description": "Financial charting extension for Chart.js v4.5+ (candlestick, OHLC, indicators, and stock chart configuration)",
   "type": "module",

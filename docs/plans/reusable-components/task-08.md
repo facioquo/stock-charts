@@ -41,8 +41,8 @@ Complete final validation of library implementation, remove old Angular code, fl
 
 **Code cleanup**:
 
-- Remove old file:client/src/app/services/chart.service.ts (old implementation)
-- Remove old file:client/src/app/services/config.service.ts (old implementation)
+- Remove old file client/src/app/services/chart.service.ts (old implementation)
+- Remove old file client/src/app/services/config.service.ts (old implementation)
 - Remove feature flag from environment files
 - Remove unused imports
 - Update tests to use library

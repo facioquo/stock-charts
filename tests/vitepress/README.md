@@ -15,7 +15,7 @@ This example shows how to use the indy-charts library in a VitePress documentati
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 24+
 - pnpm (recommended)
 
 ### Install Dependencies
