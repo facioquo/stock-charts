@@ -278,12 +278,10 @@ export class SalesChartComponent implements AfterViewInit, OnDestroy {
 
 ### Step 4: Format and validate
 
-```bash
 pnpm run lint --fix    # Fix ESLint errors
-prettier --write src/  # Format code
+pnpm run format        # Format code (uses project-configured prettier)
 pnpm run build         # Verify compilation
 pnpm test              # Run tests
-```
 
 ### Step 5: Check for errors
 
