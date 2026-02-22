@@ -2,17 +2,8 @@
   "name": "Dev Container",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "installZsh": true,
-      "installOhMyZsh": true,
-      "upgradePackages": true,
-      "username": "vscode",
-      "userUid": "automatic",
-      "userGid": "automatic"
-    },
     "ghcr.io/devcontainers/features/node:1": {
-      "version": "24.13.1",
-      "pnpmVersion": "10.30.0"
+      "version": "24"
     },
     "ghcr.io/devcontainers/features/dotnet:2": {
       "version": "10.0"
@@ -20,13 +11,20 @@
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/copilot-cli:1": {},
     "ghcr.io/devcontainers/features/azure-cli:1": {},
-    "ghcr.io/devcontainers-extra/features/angular-cli:2": {}
+    "ghcr.io/devcontainers-extra/features/angular-cli:2": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true,
+      "username": "vscode",
+      "userUid": "automatic",
+      "userGid": "automatic"
+    }
   },
   "customizations": {
     "vscode": {
       "extensions": [
         "angular.ng-template",
-        "azurite.azurite",
         "christian-kohler.npm-intellisense",
         "dbaeumer.vscode-eslint",
         "davidanson.vscode-markdownlint",
@@ -43,14 +41,18 @@
         "chat.tools.global.autoApprove": true,
         "dotnet.defaultSolution": "Charts.sln",
         "editor.formatOnSave": true,
-        "terminal.integrated.defaultProfile.linux": "zsh"
+        "terminal.integrated.allowInUntrustedWorkspace": true,
+        "terminal.integrated.defaultProfile.linux": "bash"
       }
     }
   },
-  "remoteEnv": {
+  "containerEnv": {
     "ALPACA_KEY": "${localEnv:ALPACA_KEY}",
     "ALPACA_SECRET": "${localEnv:ALPACA_SECRET}",
     "AzureWebJobsStorage": "${localEnv:AzureWebJobsStorage}",
+    "DISABLE_TELEMETRY": "1",
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+    "NG_CLI_ANALYTICS": "false",
     "NG_FORCE_TTY": "false"
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh",

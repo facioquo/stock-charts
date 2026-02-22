@@ -7,7 +7,7 @@ on:
     branches: ["main"]
 
 env:
-  NODE_VERSION: "24.13.1"
+  NODE_VERSION: 24
 
 jobs:
   test-backend:

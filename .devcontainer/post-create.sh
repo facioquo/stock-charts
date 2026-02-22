@@ -22,11 +22,8 @@ git config pull.rebase false
 echo "🔐 Trusting .NET dev certificates..."
 dotnet dev-certs https --trust 2>/dev/null || echo "  (dev-certs trust may require manual action on some systems)"
 
-echo "🧰 Installing .NET-based tools..."
-dotnet tool install --global dotnet-format
-dotnet tool install --global roslynator.dotnet.cli@0.11.0  # bug in 0.12.0
-dotnet tool install --global dotnet-outdated-tool
-dotnet tool list --global
+echo "🧰 Installing .NET tools..."
+dotnet tool restore
 
 # Disable Angular auto-completion
 ng config -g cli.completion.prompted true

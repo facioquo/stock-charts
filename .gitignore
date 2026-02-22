@@ -56,6 +56,7 @@ lerna-debug.log*
 testem.log
 .node_repl_history
 .npm
+.pnpm-store
 .yarn-integrity
 
 # ========================================

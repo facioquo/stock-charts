@@ -20,7 +20,6 @@
     "ms-azuretools.vscode-azurefunctions",
     "ms-azuretools.vscode-azurestorage",
     "ms-dotnettools.csdevkit",
-    "ms-vscode-remote.remote-containers",
     "redhat.vscode-yaml",
     "vitest.explorer"
   ],

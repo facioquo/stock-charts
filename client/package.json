@@ -2,10 +2,10 @@
   "name": "@stock-charts/client",
   "description": "Angular frontend for stock charts application",
   "type": "module",
-  "packageManager": "pnpm@10.30.0",
+  "packageManager": "pnpm@10.30.1",
   "engines": {
-    "node": ">=24.13.1",
-    "pnpm": ">=10.30.0"
+    "node": ">=24 <25",
+    "pnpm": ">=10"
   },
   "scripts": {
     "ng": "ng",
@@ -23,6 +23,8 @@
     "lint:fix": "ng lint --fix",
     "format": "prettier --write \"src/**/*.{ts,html,scss,css,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,scss,css,json}\"",
+    "format:web": "pnpm run format",
+    "format:web:check": "pnpm run format:check",
     "build:lib": "tsc -p src/chartjs/financial/tsconfig.lib.json",
     "clean": "rm -rf .angular coverage dist node_modules test-results"
   },

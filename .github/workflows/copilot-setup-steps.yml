@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: "24.13.1"
+  NODE_VERSION: 24
 
 jobs:
   copilot-setup-steps:

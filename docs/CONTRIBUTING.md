@@ -19,11 +19,11 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
 
 **All platforms:**
 
-- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24.13.1 LTS or later)
-- [pnpm](https://pnpm.io/) (v10.30.0 or later) - Installed via platform package managers:
+- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
+- [pnpm](https://pnpm.io/) (v10.30.1 or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
-  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.30.0 --activate`)
+  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.30.1 --activate`)
 - [Angular CLI](https://angular.dev/cli) - Installed globally during setup
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
@@ -57,10 +57,10 @@ pnpm install
 
 Installs all prerequisites via [Homebrew](https://brew.sh/):
 
-- Node.js v24
+- Node.js v24 LTS
 - .NET SDK v10
 - Azure Functions Core Tools v4
-- pnpm v10.30.0 (via Homebrew)
+- pnpm v10 LTS (via Homebrew)
 - Angular CLI (global via pnpm)
 
 ```bash
@@ -71,9 +71,9 @@ bash scripts/setup-macos.sh
 
 Installs all prerequisites via apt-get:
 
-- Node.js v24.13.1
+- Node.js v24 LTS
 - .NET SDK v10.0
-- pnpm v10.30.0 (via Corepack)
+- pnpm v10 LTS (via Corepack)
 - Angular CLI (global)
 
 ```bash
@@ -86,10 +86,10 @@ bash scripts/setup-linux.sh
 
 Installs all prerequisites via winget (requires Git Bash for Windows):
 
-- Node.js v24.13.1 LTS
+- Node.js v24 LTS
 - .NET SDK v10.0
 - Azure Functions Core Tools v4
-- pnpm v10.30.0 (via winget)
+- pnpm v10 LTS (via winget)
 - Angular CLI (global via pnpm)
 
 ```bash
@@ -113,8 +113,8 @@ bash scripts/setup-environment.sh
 After running the setup script or manual installation, verify all tools:
 
 ```bash
-node --version    # Should be v24.13.1+
-pnpm --version    # Should be 10.30.0+
+node --version    # Should be v24+
+pnpm --version    # Should be 10.30.1+
 dotnet --version  # Should be 10.0+
 func --version    # Should be 4.x
 ```
