@@ -10,10 +10,10 @@
 - Replace Angular service injection with parameter-based configuration throughout for framework independence
 
 <details>
-<summary><b>Design Choices</b></summary>
+<summary>**Design Choices**</summary>
 
 <details>
-<summary><b>Design Choice 1: Package Publishing Strategy</b></summary>
+<summary>**Design Choice 1: Package Publishing Strategy**</summary>
 
 **Options Considered:**
 
@@ -28,7 +28,7 @@
 </details>
 
 <details>
-<summary><b>Design Choice 2: Build Tooling Approach</b></summary>
+<summary>**Design Choice 2: Build Tooling Approach**</summary>
 
 **Options Considered:**
 
@@ -43,7 +43,7 @@
 </details>
 
 <details>
-<summary><b>Design Choice 3: API Integration Pattern</b></summary>
+<summary>**Design Choice 3: API Integration Pattern**</summary>
 
 **Options Considered:**
 
@@ -59,7 +59,7 @@
 
 </details>
 
-<b>💡 User Tips</b>
+**💡 User Tips**
 
 Regenerate the plan with different choices with `@coderabbitai <feedback>`.
 
@@ -70,7 +70,7 @@ Regenerate the plan with different choices with `@coderabbitai <feedback>`.
 Extract all framework-agnostic chart configuration logic from ConfigService and ChartService into the library, converting Angular dependency injection patterns to parameter-based configuration.
 
 <details>
-<summary><b>Task 1: Create Configuration Types and Interfaces</b></summary>
+<summary>**Task 1: Create Configuration Types and Interfaces**</summary>
 
 Define the parameter-based configuration interfaces that replace Angular service injection.
 
@@ -83,7 +83,7 @@ Define the parameter-based configuration interfaces that replace Angular service
 </details>
 
 <details>
-<summary><b>Task 2: Extract Chart Configuration Builders</b></summary>
+<summary>**Task 2: Extract Chart Configuration Builders**</summary>
 
 Convert ConfigService methods to pure functions that accept settings as parameters.
 
@@ -96,7 +96,7 @@ Convert ConfigService methods to pure functions that accept settings as paramete
 </details>
 
 <details>
-<summary><b>Task 3: Extract Dataset and Annotation Builders</b></summary>
+<summary>**Task 3: Extract Dataset and Annotation Builders**</summary>
 
 Extract dataset creation and annotation logic as pure factory functions.
 
@@ -109,7 +109,7 @@ Extract dataset creation and annotation logic as pure factory functions.
 </details>
 
 <details>
-<summary><b>Task 4: Extract Data Transformation Pipeline</b></summary>
+<summary>**Task 4: Extract Data Transformation Pipeline**</summary>
 
 Extract the data processing logic that transforms API responses into Chart.js datasets.
 
@@ -122,7 +122,7 @@ Extract the data processing logic that transforms API responses into Chart.js da
 </details>
 
 <details>
-<summary><b>🤖 Prompt for AI agents</b></summary>
+<summary>**🤖 Prompt for AI agents**</summary>
 
 ```markdown
 This phase extracts all framework-agnostic chart configuration logic from
@@ -178,7 +178,7 @@ dependency injection patterns to parameter-based pure functions.
 Create the main library exports: OverlayChart and OscillatorChart classes that provide simple APIs and handle all chart lifecycle management internally.
 
 <details>
-<summary><b>Task 1: Create OverlayChart Abstraction</b></summary>
+<summary>**Task 1: Create OverlayChart Abstraction**</summary>
 
 Build the primary overlay chart component that manages candlestick, volume, and overlay indicator datasets.
 
@@ -193,7 +193,7 @@ Build the primary overlay chart component that manages candlestick, volume, and 
 </details>
 
 <details>
-<summary><b>Task 2: Create OscillatorChart Abstraction</b></summary>
+<summary>**Task 2: Create OscillatorChart Abstraction**</summary>
 
 Build the oscillator chart component for indicators displayed in separate chart panels.
 
@@ -208,7 +208,7 @@ Build the oscillator chart component for indicators displayed in separate chart 
 </details>
 
 <details>
-<summary><b>Task 3: Create Chart Manager for Multi-Chart Coordination</b></summary>
+<summary>**Task 3: Create Chart Manager for Multi-Chart Coordination**</summary>
 
 Build a coordinator class that manages an overlay chart and multiple oscillator charts together.
 
@@ -223,7 +223,7 @@ Build a coordinator class that manages an overlay chart and multiple oscillator 
 </details>
 
 <details>
-<summary><b>🤖 Prompt for AI agents</b></summary>
+<summary>**🤖 Prompt for AI agents**</summary>
 
 ```markdown
 This phase creates the main library exports: OverlayChart and OscillatorChart
@@ -282,7 +282,7 @@ lifecycle management internally.
 Create data fetching utilities and data models that can be used optionally by consumers who want built-in API support.
 
 <details>
-<summary><b>Task 1: Create Data Models and Type Definitions</b></summary>
+<summary>**Task 1: Create Data Models and Type Definitions**</summary>
 
 Define the data contracts matching the backend API responses.
 
@@ -296,7 +296,7 @@ Define the data contracts matching the backend API responses.
 </details>
 
 <details>
-<summary><b>Task 2: Create API Client Utilities</b></summary>
+<summary>**Task 2: Create API Client Utilities**</summary>
 
 Build framework-agnostic fetch utilities for retrieving chart data.
 
@@ -310,7 +310,7 @@ Build framework-agnostic fetch utilities for retrieving chart data.
 </details>
 
 <details>
-<summary><b>Task 3: Create Static Data Support</b></summary>
+<summary>**Task 3: Create Static Data Support**</summary>
 
 Enable usage with pre-bundled static data for build-time rendering scenarios like VitePress.
 
@@ -323,7 +323,7 @@ Enable usage with pre-bundled static data for build-time rendering scenarios lik
 </details>
 
 <details>
-<summary><b>🤖 Prompt for AI agents</b></summary>
+<summary>**🤖 Prompt for AI agents**</summary>
 
 ```markdown
 This phase creates the API integration layer with data models and optional fetch
@@ -390,7 +390,7 @@ VitePress build-time rendering.
 Set up the build pipeline for library distribution and update the Angular application to consume the library.
 
 <details>
-<summary><b>Task 1: Update Library Package Configuration</b></summary>
+<summary>**Task 1: Update Library Package Configuration**</summary>
 
 Configure the package.json for npm publishing with appropriate metadata and dependencies.
 
@@ -404,7 +404,7 @@ Configure the package.json for npm publishing with appropriate metadata and depe
 </details>
 
 <details>
-<summary><b>Task 2: Create Library TypeScript Configuration</b></summary>
+<summary>**Task 2: Create Library TypeScript Configuration**</summary>
 
 Set up TypeScript compilation specifically for the library output.
 
@@ -417,7 +417,7 @@ Set up TypeScript compilation specifically for the library output.
 </details>
 
 <details>
-<summary><b>Task 3: Add Library Build Scripts and Entry Points</b></summary>
+<summary>**Task 3: Add Library Build Scripts and Entry Points**</summary>
 
 Configure npm scripts and ensure proper module format support.
 
@@ -430,7 +430,7 @@ Configure npm scripts and ensure proper module format support.
 </details>
 
 <details>
-<summary><b>Task 4: Configure Angular Application Path Mapping</b></summary>
+<summary>**Task 4: Configure Angular Application Path Mapping**</summary>
 
 Set up path aliases and update imports in the Angular application.
 
@@ -443,7 +443,7 @@ Set up path aliases and update imports in the Angular application.
 </details>
 
 <details>
-<summary><b>Task 5: Validate Existing Functionality</b></summary>
+<summary>**Task 5: Validate Existing Functionality**</summary>
 
 Confirm the Angular application works correctly with the refactored architecture.
 
@@ -455,7 +455,7 @@ Confirm the Angular application works correctly with the refactored architecture
 </details>
 
 <details>
-<summary><b>🤖 Prompt for AI agents</b></summary>
+<summary>**🤖 Prompt for AI agents**</summary>
 
 ```markdown
 This phase sets up the library build pipeline and integrates the library into
@@ -529,7 +529,7 @@ true`
 Create documentation focused on the simple, high-level API for library consumers.
 
 <details>
-<summary><b>Task 1: Create Library Usage Documentation</b></summary>
+<summary>**Task 1: Create Library Usage Documentation**</summary>
 
 Document the simple high-level API for creating charts.
 
@@ -542,7 +542,7 @@ Document the simple high-level API for creating charts.
 </details>
 
 <details>
-<summary><b>Task 2: Create VitePress Integration Guide</b></summary>
+<summary>**Task 2: Create VitePress Integration Guide**</summary>
 
 Document the specific integration pattern for VitePress/Vue projects.
 
@@ -555,7 +555,7 @@ Document the specific integration pattern for VitePress/Vue projects.
 </details>
 
 <details>
-<summary><b>Task 3: Prepare for npm Publishing</b></summary>
+<summary>**Task 3: Prepare for npm Publishing**</summary>
 
 Finalize the package for publication to npm.
 
@@ -567,7 +567,7 @@ Finalize the package for publication to npm.
 </details>
 
 <details>
-<summary><b>🤖 Prompt for AI agents</b></summary>
+<summary>**🤖 Prompt for AI agents**</summary>
 
 ```markdown
 This phase creates comprehensive documentation focused on the simple, high-level
@@ -628,7 +628,7 @@ projects, particularly VitePress.
 </details>
 
 <details>
-<summary><b>Research</b></summary>
+<summary>**Research**</summary>
 
 This is a financial stock charting application with an Angular 21 frontend and .NET backend. The Angular client contains three key layers of chart functionality: (1) A framework-agnostic Chart.js financial plugin at `client/src/chartjs/financial/` (~1,040 lines) implementing candlestick/OHLC chart types with custom controllers, elements, and theming; (2) ConfigService (~400 lines) containing chart configuration builders for overlay and oscillator charts, dataset factories, and annotation helpers that are 95% framework-agnostic; (3) ChartService (~1,000 lines) which orchestrates the complete chart lifecycle including data fetching, chart initialization, indicator management, and responsive resize handling. The goal is to extract all three layers into a unified library with simple high-level APIs that handle everything internally, so consumers can create complete stock charts with minimal code.
 
@@ -639,7 +639,7 @@ This is a financial stock charting application with an Angular 21 frontend and .
 ### 🚀 Next Steps
 
 <details>
-<summary><b>🤖 All AI agent prompts combined</b></summary>
+<summary>**🤖 All AI agent prompts combined**</summary>
 
 ```markdown
 Task: 1

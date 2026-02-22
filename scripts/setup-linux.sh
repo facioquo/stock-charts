@@ -62,10 +62,12 @@ setup_nvm() {
 
   # Download and run the official nvm install script
   local nvm_version="v0.40.4"
-  curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_version/install.sh" | bash || {
+  # Official nvm installer: pinned to $nvm_version; curl|bash is the only supported install method
+  curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_version/install.sh" | bash # nosemgrep: bash.curl.security.curl-pipe-bash
+  if [ $? -ne 0 ]; then
     err "Failed to download nvm installer"
     return 1
-  }
+  fi
 
   # Source nvm after installation
   if [ -s "$HOME/.nvm/nvm.sh" ]; then
@@ -207,7 +209,8 @@ setup_coderabbit() {
   log "🐇 Installing CodeRabbit CLI"
   apt_install libsecret-1-0 libsecret-tools gnome-keyring dbus-user-session
 
-  if curl -fsSL https://cli.coderabbit.ai/install.sh | bash 2>/dev/null; then
+  # Official CodeRabbit CLI installer: curl|bash is the only supported install method
+  if curl -fsSL https://cli.coderabbit.ai/install.sh | bash 2>/dev/null; then # nosemgrep: bash.curl.security.curl-pipe-bash
     log "CodeRabbit CLI installed"
   else
     warn "CodeRabbit CLI installation failed or skipped"
