@@ -23,6 +23,11 @@ import {
 function createCanvasContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   const base = {
     canvas,
+    // length: 0 prevents Chart.js's getCanvas() helper from treating this context
+    // proxy as an array-like (item && item.length → item = item[0]) which would
+    // cause acquireContext() to receive a function instead of the canvas element,
+    // resulting in chart.ctx being null and "Failed to create chart" errors.
+    length: 0,
     fillStyle: "#000",
     strokeStyle: "#000",
     lineWidth: 1,
@@ -201,7 +206,7 @@ describe("ChartService Smoke Tests", () => {
         type: "candlestick" as const,
         data: { datasets: [] },
         options: {
-          responsive: true,
+          responsive: false, // Disable resize observers in jsdom test environment
           maintainAspectRatio: false,
           animation: false as const,
           scales: {
@@ -216,7 +221,7 @@ describe("ChartService Smoke Tests", () => {
         }
       })),
       baseOverlayOptions: vi.fn((volumeAxisSize: number) => ({
-        responsive: true,
+        responsive: false, // Disable resize observers in jsdom test environment
         maintainAspectRatio: false,
         animation: false as const,
         scales: {
@@ -230,7 +235,7 @@ describe("ChartService Smoke Tests", () => {
         }
       })),
       baseOscillatorOptions: vi.fn(() => ({
-        responsive: true,
+        responsive: false, // Disable resize observers in jsdom test environment
         maintainAspectRatio: false,
         animation: false as const,
         scales: {
@@ -318,21 +323,29 @@ describe("ChartService Smoke Tests", () => {
   });
 
   afterEach(() => {
-    // Clean up DOM elements
+    // Complete resize subject first to stop any pending resize callbacks
+    resizeSubject.complete();
+
+    // Destroy charts BEFORE removing DOM elements.
+    // Chart.js registers a MutationObserver ("detached" listener) that fires
+    // when the canvas is removed from the DOM and tries to call chart.update()
+    // on the now-orphaned element, producing unhandled errors.  Destroying the
+    // chart first cleanly unregisters all observers/listeners.
+    if (service.chartOverlay) {
+      service.chartOverlay.destroy();
+      (service as any).chartOverlay = undefined;
+    }
+
+    // Clean up service (completes destroy$ subject, stops RxJS subscriptions)
+    service.ngOnDestroy();
+
+    // Remove DOM elements only after chart observers are detached
     if (canvasElement && canvasElement.parentNode) {
       canvasElement.parentNode.removeChild(canvasElement);
     }
     if (oscillatorsZone && oscillatorsZone.parentNode) {
       oscillatorsZone.parentNode.removeChild(oscillatorsZone);
     }
-
-    // Destroy charts
-    if (service.chartOverlay) {
-      service.chartOverlay.destroy();
-    }
-
-    // Clean up service
-    service.ngOnDestroy();
   });
 
   /**
