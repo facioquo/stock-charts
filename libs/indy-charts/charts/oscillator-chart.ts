@@ -58,6 +58,7 @@ export class OscillatorChart {
   updateLegend(selection: IndicatorSelection): void {
     if (!this.chart) return;
 
+    if (!this.chart.scales["x"] || !this.chart.scales["y"]) return;
     const xPos: ScaleValue = this.chart.scales["x"].min;
     const yPos: ScaleValue = this.chart.scales["y"].max;
 
@@ -99,7 +100,7 @@ export class OscillatorChart {
       if (ext.pointRotation && Array.isArray(ext.pointRotation)) {
         resExt.pointRotation = ext.pointRotation
           .slice(startIndex)
-          .filter((v): v is number => typeof v === "number");
+          .map(v => (typeof v === "number" ? v : NaN));
       }
 
       if (ext.pointBackgroundColor && Array.isArray(ext.pointBackgroundColor)) {
@@ -142,7 +143,9 @@ export class OscillatorChart {
     const qtyThresholds = listing.chartConfig?.thresholds?.length ?? 0;
 
     listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold, index: number) => {
-      const thresholdDataset = createThresholdDataset(threshold, selection.results[0], index);
+      const firstResult = selection.results?.[0];
+      if (!firstResult) return;
+      const thresholdDataset = createThresholdDataset(threshold, firstResult, index);
       chartConfig.data.datasets.push(thresholdDataset);
     });
 

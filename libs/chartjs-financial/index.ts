@@ -1,3 +1,5 @@
+/// <reference path="./types/chartjs-augment.d.ts" />
+
 // Chart.js controllers
 export { CandlestickController } from "./controllers/candlestick.controller";
 export { FinancialController } from "./controllers/financial.controller";

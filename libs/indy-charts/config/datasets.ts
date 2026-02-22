@@ -7,7 +7,7 @@ const THRESHOLD_ORDER_OFFSET = 100;
 export function baseDataset(
   r: IndicatorResult,
   c: IndicatorResultConfig
-): ChartDataset | undefined {
+): ChartDataset {
   switch (r.lineType) {
     case "solid": {
       const lineDataset: ChartDataset = {
@@ -120,7 +120,7 @@ export function baseDataset(
     }
   }
 
-  return undefined;
+  throw new Error(`Unsupported lineType: "${r.lineType}" for result "${r.dataName}"`);
 }
 
 export function createThresholdDataset(

@@ -16,6 +16,11 @@
       "version": "10.1.4",
       "commands": ["swagger"],
       "rollForward": true
+    },
+    "dotnet-reportgenerator-globaltool": {
+      "version": "5.5.1",
+      "commands": ["reportgenerator"],
+      "rollForward": true
     }
   }
 }

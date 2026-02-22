@@ -125,7 +125,6 @@ export class ChartManager {
 
       if (
         listing.category === CATEGORIES.CANDLESTICK_PATTERN &&
-        dataset &&
         dataset.type !== "bar"
       ) {
         const ext = dataset as ExtendedChartDataset;
@@ -134,10 +133,8 @@ export class ChartManager {
         ext.pointBorderColor = pointColor;
       }
 
-      if (dataset) {
-        dataset.data = dataPoints;
-        result.dataset = dataset as ChartDataset;
-      }
+      dataset.data = dataPoints;
+      result.dataset = dataset;
     });
 
     // Store deep copy for efficient resizing.
@@ -177,7 +174,7 @@ export class ChartManager {
       const startIndex = Math.max(0, this._allQuotes.length - this._currentBarCount);
       selection.results.forEach((result, i) => {
         const full = fullDatasets[i];
-        if (full) {
+        if (full && result.dataset) {
           result.dataset.data = [...full.data.slice(startIndex)];
         }
       });

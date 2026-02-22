@@ -31,6 +31,9 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix"
   },
+  "dependencies": {
+    "@facioquo/chartjs-chart-financial": "workspace:*"
+  },
   "peerDependencies": {
     "chart.js": "^4.5.1",
     "chartjs-adapter-date-fns": "^3.0.0",

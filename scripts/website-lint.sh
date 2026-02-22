@@ -23,7 +23,7 @@ case "$mode" in
     log "Running Angular linting checks..."
     # Suppress autocompletion prompt with here-string, preserve all output
     # Capture exit code without triggering set -e by using || pattern
-    pnpm run lint <<<"n" || lint_exit=$?
+    pnpm --filter @stock-charts/client run lint <<<"n" || lint_exit=$?
 
     # Format Angular code
     log "Checking Angular code formatting..."
@@ -42,7 +42,7 @@ case "$mode" in
     log "Running Angular linting fixes..."
     # Suppress autocompletion prompt with here-string, preserve all output
     # Capture exit code without triggering set -e by using || pattern
-    pnpm run lint:fix <<<"n" || lint_exit=$?
+    pnpm --filter @stock-charts/client run lint:fix <<<"n" || lint_exit=$?
 
     # Format Angular code
     log "Formatting Angular code..."

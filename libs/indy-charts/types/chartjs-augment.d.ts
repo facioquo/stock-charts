@@ -11,7 +11,7 @@ import {
   CartesianScaleTypeRegistry
 } from "chart.js";
 
-import type { FinancialDataPoint, FinancialParsedData } from "./financial.types";
+import type { FinancialDataPoint, FinancialParsedData } from "@facioquo/chartjs-chart-financial";
 
 declare module "chart.js" {
   interface ChartTypeRegistry {

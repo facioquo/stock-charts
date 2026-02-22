@@ -22,13 +22,12 @@ type ExtendedChartDataset = ChartDataset & {
 import {
   applyFinancialElementTheme,
   buildCandlestickDataset,
+  buildFinancialChartOptions,
   buildVolumeDataset,
   COLORS,
   FinancialDataPoint,
   getFinancialPalette
 } from "@facioquo/chartjs-chart-financial";
-
-import { buildFinancialChartOptions } from "@facioquo/indy-charts";
 
 // plugins
 import { AnnotationOptions, LabelAnnotationOptions, ScaleValue } from "chartjs-plugin-annotation";

@@ -3,12 +3,12 @@ import { Chart, ChartData, ChartDataset } from "chart.js";
 import { ScaleValue } from "chartjs-plugin-annotation";
 
 import {
+  applyFinancialElementTheme,
   buildCandlestickDataset,
   buildFinancialChartOptions,
   buildVolumeDataset,
-  getFinancialPalette,
-  applyFinancialElementTheme
-} from "../index";
+  getFinancialPalette
+} from "@facioquo/chartjs-chart-financial";
 
 import { processQuoteData } from "../data/transformers";
 import { baseOverlayConfig, baseOverlayOptions } from "../config/overlay";
@@ -53,8 +53,8 @@ export class OverlayChart {
     if (this.chart) this.chart.destroy();
     this.chart = new Chart(this.ctx, chartConfig);
 
-    // Return deep copy of datasets for dynamic slicing
-    return JSON.parse(JSON.stringify(chartData.datasets));
+    // Return deep copy of datasets for dynamic slicing (structuredClone preserves NaN)
+    return structuredClone(chartData.datasets);
   }
 
   addIndicatorDatasets(results: IndicatorResult[]): void {

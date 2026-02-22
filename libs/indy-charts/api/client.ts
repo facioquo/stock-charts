@@ -71,7 +71,8 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         }
       });
 
-      const url = params.toString() ? `${listing.endpoint}?${params.toString()}` : listing.endpoint;
+      const endpointUrl = new URL(listing.endpoint, baseUrl).toString();
+      const url = params.toString() ? `${endpointUrl}?${params.toString()}` : endpointUrl;
 
       try {
         const response = await fetch(url);

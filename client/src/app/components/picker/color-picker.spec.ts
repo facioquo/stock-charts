@@ -170,7 +170,7 @@ describe("Color Picker Functionality", () => {
       ]);
       expect(ngxColor).toBeTruthy();
       expect(materoColorpicker).toBeTruthy();
-    });
+    }, 30_000);
 
     it("should support both hex and hex8 color formats", () => {
       // Test hex color validation

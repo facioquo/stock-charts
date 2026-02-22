@@ -19,7 +19,6 @@ import {
 
 /**
  * Mock canvas context for Chart.js rendering.
- * Based on pattern from client/src/chartjs/financial/financial.integration.spec.ts
  */
 function createCanvasContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   const base = {

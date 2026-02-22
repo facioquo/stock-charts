@@ -64,7 +64,7 @@ roslynator_available() {
   fi
 
   # Test if roslynator can run (version check is lightweight)
-  if roslynator --version >/dev/null 2>&1; then
+  if dotnet tool run roslynator --version >/dev/null 2>&1; then
     return 0
   fi
 
@@ -88,7 +88,7 @@ lint_check() {
     msbuild_path=$(get_msbuild_path)
 
     log "Running Roslynator analysis..."
-    if roslynator analyze --msbuild-path "$msbuild_path"; then
+    if dotnet tool run roslynator analyze --msbuild-path "$msbuild_path"; then
       log "Roslynator analysis completed"
     else
       roslynator_exit_code=$?
@@ -131,7 +131,7 @@ lint_fix() {
     msbuild_path=$(get_msbuild_path)
 
     log "Running Roslynator fixes..."
-    if roslynator fix --msbuild-path "$msbuild_path"; then
+    if dotnet tool run roslynator fix --msbuild-path "$msbuild_path"; then
       log "Roslynator fixes completed"
     else
       roslynator_exit_code=$?

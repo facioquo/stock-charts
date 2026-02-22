@@ -1,4 +1,4 @@
-// Config builders
+// Indy-specific config types
 export type {
   ChartConfig,
   ChartFill,
@@ -15,49 +15,7 @@ export type {
   RawQuote
 } from "./config";
 
-export {
-  baseChartOptions,
-  baseDataset,
-  baseOscillatorConfig,
-  baseOscillatorOptions,
-  baseOverlayConfig,
-  baseOverlayOptions,
-  commonLegendAnnotation,
-  createThresholdDataset,
-  defaultXAxisOptions,
-  FONT_FAMILY
-} from "./config";
-
-// Factory functions
-export {
-  buildCandlestickDataset,
-  buildVolumeDataset,
-  toFinancialDataPoint
-} from "./factories/datasets";
-
-export { applyFinancialElementTheme, buildFinancialChartOptions } from "./factories/options";
-
-// Theme and colors
-export { COLORS, getCandleColor, getFinancialPalette, getVolumeColor } from "./theme/colors";
-
-// Types
-export type {
-  FinancialColorSet,
-  FinancialDataPoint,
-  FinancialDatasetOptions,
-  FinancialPalette,
-  FinancialParsedData,
-  FinancialThemeMode,
-  OhlcDatasetOptions
-} from "./types/financial.types";
-
-// Data transformers
-export {
-  addExtraBars,
-  buildDataPoints,
-  getCandlePointConfiguration,
-  processQuoteData
-} from "./data";
+export { commonLegendAnnotation } from "./config";
 
 // Chart abstractions
 export { ChartManager, OverlayChart, OscillatorChart } from "./charts";
