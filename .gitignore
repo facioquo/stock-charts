@@ -88,7 +88,10 @@ appsettings.Development.json
 # AZURE & LOCAL DEVELOPMENT
 # ========================================
 .azurite/
+.claude/
+.codex/
 .codacy/
+.copilot/
 
 # ========================================
 # OS & SYSTEM FILES
