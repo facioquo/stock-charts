@@ -22,6 +22,7 @@
     "build:prod": "pnpm -r run build:prod --if-present",
     "start": "pnpm --filter @stock-charts/client run start",
     "test": "pnpm -r run test",
+    "test:e2e": "pnpm --filter @stock-charts/playwright-tests run test",
     "test:watch": "pnpm -r run test:watch",
     "test:coverage": "pnpm --filter @stock-charts/client run test:coverage",
     "pretest:dotnet": "dotnet tool restore",
@@ -55,7 +56,6 @@
     "deps:update": "ncu --deep --peer --upgrade"
   },
   "devDependencies": {
-    "@playwright/test": "1.58.2",
     "azurite": "^3.35.0",
     "markdownlint-cli2": "^0.21.0",
     "npm-check-updates": "^19.3.2",

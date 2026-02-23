@@ -2,6 +2,7 @@ packages:
   - client
   - libs/chartjs-financial
   - libs/indy-charts
+  - tests/playwright
   - tests/vitepress
 
 ignoredBuiltDependencies:

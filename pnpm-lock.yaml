@@ -8,9 +8,6 @@ importers:
 
   .:
     devDependencies:
-      '@playwright/test':
-        specifier: 1.58.2
-        version: 1.58.2
       azurite:
         specifier: ^3.35.0
         version: 3.35.0
@@ -224,6 +221,12 @@ importers:
       vitest:
         specifier: ^4.0.18
         version: 4.0.18(@opentelemetry/api@1.9.0)(@types/node@25.3.0)(jiti@2.6.1)(jsdom@28.1.0)(sass@1.97.1)
+
+  tests/playwright:
+    devDependencies:
+      '@playwright/test':
+        specifier: 1.58.2
+        version: 1.58.2
 
   tests/vitepress:
     dependencies:

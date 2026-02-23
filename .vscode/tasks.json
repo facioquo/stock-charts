@@ -236,6 +236,19 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "Test: E2E (Playwright)",
+      "detail": "Run Playwright end-to-end tests (builds and previews VitePress site first)",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/playwright-tests run test",
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "clear": true,
+        "panel": "dedicated"
+      }
+    },
+    {
       "label": "Review: CodeRabbit CLI (plain)",
       "detail": "Perform a full code review with CodeRabbit CLI in plain text response mode",
       "type": "shell",
