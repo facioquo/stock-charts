@@ -117,6 +117,7 @@ if (!mcpPlaywrightTestJs) {
   const manualPath = process.argv[2];
 
   if (manualPath) {
+    // A path was explicitly supplied — validate it and fail loudly if wrong.
     if (fs.existsSync(manualPath) && fs.statSync(manualPath).isFile()) {
       mcpPlaywrightTestJs = manualPath;
     } else {
@@ -126,12 +127,14 @@ if (!mcpPlaywrightTestJs) {
       process.exit(1);
     }
   } else {
+    // No MCP runtime found and no manual path given — this is expected in CI/CD
+    // environments (Cloudflare Pages, GitHub Actions, etc.) where the VS Code
+    // MCP extension is not installed.  Exit cleanly so postinstall does not
+    // block the build.
     process.stdout.write(
-      "Playwright MCP shim: Could not find MCP playwright runtime.\n" +
-        "  To set up manually, run:\n" +
-        "    node scripts/setup-playwright-mcp.cjs <path-to-playwright-test.js>\n"
+      "Playwright MCP shim: MCP playwright runtime not found, skipping (not a VS Code MCP environment).\n"
     );
-    process.exit(1);
+    process.exit(0);
   }
 }
 
