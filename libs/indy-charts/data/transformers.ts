@@ -53,7 +53,7 @@ export function buildDataPoints(
     let yValue = typeof rawValue === "number" ? rawValue : undefined;
 
     // apply candle pointers
-    if (yValue !== undefined && yValue !== null && listing.category === CATEGORIES.CANDLESTICK_PATTERN) {
+    if (yValue !== undefined && listing.category === CATEGORIES.CANDLESTICK_PATTERN) {
       const candleConfig = getCandlePointConfiguration(row["match"] as number, row.candle);
       yValue = candleConfig.yValue;
       pointColor.push(candleConfig.color);
