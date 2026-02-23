@@ -22,6 +22,7 @@ type ExtendedChartDataset = ChartDataset & {
 
 export class OscillatorChart {
   chart: Chart | undefined;
+  private fullThresholdDatasets: ChartDataset[] = [];
 
   constructor(
     private readonly ctx: CanvasRenderingContext2D | HTMLCanvasElement,
@@ -36,6 +37,9 @@ export class OscillatorChart {
 
     // Add thresholds
     this.configureThresholds(chartConfig, selection, listing);
+
+    // Capture full threshold datasets for slicing in applySlicedData
+    this.fullThresholdDatasets = structuredClone(chartConfig.data.datasets) as ChartDataset[];
 
     // Configure y-axis bounds
     this.configureYAxis(chartConfig, listing);
@@ -85,6 +89,21 @@ export class OscillatorChart {
     fullDatasets: ChartDataset[],
     startIndex: number
   ): void {
+    // Slice threshold datasets (inserted before selection datasets in render)
+    this.fullThresholdDatasets.forEach((fullDataset, i) => {
+      if (!this.chart?.data.datasets[i]) return;
+      if (fullDataset.data && Array.isArray(fullDataset.data)) {
+        this.chart.data.datasets[i].data = [
+          ...(fullDataset.data as unknown[]).slice(startIndex)
+        ];
+      }
+      if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
+        this.chart.data.datasets[i].backgroundColor = [
+          ...(fullDataset.backgroundColor as string[]).slice(startIndex)
+        ];
+      }
+    });
+
     selection.results.forEach((result: IndicatorResult, resultIndex: number) => {
       if (!result.dataset || !fullDatasets[resultIndex]) return;
 

@@ -32,6 +32,7 @@ export default tseslint.config(
     files: ["**/*.spec.ts"],
     ...vitest.configs.recommended,
     rules: {
+      ...vitest.configs.recommended.rules,
       "@typescript-eslint/no-explicit-any": "off",
       "vitest/no-disabled-tests": "warn",
       "vitest/no-focused-tests": "warn",

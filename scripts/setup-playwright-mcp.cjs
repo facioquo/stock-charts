@@ -45,9 +45,13 @@ function findAllCachedPlaywrightTestJs() {
   const results = [];
 
   // Directories that may contain npx hash-caches with playwright installs
+  // Allow overriding the npx search root via NPX_SEARCH_DIR env var
+  // (e.g., NPX_SEARCH_DIR=D:\packages\npm\_npx for non-default pnpm installs)
+  const envSearchDir = process.env["NPX_SEARCH_DIR"] || null;
+
   const searchDirs = [
-    // pnpm on non-default drive (e.g., D:\packages\npm\_npx\)
-    "D:\\packages\\npm\\_npx",
+    // Optional env-override for custom npx cache locations (e.g., pnpm on non-default drive)
+    ...(envSearchDir ? [envSearchDir] : []),
     // Windows npm default cache
     path.join(process.env["LOCALAPPDATA"] || "", "npm-cache", "_npx"),
     path.join(
@@ -87,11 +91,30 @@ function findAllCachedPlaywrightTestJs() {
 }
 
 /**
+ * Read the @playwright/test version declared in the playwright workspace package.json.
+ * Falls back to a hardcoded version if the file cannot be read.
+ * @returns {string}
+ */
+function getWorkspacePlaywrightVersion() {
+  try {
+    const pkgPath = path.join(ROOT, "tests", "playwright", "package.json");
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+    const version =
+      (pkg.devDependencies ?? {})["@playwright/test"] ??
+      (pkg.dependencies ?? {})["@playwright/test"];
+    // Strip semver range prefix (^, ~, >=, etc.)
+    return version ? version.replace(/^[^0-9]*/, "") : "1.58.2";
+  } catch {
+    return "1.58.2";
+  }
+}
+
+/**
  * Find the playwright test.js used by the VS Code MCP extension.
  * @returns {string|null}
  */
 function findMcpPlaywrightTestJs() {
-  const WORKSPACE_PW_VERSION = "1.58.2";
+  const WORKSPACE_PW_VERSION = getWorkspacePlaywrightVersion();
   const candidates = findAllCachedPlaywrightTestJs();
 
   // Prefer candidate matching workspace playwright version
@@ -117,12 +140,20 @@ if (!mcpPlaywrightTestJs) {
   const manualPath = process.argv[2];
 
   if (manualPath) {
-    // A path was explicitly supplied — validate it and fail loudly if wrong.
-    if (fs.existsSync(manualPath) && fs.statSync(manualPath).isFile()) {
-      mcpPlaywrightTestJs = manualPath;
-    } else {
+    // A path was explicitly supplied — normalize, then validate and fail loudly if wrong.
+    const resolvedPath = path.resolve(manualPath);
+    try {
+      if (fs.existsSync(resolvedPath) && fs.statSync(resolvedPath).isFile()) {
+        mcpPlaywrightTestJs = resolvedPath;
+      } else {
+        process.stdout.write(
+          `Playwright MCP shim: Provided path does not exist or is not a file: ${resolvedPath}\n`
+        );
+        process.exit(1);
+      }
+    } catch (err) {
       process.stdout.write(
-        `Playwright MCP shim: Provided path does not exist or is not a file: ${manualPath}\n`
+        `Playwright MCP shim: Error validating path ${resolvedPath}: ${err.message}\n`
       );
       process.exit(1);
     }

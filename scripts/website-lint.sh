@@ -15,7 +15,7 @@ set -euo pipefail
 
 mode="${1:-check}"  # "check" or "fix"
 
-log() { printf '[lint] %s\n' "$*"; }
+log() { printf '\n[lint] %s\n' "$*"; }
 err() { printf '[error] %s\n' "$*" >&2; }
 
 case "$mode" in

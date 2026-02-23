@@ -255,7 +255,9 @@ lifecycle management internally.
   - Implement `render()` method:
     - Use data transformers to process indicator data into ScatterDataPoints
     - Create indicator line datasets using dataset builders from Phase 1
-- Create threshold lines with fill regions between threshold values using annotation builders - Use oscillator configuration builders from Phase 1 - Instantiate Chart.js with generated config
+    - Create threshold lines with fill regions between threshold values using annotation builders
+    - Use oscillator configuration builders from Phase 1
+    - Instantiate Chart.js with generated config
   - Implement legend annotation placement using chart scale coordinates
   - Implement `updateTheme(theme)`: switch theme, update colors
   - Implement `resize()` and `destroy()` lifecycle methods
@@ -722,7 +724,9 @@ lifecycle management internally.
   - Implement `render()` method:
     - Use data transformers to process indicator data into ScatterDataPoints
     - Create indicator line datasets using dataset builders from Phase 1
-- Create threshold lines with fill regions between threshold values using annotation builders - Use oscillator configuration builders from Phase 1 - Instantiate Chart.js with generated config
+    - Create threshold lines with fill regions between threshold values using annotation builders
+    - Use oscillator configuration builders from Phase 1
+    - Instantiate Chart.js with generated config
   - Implement legend annotation placement using chart scale coordinates
   - Implement `updateTheme(theme)`: switch theme, update colors
   - Implement `resize()` and `destroy()` lifecycle methods

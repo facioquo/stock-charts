@@ -64,7 +64,7 @@ setup_nvm() {
   local nvm_version="v0.40.4"
   local tmp_nvm
   tmp_nvm=$(mktemp /tmp/nvm-install-XXXXXX.sh)
-  trap 'rm -f "$tmp_nvm"' RETURN
+  trap 'rm -f "$tmp_nvm"; trap - RETURN' RETURN
 
   if ! curl -fsSL -o "$tmp_nvm" "https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_version/install.sh" || \
      [ ! -s "$tmp_nvm" ]; then # nosemgrep: bash.curl.security.curl-pipe-bash

@@ -79,6 +79,7 @@ export class OverlayChart {
 
   updateLegends(overlaySelections: IndicatorSelection[]): void {
     if (!this.chart) return;
+    if (!this.chart.scales["x"] || !this.chart.scales["y"]) return;
 
     const xPos: ScaleValue = this.chart.scales["x"].min;
     const yPos: ScaleValue = this.chart.scales["y"].max;
@@ -89,8 +90,9 @@ export class OverlayChart {
       .sort((a, b) => a.label.localeCompare(b.label));
 
     if (this.chart.options?.plugins?.annotation) {
-      this.chart.options.plugins.annotation.annotations = sorted.map(
-        (selection: IndicatorSelection, index: number) => {
+      this.chart.options.plugins.annotation.annotations = sorted
+        .filter(selection => selection.results.length > 0 && selection.results[0] !== undefined)
+        .map((selection: IndicatorSelection, index: number) => {
           const annotation = commonLegendAnnotation(
             selection.label,
             xPos,
@@ -102,10 +104,9 @@ export class OverlayChart {
           annotation.color = selection.results[0].color;
           adjY += 15; // LEGEND_Y_OFFSET
           return annotation;
-        }
-      );
+        });
+      this.chart.update("none");
     }
-    this.chart.update("none");
   }
 
   updateTheme(settings: ChartSettings): void {

@@ -138,15 +138,14 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
       selection: IndicatorSelection,
       listing: IndicatorListing
     ): Promise<unknown[]> {
-      const params = new URLSearchParams();
+      const endpointUrl = new URL(listing.endpoint, baseUrl);
       selection.params.forEach((p: IndicatorParam) => {
         if (p.value != null) {
-          params.set(p.paramName, String(p.value));
+          endpointUrl.searchParams.set(p.paramName, String(p.value));
         }
       });
 
-      const endpointUrl = new URL(listing.endpoint, baseUrl).toString();
-      const url = params.toString() ? `${endpointUrl}?${params.toString()}` : endpointUrl;
+      const url = endpointUrl.toString();
 
       try {
         const response = await fetch(url);
