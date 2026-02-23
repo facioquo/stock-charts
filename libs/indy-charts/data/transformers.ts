@@ -49,8 +49,8 @@ export function buildDataPoints(
   const pointRotation: number[] = [];
 
   data.forEach(row => {
-    let yValue =
-      typeof row[result.dataName] === "number" ? row[result.dataName] : undefined;
+    const rawValue: unknown = row[result.dataName];
+    let yValue = typeof rawValue === "number" ? rawValue : undefined;
 
     // apply candle pointers
     if (yValue !== undefined && yValue !== null && listing.category === CATEGORIES.CANDLESTICK_PATTERN) {

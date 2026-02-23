@@ -14,6 +14,7 @@
     "url": "https://github.com/facioquo/stock-charts.git"
   },
   "scripts": {
+    "postinstall": "node scripts/setup-playwright-mcp.cjs",
     "clean": "rm -rf node_modules .azurite .codacy && pnpm -r run clean",
     "prebuild": "pnpm run generate:backups",
     "build": "pnpm -r run build",
@@ -54,9 +55,11 @@
     "deps:update": "ncu --deep --peer --upgrade"
   },
   "devDependencies": {
+    "@playwright/test": "1.58.2",
     "azurite": "^3.35.0",
     "markdownlint-cli2": "^0.21.0",
     "npm-check-updates": "^19.3.2",
+    "playwright": "1.58.2",
     "prettier": "^3.8.1",
     "rimraf": "^6.1.3",
     "typescript": "^5.9.3"
