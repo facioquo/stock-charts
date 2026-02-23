@@ -1,8 +1,25 @@
+import { fileURLToPath, URL } from "url";
+
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
   title: "Indy Charts Demo",
   description: "Financial charting with @facioquo/indy-charts",
+
+  vite: {
+    resolve: {
+      // Resolve workspace packages from their TypeScript source so they can be
+      // bundled directly without requiring a pre-built dist/ (e.g. in CI).
+      alias: {
+        "@facioquo/chartjs-chart-financial": fileURLToPath(
+          new URL("../../../libs/chartjs-financial/index.ts", import.meta.url)
+        ),
+        "@facioquo/indy-charts": fileURLToPath(
+          new URL("../../../libs/indy-charts/index.ts", import.meta.url)
+        )
+      }
+    }
+  },
 
   themeConfig: {
     nav: [
