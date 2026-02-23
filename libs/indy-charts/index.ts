@@ -1,3 +1,6 @@
+// Setup helper
+export { setupIndyCharts } from "./setup";
+
 // Indy-specific config types
 export type {
   ChartConfig,

@@ -135,3 +135,4 @@ Backup*/
 CDF_GUID.txt
 dlldata.c
 FodyWeavers.xsd
+.playwright-mcp/

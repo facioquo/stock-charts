@@ -4,41 +4,48 @@ A simple candlestick chart with volume.
 
 ## Live Demo
 
+> **Requires API**: Renders live data from `https://localhost:5001`. Start the Web API with `cd server/WebApi && dotnet run`.
+
 <script setup>
 import { onMounted, ref } from 'vue';
-import { Chart, registerables } from 'chart.js';
-import 'chartjs-adapter-date-fns';
-import annotationPlugin from 'chartjs-plugin-annotation';
-import { registerFinancialCharts } from '@facioquo/chartjs-chart-financial';
-import { ChartManager, loadStaticQuotes } from '@facioquo/indy-charts';
+import { setupIndyCharts, createApiClient, OverlayChart } from '@facioquo/indy-charts';
 
-const mainCanvasRef = ref(null);
-const volumeCanvasRef = ref(null);
+const canvasRef = ref(null);
+const errorMsg = ref('');
 
 onMounted(async () => {
-  // Register Chart.js components
-  Chart.register(...registerables, annotationPlugin);
-  registerFinancialCharts();
+  // One-time setup: registers Chart.js, financial chart types, and date adapter
+  setupIndyCharts();
 
-  // Create chart manager
-  const manager = new ChartManager({
-    mainCanvas: mainCanvasRef.value,
-    volumeCanvas: volumeCanvasRef.value
+  const client = createApiClient({
+    baseUrl: 'https://localhost:5001',
+    onError: (_ctx, _err) => {
+      errorMsg.value = 'Unable to load data — start the Web API: cd server/WebApi && dotnet run';
+    }
   });
 
-  // Load sample data
-  const quotes = await loadStaticQuotes('AAPL');
-  manager.setQuotes(quotes);
-
-  // Render charts
-  manager.renderMainChart('candlestick');
-  manager.renderVolumeChart();
+  try {
+    const quotes = await client.getQuotes();
+    const chart = new OverlayChart(canvasRef.value, {
+      isDarkTheme: false,
+      showTooltips: true
+    });
+    // Render the last 250 bars (price candlesticks + volume in one canvas)
+    chart.render(quotes.slice(-250));
+  } catch {
+    errorMsg.value = 'Unable to load data — start the Web API: cd server/WebApi && dotnet run';
+  }
 });
 </script>
 
 <div style="max-width: 1000px; margin: 20px auto;">
-  <canvas ref="mainCanvasRef" style="width: 100%; height: 400px;"></canvas>
-  <canvas ref="volumeCanvasRef" style="width: 100%; height: 150px; margin-top: 10px;"></canvas>
+  <div
+    v-if="errorMsg"
+    style="padding: 12px; background: #fef3c7; border: 1px solid #d97706; border-radius: 6px; color: #92400e; font-size: 14px;"
+  >
+    ⚠️ {{ errorMsg }}
+  </div>
+  <canvas v-else ref="canvasRef" style="width: 100%; height: 450px;"></canvas>
 </div>
 
 ## Source Code
@@ -46,67 +53,45 @@ onMounted(async () => {
 ```vue
 <script setup>
 import { onMounted, ref } from "vue";
-import { Chart, registerables } from "chart.js";
-import "chartjs-adapter-date-fns";
-import annotationPlugin from "chartjs-plugin-annotation";
-import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
-import { ChartManager, loadStaticQuotes } from "@facioquo/indy-charts";
+import { setupIndyCharts, createApiClient, OverlayChart } from "@facioquo/indy-charts";
 
-const mainCanvasRef = ref(null);
-const volumeCanvasRef = ref(null);
+const canvasRef = ref(null);
+const errorMsg = ref("");
 
 onMounted(async () => {
-  Chart.register(...registerables, annotationPlugin);
-  registerFinancialCharts();
+  // One-time setup: registers Chart.js, financial chart types, and date adapter
+  setupIndyCharts();
 
-  const manager = new ChartManager({
-    mainCanvas: mainCanvasRef.value,
-    volumeCanvas: volumeCanvasRef.value
+  const client = createApiClient({
+    baseUrl: "https://localhost:5001",
+    onError: (_ctx, _err) => {
+      errorMsg.value = "API unavailable";
+    }
   });
 
-  const quotes = await loadStaticQuotes("AAPL");
-  manager.setQuotes(quotes);
+  const quotes = await client.getQuotes();
+  const chart = new OverlayChart(canvasRef.value, {
+    isDarkTheme: false,
+    showTooltips: true
+  });
 
-  manager.renderMainChart("candlestick");
-  manager.renderVolumeChart();
+  // Render the last 250 bars (price candlesticks + volume in one canvas)
+  chart.render(quotes.slice(-250));
 });
 </script>
 
 <template>
-  <div class="chart-container">
-    <canvas ref="mainCanvasRef"></canvas>
-    <canvas ref="volumeCanvasRef"></canvas>
-  </div>
+  <div v-if="errorMsg">{{ errorMsg }}</div>
+  <canvas v-else ref="canvasRef" style="width: 100%; height: 450px;"></canvas>
 </template>
-
-<style scoped>
-.chart-container {
-  max-width: 1000px;
-  margin: 20px auto;
-}
-canvas {
-  width: 100%;
-}
-</style>
 ```
 
 ## Key Points
 
-1. **Register Components**: Always register Chart.js and financial charts before creating charts
-2. **Canvas Elements**: Use refs to access canvas elements in Vue
-3. **Static Data**: `loadStaticQuotes()` provides sample data for demos
-4. **ChartManager**: Simplifies multi-chart management
-
-## Customization
-
-You can customize the chart appearance:
-
-```typescript
-manager.renderMainChart("candlestick", {
-  theme: "dark",
-  title: "AAPL Stock Price"
-});
-```
+1. **One-time setup**: `setupIndyCharts()` registers Chart.js, financial chart types, and the date adapter — call it once before creating any charts
+2. **API client**: `createApiClient({ baseUrl })` provides typed access to the REST API
+3. **OverlayChart**: Renders price candlesticks and volume bars on a single canvas with dual y-axes
+4. **Bar count**: `quotes.slice(-250)` limits the display to the most recent 250 bars
 
 ## Next Steps
 
