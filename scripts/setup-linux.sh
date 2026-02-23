@@ -129,7 +129,41 @@ setup_dotnet() {
   fi
 
   log "Installing .NET SDK v$dotnet_version"
-  apt_update
+
+  # On Debian/Ubuntu, dotnet-sdk-10.0 is not in default repositories.
+  # Add Microsoft's official APT feed before attempting to install.
+  if command -v apt-get &>/dev/null && [[ -f /etc/os-release ]]; then
+    local distro_id version_id
+    distro_id=$(. /etc/os-release && echo "${ID:-}")
+    version_id=$(. /etc/os-release && echo "${VERSION_ID:-}")
+
+    if [[ "$distro_id" == "ubuntu" || "$distro_id" == "debian" ]] && [[ -n "$version_id" ]]; then
+      log "Adding Microsoft APT feed for ${distro_id} ${version_id}"
+
+      # Ensure HTTPS transport prerequisites are present
+      apt_install apt-transport-https ca-certificates
+
+      # Register the Microsoft packages repository via the official .deb package
+      local ms_pkg_deb
+      ms_pkg_deb=$(mktemp /tmp/packages-microsoft-prod-XXXXXX.deb)
+
+      if curl -fsSL -o "$ms_pkg_deb" \
+          "https://packages.microsoft.com/config/${distro_id}/${version_id}/packages-microsoft-prod.deb" && \
+         [[ -s "$ms_pkg_deb" ]]; then
+        if can_sudo; then
+          sudo dpkg -i "$ms_pkg_deb" || warn "Microsoft APT feed registration failed"
+        else
+          dpkg -i "$ms_pkg_deb" || warn "Microsoft APT feed registration failed"
+        fi
+      else
+        warn "Could not download Microsoft packages config; dotnet install may fail"
+      fi
+
+      rm -f "$ms_pkg_deb"
+      apt_update
+    fi
+  fi
+
   apt_install "dotnet-sdk-${dotnet_version}"
 
   if command -v dotnet &>/dev/null; then

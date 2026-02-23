@@ -85,13 +85,13 @@ importers:
         version: 4.5.1
       chartjs-adapter-date-fns:
         specifier: ^3.0.0
-        version: 3.0.0(chart.js@4.5.1)(date-fns@4.1.0)
+        version: 3.0.0(chart.js@4.5.1)(date-fns@3.6.0)
       chartjs-plugin-annotation:
         specifier: ^3.1.0
         version: 3.1.0(chart.js@4.5.1)
       date-fns:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^3.0.0
+        version: 3.6.0
       ngx-color:
         specifier: ^10.1.0
         version: 10.1.0(@angular/common@21.1.5(@angular/core@21.1.5(@angular/compiler@21.1.5)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@21.1.5(@angular/compiler@21.1.5)(rxjs@7.8.2)(zone.js@0.16.1))
@@ -238,13 +238,13 @@ importers:
         version: 4.5.1
       chartjs-adapter-date-fns:
         specifier: 3.0.0
-        version: 3.0.0(chart.js@4.5.1)(date-fns@4.1.0)
+        version: 3.0.0(chart.js@4.5.1)(date-fns@3.6.0)
       chartjs-plugin-annotation:
         specifier: 3.1.0
         version: 3.1.0(chart.js@4.5.1)
       date-fns:
-        specifier: 4.1.0
-        version: 4.1.0
+        specifier: ^3.0.0
+        version: 3.6.0
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.3
@@ -3098,8 +3098,8 @@ packages:
     resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
     engines: {node: '>=0.11'}
 
-  date-fns@4.1.0:
-    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
+  date-fns@3.6.0:
+    resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
 
   debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -8468,10 +8468,10 @@ snapshots:
       chart.js: 4.5.1
       date-fns: 2.30.0
 
-  chartjs-adapter-date-fns@3.0.0(chart.js@4.5.1)(date-fns@4.1.0):
+  chartjs-adapter-date-fns@3.0.0(chart.js@4.5.1)(date-fns@3.6.0):
     dependencies:
       chart.js: 4.5.1
-      date-fns: 4.1.0
+      date-fns: 3.6.0
 
   chartjs-plugin-annotation@3.1.0(chart.js@4.5.1):
     dependencies:
@@ -8646,7 +8646,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.28.6
 
-  date-fns@4.1.0: {}
+  date-fns@3.6.0: {}
 
   debug@2.6.9:
     dependencies:

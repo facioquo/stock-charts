@@ -19,7 +19,7 @@
     "prebuild": "pnpm run generate:backups",
     "build": "pnpm -r run build",
     "prebuild:prod": "pnpm run generate:backups",
-    "build:prod": "pnpm -r run build:prod",
+    "build:prod": "pnpm -r run build:prod --if-present",
     "start": "pnpm --filter @stock-charts/client run start",
     "test": "pnpm -r run test",
     "test:watch": "pnpm -r run test:watch",

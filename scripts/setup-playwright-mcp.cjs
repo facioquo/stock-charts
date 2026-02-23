@@ -111,15 +111,28 @@ function findMcpPlaywrightTestJs() {
   return candidates[0] ?? null;
 }
 
-const mcpPlaywrightTestJs = findMcpPlaywrightTestJs();
+let mcpPlaywrightTestJs = findMcpPlaywrightTestJs();
 
 if (!mcpPlaywrightTestJs) {
-  process.stdout.write(
-    "Playwright MCP shim: Could not find MCP playwright runtime.\n" +
-      "  To set up manually, run:\n" +
-      "    node scripts/setup-playwright-mcp.cjs <path-to-playwright-test.js>\n"
-  );
-  process.exit(0);
+  const manualPath = process.argv[2];
+
+  if (manualPath) {
+    if (fs.existsSync(manualPath) && fs.statSync(manualPath).isFile()) {
+      mcpPlaywrightTestJs = manualPath;
+    } else {
+      process.stdout.write(
+        `Playwright MCP shim: Provided path does not exist or is not a file: ${manualPath}\n`
+      );
+      process.exit(1);
+    }
+  } else {
+    process.stdout.write(
+      "Playwright MCP shim: Could not find MCP playwright runtime.\n" +
+        "  To set up manually, run:\n" +
+        "    node scripts/setup-playwright-mcp.cjs <path-to-playwright-test.js>\n"
+    );
+    process.exit(1);
+  }
 }
 
 const shimContent = `module.exports = require(${JSON.stringify(mcpPlaywrightTestJs)});\n`;

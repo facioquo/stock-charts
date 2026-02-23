@@ -5,6 +5,13 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:4173"
   },
+  webServer: {
+    command:
+      "pnpm --filter @stock-charts/vitepress-example run build && pnpm --filter @stock-charts/vitepress-example run preview",
+    port: 4173,
+    timeout: 120_000,
+    reuseExistingServer: true
+  },
   projects: [
     {
       name: "chromium",

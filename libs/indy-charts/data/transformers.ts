@@ -74,17 +74,22 @@ export function buildDataPoints(
 }
 
 export function addExtraBars(dataPoints: ScatterDataPoint[], extraBars: number): void {
-  const maxTime = Math.max(
-    ...dataPoints.map(h => {
-      const dateTime = h.x != null ? new Date(h.x).getTime() : 0;
-      return Number.isFinite(dateTime) ? dateTime : 0;
-    })
-  );
-  const nextDate = new Date(maxTime);
+  const maxTime =
+    dataPoints.length > 0
+      ? Math.max(
+          ...dataPoints.map(h => {
+            const dateTime = h.x != null ? new Date(h.x).getTime() : 0;
+            return Number.isFinite(dateTime) ? dateTime : 0;
+          })
+        )
+      : 0;
 
-  for (let i = 1; i < extraBars; i++) {
-    nextDate.setDate(nextDate.getDate() + 1);
-    dataPoints.push({ x: new Date(nextDate).valueOf(), y: Number.NaN });
+  // Fall back to today when dataPoints is empty or every timestamp was invalid.
+  const baseDate = maxTime > 0 ? new Date(maxTime) : new Date();
+
+  for (let i = 0; i < extraBars; i++) {
+    baseDate.setDate(baseDate.getDate() + 1);
+    dataPoints.push({ x: baseDate.valueOf(), y: NaN });
   }
 }
 
