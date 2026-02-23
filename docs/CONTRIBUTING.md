@@ -31,6 +31,20 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
 
 **Note:** Azure Functions Core Tools is essential for running the backend Azure Functions locally (`func start` command). It is not installed automatically with Node or .NET SDK.
 
+**Add symlinks if you're not using GitHub Copilot** as your coding agent.
+
+   If your AI coding vendor requires a unique configuration folder for cusomt agents or agent skills, create proper symlinks in your local environment from any **Linux/macOS** shell commandline.  Example:
+
+   ```bash
+   cd .cursor
+   ln --symbolic ../.agents/skills
+   ln --symbolic ../.github/agents
+   ```
+
+  > [!WARNING]
+  > **Windows OS**: Invoke `wsl` to use the WSL(Linux) shell.
+  > This does not work properly in Windows terminals, including Git Bash for Windows.
+
 ### Platform-specific installation
 
 #### Quick setup (all platforms)
