@@ -28,8 +28,8 @@
     "test:watch": "vitest",
     "format": "prettier --write \"**/*.{ts,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,json,md}\"",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@facioquo/chartjs-chart-financial": "workspace:*"
@@ -40,5 +40,13 @@
     "chartjs-plugin-annotation": "^3.1.0",
     "date-fns": "^2.19.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@eslint/js": "^9.39.3",
+    "@vitest/eslint-plugin": "^1.6.9",
+    "eslint": "^9.39.3",
+    "eslint-config-prettier": "^10.1.8",
+    "jiti": "^2.6.1",
+    "typescript-eslint": "^8.56.0",
+    "vitest": "^4.0.18"
+  }
 }

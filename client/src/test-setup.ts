@@ -19,19 +19,17 @@ import {
 } from "@angular/platform-browser-dynamic/testing";
 
 // Initialize Angular TestBed environment.
-// Destroy any existing platform first to prevent NG0400 errors in watch/re-run mode.
-// This must be called once before any tests that use TestBed APIs.
-// Use try-catch to handle cases where TestBed is already initialized in Vitest worker pools.
-try {
-  destroyPlatform();
-  getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
-} catch (error) {
-  // If initTestEnvironment was already called, that's fine - just continue.
-  // This can happen when Vitest reuses worker pools across test files.
-  if (!(error as Error).message?.includes("Cannot set base providers")) {
-    throw error;
-  }
-}
+// In Vitest worker pools the setup file is re-evaluated for each worker, so
+// TestBed may already be initialized when this module runs again.
+// The correct reset sequence is:
+//   1. resetTestEnvironment() — clears _isInitialized and provider state
+//   2. destroyPlatform()      — tears down the existing Angular platform
+//   3. initTestEnvironment()  — creates a fresh platform + test environment
+// This avoids the "Cannot set base providers because it has already been
+// called" error without needing a try-catch.
+getTestBed().resetTestEnvironment();
+destroyPlatform();
+getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
 
 // ========================================================================
 // Browser API Shims for jsdom
@@ -48,7 +46,7 @@ if (typeof window.getComputedStyle !== "function") {
   Object.defineProperty(window, "getComputedStyle", {
     value: (elt: Element) => ({
       display: "block",
-      appearance: "-webkit-appearance",
+      appearance: "none",
       position: "static",
       getPropertyValue: (prop: string) => {
         if (prop === "transform") {

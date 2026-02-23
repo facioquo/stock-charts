@@ -23,14 +23,18 @@ describe("AppComponent", () => {
     await TestBed.configureTestingModule({
       imports: [RouterOutlet],
       providers: [{ provide: UserService, useValue: userServiceSpy }]
-    }).compileComponents();
+    });
 
-    const fixture = TestBed.overrideComponent(AppComponent, {
+    TestBed.overrideComponent(AppComponent, {
       set: {
         template: "<router-outlet></router-outlet>",
         styles: []
       }
-    }).createComponent(AppComponent);
+    });
+
+    await TestBed.compileComponents();
+
+    const fixture = TestBed.createComponent(AppComponent);
 
     const component = fixture.componentInstance;
     expect(component).toBeTruthy();

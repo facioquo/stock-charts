@@ -60,12 +60,20 @@ setup_nvm() {
 
   warn "nvm not found, attempting installation via official installer"
 
-  # Download and run the official nvm install script
+  # Download nvm installer to temp file so curl failures are caught separately from execution
   local nvm_version="v0.40.4"
-  # Official nvm installer: pinned to $nvm_version; curl|bash is the only supported install method
-  curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_version/install.sh" | bash # nosemgrep: bash.curl.security.curl-pipe-bash
-  if [ $? -ne 0 ]; then
+  local tmp_nvm
+  tmp_nvm=$(mktemp /tmp/nvm-install-XXXXXX.sh)
+  trap 'rm -f "$tmp_nvm"' RETURN
+
+  if ! curl -fsSL -o "$tmp_nvm" "https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_version/install.sh" || \
+     [ ! -s "$tmp_nvm" ]; then # nosemgrep: bash.curl.security.curl-pipe-bash
     err "Failed to download nvm installer"
+    return 1
+  fi
+
+  if ! bash "$tmp_nvm"; then
+    err "Failed to run nvm installer"
     return 1
   fi
 
@@ -147,18 +155,16 @@ setup_dotnet_tools() {
     log "Dotnet tools restored successfully"
 
     # Verify critical tools are available via dotnet tool list
-    if command -v dotnet &>/dev/null; then
-      if dotnet tool list --global 2>/dev/null | grep -q "dotnet-format" || \
-         dotnet tool list 2>/dev/null | grep -q "dotnet-format"; then
-        log "✓ dotnet format is available (primary linting tool)"
-      fi
+    if dotnet tool list --global 2>/dev/null | grep -q "dotnet-format" || \
+       dotnet tool list 2>/dev/null | grep -q "dotnet-format"; then
+      log "✓ dotnet format is available (primary linting tool)"
+    fi
 
-      if dotnet tool list --global 2>/dev/null | grep -qiE "roslynator|dotnet-roslynator" || \
-         dotnet tool list 2>/dev/null | grep -qiE "roslynator|dotnet-roslynator"; then
-        log "✓ roslynator is available (optional analyzer)"
-        warn "Note: roslynator may have compatibility issues with your .NET SDK version"
-        warn "See scripts/dotnet-lint.sh for recommended linting approach"
-      fi
+    if dotnet tool list --global 2>/dev/null | grep -qiE "roslynator|dotnet-roslynator" || \
+       dotnet tool list 2>/dev/null | grep -qiE "roslynator|dotnet-roslynator"; then
+      log "✓ roslynator is available (optional analyzer)"
+      warn "Note: roslynator may have compatibility issues with your .NET SDK version"
+      warn "See scripts/dotnet-lint.sh for recommended linting approach"
     fi
   else
     warn "dotnet tool restore completed with warnings (some tools may be unavailable)"
@@ -175,7 +181,7 @@ setup_angular_cli() {
   fi
 
   log "Installing Angular CLI globally..."
-  pnpm install -g @angular/cli || err "Angular CLI installation failed"
+  pnpm install -g @angular/cli || { err "Angular CLI installation failed"; return 1; }
 }
 
 # =========================================================================
@@ -210,7 +216,7 @@ setup_coderabbit() {
   apt_install libsecret-1-0 libsecret-tools gnome-keyring dbus-user-session
 
   # Official CodeRabbit CLI installer: curl|bash is the only supported install method
-  if curl -fsSL https://cli.coderabbit.ai/install.sh | bash 2>/dev/null; then # nosemgrep: bash.curl.security.curl-pipe-bash
+  if curl -fsSL https://cli.coderabbit.ai/install.sh | bash; then # nosemgrep: bash.curl.security.curl-pipe-bash
     log "CodeRabbit CLI installed"
   else
     warn "CodeRabbit CLI installation failed or skipped"

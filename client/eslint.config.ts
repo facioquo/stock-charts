@@ -6,12 +6,7 @@ import vitest from "@vitest/eslint-plugin";
 
 export default tseslint.config(
   {
-    ignores: [
-      "projects/**/*",
-      "dist/**/*",
-      ".angular/**/*",
-      "node_modules/**/*"
-    ]
+    ignores: ["projects/**/*", "dist/**/*", ".angular/**/*", "node_modules/**/*"]
   },
   // TypeScript files
   {
@@ -92,10 +87,7 @@ export default tseslint.config(
   // HTML templates
   {
     files: ["**/*.html"],
-    extends: [
-      ...angular.configs.templateRecommended,
-      ...angular.configs.templateAccessibility
-    ],
+    extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
     rules: {}
   }
 );

@@ -38,7 +38,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        const raw: RawQuote[] = await response.json();
+        const raw = (await response.json()) as RawQuote[];
         return toQuotes(raw);
       } catch (error) {
         onError?.("Error fetching quotes", error);
@@ -52,7 +52,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        const data: IndicatorListing[] = await response.json();
+        const data = (await response.json()) as IndicatorListing[];
         return data;
       } catch (error) {
         onError?.("Error fetching listings", error);
@@ -79,7 +79,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        const data: unknown[] = await response.json();
+        const data = (await response.json()) as unknown[];
         return data;
       } catch (error) {
         onError?.("Error fetching selection data", error);

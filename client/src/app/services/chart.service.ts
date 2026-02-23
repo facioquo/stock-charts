@@ -848,35 +848,6 @@ export class ChartService implements OnDestroy {
     });
   }
 
-  private processQuotes(allQuotes: Quote[]): void {
-    // Store full dataset for dynamic slicing
-    this.allQuotes = allQuotes;
-
-    // Slice array to desired length based on window size (keep newest data)
-    const quotes = allQuotes.slice(-this.currentBarCount);
-
-    // load base overlay chart
-    this.loadOverlayChart(quotes);
-
-    // add/load indicators
-    this.loadIndicatorListings();
-  }
-
-  private loadIndicatorListings(): void {
-    this.api.getListings().subscribe({
-      next: (listings: IndicatorListing[]) => {
-        // load catalog
-        this.listings = listings;
-
-        // load indicators
-        this.loadSelections();
-      },
-      error: (e: HttpErrorResponse) => {
-        this.logHttpError("Error loading listings", e);
-      }
-    });
-  }
-
   loadOverlayChart(quotes: Quote[]) {
     const palette = getFinancialPalette(this.usr.settings.isDarkTheme ? "dark" : "light");
     applyFinancialElementTheme(palette);

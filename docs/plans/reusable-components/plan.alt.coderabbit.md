@@ -59,7 +59,7 @@
 
 </details>
 
-**💡 User Tips**
+### 💡 User Tips
 
 Regenerate the plan with different choices with `@coderabbitai <feedback>`.
 

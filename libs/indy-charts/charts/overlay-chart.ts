@@ -137,7 +137,7 @@ export class OverlayChart {
     if (fullVolume && currentVolume && fullVolume.type === "bar") {
       currentVolume.data = [...fullVolume.data.slice(startIndex)];
       if (fullVolume.backgroundColor && Array.isArray(fullVolume.backgroundColor)) {
-        currentVolume.backgroundColor = [...fullVolume.backgroundColor.slice(startIndex)];
+        currentVolume.backgroundColor = [...(fullVolume.backgroundColor as string[]).slice(startIndex)];
       }
     }
 

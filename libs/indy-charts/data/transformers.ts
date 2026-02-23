@@ -50,11 +50,11 @@ export function buildDataPoints(
 
   data.forEach(row => {
     let yValue =
-      typeof row[result.dataName] === "number" ? (row[result.dataName] as number) : undefined;
+      typeof row[result.dataName] === "number" ? row[result.dataName] : undefined;
 
     // apply candle pointers
     if (yValue !== undefined && yValue !== null && listing.category === CATEGORIES.CANDLESTICK_PATTERN) {
-      const candleConfig = getCandlePointConfiguration(row["match"] as number, row.candle as Quote);
+      const candleConfig = getCandlePointConfiguration(row["match"] as number, row.candle);
       yValue = candleConfig.yValue;
       pointColor.push(candleConfig.color);
       pointRotation.push(candleConfig.rotation);

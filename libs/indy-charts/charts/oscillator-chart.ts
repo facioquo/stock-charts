@@ -112,7 +112,7 @@ export class OscillatorChart {
       }
 
       if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
-        result.dataset.backgroundColor = [...fullDataset.backgroundColor.slice(startIndex)];
+        result.dataset.backgroundColor = [...(fullDataset.backgroundColor as string[]).slice(startIndex)];
       }
     });
 
