@@ -3,5 +3,5 @@
   "config": {
     "MD033": false // allows <any-placeholder>
   },
-  "ignores": ["vite/**", "vitest/**", "vitepress/**"]
+  "ignores": ["find-skills/**", "vite/**", "vitest/**", "vitepress/**"]
 }

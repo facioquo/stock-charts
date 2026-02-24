@@ -230,9 +230,6 @@ importers:
 
   tests/vitepress:
     dependencies:
-      '@facioquo/chartjs-chart-financial':
-        specifier: workspace:*
-        version: link:../../libs/chartjs-financial
       '@facioquo/indy-charts':
         specifier: workspace:*
         version: link:../../libs/indy-charts
