@@ -4,7 +4,20 @@
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "plansDirectory": "docs/plans",
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": [
+      "Bash(python:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(ncu *)",
+      "Bash(npm *)",
+      "Bash(pnpm *)",
+      "Bash(ng *)"
+    ],
+    "ask": ["Bash(git commit *)"],
+    "deny": ["Bash(git push *)"]
+  },
   "agentsDirectories": [".github/agents"],
   "skillsDirectory": ".agents/skills"
 }

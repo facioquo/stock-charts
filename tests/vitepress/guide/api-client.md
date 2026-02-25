@@ -1,27 +1,50 @@
 # API Client Configuration
 
-The `@facioquo/indy-charts` library includes a flexible API client for fetching stock quote data.
+The `@facioquo/indy-charts` library includes a lightweight API client for
+fetching quotes and indicator data from the stock-charts Web API.
 
 ## Basic Usage
 
 ```typescript
-import { fetchQuotes } from "@facioquo/indy-charts";
+import { createApiClient } from "@facioquo/indy-charts";
 
-const quotes = await fetchQuotes("MSFT");
+const client = createApiClient({
+  baseUrl: "https://localhost:5001",
+  onError: (context, error) => {
+    console.error(context, error);
+  }
+});
+
+const quotes = await client.getQuotes();
 ```
 
 ## Configuration
 
-The API client supports multiple data sources with automatic fallback:
+`createApiClient()` accepts a base URL and an optional error callback:
 
 ```typescript
-import { ApiClient } from "@facioquo/indy-charts";
+import { createApiClient } from "@facioquo/indy-charts";
 
-const client = new ApiClient({
-  apiUrl: "https://your-api.com",
-  cacheEnabled: true
+const client = createApiClient({
+  baseUrl: "https://your-api.com",
+  onError: (context, error) => {
+    console.error(`[indy-charts] ${context}`, error);
+  }
 });
 ```
+
+## Available Methods
+
+```typescript
+const quotes = await client.getQuotes();
+const listings = await client.getListings();
+const rows = await client.getSelectionData(selection, listing);
+```
+
+- `getQuotes()` fetches quote history from `GET /quotes`
+- `getListings()` fetches indicator metadata from `GET /indicators`
+- `getSelectionData(selection, listing)` fetches computed indicator rows using
+  the listing endpoint and `selection.params`
 
 ## Data Format
 

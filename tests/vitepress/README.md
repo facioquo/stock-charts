@@ -52,7 +52,13 @@ pnpm run preview
 ```text
 tests/vitepress/
 ├── .vitepress/
-│   └── config.ts          # VitePress configuration
+│   ├── config.ts          # VitePress configuration
+│   └── theme/             # Demo components and styling
+│       ├── index.ts
+│       ├── custom.css
+│       └── components/
+│           ├── IndyOverlayDemo.vue
+│           └── IndyIndicatorsDemo.vue
 ├── guide/
 │   ├── index.md           # Introduction
 │   ├── installation.md    # Installation guide
@@ -67,31 +73,21 @@ tests/vitepress/
 
 ## Key Features
 
-### Vue Components
+### Vue Components (Recommended Pattern)
 
 VitePress uses Vue 3, so you can use Vue components directly in markdown:
 
 ```vue
-<script setup>
-import { onMounted, ref } from "vue";
-import { ChartManager } from "@facioquo/indy-charts";
-
-const canvasRef = ref(null);
-
-onMounted(() => {
-  const manager = new ChartManager({
-    mainCanvas: canvasRef.value
-  });
-  // ... initialize chart
-});
-</script>
-
-<canvas ref="canvasRef"></canvas>
+<ClientOnly>
+  <IndyOverlayDemo api-base-url="https://localhost:5001" :bar-count="250" />
+</ClientOnly>
 ```
 
 ### Live Examples
 
-All examples include working code that runs in the browser. See the `examples/` directory.
+- `/examples/` renders a live `OverlayChart` demo
+- `/examples/indicators` renders live indicator charts via `ChartManager`
+- `/examples/multiple` is currently a recipe page (truthful code, no live embed)
 
 ### TypeScript Support
 
@@ -118,8 +114,12 @@ Configure navigation in `.vitepress/config.ts`:
 ```typescript
 export default defineConfig({
   themeConfig: {
-    nav: [...],
-    sidebar: [...]
+    nav: [
+      /* ... */
+    ],
+    sidebar: [
+      /* ... */
+    ]
   }
 });
 ```
@@ -167,15 +167,15 @@ If you encounter module resolution issues, ensure:
 Check:
 
 1. Canvas element is properly referenced
-2. Chart.js components are registered
-3. Financial charts are registered
-4. Data is loaded before rendering
+2. `setupIndyCharts()` is called before creating charts
+3. The Web API is running (`https://localhost:5001`)
+4. Local Web API CORS includes VitePress dev/preview ports (`5173` / `4173`)
 
 ## Resources
 
 - [VitePress Documentation](https://vitepress.dev/)
-- [Indy Charts API Reference](https://github.com/facioquo/stock-charts/tree/main/libs/indy-charts)
-- [Chart.js Financial Plugin](https://github.com/facioquo/stock-charts/tree/main/libs/chartjs-financial)
+- [Indy Charts API Reference](https://github.com/facioquo/stock-charts/tree/reusable-charts/libs/indy-charts)
+- [Chart.js Financial Plugin](https://github.com/facioquo/stock-charts/tree/reusable-charts/libs/chartjs-financial)
 
 ## License
 

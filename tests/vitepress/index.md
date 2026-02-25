@@ -36,31 +36,25 @@ features:
 
   - icon: ⚡
     title: Performance
-    details: Optimized for large datasets with efficient rendering and caching.
+    details: Optimized for large datasets with efficient rendering and responsive chart updates.
 ---
 
 ## Quick Example
 
 ```typescript
-import { Chart, registerables } from "chart.js";
-import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
-import { ChartManager, createApiClient } from "@facioquo/indy-charts";
+import { createApiClient, OverlayChart, setupIndyCharts } from "@facioquo/indy-charts";
 
-// Register Chart.js components
-Chart.register(...registerables);
-registerFinancialCharts();
+setupIndyCharts();
 
-// Create chart manager
-const manager = new ChartManager({
-  mainCanvas: document.getElementById("main-chart"),
-  volumeCanvas: document.getElementById("volume-chart"),
-  apiClient: createApiClient({ baseUrl: "/api" })
+const client = createApiClient({ baseUrl: "https://localhost:5001" });
+const quotes = await client.getQuotes();
+
+const chart = new OverlayChart(document.getElementById("main-chart") as HTMLCanvasElement, {
+  isDarkTheme: false,
+  showTooltips: true
 });
 
-// Load and render
-await manager.loadQuotes("AAPL");
-manager.renderMainChart("candlestick");
-manager.renderVolumeChart();
+chart.render(quotes.slice(-250));
 ```
 
 ## Installation
@@ -68,15 +62,15 @@ manager.renderVolumeChart();
 ::: code-group
 
 ```bash [npm]
-npm install @facioquo/indy-charts @facioquo/chartjs-chart-financial chart.js
+npm install @facioquo/indy-charts chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
 ```
 
 ```bash [pnpm]
-pnpm add @facioquo/indy-charts @facioquo/chartjs-chart-financial chart.js
+pnpm add @facioquo/indy-charts chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
 ```
 
 ```bash [yarn]
-yarn add @facioquo/indy-charts @facioquo/chartjs-chart-financial chart.js
+yarn add @facioquo/indy-charts chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
 ```
 
 :::

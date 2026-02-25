@@ -16,8 +16,21 @@ export default defineConfig({
         ),
         "@facioquo/indy-charts": fileURLToPath(
           new URL("../../../libs/indy-charts/index.ts", import.meta.url)
+        ),
+        // Pin date-fns to the version installed in this package's node_modules.
+        // chartjs-adapter-date-fns@3.0.0 declares date-fns@^2 as its peer dep
+        // so pnpm may resolve a different (older) virtual-store instance;
+        // the explicit alias ensures both the adapter and any other
+        // importers share the same date-fns@3 installed here.
+        "date-fns": fileURLToPath(
+          new URL("../node_modules/date-fns", import.meta.url)
         )
       }
+    },
+    ssr: {
+      // Prevent SSR externalisation of these packages so Vite can resolve their
+      // peer-dep imports (e.g. date-fns) through the pnpm virtual store.
+      noExternal: ["chartjs-adapter-date-fns", "chart.js", "date-fns"]
     }
   },
 

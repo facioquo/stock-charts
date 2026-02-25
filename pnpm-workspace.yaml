@@ -11,3 +11,4 @@ ignoredBuiltDependencies:
   - lmdb
   - msgpackr-extract
   - unrs-resolver
+  - vue-demi

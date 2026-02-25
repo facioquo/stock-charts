@@ -311,7 +311,7 @@
       "label": "Run: Azure Functions",
       "detail": "Start Azure Functions host",
       "type": "shell",
-      "command": "func start",
+      "command": "[ -f local.settings.json ] || cp local.settings.example.json local.settings.json && func start",
       "dependsOn": "Build: Backend .NET (incremental)",
       "dependsOrder": "sequence",
       "isBackground": true,
@@ -366,6 +366,35 @@
       }
     },
     {
+      "label": "Run: VitePress chart demo dev server",
+      "detail": "Start VitePress demo site (tests/vitepress) with HMR",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/vitepress-example run dev -- --host 0.0.0.0 --port 5173",
+      "isBackground": true,
+      "group": "none",
+      "problemMatcher": {
+        "owner": "vitepress-demo",
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*vitepress v",
+          "endsPattern": "^.*Local:\\s+http://"
+        }
+      }
+    },
+    {
+      "label": "Run: VitePress chart demo full stack",
+      "detail": "Start Azurite, Azure Functions, Web API, and VitePress demo site for daily dev validation",
+      "dependsOn": [
+        "Stop: VitePress chart demo full stack",
+        "Run: Azure Storage",
+        "Run: Azure Functions",
+        "Run: Web API",
+        "Run: VitePress chart demo dev server"
+      ],
+      "dependsOrder": "sequence"
+    },
+    {
       "label": "Stop: Backend services",
       "detail": "Stop backend services (Azure Functions + Web API)",
       "type": "shell",
@@ -402,6 +431,33 @@
       "group": "none"
     },
     {
+      "label": "Stop: VitePress chart demo dev server",
+      "detail": "Stop the VitePress demo dev server (default port 5173)",
+      "type": "shell",
+      "command": "npx",
+      "args": ["kill-port", "5173"],
+      "presentation": {
+        "clear": true,
+        "reveal": "always"
+      },
+      "group": "none"
+    },
+    {
+      "label": "Stop: VitePress chart demo full stack",
+      "detail": "Stop VitePress demo server plus backend services and Azurite",
+      "dependsOn": [
+        "Stop: VitePress chart demo dev server",
+        "Stop: Backend services",
+        "Stop: Azurite"
+      ],
+      "dependsOrder": "sequence",
+      "group": "none",
+      "presentation": {
+        "clear": true,
+        "reveal": "always"
+      }
+    },
+    {
       "label": "Stop: All services",
       "detail": "Gracefully stop all running Backend and Website services (cross-platform)",
       "dependsOn": [
@@ -426,8 +482,7 @@
       "dependsOn": [
         "Clean: Backend .NET (hard reset)",
         "Clean: Website",
-        "Clean: Root and Azure storage",
-        "Delete: Claude temporary files"
+        "Clean: Root and Azure storage"
       ],
       "dependsOrder": "parallel",
       "group": "build"

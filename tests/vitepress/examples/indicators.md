@@ -6,56 +6,91 @@ Example showing how to add technical indicators to charts.
 
 This example demonstrates:
 
-- Adding SMA (Simple Moving Average) overlays
+- Adding EMA/SMA-style overlay indicators
 - Adding RSI (Relative Strength Index) oscillator
 - Customizing indicator parameters
 
-## Code Example
+## Live Demo
+
+> **Requires full stack demo services**: Start the Web API (and supporting services) with the VS Code task `Run: VitePress chart demo full stack`.
+
+<ClientOnly>
+  <IndyIndicatorsDemo />
+</ClientOnly>
+
+## ChartManager Recipe (Real API)
 
 ```typescript
-import { Chart, registerables } from "chart.js";
-import "chartjs-adapter-date-fns";
-import annotationPlugin from "chartjs-plugin-annotation";
-import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
 import {
+  createApiClient,
   ChartManager,
-  loadStaticQuotes,
-  loadStaticIndicatorData
+  loadStaticIndicatorData,
+  setupIndyCharts,
+  type IndicatorListing,
+  type IndicatorSelection
 } from "@facioquo/indy-charts";
 
-// Register components
-Chart.register(...registerables, annotationPlugin);
-registerFinancialCharts();
+setupIndyCharts();
 
-// Create manager with oscillator canvas
+const client = createApiClient({ baseUrl: "https://localhost:5001" });
+const [quotes, listings] = await Promise.all([client.getQuotes(), client.getListings()]);
+
 const manager = new ChartManager({
-  mainCanvas: document.getElementById("main-chart"),
-  volumeCanvas: document.getElementById("volume-chart"),
-  oscillatorCanvas: document.getElementById("oscillator-chart")
+  settings: {
+    isDarkTheme: false,
+    showTooltips: true
+  }
 });
+manager.initializeOverlay(document.getElementById("main-chart") as HTMLCanvasElement, quotes, 250);
 
-// Load data
-const quotes = await loadStaticQuotes("AAPL");
-manager.setQuotes(quotes);
+function defaultSelection(listing: IndicatorListing): IndicatorSelection {
+  return {
+    ucid: crypto.randomUUID(),
+    uiid: listing.uiid,
+    label: listing.legendTemplate,
+    chartType: listing.chartType,
+    params: listing.parameters?.map(param => ({
+      paramName: param.paramName,
+      displayName: param.displayName,
+      minimum: param.minimum,
+      maximum: param.maximum,
+      value: param.defaultValue
+    })) ?? [],
+    results: listing.results.map(result => ({
+      label: result.tooltipTemplate,
+      displayName: result.displayName,
+      dataName: result.dataName,
+      color: result.defaultColor,
+      lineType: result.lineType,
+      lineWidth: result.lineWidth ?? 2,
+      order: listing.order,
+      dataset: { type: "line", data: [] } as never
+    }))
+  };
+}
 
-// Add SMA indicator overlay
-const sma20 = await loadStaticIndicatorData("SMA", { period: 20 });
-const sma50 = await loadStaticIndicatorData("SMA", { period: 50 });
+const emaListing = listings.find(x => x.uiid === "EMA");
+const rsiListing = listings.find(x => x.uiid === "RSI");
+if (!emaListing || !rsiListing) throw new Error("Required indicators not available");
 
-// Render main chart with indicators
-manager.renderMainChart("candlestick", {
-  overlays: [
-    { type: "SMA", data: sma20, color: "blue" },
-    { type: "SMA", data: sma50, color: "red" }
-  ]
-});
+const emaSelection = defaultSelection(emaListing);
+const emaLookback = emaSelection.params.find(p => p.paramName === "lookbackPeriods");
+if (emaLookback) emaLookback.value = 20;
 
-// Render volume
-manager.renderVolumeChart();
+const emaRows = loadStaticIndicatorData(await client.getSelectionData(emaSelection, emaListing));
+manager.processSelectionData(emaSelection, emaListing, emaRows);
+manager.displaySelection(emaSelection, emaListing);
 
-// Add RSI oscillator
-const rsi = await loadStaticIndicatorData("RSI", { period: 14 });
-manager.renderOscillatorChart("RSI", rsi);
+const rsiSelection = defaultSelection(rsiListing);
+const rsiRows = loadStaticIndicatorData(await client.getSelectionData(rsiSelection, rsiListing));
+manager.processSelectionData(rsiSelection, rsiListing, rsiRows);
+manager.displaySelection(rsiSelection, rsiListing);
+
+manager.createOscillator(
+  document.getElementById("rsi-chart") as HTMLCanvasElement,
+  rsiSelection,
+  rsiListing
+);
 ```
 
 ## Available Indicators
@@ -80,43 +115,27 @@ Displayed in separate chart below:
 
 ## Indicator Parameters
 
-Each indicator accepts different parameters:
+Indicator parameters are supplied through `IndicatorSelection.params`, then
+submitted with `client.getSelectionData(selection, listing)`:
 
 ```typescript
-// SMA with custom period
-loadStaticIndicatorData("SMA", { period: 20 });
+const macdSelection = defaultSelection(macdListing);
 
-// EMA with custom period
-loadStaticIndicatorData("EMA", { period: 12 });
+// Override the defaults using the parameter names provided by the listing
+for (const param of macdSelection.params) {
+  if (param.paramName.toLowerCase().includes("fast")) param.value = 12;
+  if (param.paramName.toLowerCase().includes("slow")) param.value = 26;
+  if (param.paramName.toLowerCase().includes("signal")) param.value = 9;
+}
 
-// RSI with custom period
-loadStaticIndicatorData("RSI", { period: 14 });
-
-// MACD with custom parameters
-loadStaticIndicatorData("MACD", {
-  fastPeriod: 12,
-  slowPeriod: 26,
-  signalPeriod: 9
-});
+const rawMacd = await client.getSelectionData(macdSelection, macdListing);
+const macdRows = loadStaticIndicatorData(rawMacd);
 ```
 
-## Styling Indicators
+## Notes
 
-Customize indicator appearance:
-
-```typescript
-manager.renderMainChart("candlestick", {
-  overlays: [
-    {
-      type: "SMA",
-      data: sma20,
-      color: "rgba(0, 123, 255, 0.8)",
-      lineWidth: 2,
-      label: "SMA 20"
-    }
-  ]
-});
-```
+- The live demo above uses `ChartManager` with one overlay chart and two oscillator charts.
+- This page intentionally demonstrates real library method flow (`initializeOverlay`, `processSelectionData`, `displaySelection`, `createOscillator`) instead of simplified pseudo APIs.
 
 ## Multiple Oscillators
 
@@ -130,15 +149,17 @@ const macdCanvas = document.getElementById("macd-chart");
 // Process data for each selection
 manager.processSelectionData(rsiSelection, rsiListing, rsiData);
 manager.processSelectionData(macdSelection, macdListing, macdData);
+manager.displaySelection(rsiSelection, rsiListing);
+manager.displaySelection(macdSelection, macdListing);
 
 // Create oscillator charts with the canvas elements
 const rsiOscillator = manager.createOscillator(
-  rsiCanvas,
+  rsiCanvas as HTMLCanvasElement,
   rsiSelection,
   rsiListing
 );
 const macdOscillator = manager.createOscillator(
-  macdCanvas,
+  macdCanvas as HTMLCanvasElement,
   macdSelection,
   macdListing
 );

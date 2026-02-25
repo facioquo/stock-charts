@@ -5,7 +5,7 @@
 - High-level chart abstractions (`ChartManager`, `OverlayChart`, `OscillatorChart`)
 - Technical indicator support
 - Data transformation utilities
-- API client with caching
+- API client utilities and static data helpers
 - Pre-configured chart options
 
 Built on top of [@facioquo/chartjs-chart-financial](https://github.com/facioquo/stock-charts/tree/main/libs/chartjs-financial) and Chart.js.
@@ -35,8 +35,7 @@ Support for common indicators including:
 Built-in API client with:
 
 - RESTful endpoint integration
-- LocalStorage caching
-- Configurable cache TTL
+- Typed `getQuotes()`, `getListings()`, and `getSelectionData(...)` methods
 - Static data loading for demos
 
 ### Configuration
@@ -73,7 +72,7 @@ Works in all modern browsers that support:
 
 - ES2020
 - Canvas API
-- LocalStorage (for caching)
+- `fetch` API
 
 ## Next Steps
 

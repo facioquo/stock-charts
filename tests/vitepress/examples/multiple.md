@@ -7,46 +7,42 @@ Example showing how to manage multiple independent charts.
 This example demonstrates:
 
 - Creating multiple chart managers
-- Comparing different stocks
-- Synchronizing chart interactions
+- Reusing one quote source across views
+- Coordinating chart window sizes in application code
+
+## Status
+
+This page is currently a **recipe page** (code example only), not a live
+embedded demo. The code below uses real `@facioquo/indy-charts` APIs.
 
 ## Basic Multiple Charts
 
 ```typescript
-import { Chart, registerables } from "chart.js";
-import "chartjs-adapter-date-fns";
-import annotationPlugin from "chartjs-plugin-annotation";
-import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
-import { ChartManager, loadStaticQuotes } from "@facioquo/indy-charts";
+import { ChartManager, createApiClient, setupIndyCharts } from "@facioquo/indy-charts";
 
-// Register components
-Chart.register(...registerables, annotationPlugin);
-registerFinancialCharts();
+setupIndyCharts();
+const client = createApiClient({ baseUrl: "https://localhost:5001" });
+const quotes = await client.getQuotes();
 
-// Create first chart manager
+const settings = { isDarkTheme: false, showTooltips: true };
 const manager1 = new ChartManager({
-  mainCanvas: document.getElementById("chart1-main"),
-  volumeCanvas: document.getElementById("chart1-volume")
+  settings
 });
-
-// Create second chart manager
 const manager2 = new ChartManager({
-  mainCanvas: document.getElementById("chart2-main"),
-  volumeCanvas: document.getElementById("chart2-volume")
+  settings
 });
 
-// Load different stocks
-const aaplQuotes = await loadStaticQuotes("AAPL");
-const msftQuotes = await loadStaticQuotes("MSFT");
+manager1.initializeOverlay(
+  document.getElementById("chart1-main") as HTMLCanvasElement,
+  quotes,
+  250
+);
 
-// Render charts
-manager1.setQuotes(aaplQuotes);
-manager1.renderMainChart("candlestick");
-manager1.renderVolumeChart();
-
-manager2.setQuotes(msftQuotes);
-manager2.renderMainChart("candlestick");
-manager2.renderVolumeChart();
+manager2.initializeOverlay(
+  document.getElementById("chart2-main") as HTMLCanvasElement,
+  quotes,
+  120
+);
 ```
 
 ## HTML Layout
@@ -54,15 +50,13 @@ manager2.renderVolumeChart();
 ```html
 <div class="charts-grid">
   <div class="chart-panel">
-    <h2>AAPL</h2>
+    <h2>Longer Window (250 bars)</h2>
     <canvas id="chart1-main"></canvas>
-    <canvas id="chart1-volume"></canvas>
   </div>
 
   <div class="chart-panel">
-    <h2>MSFT</h2>
+    <h2>Shorter Window (120 bars)</h2>
     <canvas id="chart2-main"></canvas>
-    <canvas id="chart2-volume"></canvas>
   </div>
 </div>
 
@@ -89,77 +83,37 @@ manager2.renderVolumeChart();
 
 ## Chart Comparison
 
-Create a side-by-side comparison with synchronized date ranges:
+Create a side-by-side comparison with a shared quote source and different
+window sizes:
 
 ```typescript
-// Load quotes for multiple symbols
-const quotes = await Promise.all([
-  loadStaticQuotes("AAPL"),
-  loadStaticQuotes("MSFT"),
-  loadStaticQuotes("GOOGL")
-]);
+const quotes = await client.getQuotes();
+const windows = [250, 120, 60];
 
-// Find common date range
-const startDate = Math.max(...quotes.map(q => q[0].date));
-const endDate = Math.min(...quotes.map(q => q[q.length - 1].date));
-
-// Filter quotes to common range
-const filteredQuotes = quotes.map(q =>
-  q.filter(quote => quote.date >= startDate && quote.date <= endDate)
-);
-
-// Create and render charts
-const managers = filteredQuotes.map((quotes, index) => {
-  const manager = new ChartManager({
-    mainCanvas: document.getElementById(`chart${index}-main`),
-    volumeCanvas: document.getElementById(`chart${index}-volume`)
-  });
-
-  manager.setQuotes(quotes);
-  manager.renderMainChart("candlestick");
-  manager.renderVolumeChart();
-
+const managers = windows.map((barCount, index) => {
+  const manager = new ChartManager({ settings });
+  manager.initializeOverlay(
+    document.getElementById(`chart${index}-main`) as HTMLCanvasElement,
+    quotes,
+    barCount
+  );
   return manager;
 });
 ```
 
-## Synchronized Zooming
+## Coordinated Window Changes (Application-Level)
 
-Synchronize zoom/pan across multiple charts:
+`ChartManager` does not provide built-in synchronized zoom events. Coordinate
+window changes in your app by applying `setBarCount()` to each instance:
 
 ```typescript
-// Array of chart managers
 const managers = [manager1, manager2, manager3];
 
-// Listen to zoom events on first chart
-manager1.onZoom((minDate, maxDate) => {
-  // Apply same zoom to other charts
-  managers.slice(1).forEach(manager => {
-    manager.setDateRange(minDate, maxDate);
-  });
-});
-```
-
-## Dynamic Updates
-
-Update all charts when new data arrives:
-
-```typescript
-async function updateAllCharts() {
-  const symbols = ["AAPL", "MSFT", "GOOGL"];
-
-  const updates = await Promise.all(
-    symbols.map(symbol => loadStaticQuotes(symbol))
-  );
-
-  managers.forEach((manager, index) => {
-    manager.setQuotes(updates[index]);
-    manager.refresh();
-  });
+function applyWindow(barCount: number) {
+  managers.forEach(manager => manager.setBarCount(barCount));
 }
 
-// Update every 5 minutes
-setInterval(updateAllCharts, 5 * 60 * 1000);
+applyWindow(180);
 ```
 
 ## Performance Considerations
@@ -172,8 +126,7 @@ When managing multiple charts:
 4. **Destroy Unused**: Clean up charts when switching views
 
 ```typescript
-// Destroy when no longer needed
-manager.destroy();
+managers.forEach(manager => manager.destroy());
 ```
 
 ## Next Steps

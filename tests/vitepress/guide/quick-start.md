@@ -4,7 +4,8 @@ This guide will help you create your first financial chart in minutes.
 
 ## Step 1: HTML Setup
 
-Create a basic HTML structure with canvas elements:
+Create a basic HTML structure with a single canvas element (the overlay chart
+renders both price and volume):
 
 ```html
 <!DOCTYPE html>
@@ -26,8 +27,7 @@ Create a basic HTML structure with canvas elements:
   <body>
     <div class="chart-container">
       <h1>Stock Chart</h1>
-      <canvas id="main-chart"></canvas>
-      <canvas id="volume-chart"></canvas>
+      <canvas id="price-chart"></canvas>
     </div>
 
     <script type="module" src="/main.js"></script>
@@ -37,56 +37,44 @@ Create a basic HTML structure with canvas elements:
 
 ## Step 2: Initialize Chart.js
 
-Register Chart.js components and financial chart types:
+Initialize the library once (this registers Chart.js components, financial chart
+types, the annotation plugin, and the date adapter):
 
 ```typescript
-import { Chart, registerables } from "chart.js";
-import "chartjs-adapter-date-fns";
-import annotationPlugin from "chartjs-plugin-annotation";
-import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
+import { setupIndyCharts } from "@facioquo/indy-charts";
 
-// Register all Chart.js components
-Chart.register(...registerables, annotationPlugin);
-
-// Register financial chart types
-registerFinancialCharts();
+setupIndyCharts();
 ```
 
-## Step 3: Create Chart Manager
+## Step 3: Create API Client and Chart
 
-Set up the chart manager with your canvas elements:
+Create the API client and an `OverlayChart` instance:
 
 ```typescript
-import { ChartManager, loadStaticQuotes } from "@facioquo/indy-charts";
+import { createApiClient, OverlayChart } from "@facioquo/indy-charts";
 
-// Get canvas elements
-const mainCanvas = document.getElementById("main-chart") as HTMLCanvasElement;
-const volumeCanvas = document.getElementById(
-  "volume-chart"
-) as HTMLCanvasElement;
+const canvas = document.getElementById("price-chart") as HTMLCanvasElement;
 
-// Create chart manager
-const manager = new ChartManager({
-  mainCanvas,
-  volumeCanvas
-  // API client is optional - we'll use static data for this example
+const client = createApiClient({
+  baseUrl: "https://localhost:5001",
+  onError: (context, error) => {
+    console.error(context, error);
+  }
+});
+
+const chart = new OverlayChart(canvas, {
+  isDarkTheme: false,
+  showTooltips: true
 });
 ```
 
 ## Step 4: Load Data and Render
 
-Load stock data and render the charts:
+Load quotes from the API and render the last 250 bars:
 
 ```typescript
-// Load sample data (for production, use an API client)
-const quotes = await loadStaticQuotes("AAPL");
-
-// Set quotes in the manager
-manager.setQuotes(quotes);
-
-// Render charts
-manager.renderMainChart("candlestick");
-manager.renderVolumeChart();
+const quotes = await client.getQuotes();
+chart.render(quotes.slice(-250));
 ```
 
 ## Complete Example
@@ -94,32 +82,20 @@ manager.renderVolumeChart();
 Here's the full code:
 
 ```typescript
-import { Chart, registerables } from "chart.js";
-import "chartjs-adapter-date-fns";
-import annotationPlugin from "chartjs-plugin-annotation";
-import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
-import { ChartManager, loadStaticQuotes } from "@facioquo/indy-charts";
+import { createApiClient, OverlayChart, setupIndyCharts } from "@facioquo/indy-charts";
 
-// Register Chart.js
-Chart.register(...registerables, annotationPlugin);
-registerFinancialCharts();
+setupIndyCharts();
 
-// Initialize
-const mainCanvas = document.getElementById("main-chart") as HTMLCanvasElement;
-const volumeCanvas = document.getElementById(
-  "volume-chart"
-) as HTMLCanvasElement;
+const canvas = document.getElementById("price-chart") as HTMLCanvasElement;
+const client = createApiClient({ baseUrl: "https://localhost:5001" });
 
-const manager = new ChartManager({
-  mainCanvas,
-  volumeCanvas
+const chart = new OverlayChart(canvas, {
+  isDarkTheme: false,
+  showTooltips: true
 });
 
-// Load and render
-const quotes = await loadStaticQuotes("AAPL");
-manager.setQuotes(quotes);
-manager.renderMainChart("candlestick");
-manager.renderVolumeChart();
+const quotes = await client.getQuotes();
+chart.render(quotes.slice(-250));
 ```
 
 ## What's Next?

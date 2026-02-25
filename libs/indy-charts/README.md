@@ -7,7 +7,7 @@ Framework-agnostic financial charting library with technical indicators and stoc
 - **Chart Abstractions**: High-level `OverlayChart`, `OscillatorChart`, and `ChartManager` classes
 - **Technical Indicators**: Support for multiple indicators with customizable parameters
 - **Data Transformations**: Quote data processing and OHLC data point builders
-- **API Client**: Built-in API client with LocalStorage caching
+- **API Client**: Built-in API client for quotes and indicator data
 - **Configuration Builders**: Pre-configured chart options for financial charts
 - **TypeScript**: Full type definitions included
 - **Framework Agnostic**: Works with any JavaScript framework or vanilla JS
@@ -15,38 +15,28 @@ Framework-agnostic financial charting library with technical indicators and stoc
 ## Installation
 
 ```bash
-npm install @facioquo/indy-charts @facioquo/chartjs-chart-financial chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
+npm install @facioquo/indy-charts chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
 ```
 
 ## Quick Start
 
 ```typescript
-import { Chart, registerables } from "chart.js";
-import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
-import { ChartManager, createApiClient } from "@facioquo/indy-charts";
+import { createApiClient, OverlayChart, setupIndyCharts } from "@facioquo/indy-charts";
 
-// Register Chart.js components
-Chart.register(...registerables);
-registerFinancialCharts();
+setupIndyCharts();
 
-// Create API client
-const apiClient = createApiClient({
-  baseUrl: "https://api.example.com",
-  cacheEnabled: true
+const client = createApiClient({
+  baseUrl: "https://api.example.com"
 });
 
-// Create chart manager
-const manager = new ChartManager({
-  mainCanvas: document.getElementById("main-chart"),
-  volumeCanvas: document.getElementById("volume-chart"),
-  oscillatorCanvas: document.getElementById("oscillator-chart"),
-  apiClient
+const quotes = await client.getQuotes();
+
+const chart = new OverlayChart(document.getElementById("main-chart") as HTMLCanvasElement, {
+  isDarkTheme: false,
+  showTooltips: true
 });
 
-// Load data and render charts
-await manager.loadQuotes("AAPL");
-manager.renderMainChart("candlestick");
-manager.renderVolumeChart();
+chart.render(quotes.slice(-250));
 ```
 
 ## Architecture
@@ -78,15 +68,17 @@ Pre-built configuration objects for common chart types:
 ```typescript
 const apiClient = createApiClient({
   baseUrl: "https://api.example.com",
-  cacheEnabled: true,
-  cacheTTL: 3600000 // 1 hour
+  onError: (context, error) => console.error(context, error)
 });
 
 // Fetch quotes
-const quotes = await apiClient.getQuotes("AAPL");
+const quotes = await apiClient.getQuotes();
+const listings = await apiClient.getListings();
+const rows = await apiClient.getSelectionData(selection, listing);
 
 // Load static data (for demo/testing)
-const staticQuotes = await loadStaticQuotes("AAPL");
+const staticQuotes = loadStaticQuotes(rawQuoteArray);
+const staticRows = loadStaticIndicatorData(rawIndicatorRows);
 ```
 
 ## Usage with VitePress

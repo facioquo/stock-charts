@@ -12,7 +12,6 @@ Install the core libraries and their peer dependencies:
 
 ```bash [npm]
 npm install @facioquo/indy-charts \
-  @facioquo/chartjs-chart-financial \
   chart.js \
   chartjs-adapter-date-fns \
   chartjs-plugin-annotation \
@@ -21,7 +20,6 @@ npm install @facioquo/indy-charts \
 
 ```bash [pnpm]
 pnpm add @facioquo/indy-charts \
-  @facioquo/chartjs-chart-financial \
   chart.js \
   chartjs-adapter-date-fns \
   chartjs-plugin-annotation \
@@ -30,7 +28,6 @@ pnpm add @facioquo/indy-charts \
 
 ```bash [yarn]
 yarn add @facioquo/indy-charts \
-  @facioquo/chartjs-chart-financial \
   chart.js \
   chartjs-adapter-date-fns \
   chartjs-plugin-annotation \
@@ -50,21 +47,17 @@ The main library providing:
 - Data transformers
 - API client
 
-### @facioquo/chartjs-chart-financial
-
-Chart.js plugin providing:
-
-- Candlestick chart type
-- OHLC chart type
-- Financial data elements
-- Theme support
-
 ### Peer Dependencies
 
 - **chart.js**: Core charting library
 - **chartjs-adapter-date-fns**: Date handling for Chart.js
 - **chartjs-plugin-annotation**: Annotation support
 - **date-fns**: Date formatting utilities
+
+### Transitive Dependency
+
+`@facioquo/indy-charts` depends on `@facioquo/chartjs-chart-financial`
+internally. Most consumers should not need to install it directly.
 
 ## TypeScript
 

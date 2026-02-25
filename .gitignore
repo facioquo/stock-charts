@@ -27,6 +27,7 @@ artifacts/
 *.trx
 TestResult.xml
 nunit-*.xml
+**/playwright-report/
 
 # MSBuild Binary and Structured Log
 *.binlog
@@ -89,6 +90,7 @@ appsettings.Development.json
 # ========================================
 .azurite/
 # .claude/
+.claude/*.local.json
 .codex/
 .codacy/
 .copilot/
