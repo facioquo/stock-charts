@@ -5,6 +5,7 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   title: "Indy Charts Demo",
   description: "Financial charting with @facioquo/indy-charts",
+  appearance: "dark",
 
   vite: {
     resolve: {

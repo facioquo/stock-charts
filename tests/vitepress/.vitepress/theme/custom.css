@@ -21,6 +21,9 @@
   box-shadow: var(--indy-demo-shadow);
   padding: 14px;
   margin: 18px 0 24px;
+  overflow: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .indy-demo__header {
@@ -88,6 +91,8 @@
   border-radius: 12px;
   background: color-mix(in srgb, var(--vp-c-bg) 94%, transparent);
   padding: 10px;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .indy-demo__panel-title {
