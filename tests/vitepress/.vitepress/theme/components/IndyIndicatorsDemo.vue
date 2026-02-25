@@ -30,7 +30,6 @@ const props = withDefaults(defineProps<Props>(), {
   showTooltips: true
 });
 
-const rootRef = ref<HTMLElement | null>(null);
 const overlayCanvasRef = ref<HTMLCanvasElement | null>(null);
 const rsiCanvasRef = ref<HTMLCanvasElement | null>(null);
 const macdCanvasRef = ref<HTMLCanvasElement | null>(null);
@@ -42,7 +41,6 @@ const { isDark } = useData();
 
 let manager: ChartManager | null = null;
 let disposed = false;
-let resizeObserver: ResizeObserver | null = null;
 let loadToken = 0;
 
 function currentSettings(): ChartSettings {
@@ -55,14 +53,6 @@ function currentSettings(): ChartSettings {
 function destroyManager(): void {
   manager?.destroy();
   manager = null;
-}
-
-function startResizeObserver(): void {
-  if (!rootRef.value || resizeObserver) return;
-  resizeObserver = new ResizeObserver(() => {
-    manager?.resize();
-  });
-  resizeObserver.observe(rootRef.value);
 }
 
 async function addIndicator(
@@ -130,9 +120,6 @@ async function loadDemo(): Promise<void> {
     await addIndicator(client, listings, "EMA", { lookbackPeriods: 20 });
     await addIndicator(client, listings, "RSI", { lookbackPeriods: 14 }, rsiCanvasRef.value);
     await addIndicator(client, listings, "MACD", {}, macdCanvasRef.value);
-
-    manager.resize();
-    startResizeObserver();
   } catch (error) {
     if (disposed || token !== loadToken) return;
 
@@ -154,14 +141,12 @@ onMounted(() => {
 
 onUnmounted(() => {
   disposed = true;
-  resizeObserver?.disconnect();
-  resizeObserver = null;
   destroyManager();
 });
 </script>
 
 <template>
-  <section ref="rootRef" class="indy-demo" data-testid="indy-indicators-demo">
+  <section class="indy-demo" data-testid="indy-indicators-demo">
     <div class="indy-demo__header">
       <div>
         <p class="indy-demo__title">Live Indicators Demo</p>

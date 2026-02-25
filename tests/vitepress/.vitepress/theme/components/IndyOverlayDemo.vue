@@ -22,7 +22,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
-const rootRef = ref<HTMLElement | null>(null);
 const phase = ref<"idle" | "loading" | "ready" | "error">("idle");
 const errorMessage = ref("");
 
@@ -30,7 +29,6 @@ const { isDark } = useData();
 
 let chart: OverlayChart | null = null;
 let disposed = false;
-let resizeObserver: ResizeObserver | null = null;
 let loadToken = 0;
 
 function currentSettings(): ChartSettings {
@@ -43,15 +41,6 @@ function currentSettings(): ChartSettings {
 function destroyChart(): void {
   chart?.destroy();
   chart = null;
-}
-
-function startResizeObserver(): void {
-  if (!rootRef.value || resizeObserver) return;
-
-  resizeObserver = new ResizeObserver(() => {
-    chart?.resize();
-  });
-  resizeObserver.observe(rootRef.value);
 }
 
 async function loadDemo(): Promise<void> {
@@ -83,7 +72,6 @@ async function loadDemo(): Promise<void> {
 
     chart = new OverlayChart(canvasRef.value, currentSettings());
     chart.render(quotes.slice(-props.barCount));
-    startResizeObserver();
   } catch {
     if (disposed || token !== loadToken) return;
 
@@ -103,14 +91,12 @@ onMounted(() => {
 
 onUnmounted(() => {
   disposed = true;
-  resizeObserver?.disconnect();
-  resizeObserver = null;
   destroyChart();
 });
 </script>
 
 <template>
-  <section ref="rootRef" class="indy-demo" data-testid="indy-overlay-demo">
+  <section class="indy-demo" data-testid="indy-overlay-demo">
     <div class="indy-demo__header">
       <div>
         <p class="indy-demo__title">Live Overlay Chart Demo</p>
