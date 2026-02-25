@@ -10,7 +10,7 @@
     "MD007": { "indent": 2 },
     "MD013": false, // allow long lines
     "MD024": { "siblings_only": true },
-    "MD033": { "allowed_elements": ["details", "summary", "br", "sub", "sup", "kbd", "abbr", "a", "img"] },
+    "MD033": { "allowed_elements": ["details", "summary", "b", "br", "sub", "sup", "kbd", "abbr", "a", "img", "script", "div", "canvas", "ClientOnly", "IndyIndicatorsDemo"] },
     "MD041": false,
     "MD046": { "style": "fenced" },
     "MD048": { "style": "backtick" },

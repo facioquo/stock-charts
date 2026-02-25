@@ -30,7 +30,7 @@ export default tseslint.config(
   // Test files - relaxed rules + vitest plugin
   {
     files: ["**/*.spec.ts"],
-    ...vitest.configs.recommended,
+    plugins: vitest.configs.recommended.plugins,
     rules: {
       ...vitest.configs.recommended.rules,
       "@typescript-eslint/no-explicit-any": "off",

@@ -2,7 +2,7 @@
   --indy-demo-border: color-mix(in srgb, var(--vp-c-divider) 72%, transparent);
   --indy-demo-bg: color-mix(in srgb, var(--vp-c-bg-soft) 85%, white 15%);
   --indy-demo-bg-alt: color-mix(in srgb, var(--vp-c-bg) 90%, var(--vp-c-bg-soft) 10%);
-  --indy-demo-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+  --indy-demo-shadow: 0 18px 42px rgb(15 23 42 / 8%);
   --indy-demo-radius: 16px;
   --indy-demo-chart-height: clamp(280px, 46vw, 480px);
   --indy-demo-osc-height: clamp(180px, 26vw, 260px);
@@ -11,7 +11,7 @@
 .dark {
   --indy-demo-bg: color-mix(in srgb, var(--vp-c-bg-soft) 82%, black 18%);
   --indy-demo-bg-alt: color-mix(in srgb, var(--vp-c-bg) 88%, black 12%);
-  --indy-demo-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+  --indy-demo-shadow: 0 16px 36px rgb(0 0 0 / 28%);
 }
 
 .indy-demo {
@@ -132,7 +132,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-@media (max-width: 900px) {
+@media (width <= 900px) {
   .indy-demo__osc-grid {
     grid-template-columns: 1fr;
   }

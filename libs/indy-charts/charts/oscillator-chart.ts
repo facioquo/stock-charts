@@ -28,12 +28,12 @@ export class OscillatorChart {
    */
   render(selection: IndicatorSelection, listing: IndicatorListing): void {
     const chartConfig = baseOscillatorConfig(this.settings);
+    // reset stored full threshold datasets for this render
+    this.fullThresholdDatasets = [];
 
     // Add thresholds
     this.configureThresholds(chartConfig, selection, listing);
 
-    // Capture full threshold datasets for slicing in applySlicedData
-    this.fullThresholdDatasets = structuredClone(chartConfig.data.datasets) as ChartDataset[];
 
     // Configure y-axis bounds
     this.configureYAxis(chartConfig, listing);
@@ -160,6 +160,8 @@ export class OscillatorChart {
       if (!firstResult) return;
       const thresholdDataset = createThresholdDataset(threshold, firstResult, index);
       chartConfig.data.datasets.push(thresholdDataset);
+      // store a full (unsliced) copy for later dynamic slicing
+      this.fullThresholdDatasets.push(structuredClone(thresholdDataset) as ChartDataset);
     });
 
     // Hide thresholds from tooltips

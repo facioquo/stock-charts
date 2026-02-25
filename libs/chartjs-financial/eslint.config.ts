@@ -35,8 +35,10 @@ export default tseslint.config(
     files: ["**/*.spec.ts"],
     ...vitest.configs.recommended,
     rules: {
+      // preserve vitest recommended rules, then override specific entries
       ...vitest.configs.recommended.rules,
       "@typescript-eslint/no-explicit-any": "off",
+      // relax some vitest rules for local tests
       "vitest/no-disabled-tests": "warn",
       "vitest/no-focused-tests": "warn",
       "vitest/no-identical-title": "error"
