@@ -139,3 +139,5 @@ dlldata.c
 FodyWeavers.xsd
 .playwright-mcp/
 playwright-report/
+tests/vitepress/--host/
+.vitepress/cache/

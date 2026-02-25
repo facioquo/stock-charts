@@ -369,7 +369,7 @@
       "label": "Run: VitePress chart demo dev server",
       "detail": "Start VitePress demo site (tests/vitepress) with HMR",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/vitepress-example run dev -- --host 0.0.0.0 --port 5173",
+      "command": "pnpm --filter @stock-charts/vitepress-example run dev",
       "isBackground": true,
       "group": "none",
       "problemMatcher": {
