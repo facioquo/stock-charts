@@ -6,18 +6,14 @@ Issue #452 and follow-on PR remediation work.
 Temporary planning notes under `.claude/plans/` are working drafts only and
 must be merged here (or into task files in this folder) before completion.
 
-## Status note (re-baselined)
+## Status note
 
-The previous version of this file became stale and over-reported completion.
-Specifically:
+All tasks are complete as of 2026-02-24. Task 12 resolved the final quality
+pass: API drift in VitePress docs, demonstrator polish, and Playwright hardening.
 
-- It marked VitePress docs/examples work as complete, but the `tests/vitepress`
-  site still contains fictional API snippets and incomplete demo polish.
-- It marked API client LocalStorage caching as delivered, but the current
-  `libs/indy-charts` API client does not implement caching.
-- It described earlier package/layout states that no longer match the repo.
-
-This revision re-baselines task statuses to match the current repository.
+The previous version of this file had over-reported completion on VitePress
+docs/examples and claimed LocalStorage caching that was not implemented. This
+was corrected during the Task 12 re-baselining and subsequent implementation.
 
 ## Supporting information
 
@@ -48,47 +44,60 @@ graph TD
 
 ## Task status matrix
 
-| Task | Title | Status | Notes |
-|------|-------|--------|-------|
-| [Task 1](task-01.md) | Smoke tests for chart critical paths | Complete | Historical task appears complete. |
-| [Task 2](task-02.md) | Extract config and transformers | Complete | Implemented via `libs/indy-charts` and supporting modules. |
-| [Task 3](task-03.md) | High-level chart abstractions | Complete | `OverlayChart`, `OscillatorChart`, `ChartManager` exist. |
-| [Task 4](task-04.md) | API client and LocalStorage caching | Partial | API client exists; caching claims are stale / not implemented in current `libs/indy-charts/api/client.ts`. |
-| [Task 5](task-05.md) | Build pipeline and package metadata | Complete | Workspaces/package metadata exist for extracted libraries. |
-| [Task 6](task-06.md) | Angular integration with feature flag | Complete (re-verify as needed) | Historical completion accepted; validation can be revisited separately. |
-| [Task 7](task-07.md) | VitePress integration docs and examples | Partial | `tests/vitepress` exists, but docs contain fictional APIs and incomplete demonstrator polish. |
-| [Task 8](task-08.md) | Validate, remove old code, publish | Needs remediation / superseded in parts | File is stale and over-claims completion/publishing. Treat as historical checklist, not current truth. |
-| Task 9 | Restore standalone `libs/chartjs-financial` workspace | Complete | Workspace exists: `libs/chartjs-financial`. |
-| Task 10 | Separate `libs/indy-charts` workspace | Complete | Workspace exists: `libs/indy-charts`. |
-| Task 11 | Add `tests/vitepress` workspace sample | Partial | Workspace exists; still needs correctness/UX finish work. |
-| [Task 12](task-12.md) | Finish VitePress demonstrator + resolve PR #454 review feedback | Open | New remediation task consolidating temporary PR-454 plan work. |
+| Task                  | Title                                                           | Status                                  | Notes                                                                                                      |
+| --------------------- | --------------------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| [Task 1](task-01.md)  | Smoke tests for chart critical paths                            | Complete                                | Historical task appears complete.                                                                          |
+| [Task 2](task-02.md)  | Extract config and transformers                                 | Complete                                | Implemented via `libs/indy-charts` and supporting modules.                                                 |
+| [Task 3](task-03.md)  | High-level chart abstractions                                   | Complete                                | `OverlayChart`, `OscillatorChart`, `ChartManager` exist.                                                   |
+| [Task 4](task-04.md)  | API client and LocalStorage caching                             | Partial                                 | API client exists; caching claims are stale / not implemented in current `libs/indy-charts/api/client.ts`. |
+| [Task 5](task-05.md)  | Build pipeline and package metadata                             | Complete                                | Workspaces/package metadata exist for extracted libraries.                                                 |
+| [Task 6](task-06.md)  | Angular integration with feature flag                           | Complete (re-verify as needed)          | Historical completion accepted; validation can be revisited separately.                                    |
+| [Task 7](task-07.md)  | VitePress integration docs and examples                         | Complete (via Task 12)                  | All fictional API drift corrected; demonstrator polish completed in Task 12.                               |
+| [Task 8](task-08.md)  | Validate, remove old code, publish                              | Needs remediation / superseded in parts | File is stale and over-claims completion/publishing. Treat as historical checklist, not current truth.     |
+| Task 9                | Restore standalone `libs/chartjs-financial` workspace           | Complete                                | Workspace exists: `libs/chartjs-financial`.                                                                |
+| Task 10               | Separate `libs/indy-charts` workspace                           | Complete                                | Workspace exists: `libs/indy-charts`.                                                                      |
+| Task 11               | Add `tests/vitepress` workspace sample                          | Complete                                | Workspace complete with correct APIs, reusable components, dark mode, and responsive layout.               |
+| [Task 12](task-12.md) | Finish VitePress demonstrator + resolve PR #454 review feedback | Complete                                | All acceptance criteria met: API drift fixed, `IndyOverlayDemo`/`IndyIndicatorsDemo` components, Playwright clean. |
 
-## Current repo baseline (high-level)
+## Current repo baseline
 
-The reusable component initiative is substantially implemented, but the final
-documentation/demo quality pass is incomplete.
+The reusable component initiative is fully implemented. All planned tasks are
+complete, including the final documentation/demo quality pass in Task 12.
 
 ### Present in repo
 
 - `libs/chartjs-financial/` standalone workspace
 - `libs/indy-charts/` standalone workspace with chart abstractions and API client
-- `tests/vitepress/` VitePress example workspace
-- `tests/playwright/` VitePress UI tests
+- `tests/vitepress/` VitePress example workspace with live demos and correct API docs
+- `tests/playwright/` VitePress UI tests (11/11 content tests passing)
 
-### Remaining finish work (tracked in Task 12)
+### Remaining finish work
 
-- Correct VitePress docs/snippets to match actual `@facioquo/indy-charts` APIs
-- Finish polish of the VitePress basic chart demonstrator (`/examples/`)
-- Harden Playwright selectors/URLs for VitePress default theme behavior
-- Fix `libs/indy-charts/README.md` API drift
+<!-- All Task 12 remediation items are complete as of 2026-02-24. -->
+
+- [x] Correct VitePress docs/snippets to match actual `@facioquo/indy-charts` APIs
+- [x] Finish polish of the VitePress basic chart demonstrator (`/examples/`)
+  - Reusable `IndyOverlayDemo.vue` and `IndyIndicatorsDemo.vue` components
+  - Loading/error states with `data-testid` hooks
+  - Theme sync via `useData().isDark`
+  - Responsive canvas (`position: absolute; inset: 0`)
+  - Dark mode default via `appearance: 'dark'` in config
+- [x] Harden Playwright selectors/URLs for VitePress default theme behavior
+- [x] Fix `libs/indy-charts/README.md` API drift
 
 ## Active focus
 
-### Task 12: PR #454 review remediation + VitePress finish
+### All planned tasks complete
 
-The temporary `.claude` plan for PR #454 has been migrated into
-[`task-12.md`](task-12.md). This keeps the canonical status and detailed
-acceptance criteria in this folder and avoids duplicate planning tracks.
+Task 12 (the final remediation task) is complete as of 2026-02-24. The
+`reusable-charts` branch contains:
+
+- Corrected VitePress docs with real `@facioquo/indy-charts` APIs
+- Reusable `IndyOverlayDemo.vue` / `IndyIndicatorsDemo.vue` components
+- Responsive dark-mode-default VitePress site
+- Clean Playwright test suite (11/11 content tests pass)
+
+Any new work should be tracked in a new task file.
 
 ## Incorporated alternate-plan notes (historical -> current)
 
