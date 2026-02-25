@@ -88,7 +88,11 @@ export function addExtraBars(dataPoints: ScatterDataPoint[], extraBars: number):
   const baseDate = maxTime > 0 ? new Date(maxTime) : new Date();
 
   for (let i = 0; i < extraBars; i++) {
-    baseDate.setDate(baseDate.getDate() + 1);
+    // Advance to the next business day, skipping Saturday (6) and Sunday (0),
+    // so extra bars align with expected trading sessions on daily charts.
+    do {
+      baseDate.setDate(baseDate.getDate() + 1);
+    } while (baseDate.getDay() === 0 || baseDate.getDay() === 6);
     dataPoints.push({ x: baseDate.valueOf(), y: NaN });
   }
 }

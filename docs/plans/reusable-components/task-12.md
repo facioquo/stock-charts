@@ -46,47 +46,47 @@ helping developers evaluate and understand the charting capabilities quickly.
 ### Documentation/API drift — FIXED
 
 - [x] `tests/vitepress/guide/quick-start.md` — updated to use
-  `setupIndyCharts()`, `createApiClient()`, `OverlayChart`, `client.getQuotes()`
+      `setupIndyCharts()`, `createApiClient()`, `OverlayChart`, `client.getQuotes()`
 - [x] `tests/vitepress/guide/api-client.md` — updated to use
-  `createApiClient()`, `client.getQuotes()`, `client.getListings()`,
-  `client.getSelectionData()`
+      `createApiClient()`, `client.getQuotes()`, `client.getListings()`,
+      `client.getSelectionData()`
 - [x] `tests/vitepress/examples/indicators.md` — uses real `ChartManager`,
-  `loadStaticIndicatorData()`, correct API sequences
+      `loadStaticIndicatorData()`, correct API sequences
 - [x] `tests/vitepress/examples/multiple.md` — uses real `ChartManager`,
-  `createApiClient()`, `initializeOverlay()` APIs; labeled as recipe page
+      `createApiClient()`, `initializeOverlay()` APIs; labeled as recipe page
 - [x] `tests/vitepress/index.md` — home page quick example uses
-  `setupIndyCharts()`, `createApiClient()`, `OverlayChart`
+      `setupIndyCharts()`, `createApiClient()`, `OverlayChart`
 - [x] `tests/vitepress/guide/index.md` — no caching/TTL claims; correct API
-  feature descriptions
+      feature descriptions
 - [x] `tests/vitepress/README.md` — project structure matches repo; correct API
-  snippets and no stale branch references
+      snippets and no stale branch references
 - [x] `libs/indy-charts/README.md` — uses `createApiClient()`,
-  `loadStaticQuotes()`, `OverlayChart`; no fictional caching examples
+      `loadStaticQuotes()`, `OverlayChart`; no fictional caching examples
 
 ### VitePress site/demo polish — FIXED
 
 - [x] `/examples/` live overlay demo extracted into reusable `IndyOverlayDemo.vue`
-  component; inline markdown implementation replaced
+      component; inline markdown implementation replaced
 - [x] Demo syncs `isDarkTheme` to VitePress appearance via `useData().isDark`
 - [x] Inline styles moved into `.vitepress/theme/custom.css` (`.indy-demo`,
-  `.indy-demo__panel`, `.indy-demo__canvas`)
+      `.indy-demo__panel`, `.indy-demo__canvas`)
 - [x] Loading/error states with stable `data-testid` hooks in both
-  `IndyOverlayDemo.vue` and `IndyIndicatorsDemo.vue`
+      `IndyOverlayDemo.vue` and `IndyIndicatorsDemo.vue`
 - [x] `/examples/indicators` has live `IndyIndicatorsDemo` component (not just
-  recipe)
+      recipe)
 - [x] `/examples/multiple` explicitly labeled as recipe-only page
 - [x] Responsive styling: canvas uses `position: absolute; inset: 0` to allow
-  container to resize freely regardless of Chart.js pixel width
+      container to resize freely regardless of Chart.js pixel width
 - [x] Dark mode defaults to `appearance: 'dark'` in `config.ts`
 
 ### Playwright test gaps — FIXED
 
 - [x] `tests/playwright/vitepress.spec.ts` — no hardcoded `BASE` constant;
-  uses relative paths with `baseURL` from Playwright config
+      uses relative paths with `baseURL` from Playwright config
 - [x] Dark mode test uses `.VPNavBarAppearance button[role='switch']` CSS
-  selector (stable, not accessible-name dependent)
+      selector (stable, not accessible-name dependent)
 - [x] Examples page tests use `getByTestId` and accept either canvas or error
-  state for deterministic results regardless of API availability
+      state for deterministic results regardless of API availability
 
 ### Already fixed (do not re-do)
 

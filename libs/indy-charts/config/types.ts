@@ -2,6 +2,17 @@ import { ChartDataset } from "chart.js";
 
 // CHARTS
 
+/**
+ * Extended dataset interface for candlestick pattern datasets that carry
+ * per-point visual properties not present on the base ChartDataset type.
+ * Used internally by ChartManager and OscillatorChart.
+ */
+export type ExtendedChartDataset = ChartDataset & {
+  pointRotation?: number[];
+  pointBackgroundColor?: string[];
+  pointBorderColor?: string[];
+};
+
 export interface Quote {
   date: Date;
   open: number;

@@ -2,6 +2,7 @@ import { ChartDataset } from "chart.js";
 
 import {
   ChartSettings,
+  ExtendedChartDataset,
   IndicatorDataRow,
   IndicatorListing,
   IndicatorResult,
@@ -26,13 +27,6 @@ const CATEGORIES = {
   CANDLESTICK_PATTERN: "candlestick-pattern"
 } as const;
 
-// Extended dataset interface for candlestick pattern datasets
-type ExtendedChartDataset = ChartDataset & {
-  pointRotation?: number[];
-  pointBackgroundColor?: string[];
-  pointBorderColor?: string[];
-};
-
 export interface ChartManagerConfig {
   settings: ChartSettings;
   extraBars?: number;
@@ -45,8 +39,13 @@ export class ChartManager {
   private _allQuotes: Quote[] = [];
   private _allProcessedDatasets = new Map<string, ChartDataset[]>();
   private _currentBarCount = 250;
-  settings: ChartSettings;
+  private _settings: ChartSettings;
   private extraBars: number;
+
+  /** Current chart settings. Update via updateTheme() to propagate to all charts. */
+  get settings(): ChartSettings {
+    return this._settings;
+  }
 
   /** Read-only access to the overlay chart instance. */
   get overlayChart(): OverlayChart | undefined {
@@ -74,7 +73,7 @@ export class ChartManager {
   }
 
   constructor(config: ChartManagerConfig) {
-    this.settings = config.settings;
+    this._settings = config.settings;
     this.extraBars = config.extraBars ?? EXTRA_BARS;
   }
 
@@ -92,7 +91,7 @@ export class ChartManager {
     this._allQuotes = allQuotes;
     this._currentBarCount = barCount;
 
-    this._overlayChart = new OverlayChart(ctx, this.settings);
+    this._overlayChart = new OverlayChart(ctx, this._settings);
 
     // Render with full allQuotes so stored datasets cover complete history,
     // enabling correct slicing when setBarCount() is called later.
@@ -208,7 +207,7 @@ export class ChartManager {
       );
     }
 
-    const oscillator = new OscillatorChart(ctx, this.settings);
+    const oscillator = new OscillatorChart(ctx, this._settings);
     oscillator.render(selection, listing);
     this._oscillators.set(selection.ucid, oscillator);
     return oscillator;
@@ -244,7 +243,7 @@ export class ChartManager {
    * Update theme across all charts.
    */
   updateTheme(settings: ChartSettings): void {
-    this.settings = settings;
+    this._settings = settings;
 
     if (this._overlayChart) {
       this._overlayChart.updateTheme(settings);

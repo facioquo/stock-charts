@@ -8,17 +8,11 @@ import { commonLegendAnnotation } from "../config/annotations";
 import {
   ChartSettings,
   ChartThreshold,
+  ExtendedChartDataset,
   IndicatorListing,
   IndicatorResult,
   IndicatorSelection
 } from "../config/types";
-
-// Extended dataset interface for candlestick pattern datasets
-type ExtendedChartDataset = ChartDataset & {
-  pointRotation?: number[];
-  pointBackgroundColor?: string[];
-  pointBorderColor?: string[];
-};
 
 export class OscillatorChart {
   chart: Chart | undefined;
@@ -94,7 +88,7 @@ export class OscillatorChart {
       if (!this.chart?.data.datasets[i]) return;
       if (fullDataset.data && Array.isArray(fullDataset.data)) {
         this.chart.data.datasets[i].data = [
-          ...(fullDataset.data as unknown[]).slice(startIndex)
+          ...fullDataset.data.slice(startIndex)
         ];
       }
       if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
