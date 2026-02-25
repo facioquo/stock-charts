@@ -10,6 +10,9 @@ must be merged here (or into task files in this folder) before completion.
 
 All tasks are complete as of 2026-02-24. Task 12 resolved the final quality
 pass: API drift in VitePress docs, demonstrator polish, and Playwright hardening.
+A follow-on fix pass on 2026-02-24 addressed review feedback: `ChartManager.settings`
+encapsulation, `ExtendedChartDataset` deduplication across chart classes, business-day
+padding in `addExtraBars()`, and removal of a non-idiomatic chart canvas resize pattern.
 
 The previous version of this file had over-reported completion on VitePress
 docs/examples and claimed LocalStorage caching that was not implemented. This
@@ -80,7 +83,7 @@ complete, including the final documentation/demo quality pass in Task 12.
   - Reusable `IndyOverlayDemo.vue` and `IndyIndicatorsDemo.vue` components
   - Loading/error states with `data-testid` hooks
   - Theme sync via `useData().isDark`
-  - Responsive canvas (`position: absolute; inset: 0`)
+  - Responsive canvas (idiomatic Chart.js native resize via `responsive: true`, `display: block` on canvas — non-idiomatic `position: absolute` pattern removed)
   - Dark mode default via `appearance: 'dark'` in config
 - [x] Harden Playwright selectors/URLs for VitePress default theme behavior
 - [x] Fix `libs/indy-charts/README.md` API drift

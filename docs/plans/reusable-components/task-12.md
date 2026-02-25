@@ -75,8 +75,9 @@ helping developers evaluate and understand the charting capabilities quickly.
 - [x] `/examples/indicators` has live `IndyIndicatorsDemo` component (not just
       recipe)
 - [x] `/examples/multiple` explicitly labeled as recipe-only page
-- [x] Responsive styling: canvas uses `position: absolute; inset: 0` to allow
-      container to resize freely regardless of Chart.js pixel width
+- [x] Responsive styling: canvas uses idiomatic `display: block`; Chart.js native
+      resize (`responsive: true`) manages dimensions — non-idiomatic `position: absolute`
+      approach was added and then removed after causing layout conflicts
 - [x] Dark mode defaults to `appearance: 'dark'` in `config.ts`
 
 ### Playwright test gaps — FIXED
