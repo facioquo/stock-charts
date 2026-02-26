@@ -19,56 +19,24 @@ warn() { printf '\n[warning] %s\n' "$*"; }
 
 mode="${1:-check}"  # "check" or "fix"
 
-# Get MSBuild path - find the latest SDK's version-specific toolset
-get_msbuild_path() {
-  # Parse SDK version and bracketed base path from `dotnet --list-sdks` last line
-  # Example line: "8.0.100 [/usr/share/dotnet/sdk]"
-  local sdk_line sdk_version base_path candidate
-  sdk_line=$(dotnet --list-sdks | tail -1)
-
-  sdk_version=$(echo "$sdk_line" | awk '{print $1}')
-  base_path=$(echo "$sdk_line" | awk '{print $NF}' | sed 's/\[//;s/\]//')
-
-  if [ -z "$sdk_version" ] || [ -z "$base_path" ]; then
-    return 1
+# Restore dotnet local tools if not already installed
+restore_tools() {
+  # Only restore if .config/dotnet-tools.json or dotnet-tools.json exists
+  if [ -f ".config/dotnet-tools.json" ] || [ -f "dotnet-tools.json" ]; then
+    log "Restoring dotnet local tools..."
+    dotnet tool restore --verbosity minimal || true
   fi
-
-  # Try version-specific MSBuild toolset path first
-  candidate="${base_path}/${sdk_version}/MSBuild/Current/Bin"
-  if [ -d "$candidate" ]; then
-    echo "$candidate"
-    return 0
-  fi
-
-  # Fall back to base MSBuild path
-  candidate="${base_path}/MSBuild/Current/Bin"
-  if [ -d "$candidate" ]; then
-    echo "$candidate"
-    return 0
-  fi
-
-  return 1
 }
 
 # Test if roslynator is available and functional
 roslynator_available() {
-  # Check if roslynator command exists
-  if ! command -v roslynator &>/dev/null; then
+  # Roslynator is a local dotnet tool — not on PATH, so skip command -v check.
+  # Test directly via dotnet tool run (works after dotnet tool restore).
+  if ! dotnet tool run roslynator --version >/dev/null 2>&1; then
     return 1
   fi
 
-  # Get MSBuild path
-  local msbuild_path
-  if ! msbuild_path=$(get_msbuild_path); then
-    return 1
-  fi
-
-  # Test if roslynator can run (version check is lightweight)
-  if dotnet tool run roslynator --version >/dev/null 2>&1; then
-    return 0
-  fi
-
-  return 1
+  return 0
 }
 
 lint_check() {
@@ -80,15 +48,13 @@ lint_check() {
   # Always run dotnet format check (it's built-in and reliable)
   # Returns 0 if no changes needed, 1 if changes would be made
   # Capture exit code without triggering set -e by using || pattern
+  log "Running dotnet format check..."
   dotnet format --verify-no-changes --verbosity quiet || dotnet_exit_code=$?
 
   # Try roslynator if available, but don't fail the script if it's not
   if roslynator_available; then
-    local msbuild_path
-    msbuild_path=$(get_msbuild_path)
-
     log "Running Roslynator analysis..."
-    if dotnet tool run roslynator analyze --msbuild-path "$msbuild_path"; then
+    if dotnet tool run roslynator analyze; then
       log "Roslynator analysis completed"
     else
       roslynator_exit_code=$?
@@ -120,6 +86,7 @@ lint_fix() {
 
   # Always run dotnet format fix (it's built-in and reliable)
   # Capture exit code without triggering set -e by using || pattern
+  log "Running dotnet format..."
   dotnet format --verbosity minimal || dotnet_exit_code=$?
   if [ "$dotnet_exit_code" -ne 0 ]; then
     warn "dotnet format completed with exit code $dotnet_exit_code"
@@ -127,11 +94,8 @@ lint_fix() {
 
   # Try roslynator if available, but don't fail if it's not
   if roslynator_available; then
-    local msbuild_path
-    msbuild_path=$(get_msbuild_path)
-
     log "Running Roslynator fixes..."
-    if dotnet tool run roslynator fix --msbuild-path "$msbuild_path"; then
+    if dotnet tool run roslynator fix; then
       log "Roslynator fixes completed"
     else
       roslynator_exit_code=$?
@@ -149,6 +113,7 @@ lint_fix() {
 }
 
 # Main
+restore_tools
 case "$mode" in
   check)
     lint_check

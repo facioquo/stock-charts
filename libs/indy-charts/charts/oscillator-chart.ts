@@ -161,7 +161,7 @@ export class OscillatorChart {
       const thresholdDataset = createThresholdDataset(threshold, firstResult, index);
       chartConfig.data.datasets.push(thresholdDataset);
       // store a full (unsliced) copy for later dynamic slicing
-      this.fullThresholdDatasets.push(structuredClone(thresholdDataset) as ChartDataset);
+      this.fullThresholdDatasets.push(structuredClone(thresholdDataset));
     });
 
     // Hide thresholds from tooltips
