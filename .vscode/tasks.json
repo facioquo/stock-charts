@@ -68,13 +68,13 @@
     },
     {
       "label": "Check: Angular packages (client)",
-      "detail": "Check for dependecy updates using Angular CLI for the client website.",
+      "detail": "Check for dependency updates using Angular CLI for the client website.",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client exec ng update"
     },
     {
       "label": "Update: Angular packages (client)",
-      "detail": "Update dependecy using Angular CLI for the client website.",
+      "detail": "Update dependencies using Angular CLI for the client website.",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client exec ng update @angular/cli @angular/core @angular/material @angular/compiler @angular/compiler-cli @angular/platform-browser @angular/platform-browser-dynamic @angular/router @angular/forms @angular/animations @angular/service-worker @angular/cdk @angular/build angular-eslint --allow-dirty"
     },
