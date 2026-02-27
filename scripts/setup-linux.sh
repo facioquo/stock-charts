@@ -96,8 +96,12 @@ setup_node() {
   if ! command -v node &>/dev/null; then
     log "Node not found, installing via nvm"
     setup_nvm || return 1
-    nvm install "$node_version"
-    nvm use "$node_version"
+    if ! command -v node &>/dev/null; then
+      log "Node not found, installing via nvm"
+      setup_nvm || return 1
+      nvm install "$node_version" || { err "Failed to install Node $node_version"; return 1; }
+      nvm use "$node_version" || { err "Failed to activate Node $node_version"; return 1; }
+    fi
   fi
 
   log "Node: $(node --version)"
