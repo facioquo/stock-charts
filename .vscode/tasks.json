@@ -321,12 +321,12 @@
       "label": "Run: Azure Functions",
       "detail": "Start Azure Functions host",
       "type": "shell",
-      "command": "[ -f local.settings.json ] || cp local.settings.example.json local.settings.json && func start",
+      "command": "node scripts/start-functions.js",
       "dependsOn": "Build: Backend .NET (incremental)",
       "dependsOrder": "sequence",
       "isBackground": true,
       "options": {
-        "cwd": "${workspaceFolder}/server/Functions"
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": {
         "owner": "azure-functions",
@@ -494,7 +494,7 @@
         "Clean: Website",
         "Clean: Root and Azure storage"
       ],
-      "dependsOrder": "parallel",
+      "dependsOrder": "sequence",
       "group": "build"
     },
     {
@@ -534,7 +534,13 @@
       "label": "Delete: Claude temporary files",
       "detail": "Delete all tmpclaude-*-cwd files (bug workaround)",
       "type": "shell",
-      "command": "find . -maxdepth 25 -type f -name 'tmpclaude-*-cwd' -delete"
+      "command": "find . -maxdepth 25 -type f -name 'tmpclaude-*-cwd' -delete",
+      "options": {
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-lc"]
+        }
+      }
     }
   ]
 }

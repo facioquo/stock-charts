@@ -50,7 +50,7 @@ export function createDefaultSelection(listing: IndicatorListing): IndicatorSele
       displayName: config.displayName,
       lineType: config.lineType,
       lineWidth: typeof config.lineWidth === "number" ? config.lineWidth : 2,
-      order: listing.order as number,
+      order: config.order,
       // Runtime chart dataset is populated by ChartManager.processSelectionData()
       dataset: { type: "line", data: [] } as ChartDataset
     } as IndicatorResult;

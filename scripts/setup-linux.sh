@@ -14,7 +14,7 @@ warn() { printf '\n[warning] %s\n' "$*"; }
 
 # Detect environment and privileges
 can_sudo() { sudo -n true 2>/dev/null || false; }
-is_codex_universal() { [ -d "/opt/miniconda3" ] || [ -f "/.codex-universal" ]; }
+is_codex_universal() { [ -f "/.codex-universal" ]; }
 
 # =========================================================================
 # APT Package Management (with privilege detection)

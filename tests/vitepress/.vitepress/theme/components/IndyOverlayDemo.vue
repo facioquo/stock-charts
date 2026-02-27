@@ -66,6 +66,7 @@ async function loadDemo(): Promise<void> {
     phase.value = "ready";
     await nextTick();
 
+    if (disposed || token !== loadToken) return;
     if (!canvasRef.value) {
       throw new Error("Demo canvas is not available.");
     }

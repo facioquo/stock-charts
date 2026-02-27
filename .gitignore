@@ -28,6 +28,7 @@ artifacts/
 TestResult.xml
 nunit-*.xml
 **/playwright-report/
+.playwright-mcp/
 
 # MSBuild Binary and Structured Log
 *.binlog
@@ -137,7 +138,5 @@ Backup*/
 CDF_GUID.txt
 dlldata.c
 FodyWeavers.xsd
-.playwright-mcp/
-playwright-report/
 tests/vitepress/--host/
 .vitepress/cache/

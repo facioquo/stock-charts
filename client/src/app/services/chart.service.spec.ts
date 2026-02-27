@@ -428,7 +428,9 @@ describe("ChartService Smoke Tests", () => {
     expect(datasetCountAfterAdd).toBeGreaterThan(2); // More than candlestick + volume
 
     // Act: Remove indicator
-    const ucidToRemove = addedSelection?.ucid ?? "";
+    const ucidToRemove = addedSelection?.ucid;
+    expect(ucidToRemove).toBeDefined();
+    if (!ucidToRemove) return;
     service.deleteSelection(ucidToRemove);
 
     // Assert: Selection removed from selections array

@@ -60,29 +60,28 @@ async function addIndicator(
   listings: IndicatorListing[],
   uiid: string,
   paramOverrides: Record<string, number>,
-  oscillatorCanvas?: HTMLCanvasElement | null
+  oscillatorCanvas: HTMLCanvasElement | null | undefined,
+  managerRef: ChartManager,
+  token: number
 ): Promise<void> {
-  if (!manager) {
-    throw new Error("Indicators demo manager is not initialized.");
-  }
-
   const listing = requireListing(listings, uiid);
   const selection = applySelectionTokens(
     setSelectionParams(createDefaultSelection(listing), paramOverrides)
   );
 
   const raw = await client.getSelectionData(selection, listing);
+  if (disposed || token !== loadToken || manager !== managerRef) return;
   const rows = loadStaticIndicatorData(raw);
 
-  manager.processSelectionData(selection, listing, rows);
-  manager.displaySelection(selection, listing);
+  managerRef.processSelectionData(selection, listing, rows);
+  managerRef.displaySelection(selection, listing);
 
   if (listing.chartType === "oscillator") {
     if (!oscillatorCanvas) {
       throw new Error(`Oscillator canvas is required for indicator "${uiid}".`);
     }
 
-    manager.createOscillator(oscillatorCanvas, selection, listing);
+    managerRef.createOscillator(oscillatorCanvas, selection, listing);
   }
 }
 
@@ -114,12 +113,13 @@ async function loadDemo(): Promise<void> {
       throw new Error("One or more chart canvases are missing.");
     }
 
-    manager = new ChartManager({ settings: currentSettings() });
-    manager.initializeOverlay(overlayCanvasRef.value, quotes, props.barCount);
+    const chartManager = new ChartManager({ settings: currentSettings() });
+    manager = chartManager;
+    chartManager.initializeOverlay(overlayCanvasRef.value, quotes, props.barCount);
 
-    await addIndicator(client, listings, "EMA", { lookbackPeriods: 20 });
-    await addIndicator(client, listings, "RSI", { lookbackPeriods: 14 }, rsiCanvasRef.value);
-    await addIndicator(client, listings, "MACD", {}, macdCanvasRef.value);
+    await addIndicator(client, listings, "EMA", { lookbackPeriods: 20 }, undefined, chartManager, token);
+    await addIndicator(client, listings, "RSI", { lookbackPeriods: 14 }, rsiCanvasRef.value, chartManager, token);
+    await addIndicator(client, listings, "MACD", {}, macdCanvasRef.value, chartManager, token);
   } catch (error) {
     if (disposed || token !== loadToken) return;
 

@@ -27,7 +27,7 @@
     "test:coverage": "pnpm --filter @stock-charts/client run test:coverage",
     "pretest:dotnet": "dotnet tool restore",
     "test:dotnet": "dotnet test Charts.sln --collect:\"XPlat Code Coverage\" --results-directory ./server/coverage --logger trx && dotnet tool run reportgenerator -reports:server/coverage/**/coverage.cobertura.xml -targetdir:server/coverage -reporttypes:lcov",
-    "test:all": "pnpm --filter @stock-charts/client run test:coverage && pnpm run test:dotnet",
+    "test:all": "pnpm --filter @stock-charts/client run test:coverage && pnpm run test:dotnet && pnpm run test:e2e",
     "lint": "bash scripts/website-lint.sh check && pnpm run lint:dotnet && pnpm run lint:md",
     "lint:fix": "bash scripts/website-lint.sh fix && pnpm run lint:dotnet:fix && pnpm run lint:md:fix",
     "lint:dotnet": "bash scripts/dotnet-lint.sh check",

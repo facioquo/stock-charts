@@ -21,8 +21,7 @@ let initialized = false;
  */
 export function setupIndyCharts(): void {
   if (initialized) return;
-  initialized = true;
-
   Chart.register(...registerables, annotationPlugin);
   registerFinancialCharts();
+  initialized = true;
 }

@@ -265,11 +265,21 @@ export class ChartManager {
    * Update all charts with a new bar count (for window resize).
    */
   setBarCount(barCount: number): void {
-    if (barCount === this._currentBarCount || this._allQuotes.length === 0) return;
-    this._currentBarCount = barCount;
+    // No quotes -> nothing to do.
+    if (this._allQuotes.length === 0) return;
 
     const totalQuotes = this._allQuotes.length;
-    const startIndex = Math.max(0, totalQuotes - barCount);
+
+    // Normalize incoming barCount: coerce to finite integer, floor, and clamp
+    // into the valid range [1, totalQuotes]. This prevents zero/negative/
+    // non-integer values producing empty windows or invalid internal state.
+    let normalizedBarCount = Number.isFinite(barCount) ? Math.floor(barCount) : 1;
+    normalizedBarCount = Math.max(1, Math.min(normalizedBarCount, totalQuotes));
+
+    if (normalizedBarCount === this._currentBarCount) return;
+    this._currentBarCount = normalizedBarCount;
+
+    const startIndex = Math.max(0, totalQuotes - normalizedBarCount);
 
     // Update overlay main datasets (candlestick + volume)
     const fullMainDatasets = this._allProcessedDatasets.get("overlay-main");

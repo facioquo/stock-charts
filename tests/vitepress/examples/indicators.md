@@ -26,6 +26,7 @@ import {
   ChartManager,
   loadStaticIndicatorData,
   setupIndyCharts,
+  type ExtendedChartDataset,
   type IndicatorListing,
   type IndicatorSelection
 } from "@facioquo/indy-charts";
@@ -64,7 +65,7 @@ function defaultSelection(listing: IndicatorListing): IndicatorSelection {
       lineType: result.lineType,
       lineWidth: result.lineWidth ?? 2,
       order: listing.order,
-      dataset: { type: "line", data: [] } as never
+      dataset: { type: "line", data: [] } as ExtendedChartDataset
     }))
   };
 }
@@ -119,6 +120,7 @@ Indicator parameters are supplied through `IndicatorSelection.params`, then
 submitted with `client.getSelectionData(selection, listing)`:
 
 ```typescript
+// macdListing and defaultSelection are defined in the recipe above
 const macdSelection = defaultSelection(macdListing);
 
 // Override the defaults using the parameter names provided by the listing
@@ -143,8 +145,13 @@ Display multiple oscillators:
 
 ```typescript
 // Create additional canvas elements
-const rsiCanvas = document.getElementById("rsi-chart");
-const macdCanvas = document.getElementById("macd-chart");
+const rsiCanvas = document.getElementById("rsi-chart") as HTMLCanvasElement | null;
+const macdCanvas = document.getElementById("macd-chart") as HTMLCanvasElement | null;
+if (!rsiCanvas || !macdCanvas) throw new Error("Canvas elements not found");
+
+// Load data for each selection (ensure these are available before processing)
+const rsiData = loadStaticIndicatorData(await client.getSelectionData(rsiSelection, rsiListing));
+const macdData = loadStaticIndicatorData(await client.getSelectionData(macdSelection, macdListing));
 
 // Process data for each selection
 manager.processSelectionData(rsiSelection, rsiListing, rsiData);
@@ -154,12 +161,12 @@ manager.displaySelection(macdSelection, macdListing);
 
 // Create oscillator charts with the canvas elements
 const rsiOscillator = manager.createOscillator(
-  rsiCanvas as HTMLCanvasElement,
+  rsiCanvas,
   rsiSelection,
   rsiListing
 );
 const macdOscillator = manager.createOscillator(
-  macdCanvas as HTMLCanvasElement,
+  macdCanvas,
   macdSelection,
   macdListing
 );
