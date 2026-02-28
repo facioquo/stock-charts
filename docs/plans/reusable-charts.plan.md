@@ -111,9 +111,10 @@ The core library extraction and VitePress documentation are complete:
    to `"date-fns": ">=2.19.0"`. VitePress date-fns alias still needed because
    `chartjs-adapter-date-fns@3.0.0` itself declares `date-fns@^2` as peer.
 
-9. **Minimal library test coverage** — `@facioquo/indy-charts` has only ESLint
-   config and color utility tests. Core classes (`ChartManager`, `OverlayChart`,
-   `OscillatorChart`, `createApiClient`) have zero unit tests.
+9. ~~**Minimal library test coverage**~~ — **RESOLVED (Phase 3).** 118
+   library tests across 9 spec files: ChartManager (31), createApiClient (21),
+   static helpers (7), data transformers (28), selection helpers (25),
+   colors (2), ESLint config (4).
 
 ## Task list
 
@@ -244,12 +245,13 @@ Establish confidence for external consumers.
     loadStaticIndicatorData pass-through (3).
   - 90 total library tests passing.
 
-- [ ] Task 3.3: Add unit tests for data transformers
-  - Test `processQuoteData()` output shape and volumeAxisSize calculation.
-  - Test `buildDataPoints()` with various indicator types.
-  - Test `addExtraBars()` business-day padding.
-  - Test `getCandlePointConfiguration()` for match values (-100, 100, other).
-  - Target 70% coverage for `data/` module.
+- [x] Task 3.3: Add unit tests for data transformers
+  - 28 tests in `data/transformers.spec.ts`: processQuoteData (6),
+    buildDataPoints (9 — including candlestick-pattern category tests),
+    addExtraBars (7 — weekend skipping, empty array fallback, monotonic
+    timestamps), getCandlePointConfiguration (6 — bearish/bullish/neutral
+    match values and multiplier correctness).
+  - 118 total library tests passing.
 
 - [x] Task 3.4: Add unit tests for `createDefaultSelection()` and `applySelectionTokens()`
   - Test default param hydration from listing.
