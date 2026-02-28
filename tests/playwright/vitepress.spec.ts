@@ -84,6 +84,7 @@ test.describe("VitePress Documentation Site", () => {
       page
         .getByTestId("indy-overlay-demo-canvas")
         .or(page.getByTestId("indy-overlay-demo-error"))
+        .filter({ visible: true })
     ).toBeVisible({ timeout: 15000 });
   });
 

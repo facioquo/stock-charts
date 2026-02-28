@@ -99,7 +99,7 @@
     },
     {
       "label": "Build: All projects (full rebuild)",
-      "detail": "Full rebuild without incremental compilation",
+      "detail": "Full hard-reset rebuild without incremental compilation",
       "dependsOn": [
         "Clean: All (hard reset)",
         "Install: All package dependencies",
@@ -461,10 +461,10 @@
     },
     {
       "label": "Stop: VitePress chart demo dev server",
-      "detail": "Stop the VitePress demo dev server (default port 5173)",
+      "detail": "Stop VitePress demo servers (dev port 4300, preview port 4301)",
       "type": "shell",
       "command": "npx",
-      "args": ["kill-port", "5173"],
+      "args": ["kill-port", "4300", "4301"],
       "presentation": {
         "clear": true,
         "reveal": "always"
@@ -492,7 +492,8 @@
       "dependsOn": [
         "Stop: Azurite",
         "Stop: Backend services",
-        "Stop: Website dev server"
+        "Stop: Website dev server",
+        "Stop: VitePress chart demo dev server"
       ],
       "dependsOrder": "sequence",
       "group": "none",

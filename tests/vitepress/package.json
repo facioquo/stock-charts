@@ -5,9 +5,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "vitepress dev --host 0.0.0.0 --port 5173",
+    "dev": "vitepress dev --host 0.0.0.0 --port 4300",
     "build": "vitepress build",
-    "preview": "vitepress preview",
+    "preview": "vitepress preview --port 4301",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

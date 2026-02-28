@@ -34,11 +34,12 @@ if (!existsSync(settingsFile)) {
 
 console.log("Starting Azure Functions...");
 
-// shell: true resolves 'func' from PATH on Windows, where it is a .cmd wrapper.
-const func = spawn("func", ["start"], {
+// On Windows, 'func' is a .cmd wrapper that requires the explicit extension.
+// Avoid shell:true (Node DEP0190) by resolving the platform-specific executable.
+const funcCmd = process.platform === "win32" ? "func.cmd" : "func";
+const func = spawn(funcCmd, ["start"], {
   cwd: functionsDir,
-  stdio: "inherit",
-  shell: true,
+  stdio: "inherit"
 });
 
 func.on("error", (err) => {
