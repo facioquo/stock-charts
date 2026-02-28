@@ -225,20 +225,24 @@ removing ~1,000 lines of duplicated code.
 
 Establish confidence for external consumers.
 
-- [ ] Task 3.1: Add unit tests for `ChartManager`
-  - Test `initializeOverlay()` with mocked canvas context.
-  - Test `processSelectionData()` → `displaySelection()` lifecycle.
-  - Test `removeSelection()` cleanup.
-  - Test `setBarCount()` slicing correctness.
-  - Test `updateTheme()` propagation.
-  - Target 60% coverage for `charts/` module.
+- [x] Task 3.1: Add unit tests for `ChartManager`
+  - 31 tests in `charts/chart-manager.spec.ts` covering: constructor (4),
+    initializeOverlay (4), processSelectionData (2), displaySelection (3),
+    createOscillator (3), removeSelection (3), updateTheme (3),
+    setBarCount (7), destroy (2).
+  - Mocks `OverlayChart`/`OscillatorChart` via `vi.mock` for DOM-free testing.
+  - Added ESLint spec relaxations: `no-unsafe-assignment`, `no-unsafe-call`,
+    `no-unsafe-member-access`, `unbound-method` (standard for test files with
+    mocking).
+  - 62 total library tests passing.
 
-- [ ] Task 3.2: Add unit tests for `createApiClient`
-  - Test `getQuotes()` with mocked fetch, verify Date objects returned.
-  - Test `getListings()` with mocked fetch.
-  - Test `getSelectionData()` query string construction.
-  - Test `onError` callback invocation.
-  - Target 50% coverage for `api/` module.
+- [x] Task 3.2: Add unit tests for `createApiClient` and static helpers
+  - 21 tests in `api/client.spec.ts`: baseUrl normalisation (2), getQuotes (6),
+    getListings (4), getSelectionData (7), onError callback behaviour (2).
+    Mocks global `fetch` via `vi.stubGlobal` for DOM-free testing.
+  - 7 tests in `api/static.spec.ts`: loadStaticQuotes date conversion (4),
+    loadStaticIndicatorData pass-through (3).
+  - 90 total library tests passing.
 
 - [ ] Task 3.3: Add unit tests for data transformers
   - Test `processQuoteData()` output shape and volumeAxisSize calculation.
