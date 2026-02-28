@@ -3,6 +3,9 @@ import { bootstrapApplication } from "@angular/platform-browser";
 import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { provideRouter } from "@angular/router";
 
+import { Chart } from "chart.js";
+import AnnotationPlugin from "chartjs-plugin-annotation";
+
 import { env } from "./environments/environment";
 import { provideAnimations } from "@angular/platform-browser/animations";
 import { AppComponent } from "./app/app.component";
@@ -14,6 +17,7 @@ if (env.production) {
 }
 
 registerFinancialCharts();
+Chart.register(AnnotationPlugin);
 
 bootstrapApplication(AppComponent, {
   providers: [

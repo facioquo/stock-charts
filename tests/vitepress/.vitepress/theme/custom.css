@@ -4,8 +4,6 @@
   --indy-demo-bg-alt: color-mix(in srgb, var(--vp-c-bg) 90%, var(--vp-c-bg-soft) 10%);
   --indy-demo-shadow: 0 18px 42px rgb(15 23 42 / 8%);
   --indy-demo-radius: 16px;
-  --indy-demo-chart-height: clamp(280px, 46vw, 480px);
-  --indy-demo-osc-height: clamp(180px, 26vw, 260px);
 }
 
 .dark {
@@ -110,11 +108,23 @@
 }
 
 .indy-demo__canvas-wrap--overlay {
-  height: var(--indy-demo-chart-height);
+  aspect-ratio: 2.5;
+}
+
+@media (width <= 880px) {
+  .indy-demo__canvas-wrap--overlay {
+    aspect-ratio: 2;
+  }
 }
 
 .indy-demo__canvas-wrap--oscillator {
-  height: var(--indy-demo-osc-height);
+  aspect-ratio: 10;
+}
+
+@media (width <= 880px) {
+  .indy-demo__canvas-wrap--oscillator {
+    aspect-ratio: 8;
+  }
 }
 
 .indy-demo__canvas {
@@ -129,13 +139,6 @@
 .indy-demo__osc-grid {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-@media (width <= 900px) {
-  .indy-demo__osc-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
