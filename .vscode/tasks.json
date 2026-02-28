@@ -6,7 +6,7 @@
   "presentation": {
     "echo": true,
     "clear": true,
-    "focus": true,
+    "focus": false,
     "panel": "dedicated",
     "showReuseMessage": false
   },

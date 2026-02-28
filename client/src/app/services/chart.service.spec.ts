@@ -429,8 +429,8 @@ describe("ChartService Smoke Tests", () => {
 
     // Act: Remove indicator
     const ucidToRemove = addedSelection?.ucid;
-    expect(ucidToRemove).toBeDefined();
-    if (!ucidToRemove) return;
+    expect(ucidToRemove).toBeTruthy();
+    if (!ucidToRemove) throw new Error("ucid must be a non-empty string");
     service.deleteSelection(ucidToRemove);
 
     // Assert: Selection removed from selections array

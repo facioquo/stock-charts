@@ -109,6 +109,8 @@ async function loadDemo(): Promise<void> {
     phase.value = "ready";
     await nextTick();
 
+    if (disposed || token !== loadToken) return;
+
     if (!overlayCanvasRef.value || !rsiCanvasRef.value || !macdCanvasRef.value) {
       throw new Error("One or more chart canvases are missing.");
     }

@@ -97,8 +97,6 @@ setup_node() {
     log "Node not found, installing via nvm"
     setup_nvm || return 1
     if ! command -v node &>/dev/null; then
-      log "Node not found, installing via nvm"
-      setup_nvm || return 1
       nvm install "$node_version" || { err "Failed to install Node $node_version"; return 1; }
       nvm use "$node_version" || { err "Failed to activate Node $node_version"; return 1; }
     fi
@@ -114,7 +112,7 @@ setup_node() {
 setup_pnpm() {
   if ! command -v pnpm &>/dev/null; then
     log "Installing pnpm globally"
-    npm install -g pnpm
+    npm install -g pnpm || { err "Failed to install pnpm globally"; return 1; }
   fi
 
   log "pnpm: $(pnpm --version)"

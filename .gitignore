@@ -138,5 +138,4 @@ Backup*/
 CDF_GUID.txt
 dlldata.c
 FodyWeavers.xsd
-tests/vitepress/--host/
 .vitepress/cache/

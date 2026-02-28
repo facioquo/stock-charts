@@ -20,10 +20,10 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
 **All platforms:**
 
 - [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
-- [pnpm](https://pnpm.io/) (v10.30.1 or later) - Installed via platform package managers:
+- [pnpm](https://pnpm.io/) (v10.30.3 or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
-  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.30.1 --activate`)
+  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.30.3 --activate`)
 - [Angular CLI](https://angular.dev/cli) - Installed globally during setup
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
@@ -128,7 +128,7 @@ After running the setup script or manual installation, verify all tools:
 
 ```bash
 node --version    # Should be v24+
-pnpm --version    # Should be 10.30.1+
+pnpm --version    # Should be 10.30.3+
 dotnet --version  # Should be 10.0+
 func --version    # Should be 4.x
 ```

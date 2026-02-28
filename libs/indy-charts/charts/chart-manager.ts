@@ -91,6 +91,7 @@ export class ChartManager {
     this._allQuotes = allQuotes;
     this._currentBarCount = barCount;
 
+    this._overlayChart?.destroy();
     this._overlayChart = new OverlayChart(ctx, this._settings);
 
     // Render with full allQuotes so stored datasets cover complete history,
@@ -207,6 +208,7 @@ export class ChartManager {
       );
     }
 
+    this._oscillators.get(selection.ucid)?.destroy();
     const oscillator = new OscillatorChart(ctx, this._settings);
     oscillator.render(selection, listing);
     this._oscillators.set(selection.ucid, oscillator);

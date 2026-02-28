@@ -46,6 +46,10 @@ func.on("error", (err) => {
   process.exit(1);
 });
 
-func.on("close", (code) => {
-  process.exit(code ?? 0);
+func.on("close", (code, signal) => {
+  if (signal) {
+    process.exit(1);
+  } else {
+    process.exit(code ?? 0);
+  }
 });
