@@ -146,11 +146,12 @@
     },
     {
       "label": "Lint: All (check)",
-      "detail": "Run all linting and formatting checks (ESLint, Prettier, Roslynator, dotnet format, markdownlint)",
+      "detail": "Run all linting and formatting checks (ESLint, Prettier, Roslynator, dotnet format, markdownlint, stylelint)",
       "dependsOn": [
         "Lint: Website (check)",
         "Lint: Backend .NET (check)",
-        "Lint: Markdown (check)"
+        "Lint: Markdown (check)",
+        "Lint: CSS (check)"
       ],
       "dependsOrder": "parallel",
       "group": "test",
@@ -166,8 +167,12 @@
     },
     {
       "label": "Lint: All code (fix)",
-      "detail": "Auto-fix Website (ESLint + Prettier) and Backend (Roslynator + dotnet format) code",
-      "dependsOn": ["Lint: Website (fix)", "Lint: Backend .NET (fix)"],
+      "detail": "Auto-fix Website (ESLint + Prettier), Backend (Roslynator + dotnet format), and CSS (stylelint) code",
+      "dependsOn": [
+        "Lint: Website (fix)",
+        "Lint: Backend .NET (fix)",
+        "Lint: CSS (fix)"
+      ],
       "dependsOrder": "parallel",
       "group": "none",
       "problemMatcher": ["$tsc", "$markdownlint"]
@@ -221,6 +226,20 @@
       "command": "pnpm run lint:md:fix",
       "group": "none",
       "problemMatcher": "$markdownlint"
+    },
+    {
+      "label": "Lint: CSS (check)",
+      "detail": "Check CSS files with stylelint",
+      "type": "shell",
+      "command": "pnpm run lint:css",
+      "group": "test"
+    },
+    {
+      "label": "Lint: CSS (fix)",
+      "detail": "Auto-fix CSS files with stylelint",
+      "type": "shell",
+      "command": "pnpm run lint:css:fix",
+      "group": "none"
     },
     {
       "label": "Test: All tests",

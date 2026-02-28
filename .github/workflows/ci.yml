@@ -111,6 +111,9 @@ jobs:
       - name: Lint
         run: pnpm --filter @stock-charts/client run lint
 
+      - name: Lint CSS
+        run: pnpm run lint:css
+
       - name: Run unit tests
         run: pnpm --filter @stock-charts/client run test:coverage
 

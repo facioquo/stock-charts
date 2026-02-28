@@ -36,6 +36,8 @@
     "bench:chart-config": "node scripts/bench-chart-config.js",
     "lint:md": "markdownlint-cli2",
     "lint:md:fix": "markdownlint-cli2 --fix",
+    "lint:css": "stylelint \"**/*.{css,scss}\"",
+    "lint:css:fix": "stylelint \"**/*.{css,scss}\" --fix",
     "format": "pnpm run format:web && pnpm run format:dotnet",
     "format:check": "pnpm run format:web:check && pnpm run format:dotnet:check",
     "format:web": "pnpm --filter @stock-charts/client run format:web && prettier --write .vscode/**/*.json docs/**/*.md",
@@ -58,8 +60,10 @@
     "markdownlint-cli2": "^0.21.0",
     "npm-check-updates": "^19.3.2",
     "playwright": "1.58.2",
+    "postcss-scss": "^4.0.9",
     "prettier": "^3.8.1",
     "rimraf": "^6.1.3",
+    "stylelint": "^17.4.0",
     "typescript": "^5.9.3"
   }
 }
