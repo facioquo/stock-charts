@@ -3,21 +3,18 @@ import { bootstrapApplication } from "@angular/platform-browser";
 import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { provideRouter } from "@angular/router";
 
-import { Chart } from "chart.js";
-import AnnotationPlugin from "chartjs-plugin-annotation";
+import { setupIndyCharts } from "@facioquo/indy-charts";
 
 import { env } from "./environments/environment";
 import { provideAnimations } from "@angular/platform-browser/animations";
 import { AppComponent } from "./app/app.component";
 import { routes } from "./app/app.routes";
-import { registerFinancialCharts } from "@facioquo/chartjs-chart-financial";
 
 if (env.production) {
   enableProdMode();
 }
 
-registerFinancialCharts();
-Chart.register(AnnotationPlugin);
+setupIndyCharts();
 
 bootstrapApplication(AppComponent, {
   providers: [

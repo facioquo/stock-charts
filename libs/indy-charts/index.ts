@@ -18,7 +18,17 @@ export type {
   RawQuote
 } from "./config";
 
-export { commonLegendAnnotation } from "./config";
+export {
+  baseChartOptions,
+  baseDataset,
+  baseOscillatorConfig,
+  baseOscillatorOptions,
+  baseOverlayConfig,
+  baseOverlayOptions,
+  commonLegendAnnotation,
+  defaultXAxisOptions,
+  FONT_FAMILY
+} from "./config";
 
 // Chart abstractions
 export { ChartManager, OverlayChart, OscillatorChart } from "./charts";

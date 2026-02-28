@@ -29,7 +29,17 @@ import {
   getFinancialPalette
 } from "@facioquo/chartjs-chart-financial";
 
-import { applySelectionTokens, createDefaultSelection } from "@facioquo/indy-charts";
+import {
+  applySelectionTokens,
+  baseDataset,
+  baseOscillatorConfig,
+  baseOscillatorOptions,
+  baseOverlayConfig,
+  baseOverlayOptions,
+  commonLegendAnnotation,
+  createDefaultSelection,
+  type ChartSettings
+} from "@facioquo/indy-charts";
 
 // plugins
 import { AnnotationOptions, LabelAnnotationOptions, ScaleValue } from "chartjs-plugin-annotation";
@@ -46,7 +56,6 @@ import {
 
 // services
 import { ApiService } from "./api.service";
-import { ChartConfigService } from "./config.service";
 import { UserService } from "./user.service";
 import { UtilityService } from "./utility.service";
 import { WindowService } from "./window.service";
@@ -56,7 +65,6 @@ import { WindowService } from "./window.service";
 })
 export class ChartService implements OnDestroy {
   private readonly api = inject(ApiService);
-  private readonly cfg = inject(ChartConfigService);
   private readonly usr = inject(UserService);
   private readonly util = inject(UtilityService);
   private readonly window = inject(WindowService);
@@ -68,6 +76,14 @@ export class ChartService implements OnDestroy {
   private static readonly CANDLE_LOW_MULTIPLIER = 0.99;
   private static readonly LEGEND_Y_OFFSET = 15;
   private static readonly THRESHOLD_ORDER_OFFSET = 100;
+
+  /** Current chart settings derived from user preferences. */
+  private get chartSettings(): ChartSettings {
+    return {
+      isDarkTheme: this.usr.settings.isDarkTheme,
+      showTooltips: this.usr.settings.showTooltips
+    };
+  }
 
   // Chart type constants
   private static readonly CHART_TYPES = {
@@ -142,7 +158,7 @@ export class ChartService implements OnDestroy {
     selection.results.forEach((result: IndicatorResult) => {
       const resultConfig = listing.results.find(x => x.dataName === result.dataName);
       if (!resultConfig) return;
-      const dataset = this.cfg.baseDataset(result, resultConfig);
+      const dataset = baseDataset(result, resultConfig);
       const { dataPoints, pointColor, pointRotation } = this.buildDataPoints(data, result, listing);
       this.addExtraBars(dataPoints);
       if (
@@ -321,7 +337,7 @@ export class ChartService implements OnDestroy {
     scrollToMe: boolean
   ) {
     // default configuration
-    const chartConfig = this.cfg.baseOscillatorConfig();
+    const chartConfig = baseOscillatorConfig(this.chartSettings);
 
     // add thresholds and configure chart
     this.configureOscillatorThresholds(chartConfig, selection, listing);
@@ -477,11 +493,12 @@ export class ChartService implements OnDestroy {
     index: number
   ): AnnotationOptions & LabelAnnotationOptions {
     // annotation with defaults
-    const annotation: AnnotationOptions & LabelAnnotationOptions = this.cfg.commonLegendAnnotation(
+    const annotation: AnnotationOptions & LabelAnnotationOptions = commonLegendAnnotation(
       selection.label,
       xPos,
       yPos,
-      adjY
+      adjY,
+      this.chartSettings
     );
 
     // customize annotation
@@ -497,7 +514,7 @@ export class ChartService implements OnDestroy {
     const xPos: ScaleValue = chart.scales["x"].min;
     const yPos: ScaleValue = chart.scales["y"].max;
 
-    const annotation = this.cfg.commonLegendAnnotation(selection.label, xPos, yPos, 1);
+    const annotation = commonLegendAnnotation(selection.label, xPos, yPos, 1, this.chartSettings);
 
     if (chart.options?.plugins?.annotation) {
       chart.options.plugins.annotation.annotations = { annotation };
@@ -574,7 +591,7 @@ export class ChartService implements OnDestroy {
       const volumeAxisSize = this.chartOverlay.scales.volumeAxis.max;
 
       // replace chart options (applies theme)
-      this.chartOverlay.options = this.cfg.baseOverlayOptions(volumeAxisSize);
+      this.chartOverlay.options = baseOverlayOptions(volumeAxisSize, this.chartSettings);
 
       // regenerate
       this.chartOverlay.update("none"); // load scales
@@ -592,7 +609,7 @@ export class ChartService implements OnDestroy {
 
       if (!chart) return;
       // replace chart options (applies theme)
-      chart.options = this.cfg.baseOscillatorOptions();
+      chart.options = baseOscillatorOptions(this.chartSettings);
 
       // regenerate annotations
       chart.update("none"); // load scales
@@ -854,7 +871,7 @@ export class ChartService implements OnDestroy {
 
   private createOverlayChart(chartData: ChartData, volumeAxisSize: number): void {
     // default overlay chart configuration
-    const chartConfig = this.cfg.baseOverlayConfig(volumeAxisSize);
+    const chartConfig = baseOverlayConfig(volumeAxisSize, this.chartSettings);
     chartConfig.options = buildFinancialChartOptions(chartConfig.options ?? {});
 
     // add chart data

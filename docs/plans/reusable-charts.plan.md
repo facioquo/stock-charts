@@ -69,7 +69,8 @@ The core library extraction and VitePress documentation are complete:
   delegate to `ChartManager`
 - **VitePress docs and demos** — installation guide, quick start, API client
   docs, live `IndyOverlayDemo` and `IndyIndicatorsDemo` Vue components
-- **Playwright tests** — 11/11 VitePress content tests passing
+- **Playwright tests** — 12/12 VitePress content tests + 6/6 Angular website
+  tests passing (18 total)
 - **PR #454 review fixes** — partial-update index bug, `ChartManager.settings`
   encapsulation, business-day padding in `addExtraBars()`, and other CodeRabbit
   feedback addressed
@@ -95,20 +96,20 @@ The core library extraction and VitePress documentation are complete:
    `registerFinancialCharts()` + `Chart.register(AnnotationPlugin)` instead of
    using `setupIndyCharts()`.
 
-5. **Missing library helpers** — `defaultSelection()` and
-   `selectionTokenReplacement()` are independently implemented in both the
-   Angular client and VitePress demo utils. These belong in the library.
+5. ~~**Missing library helpers**~~ — **RESOLVED (Phase 1).** `createDefaultSelection()`,
+   `applySelectionTokens()`, and `calculateOptimalBars()` are now exported from
+   `@facioquo/indy-charts`. Both consumers (Angular, VitePress) import from the
+   library.
 
-6. **Missing resize utility** — `calculateOptimalBars()` logic exists only in
-   Angular's `WindowService`. External consumers need this too.
+6. ~~**Missing resize utility**~~ — **RESOLVED (Phase 1).** `calculateOptimalBars()`
+   exported from `@facioquo/indy-charts/helpers`.
 
 7. **Libraries not publishable** — both packages are `private: true` with
    `UNLICENSED`. External consumers can't install from a registry.
 
-8. **`date-fns` peer dep version mismatch** — `@facioquo/indy-charts` declares
-   `"date-fns": "^2.19.0"` but the workspace (and VitePress) uses `^4.1.0`.
-   A Vite alias workaround exists in VitePress config, but this will break
-   every external consumer.
+8. ~~**`date-fns` peer dep version mismatch**~~ — **RESOLVED (Phase 1).** Updated
+   to `"date-fns": ">=2.19.0"`. VitePress date-fns alias still needed because
+   `chartjs-adapter-date-fns@3.0.0` itself declares `date-fns@^2` as peer.
 
 9. **Minimal library test coverage** — `@facioquo/indy-charts` has only ESLint
    config and color utility tests. Core classes (`ChartManager`, `OverlayChart`,
@@ -158,19 +159,23 @@ never need Chart.js imports.
 Rewrite the Angular client to delegate all Chart.js work to `ChartManager`,
 removing ~1,000 lines of duplicated code.
 
-- [ ] Task 2.1: Replace `main.ts` Chart.js registration with `setupIndyCharts()`
+- [x] Task 2.1: Replace `main.ts` Chart.js registration with `setupIndyCharts()`
   - Remove manual `registerFinancialCharts()` and
     `Chart.register(AnnotationPlugin)` calls.
   - Call `setupIndyCharts()` once from `main.ts`.
   - Remove direct `chart.js` and `chartjs-plugin-annotation` imports from
     `main.ts`.
 
-- [ ] Task 2.2: Delete `config.service.ts` — replace with library imports
+- [x] Task 2.2: Delete `config.service.ts` — replace with library imports
   - All config builder functions (`baseOverlayConfig`, `baseOscillatorConfig`,
     `baseChartOptions`, `defaultXAxisOptions`, `baseDataset`,
-    `commonLegendAnnotation`) already exist in `libs/indy-charts/config/`.
-  - Remove `ChartConfigService` entirely.
-  - Update `chart.service.spec.ts` and `config.service.spec.ts` accordingly.
+    `commonLegendAnnotation`) now exported from `@facioquo/indy-charts`.
+  - Removed `ChartConfigService` entirely; `chart.service.ts` imports library
+    functions directly and threads `ChartSettings` via a private getter.
+  - Updated `chart.service.spec.ts`: removed mock config service, uses real
+    library functions; test 3 (theme switching) rewritten to test config
+    functions directly since Chart.js proxy resolution fails in JSDOM.
+  - Deleted `config.service.ts` (398 lines) and `config.service.spec.ts`.
 
 - [ ] Task 2.3: Delete `chart.models.ts` — import types from library
   - All interfaces exist in `@facioquo/indy-charts`:
@@ -241,10 +246,11 @@ Establish confidence for external consumers.
   - Test `getCandlePointConfiguration()` for match values (-100, 100, other).
   - Target 70% coverage for `data/` module.
 
-- [ ] Task 3.4: Add unit tests for `createDefaultSelection()` and `applySelectionTokens()`
+- [x] Task 3.4: Add unit tests for `createDefaultSelection()` and `applySelectionTokens()`
   - Test default param hydration from listing.
   - Test token replacement in labels.
   - Test with missing/optional params.
+  - 25 tests across 3 spec files (8 + 7 + 10) covering helpers.
 
 ### Phase 4: Publishing and external consumption
 
@@ -346,7 +352,7 @@ const quotes = loadStaticQuotes(rawQuoteArray);
 const rows = loadStaticIndicatorData(rawIndicatorArray);
 ```
 
-### Selection helpers (to be added in Phase 1)
+### Selection helpers
 
 ```typescript
 import {
