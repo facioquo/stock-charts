@@ -104,8 +104,10 @@ The core library extraction and VitePress documentation are complete:
 6. ~~**Missing resize utility**~~ — **RESOLVED (Phase 1).** `calculateOptimalBars()`
    exported from `@facioquo/indy-charts/helpers`.
 
-7. **Libraries not publishable** — both packages are `private: true` with
-   `UNLICENSED`. External consumers can't install from a registry.
+7. ~~**Libraries not publishable**~~ — **RESOLVED (Phase 4).** Both packages
+   are Apache-2.0 licensed, `private: true` removed, `publishConfig` targets
+   GitHub Packages (`https://npm.pkg.github.com`), and a
+   `publish-packages.yml` workflow handles release-triggered publishing.
 
 8. ~~**`date-fns` peer dep version mismatch**~~ — **RESOLVED (Phase 1).** Updated
    to `"date-fns": ">=2.19.0"`. VitePress date-fns alias still needed because
@@ -263,21 +265,27 @@ Establish confidence for external consumers.
 
 Prepare libraries for consumption outside this workspace.
 
-- [ ] Task 4.1: Choose license and update package metadata
-  - Replace `UNLICENSED` with chosen open-source license in both library
-    `package.json` files.
-  - Update `author`, `repository`, `homepage`, and `bugs` fields.
+- [x] Task 4.1: Choose license and update package metadata
+  - Set `"license": "Apache-2.0"` in both library `package.json` files
+    (matches the root project license).
+  - Added `repository` (with `directory` field), `homepage`, and `bugs` fields
+    pointing to `github.com/facioquo/stock-charts`.
+  - Removed `"private": true` from both packages.
 
-- [ ] Task 4.2: Remove `private: true` and set version for publishing
-  - Decide on initial version (likely `0.1.0` or `1.0.0`).
-  - Remove `"private": true` from both library `package.json` files.
-  - Verify `pnpm pack` produces correct tarballs with only `dist/` and metadata.
+- [x] Task 4.2: Remove `private: true` and set version for publishing
+  - Version kept at `0.1.0` (pre-1.0 signals early/experimental stage).
+  - Added `"publishConfig": { "registry": "https://npm.pkg.github.com" }` to
+    both packages to target GitHub Packages.
+  - Validated `pnpm pack --dry-run` produces clean tarballs: only `dist/`,
+    `README.md`, `NOTICE` (chartjs-financial), and `package.json`. Stale
+    `dist/eslint.config.*` files cleaned by rebuilding after `rm -rf dist/`.
 
-- [ ] Task 4.3: Configure GitHub Packages publishing
-  - Add `.npmrc` configuration for `@facioquo` scope → GitHub Packages.
-  - Add or update GitHub Actions workflow to publish on release/tag.
-  - Verify consumers can install from the private registry with appropriate
-    authentication.
+- [x] Task 4.3: Configure GitHub Packages publishing
+  - Created root `.npmrc` with `@facioquo:registry=https://npm.pkg.github.com`.
+  - Created `.github/workflows/publish-packages.yml` workflow triggered on
+    GitHub Release events. Builds both libraries, runs tests, then publishes
+    with `--access restricted` using `GITHUB_TOKEN`.
+  - Publish order: chartjs-chart-financial first (dependency of indy-charts).
 
 - [ ] Task 4.4: Validate external consumption
   - Test installation in a fresh VitePress project outside this workspace.

@@ -3,8 +3,19 @@
   "version": "0.1.0",
   "description": "Financial charting extension for Chart.js (candlestick, OHLC, volume charts)",
   "author": "facioquo",
-  "license": "UNLICENSED",
-  "private": true,
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/facioquo/stock-charts.git",
+    "directory": "libs/chartjs-financial"
+  },
+  "homepage": "https://github.com/facioquo/stock-charts/tree/main/libs/chartjs-financial#readme",
+  "bugs": {
+    "url": "https://github.com/facioquo/stock-charts/issues"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "engines": {
     "node": ">=24 <25"
   },

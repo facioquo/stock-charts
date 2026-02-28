@@ -3,8 +3,19 @@
   "version": "0.1.0",
   "description": "Framework-agnostic financial charting library with technical indicators and stock market data visualization",
   "author": "facioquo",
-  "license": "UNLICENSED",
-  "private": true,
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/facioquo/stock-charts.git",
+    "directory": "libs/indy-charts"
+  },
+  "homepage": "https://github.com/facioquo/stock-charts/tree/main/libs/indy-charts#readme",
+  "bugs": {
+    "url": "https://github.com/facioquo/stock-charts/issues"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "engines": {
     "node": ">=24 <25"
   },
