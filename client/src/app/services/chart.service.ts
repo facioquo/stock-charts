@@ -29,6 +29,8 @@ import {
   getFinancialPalette
 } from "@facioquo/chartjs-chart-financial";
 
+import { applySelectionTokens, createDefaultSelection } from "@facioquo/indy-charts";
+
 // plugins
 import { AnnotationOptions, LabelAnnotationOptions, ScaleValue } from "chartjs-plugin-annotation";
 
@@ -37,10 +39,7 @@ import {
   ChartThreshold,
   IndicatorDataRow,
   IndicatorListing,
-  IndicatorParam,
-  IndicatorParamConfig,
   IndicatorResult,
-  IndicatorResultConfig,
   IndicatorSelection,
   Quote
 } from "../pages/chart/chart.models";
@@ -266,45 +265,7 @@ export class ChartService implements OnDestroy {
       throw new Error(`Indicator listing not found for uiid: ${uiid}`);
     }
 
-    // initialize selection
-    const selection: IndicatorSelection = {
-      ucid: this.util.guid("chart"),
-      uiid: listing.uiid,
-      label: listing.legendTemplate,
-      chartType: listing.chartType,
-      params: [],
-      results: []
-    };
-
-    // load default parameters
-    listing.parameters?.forEach((config: IndicatorParamConfig) => {
-      const param = {
-        paramName: config.paramName,
-        displayName: config.displayName,
-        minimum: config.minimum,
-        maximum: config.maximum,
-        value: config.defaultValue
-      } as IndicatorParam;
-
-      selection.params.push(param);
-    });
-
-    // load default results colors and containers
-    listing.results.forEach((config: IndicatorResultConfig) => {
-      const result = {
-        label: config.tooltipTemplate,
-        color: config.defaultColor,
-        dataName: config.dataName,
-        displayName: config.displayName,
-        lineType: config.lineType,
-        lineWidth: config.lineWidth,
-        order: listing.order
-      } as IndicatorResult;
-
-      selection.results.push(result);
-    });
-
-    return selection;
+    return createDefaultSelection(listing);
   }
 
   cacheSelections() {
@@ -972,18 +933,7 @@ export class ChartService implements OnDestroy {
   //#region UTILITIES
 
   selectionTokenReplacement(selection: IndicatorSelection): IndicatorSelection {
-    selection.params.forEach((param, index) => {
-      if (param.value === null || param.value === undefined) return;
-
-      selection.label = selection.label.replace(`[P${index + 1}]`, param.value.toString());
-
-      selection.results.forEach(r => {
-        if (param.value != null) {
-          r.label = r.label.replace(`[P${index + 1}]`, param.value.toString());
-        }
-      });
-    });
-    return selection;
+    return applySelectionTokens(selection);
   }
   //#endregion
 }

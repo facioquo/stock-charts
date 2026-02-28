@@ -56,6 +56,12 @@ Pre-built configuration objects for common chart types:
 - `baseChartOptions`: Common Chart.js options
 - `baseDataset`: Common dataset configuration
 
+### Helpers
+
+- `createDefaultSelection(listing, paramOverrides?, idPrefix?)`: Create an `IndicatorSelection` from a listing with default parameters
+- `applySelectionTokens(selection)`: Replace `[P1]`, `[P2]`, … tokens in labels with parameter values
+- `calculateOptimalBars(containerWidth, pixelsPerBar?)`: Calculate optimal bar count for a given container width (clamped 20–500)
+
 ### Data Processing
 
 - `processQuoteData(quotes)`: Transform raw quote data

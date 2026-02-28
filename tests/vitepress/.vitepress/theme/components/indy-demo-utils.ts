@@ -1,80 +1,14 @@
-import type { ChartDataset } from "chart.js";
-
 import type {
   IndicatorListing,
-  IndicatorParam,
-  IndicatorParamConfig,
-  IndicatorResult,
-  IndicatorResultConfig,
   IndicatorSelection
 } from "@facioquo/indy-charts";
 
-let localCounter = 0;
+import {
+  applySelectionTokens,
+  createDefaultSelection
+} from "@facioquo/indy-charts";
 
-function nextId(): string {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    return crypto.randomUUID();
-  }
-
-  localCounter += 1;
-  return `vp-indicator-${Date.now()}-${localCounter}`;
-}
-
-export function createDefaultSelection(listing: IndicatorListing): IndicatorSelection {
-  const selection = {
-    ucid: nextId(),
-    uiid: listing.uiid,
-    label: listing.legendTemplate,
-    chartType: listing.chartType,
-    params: [],
-    results: []
-  } as IndicatorSelection;
-
-  listing.parameters?.forEach((config: IndicatorParamConfig) => {
-    const param = {
-      paramName: config.paramName,
-      displayName: config.displayName,
-      minimum: config.minimum,
-      maximum: config.maximum,
-      value: config.defaultValue
-    } as IndicatorParam;
-
-    selection.params.push(param);
-  });
-
-  listing.results.forEach((config: IndicatorResultConfig) => {
-    const result = {
-      label: config.tooltipTemplate,
-      color: config.defaultColor,
-      dataName: config.dataName,
-      displayName: config.displayName,
-      lineType: config.lineType,
-      lineWidth: typeof config.lineWidth === "number" ? config.lineWidth : 2,
-      order: config.order,
-      // Runtime chart dataset is populated by ChartManager.processSelectionData()
-      dataset: { type: "line", data: [] } as ChartDataset
-    } as IndicatorResult;
-
-    selection.results.push(result);
-  });
-
-  return selection;
-}
-
-export function applySelectionTokens(selection: IndicatorSelection): IndicatorSelection {
-  selection.params.forEach((param, index) => {
-    if (param.value == null) return;
-    const token = `[P${index + 1}]`;
-    const valueText = String(param.value);
-
-    selection.label = selection.label.replace(token, valueText);
-    selection.results.forEach(result => {
-      result.label = result.label.replace(token, valueText);
-    });
-  });
-
-  return selection;
-}
+export { applySelectionTokens, createDefaultSelection };
 
 export function setSelectionParams(
   selection: IndicatorSelection,

@@ -124,7 +124,7 @@ The core library extraction and VitePress documentation are complete:
 Make `@facioquo/indy-charts` a fully self-contained dependency so consumers
 never need Chart.js imports.
 
-- [ ] Task 1.1: Move `defaultSelection()` into `@facioquo/indy-charts`
+- [x] Task 1.1: Move `defaultSelection()` into `@facioquo/indy-charts`
   - Extract from Angular `ChartService.defaultSelection()` and VitePress
     `indy-demo-utils.ts` → `createDefaultSelection()` in the library.
   - Given an `IndicatorListing`, produce an `IndicatorSelection` with default
@@ -132,7 +132,7 @@ never need Chart.js imports.
   - Export from `libs/indy-charts/index.ts`.
   - Update both consumers (Angular, VitePress) to import from the library.
 
-- [ ] Task 1.2: Move `selectionTokenReplacement()` into `@facioquo/indy-charts`
+- [x] Task 1.2: Move `selectionTokenReplacement()` into `@facioquo/indy-charts`
   - Extract from Angular `ChartService.selectionTokenReplacement()` and
     VitePress `applySelectionTokens()` → `applySelectionTokens()` in the
     library.
@@ -140,12 +140,12 @@ never need Chart.js imports.
   - Export from `libs/indy-charts/index.ts`.
   - Update both consumers to import from the library.
 
-- [ ] Task 1.3: Add `calculateOptimalBars()` utility to library
+- [x] Task 1.3: Add `calculateOptimalBars()` utility to library
   - Extract from Angular `WindowService.calculateOptimalBars()`.
   - Pure function: `(containerWidth: number, pixelsPerBar?: number) => number`.
   - Export from `libs/indy-charts/index.ts`.
 
-- [ ] Task 1.4: Fix `date-fns` peer dependency range
+- [x] Task 1.4: Fix `date-fns` peer dependency range
   - Update `@facioquo/indy-charts` peerDependencies to
     `"date-fns": ">=2.19.0"` (or `"^2.19.0 || ^3.0.0 || ^4.0.0"`) since only
     the adapter import is used internally.
