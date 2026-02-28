@@ -96,10 +96,8 @@ setup_node() {
   if ! command -v node &>/dev/null; then
     log "Node not found, installing via nvm"
     setup_nvm || return 1
-    if ! command -v node &>/dev/null; then
-      nvm install "$node_version" || { err "Failed to install Node $node_version"; return 1; }
-      nvm use "$node_version" || { err "Failed to activate Node $node_version"; return 1; }
-    fi
+    nvm install "$node_version" || { err "Failed to install Node $node_version"; return 1; }
+    nvm use "$node_version" || { err "Failed to activate Node $node_version"; return 1; }
   fi
 
   log "Node: $(node --version)"
@@ -132,14 +130,16 @@ setup_dotnet() {
 
   log "Installing .NET SDK v$dotnet_version"
 
-  # On Debian/Ubuntu, dotnet-sdk-10.0 is not in default repositories.
+  # On Debian, dotnet-sdk-10.0 is not in default repositories.
   # Add Microsoft's official APT feed before attempting to install.
+  # Note: Ubuntu 22.04+ ships .NET in the official Ubuntu Universe APT repository;
+  # adding the Microsoft feed on Ubuntu creates package conflicts.
   if command -v apt-get &>/dev/null && [[ -f /etc/os-release ]]; then
     local distro_id version_id
     distro_id=$(. /etc/os-release && echo "${ID:-}")
     version_id=$(. /etc/os-release && echo "${VERSION_ID:-}")
 
-    if [[ "$distro_id" == "ubuntu" || "$distro_id" == "debian" ]] && [[ -n "$version_id" ]]; then
+    if [[ "$distro_id" == "debian" ]] && [[ -n "$version_id" ]]; then
       log "Adding Microsoft APT feed for ${distro_id} ${version_id}"
 
       # Ensure HTTPS transport prerequisites are present

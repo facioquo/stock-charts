@@ -76,7 +76,7 @@ export class OhlcController extends FinancialController {
         ...(includeOptions ? { options } : {})
       };
 
-      controller.updateElement(elements[i], dataIndex, properties, mode);
+      controller.updateElement(elements[dataIndex], dataIndex, properties, mode);
     }
   }
 }
