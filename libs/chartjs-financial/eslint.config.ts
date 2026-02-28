@@ -4,7 +4,7 @@ import vitest from "@vitest/eslint-plugin";
 import prettier from "eslint-config-prettier";
 
 export default tseslint.config(
-  { ignores: ["dist/**/*", "node_modules/**/*"] },
+  { ignores: ["dist/**", "node_modules/**"] },
   // TypeScript source and spec files
   {
     files: ["**/*.ts"],
@@ -14,7 +14,8 @@ export default tseslint.config(
     ],
     languageOptions: {
       parserOptions: {
-        project: ["./tsconfig.eslint.json"]
+        project: ["./tsconfig.eslint.json"],
+        tsconfigRootDir: import.meta.dirname as string
       }
     },
     rules: {

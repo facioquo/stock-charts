@@ -20,5 +20,5 @@
     "allowSyntheticDefaultImports": true
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules", "dist", "**/*.spec.ts"]
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "eslint.config.ts"]
 }

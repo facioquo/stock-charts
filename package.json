@@ -58,7 +58,7 @@
   "devDependencies": {
     "azurite": "^3.35.0",
     "markdownlint-cli2": "^0.21.0",
-    "npm-check-updates": "^19.3.2",
+    "npm-check-updates": "^19.6.3",
     "playwright": "1.58.2",
     "postcss-scss": "^4.0.9",
     "prettier": "^3.8.1",

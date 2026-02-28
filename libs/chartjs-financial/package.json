@@ -36,12 +36,12 @@
     "chart.js": "^4.5.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.3",
+    "@eslint/js": "^10.0.1",
     "@vitest/eslint-plugin": "^1.6.9",
-    "eslint": "^9.39.3",
+    "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
     "jiti": "^2.6.1",
-    "typescript-eslint": "^8.56.0",
+    "typescript-eslint": "^8.56.1",
     "vitest": "^4.0.18"
   }
 }

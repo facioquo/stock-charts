@@ -12,8 +12,8 @@ describe("eslint.config", () => {
     const ignoresBlock = (config as ConfigBlock[]).find(
       c => "ignores" in c && !("files" in c)
     );
-    expect(ignoresBlock?.ignores).toContain("dist/**/*");
-    expect(ignoresBlock?.ignores).toContain("node_modules/**/*");
+    expect(ignoresBlock?.ignores).toContain("dist/**");
+    expect(ignoresBlock?.ignores).toContain("node_modules/**");
   });
 
   it("includes a TypeScript files configuration block", () => {

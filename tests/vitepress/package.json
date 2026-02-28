@@ -16,15 +16,15 @@
     "chart.js": "4.5.1",
     "chartjs-adapter-date-fns": "3.0.0",
     "chartjs-plugin-annotation": "3.1.0",
-    "date-fns": "^3.0.0"
+    "date-fns": "^4.1.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.3",
-    "eslint": "^9.39.3",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
     "jiti": "^2.6.1",
-    "typescript-eslint": "^8.56.0",
-    "vitepress": "1.5.0",
-    "vue": "3.5.13"
+    "typescript-eslint": "^8.56.1",
+    "vitepress": "2.0.0-alpha.16",
+    "vue": "3.5.29"
   }
 }

@@ -96,6 +96,7 @@ test.describe("VitePress Documentation Site", () => {
       page
         .getByTestId("indy-indicators-demo-overlay-canvas")
         .or(page.getByTestId("indy-indicators-demo-error"))
+        .filter({ visible: true })
     ).toBeVisible({ timeout: 20000 });
   });
 });
