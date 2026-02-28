@@ -52,18 +52,26 @@ Update Angular app to use the library via TypeScript path mapping, implement fea
 - Theme switching (global state mutation)
 - LocalStorage serialization (format compatibility)
 
+## Status: Complete (approach evolved — no feature flag; direct workspace integration)
+
+The Angular app integrates the libraries via pnpm workspace resolution (no
+TypeScript path mapping aliases needed). The feature-flag parallel code path
+approach was not used; the Angular services were updated in-place to import from
+`@facioquo/chartjs-chart-financial`. `ConfigService` and `ChartService` remain
+as Angular services and were not replaced by `ChartManager`.
+
 ## Acceptance Criteria
 
-- [ ] Updated file:client/tsconfig.json with path mapping: `"@stock-charts/financial": ["./src/chartjs/financial/index.ts"]`
-- [ ] Added `USE_CHART_LIBRARY` flag to environment files
-- [ ] Created new ChartService implementation using library:
-  - Uses `ChartManager` instead of direct Chart.js
-  - Uses `createApiClient()` for data fetching
-  - Delegates to library for all chart operations
-- [ ] Updated file:client/src/main.ts to import from `@stock-charts/financial`
-- [ ] Components work with both old and new implementations
-- [ ] Old code still present (not removed yet)
-- [ ] Both code paths compile successfully
+- [ ] TypeScript path mapping in `tsconfig.json` — **not needed; pnpm workspace
+      resolution handles `@facioquo/` imports directly**
+- [ ] `USE_CHART_LIBRARY` feature flag — **not implemented; approach was dropped**
+- [ ] `ChartService` rewritten to use `ChartManager` — **not done; `ChartService`
+      was updated in-place to import builders from `@facioquo/chartjs-chart-financial`**
+- [x] Angular app imports from `@facioquo/chartjs-chart-financial` (financial
+      primitives: datasets, options, colors, types)
+- [x] Old `ChartService` and `ConfigService` retained and updated (not replaced)
+- [x] App compiles and builds successfully with library imports
+- [ ] Dual code-path validation (old vs new) — **not applicable; single updated path**
 
 ## Verification Steps
 

@@ -51,17 +51,30 @@ Extract ConfigService methods and ChartService data transformation logic into fr
 - No side effects (no DOM manipulation, no global state mutation)
 - Return Chart.js configuration objects
 
+## Status: Complete (implementation location changed)
+
+All pure config and data transformation functions were extracted, but the
+destination changed from `client/src/chartjs/financial/` to the standalone
+`libs/indy-charts/` workspace. The `client/src/chartjs/` directory no longer
+exists; equivalent functionality lives in `libs/indy-charts/config/` and
+`libs/indy-charts/data/`.
+
 ## Acceptance Criteria
 
-- [ ] Created client/src/chartjs/financial/config/types.ts with ChartSettings, OverlayChartConfig, OscillatorChartConfig interfaces
-- [ ] Created client/src/chartjs/financial/config/common.ts with baseChartOptions(), defaultXAxisOptions()
-- [ ] Created client/src/chartjs/financial/config/overlay.ts with baseOverlayConfig(), baseOverlayOptions()
-- [ ] Created client/src/chartjs/financial/config/oscillator.ts with baseOscillatorConfig(), baseOscillatorOptions()
-- [ ] Created client/src/chartjs/financial/config/datasets.ts with baseDataset() supporting all 6 line types
-- [ ] Created client/src/chartjs/financial/config/annotations.ts with commonLegendAnnotation()
-- [ ] Created client/src/chartjs/financial/data/transformers.ts with processQuoteData(), buildDataPoints(), addExtraBars(), getCandlePointConfiguration()
-- [ ] All functions are pure (no DI, no side effects)
-- [ ] Existing ConfigService tests still pass (using old implementation)
+> **Note**: Paths below reflect original plan. Actual location is `libs/indy-charts/`.
+
+- [x] Config types created: `libs/indy-charts/config/types.ts` with
+      `ChartSettings`, `OverlayChartConfig`, `OscillatorChartConfig` interfaces
+- [x] Common config: `libs/indy-charts/config/common.ts` with base chart/axis options
+- [x] Overlay config: `libs/indy-charts/config/overlay.ts`
+- [x] Oscillator config: `libs/indy-charts/config/oscillator.ts`
+- [x] Dataset builders: `libs/indy-charts/config/datasets.ts` supporting all line types
+- [x] Annotations: `libs/indy-charts/config/annotations.ts` with legend annotation
+- [x] Data transformers: `libs/indy-charts/data/transformers.ts` with
+      `processQuoteData()`, `buildDataPoints()`, `addExtraBars()`,
+      `getCandlePointConfiguration()`
+- [x] All functions are pure (no Angular DI, no side effects)
+- [x] Existing `ConfigService` tests still pass
 
 ## Verification Steps
 

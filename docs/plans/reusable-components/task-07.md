@@ -44,22 +44,25 @@ Document library usage for VitePress with complete examples for both static (bui
 - Vue 3 composition API (VitePress standard)
 - Minimal (focus on chart, not boilerplate)
 
+## Status: Complete (fulfilled via Task 12)
+
+All VitePress documentation and integration examples were completed as part of
+Task 12. See [task-12.md](task-12.md) for the full list of deliverables.
+
 ## Acceptance Criteria
 
-- [ ] Updated file:client/src/chartjs/financial/README.md with:
-  - Installation instructions
-  - Peer dependencies list
-  - Quick start example (< 10 lines)
-  - API reference (OverlayChart, OscillatorChart, ChartManager)
-  - Theme configuration
-- [ ] Created VitePress integration guide section with:
-  - Static chart example (build-time rendering)
-  - Interactive chart example (client-side rendering)
-  - SSR handling example (onMounted hook)
-  - Theme sync example (VitePress dark mode toggle)
-  - Complete Vue component (copy-paste ready)
-- [ ] Examples tested in actual VitePress environment (if available)
-- [ ] Documentation reviewed for clarity
+- [x] `libs/indy-charts/README.md` updated with correct APIs (`createApiClient()`,
+      `setupIndyCharts()`, `OverlayChart`, `ChartManager`, `loadStaticQuotes()`)
+- [x] `libs/chartjs-financial/README.md` documents financial chart types
+- [x] VitePress integration guide (`tests/vitepress/guide/`) with:
+  - [x] `quick-start.md` — correct `setupIndyCharts()` / `OverlayChart` usage
+  - [x] `api-client.md` — `createApiClient()` with `getQuotes()`, `getListings()`,
+        `getSelectionData()`
+  - [x] SSR-safe examples using `onMounted` / `<ClientOnly>` patterns
+  - [x] Theme sync via VitePress `useData().isDark`
+- [x] `tests/vitepress/examples/` with live demo components
+      (`IndyOverlayDemo.vue`, `IndyIndicatorsDemo.vue`)
+- [x] Examples tested in VitePress environment (Playwright, 11/11 passing)
 
 ## Verification Steps
 

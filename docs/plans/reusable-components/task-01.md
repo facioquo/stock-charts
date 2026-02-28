@@ -44,15 +44,20 @@ Add minimal smoke tests for chart initialization, indicator lifecycle, theme swi
 - Theme colors change (sample verification)
 - Dataset slicing works (bar count changes)
 
+## Status: Complete
+
+All four smoke tests are implemented in `client/src/app/services/chart.service.spec.ts`
+under the `"ChartService Smoke Tests"` describe block.
+
 ## Acceptance Criteria
 
-- [ ] Test file created: file:client/src/app/services/chart.service.spec.ts
-- [ ] Test 1: Chart initialization - creates overlay chart with sample quotes
-- [ ] Test 2: Indicator lifecycle - adds and removes indicator dataset
-- [ ] Test 3: Theme switching - verifies color changes on theme update
-- [ ] Test 4: Dataset slicing - verifies bar count changes slice datasets correctly
-- [ ] All tests pass in CI
-- [ ] Tests use mocked dependencies (no real HTTP calls)
+- [x] Test file created: `client/src/app/services/chart.service.spec.ts`
+- [x] Test 1: Chart initialization - creates overlay chart with sample quotes
+- [x] Test 2: Indicator lifecycle - adds and removes indicator dataset
+- [x] Test 3: Theme switching - verifies color changes on theme update
+- [x] Test 4: Dataset slicing - verifies bar count changes slice datasets correctly
+- [x] All tests pass in CI
+- [x] Tests use mocked dependencies (no real HTTP calls)
 
 ## Verification Steps
 

@@ -57,17 +57,27 @@ Create the main library exports: OverlayChart, OscillatorChart, and ChartManager
 - Maintain deep copies for efficient slicing
 - Handle array properties (pointRotation, pointBackgroundColor, backgroundColor)
 
+## Status: Complete (implementation location changed)
+
+All three chart abstraction classes are implemented. The destination changed
+from `client/src/chartjs/financial/charts/` to `libs/indy-charts/charts/`.
+
 ## Acceptance Criteria
 
-- [ ] Created client/src/chartjs/financial/charts/overlay-chart.ts with OverlayChart class
-- [ ] OverlayChart implements: constructor, render(), addIndicator(), removeIndicator(), setBarCount(), updateTheme(), destroy()
-- [ ] Created client/src/chartjs/financial/charts/oscillator-chart.ts with OscillatorChart class
-- [ ] OscillatorChart implements: constructor, render(), updateTheme(), destroy()
-- [ ] Created client/src/chartjs/financial/charts/chart-manager.ts with ChartManager class
-- [ ] ChartManager implements: initialize(), createOverlayChart(), addOscillator(), removeOscillator(), setBarCount(), updateAllThemes(), destroy()
-- [ ] Dataset slicing logic works correctly (slices price, volume, indicators consistently)
-- [ ] Theme switching works without destroying charts
-- [ ] Updated file:client/src/chartjs/financial/index.ts to export new classes
+> **Note**: Paths below reflect original plan. Actual location is `libs/indy-charts/charts/`.
+
+- [x] `libs/indy-charts/charts/overlay-chart.ts` — `OverlayChart` class
+- [x] `OverlayChart` implements: constructor, `render()`, `addIndicator()`,
+      `removeIndicator()`, `setBarCount()`, `updateTheme()`, `destroy()`
+- [x] `libs/indy-charts/charts/oscillator-chart.ts` — `OscillatorChart` class
+- [x] `OscillatorChart` implements: constructor, `render()`, `updateTheme()`, `destroy()`
+- [x] `libs/indy-charts/charts/chart-manager.ts` — `ChartManager` class
+- [x] `ChartManager` implements: `initializeOverlay()`, `displaySelection()`,
+      `createOscillator()`, `removeSelection()`, `setBarCount()`,
+      `updateAllThemes()`, `destroy()`
+- [x] Dataset slicing logic works correctly (slices price, volume, indicators consistently)
+- [x] Theme switching works without destroying charts
+- [x] All classes exported from `libs/indy-charts/index.ts`
 
 ## Verification Steps
 

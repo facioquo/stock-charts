@@ -56,26 +56,32 @@ Complete final validation of library implementation, remove old Angular code, fl
 - Package size reasonable
 - npm credentials configured
 
+## Status: Superseded / Not fully executed
+
+This task as originally written assumed npm publishing and complete removal of
+Angular services. Neither happened: libraries remain `private: true` at `v0.1.0`
+and are consumed via workspace linking. Angular services were updated in-place
+(not removed). Task 12 handled the PR and quality pass instead.
+
 ## Acceptance Criteria
 
-- [ ] Completed manual testing checklist (all items pass):
-  - Chart loads on page load ✓
-  - Default indicators display ✓
-  - Add/remove indicators ✓
-  - Change indicator parameters ✓
-  - Theme switching ✓
-  - Window resize ✓
-  - LocalStorage persistence ✓
-  - Fallback to backup data ✓
-- [ ] Completed edge case testing (all items pass)
-- [ ] Removed old ChartService implementation
-- [ ] Removed old ConfigService implementation
-- [ ] Removed USE_CHART_LIBRARY feature flag
-- [ ] Updated all imports to use library
-- [ ] All tests pass: `pnpm test:all`
-- [ ] Production build succeeds: `pnpm build:prod`
-- [ ] Published to npm: `@stock-charts/financial@1.0.0`
-- [ ] Updated Angular app to use published package (not path mapping)
+- [x] Chart loads on page load
+- [x] Default indicators display
+- [x] Add/remove indicators
+- [x] Change indicator parameters
+- [x] Theme switching
+- [x] Window resize
+- [ ] LocalStorage persistence — **caching not implemented (see Task 4)**
+- [x] Fallback to backup data
+- [ ] Removed old `ChartService` implementation — **retained and updated in-place**
+- [ ] Removed old `ConfigService` implementation — **retained and updated in-place**
+- [ ] Removed `USE_CHART_LIBRARY` feature flag — **never added (feature flag
+      approach was not pursued)**
+- [x] Updated Angular app imports to use `@facioquo/chartjs-chart-financial`
+- [x] All tests pass: `pnpm test:all`
+- [x] Production build succeeds: `pnpm build:prod`
+- [ ] Published to npm — **not done; packages are `private: true` at `v0.1.0`**
+- [ ] Angular app uses published package — **uses workspace linking, not published npm**
 
 ## Verification Steps
 

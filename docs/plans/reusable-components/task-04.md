@@ -55,17 +55,31 @@ Add optional HTTP client for fetching quotes/indicators and built-in localStorag
 - Exclude Chart.js instances from serialization
 - Provide `enableCaching(key)` and `restoreState()` methods
 
+## Status: Partial — API client done, LocalStorage caching not implemented
+
+The API client was implemented in `libs/indy-charts/api/`. The LocalStorage
+caching feature (`enableCaching()`, `restoreState()`) was never implemented.
+The `plan.md` acknowledges this under Task 4 status ("caching claims are stale
+/ not implemented").
+
 ## Acceptance Criteria
 
-- [ ] Created client/src/chartjs/financial/api/models.ts with Quote, RawQuote, IndicatorListing, IndicatorDataRow interfaces
-- [ ] Created client/src/chartjs/financial/api/client.ts with `createApiClient()` factory
-- [ ] Implemented `fetchQuotes()` - returns `Promise<Quote[]>`, transforms dates
-- [ ] Implemented `fetchIndicatorListings()` - returns `Promise<IndicatorListing[]>`
-- [ ] Implemented `fetchIndicatorData(endpoint, params)` - returns `Promise<IndicatorDataRow[]>`
-- [ ] Added `ChartManager.enableCaching(key)` method
-- [ ] Added `ChartManager.restoreState()` method
-- [ ] Caching skips if window undefined (SSR-safe)
-- [ ] Backward compatible with existing localStorage format
+> **Note**: Paths below reflect original plan. Actual location is `libs/indy-charts/api/`.
+
+- [x] Data model interfaces defined in `libs/indy-charts/types/` and
+      `libs/indy-charts/api/`
+- [x] `libs/indy-charts/api/client.ts` — `createApiClient()` factory with
+      `baseUrl` and `onError` config
+- [x] Implemented `getQuotes()` — returns `Promise<Quote[]>`, transforms dates
+- [x] Implemented `getListings()` — returns `Promise<IndicatorListing[]>`
+- [x] Implemented `getSelectionData(selection, listing)` — returns
+      `Promise<IndicatorDataRow[]>`
+- [x] `libs/indy-charts/api/static.ts` — `loadStaticQuotes()` and
+      `loadStaticIndicatorData()` helpers
+- [ ] `ChartManager.enableCaching(key)` — **not implemented**
+- [ ] `ChartManager.restoreState()` — **not implemented**
+- [ ] LocalStorage caching (SSR-safe) — **not implemented**
+- [ ] Backward-compatible localStorage format — **not applicable (caching not built)**
 
 ## Verification Steps
 

@@ -49,21 +49,28 @@ Set up TypeScript compilation, package.json metadata, and npm publishing configu
 - `types`: TypeScript declarations
 - `exports`: Modern package resolution
 
+## Status: Complete (scope evolved — two private workspace packages, not published)
+
+The build pipeline was implemented as two standalone pnpm workspace packages:
+`libs/chartjs-financial/` (`@facioquo/chartjs-chart-financial`) and
+`libs/indy-charts/` (`@facioquo/indy-charts`). Both are consumed via workspace
+linking. Publishing to npm was deferred; packages remain `private: true`.
+
 ## Acceptance Criteria
 
-- [ ] Updated file:client/src/chartjs/financial/package.json:
-  - Removed `"private": true`
-  - Set `"name": "@stock-charts/financial"`
-  - Added peer dependencies (chart.js ^4.5.1)
-  - Added optional peer dependencies (chartjs-adapter-date-fns, date-fns)
-  - Set main, module, types entry points
-  - Added exports field
-  - Added files array (specifies what to publish)
-- [ ] Created client/src/chartjs/financial/tsconfig.lib.json
-- [ ] Added `build:lib` script to file:client/package.json
-- [ ] Build succeeds: `pnpm build:lib`
-- [ ] Generated dist/ contains .js, .d.ts files
-- [ ] Run `pnpm pack` - verify package contents
+> **Note**: Original plan named one package `@stock-charts/financial`. Actual
+> implementation split into two packages with `@facioquo/` namespace.
+
+- [x] `libs/chartjs-financial/package.json` configured with name, peer deps,
+      entry points, and exports field
+- [x] `libs/indy-charts/package.json` configured with name, peer deps
+      (`chart.js ^4.5.1`, `chartjs-adapter-date-fns`, `date-fns`),
+      entry points, and exports field
+- [x] TypeScript build config (`tsconfig.json`) present in both library workspaces
+- [x] Build succeeds for both libraries
+- [x] Generated `dist/` contains `.js` and `.d.ts` files
+- [ ] `"private": true` removed — **packages are still private, not publishable**
+- [ ] Published to npm — **not done; packages consumed via workspace linking only**
 
 ## Verification Steps
 
