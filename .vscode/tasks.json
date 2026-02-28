@@ -82,7 +82,7 @@
       "label": "Update: Node packages",
       "detail": "Update dependencies in root and all workspace packages to latest versions",
       "type": "shell",
-      "command": "pnpm run deps:update",
+      "command": "pnpm run deps:update && pnpm install",
       "dependsOn": "Update: Angular packages (client)",
       "dependsOrder": "sequence"
     },
