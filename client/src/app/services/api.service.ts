@@ -10,7 +10,7 @@ import {
   IndicatorSelection,
   Quote,
   RawQuote
-} from "../pages/chart/chart.models";
+} from "@facioquo/indy-charts";
 
 @Injectable({ providedIn: "root" })
 export class ApiService {

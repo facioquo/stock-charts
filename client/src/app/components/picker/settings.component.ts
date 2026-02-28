@@ -22,7 +22,7 @@ import { MatButton, MatIconButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
 import { MatToolbar } from "@angular/material/toolbar";
 import { MatTooltip } from "@angular/material/tooltip";
-import { IndicatorListing, IndicatorSelection } from "../../pages/chart/chart.models";
+import type { IndicatorListing, IndicatorSelection } from "@facioquo/indy-charts";
 import { PickConfigComponent } from "./pick-config.component";
 
 @Component({

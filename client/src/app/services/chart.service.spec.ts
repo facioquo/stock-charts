@@ -1,20 +1,19 @@
 import "@angular/compiler"; // Required for JIT compilation in tests
-import { Chart } from "chart.js";
 import { beforeEach, describe, expect, it, vi, afterEach } from "vitest";
 import { of, Subject } from "rxjs";
 
-import { setupIndyCharts } from "@facioquo/indy-charts";
+import { ChartManager, setupIndyCharts } from "@facioquo/indy-charts";
 import { ChartService } from "./chart.service";
 import { ApiService } from "./api.service";
 import { UserService } from "./user.service";
 import { UtilityService } from "./utility.service";
 import { WindowService } from "./window.service";
-import {
+import type {
   IndicatorListing,
   Quote,
   IndicatorSelection,
   IndicatorDataRow
-} from "../pages/chart/chart.models";
+} from "@facioquo/indy-charts";
 
 /**
  * Mock canvas context for Chart.js rendering.
@@ -136,10 +135,40 @@ function generateSampleIndicatorListing(): IndicatorListing {
 }
 
 /**
+ * Helper: create a properly mocked HTMLCanvasElement with 2d context.
+ */
+function createMockCanvas(id: string): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.id = id;
+  canvas.width = 800;
+  canvas.height = 400;
+  Object.defineProperty(canvas, "getContext", {
+    value: (contextType: string) => {
+      if (contextType === "2d") {
+        return createCanvasContext(canvas);
+      }
+      return null;
+    },
+    configurable: true
+  });
+  Object.defineProperty(canvas, "ownerDocument", {
+    value: document,
+    writable: false,
+    configurable: true
+  });
+  Object.defineProperty(canvas, "parentNode", {
+    value: document.body,
+    writable: true,
+    configurable: true
+  });
+  return canvas;
+}
+
+/**
  * Smoke Tests for ChartService Critical Paths
  *
- * These tests verify core functionality before refactoring:
- * 1. Chart initialization (overlay chart with quotes)
+ * These tests verify core functionality through ChartManager delegation:
+ * 1. Chart initialization (overlay chart with quotes via ChartManager)
  * 2. Indicator lifecycle (add/remove indicator dataset)
  * 3. Theme switching (color changes on theme update)
  * 4. Dataset slicing (bar count changes slice datasets correctly)
@@ -155,14 +184,16 @@ describe("ChartService Smoke Tests", () => {
   let canvasElement: HTMLCanvasElement;
   let oscillatorsZone: HTMLDivElement;
 
+  /** Typed shortcut: access the private ChartManager for assertions. */
+  function getChartManager(): ChartManager {
+    return (service as unknown as { chartManager: ChartManager }).chartManager;
+  }
+
   beforeEach(() => {
-    // Register Chart.js plugins and financial chart types before tests
+    // Register Chart.js plugins and financial chart types
     setupIndyCharts();
 
-    // Reset counter for each test
     guidCounter = 0;
-
-    // Create resize subject for WindowService
     resizeSubject = new Subject<{ width: number; height: number }>();
 
     // Mock ApiService
@@ -173,7 +204,7 @@ describe("ChartService Smoke Tests", () => {
         const sampleData: IndicatorDataRow[] = generateSampleQuotes(100).map(q => ({
           date: q.date.toISOString(),
           candle: q,
-          sma: q.close * 0.99 // Mock indicator value
+          sma: q.close * 0.99
         }));
         return of(sampleData);
       })
@@ -199,30 +230,7 @@ describe("ChartService Smoke Tests", () => {
     } as unknown as UtilityService;
 
     // Mock canvas element and context
-    canvasElement = document.createElement("canvas");
-    canvasElement.id = "chartOverlay";
-    canvasElement.width = 800;
-    canvasElement.height = 400;
-    Object.defineProperty(canvasElement, "getContext", {
-      value: (contextType: string) => {
-        if (contextType === "2d") {
-          return createCanvasContext(canvasElement);
-        }
-        return null;
-      },
-      configurable: true
-    });
-    // Ensure canvas is properly attached to document for Chart.js
-    Object.defineProperty(canvasElement, "ownerDocument", {
-      value: document,
-      writable: false,
-      configurable: true
-    });
-    Object.defineProperty(canvasElement, "parentNode", {
-      value: document.body,
-      writable: true,
-      configurable: true
-    });
+    canvasElement = createMockCanvas("chartOverlay");
     document.body.appendChild(canvasElement);
 
     // Create oscillators zone container
@@ -230,27 +238,25 @@ describe("ChartService Smoke Tests", () => {
     oscillatorsZone.id = "oscillators-zone";
     document.body.appendChild(oscillatorsZone);
 
-    // Create service instance by mocking the internal properties directly
-    // This avoids the inject() context requirement
+    // Create service instance by mocking the internal properties directly.
+    // This avoids the inject() context requirement.
     service = Object.create(ChartService.prototype);
     (service as any).api = mockApiService;
     (service as any).usr = mockUserService;
     (service as any).util = mockUtilityService;
     (service as any).window = mockWindowService;
     (service as any).destroy$ = new Subject<void>();
-    service.listings = [];
-    service.selections = [];
     (service as any).loading = { set: vi.fn(), update: vi.fn() };
-    service.extraBars = 7; // ChartService.EXTRA_BARS
-    service.currentBarCount = 50;
-    service.allQuotes = [];
-    service.allProcessedDatasets = new Map();
 
-    // Mock internal methods that are called but not critical for smoke tests
+    // Initialize ChartManager (mirrors constructor logic)
+    (service as any).chartManager = new ChartManager({
+      settings: { isDarkTheme: false, showTooltips: true }
+    });
+
+    service.listings = [];
+
+    // Mock cacheSelections to avoid localStorage side effects
     (service as any).cacheSelections = vi.fn();
-    (service as any).addOverlayLegend = vi.fn();
-    (service as any).addOscillatorLegend = vi.fn();
-    (service as any).forceChartsResize = vi.fn();
 
     // Subscribe to window resize events
     const resizeObs = mockWindowService.getResizeObservable?.();
@@ -265,24 +271,20 @@ describe("ChartService Smoke Tests", () => {
     // Complete resize subject first to stop any pending resize callbacks
     resizeSubject.complete();
 
-    // Destroy charts BEFORE removing DOM elements.
+    // Destroy ChartManager BEFORE removing DOM elements.
     // Chart.js registers a MutationObserver ("detached" listener) that fires
     // when the canvas is removed from the DOM and tries to call chart.update()
-    // on the now-orphaned element, producing unhandled errors.  Destroying the
-    // chart first cleanly unregisters all observers/listeners.
-    if (service.chartOverlay) {
-      service.chartOverlay.destroy();
-      (service as any).chartOverlay = undefined;
-    }
+    // on the now-orphaned element, producing unhandled errors.
+    getChartManager().destroy();
 
-    // Clean up service (completes destroy$ subject, stops RxJS subscriptions)
+    // Clean up service (completes destroy$ subject)
     service.ngOnDestroy();
 
     // Remove DOM elements only after chart observers are detached
-    if (canvasElement && canvasElement.parentNode) {
+    if (canvasElement?.parentNode) {
       canvasElement.parentNode.removeChild(canvasElement);
     }
-    if (oscillatorsZone && oscillatorsZone.parentNode) {
+    if (oscillatorsZone?.parentNode) {
       oscillatorsZone.parentNode.removeChild(oscillatorsZone);
     }
   });
@@ -292,31 +294,27 @@ describe("ChartService Smoke Tests", () => {
    * Verifies that overlay chart is created with candlestick and volume datasets
    */
   it("should initialize overlay chart with sample quotes", () => {
-    // Arrange: Quotes are provided by mock ApiService
     const sampleQuotes = generateSampleQuotes(100);
+    const mgr = getChartManager();
 
-    // Act: Load overlay chart
-    service.loadOverlayChart(sampleQuotes.slice(-50));
+    // Act: Initialize overlay via ChartManager (same path as loadCharts)
+    const ctx = canvasElement.getContext("2d");
+    expect(ctx).toBeTruthy();
+    mgr.initializeOverlay(ctx as CanvasRenderingContext2D, sampleQuotes, 50);
 
-    // Assert: Chart instance exists
-    expect(service.chartOverlay).toBeDefined();
-    expect(service.chartOverlay).toBeInstanceOf(Chart);
+    // Assert: overlay Chart.js instance exists
+    const chart = mgr.overlayChart?.chart;
+    expect(chart).toBeDefined();
 
-    // Mock chart.update() to avoid ownerDocument issues in tests
-    if (service.chartOverlay) {
-      service.chartOverlay.update = vi.fn();
-    }
+    // Stub update to avoid JSDOM proxy errors on subsequent calls
+    if (chart) chart.update = vi.fn();
 
     // Assert: Chart has datasets (candlestick + volume)
-    const datasets = service.chartOverlay?.data.datasets;
+    const datasets = chart?.data.datasets;
     expect(datasets).toBeDefined();
     expect(datasets?.length).toBeGreaterThanOrEqual(2);
-
-    // Assert: First dataset is candlestick
     expect(datasets?.[0]?.type).toBe("candlestick");
     expect(datasets?.[0]?.data.length).toBeGreaterThan(0);
-
-    // Assert: Second dataset is volume bars
     expect(datasets?.[1]?.type).toBe("bar");
     expect(datasets?.[1]?.data.length).toBeGreaterThan(0);
   });
@@ -326,19 +324,20 @@ describe("ChartService Smoke Tests", () => {
    * Verifies adding and removing indicator datasets
    */
   it("should add and remove indicator dataset", async () => {
-    // Arrange: Initialize chart first
     const sampleQuotes = generateSampleQuotes(100);
-    service.loadOverlayChart(sampleQuotes.slice(-50));
+    const mgr = getChartManager();
 
-    // Mock chart.update() to avoid ownerDocument issues
-    if (service.chartOverlay) {
-      service.chartOverlay.update = vi.fn();
-    }
+    // Initialize overlay
+    const ctx = canvasElement.getContext("2d");
+    expect(ctx).toBeTruthy();
+    mgr.initializeOverlay(ctx as CanvasRenderingContext2D, sampleQuotes, 50);
+
+    const chart = mgr.overlayChart?.chart;
+    if (chart) chart.update = vi.fn();
 
     const listing = generateSampleIndicatorListing();
     service.listings = [listing];
 
-    // Create default selection
     const selection = service.defaultSelection(listing.uiid);
 
     // Act: Add indicator
@@ -356,49 +355,48 @@ describe("ChartService Smoke Tests", () => {
       });
     });
 
-    // Assert: Selection added to selections array
-    expect(service.selections.length).toBeGreaterThan(0);
-    const addedSelection = service.selections.find(s => s.uiid === listing.uiid);
-    expect(addedSelection).toBeDefined();
-    expect(addedSelection?.ucid).toBeDefined();
+    // Assert: Selection registered in ChartManager
+    expect(mgr.selections.length).toBeGreaterThan(0);
+    const added = mgr.selections.find(s => s.uiid === listing.uiid);
+    expect(added).toBeDefined();
+    expect(added?.ucid).toBeTruthy();
+
+    // Assert: service.selections proxies ChartManager
+    expect(service.selections.length).toBe(mgr.selections.length);
 
     // Assert: Dataset added to chart
-    const datasetCountAfterAdd = service.chartOverlay?.data.datasets.length;
-    expect(datasetCountAfterAdd).toBeGreaterThan(2); // More than candlestick + volume
+    const datasetCountAfterAdd = chart?.data.datasets.length;
+    expect(datasetCountAfterAdd).toBeGreaterThan(2);
 
     // Act: Remove indicator
-    const ucidToRemove = addedSelection?.ucid;
-    expect(ucidToRemove).toBeTruthy();
-    if (!ucidToRemove) throw new Error("ucid must be a non-empty string");
-    service.deleteSelection(ucidToRemove);
+    expect(added).toBeDefined();
+    const ucid = (added as IndicatorSelection).ucid;
+    service.deleteSelection(ucid);
 
-    // Assert: Selection removed from selections array
-    expect(service.selections.find(s => s.ucid === ucidToRemove)).toBeUndefined();
+    // Assert: Selection removed
+    expect(mgr.selections.find(s => s.ucid === ucid)).toBeUndefined();
+    expect(service.selections.find(s => s.ucid === ucid)).toBeUndefined();
 
     // Assert: Dataset removed from chart
-    const datasetCountAfterRemove = service.chartOverlay?.data.datasets.length;
-    expect(datasetCountAfterRemove).toBe(2); // Back to candlestick + volume only
+    const datasetCountAfterRemove = chart?.data.datasets.length;
+    expect(datasetCountAfterRemove).toBe(2);
   });
 
   /**
    * Test 3: Theme Switching
    * Verifies that theme changes produce different chart options.
    *
-   * NOTE: Full `onSettingsChange()` integration test is skipped in JSDOM
-   * because Chart.js v4 proxy-based option resolution triggers
-   * `String.prototype.toString` errors when financial element defaults
-   * contain non-string color objects (e.g. `{ up, down, unchanged }`).
+   * NOTE: Full onSettingsChange() integration test skipped in JSDOM because
+   * Chart.js v4 proxy-based option resolution triggers toString errors when
+   * financial element defaults contain non-string color objects.
    * The library config functions are tested directly instead.
    */
   it("should produce different chart options for dark vs light theme", async () => {
-    // Import library config functions directly
     const { baseOverlayOptions: overlayOpts } = await import("@facioquo/indy-charts");
 
-    // Arrange: Define light and dark settings
     const lightSettings = { isDarkTheme: false, showTooltips: true };
     const darkSettings = { isDarkTheme: true, showTooltips: true };
 
-    // Act: Generate options for both themes
     const lightOptions = overlayOpts(100000, lightSettings);
     const darkOptions = overlayOpts(100000, darkSettings);
 
@@ -409,65 +407,61 @@ describe("ChartService Smoke Tests", () => {
     expect(darkGridColor).toBeDefined();
     expect(lightGridColor).not.toEqual(darkGridColor);
 
-    // Assert: Backdrop colors differ between themes
+    // Assert: Backdrop colors differ
     const lightBackdrop = (lightOptions.scales?.y as Record<string, unknown>)?.ticks;
     const darkBackdrop = (darkOptions.scales?.y as Record<string, unknown>)?.ticks;
     expect(lightBackdrop).not.toEqual(darkBackdrop);
 
-    // Assert: Chart exists and would receive updated options
-    const sampleQuotes = generateSampleQuotes(100);
-    service.loadOverlayChart(sampleQuotes.slice(-50));
-    expect(service.chartOverlay).toBeDefined();
-    expect(service.chartOverlay?.options).toBeDefined();
+    // Assert: Chart would receive updated options
+    const ctx = canvasElement.getContext("2d");
+    expect(ctx).toBeTruthy();
+    getChartManager().initializeOverlay(
+      ctx as CanvasRenderingContext2D,
+      generateSampleQuotes(100),
+      50
+    );
+    expect(getChartManager().overlayChart?.chart).toBeDefined();
   });
 
   /**
    * Test 4: Dataset Slicing
-   * Verifies that window resize correctly slices datasets based on bar count
+   * Verifies that ChartManager.setBarCount() correctly slices datasets
    */
-  it("should slice datasets correctly on window resize", () => {
-    // Arrange: Initialize chart with 100 quotes, display 50 bars
+  it("should slice datasets correctly on bar count change", () => {
     const sampleQuotes = generateSampleQuotes(100);
-    service.allQuotes = sampleQuotes;
-    service.currentBarCount = 50;
-    service.loadOverlayChart(sampleQuotes.slice(-50));
+    const mgr = getChartManager();
 
-    const initialDataLength = service.chartOverlay?.data.datasets[0]?.data.length ?? 0;
+    // Initialize with 50 bars
+    const ctx = canvasElement.getContext("2d");
+    expect(ctx).toBeTruthy();
+    mgr.initializeOverlay(ctx as CanvasRenderingContext2D, sampleQuotes, 50);
+
+    const chart = mgr.overlayChart?.chart;
+    expect(chart).toBeDefined();
+
+    const initialDataLength = chart?.data.datasets[0]?.data.length ?? 0;
     expect(initialDataLength).toBeGreaterThan(0);
 
-    // Store full datasets (simulate what happens during indicator loading)
-    if (service.chartOverlay) {
-      service.allProcessedDatasets.set(
-        "overlay-main",
-        JSON.parse(JSON.stringify(service.chartOverlay.data.datasets))
-      );
-    }
+    // Act: Reduce to 30 bars
+    mgr.setBarCount(30);
 
-    // Act: Trigger resize with smaller bar count (30 bars)
-    (mockWindowService.calculateOptimalBars as any).mockReturnValue(30);
-    resizeSubject.next({ width: 800, height: 600 });
-
-    // Assert: Bar count updated
-    expect(service.currentBarCount).toBe(30);
-
-    // Assert: Dataset was sliced (fewer data points displayed)
-    // Note: The actual dataset length should be close to the new bar count
-    // (may include extra bars for spacing)
-    const newDataLength = service.chartOverlay?.data.datasets[0]?.data.length ?? 0;
+    // Assert: Data was sliced
+    const newDataLength = chart?.data.datasets[0]?.data.length ?? 0;
     expect(newDataLength).toBeLessThan(initialDataLength);
-    expect(newDataLength).toBeLessThanOrEqual(30 + service.extraBars);
+    expect(newDataLength).toBeLessThanOrEqual(30 + 7); // +7 for extra bars
 
-    // Act: Trigger resize with larger bar count (70 bars)
-    (mockWindowService.calculateOptimalBars as any).mockReturnValue(70);
+    // Act: Expand to 70 bars
+    mgr.setBarCount(70);
 
-    resizeSubject.next({ width: 1400, height: 600 });
-
-    // Assert: Bar count updated
-    expect(service.currentBarCount).toBe(70);
-
-    // Assert: Dataset was expanded (more data points displayed)
-    const expandedDataLength = service.chartOverlay?.data.datasets[0]?.data.length ?? 0;
+    // Assert: More data points displayed
+    const expandedDataLength = chart?.data.datasets[0]?.data.length ?? 0;
     expect(expandedDataLength).toBeGreaterThan(newDataLength);
-    expect(expandedDataLength).toBeLessThanOrEqual(70 + service.extraBars);
+    expect(expandedDataLength).toBeLessThanOrEqual(70 + 7);
+
+    // Verify integration: onWindowResize delegates to setBarCount
+    expect(mgr.currentBarCount).toBe(70);
+    (mockWindowService.calculateOptimalBars as any).mockReturnValue(40);
+    resizeSubject.next({ width: 800, height: 600 });
+    expect(mgr.currentBarCount).toBe(40);
   });
 });

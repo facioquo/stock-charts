@@ -4,7 +4,7 @@ import { MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "v
 import { env } from "../../environments/environment";
 import backupIndicators from "../data/backup-indicators.json";
 import backupQuotes from "../data/backup-quotes.json"; // Added JSON quotes import
-import { IndicatorListing, RawQuote } from "../pages/chart/chart.models";
+import type { IndicatorListing, RawQuote } from "@facioquo/indy-charts";
 import { ApiService } from "./api.service";
 
 const BACKUP_INDICATORS = backupIndicators as IndicatorListing[];

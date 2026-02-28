@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { Chart, ChartConfiguration } from "chart.js";
-import { IndicatorListing, Quote } from "../app/pages/chart/chart.models";
+import type { IndicatorListing, Quote } from "@facioquo/indy-charts";
 import { ChartService } from "../app/services/chart.service";
 import { MediaQueryService } from "../app/services/media-query.service";
 import { WindowService } from "../app/services/window.service";

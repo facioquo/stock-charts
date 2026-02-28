@@ -7,6 +7,7 @@ export type {
   ChartFill,
   ChartSettings,
   ChartThreshold,
+  ExtendedChartDataset,
   IndicatorDataRow,
   IndicatorListing,
   IndicatorParam,

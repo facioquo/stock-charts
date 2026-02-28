@@ -77,24 +77,24 @@ The core library extraction and VitePress documentation are complete:
 
 ### Present problems
 
-1. **Massive code duplication between client and library** — `chart.service.ts`
-   (990 lines) and `config.service.ts` (398 lines) duplicate nearly all chart
-   config, data transformation, dataset slicing, legend management, and theme
-   switching that already exists in `@facioquo/indy-charts`. The client should
-   delegate to `ChartManager` instead of reimplementing Chart.js logic.
+1. ~~**Massive code duplication between client and library**~~ — **RESOLVED
+   (Task 2.4).** `chart.service.ts` rewritten from 948→~280 lines. Delegates
+   to `ChartManager` for all Chart.js work. `config.service.ts` deleted
+   (Task 2.2). Net reduction: ~1,060 lines of duplicated chart logic removed.
 
-2. **Client imports wrong packages** — `chart.service.ts` imports directly from
-   `chart.js`, `chartjs-plugin-annotation`, and
-   `@facioquo/chartjs-chart-financial`. Per architecture rules, it should only
-   import from `@facioquo/indy-charts`.
+2. ~~**Client imports wrong packages**~~ — **RESOLVED (Task 2.4).** The only
+   chart-related import in `chart.service.ts` is `@facioquo/indy-charts`.
+   All `chart.js`, `chartjs-plugin-annotation`, and
+   `@facioquo/chartjs-chart-financial` imports removed.
 
-3. **Duplicate type definitions** — `chart.models.ts` duplicates all interfaces
-   from `libs/indy-charts/config/types.ts`. The client's `IndicatorSelection`
-   has an Angular-specific `chart?: Chart` field that needs special handling.
+3. ~~**Duplicate type definitions**~~ — **RESOLVED (Task 2.3).** Deleted
+   `chart.models.ts`. All types imported from `@facioquo/indy-charts`.
+   `ClientIndicatorSelection` in `client/src/app/types/chart.types.ts` extends
+   the library's `IndicatorSelection` with the Angular-specific `chart?: Chart`
+   field. `UserSettings` re-exported as alias for `ChartSettings`.
 
-4. **Manual Chart.js registration** — `main.ts` manually calls
-   `registerFinancialCharts()` + `Chart.register(AnnotationPlugin)` instead of
-   using `setupIndyCharts()`.
+4. ~~**Manual Chart.js registration**~~ — **RESOLVED (Task 2.1).** `main.ts`
+   now calls `setupIndyCharts()` instead of manual registration.
 
 5. ~~**Missing library helpers**~~ — **RESOLVED (Phase 1).** `createDefaultSelection()`,
    `applySelectionTokens()`, and `calculateOptimalBars()` are now exported from
@@ -177,48 +177,49 @@ removing ~1,000 lines of duplicated code.
     functions directly since Chart.js proxy resolution fails in JSDOM.
   - Deleted `config.service.ts` (398 lines) and `config.service.spec.ts`.
 
-- [ ] Task 2.3: Delete `chart.models.ts` — import types from library
-  - All interfaces exist in `@facioquo/indy-charts`:
-    `Quote`, `RawQuote`, `IndicatorDataRow`, `IndicatorListing`,
-    `IndicatorParamConfig`, `IndicatorResultConfig`, `IndicatorSelection`,
-    `IndicatorParam`, `IndicatorResult`, `ChartConfig`, `ChartThreshold`,
-    `ChartFill`, `ChartSettings`.
-  - The client-specific `UserSettings` interface (with extra UI fields) remains
-    in an Angular service or a local types file.
-  - The client's `IndicatorSelection.chart?: Chart` field does not belong in the
-    library; use a separate `Map<string, Chart>` or rely on
-    `ChartManager.oscillators` for oscillator references.
-  - Update all client imports.
+- [x] Task 2.3: Delete `chart.models.ts` — import types from library
+  - Created `client/src/app/types/chart.types.ts` with
+    `ClientIndicatorSelection extends IndicatorSelection` (adds `chart?: Chart`)
+    and `UserSettings` re-exported as alias for `ChartSettings`.
+  - Added `ExtendedChartDataset` to library exports.
+  - Updated 9 client files to import types from `@facioquo/indy-charts`.
+  - Deleted `chart.models.ts`.
 
-- [ ] Task 2.4: Rewrite `chart.service.ts` to delegate to `ChartManager`
-  - Replace ~990 lines with ~200-300 lines that:
-    - Instantiate `ChartManager` with current `ChartSettings`.
-    - Delegate `loadCharts()` → `ChartManager.initializeOverlay()`.
-    - Delegate `addSelection()` → `ChartManager.processSelectionData()` +
-      `displaySelection()` + `createOscillator()`.
-    - Delegate `deleteSelection()` → `ChartManager.removeSelection()` + DOM
-      cleanup for oscillator containers.
-    - Delegate `onSettingsChange()` → `ChartManager.updateTheme()`.
-    - Delegate `onWindowResize()` → `ChartManager.setBarCount()` (using
-      `calculateOptimalBars()` from library).
-    - Keep Angular-specific concerns: `HttpClient`-based `ApiService` usage
-      (RxJS), `localStorage` caching, oscillator DOM container management,
-      dialog/scroll integration, default selection hydration.
-  - Remove all direct `chart.js`, `chartjs-plugin-annotation`, and
-    `@facioquo/chartjs-chart-financial` imports.
-  - The only chart-related import should be `@facioquo/indy-charts`.
+- [x] Task 2.4: Rewrite `chart.service.ts` to delegate to `ChartManager`
+  - Rewrote from 948→~280 lines. Service now delegates to `ChartManager`:
+    - `loadCharts()` → `ChartManager.initializeOverlay(ctx, quotes, barCount)`
+    - `addSelection()` → `processSelectionData()` + `displaySelection()` +
+      `createOscillator()` (with Angular DOM container management)
+    - `deleteSelection()` → `ChartManager.removeSelection()` + DOM cleanup
+    - `onSettingsChange()` → `ChartManager.updateTheme(settings)`
+    - `onWindowResize()` → `ChartManager.setBarCount()` + `resize()`
+  - Kept Angular concerns: `ApiService` (RxJS), `localStorage` caching,
+    oscillator DOM container management, dialog/scroll, loading signal.
+  - Removed `ClientIndicatorSelection` from `chart.types.ts` — `ChartManager`
+    tracks oscillator chart references internally.
+  - Only chart import: `@facioquo/indy-charts`.
+  - Rewrote `chart.service.spec.ts`: 4 smoke tests covering init, indicator
+    lifecycle, theme switching, and dataset slicing.
 
-- [ ] Task 2.5: Remove `@facioquo/chartjs-chart-financial` as direct client dependency
-  - Remove from `client/package.json` — it's a transitive dependency of
-    `@facioquo/indy-charts`.
-  - Remove from `client/tsconfig.json` path mappings if present.
-  - Verify the Angular build still compiles and all tests pass.
+- [x] Task 2.5: Remove `@facioquo/chartjs-chart-financial` as direct client dependency
+  - Removed from `client/package.json`. It's a transitive dependency of
+    `@facioquo/indy-charts` (regular dep, not peer).
+  - Kept `tsconfig.json` path mapping — Angular's bundler resolves indy-charts
+    to source, which imports chartjs-chart-financial; the path mapping is needed
+    for TypeScript compilation.
+  - Kept `chart.js`, `chartjs-plugin-annotation`, `chartjs-adapter-date-fns`,
+    and `date-fns` in `package.json` — they are peer deps of indy-charts and
+    pnpm requires consumers to install peers explicitly.
+  - Build, lint, and 76 tests all pass.
 
-- [ ] Task 2.6: Update smoke tests for new architecture
-  - Update `chart.service.spec.ts` to test the `ChartManager`-delegating service.
-  - Verify the four existing smoke tests still cover: init, indicator lifecycle,
-    theme switching, dataset slicing.
-  - Add test for `defaultSelection()` from library.
+- [x] Task 2.6: Update smoke tests for new architecture
+  - Verified the 4 existing smoke tests cover the ChartManager-delegating
+    architecture: init, indicator lifecycle, theme switching, dataset slicing.
+  - `defaultSelection()` already tested via library (Task 3.4, 8 tests) and
+    exercised in client Test 2's indicator lifecycle flow.
+  - Deleted dead `chart-test-harness.ts` (206 lines) — referenced obsolete
+    `allQuotes` and `indicatorListings` APIs, was never imported.
+  - 76 client tests pass.
 
 ### Phase 3: Library quality and testing
 

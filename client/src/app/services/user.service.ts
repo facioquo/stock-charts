@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from "@angular/common";
 import { Injectable, PLATFORM_ID, inject } from "@angular/core";
-import { UserSettings } from "../pages/chart/chart.models";
+import { UserSettings } from "../types/chart.types";
 
 @Injectable({
   providedIn: "root"
