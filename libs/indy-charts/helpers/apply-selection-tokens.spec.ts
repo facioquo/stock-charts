@@ -116,4 +116,29 @@ describe("applySelectionTokens", () => {
     expect(selection.label).toBe("SMA(14)");
     expect(selection.results[0].label).toBe("SMA(14)");
   });
+
+  it("replaces all occurrences of a repeated token", () => {
+    const selection = makeSelection({
+      label: "Custom [P1]-[P1]",
+      params: [
+        { paramName: "lookbackPeriods", displayName: "Periods", minimum: 1, maximum: 200, value: 10 }
+      ],
+      results: [
+        {
+          label: "R [P1]/[P1]",
+          color: "#1E88E5",
+          dataName: "result",
+          displayName: "Result",
+          lineType: "solid",
+          lineWidth: 2,
+          order: 10,
+          dataset: emptyDataset
+        }
+      ]
+    });
+    applySelectionTokens(selection);
+
+    expect(selection.label).toBe("Custom 10-10");
+    expect(selection.results[0].label).toBe("R 10/10");
+  });
 });

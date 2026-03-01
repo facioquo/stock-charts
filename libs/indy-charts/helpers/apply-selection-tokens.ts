@@ -13,7 +13,7 @@ export function applySelectionTokens(selection: IndicatorSelection): IndicatorSe
   selection.params.forEach((param, index) => {
     if (param.value == null) return;
 
-    const token = `[P${index + 1}]`;
+    const token = new RegExp(`\\[P${index + 1}\\]`, "g");
     const valueText = String(param.value);
 
     selection.label = selection.label.replace(token, valueText);

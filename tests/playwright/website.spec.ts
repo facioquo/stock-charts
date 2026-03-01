@@ -26,7 +26,7 @@ test.describe("Stock Charts Angular Website", () => {
   test.describe.configure({ timeout: 30_000 });
 
   test("home page loads and navigates to chart page", async ({ page }) => {
-    const { consoleErrors, pageErrors } = collectErrors(page);
+    const { pageErrors } = collectErrors(page);
 
     await page.goto(WEBSITE_URL);
     await page.waitForLoadState("networkidle");
@@ -40,7 +40,7 @@ test.describe("Stock Charts Angular Website", () => {
   });
 
   test("main overlay chart canvas renders", async ({ page }) => {
-    const { consoleErrors, pageErrors } = collectErrors(page);
+    const { pageErrors } = collectErrors(page);
 
     await page.goto(WEBSITE_URL);
     await page.waitForLoadState("networkidle");
@@ -165,9 +165,7 @@ test.describe("Stock Charts Angular Website", () => {
     // Page errors are always critical
     expect(pageErrors, "No uncaught page errors").toEqual([]);
 
-    // Console errors should be minimal (log them for debugging)
-    if (criticalErrors.length > 0) {
-      console.log("Console errors found:", criticalErrors);
-    }
+    // Console errors should be minimal
+    expect(criticalErrors, "No critical console errors should occur").toEqual([]);
   });
 });

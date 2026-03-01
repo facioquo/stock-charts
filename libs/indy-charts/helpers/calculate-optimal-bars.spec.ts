@@ -51,4 +51,33 @@ describe("calculateOptimalBars", () => {
     // 375 / 5 = 75
     expect(calculateOptimalBars(375)).toBe(75);
   });
+
+  it("falls back to default pixelsPerBar when 0 is provided", () => {
+    // 0 is non-positive → default (5); 1920 / 5 = 384
+    expect(calculateOptimalBars(1920, 0)).toBe(384);
+  });
+
+  it("falls back to default pixelsPerBar for negative values", () => {
+    expect(calculateOptimalBars(1920, -3)).toBe(384);
+  });
+
+  it("falls back to default pixelsPerBar for NaN", () => {
+    expect(calculateOptimalBars(1920, NaN)).toBe(384);
+  });
+
+  it("falls back to default pixelsPerBar for Infinity", () => {
+    expect(calculateOptimalBars(1920, Infinity)).toBe(384);
+  });
+
+  it("returns minimum bars for negative containerWidth", () => {
+    expect(calculateOptimalBars(-100)).toBe(20);
+  });
+
+  it("returns minimum bars for NaN containerWidth", () => {
+    expect(calculateOptimalBars(NaN)).toBe(20);
+  });
+
+  it("returns minimum bars for Infinity containerWidth", () => {
+    expect(calculateOptimalBars(Infinity)).toBe(20);
+  });
 });

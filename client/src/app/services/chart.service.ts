@@ -234,21 +234,35 @@ export class ChartService implements OnDestroy {
 
   /** Persist current selections to localStorage (without chart references). */
   private cacheSelections(): void {
-    localStorage.setItem("selections", JSON.stringify([...this.selections]));
+    try {
+      localStorage.setItem("selections", JSON.stringify([...this.selections]));
+    } catch {
+      // localStorage may be unavailable (private browsing, quota exceeded, etc.)
+    }
   }
 
   /** Load cached selections or fall back to defaults. */
   private loadSelections(): void {
-    const raw = localStorage.getItem("selections");
+    let raw: string | null = null;
+    try {
+      raw = localStorage.getItem("selections");
+    } catch {
+      // localStorage unavailable — fall through to defaults
+    }
+
     if (!raw) {
       this.loadDefaultSelections();
       return;
     }
 
-    const cached = JSON.parse(raw) as IndicatorSelection[] | null;
-    if (cached?.length) {
-      cached.forEach(selection => this.addSelectionWithoutScroll(selection));
-      return;
+    try {
+      const cached = JSON.parse(raw) as IndicatorSelection[] | null;
+      if (cached?.length) {
+        cached.forEach(selection => this.addSelectionWithoutScroll(selection));
+        return;
+      }
+    } catch {
+      // Corrupted JSON — fall through to defaults
     }
 
     this.loadDefaultSelections();

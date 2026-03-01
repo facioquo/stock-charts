@@ -22,6 +22,14 @@ export function calculateOptimalBars(
   containerWidth: number,
   pixelsPerBar: number = DEFAULT_PIXELS_PER_BAR
 ): number {
+  if (!Number.isFinite(pixelsPerBar) || pixelsPerBar <= 0) {
+    pixelsPerBar = DEFAULT_PIXELS_PER_BAR;
+  }
+
+  if (!Number.isFinite(containerWidth) || containerWidth <= 0) {
+    return MIN_BARS;
+  }
+
   const calculated = Math.floor(containerWidth / pixelsPerBar);
   return Math.max(MIN_BARS, Math.min(MAX_BARS, calculated));
 }

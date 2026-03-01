@@ -125,7 +125,15 @@ setup_dotnet() {
   if command -v dotnet &>/dev/null; then
     log "Existing .NET SDKs:"
     dotnet --list-sdks || log "(Could not list SDKs)"
-    return 0
+
+    # Verify the required SDK major version is installed
+    local major="${dotnet_version%%.*}"
+    if dotnet --list-sdks 2>/dev/null | grep -q "^${major}\."; then
+      log ".NET SDK v${dotnet_version} series already installed"
+      return 0
+    fi
+
+    warn ".NET SDK v${dotnet_version} series not found among installed SDKs; attempting install"
   fi
 
   log "Installing .NET SDK v$dotnet_version"
