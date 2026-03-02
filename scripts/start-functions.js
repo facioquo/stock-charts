@@ -60,7 +60,13 @@ if (!checkFuncAvailable(process.platform === "win32" ? "func.cmd" : "func")) {
   console.error("If you use npm: `npm i -g azure-functions-core-tools@4` (or use the platform installer). Ensure the 'func' command is on your PATH and restart your terminal/VS Code.");
   process.exit(1);
 }
+// Allowlist of commands that may be spawned by this script.
+const ALLOWED_COMMANDS = new Set(["func", "func.cmd", "npx"]);
+
 function trySpawn(cmd, args, opts) {
+  if (!ALLOWED_COMMANDS.has(cmd)) {
+    return { syncError: new Error(`Blocked: '${cmd}' is not an allowed command`) };
+  }
   try {
     return spawn(cmd, args, opts);
   } catch (err) {

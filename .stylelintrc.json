@@ -27,7 +27,7 @@
     }
   ],
   "rules": {
-    "alpha-value-notation": ["percentage", { "exceptProperties": [] }],
+    "alpha-value-notation": ["percentage", { "exceptProperties": ["opacity"] }],
     "color-function-notation": "modern",
     "media-feature-range-notation": "context",
     "selector-class-pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--(?:[a-z0-9]+(?:-[a-z0-9]+)*))?$"

@@ -266,10 +266,16 @@ setup_coderabbit() {
   log "🐇 Installing CodeRabbit CLI"
   apt_install libsecret-1-0 libsecret-tools gnome-keyring dbus-user-session
 
-  # Official CodeRabbit CLI installer: curl|bash is the only supported install method
-  if curl -fsSL https://cli.coderabbit.ai/install.sh | bash; then # nosemgrep: bash.curl.security.curl-pipe-bash
+  # Official CodeRabbit CLI installer: download to a temp file then execute
+  # (avoids curl|bash pipe; see https://cli.coderabbit.ai for details)
+  local install_script
+  install_script="$(mktemp)"
+  if curl -fsSL https://cli.coderabbit.ai/install.sh -o "$install_script"; then
+    bash "$install_script"
+    rm -f "$install_script"
     log "CodeRabbit CLI installed"
   else
+    rm -f "$install_script"
     warn "CodeRabbit CLI installation failed or skipped"
   fi
 }
