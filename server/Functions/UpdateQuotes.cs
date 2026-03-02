@@ -37,6 +37,18 @@ public partial class Jobs
         _keyVaultUrl = _configuration["KEY_VAULT_URL"];
     }
 
+    private static bool ShouldSkipStartupExecution(IConfiguration configuration)
+    {
+        // Only skip if FUNCTIONS_RUN_ON_STARTUP_ENABLED is explicitly false.
+        if (configuration.GetValue<bool>("FUNCTIONS_RUN_ON_STARTUP_ENABLED", defaultValue: true))
+        {
+            return false;
+        }
+
+        // Ensure the skip is applied only once per host process in a thread-safe manner.
+        return Interlocked.CompareExchange(ref _startupSkipDone, 1, 0) == 0;
+    }
+
     /// <summary>
     /// Schedule to get and cache quotes from source feed.
     /// </summary>
@@ -54,8 +66,7 @@ public partial class Jobs
         // prevents thundering-herd or duplicate executions across multiple instances.
         // The Interlocked flag ensures the skip applies only ONCE per host process — all subsequent
         // scheduled invocations (every minute during market hours) proceed normally.
-        if (!_configuration.GetValue<bool>("FUNCTIONS_RUN_ON_STARTUP_ENABLED", defaultValue: true)
-            && Interlocked.CompareExchange(ref _startupSkipDone, 1, 0) == 0)
+        if (ShouldSkipStartupExecution(_configuration))
         {
             _logger.LogInformation("Skipping startup execution (FUNCTIONS_RUN_ON_STARTUP_ENABLED=false). Scheduled invocations will proceed normally.");
             return;
