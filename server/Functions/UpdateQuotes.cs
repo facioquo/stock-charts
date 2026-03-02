@@ -19,6 +19,10 @@ public partial class Jobs
     private readonly string? _alpacaKey;
     private readonly string? _alpacaSecret;
 
+    // Thread-safe one-shot flag: 0 = startup skip not yet consumed, 1 = already consumed.
+    // Static so the skip applies once per host process, not once per DI-injected instance.
+    private static int _startupSkipDone;
+
     public Jobs(
         ILoggerFactory loggerFactory,
         IConfiguration configuration,
@@ -45,13 +49,15 @@ public partial class Jobs
     [Function("UpdateQuotes")]
     public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5", RunOnStartup = true)] TimerInfo _)
     {
-        // Guard: skip startup-triggered execution when FUNCTIONS_RUN_ON_STARTUP_ENABLED=false.
-        // RunOnStartup=true fires on every host start/scale-out; disable in production to
-        // prevent thundering-herd or duplicate executions across multiple instances.
-        // Scheduled executions (every minute during market hours) are unaffected.
-        if (!_configuration.GetValue<bool>("FUNCTIONS_RUN_ON_STARTUP_ENABLED", defaultValue: true))
+        // Guard: skip the very first (RunOnStartup) execution when FUNCTIONS_RUN_ON_STARTUP_ENABLED=false.
+        // RunOnStartup=true fires immediately on every host start/scale-out; disabling it in production
+        // prevents thundering-herd or duplicate executions across multiple instances.
+        // The Interlocked flag ensures the skip applies only ONCE per host process — all subsequent
+        // scheduled invocations (every minute during market hours) proceed normally.
+        if (!_configuration.GetValue<bool>("FUNCTIONS_RUN_ON_STARTUP_ENABLED", defaultValue: true)
+            && Interlocked.CompareExchange(ref _startupSkipDone, 1, 0) == 0)
         {
-            _logger.LogInformation("Skipping startup execution (FUNCTIONS_RUN_ON_STARTUP_ENABLED=false).");
+            _logger.LogInformation("Skipping startup execution (FUNCTIONS_RUN_ON_STARTUP_ENABLED=false). Scheduled invocations will proceed normally.");
             return;
         }
         // Check if Alpaca credentials are available
