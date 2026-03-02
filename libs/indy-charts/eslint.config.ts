@@ -8,10 +8,7 @@ export default tseslint.config(
   // TypeScript source and spec files
   {
     files: ["**/*.ts"],
-    extends: [
-      eslint.configs.recommended,
-      ...tseslint.configs.recommendedTypeChecked
-    ],
+    extends: [eslint.configs.recommended, ...tseslint.configs.recommendedTypeChecked],
     languageOptions: {
       parserOptions: {
         project: ["./tsconfig.eslint.json"],

@@ -271,13 +271,11 @@ describe("ChartService Smoke Tests", () => {
     // Complete resize subject first to stop any pending resize callbacks
     resizeSubject.complete();
 
-    // Destroy ChartManager BEFORE removing DOM elements.
-    // Chart.js registers a MutationObserver ("detached" listener) that fires
-    // when the canvas is removed from the DOM and tries to call chart.update()
-    // on the now-orphaned element, producing unhandled errors.
-    getChartManager().destroy();
-
-    // Clean up service (completes destroy$ subject)
+    // Clean up service (completes destroy$ subject and destroys ChartManager).
+    // ChartManager.destroy() is idempotent, so calling it here is safe.
+    // The destroy$ subject triggering manager destruction happens BEFORE
+    // removing DOM elements to prevent Chart.js MutationObserver errors when
+    // the canvas is removed from the DOM.
     service.ngOnDestroy();
 
     // Remove DOM elements only after chart observers are detached
@@ -401,15 +399,15 @@ describe("ChartService Smoke Tests", () => {
     const darkOptions = overlayOpts(100000, darkSettings);
 
     // Assert: Grid colors differ between themes
-    const lightGridColor = (lightOptions.scales?.y as Record<string, unknown>)?.grid;
-    const darkGridColor = (darkOptions.scales?.y as Record<string, unknown>)?.grid;
+    const lightGridColor = (lightOptions.scales?.["y"] as Record<string, unknown>)?.["grid"];
+    const darkGridColor = (darkOptions.scales?.["y"] as Record<string, unknown>)?.["grid"];
     expect(lightGridColor).toBeDefined();
     expect(darkGridColor).toBeDefined();
     expect(lightGridColor).not.toEqual(darkGridColor);
 
     // Assert: Backdrop colors differ
-    const lightBackdrop = (lightOptions.scales?.y as Record<string, unknown>)?.ticks;
-    const darkBackdrop = (darkOptions.scales?.y as Record<string, unknown>)?.ticks;
+    const lightBackdrop = (lightOptions.scales?.["y"] as Record<string, unknown>)?.["ticks"];
+    const darkBackdrop = (darkOptions.scales?.["y"] as Record<string, unknown>)?.["ticks"];
     expect(lightBackdrop).not.toEqual(darkBackdrop);
 
     // Assert: Chart would receive updated options

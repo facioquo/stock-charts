@@ -125,156 +125,56 @@ const config: ChartConfiguration<"line"> = {
 };
 ```
 
-**React integration example**:
+**Angular integration example** (Angular v21, signals-based standalone):
 
 ```typescript
-// ✅ Good - React Chart.js component with TypeScript
-import { useEffect, useRef } from "react";
-import {
-  Chart,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  ChartData,
-  ChartOptions
-} from "chart.js";
-
-// Register required Chart.js components once at module level
-Chart.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-interface SalesChartProps {
-  data: SalesData[];
-  loading?: boolean;
-}
-
-export function SalesChart({ data, loading }: SalesChartProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const chartRef = useRef<Chart<"line"> | null>(null);
-
-  useEffect(() => {
-    if (!canvasRef.current || loading) return;
-
-    const chartData: ChartData<"line"> = {
-      labels: data.map(d => d.month),
-      datasets: [{
-        label: "Monthly Revenue",
-        data: data.map(d => d.revenue),
-        borderColor: "rgb(75, 192, 192)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        tension: 0.1
-      }]
-    };
-
-    const options: ChartOptions<"line"> = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: "top" },
-        title: { display: true, text: "Sales Performance" }
-      }
-    };
-
-    chartRef.current = new Chart(canvasRef.current, {
-      type: "line",
-      data: chartData,
-      options
-    });
-
-    return () => {
-      chartRef.current?.destroy();
-      chartRef.current = null;
-    };
-  }, [data, loading]);
-
-  if (loading) {
-    return <div>Loading chart...</div>;
-  }
-
-  return (
-    <div style={{ height: "400px", position: "relative" }}>
-      <canvas ref={canvasRef} />
-    </div>
-  );
-}
-```
-
-**Angular integration example**:
-
-```typescript
-// ✅ Good - Angular Chart.js component with TypeScript
-import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnDestroy } from "@angular/core";
-import { Chart, ChartConfiguration, ChartData } from "chart.js";
+// ✅ Good - Angular v21 standalone component with signal inputs and reactive effect
+import { Component, DestroyRef, effect, inject, input, viewChild, ElementRef } from "@angular/core";
+import { Chart, ChartConfiguration } from "chart.js";
 
 @Component({
   selector: "app-sales-chart",
-  template: `
-    <div class="chart-container">
-      <canvas #chartCanvas></canvas>
-    </div>
-  `,
-  styles: [`
-    .chart-container {
-      position: relative;
-      height: 400px;
-      width: 100%;
-    }
-  `]
+  standalone: true,
+  templateUrl: "./sales-chart.component.html",
+  styleUrl: "./sales-chart.component.scss"
 })
-export class SalesChartComponent implements AfterViewInit, OnDestroy {
-  @Input() data: SalesData[] = [];
-  @ViewChild("chartCanvas") chartCanvas!: ElementRef<HTMLCanvasElement>;
+export class SalesChartComponent {
+  readonly data = input<SalesData[]>([]);
+  private readonly canvas = viewChild<ElementRef<HTMLCanvasElement>>("chartCanvas");
   private chart?: Chart;
 
-  ngAfterViewInit(): void {
-    this.createChart();
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.chart?.destroy());
+    effect(() => {
+      const el = this.canvas();
+      if (!el) return;
+      this.chart?.destroy();
+      this.chart = new Chart(el.nativeElement, this.buildConfig());
+    });
   }
 
-  ngOnDestroy(): void {
-    this.chart?.destroy();
-  }
-
-  private createChart(): void {
-    const config: ChartConfiguration<"line"> = {
+  private buildConfig(): ChartConfiguration<"line"> {
+    return {
       type: "line",
-      data: this.getChartData(),
+      data: {
+        labels: this.data().map(d => d.month),
+        datasets: [{
+          label: "Revenue",
+          data: this.data().map(d => d.revenue),
+          borderColor: "rgb(75, 192, 192)"
+        }]
+      },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "top"
-          }
-        }
+        plugins: { legend: { position: "top" } }
       }
-    };
-
-    this.chart = new Chart(this.chartCanvas.nativeElement, config);
-  }
-
-  private getChartData(): ChartData<"line"> {
-    return {
-      labels: this.data.map(d => d.month),
-      datasets: [{
-        label: "Revenue",
-        data: this.data.map(d => d.revenue),
-        borderColor: "rgb(75, 192, 192)"
-      }]
     };
   }
 }
 ```
+
+For other frameworks (React, Vue, etc.), see the [Chart.js documentation](https://chartjs.org/docs).
 
 ### Step 4: Format and validate
 
@@ -297,67 +197,6 @@ Review the Problems panel for compilation errors and warnings.
 - Proper accessibility labels configured
 - Loading and error states handled
 - Chart updates efficiently on data changes
-
----
-
-## Common chart types and configurations
-
-### Line charts
-
-Best for: Time series data, trends over time
-
-```typescript
-const config: ChartConfiguration<"line"> = {
-  type: "line",
-  data: chartData,
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { position: "top" }
-    },
-    scales: {
-      y: { beginAtZero: true }
-    }
-  }
-};
-```
-
-### Bar charts
-
-Best for: Comparing categories, discrete data points
-
-```typescript
-const config: ChartConfiguration<"bar"> = {
-  type: "bar",
-  data: chartData,
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { display: false }
-    },
-    scales: {
-      y: { beginAtZero: true }
-    }
-  }
-};
-```
-
-### Pie/Doughnut charts
-
-Best for: Part-to-whole relationships, proportions
-
-```typescript
-const config: ChartConfiguration<"doughnut"> = {
-  type: "doughnut",
-  data: chartData,
-  options: {
-    responsive: true,
-    plugins: {
-      legend: { position: "right" }
-    }
-  }
-};
-```
 
 ## Customizations and advanced features
 

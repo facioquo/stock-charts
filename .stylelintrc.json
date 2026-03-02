@@ -1,10 +1,13 @@
 {
+  "extends": "stylelint-config-standard",
   "ignoreFiles": [
     ".agents/**",
     ".azurite/**",
     ".github/**",
     "node_modules/**",
     "**/node_modules/**",
+    "coverage/**",
+    "**/coverage/**",
     "dist/**",
     "**/dist/**",
     "**/*.md"
@@ -12,15 +15,20 @@
   "overrides": [
     {
       "files": ["**/*.scss"],
-      "customSyntax": "postcss-scss"
+      "customSyntax": "postcss-scss",
+      "rules": {
+        "at-rule-no-unknown": [
+          true,
+          {
+            "ignoreAtRules": ["use", "mixin", "include", "extend", "function", "return", "each", "for", "if", "else", "while"]
+          }
+        ]
+      }
     }
   ],
   "rules": {
-    "selector-class-pattern": [
-      "^[a-z][a-z0-9]*(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?$",
-      {
-        "message": "Expected class selector to follow kebab-case or BEM naming convention"
-      }
-    ]
+    "alpha-value-notation": ["percentage", { "exceptProperties": [] }],
+    "color-function-notation": "modern",
+    "media-feature-range-notation": "context"
   }
 }

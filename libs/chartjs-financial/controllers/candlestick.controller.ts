@@ -32,16 +32,16 @@ interface CandlestickControllerInternals {
 }
 
 export class CandlestickController extends FinancialController {
-  static id = "candlestick";
+  static override id = "candlestick";
 
-  static defaults = merge(
+  static override defaults = merge(
     {
       dataElementType: CandlestickElement.id
     },
     (Chart.defaults as unknown as { financial: Record<string, unknown> }).financial
   );
 
-  updateElements(elements: unknown[], start: number, count: number, mode: string): void {
+  override updateElements(elements: unknown[], start: number, count: number, mode: string): void {
     const controller = this as unknown as CandlestickControllerInternals;
     const dataset = controller.getDataset();
     const ruler = controller._ruler ?? this._getRuler();

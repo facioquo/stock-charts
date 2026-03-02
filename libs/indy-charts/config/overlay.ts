@@ -25,8 +25,8 @@ export function baseOverlayOptions(volumeAxisSize: number, settings: ChartSettin
   const options = baseChartOptions(settings);
 
   // format y-axis (helper context)
-  if (!options.scales || !options.scales.y) return options;
-  const y = options.scales.y as CartesianScaleOptions;
+  if (!options.scales || !options.scales["y"]) return options;
+  const y = options.scales["y"] as CartesianScaleOptions;
 
   // format primary y-axis labels
   y.ticks.callback = (value, index, values) => {
@@ -40,7 +40,7 @@ export function baseOverlayOptions(volumeAxisSize: number, settings: ChartSettin
   if (!options.scales) {
     options.scales = {} as ChartOptions["scales"];
   }
-  (options.scales as Record<string, ScaleOptions>).volumeAxis = {
+  (options.scales as Record<string, ScaleOptions>)["volumeAxis"] = {
     display: false,
     type: "linear",
     axis: "y",

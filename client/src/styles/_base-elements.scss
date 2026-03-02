@@ -57,7 +57,6 @@ mat-toolbar.dialog-title {
   font-size: 1.5rem;
   font-weight: 600;
   cursor: default;
-
   padding-left: 38px;
 }
 
@@ -65,13 +64,11 @@ mat-toolbar.dialog-title {
   font-size: 1.3rem !important;
   font-weight: 600 !important;
   cursor: default;
-
   line-height: 1 !important;
 }
 
 mat-dialog-content {
   padding-top: 1rem !important;
-
   box-shadow:
     0 0 1px 0 rgb(0 0 0 / 20%),
     0 0 3px 0 rgb(0 0 0 / 14%),

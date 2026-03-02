@@ -10,6 +10,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open --hmr",
+    "serve": "ng serve --hmr",
     "prebuild": "node ../scripts/generate-backup-indicators.js",
     "build": "ng build --configuration=development",
     "prebuild.prod": "node ../scripts/generate-backup-indicators.js",

@@ -83,8 +83,9 @@ export class ChartService implements OnDestroy {
     scrollToMe: boolean = false
   ): Observable<void> {
     return this.api.getSelectionData(selection, listing).pipe(
-      map((data: IndicatorDataRow[]) => {
-        this.chartManager.processSelectionData(selection, listing, data);
+      map(data => {
+        const rows = data as IndicatorDataRow[];
+        this.chartManager.processSelectionData(selection, listing, rows);
         applySelectionTokens(selection);
         this.chartManager.displaySelection(selection, listing);
 
@@ -107,7 +108,12 @@ export class ChartService implements OnDestroy {
   addSelectionWithoutScroll(selection: IndicatorSelection): void {
     const listing = this.listings.find(x => x.uiid === selection.uiid);
     if (!listing) return;
-    this.addSelection(selection, listing, false).subscribe();
+    this.addSelection(selection, listing, false).subscribe({
+      error: (error: unknown) => {
+        // Log error to console but don't re-throw to prevent unhandled exception during startup
+        console.error("Error adding selection without scroll:", error);
+      }
+    });
   }
 
   /** Create a default selection from the indicator catalog. */
@@ -173,6 +179,7 @@ export class ChartService implements OnDestroy {
         }
 
         const barCount = this.window.calculateOptimalBars();
+        console.log(`Loading charts with ${barCount} bars`);
         this.chartManager.initializeOverlay(ctx, allQuotes, barCount);
 
         this.api.getListings().subscribe({

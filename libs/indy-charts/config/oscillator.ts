@@ -19,13 +19,13 @@ export function baseOscillatorOptions(settings: ChartSettings): ChartOptions {
   const options = baseChartOptions(settings);
 
   // remove x-axis
-  if (options.scales?.x) {
-    options.scales.x.display = false;
+  if (options.scales?.["x"]) {
+    options.scales["x"].display = false;
   }
 
   // format y-axis (helper context)
-  if (!options.scales || !options.scales.y) return options;
-  const y = options.scales.y as CartesianScaleOptions;
+  if (!options.scales || !options.scales["y"]) return options;
+  const y = options.scales["y"] as CartesianScaleOptions;
 
   // rescale labels
   y.ticks.callback = (value: string | number, index, values) => {

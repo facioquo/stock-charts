@@ -116,7 +116,7 @@ export class FinancialController extends BarController {
     }
   };
 
-  getLabelAndValue(index: number): { label: string; value: string } {
+  override getLabelAndValue(index: number): { label: string; value: string } {
     const controller = this as unknown as FinancialControllerInternals;
     const parsed = this.getParsed(index) as ParsedFinancialLike;
     const axis = controller._cachedMeta.iScale.axis;
@@ -128,13 +128,13 @@ export class FinancialController extends BarController {
     };
   }
 
-  getAllParsedValues(): number[] {
+  override getAllParsedValues(): number[] {
     const controller = this as unknown as FinancialControllerInternals;
     const axis = controller._cachedMeta.iScale.axis;
     return controller._cachedMeta._parsed.map(point => point[axis] ?? 0);
   }
 
-  getMinMax(scale: object): { min: number; max: number } {
+  override getMinMax(scale: object): { min: number; max: number } {
     const controller = this as unknown as FinancialControllerInternals;
     const parsed = controller._cachedMeta._parsed;
     const axis = controller._cachedMeta.iScale.axis;
@@ -249,7 +249,7 @@ export class FinancialController extends BarController {
     };
   }
 
-  draw(): void {
+  override draw(): void {
     const controller = this as unknown as FinancialControllerInternals;
     const chart = controller.chart;
     const rects = controller._cachedMeta.data;

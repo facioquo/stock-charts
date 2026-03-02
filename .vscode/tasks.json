@@ -76,7 +76,7 @@
       "label": "Update: Angular packages (client)",
       "detail": "Update dependencies using Angular CLI for the client website.",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client exec ng update @angular/cli @angular/core @angular/material @angular/compiler @angular/compiler-cli @angular/platform-browser @angular/platform-browser-dynamic @angular/router @angular/forms @angular/animations @angular/service-worker @angular/cdk @angular/build angular-eslint --allow-dirty"
+      "command": "pnpm --filter @stock-charts/client exec ng update @angular/cli @angular/core @angular/material angular-eslint --allow-dirty"
     },
     {
       "label": "Update: Node packages",
@@ -179,17 +179,17 @@
     },
     {
       "label": "Lint: Website (check)",
-      "detail": "Check Angular code with ESLint and Prettier",
+      "detail": "Check Angular, library, and VitePress code with ESLint and Prettier",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run lint && pnpm run format:web:check",
+      "command": "bash scripts/website-lint.sh check",
       "group": "test",
       "problemMatcher": "$eslint-stylish"
     },
     {
       "label": "Lint: Website (fix)",
-      "detail": "Auto-fix Angular code with ESLint and format with Prettier",
+      "detail": "Auto-fix Angular, library, and VitePress code with ESLint and format with Prettier",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run lint:fix && pnpm run format:web",
+      "command": "bash scripts/website-lint.sh fix",
       "group": "none",
       "problemMatcher": "$tsc"
     },

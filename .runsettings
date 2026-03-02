@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <!-- Exclude generated code from coverage analysis -->
+          <ExcludeGeneratedCode>true</ExcludeGeneratedCode>
+          <!-- Exclude generated .g.cs files from inline mapping -->
+          <ModulePathsToExclude>
+            <!-- Exclude all generated files under obj directory -->
+            <ModulePath>.*\\obj\\.*</ModulePath>
+            <!-- Exclude Generators namespace -->
+            <ModulePath>.*Generators.*</ModulePath>
+          </ModulePathsToExclude>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

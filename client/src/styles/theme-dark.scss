@@ -2,7 +2,7 @@
 @use "themed-parts";
 
 // Shared font stack for brand typography (primary heading font fallback chain)
-$brand-font-stack: Rubik, Roboto, Arial, Helvetica, sans-serif;
+$brand-font-stack: rubik, roboto, arial, helvetica, sans-serif;
 
 // DARK THEME (default)
 // ref: https://material.angular.io/guide/theming
@@ -42,10 +42,10 @@ $dark-theme: mat.define-theme(
   // toolbar
   .main-toolbar {
     h1 {
-      color: rgba(230, 199, 76, 0.75);
+      color: rgb(230 199 76 / 75%);
 
       a:hover {
-        color: rgba(230, 199, 76, 0.9);
+        color: rgb(230 199 76 / 90%);
       }
     }
 

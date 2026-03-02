@@ -16,7 +16,13 @@ function makeSelection(overrides?: Partial<IndicatorSelection>): IndicatorSelect
     chartType: "overlay",
     params: [
       { paramName: "lookbackPeriods", displayName: "Periods", minimum: 1, maximum: 200, value: 20 },
-      { paramName: "standardDeviations", displayName: "Std Dev", minimum: 0.1, maximum: 5, value: 2 }
+      {
+        paramName: "standardDeviations",
+        displayName: "Std Dev",
+        minimum: 0.1,
+        maximum: 5,
+        value: 2
+      }
     ],
     results: [
       {
@@ -69,7 +75,7 @@ describe("applySelectionTokens", () => {
 
   it("skips params with null value", () => {
     const selection = makeSelection();
-    selection.params[0].value = undefined;
+    selection.params[0].value = null as unknown as number;
     applySelectionTokens(selection);
 
     expect(selection.label).toBe("Bollinger Bands([P1],2)");
@@ -96,7 +102,13 @@ describe("applySelectionTokens", () => {
     const selection = makeSelection({
       label: "SMA([P1])",
       params: [
-        { paramName: "lookbackPeriods", displayName: "Periods", minimum: 1, maximum: 200, value: 14 }
+        {
+          paramName: "lookbackPeriods",
+          displayName: "Periods",
+          minimum: 1,
+          maximum: 200,
+          value: 14
+        }
       ],
       results: [
         {
@@ -121,7 +133,13 @@ describe("applySelectionTokens", () => {
     const selection = makeSelection({
       label: "Custom [P1]-[P1]",
       params: [
-        { paramName: "lookbackPeriods", displayName: "Periods", minimum: 1, maximum: 200, value: 10 }
+        {
+          paramName: "lookbackPeriods",
+          displayName: "Periods",
+          minimum: 1,
+          maximum: 200,
+          value: 10
+        }
       ],
       results: [
         {

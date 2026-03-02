@@ -1,6 +1,6 @@
 # Indicator charts (indy-charts)
 
-This Chart.js chart component is a standalone reusable library for use in generating simple depictions of indicators in documentation sites.  In this repository, it must only depend on the [`@facioquo/chartjs-chart-financial`](../chartjs-financial/) package and no other elements in this workspace.
+This Chart.js chart component is a standalone reusable library for use in generating simple depictions of indicators in documentation sites. In this repository, it must only depend on the [`@facioquo/chartjs-chart-financial`](../chartjs-financial/) package and no other elements in this workspace.
 
 > Indirectly, this component does rely on the [REST API](../../server/) through configuration only.
 

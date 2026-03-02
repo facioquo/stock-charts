@@ -41,9 +41,7 @@ function makeListing(overrides?: Partial<IndicatorListing>): IndicatorListing {
   };
 }
 
-function makeSelection(
-  params: IndicatorParam[] = []
-): IndicatorSelection {
+function makeSelection(params: IndicatorParam[] = []): IndicatorSelection {
   return {
     ucid: "SMA-1",
     uiid: "SMA",
@@ -54,10 +52,7 @@ function makeSelection(
   };
 }
 
-function makeParam(
-  name: string,
-  value?: number
-): IndicatorParam {
+function makeParam(name: string, value?: number): IndicatorParam {
   return {
     paramName: name,
     displayName: name,
@@ -143,10 +138,7 @@ describe("createApiClient", () => {
 
   describe("getQuotes", () => {
     it("returns Quote[] with Date objects from raw ISO strings", async () => {
-      const raw: RawQuote[] = [
-        rawQuote("2024-01-01T00:00:00Z"),
-        rawQuote("2024-01-02T00:00:00Z")
-      ];
+      const raw: RawQuote[] = [rawQuote("2024-01-01T00:00:00Z"), rawQuote("2024-01-02T00:00:00Z")];
       mockFetchOk(raw);
 
       const quotes = await client.getQuotes();
@@ -160,9 +152,7 @@ describe("createApiClient", () => {
     it("calls fetch with correct URL", async () => {
       mockFetchOk([]);
       await client.getQuotes();
-      expect(vi.mocked(fetch)).toHaveBeenCalledWith(
-        `${BASE_URL}/quotes`
-      );
+      expect(vi.mocked(fetch)).toHaveBeenCalledWith(`${BASE_URL}/quotes`);
     });
 
     it("returns empty array when API returns empty", async () => {
@@ -174,23 +164,15 @@ describe("createApiClient", () => {
     it("throws and calls onError on HTTP error", async () => {
       mockFetchError(500, "Internal Server Error");
 
-      await expect(client.getQuotes()).rejects.toThrow(
-        "HTTP 500: Internal Server Error"
-      );
-      expect(onError).toHaveBeenCalledWith(
-        "Error fetching quotes",
-        expect.any(Error)
-      );
+      await expect(client.getQuotes()).rejects.toThrow("HTTP 500: Internal Server Error");
+      expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(Error));
     });
 
     it("throws and calls onError on network error", async () => {
       mockFetchNetworkError("Network failure");
 
       await expect(client.getQuotes()).rejects.toThrow("Network failure");
-      expect(onError).toHaveBeenCalledWith(
-        "Error fetching quotes",
-        expect.any(Error)
-      );
+      expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(Error));
     });
 
     it("preserves all OHLCV fields", async () => {
@@ -228,31 +210,21 @@ describe("createApiClient", () => {
     it("calls fetch with correct URL", async () => {
       mockFetchOk([]);
       await client.getListings();
-      expect(vi.mocked(fetch)).toHaveBeenCalledWith(
-        `${BASE_URL}/indicators`
-      );
+      expect(vi.mocked(fetch)).toHaveBeenCalledWith(`${BASE_URL}/indicators`);
     });
 
     it("throws and calls onError on HTTP error", async () => {
       mockFetchError(404, "Not Found");
 
-      await expect(client.getListings()).rejects.toThrow(
-        "HTTP 404: Not Found"
-      );
-      expect(onError).toHaveBeenCalledWith(
-        "Error fetching listings",
-        expect.any(Error)
-      );
+      await expect(client.getListings()).rejects.toThrow("HTTP 404: Not Found");
+      expect(onError).toHaveBeenCalledWith("Error fetching listings", expect.any(Error));
     });
 
     it("throws and calls onError on network error", async () => {
       mockFetchNetworkError("DNS lookup failed");
 
       await expect(client.getListings()).rejects.toThrow("DNS lookup failed");
-      expect(onError).toHaveBeenCalledWith(
-        "Error fetching listings",
-        expect.any(Error)
-      );
+      expect(onError).toHaveBeenCalledWith("Error fetching listings", expect.any(Error));
     });
   });
 
@@ -275,10 +247,7 @@ describe("createApiClient", () => {
     it("appends params as query string", async () => {
       mockFetchOk([]);
       const listing = makeListing({ endpoint: "sma" });
-      const selection = makeSelection([
-        makeParam("lookbackPeriods", 20),
-        makeParam("smaType", 1)
-      ]);
+      const selection = makeSelection([makeParam("lookbackPeriods", 20), makeParam("smaType", 1)]);
 
       await client.getSelectionData(selection, listing);
 
@@ -305,7 +274,10 @@ describe("createApiClient", () => {
     });
 
     it("returns data array from API response", async () => {
-      const data = [{ date: "2024-01-01", sma: 50.5 }, { date: "2024-01-02", sma: 51.0 }];
+      const data = [
+        { date: "2024-01-01", sma: 50.5 },
+        { date: "2024-01-02", sma: 51.0 }
+      ];
       mockFetchOk(data);
 
       const result = await client.getSelectionData(
@@ -318,27 +290,21 @@ describe("createApiClient", () => {
     it("throws and calls onError on HTTP error", async () => {
       mockFetchError(503, "Service Unavailable");
 
-      await expect(
-        client.getSelectionData(makeSelection([]), makeListing())
-      ).rejects.toThrow("HTTP 503: Service Unavailable");
-
-      expect(onError).toHaveBeenCalledWith(
-        "Error fetching selection data",
-        expect.any(Error)
+      await expect(client.getSelectionData(makeSelection([]), makeListing())).rejects.toThrow(
+        "HTTP 503: Service Unavailable"
       );
+
+      expect(onError).toHaveBeenCalledWith("Error fetching selection data", expect.any(Error));
     });
 
     it("throws and calls onError on network error", async () => {
       mockFetchNetworkError("Connection refused");
 
-      await expect(
-        client.getSelectionData(makeSelection([]), makeListing())
-      ).rejects.toThrow("Connection refused");
-
-      expect(onError).toHaveBeenCalledWith(
-        "Error fetching selection data",
-        expect.any(Error)
+      await expect(client.getSelectionData(makeSelection([]), makeListing())).rejects.toThrow(
+        "Connection refused"
       );
+
+      expect(onError).toHaveBeenCalledWith("Error fetching selection data", expect.any(Error));
     });
 
     it("resolves nested endpoint paths correctly", async () => {

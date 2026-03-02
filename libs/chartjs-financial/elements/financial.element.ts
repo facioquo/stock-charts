@@ -53,7 +53,7 @@ export class FinancialElement extends Element {
     };
   }
 
-  tooltipPosition(useFinalPosition?: boolean): { x: number; y: number } {
+  override tooltipPosition(useFinalPosition?: boolean): { x: number; y: number } {
     const { x, open, close } = this.getProps(["x", "open", "close"], useFinalPosition) as {
       x: number;
       open: number;

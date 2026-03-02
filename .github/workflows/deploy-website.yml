@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 env:
-  NODE_VERSION: 24
+  NODE_VERSION: 24.14.0
 
 jobs:
   versioning:

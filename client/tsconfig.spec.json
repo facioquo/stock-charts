@@ -2,9 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
-    "types": ["node"],
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "types": ["vitest/globals"]
   },
-  "include": ["src/**/*.spec.ts", "src/test-setup.ts", "src/polyfills.ts", "src/**/*.d.ts"]
+  "include": ["src/**/*.spec.ts", "src/test-setup.ts", "src/**/*.d.ts"]
 }

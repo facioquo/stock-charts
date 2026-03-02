@@ -123,10 +123,7 @@ export class ChartManager {
       const { dataPoints, pointColor, pointRotation } = buildDataPoints(data, result, listing);
       addExtraBars(dataPoints, this.extraBars);
 
-      if (
-        listing.category === CATEGORIES.CANDLESTICK_PATTERN &&
-        dataset.type !== "bar"
-      ) {
+      if (listing.category === CATEGORIES.CANDLESTICK_PATTERN && dataset.type !== "bar") {
         const ext = dataset as ExtendedChartDataset;
         ext.pointRotation = pointRotation;
         ext.pointBackgroundColor = pointColor;

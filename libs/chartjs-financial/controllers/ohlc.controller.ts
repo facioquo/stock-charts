@@ -33,9 +33,9 @@ interface OhlcControllerInternals {
 }
 
 export class OhlcController extends FinancialController {
-  static id = "ohlc";
+  static override id = "ohlc";
 
-  static defaults = merge(
+  static override defaults = merge(
     {
       dataElementType: OhlcElement.id,
       datasets: {
@@ -46,7 +46,7 @@ export class OhlcController extends FinancialController {
     (Chart.defaults as unknown as { financial: Record<string, unknown> }).financial
   );
 
-  updateElements(elements: unknown[], start: number, count: number, mode: string): void {
+  override updateElements(elements: unknown[], start: number, count: number, mode: string): void {
     const controller = this as unknown as OhlcControllerInternals;
     const dataset = controller.getDataset();
     const ruler = controller._ruler ?? this._getRuler();

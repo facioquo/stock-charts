@@ -4,10 +4,7 @@ import { ChartThreshold, IndicatorResult, IndicatorResultConfig } from "./types"
 
 const THRESHOLD_ORDER_OFFSET = 100;
 
-export function baseDataset(
-  r: IndicatorResult,
-  c: IndicatorResultConfig
-): ChartDataset {
+export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): ChartDataset {
   switch (r.lineType) {
     case "solid": {
       const lineDataset: ChartDataset = {

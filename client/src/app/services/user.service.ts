@@ -1,12 +1,12 @@
 import { isPlatformBrowser } from "@angular/common";
 import { Injectable, PLATFORM_ID, inject } from "@angular/core";
-import { UserSettings } from "../types/chart.types";
+import type { UserSettings } from "../types/chart.types";
 
 @Injectable({
   providedIn: "root"
 })
 export class UserService {
-  settings: UserSettings; // initialized in app.component.ts
+  settings!: UserSettings; // initialized in app.component.ts
 
   // platform detection for SSR safety
   private readonly platformId = inject(PLATFORM_ID);

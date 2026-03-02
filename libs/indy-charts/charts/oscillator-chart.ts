@@ -34,7 +34,6 @@ export class OscillatorChart {
     // Add thresholds
     this.configureThresholds(chartConfig, selection, listing);
 
-
     // Configure y-axis bounds
     this.configureYAxis(chartConfig, listing);
 
@@ -87,9 +86,7 @@ export class OscillatorChart {
     this.fullThresholdDatasets.forEach((fullDataset, i) => {
       if (!this.chart?.data.datasets[i]) return;
       if (fullDataset.data && Array.isArray(fullDataset.data)) {
-        this.chart.data.datasets[i].data = [
-          ...fullDataset.data.slice(startIndex)
-        ];
+        this.chart.data.datasets[i].data = [...fullDataset.data.slice(startIndex)];
       }
       if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
         this.chart.data.datasets[i].backgroundColor = [
@@ -125,7 +122,9 @@ export class OscillatorChart {
       }
 
       if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
-        result.dataset.backgroundColor = [...(fullDataset.backgroundColor as string[]).slice(startIndex)];
+        result.dataset.backgroundColor = [
+          ...(fullDataset.backgroundColor as string[]).slice(startIndex)
+        ];
       }
     });
 
@@ -173,9 +172,9 @@ export class OscillatorChart {
   }
 
   private configureYAxis(chartConfig: ChartConfiguration, listing: IndicatorListing): void {
-    if (chartConfig.options?.scales?.y) {
-      chartConfig.options.scales.y.suggestedMin = listing.chartConfig?.minimumYAxis;
-      chartConfig.options.scales.y.suggestedMax = listing.chartConfig?.maximumYAxis;
+    if (chartConfig.options?.scales?.["y"]) {
+      chartConfig.options.scales["y"].suggestedMin = listing.chartConfig?.minimumYAxis;
+      chartConfig.options.scales["y"].suggestedMax = listing.chartConfig?.maximumYAxis;
     }
   }
 }

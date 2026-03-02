@@ -57,7 +57,7 @@ export class SettingsComponent {
   usr = inject(UserService);
 
   listings: IndicatorListing[];
-  selections: IndicatorSelection[];
+  selections!: IndicatorSelection[];
 
   constructor() {
     this.listings = this.cht.listings;

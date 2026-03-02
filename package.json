@@ -21,12 +21,13 @@
     "prebuild:prod": "node scripts/generate-backup-indicators.js",
     "build:prod": "pnpm -r run build:prod --if-present",
     "start": "pnpm --filter @stock-charts/client run start",
+    "serve": "pnpm --filter @stock-charts/client run serve",
     "test": "pnpm -r run test",
     "test:e2e": "pnpm --filter @stock-charts/playwright-tests run test",
     "test:watch": "pnpm -r run test:watch",
     "test:coverage": "pnpm --filter @stock-charts/client run test:coverage",
-    "pretest:dotnet": "dotnet tool restore",
-    "test:dotnet": "dotnet test Charts.sln --collect:\"XPlat Code Coverage\" --results-directory ./server/coverage --logger trx && dotnet tool run reportgenerator -reports:server/coverage/**/coverage.cobertura.xml -targetdir:server/coverage -reporttypes:lcov",
+    "pretest:dotnet": "dotnet tool restore && rm -rf server/coverage",
+    "test:dotnet": "dotnet test Charts.sln --settings .runsettings --collect:\"XPlat Code Coverage\" --results-directory ./server/coverage --logger trx && (dotnet tool run reportgenerator -reports:server/coverage/**/coverage.cobertura.xml -targetdir:server/coverage -reporttypes:lcov;TextSummary --skip:ObjectReport 2>&1 | grep -v 'LoggerMessage.g.cs' || true) && echo && cat server/coverage/Summary.txt",
     "test:all": "pnpm --filter @stock-charts/client run test:coverage && pnpm run test:dotnet && pnpm run test:e2e",
     "lint": "bash scripts/website-lint.sh check && pnpm run lint:dotnet && pnpm run lint:md",
     "lint:fix": "bash scripts/website-lint.sh fix && pnpm run lint:dotnet:fix && pnpm run lint:md:fix",
@@ -64,6 +65,7 @@
     "prettier": "^3.8.1",
     "rimraf": "^6.1.3",
     "stylelint": "^17.4.0",
+    "stylelint-config-standard": "^40.0.0",
     "typescript": "^5.9.3"
   }
 }

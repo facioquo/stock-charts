@@ -176,11 +176,18 @@ setup_dotnet() {
 
   apt_install "dotnet-sdk-${dotnet_version}"
 
-  if command -v dotnet &>/dev/null; then
-    log "Installed .NET SDKs:"
-    dotnet --list-sdks || true
-  else
-    err "Failed to install .NET SDK"
+  # Verify the requested .NET version was actually installed
+  if ! command -v dotnet &>/dev/null; then
+    err "Failed to install .NET SDK ${dotnet_version}: dotnet command not found"
+    return 1
+  fi
+
+  log "Installed .NET SDKs:"
+  dotnet --list-sdks || true
+
+  # Parse dotnet --list-sdks output to verify the requested version
+  if ! dotnet --list-sdks | grep -q "^${dotnet_version}\."; then
+    err "Failed to install .NET SDK ${dotnet_version}: requested version not found in installed SDKs"
     return 1
   fi
 }

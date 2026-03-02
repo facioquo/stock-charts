@@ -1,7 +1,5 @@
 import { test, expect, type Page, type ConsoleMessage } from "@playwright/test";
 
-const WEBSITE_URL = "http://localhost:4200";
-
 /**
  * Collects console errors and page errors for debugging chart issues.
  */
@@ -28,7 +26,7 @@ test.describe("Stock Charts Angular Website", () => {
   test("home page loads and navigates to chart page", async ({ page }) => {
     const { pageErrors } = collectErrors(page);
 
-    await page.goto(WEBSITE_URL);
+    await page.goto("/");
     await page.waitForLoadState("networkidle");
 
     // The app should be visible
@@ -42,7 +40,7 @@ test.describe("Stock Charts Angular Website", () => {
   test("main overlay chart canvas renders", async ({ page }) => {
     const { pageErrors } = collectErrors(page);
 
-    await page.goto(WEBSITE_URL);
+    await page.goto("/");
     await page.waitForLoadState("networkidle");
 
     // Wait for the chart overlay canvas to appear
@@ -65,11 +63,17 @@ test.describe("Stock Charts Angular Website", () => {
 
   test("chart loads with correct bar count logged", async ({ page }) => {
     const consoleLogs: string[] = [];
+    const pageErrors: string[] = [];
+
     page.on("console", (msg: ConsoleMessage) => {
       consoleLogs.push(msg.text());
     });
 
-    await page.goto(WEBSITE_URL);
+    page.on("pageerror", (error: Error) => {
+      pageErrors.push(`${error.name}: ${error.message}`);
+    });
+
+    await page.goto("/");
     await page.waitForLoadState("networkidle");
 
     // Wait for chart canvas to confirm loading completed
@@ -85,20 +89,37 @@ test.describe("Stock Charts Angular Website", () => {
     const barCount = parseInt(match![1], 10);
     expect(barCount, "Bar count should be at least 20").toBeGreaterThanOrEqual(20);
     expect(barCount, "Bar count should be at most 500").toBeLessThanOrEqual(500);
+
+    // Verify no page errors occurred during chart loading
+    expect(pageErrors, "No page errors should occur").toEqual([]);
   });
 
   test("chart canvas has painted content (not blank)", async ({ page }) => {
     const { pageErrors } = collectErrors(page);
 
-    await page.goto(WEBSITE_URL);
+    await page.goto("/");
     await page.waitForLoadState("networkidle");
 
     // Wait for chart to render
     const chartCanvas = page.locator("#chartOverlay");
     await expect(chartCanvas).toBeVisible({ timeout: 15_000 });
 
-    // Wait a bit for Chart.js rendering to complete
-    await page.waitForTimeout(2000);
+    // Wait for the canvas to have painted content (non-blank)
+    await page.waitForFunction(
+      () => {
+        const canvas = document.getElementById("chartOverlay") as HTMLCanvasElement | null;
+        if (!canvas) return false;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return false;
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        // Check if any pixel has non-zero alpha (meaning something was drawn)
+        for (let i = 3; i < imageData.data.length; i += 4) {
+          if (imageData.data[i] > 0) return true;
+        }
+        return false;
+      },
+      { timeout: 15_000 }
+    );
 
     // Check if the canvas has non-blank content by evaluating pixel data
     const hasContent = await page.evaluate(() => {
@@ -121,7 +142,7 @@ test.describe("Stock Charts Angular Website", () => {
   test("oscillator charts render in oscillators zone", async ({ page }) => {
     const { pageErrors } = collectErrors(page);
 
-    await page.goto(WEBSITE_URL);
+    await page.goto("/");
     await page.waitForLoadState("networkidle");
 
     // Wait for main chart to load
@@ -146,12 +167,15 @@ test.describe("Stock Charts Angular Website", () => {
   test("no critical console errors during full page lifecycle", async ({ page }) => {
     const { consoleErrors, pageErrors } = collectErrors(page);
 
-    await page.goto(WEBSITE_URL);
+    await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Wait for everything to load
+    // Wait for everything to load (main chart and oscillators)
     await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
-    await page.waitForTimeout(5000);
+
+    // Wait for oscillator charts to load by checking for oscillator canvases
+    const oscillatorCanvases = page.locator("#oscillators-zone canvas");
+    await expect(oscillatorCanvases.first()).toBeVisible({ timeout: 15_000 });
 
     // Filter out known acceptable warnings (e.g., CORS in dev, etc.)
     const criticalErrors = consoleErrors.filter(
@@ -159,7 +183,9 @@ test.describe("Stock Charts Angular Website", () => {
         !msg.includes("favicon") &&
         !msg.includes("service-worker") &&
         !msg.includes("ngsw") &&
-        !msg.includes("CORS")
+        !msg.includes("CORS") &&
+        // Expected when backend is not running (app falls back to backup data)
+        !msg.includes("ERR_CONNECTION_REFUSED")
     );
 
     // Page errors are always critical

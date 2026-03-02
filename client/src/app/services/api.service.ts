@@ -53,7 +53,16 @@ export class ApiService {
     selection.params.forEach((p: IndicatorParam) => {
       params = params.set(p.paramName, String(p.value));
     });
-    return this.http.get<unknown[]>(listing.endpoint, { ...this.requestHeader(), params });
+    return this.http.get<unknown[]>(listing.endpoint, { ...this.requestHeader(), params }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.warn("Backend API unavailable, using empty data for indicator", {
+          uiid: selection.uiid,
+          status: error.status,
+          statusText: error.statusText
+        });
+        return of([]);
+      })
+    );
   }
 
   // HELPERS

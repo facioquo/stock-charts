@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: 24
+  NODE_VERSION: 24.14.0
 
 permissions:
   contents: read
@@ -53,12 +53,46 @@ jobs:
 
       - name: Publish @facioquo/chartjs-chart-financial
         working-directory: libs/chartjs-financial
-        run: pnpm publish --no-git-checks --access restricted
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PACKAGE_VERSION=$(jq -r '.version' package.json)
+          PACKAGE_NAME=$(jq -r '.name' package.json)
+
+          # Determine if this is a prerelease (contains alpha, rc, beta, etc.)
+          if [[ "$PACKAGE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-[a-zA-Z]+ ]]; then
+            NPM_TAG="next"
+          else
+            NPM_TAG="latest"
+          fi
+
+          # Check if the version already exists in the registry (safe for workflow reruns)
+          if npm view "$PACKAGE_NAME@$PACKAGE_VERSION" > /dev/null 2>&1; then
+            echo "Version $PACKAGE_VERSION already published; skipping publish."
+          else
+            echo "Publishing $PACKAGE_NAME@$PACKAGE_VERSION with tag '$NPM_TAG'"
+            pnpm publish --no-git-checks --access restricted --tag "$NPM_TAG"
+          fi
 
       - name: Publish @facioquo/indy-charts
         working-directory: libs/indy-charts
-        run: pnpm publish --no-git-checks --access restricted
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PACKAGE_VERSION=$(jq -r '.version' package.json)
+          PACKAGE_NAME=$(jq -r '.name' package.json)
+
+          # Determine if this is a prerelease (contains alpha, rc, beta, etc.)
+          if [[ "$PACKAGE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-[a-zA-Z]+ ]]; then
+            NPM_TAG="next"
+          else
+            NPM_TAG="latest"
+          fi
+
+          # Check if the version already exists in the registry (safe for workflow reruns)
+          if npm view "$PACKAGE_NAME@$PACKAGE_VERSION" > /dev/null 2>&1; then
+            echo "Version $PACKAGE_VERSION already published; skipping publish."
+          else
+            echo "Publishing $PACKAGE_NAME@$PACKAGE_VERSION with tag '$NPM_TAG'"
+            pnpm publish --no-git-checks --access restricted --tag "$NPM_TAG"
+          fi

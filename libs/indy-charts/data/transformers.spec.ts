@@ -6,22 +6,13 @@ import {
   addExtraBars,
   getCandlePointConfiguration
 } from "./transformers";
-import type {
-  IndicatorDataRow,
-  IndicatorListing,
-  IndicatorResult,
-  Quote
-} from "../config/types";
+import type { IndicatorDataRow, IndicatorListing, IndicatorResult, Quote } from "../config/types";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeQuote(
-  dateStr: string,
-  close = 100,
-  volume = 1000
-): Quote {
+function makeQuote(dateStr: string, close = 100, volume = 1000): Quote {
   return {
     date: new Date(dateStr),
     open: close - 1,
@@ -108,10 +99,7 @@ describe("processQuoteData", () => {
   });
 
   it("calculates volumeAxisSize as 20× average volume", () => {
-    const quotes = [
-      makeQuote("2024-01-01", 100, 1000),
-      makeQuote("2024-01-02", 100, 3000)
-    ];
+    const quotes = [makeQuote("2024-01-01", 100, 1000), makeQuote("2024-01-02", 100, 3000)];
     const { volumeAxisSize } = processQuoteData(quotes);
 
     // avg = (1000+3000)/2 = 2000, 20 × 2000 = 40000
@@ -247,9 +235,7 @@ describe("buildDataPoints", () => {
 
   it("applies candle point config for candlestick-pattern category", () => {
     const candle = makeQuote("2024-01-01", 100);
-    const data: IndicatorDataRow[] = [
-      { date: "2024-01-01", candle, signal: 42, match: 100 }
-    ];
+    const data: IndicatorDataRow[] = [{ date: "2024-01-01", candle, signal: 42, match: 100 }];
     const result = makeResult({ dataName: "signal" });
     const listing = makeListing({ category: "candlestick-pattern" });
 
@@ -263,9 +249,7 @@ describe("buildDataPoints", () => {
 
   it("applies bearish candle config for match=-100", () => {
     const candle = makeQuote("2024-01-01", 100);
-    const data: IndicatorDataRow[] = [
-      { date: "2024-01-01", candle, signal: 42, match: -100 }
-    ];
+    const data: IndicatorDataRow[] = [{ date: "2024-01-01", candle, signal: 42, match: -100 }];
     const result = makeResult({ dataName: "signal" });
     const listing = makeListing({ category: "candlestick-pattern" });
 
@@ -313,9 +297,7 @@ describe("addExtraBars", () => {
   });
 
   it("sets extra bars y-value to NaN", () => {
-    const dataPoints: ScatterDataPoint[] = [
-      { x: new Date("2024-01-05").valueOf(), y: 100 }
-    ];
+    const dataPoints: ScatterDataPoint[] = [{ x: new Date("2024-01-05").valueOf(), y: 100 }];
 
     addExtraBars(dataPoints, 2);
 
@@ -336,9 +318,7 @@ describe("addExtraBars", () => {
   });
 
   it("does nothing when extraBars is 0", () => {
-    const dataPoints: ScatterDataPoint[] = [
-      { x: new Date("2024-01-05").valueOf(), y: 100 }
-    ];
+    const dataPoints: ScatterDataPoint[] = [{ x: new Date("2024-01-05").valueOf(), y: 100 }];
 
     addExtraBars(dataPoints, 0);
 
@@ -346,9 +326,7 @@ describe("addExtraBars", () => {
   });
 
   it("produces strictly increasing timestamps", () => {
-    const dataPoints: ScatterDataPoint[] = [
-      { x: new Date("2024-01-05").valueOf(), y: 100 }
-    ];
+    const dataPoints: ScatterDataPoint[] = [{ x: new Date("2024-01-05").valueOf(), y: 100 }];
 
     addExtraBars(dataPoints, 5);
 

@@ -242,11 +242,11 @@ function makeSelection(listing: IndicatorListing, ucid: string): IndicatorSelect
 }
 
 function makeIndicatorData(quotes: Quote[]): IndicatorDataRow[] {
-  return quotes.map(q => ({
+  return quotes.map((q, index) => ({
     date: q.date.toISOString(),
     candle: q,
     sma: q.close * 0.99,
-    rsi: 50 + Math.random() * 10
+    rsi: 50 + (index % 10) // Deterministic value derived from index, not Math.random()
   }));
 }
 
@@ -289,7 +289,7 @@ describe("ChartManager", () => {
 
     it("accepts custom extraBars", () => {
       const custom = new ChartManager({ settings: defaultSettings, extraBars: 10 });
-      // extraBars is private; verified indirectly via render call count.
+      // Verify ChartManager accepts the extraBars option in configuration
       expect(custom.settings).toEqual(defaultSettings);
       custom.destroy();
     });
@@ -327,10 +327,7 @@ describe("ChartManager", () => {
 
       const overlay = mgr.overlayChart as unknown as ReturnType<typeof createMockOverlay>;
       // startIndex = 100 - 30 = 70
-      expect(overlay.applySlicedData).toHaveBeenCalledWith(
-        expect.any(Array),
-        70
-      );
+      expect(overlay.applySlicedData).toHaveBeenCalledWith(expect.any(Array), 70);
     });
 
     it("destroys a previous overlay before creating a new one", () => {
@@ -364,14 +361,17 @@ describe("ChartManager", () => {
       const listing = makeOverlayListing();
       const selection = makeSelection(listing, "sel-2");
       const quotes = makeQuotes(30);
+      const ctx = {} as CanvasRenderingContext2D;
 
+      mgr.initializeOverlay(ctx, quotes, 15);
       mgr.processSelectionData(selection, listing, makeIndicatorData(quotes));
 
-      // Mutating the live dataset should not affect stored copy
-      // (verified indirectly — the stored datasets exist so setBarCount can use them)
-      // We'll verify via setBarCount in the slicing tests.
-      // Check that internal state is populated:
-      expect((mgr as any)._allProcessedDatasets.has("sel-2")).toBe(true);
+      // Mutating the live dataset should not affect stored copy.
+      // Verify this indirectly by calling setBarCount (which relies on stored data).
+      // If data wasn't stored, setBarCount should be a no-op; if stored correctly,
+      // it should update currentBarCount to the requested value.
+      mgr.setBarCount(20);
+      expect(mgr.currentBarCount).toBe(20);
     });
   });
 
@@ -444,9 +444,7 @@ describe("ChartManager", () => {
       const selection = makeSelection(listing, "not-registered");
       const ctx = {} as CanvasRenderingContext2D;
 
-      expect(() => mgr.createOscillator(ctx, selection, listing)).toThrow(
-        /not been registered/
-      );
+      expect(() => mgr.createOscillator(ctx, selection, listing)).toThrow(/not been registered/);
     });
 
     it("destroys a previous oscillator for the same ucid", () => {
@@ -564,10 +562,7 @@ describe("ChartManager", () => {
 
       expect(mgr.currentBarCount).toBe(30);
       // startIndex = 100 - 30 = 70
-      expect(overlay.applySlicedData).toHaveBeenCalledWith(
-        expect.any(Array),
-        70
-      );
+      expect(overlay.applySlicedData).toHaveBeenCalledWith(expect.any(Array), 70);
     });
 
     it("clamps barCount to [1, totalQuotes]", () => {
@@ -629,11 +624,7 @@ describe("ChartManager", () => {
       mgr.setBarCount(30);
 
       // startIndex = 100 - 30 = 70
-      expect(osc.applySlicedData).toHaveBeenCalledWith(
-        selection,
-        expect.any(Array),
-        70
-      );
+      expect(osc.applySlicedData).toHaveBeenCalledWith(selection, expect.any(Array), 70);
     });
 
     it("handles non-finite barCount gracefully", () => {
