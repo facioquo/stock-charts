@@ -288,11 +288,136 @@ Prepare libraries for consumption outside this workspace.
   - Publish order: chartjs-chart-financial first (dependency of indy-charts).
 
 - [ ] Task 4.4: Validate external consumption
-  - Test installation in a fresh VitePress project outside this workspace.
-  - Verify `setupIndyCharts()` → `createApiClient()` → `OverlayChart` works
-    end-to-end.
-  - Verify peer dependencies resolve correctly.
-  - Document any `.npmrc` or authentication setup needed for consumers.
+  - The full validation workflow is covered by Phase 5 below.
+  - Smoke-test locally: `pnpm pack` both libraries, install tarballs in an
+    isolated `package.json`, import `setupIndyCharts`, confirm no missing
+    peer dep errors.
+  - Verify `pnpm pack --dry-run` tarball contents include only `dist/`,
+    `README.md`, `NOTICE` (chartjs-financial only), and `package.json`.
+
+### Phase 5: External VitePress documentation site integration
+
+Integrate `@facioquo/indy-charts` into the external VitePress documentation
+site hosted in a separate GitHub repository, consuming the **published** packages
+from GitHub Packages and calling the **deployed** API endpoint
+`https://stock-charts-api.azurewebsites.net`.
+
+Prerequisites: Phase 4 tasks 4.1–4.3 complete; packages must be published to
+GitHub Packages before the external repo can install them.
+
+- [ ] Task 5.1: Publish v0.1.0 packages to GitHub Packages
+  - Create a GitHub Release tagged `v0.1.0` in the `facioquo/stock-charts`
+    repository. The `publish-packages.yml` workflow fires automatically.
+  - Confirm both `@facioquo/chartjs-chart-financial` and
+    `@facioquo/indy-charts` appear under the repository Packages page
+    with the `latest` dist-tag.
+  - This is a one-time gate; subsequent upgrades follow the same release
+    trigger with a new semver tag.
+
+- [ ] Task 5.2: Configure the external repository for GitHub Packages authentication
+  - Create `.npmrc` at the repo root:
+
+    ```text
+    @facioquo:registry=https://npm.pkg.github.com
+    //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+    ```
+
+  - Add `NODE_AUTH_TOKEN` as a repository secret set to a classic PAT
+    (`read:packages` scope) or `GITHUB_TOKEN` if the external repo is in
+    the same GitHub org that owns the packages.
+  - For local development, set `NODE_AUTH_TOKEN` via `.env` or shell
+    profile (never commit a literal token).
+
+- [ ] Task 5.3: Install `@facioquo/indy-charts` and peer dependencies
+  - Run `pnpm add @facioquo/indy-charts` — installs the published package
+    plus its transitive dependency `@facioquo/chartjs-chart-financial`.
+  - Install peer dependencies explicitly (pnpm requires it):
+    `pnpm add chart.js chartjs-plugin-annotation chartjs-adapter-date-fns date-fns`
+  - Do **not** add `@facioquo/chartjs-chart-financial` as a direct dependency;
+    it is a transitive dep of `@facioquo/indy-charts`.
+
+- [ ] Task 5.4: Configure VitePress `config.ts` for published package consumption
+  - Unlike `tests/vitepress`, the external site must **not** use workspace
+    path aliases that resolve to TypeScript source.
+  - Add `ssr.noExternal` for Chart.js family packages to prevent SSR
+    externalisation failures:
+
+    ```typescript
+    ssr: {
+      noExternal: ["chartjs-adapter-date-fns", "chart.js", "date-fns"]
+    }
+    ```
+
+  - Add a `date-fns` alias pinning the version installed in the site's own
+    `node_modules` (see `tests/vitepress/.vitepress/config.ts` for the
+    reference implementation — the `chartjs-adapter-date-fns@3.0.0` peer
+    dep mismatch still applies).
+  - Call `setupIndyCharts()` exactly once in `.vitepress/theme/index.ts`
+    inside the `enhanceApp` hook.
+
+- [ ] Task 5.5: Port demo Vue components with the deployed API URL as default
+  - Copy `IndyOverlayDemo.vue` and `IndyIndicatorsDemo.vue` from
+    `tests/vitepress/.vitepress/theme/components/` into the external repo.
+  - Change the default `apiBaseUrl` prop from `https://localhost:5001` to
+    `https://stock-charts-api.azurewebsites.net` in both components.
+  - Copy `indy-demo-utils.ts` helper alongside the components (contains
+    `requireListing`, `setSelectionParams` used by `IndyIndicatorsDemo`).
+  - In Markdown pages, pass the `api-base-url` prop explicitly if the
+    default is ever overridden per-page:
+
+    ```markdown
+    <IndyOverlayDemo
+      api-base-url="https://stock-charts-api.azurewebsites.net"
+    />
+    ```
+
+- [ ] Task 5.6: Add the external site origin to the deployed API's CORS allowlist
+  - The deployed Web API reads allowed origins from `CorsOrigins:Website`
+    in `server/WebApi/appsettings.json` (semicolon-separated). Currently
+    contains only localhost origins.
+  - Add the production domain of the external VitePress site (e.g.
+    `https://your-docs-site.github.io` or custom domain) to that list and
+    redeploy `WebApi`.
+  - Also add the domain to the Azure Functions app settings if the external
+    site calls Function endpoints directly.
+  - Validate: open the external site in a browser, check the Network tab
+    for preflight `OPTIONS` requests returning `200` with the
+    `Access-Control-Allow-Origin` header set correctly.
+
+- [ ] Task 5.7: Set up GitHub Actions CI/CD for the external repository
+  - Create `.github/workflows/deploy.yml` triggered on push to `main`:
+
+    ```yaml
+    - name: Setup Node.js with GitHub Packages auth
+      uses: actions/setup-node@v6
+      with:
+        node-version: 24
+        registry-url: https://npm.pkg.github.com
+        scope: "@facioquo"
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+    - name: Build VitePress site
+      run: pnpm run build
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v4
+    ```
+
+  - Set `NODE_AUTH_TOKEN` repository secret to a PAT with `read:packages`.
+  - Enable GitHub Pages in the repository settings (source: branch or
+    Actions artifact depending on the deploy-pages setup).
+
+- [ ] Task 5.8: End-to-end validation against the deployed API
+  - Deploy the external site and open it in a browser.
+  - Verify `IndyOverlayDemo` fetches quotes from
+    `https://stock-charts-api.azurewebsites.net/quotes` and renders an
+    OHLC candlestick chart.
+  - Verify `IndyIndicatorsDemo` loads the indicator listings dropdown,
+    requests selection data, and draws both overlay and oscillator charts.
+  - Confirm no `Access-Control-Allow-Origin` errors in the browser console.
+  - Confirm dark/light theme toggle re-renders charts correctly.
+  - Run at least a manual smoke test against the URL before marking done.
 
 ## Deferred / future work
 
