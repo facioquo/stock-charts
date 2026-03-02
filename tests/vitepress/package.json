@@ -1,0 +1,29 @@
+{
+  "name": "@stock-charts/vitepress-example",
+  "version": "1.0.0",
+  "description": "VitePress example demonstrating @facioquo/indy-charts integration",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vitepress dev --host 0.0.0.0 --port 4300",
+    "build": "vitepress build",
+    "preview": "vitepress preview --port 4301",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "chart.js": "4.5.1",
+    "chartjs-adapter-date-fns": "3.0.0",
+    "chartjs-plugin-annotation": "3.1.0",
+    "date-fns": "^3.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.2",
+    "eslint-config-prettier": "^10.1.8",
+    "jiti": "^2.6.1",
+    "typescript-eslint": "^8.56.1",
+    "vitepress": "2.0.0-alpha.16",
+    "vue": "3.5.29"
+  }
+}

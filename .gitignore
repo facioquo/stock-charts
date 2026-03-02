@@ -27,6 +27,8 @@ artifacts/
 *.trx
 TestResult.xml
 nunit-*.xml
+**/playwright-report/
+.playwright-mcp/
 
 # MSBuild Binary and Structured Log
 *.binlog
@@ -56,6 +58,7 @@ lerna-debug.log*
 testem.log
 .node_repl_history
 .npm
+.pnpm-store
 .yarn-integrity
 
 # ========================================
@@ -87,7 +90,11 @@ appsettings.Development.json
 # AZURE & LOCAL DEVELOPMENT
 # ========================================
 .azurite/
+# .claude/
+.claude/*.local.json
+.codex/
 .codacy/
+.copilot/
 
 # ========================================
 # OS & SYSTEM FILES
@@ -112,6 +119,7 @@ nul
 logs/
 *.vspscc
 *.vssscc
+tmpclaude-*
 
 # ========================================
 # LOGS & DIAGNOSTICS
@@ -130,3 +138,4 @@ Backup*/
 CDF_GUID.txt
 dlldata.c
 FodyWeavers.xsd
+.vitepress/cache/

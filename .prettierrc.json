@@ -44,6 +44,7 @@
     {
       "files": ["**/*.html"],
       "options": {
+        "parser": "angular",
         "printWidth": 120,
         "singleQuote": false,
         "bracketSameLine": false,

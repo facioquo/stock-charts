@@ -19,17 +19,31 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
 
 **All platforms:**
 
-- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24.13.1 LTS or later)
-- [pnpm](https://pnpm.io/) (v10.29.3 or later) - Installed via platform package managers:
+- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
+- [pnpm](https://pnpm.io/) (v10.30.3 or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
-  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.29.3 --activate`)
+  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.30.3 --activate`)
 - [Angular CLI](https://angular.dev/cli) - Installed globally during setup
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 
 **Note:** Azure Functions Core Tools is essential for running the backend Azure Functions locally (`func start` command). It is not installed automatically with Node or .NET SDK.
+
+**Add symlinks if you're not using GitHub Copilot** as your coding agent.
+
+If your AI coding vendor requires a unique configuration folder for custom agents or agent skills, create proper symlinks in your local environment from any **Linux/macOS** shell commandline. Example:
+
+```bash
+cd .cursor
+ln -s ../.agents/skills skills
+ln -s ../.github/agents agents
+```
+
+> [!WARNING]
+> **Windows OS**: Invoke `wsl` to use the WSL(Linux) shell.
+> This does not work properly in Windows terminals, including Git Bash for Windows.
 
 ### Platform-specific installation
 
@@ -57,10 +71,10 @@ pnpm install
 
 Installs all prerequisites via [Homebrew](https://brew.sh/):
 
-- Node.js v24
+- Node.js v24 LTS
 - .NET SDK v10
 - Azure Functions Core Tools v4
-- pnpm v10.29.3 (via Homebrew)
+- pnpm v10 LTS (via Homebrew)
 - Angular CLI (global via pnpm)
 
 ```bash
@@ -71,9 +85,9 @@ bash scripts/setup-macos.sh
 
 Installs all prerequisites via apt-get:
 
-- Node.js v24.13.1
+- Node.js v24 LTS
 - .NET SDK v10.0
-- pnpm v10.29.3 (via Corepack)
+- pnpm v10 LTS (via Corepack)
 - Angular CLI (global)
 
 ```bash
@@ -86,10 +100,10 @@ bash scripts/setup-linux.sh
 
 Installs all prerequisites via winget (requires Git Bash for Windows):
 
-- Node.js v24.13.1 LTS
+- Node.js v24 LTS
 - .NET SDK v10.0
 - Azure Functions Core Tools v4
-- pnpm v10.29.3 (via winget)
+- pnpm v10 LTS (via winget)
 - Angular CLI (global via pnpm)
 
 ```bash
@@ -113,8 +127,8 @@ bash scripts/setup-environment.sh
 After running the setup script or manual installation, verify all tools:
 
 ```bash
-node --version    # Should be v24.13.1+
-pnpm --version    # Should be 10.29.3+
+node --version    # Should be v24+
+pnpm --version    # Should be 10.30.3+
 dotnet --version  # Should be 10.0+
 func --version    # Should be 4.x
 ```

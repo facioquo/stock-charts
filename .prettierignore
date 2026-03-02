@@ -38,6 +38,9 @@ junit.xml
 # Azure local storage emulator
 .azurite
 
+# Markdown files handled separately
+**/*.md
+
 # Temporary files
 *.tmp
 *.temp

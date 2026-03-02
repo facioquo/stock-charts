@@ -20,17 +20,17 @@
   aspect-ratio: 2.5;
 
   // tablet-lg
-  @media (max-width: 880px) {
+  @media (width <= 880px) {
     aspect-ratio: 2;
   }
 
   // mobile
-  @media (max-width: 600px) {
+  @media (width <= 600px) {
     aspect-ratio: 5/4;
   }
 
   // landscape, full screen
-  @media (max-height: 400px) and (orientation: landscape) {
+  @media (height <= 400px) and (orientation: landscape) {
     aspect-ratio: unset;
     height: calc(100vh);
   }
@@ -40,24 +40,24 @@
   aspect-ratio: 10;
 
   // tablet-lg
-  @media (max-width: 880px) {
+  @media (width <= 880px) {
     aspect-ratio: 8;
   }
 
   // tablet-lg, landscape
-  @media (max-width: 880px) and (orientation: landscape) {
+  @media (width <= 880px) and (orientation: landscape) {
     aspect-ratio: unset;
     height: 25vh;
   }
 
   // mobile, landscape
-  @media (max-height: 600px) and (orientation: landscape) {
+  @media (height <= 600px) and (orientation: landscape) {
     aspect-ratio: unset;
     height: 33.33vh;
   }
 
   // mobile
-  @media (max-height: 400px) {
+  @media (height <= 400px) {
     aspect-ratio: unset;
     height: 50vh;
   }

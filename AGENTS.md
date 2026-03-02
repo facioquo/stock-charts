@@ -200,6 +200,8 @@ Scoped instruction files in `.github/instructions/` are automatically attached b
 - **Angular Material v21**: UI component library for consistent design
 - **pnpm workspaces**: Unified dependency management (root + client workspace)
 
+Client-side project dependencies are strictly in this direction only: client → indy-charts → chartjs-financial
+
 ### Backend architecture
 
 - **C# / .NET 10**: Latest language features, record types for DTOs

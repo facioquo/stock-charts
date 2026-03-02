@@ -1,237 +1,349 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-NODE_VERSION="24.13.1"
-PNPM_VERSION="10.29.3"
-DOTNET_VERSION="10.0"
-
-NODE_INSTALL_DIR="/usr/local/lib/nodejs/node-v${NODE_VERSION}"
-PROFILE_SNIPPET="/etc/profile.d/node.sh"
+# Development and CI environment setup
+# Supports both:
+#  - Local WSL/Ubuntu distributions
+#  - Codex Universal (https://github.com/openai/codex-universal)
+#
+# Pre-installed in Codex Universal: apt-get, nvm, pnpm, .NET SDK
 
 log() { printf '\n[setup] %s\n' "$*"; }
 err() { printf '\n[error] %s\n' "$*" >&2; }
+warn() { printf '\n[warning] %s\n' "$*"; }
 
-# Architecture mapping for package repositories and downloads
-arch="$(uname -m)"
-case "$arch" in
-  x86_64) MS_ARCH="amd64" ;;
-  aarch64|arm64) MS_ARCH="arm64" ;;
-  *) err "Unsupported architecture: $arch"; exit 1 ;;
-esac
+# Detect environment and privileges
+can_sudo() { sudo -n true 2>/dev/null || false; }
+is_codex_universal() { [ -f "/.codex-universal" ]; }
 
-# Retry args for curl (works fine even if you don't need it)
-RETRY_CURL_ARGS=(--fail --show-error --location --retry 5 --retry-delay 1 --retry-all-errors)
-
-# Prevent apt prompts in automated environments
-export DEBIAN_FRONTEND=noninteractive
-
-# General Linux tools (3rd line is entirely for CodeRabbit CLI)
-log "Installing base APT packages"
-sudo apt-get update
-sudo apt-get install -y --no-install-recommends ca-certificates curl git gnupg xz-utils
-
-log "Configuring Microsoft package repository for .NET SDK"
-# Get distro info
-source /etc/os-release
-distro_id="${ID}"
-distro_version="${VERSION_ID}"
-
-# Only Ubuntu is supported by this script at the moment
-if [[ "$distro_id" != "ubuntu" ]]; then
-  err "This script currently only supports Ubuntu. Detected: $distro_id"
-  err "For non-Ubuntu systems, please use the Microsoft .NET install script:"
-  err "  curl -sSL https://dot.net/v1/dotnet-install.sh | bash"
-  exit 1
-fi
-
-# Download and install Microsoft package signing key
-curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
-
-# Add Microsoft package repository for Ubuntu
-echo "deb [arch=${MS_ARCH}] https://packages.microsoft.com/repos/microsoft-ubuntu-${distro_version}-prod ${VERSION_CODENAME} main" \
-  | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
-
-# Update package index
-sudo apt-get update
-
-log "Installing .NET SDK v${DOTNET_VERSION}"
-sudo apt-get install -y "dotnet-sdk-${DOTNET_VERSION}"
-dotnet --info
-dotnet --list-sdks
-
-# Install Roslynator dotnet tool
-log "Installing Roslynator dotnet tool..."
-if dotnet tool list -g | grep -q "roslynator.dotnet.cli"; then
-  log "Roslynator already installed"
-  dotnet tool update -g roslynator.dotnet.cli --version 0.11.0 --no-cache >/dev/null 2>&1 || true
-else
-  dotnet tool install -g roslynator.dotnet.cli --version 0.11.0 --no-cache
-  log "Roslynator installed"
-fi
-
-# Configure .NET tools PATH
-log "Configuring .NET tools PATH..."
-if [ -f ~/.bashrc ] && ! grep -qF '.dotnet/tools' ~/.bashrc; then
-  echo "export PATH=\$HOME/.dotnet/tools:\$PATH" >> ~/.bashrc
-  log "Added .NET tools to PATH in ~/.bashrc"
-fi
-export PATH="$HOME/.dotnet/tools:$PATH"
-
-# --- Install Node (no nvm) ---
-log "Installing Node v${NODE_VERSION} (no nvm)"
-
-arch="$(uname -m)"
-case "$arch" in
-  x86_64) node_arch="x64" ;;
-  aarch64|arm64) node_arch="arm64" ;;
-  *) err "Unsupported architecture: $arch"; exit 1 ;;
-esac
-
-url="https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${node_arch}.tar.xz"
-
-# If node is already exactly this version, skip.
-if command -v node >/dev/null 2>&1; then
-  current="$(node -v | sed 's/^v//')"
-  if [[ "$current" == "$NODE_VERSION" ]]; then
-    log "System node version v${current} matches desired v${NODE_VERSION}; will use system node and skip install"
-    SKIP_NODE_INSTALL=1
-  fi
-fi
-# Install if SKIP_NODE_INSTALL not set and the exact node binary isn't present in the target dir.
-if [ "${SKIP_NODE_INSTALL:-0}" = "1" ]; then
-  log "Skipping node install; using system node at $(command -v node)"
-else
-  if [[ ! -x "${NODE_INSTALL_DIR}/bin/node" ]]; then
-    log "Downloading and extracting ${url} -> ${NODE_INSTALL_DIR}"
-    sudo rm -rf "${NODE_INSTALL_DIR}"
-    sudo mkdir -p "${NODE_INSTALL_DIR}"
-    curl "${RETRY_CURL_ARGS[@]}" "$url" | sudo tar -xJ --strip-components=1 -C "${NODE_INSTALL_DIR}"
-  else
-    log "Node already present in ${NODE_INSTALL_DIR}"
-  fi
-fi
-
-# Ensure PATH for current script run if we installed Node here
-if [ "${SKIP_NODE_INSTALL:-0}" = "1" ]; then
-  log "Using system node; leaving PATH unchanged"
-else
-  # Prepend installed node to PATH so subsequent commands use it
-  export PATH="${NODE_INSTALL_DIR}/bin:${PATH}"
-fi
-
-# Ensure PATH for future shells if we installed Node here
-if [ "${SKIP_NODE_INSTALL:-0}" != "1" ]; then
-  if [[ ! -f "$PROFILE_SNIPPET" ]] || ! sudo grep -qF "${NODE_INSTALL_DIR}/bin" "$PROFILE_SNIPPET"; then
-    log "Writing ${PROFILE_SNIPPET} to persist Node on PATH"
-    sudo tee "$PROFILE_SNIPPET" >/dev/null <<EOF
-# Node.js (installed by setup script)
-export PATH="${NODE_INSTALL_DIR}/bin:\$PATH"
-EOF
-    sudo chmod 0644 "$PROFILE_SNIPPET"
-  fi
-fi
-
-log "Node: $(node --version)"
-log "npm:  $(npm --version)"
-
-# Install pnpm (via Corepack)
-log "Enabling Corepack and pnpm@${PNPM_VERSION}"
-# Try to enable corepack (may need sudo on some systems)
-if corepack enable 2>/dev/null; then
-  log "Corepack enabled system-wide"
-  # Only run prepare if corepack enable succeeded
-  corepack prepare "pnpm@${PNPM_VERSION}" --activate || log "Corepack prepare failed, will use npx fallback"
-else
-  log "Corepack enable requires elevated permissions - will use via npx instead"
-fi
-
-# Configure pnpm global directory first
-log "Configuring pnpm global directory..."
-export PNPM_HOME="${HOME}/.local/share/pnpm"
-export PATH="${PNPM_HOME}:${PATH}"
-
-# Use npx to run pnpm setup (works even without symlinks)
-npx --yes pnpm@${PNPM_VERSION} setup --force 2>/dev/null || true
-
-# Verify pnpm is available (via npx if symlink doesn't exist)
-if command -v pnpm >/dev/null 2>&1; then
-  log "pnpm: $(pnpm --version)"
-elif npx --yes pnpm@${PNPM_VERSION} --version >/dev/null 2>&1; then
-  log "pnpm: $(npx --yes pnpm@${PNPM_VERSION} --version) (via npx)"
-  # Create a shell function to use pnpm via npx
-  pnpm() { npx --yes pnpm@${PNPM_VERSION} "$@"; }
-  export -f pnpm
-else
-  err "pnpm not available"
-  exit 1
-fi
-
-# Install Angular CLI globally
-log "Installing Angular CLI globally..."
-if command -v ng >/dev/null 2>&1; then
-  ng_version=$(ng version 2>&1 | sed -n 's/^Angular CLI[[:space:]]*:[[:space:]]*\([0-9.]*\).*/\1/p' || echo "unknown")
-  log "Angular CLI already installed: ${ng_version}"
-else
-  pnpm add -g @angular/cli
-  ng_version=$(ng version 2>&1 | sed -n 's/^Angular CLI[[:space:]]*:[[:space:]]*\([0-9.]*\).*/\1/p' || echo "unknown")
-  log "Angular CLI installed: ${ng_version}"
-fi
-
-# Change to repository root
-log "Changing to repository root..."
-cd "$(dirname "$0")/.." || exit 1
-
-# Install Node dependencies
-log "📦 Installing Node dependencies..."
-pnpm install --frozen-lockfile --loglevel=error --config.confirmModulesPurge=false
-
-# Define cleanup to remove package manager caches and Apt lists to avoid
-# carrying ephemeral installation bloat in images/environments.
-# Cleanup is conservative by default on developer machines; in CI/container
-# images we'll be more aggressive. Set SKIP_CLEANUP=1 to opt out.
-cleanup() {
-  if [ "${SKIP_CLEANUP:-0}" = "1" ]; then
-    log "SKIP_CLEANUP=1; skipping cleanup"
-    return 0
-  fi
-
-  log "Cleaning package manager caches and apt lists..."
-  sudo apt-get clean || true
-  sudo rm -rf /var/lib/apt/lists/* || true
-
-  if command -v pnpm >/dev/null 2>&1; then
-    pnpm store prune --loglevel=error || true
-    # Only remove full store in CI/container environments
-    if [ "${CI:-}" = "true" ] || [ "${CONTAINER:-}" = "1" ]; then
-      rm -rf "${HOME}/.local/share/pnpm/store" || true
+# =========================================================================
+# APT Package Management (with privilege detection)
+# =========================================================================
+apt_update() {
+  if command -v apt-get &>/dev/null; then
+    log "Updating APT packages"
+    if can_sudo; then
+      sudo apt-get update -qq || true
+    else
+      apt-get update -qq || true
     fi
-  fi
-
-  if command -v npm >/dev/null 2>&1; then
-    npm cache clean --force || true
-  fi
-
-  # Remove old temp files only (safer for interactive/dev machines). In CI
-  # or when running in a container we remove everything in /tmp to reduce
-  # image size. CI environments commonly set CI=true.
-  if [ "${CI:-}" = "true" ] || [ "${CONTAINER:-}" = "1" ]; then
-    sudo rm -rf /tmp/* || true
   else
-    find /tmp -mindepth 1 -maxdepth 1 -mtime +1 -exec sudo rm -rf {} + || true
+    warn "apt-get not available, skipping package updates"
   fi
 }
 
-# Ensure cleanup runs on script exit to keep images smaller
-trap cleanup EXIT
+apt_install() {
+  local packages=("$@")
+  if command -v apt-get &>/dev/null && [ ${#packages[@]} -gt 0 ]; then
+    if can_sudo; then
+      sudo apt-get install -y "${packages[@]}" || true
+    else
+      apt-get install -y "${packages[@]}" || true
+    fi
+  fi
+}
 
-# Begin environment setup after defining cleanup handler
+# =========================================================================
+# Node Version Manager (nvm)
+# =========================================================================
+setup_nvm() {
+  if command -v nvm &>/dev/null; then
+    log "nvm already installed"
+    return 0
+  fi
 
-# Install CodeRabbit CLI
-log "🐇 Installing CodeRabbit CLI"
-sudo apt-get install -y libsecret-1-0 libsecret-tools gnome-keyring dbus-user-session
-curl -fsSL https://cli.coderabbit.ai/install.sh | sh
+  if [ -s "$HOME/.nvm/nvm.sh" ]; then
+    log "nvm directory found, sourcing nvm"
+    source "$HOME/.nvm/nvm.sh"
+    return 0
+  fi
 
-# Cleanup
-sudo apt autoremove --purge -y
+  warn "nvm not found, attempting installation via official installer"
 
-log "✅ Environment setup complete!"
+  # Download nvm installer to temp file so curl failures are caught separately from execution
+  local nvm_version="v0.40.4"
+  local tmp_nvm
+  tmp_nvm=$(mktemp /tmp/nvm-install-XXXXXX.sh)
+  trap 'rm -f "$tmp_nvm"; trap - RETURN' RETURN
+
+  if ! curl -fsSL -o "$tmp_nvm" "https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_version/install.sh" || \
+     [ ! -s "$tmp_nvm" ]; then # nosemgrep: bash.curl.security.curl-pipe-bash
+    err "Failed to download nvm installer"
+    return 1
+  fi
+
+  if ! bash "$tmp_nvm"; then
+    err "Failed to run nvm installer"
+    return 1
+  fi
+
+  # Source nvm after installation
+  if [ -s "$HOME/.nvm/nvm.sh" ]; then
+    source "$HOME/.nvm/nvm.sh"
+    log "nvm installed and sourced"
+  else
+    err "Failed to install nvm; some Node features may be unavailable"
+    return 1
+  fi
+}
+
+# =========================================================================
+# Node.js
+# =========================================================================
+setup_node() {
+  local node_version="24.14.0"
+
+  if ! command -v node &>/dev/null; then
+    log "Node not found, installing via nvm"
+    setup_nvm || return 1
+    nvm install "$node_version" || { err "Failed to install Node $node_version"; return 1; }
+    nvm use "$node_version" || { err "Failed to activate Node $node_version"; return 1; }
+  fi
+
+  log "Node: $(node --version)"
+  log "npm : $(npm --version)"
+}
+
+# =========================================================================
+# pnpm Package Manager
+# =========================================================================
+setup_pnpm() {
+  if ! command -v pnpm &>/dev/null; then
+    log "Installing pnpm globally"
+    npm install -g pnpm || { err "Failed to install pnpm globally"; return 1; }
+  fi
+
+  log "pnpm: $(pnpm --version)"
+}
+
+# =========================================================================
+# .NET SDK
+# =========================================================================
+setup_dotnet() {
+  local dotnet_version="${DOTNET_VERSION:-10.0}"
+
+  if command -v dotnet &>/dev/null; then
+    log "Existing .NET SDKs:"
+    dotnet --list-sdks || log "(Could not list SDKs)"
+
+    # Verify the required SDK major version is installed
+    local major="${dotnet_version%%.*}"
+    if dotnet --list-sdks 2>/dev/null | grep -q "^${major}\."; then
+      log ".NET SDK v${dotnet_version} series already installed"
+      return 0
+    fi
+
+    warn ".NET SDK v${dotnet_version} series not found among installed SDKs; attempting install"
+  fi
+
+  log "Installing .NET SDK v$dotnet_version"
+
+  # On Debian, dotnet-sdk-10.0 is not in default repositories.
+  # Add Microsoft's official APT feed before attempting to install.
+  # Note: Ubuntu 22.04+ ships .NET in the official Ubuntu Universe APT repository;
+  # adding the Microsoft feed on Ubuntu creates package conflicts.
+  if command -v apt-get &>/dev/null && [[ -f /etc/os-release ]]; then
+    local distro_id version_id
+    distro_id=$(. /etc/os-release && echo "${ID:-}")
+    version_id=$(. /etc/os-release && echo "${VERSION_ID:-}")
+
+    if [[ "$distro_id" == "debian" ]] && [[ -n "$version_id" ]]; then
+      log "Adding Microsoft APT feed for ${distro_id} ${version_id}"
+
+      # Ensure HTTPS transport prerequisites are present
+      apt_install apt-transport-https ca-certificates
+
+      # Register the Microsoft packages repository via the official .deb package
+      local ms_pkg_deb
+      ms_pkg_deb=$(mktemp /tmp/packages-microsoft-prod-XXXXXX.deb)
+
+      if curl -fsSL -o "$ms_pkg_deb" \
+          "https://packages.microsoft.com/config/${distro_id}/${version_id}/packages-microsoft-prod.deb" && \
+         [[ -s "$ms_pkg_deb" ]]; then
+        if can_sudo; then
+          sudo dpkg -i "$ms_pkg_deb" || warn "Microsoft APT feed registration failed"
+        else
+          dpkg -i "$ms_pkg_deb" || warn "Microsoft APT feed registration failed"
+        fi
+      else
+        warn "Could not download Microsoft packages config; dotnet install may fail"
+      fi
+
+      rm -f "$ms_pkg_deb"
+      apt_update
+    fi
+  fi
+
+  apt_install "dotnet-sdk-${dotnet_version}"
+
+  # Verify the requested .NET version was actually installed
+  if ! command -v dotnet &>/dev/null; then
+    err "Failed to install .NET SDK ${dotnet_version}: dotnet command not found"
+    return 1
+  fi
+
+  log "Installed .NET SDKs:"
+  dotnet --list-sdks || true
+
+  # Parse dotnet --list-sdks output to verify the requested version
+  if ! dotnet --list-sdks | grep -q "^${dotnet_version}\."; then
+    err "Failed to install .NET SDK ${dotnet_version}: requested version not found in installed SDKs"
+    return 1
+  fi
+}
+
+# =========================================================================
+# .NET Tools (if dotnet is available)
+# =========================================================================
+setup_dotnet_tools() {
+  if ! command -v dotnet &>/dev/null; then
+    warn "dotnet not available, skipping dotnet tools"
+    return 0
+  fi
+
+  log "Restoring dotnet tools (dotnet format, roslynator, etc)..."
+  if dotnet tool restore; then
+    log "Dotnet tools restored successfully"
+
+    # Verify critical tools are available via dotnet tool list
+    if dotnet tool list --global 2>/dev/null | grep -q "dotnet-format" || \
+       dotnet tool list 2>/dev/null | grep -q "dotnet-format"; then
+      log "✓ dotnet format is available (primary linting tool)"
+    fi
+
+    if dotnet tool list --global 2>/dev/null | grep -qiE "roslynator|dotnet-roslynator" || \
+       dotnet tool list 2>/dev/null | grep -qiE "roslynator|dotnet-roslynator"; then
+      log "✓ roslynator is available (optional analyzer)"
+      warn "Note: roslynator may have compatibility issues with your .NET SDK version"
+      warn "See scripts/dotnet-lint.sh for recommended linting approach"
+    fi
+  else
+    warn "dotnet tool restore completed with warnings (some tools may be unavailable)"
+  fi
+}
+
+# =========================================================================
+# Angular CLI
+# =========================================================================
+setup_angular_cli() {
+  if command -v ng &>/dev/null; then
+    log "Angular CLI already installed: $(ng version --minimal 2>/dev/null || echo 'version unknown')"
+    return 0
+  fi
+
+  log "Installing Angular CLI globally..."
+  pnpm install -g @angular/cli || { err "Angular CLI installation failed"; return 1; }
+}
+
+# =========================================================================
+# CodeRabbit CLI (Optional - only if curl available and not in restricted env)
+# =========================================================================
+setup_coderabbit() {
+  # Check if coderabbit already exists
+  if command -v coderabbit &>/dev/null; then
+    log "🐇 CodeRabbit CLI already installed, updating..."
+    coderabbit update || warn "CodeRabbit CLI update had issues"
+    return 0
+  fi
+
+  if ! command -v curl &>/dev/null; then
+    warn "curl not available, skipping CodeRabbit CLI"
+    return 0
+  fi
+
+  # Check if we're in a restricted environment
+  if is_codex_universal; then
+    log "Skipping CodeRabbit CLI in Codex Universal environment"
+    return 0
+  fi
+
+  # Only install CodeRabbit if privileged
+  if ! can_sudo; then
+    warn "Insufficient privileges for CodeRabbit CLI, skipping"
+    return 0
+  fi
+
+  log "🐇 Installing CodeRabbit CLI"
+  apt_install libsecret-1-0 libsecret-tools gnome-keyring dbus-user-session
+
+  # Official CodeRabbit CLI installer: download to a temp file then execute
+  # (avoids curl|bash pipe; see https://cli.coderabbit.ai for details)
+  local install_script
+  install_script="$(mktemp)"
+  if curl -fsSL https://cli.coderabbit.ai/install.sh -o "$install_script"; then
+    bash "$install_script"
+    rm -f "$install_script"
+    log "CodeRabbit CLI installed"
+  else
+    rm -f "$install_script"
+    warn "CodeRabbit CLI installation failed or skipped"
+  fi
+}
+
+# =========================================================================
+# Node Dependencies
+# =========================================================================
+setup_node_dependencies() {
+  log "📦 Installing Node dependencies..."
+  pnpm install --frozen-lockfile --loglevel=error --config.confirmModulesPurge=false || {
+    err "pnpm install failed"
+    return 1
+  }
+}
+
+# =========================================================================
+# Cleanup (environment-aware)
+# =========================================================================
+cleanup() {
+  log "Pruning caches and cleaning up environment..."
+
+  # pnpm cleanup (always safe)
+  pnpm store prune --loglevel=error 2>/dev/null || true
+
+  # apt cleanup (only if we have apt-get)
+  if command -v apt-get &>/dev/null; then
+    if can_sudo; then
+      sudo apt-get clean -qq 2>/dev/null || true
+      sudo apt-get autoclean -qq 2>/dev/null || true
+      sudo apt-get autoremove -yqq 2>/dev/null || true
+    else
+      apt-get clean -qq 2>/dev/null || true
+    fi
+  fi
+}
+
+# =========================================================================
+# Main Setup Flow
+# =========================================================================
+main() {
+  log "Starting environment setup..."
+
+  if is_codex_universal; then
+    log "Detected Codex Universal environment"
+  else
+    log "Detected local Linux environment (WSL/native)"
+  fi
+
+  # Core tools (required)
+  setup_nvm || warn "nvm setup had issues, continuing"
+  setup_node || { err "Node.js setup failed"; exit 1; }
+  setup_pnpm || { err "pnpm setup failed"; exit 1; }
+  setup_dotnet || warn ".NET SDK setup had issues, continuing"
+
+  # Tooling (required if core tools available)
+  setup_dotnet_tools || warn "dotnet tools had issues, continuing"
+  setup_angular_cli || warn "Angular CLI setup had issues, continuing"
+
+  # Optional tools
+  setup_coderabbit || true
+
+  # Dependencies
+  setup_node_dependencies || { err "Node dependency installation failed"; exit 1; }
+
+  # Cleanup
+  cleanup
+
+  log "✅ Environment setup complete!"
+}
+
+main "$@"

@@ -12,12 +12,13 @@ IServiceCollection services = builder.Services;
 // Add framework services
 services.AddControllers();
 
-// Get CORS origins from appsettings
+// Get CORS origins from appsettings (semicolon-separated list)
 // reminder: production origins defined in cloud host settings » API » CORS
 // so these are really only for localhost / development
-string? allowedOrigin = configuration.GetValue<string>("CorsOrigins:Website");
+string? allowedOriginConfig = configuration.GetValue<string>("CorsOrigins:Website");
+string[] allowedOrigins = allowedOriginConfig?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? [];
 
-if (!string.IsNullOrEmpty(allowedOrigin))
+if (allowedOrigins.Length > 0)
 {
     // Setup CORS for website
     services.AddCors(options => {
@@ -26,12 +27,12 @@ if (!string.IsNullOrEmpty(allowedOrigin))
             cors.AllowAnyHeader();
             cors.AllowAnyMethod();
             cors.AllowCredentials();
-            cors.WithOrigins(allowedOrigin)
+            cors.WithOrigins(allowedOrigins)
                 .SetIsOriginAllowedToAllowWildcardSubdomains();
         });
     });
 
-    Console.WriteLine($"CORS Origin: {allowedOrigin}");
+    Console.WriteLine($"CORS Origins: {string.Join(", ", allowedOrigins)}");
 }
 
 // Add response compression services
