@@ -10,7 +10,7 @@ This project uses **pnpm workspaces** with a root workspace and client workspace
 ### General rules
 
 - Always update packages to their latest compatible versions
-- Do not use `^` or `~` version ranges
+- Use `^` or `~` version ranges appropriately
 - Start with Angular package updates using `ng update` CLI for proper migrations
 - Use `ncu --peer` CLI to determine latest compatible versions
 - ALWAYS understand and resolve all `pnpm` warnings and `pnpm audit` issues

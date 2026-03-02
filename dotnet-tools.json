@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "roslynator.dotnet.cli": {
+      "version": "0.11.0",
+      "commands": ["roslynator"],
+      "rollForward": false
+    },
+    "dotnet-outdated-tool": {
+      "version": "4.7.0",
+      "commands": ["dotnet-outdated"],
+      "rollForward": true
+    },
+    "swashbuckle.aspnetcore.cli": {
+      "version": "10.1.4",
+      "commands": ["swagger"],
+      "rollForward": true
+    },
+    "dotnet-reportgenerator-globaltool": {
+      "version": "5.5.1",
+      "commands": ["reportgenerator"],
+      "rollForward": true
+    }
+  }
+}

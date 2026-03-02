@@ -4,8 +4,7 @@
   "$schema": "vscode://schemas/tasks",
   "version": "2.0.0",
   "presentation": {
-    "echo": true,
-    "clear": false,
+    "clear": true,
     "panel": "dedicated",
     "showReuseMessage": false
   },
@@ -15,19 +14,17 @@
   },
   "tasks": [
     {
-      "label": "Setup: Dev environment",
+      "label": "Setup: Dev environment (linux)",
       "detail": "Install all development prerequisites (Node, .NET, Azure Functions Core Tools, pnpm)",
       "type": "shell",
-      "command": "bash scripts/setup-environment.sh",
-      "group": "none",
-      "problemMatcher": []
+      "command": "bash scripts/setup-linux.sh",
+      "group": "none"
     },
     {
       "label": "Initialize: Pull, rebuild, and verify",
       "detail": "Pull latest, clean, rebuild, format, lint, and run tests",
       "dependsOn": [
         "Git: pull",
-        "Clean: All outputs",
         "Build: All projects (full rebuild)",
         "Lint: All (fix)",
         "Test: All tests"
@@ -65,20 +62,32 @@
       "label": "Check: Node packages",
       "detail": "Check for dependency updates in root and all workspace packages",
       "type": "shell",
-      "command": "pnpm run deps:check",
-      "problemMatcher": []
+      "command": "pnpm run deps:check"
+    },
+    {
+      "label": "Check: Angular packages (client)",
+      "detail": "Check for dependency updates using Angular CLI for the client website.",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/client exec ng update"
+    },
+    {
+      "label": "Update: Angular packages (client)",
+      "detail": "Update dependencies using Angular CLI for the client website.",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/client exec ng update @angular/cli @angular/core @angular/material angular-eslint --allow-dirty"
     },
     {
       "label": "Update: Node packages",
       "detail": "Update dependencies in root and all workspace packages to latest versions",
       "type": "shell",
-      "command": "pnpm run deps:update",
-      "problemMatcher": []
+      "command": "pnpm run deps:update && pnpm install",
+      "dependsOn": "Update: Angular packages (client)",
+      "dependsOrder": "sequence"
     },
     {
       "label": "Build: All projects (incremental)",
-      "detail": "Incremental build of Website and Backend .NET code",
-      "dependsOn": ["Build: Backend .NET code (incremental)", "Build: Website"],
+      "detail": "Incremental build of Website and Backend .NET",
+      "dependsOn": ["Build: Backend .NET (incremental)", "Build: Website"],
       "dependsOrder": "parallel",
       "group": {
         "kind": "build",
@@ -88,10 +97,11 @@
     },
     {
       "label": "Build: All projects (full rebuild)",
-      "detail": "Full rebuild without incremental compilation",
+      "detail": "Full hard-reset rebuild without incremental compilation",
       "dependsOn": [
-        "Clean: All outputs",
-        "Build: Backend .NET code (non-incremental)",
+        "Clean: All (hard reset)",
+        "Install: All package dependencies",
+        "Build: Backend .NET (non-incremental)",
         "Build: Website"
       ],
       "dependsOrder": "sequence",
@@ -109,7 +119,7 @@
       "dependsOrder": "sequence"
     },
     {
-      "label": "Build: Backend .NET code (non-incremental)",
+      "label": "Build: Backend .NET (non-incremental)",
       "detail": "Build .NET solution",
       "type": "shell",
       "command": "dotnet build Charts.sln -v minimal --nologo --no-incremental",
@@ -117,7 +127,7 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Build: Backend .NET code (incremental)",
+      "label": "Build: Backend .NET (incremental)",
       "detail": "Build .NET solution",
       "type": "shell",
       "command": "dotnet build Charts.sln -v minimal --nologo",
@@ -125,7 +135,7 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Build: Backend .NET code (production)",
+      "label": "Build: Backend .NET (production)",
       "detail": "Build .NET solution in Release configuration",
       "type": "shell",
       "command": "dotnet build Charts.sln -c Release -v minimal --nologo",
@@ -134,11 +144,12 @@
     },
     {
       "label": "Lint: All (check)",
-      "detail": "Run all linting and formatting checks (ESLint, Prettier, Roslynator, dotnet format, markdownlint)",
+      "detail": "Run all linting and formatting checks (ESLint, Prettier, Roslynator, dotnet format, markdownlint, stylelint)",
       "dependsOn": [
-        "Lint: Website code (check)",
-        "Lint: Backend .NET code (check)",
-        "Lint: Markdown (check)"
+        "Lint: Website (check)",
+        "Lint: Backend .NET (check)",
+        "Lint: Markdown (check)",
+        "Lint: Stylelint (check)"
       ],
       "dependsOrder": "parallel",
       "group": "test",
@@ -154,46 +165,47 @@
     },
     {
       "label": "Lint: All code (fix)",
-      "detail": "Auto-fix Website (ESLint + Prettier) and Backend (Roslynator + dotnet format) code",
+      "detail": "Auto-fix Website (ESLint + Prettier), Backend (Roslynator + dotnet format), and CSS (stylelint) code",
       "dependsOn": [
-        "Lint: Website code (fix)",
-        "Lint: Backend .NET code (fix)"
+        "Lint: Website (fix)",
+        "Lint: Backend .NET (fix)",
+        "Lint: Stylelint (fix)"
       ],
       "dependsOrder": "parallel",
       "group": "none",
       "problemMatcher": ["$tsc", "$markdownlint"]
     },
     {
-      "label": "Lint: Website code (check)",
-      "detail": "Check Angular code with ESLint and Prettier",
+      "label": "Lint: Website (check)",
+      "detail": "Check Angular, library, and VitePress code with ESLint and Prettier",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run lint && pnpm run format:web:check",
+      "command": "bash scripts/website-lint.sh check",
       "group": "test",
       "problemMatcher": "$eslint-stylish"
     },
     {
-      "label": "Lint: Website code (fix)",
-      "detail": "Auto-fix Angular code with ESLint and format with Prettier",
+      "label": "Lint: Website (fix)",
+      "detail": "Auto-fix Angular, library, and VitePress code with ESLint and format with Prettier",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run lint:fix && pnpm run format:web",
+      "command": "bash scripts/website-lint.sh fix",
       "group": "none",
       "problemMatcher": "$tsc"
     },
     {
-      "label": "Lint: Backend .NET code (check)",
-      "detail": "Run Roslynator analysis and .NET format check",
+      "label": "Lint: Backend .NET (check)",
+      "detail": "Check .NET code formatting with dotnet format (Roslynator optional)",
       "type": "shell",
-      "command": "dotnet format --verify-no-changes && roslynator analyze",
-      "dependsOn": ["Build: Backend .NET code (incremental)"],
+      "command": "bash scripts/dotnet-lint.sh check",
+      "dependsOn": ["Build: Backend .NET (incremental)"],
       "dependsOrder": "sequence",
       "group": "test",
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Lint: Backend .NET code (fix)",
-      "detail": "Format Backend .NET code with dotnet format and Roslynator",
+      "label": "Lint: Backend .NET (fix)",
+      "detail": "Format Backend .NET with dotnet format (Roslynator optional)",
       "type": "shell",
-      "command": "roslynator fix && dotnet format",
+      "command": "bash scripts/dotnet-lint.sh fix",
       "group": "none",
       "problemMatcher": "$msCompile"
     },
@@ -214,9 +226,23 @@
       "problemMatcher": "$markdownlint"
     },
     {
+      "label": "Lint: Stylelint (check)",
+      "detail": "Check CSS files with stylelint",
+      "type": "shell",
+      "command": "pnpm run lint:css",
+      "group": "test"
+    },
+    {
+      "label": "Lint: Stylelint (fix)",
+      "detail": "Auto-fix CSS files with stylelint",
+      "type": "shell",
+      "command": "pnpm run lint:css:fix",
+      "group": "none"
+    },
+    {
       "label": "Test: All tests",
-      "detail": "Run Website and Backend .NET code unit tests",
-      "dependsOn": ["Test: Website", "Test: Backend .NET code"],
+      "detail": "Run Website and Backend .NET unit tests",
+      "dependsOn": ["Test: Website", "Test: Backend .NET"],
       "dependsOrder": "parallel",
       "group": "test",
       "problemMatcher": "$msCompile"
@@ -227,21 +253,47 @@
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client run test",
       "group": "test",
-      "problemMatcher": "$tsc",
-      "presentation": { "clear": true }
+      "problemMatcher": "$tsc"
     },
     {
-      "label": "Test: Backend .NET code",
+      "label": "Test: Backend .NET",
       "detail": "Run .NET unit tests",
       "type": "shell",
       "command": "pnpm run test:dotnet",
       "group": "test",
-      "problemMatcher": "$msCompile",
-      "presentation": { "clear": true }
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Review: CodeRabbit CLI (plain)",
+      "detail": "Perform a full code review with CodeRabbit CLI in plain text response mode",
+      "type": "shell",
+      "command": "coderabbit",
+      "args": ["--plain"]
+    },
+    {
+      "label": "Review: CodeRabbit CLI (prompt-only)",
+      "detail": "Perform a full code review with CodeRabbit CLI in prompt-only response mode",
+      "type": "shell",
+      "command": "coderabbit",
+      "args": ["--prompt-only"]
+    },
+    {
+      "label": "Review: CodeRabbit CLI (uncommitted, plain)",
+      "detail": "Perform a code review on uncommitted with CodeRabbit CLI in plain text response mode",
+      "type": "shell",
+      "command": "coderabbit",
+      "args": ["--plain", "--type", "uncommitted"]
+    },
+    {
+      "label": "Review: CodeRabbit CLI (uncommitted, prompt-only)",
+      "detail": "Perform a code review on uncommitted with CodeRabbit CLI in prompt-only response mode",
+      "type": "shell",
+      "command": "coderabbit",
+      "args": ["--prompt-only", "--type", "uncommitted"]
     },
     {
       "label": "Run: Full development stack",
-      "detail": "Start all Backend .NET code services and Website dev server",
+      "detail": "Start all Backend .NET services and Website dev server",
       "dependsOn": [
         "Stop: All services",
         "Run: Azure Storage",
@@ -274,12 +326,12 @@
       "label": "Run: Azure Functions",
       "detail": "Start Azure Functions host",
       "type": "shell",
-      "command": "func start",
-      "dependsOn": "Build: Backend .NET code (incremental)",
+      "command": "node scripts/start-functions.js",
+      "dependsOn": "Build: Backend .NET (incremental)",
       "dependsOrder": "sequence",
       "isBackground": true,
       "options": {
-        "cwd": "${workspaceFolder}/server/Functions"
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": {
         "owner": "azure-functions",
@@ -384,31 +436,31 @@
     // CLEANUP
     // =========================================================================
     {
-      "label": "Clean: All outputs",
-      "detail": "Clean build outputs from all projects",
+      "label": "Clean: All (hard reset)",
+      "detail": "Hard reset: composite of all clean tasks (deep clean)",
       "dependsOn": [
-        "Clean: Root and Azure storage",
-        "Clean: Website outputs",
-        "Clean: Backend .NET outputs"
+        "Clean: Backend .NET (hard reset)",
+        "Clean: Website",
+        "Clean: Root and Azure storage"
       ],
-      "dependsOrder": "parallel",
+      "dependsOrder": "sequence",
       "group": "build"
     },
     {
-      "label": "Clean: Website outputs",
+      "label": "Clean: Website",
       "detail": "Clean Angular build outputs (dist, coverage)",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client run clean"
     },
     {
-      "label": "Clean: Backend .NET outputs",
+      "label": "Clean: Backend .NET",
       "detail": "Clean .NET build outputs (bin, obj)",
       "type": "shell",
       "command": "dotnet clean Charts.sln -v minimal --nologo",
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Clean: Backend solution (hard reset)",
+      "label": "Clean: Backend .NET (hard reset)",
       "detail": "Deletes all bin/obj folders and runs dotnet clean command (hard clean)",
       "type": "shell",
       "command": "bash scripts/dotnet-clean.sh",
@@ -425,8 +477,19 @@
       "label": "Clean: Azure Storage Emulator data",
       "detail": "Delete local Azurite data and state",
       "type": "shell",
-      "command": "pnpm run azure:clean",
-      "group": "none"
+      "command": "pnpm run azure:clean"
+    },
+    {
+      "label": "Delete: Claude temporary files",
+      "detail": "Delete all tmpclaude-*-cwd files (bug workaround)",
+      "type": "shell",
+      "command": "find . -maxdepth 25 -type f -name 'tmpclaude-*-cwd' -delete",
+      "options": {
+        "shell": {
+          "executable": "/bin/bash",
+          "args": ["-lc"]
+        }
+      }
     }
   ]
 }

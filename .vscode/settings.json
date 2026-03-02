@@ -43,6 +43,7 @@
   "debug.internalConsoleOptions": "neverOpen",
   "problems.showCurrentInStatus": true,
   "problems.sortOrder": "severity",
+  "redhat.telemetry.enabled": false,
   "search.exclude": {
     "**/node_modules": true,
     "**/bin": true,

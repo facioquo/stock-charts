@@ -1,52 +1,19 @@
 {
   // globs to lint
-  "globs": [
-    "**/*.md"
-  ],
-  // ignores (should align to repo needs)
-  "ignores": [
-    ".azurite/**",
-    ".github/**/*.md",
-    "node_modules/**",
-    "**/node_modules/**"
-  ],
-  // rules configuration (same identifiers as markdownlint rules)
+  "globs": ["**/*.md"],
+  "gitignore": true,
+  "ignores": [".azurite/**", ".github/**/*.md", "node_modules/**", "**/node_modules/**"],
   "config": {
     "default": true,
-    "MD003": {
-      "style": "atx"
-    },
-    "MD004": {
-      "style": "dash"
-    },
-    "MD007": {
-      "indent": 2
-    },
+    "MD003": { "style": "atx" },
+    "MD004": { "style": "dash" },
+    "MD007": { "indent": 2 },
     "MD013": false, // allow long lines
-    "MD024": {
-      "siblings_only": true
-    },
-    "MD033": {
-      "allowed_elements": [
-        "details",
-        "summary",
-        "br",
-        "sub",
-        "sup",
-        "kbd",
-        "abbr",
-        "a",
-        "img",
-        "workflow"
-      ]
-    },
+    "MD024": { "siblings_only": true },
+    "MD033": true,
     "MD041": false,
-    "MD046": {
-      "style": "fenced"
-    },
-    "MD048": {
-      "style": "backtick"
-    },
+    "MD046": { "style": "fenced" },
+    "MD048": { "style": "backtick" },
     "MD060": false
   }
 }

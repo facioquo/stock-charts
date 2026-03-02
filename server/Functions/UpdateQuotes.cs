@@ -37,9 +37,13 @@ public partial class Jobs
     /// Schedule to get and cache quotes from source feed.
     /// </summary>
     /// <param name="_" cref="TimerInfo">CRON-based schedule</param>
-    /// <remarks>Depends on TZ environment settings for EST time zone</remarks>
+    /// <remarks>
+    /// Depends on TZ environment settings for EST time zone.
+    /// RunOnStartup ensures at least one execution immediately after process start,
+    /// regardless of whether the current time falls within the market-hours schedule.
+    /// </remarks>
     [Function("UpdateQuotes")]
-    public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5")] TimerInfo _)
+    public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5", RunOnStartup = true)] TimerInfo _)
     {
         // Check if Alpaca credentials are available
         if (string.IsNullOrEmpty(_alpacaKey) || string.IsNullOrEmpty(_alpacaSecret))

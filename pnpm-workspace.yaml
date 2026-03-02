@@ -1,5 +1,7 @@
 packages:
   - client
+  - tests/playwright
+  - tests/vitepress
 
 ignoredBuiltDependencies:
   - '@parcel/watcher'
@@ -7,3 +9,4 @@ ignoredBuiltDependencies:
   - lmdb
   - msgpackr-extract
   - unrs-resolver
+  - vue-demi
