@@ -61,13 +61,29 @@ if (!checkFuncAvailable(FUNC_CMD)) {
   console.error("If you use npm: `npm i -g azure-functions-core-tools@4` (or use the platform installer). Ensure the 'func' command is on your PATH and restart your terminal/VS Code.");
   process.exit(1);
 }
-/** Attempt to spawn FUNC_CMD; returns the ChildProcess or a syncError wrapper. */
-function spawnFunc(useShell) {
+/** Attempt to spawn FUNC_CMD directly (no shell). Returns ChildProcess or syncError wrapper. */
+function spawnFuncDirect() {
   try {
     return spawn(FUNC_CMD, ["start"], {
       cwd: functionsDir,
       stdio: "inherit",
-      shell: useShell
+      shell: false
+    });
+  } catch (err) {
+    return { syncError: err };
+  }
+}
+
+/**
+ * Windows fallback: .cmd files need cmd.exe to run; use an explicit cmd.exe invocation
+ * instead of shell:true so the command string is never interpreted by a shell.
+ */
+function spawnFuncViaCmd() {
+  try {
+    return spawn("cmd.exe", ["/c", "func", "start"], {
+      cwd: functionsDir,
+      stdio: "inherit",
+      shell: false
     });
   } catch (err) {
     return { syncError: err };
@@ -87,12 +103,14 @@ function spawnNpxFallback() {
   }
 }
 
-let funcProcess = spawnFunc(false);
+let funcProcess = spawnFuncDirect();
 
 if (funcProcess && funcProcess.syncError) {
-  // Synchronous spawn error (e.g., EINVAL on some shells). Try shell fallback.
-  console.warn(`Spawn failed (${funcProcess.syncError.code}). Retrying with shell fallback...`);
-  funcProcess = spawnFunc(true);
+  // On Windows, .cmd wrappers require cmd.exe; retry with explicit cmd.exe invocation.
+  if (process.platform === "win32") {
+    console.warn(`Direct spawn failed (${funcProcess.syncError.code}). Retrying via cmd.exe...`);
+    funcProcess = spawnFuncViaCmd();
+  }
 }
 
 if (funcProcess && funcProcess.syncError) {
