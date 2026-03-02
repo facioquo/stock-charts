@@ -34,9 +34,10 @@ if (!existsSync(settingsFile)) {
 
 console.log("Starting Azure Functions...");
 
-// Ensure the Azure Functions Core Tools `func` executable is available.
-// On Windows the executable is exposed as 'func.cmd'.
-const funcCmd = process.platform === "win32" ? "func.cmd" : "func";
+// Allowlist: only these two platform-specific literals are ever spawned.
+// On Windows 'func' is wrapped as 'func.cmd'.
+const FUNC_CMD = process.platform === "win32" ? "func.cmd" : "func";
+const NPX_CMD = "npx";
 
 function checkFuncAvailable(cmdName) {
   try {
@@ -54,49 +55,50 @@ function checkFuncAvailable(cmdName) {
   }
 }
 
-if (!checkFuncAvailable(process.platform === "win32" ? "func.cmd" : "func")) {
+if (!checkFuncAvailable(FUNC_CMD)) {
   console.error("Azure Functions Core Tools 'func' was not found in PATH.");
   console.error("Install it from https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools\n");
   console.error("If you use npm: `npm i -g azure-functions-core-tools@4` (or use the platform installer). Ensure the 'func' command is on your PATH and restart your terminal/VS Code.");
   process.exit(1);
 }
-// Allowlist of commands that may be spawned by this script.
-const ALLOWED_COMMANDS = new Set(["func", "func.cmd", "npx"]);
-
-function trySpawn(cmd, args, opts) {
-  if (!ALLOWED_COMMANDS.has(cmd)) {
-    return { syncError: new Error(`Blocked: '${cmd}' is not an allowed command`) };
-  }
+/** Attempt to spawn FUNC_CMD; returns the ChildProcess or a syncError wrapper. */
+function spawnFunc(useShell) {
   try {
-    return spawn(cmd, args, opts);
+    return spawn(FUNC_CMD, ["start"], {
+      cwd: functionsDir,
+      stdio: "inherit",
+      shell: useShell
+    });
   } catch (err) {
     return { syncError: err };
   }
 }
 
-let funcProcess = trySpawn(funcCmd, ["start"], {
-  cwd: functionsDir,
-  stdio: "inherit"
-});
+/** Spawn via npx as a last-resort fallback when func is not on PATH but is available via npm. */
+function spawnNpxFallback() {
+  try {
+    return spawn(NPX_CMD, ["azure-functions-core-tools@4", "start"], {
+      cwd: functionsDir,
+      stdio: "inherit",
+      shell: false
+    });
+  } catch (err) {
+    return { syncError: err };
+  }
+}
+
+let funcProcess = spawnFunc(false);
 
 if (funcProcess && funcProcess.syncError) {
   // Synchronous spawn error (e.g., EINVAL on some shells). Try shell fallback.
   console.warn(`Spawn failed (${funcProcess.syncError.code}). Retrying with shell fallback...`);
-  funcProcess = trySpawn(funcCmd, ["start"], {
-    cwd: functionsDir,
-    stdio: "inherit",
-    shell: true
-  });
+  funcProcess = spawnFunc(true);
 }
 
 if (funcProcess && funcProcess.syncError) {
   // Try npx fallback to run Azure Functions Core Tools if available via npm.
   console.warn("Shell fallback failed. Trying 'npx azure-functions-core-tools@4' as a fallback...");
-  funcProcess = trySpawn("npx", ["azure-functions-core-tools@4", "start"], {
-    cwd: functionsDir,
-    stdio: "inherit",
-    shell: false
-  });
+  funcProcess = spawnNpxFallback();
 }
 
 if (!funcProcess || funcProcess.syncError) {
