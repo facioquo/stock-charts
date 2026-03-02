@@ -71,34 +71,40 @@ setup_nvm() {
     err "Failed to download nvm installer"
     return 1
   fi
-
-  if ! bash "$tmp_nvm"; then
-    err "Failed to run nvm installer"
-    return 1
-  fi
-
-  # Source nvm after installation
-  if [ -s "$HOME/.nvm/nvm.sh" ]; then
-    source "$HOME/.nvm/nvm.sh"
-    log "nvm installed and sourced"
+fi
+# Install if SKIP_NODE_INSTALL not set and the exact node binary isn't present in the target dir.
+if [ "${SKIP_NODE_INSTALL:-0}" = "1" ]; then
+  log "Skipping node install; using system node at $(command -v node)"
+else
+  if [[ ! -x "${NODE_INSTALL_DIR}/bin/node" ]]; then
+    log "Downloading and extracting ${url} -> ${NODE_INSTALL_DIR}"
+    sudo rm -rf "${NODE_INSTALL_DIR}"
+    sudo mkdir -p "${NODE_INSTALL_DIR}"
+    curl "${RETRY_CURL_ARGS[@]}" "$url" | sudo tar -xJ --strip-components=1 -C "${NODE_INSTALL_DIR}"
   else
-    err "Failed to install nvm; some Node features may be unavailable"
-    return 1
+    log "Node already present in ${NODE_INSTALL_DIR}"
   fi
-}
+fi
 
-# =========================================================================
-# Node.js
-# =========================================================================
-setup_node() {
-  local node_version="24.13.1"
+# Ensure PATH for current script run if we installed Node here
+if [ "${SKIP_NODE_INSTALL:-0}" = "1" ]; then
+  log "Using system node; leaving PATH unchanged"
+else
+  # Prepend installed node to PATH so subsequent commands use it
+  export PATH="${NODE_INSTALL_DIR}/bin:${PATH}"
+fi
 
-  if ! command -v node &>/dev/null; then
-    log "Node not found, installing via nvm"
-    setup_nvm || return 1
-    nvm install "$node_version" || { err "Failed to install Node $node_version"; return 1; }
-    nvm use "$node_version" || { err "Failed to activate Node $node_version"; return 1; }
+# Ensure PATH for future shells if we installed Node here
+if [ "${SKIP_NODE_INSTALL:-0}" != "1" ]; then
+  if [[ ! -f "$PROFILE_SNIPPET" ]] || ! sudo grep -qF "${NODE_INSTALL_DIR}/bin" "$PROFILE_SNIPPET"; then
+    log "Writing ${PROFILE_SNIPPET} to persist Node on PATH"
+    sudo tee "$PROFILE_SNIPPET" >/dev/null <<EOF
+# Node.js (installed by setup script)
+export PATH="${NODE_INSTALL_DIR}/bin:\$PATH"
+EOF
+    sudo chmod 0644 "$PROFILE_SNIPPET"
   fi
+fi
 
   log "Node: $(node --version)"
   log "npm : $(npm --version)"
@@ -201,138 +207,41 @@ setup_dotnet_tools() {
     return 0
   fi
 
-  log "Restoring dotnet tools (dotnet format, roslynator, etc)..."
-  if dotnet tool restore; then
-    log "Dotnet tools restored successfully"
+  log "Cleaning package manager caches and apt lists..."
+  sudo apt-get clean || true
+  sudo rm -rf /var/lib/apt/lists/* || true
 
-    # Verify critical tools are available via dotnet tool list
-    if dotnet tool list --global 2>/dev/null | grep -q "dotnet-format" || \
-       dotnet tool list 2>/dev/null | grep -q "dotnet-format"; then
-      log "✓ dotnet format is available (primary linting tool)"
-    fi
-
-    if dotnet tool list --global 2>/dev/null | grep -qiE "roslynator|dotnet-roslynator" || \
-       dotnet tool list 2>/dev/null | grep -qiE "roslynator|dotnet-roslynator"; then
-      log "✓ roslynator is available (optional analyzer)"
-      warn "Note: roslynator may have compatibility issues with your .NET SDK version"
-      warn "See scripts/dotnet-lint.sh for recommended linting approach"
-    fi
-  else
-    warn "dotnet tool restore completed with warnings (some tools may be unavailable)"
-  fi
-}
-
-# =========================================================================
-# Angular CLI
-# =========================================================================
-setup_angular_cli() {
-  if command -v ng &>/dev/null; then
-    log "Angular CLI already installed: $(ng version --minimal 2>/dev/null || echo 'version unknown')"
-    return 0
-  fi
-
-  log "Installing Angular CLI globally..."
-  pnpm install -g @angular/cli || { err "Angular CLI installation failed"; return 1; }
-}
-
-# =========================================================================
-# CodeRabbit CLI (Optional - only if curl available and not in restricted env)
-# =========================================================================
-setup_coderabbit() {
-  # Check if coderabbit already exists
-  if command -v coderabbit &>/dev/null; then
-    log "🐇 CodeRabbit CLI already installed, updating..."
-    coderabbit update || warn "CodeRabbit CLI update had issues"
-    return 0
-  fi
-
-  if ! command -v curl &>/dev/null; then
-    warn "curl not available, skipping CodeRabbit CLI"
-    return 0
-  fi
-
-  # Check if we're in a restricted environment
-  if is_codex_universal; then
-    log "Skipping CodeRabbit CLI in Codex Universal environment"
-    return 0
-  fi
-
-  # Only install CodeRabbit if privileged
-  if ! can_sudo; then
-    warn "Insufficient privileges for CodeRabbit CLI, skipping"
-    return 0
-  fi
-
-  log "🐇 Installing CodeRabbit CLI"
-  apt_install libsecret-1-0 libsecret-tools gnome-keyring dbus-user-session
-
-  # Official CodeRabbit CLI installer: curl|bash is the only supported install method
-  if curl -fsSL https://cli.coderabbit.ai/install.sh | bash; then # nosemgrep: bash.curl.security.curl-pipe-bash
-    log "CodeRabbit CLI installed"
-  else
-    warn "CodeRabbit CLI installation failed or skipped"
-  fi
-}
-
-# =========================================================================
-# Node Dependencies
-# =========================================================================
-setup_node_dependencies() {
-  log "📦 Installing Node dependencies..."
-  pnpm install --frozen-lockfile --loglevel=error --config.confirmModulesPurge=false || {
-    err "pnpm install failed"
-    return 1
-  }
-}
-
-# =========================================================================
-# Cleanup (environment-aware)
-# =========================================================================
-cleanup() {
-  log "Pruning caches and cleaning up environment..."
-
-  # pnpm cleanup (always safe)
-  pnpm store prune --loglevel=error 2>/dev/null || true
-
-  # apt cleanup (only if we have apt-get)
-  if command -v apt-get &>/dev/null; then
-    if can_sudo; then
-      sudo apt-get clean -qq 2>/dev/null || true
-      sudo apt-get autoclean -qq 2>/dev/null || true
-      sudo apt-get autoremove -yqq 2>/dev/null || true
-    else
-      apt-get clean -qq 2>/dev/null || true
+  if command -v pnpm >/dev/null 2>&1; then
+    pnpm store prune --loglevel=error || true
+    # Only remove full store in CI/container environments
+    if [ "${CI:-}" = "true" ] || [ "${CONTAINER:-}" = "1" ]; then
+      rm -rf "${HOME}/.local/share/pnpm/store" || true
     fi
   fi
-}
 
-# =========================================================================
-# Main Setup Flow
-# =========================================================================
-main() {
-  log "Starting environment setup..."
-
-  if is_codex_universal; then
-    log "Detected Codex Universal environment"
-  else
-    log "Detected local Linux environment (WSL/native)"
+  if command -v npm >/dev/null 2>&1; then
+    npm cache clean --force || true
   fi
 
-  # Core tools (required)
-  setup_nvm || warn "nvm setup had issues, continuing"
-  setup_node || { err "Node.js setup failed"; exit 1; }
-  setup_pnpm || { err "pnpm setup failed"; exit 1; }
-  setup_dotnet || warn ".NET SDK setup had issues, continuing"
+  # Remove old temp files only (safer for interactive/dev machines). In CI
+  # or when running in a container we remove everything in /tmp to reduce
+  # image size. CI environments commonly set CI=true.
+  if [ "${CI:-}" = "true" ] || [ "${CONTAINER:-}" = "1" ]; then
+    sudo rm -rf /tmp/* || true
+  else
+    find /tmp -mindepth 1 -maxdepth 1 -mtime +1 -exec sudo rm -rf {} + || true
+  fi
+}
 
-  # Tooling (required if core tools available)
-  setup_dotnet_tools || warn "dotnet tools had issues, continuing"
-  setup_angular_cli || warn "Angular CLI setup had issues, continuing"
+# Ensure cleanup runs on script exit to keep images smaller
+trap cleanup EXIT
 
-  # Optional tools
-  setup_coderabbit || true
+# Begin environment setup after defining cleanup handler
 
-  # Dependencies
-  setup_node_dependencies || { err "Node dependency installation failed"; exit 1; }
+# Install CodeRabbit CLI
+log "🐇 Installing CodeRabbit CLI"
+sudo apt-get install -y libsecret-1-0 libsecret-tools gnome-keyring dbus-user-session
+curl -fsSL https://cli.coderabbit.ai/install.sh | sh
 
   # Cleanup
   cleanup

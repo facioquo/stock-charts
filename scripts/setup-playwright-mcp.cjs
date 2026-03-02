@@ -169,6 +169,11 @@ if (!mcpPlaywrightTestJs) {
   }
 }
 
+// CommonJS shim: @playwright/test does not set "type":"module" in its own package.json,
+// so index.js inside that package defaults to CommonJS — module.exports is correct here.
+// The root workspace "type":"module" does NOT apply across the node_modules boundary.
+// This shim is only for the VS Code Playwright MCP extension's shared-state requirement;
+// it is a no-op in CI/CD environments (script exits early above when no MCP runtime is found).
 const shimContent = `module.exports = require(${JSON.stringify(mcpPlaywrightTestJs)});\n`;
 fs.writeFileSync(AT_PW_TEST_INDEX, shimContent);
 process.stdout.write(`Playwright MCP shim applied → ${mcpPlaywrightTestJs}\n`);

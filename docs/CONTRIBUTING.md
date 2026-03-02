@@ -33,12 +33,12 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
 
 **Add symlinks if you're not using GitHub Copilot** as your coding agent.
 
-If your AI coding vendor requires a unique configuration folder for cusomt agents or agent skills, create proper symlinks in your local environment from any **Linux/macOS** shell commandline. Example:
+If your AI coding vendor requires a unique configuration folder for custom agents or agent skills, create proper symlinks in your local environment from any **Linux/macOS** shell commandline. Example:
 
 ```bash
 cd .cursor
-ln --symbolic ../.agents/skills
-ln --symbolic ../.github/agents
+ln -s ../.agents/skills skills
+ln -s ../.github/agents agents
 ```
 
 > [!WARNING]

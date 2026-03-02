@@ -4,9 +4,7 @@
   "$schema": "vscode://schemas/tasks",
   "version": "2.0.0",
   "presentation": {
-    "echo": true,
     "clear": true,
-    "focus": false,
     "panel": "dedicated",
     "showReuseMessage": false
   },
@@ -151,7 +149,7 @@
         "Lint: Website (check)",
         "Lint: Backend .NET (check)",
         "Lint: Markdown (check)",
-        "Lint: CSS (check)"
+        "Lint: Stylelint (check)"
       ],
       "dependsOrder": "parallel",
       "group": "test",
@@ -171,7 +169,7 @@
       "dependsOn": [
         "Lint: Website (fix)",
         "Lint: Backend .NET (fix)",
-        "Lint: CSS (fix)"
+        "Lint: Stylelint (fix)"
       ],
       "dependsOrder": "parallel",
       "group": "none",
@@ -228,14 +226,14 @@
       "problemMatcher": "$markdownlint"
     },
     {
-      "label": "Lint: CSS (check)",
+      "label": "Lint: Stylelint (check)",
       "detail": "Check CSS files with stylelint",
       "type": "shell",
       "command": "pnpm run lint:css",
       "group": "test"
     },
     {
-      "label": "Lint: CSS (fix)",
+      "label": "Lint: Stylelint (fix)",
       "detail": "Auto-fix CSS files with stylelint",
       "type": "shell",
       "command": "pnpm run lint:css:fix",

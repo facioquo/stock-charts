@@ -1,16 +1,12 @@
 {
   "extends": "stylelint-config-standard",
   "ignoreFiles": [
-    ".agents/**",
-    ".azurite/**",
-    ".github/**",
-    "node_modules/**",
-    "**/node_modules/**",
-    "coverage/**",
-    "**/coverage/**",
+    ".angular",
+    ".offline",
     "dist/**",
     "**/dist/**",
-    "**/*.md"
+    "node_modules/**",
+    "**/node_modules/**"
   ],
   "overrides": [
     {
@@ -20,7 +16,19 @@
         "at-rule-no-unknown": [
           true,
           {
-            "ignoreAtRules": ["use", "mixin", "include", "extend", "function", "return", "each", "for", "if", "else", "while"]
+            "ignoreAtRules": [
+              "use",
+              "mixin",
+              "include",
+              "extend",
+              "function",
+              "return",
+              "each",
+              "for",
+              "if",
+              "else",
+              "while"
+            ]
           }
         ]
       }
