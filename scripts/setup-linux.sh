@@ -91,7 +91,7 @@ setup_nvm() {
 # Node.js
 # =========================================================================
 setup_node() {
-  local node_version="24.13.1"
+  local node_version="24.14.0"
 
   if ! command -v node &>/dev/null; then
     log "Node not found, installing via nvm"

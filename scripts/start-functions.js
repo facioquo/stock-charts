@@ -45,8 +45,8 @@ function checkFuncAvailable(cmdName) {
       const res = spawnSync("where", [cmdName], { stdio: "ignore" });
       return res.status === 0;
     } else {
-      // 'command -v' is POSIX-friendly
-      const res = spawnSync("command", ["-v", cmdName], { stdio: "ignore" });
+      // 'which' is a standalone binary available on POSIX systems
+      const res = spawnSync("which", [cmdName], { stdio: "ignore" });
       return res.status === 0;
     }
   } catch (e) {

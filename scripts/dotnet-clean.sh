@@ -50,8 +50,8 @@ for folder in "${DELETE_FOLDERS[@]}"; do
   for ignore in "${SKIPPED_FOLDERS[@]}"; do
     find_args+=("(" "-path" "./$ignore" "-prune" ")" "-o")
   done
-  find_args+=("(" "-path" "*/$folder" "-o" "-path" "./$folder" ")" "-type" "d" "-exec" "rm" "-rf" "{}" "+")
-  find "${find_args[@]}" 2>/dev/null || true
+  find_args+=("(" "(" "-path" "*/$folder" "-o" "-path" "./$folder" ")" "-a" "-type" "d" ")" "-exec" "rm" "-rf" "{}" "+")
+  find "${find_args[@]}" || true
 done
 
 # Delete files (bypasses SKIPPED_FOLDERS)
@@ -63,7 +63,7 @@ for file in "${DELETE_FILES[@]}"; do
     find_args+=("(" "-path" "./$ignore" "-prune" ")" "-o")
   done
   find_args+=("(" "-type" "f" "-name" "$file" ")" "-exec" "rm" "-f" "{}" "+")
-  find "${find_args[@]}" 2>/dev/null || true
+  find "${find_args[@]}" || true
 done
 
 echo "→ Restoring packages..."

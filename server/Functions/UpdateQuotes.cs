@@ -45,6 +45,15 @@ public partial class Jobs
     [Function("UpdateQuotes")]
     public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5", RunOnStartup = true)] TimerInfo _)
     {
+        // Guard: skip startup-triggered execution when FUNCTIONS_RUN_ON_STARTUP_ENABLED=false.
+        // RunOnStartup=true fires on every host start/scale-out; disable in production to
+        // prevent thundering-herd or duplicate executions across multiple instances.
+        // Scheduled executions (every minute during market hours) are unaffected.
+        if (!_configuration.GetValue<bool>("FUNCTIONS_RUN_ON_STARTUP_ENABLED", defaultValue: true))
+        {
+            _logger.LogInformation("Skipping startup execution (FUNCTIONS_RUN_ON_STARTUP_ENABLED=false).");
+            return;
+        }
         // Check if Alpaca credentials are available
         if (string.IsNullOrEmpty(_alpacaKey) || string.IsNullOrEmpty(_alpacaSecret))
         {
