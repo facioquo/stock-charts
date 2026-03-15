@@ -437,27 +437,37 @@ describe("ChartService Smoke Tests", () => {
     const chart = mgr.overlayChart?.chart;
     expect(chart).toBeDefined();
 
-    const initialDataLength = chart?.data.datasets[0]?.data.length ?? 0;
-    expect(initialDataLength).toBeGreaterThan(0);
+    const getLen = () => chart?.data.datasets[0]?.data.length ?? 0;
+
+    const initial = getLen();
+    expect(initial).toBeGreaterThan(0);
 
     // Act: Reduce to 30 bars
     mgr.setBarCount(30);
-
-    // Assert: Data was sliced
-    const newDataLength = chart?.data.datasets[0]?.data.length ?? 0;
-    expect(newDataLength).toBeLessThan(initialDataLength);
-    expect(newDataLength).toBeLessThanOrEqual(30 + 7); // +7 for extra bars
+    const after30 = getLen();
+    expect(after30).toBeLessThan(initial);
+    expect(after30).toBeLessThanOrEqual(30 + 7); // +7 for extra bars
 
     // Act: Expand to 70 bars
     mgr.setBarCount(70);
+    const after70 = getLen();
+    expect(after70).toBeGreaterThan(after30);
+    expect(after70).toBeLessThanOrEqual(70 + 7);
+  });
 
-    // Assert: More data points displayed
-    const expandedDataLength = chart?.data.datasets[0]?.data.length ?? 0;
-    expect(expandedDataLength).toBeGreaterThan(newDataLength);
-    expect(expandedDataLength).toBeLessThanOrEqual(70 + 7);
+  /**
+   * Test 4b: Window Resize Delegation
+   * Verifies that onWindowResize delegates to setBarCount via ChartService
+   */
+  it("should delegate window resize to optimal bar count", () => {
+    const mgr = getChartManager();
+    const ctx = canvasElement.getContext("2d");
+    expect(ctx).toBeTruthy();
+    mgr.initializeOverlay(ctx as CanvasRenderingContext2D, generateSampleQuotes(100), 50);
 
-    // Verify integration: onWindowResize delegates to setBarCount
+    mgr.setBarCount(70);
     expect(mgr.currentBarCount).toBe(70);
+
     (mockWindowService.calculateOptimalBars as any).mockReturnValue(40);
     resizeSubject.next({ width: 800, height: 600 });
     expect(mgr.currentBarCount).toBe(40);
