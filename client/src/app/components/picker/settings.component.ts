@@ -22,7 +22,7 @@ import { MatButton, MatIconButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
 import { MatToolbar } from "@angular/material/toolbar";
 import { MatTooltip } from "@angular/material/tooltip";
-import type { IndicatorListing, IndicatorSelection } from "@facioquo/indy-charts";
+import type { IndicatorListing } from "@facioquo/indy-charts";
 import { PickConfigComponent } from "./pick-config.component";
 
 @Component({
@@ -57,7 +57,6 @@ export class SettingsComponent {
   usr = inject(UserService);
 
   listings: IndicatorListing[];
-  selections!: IndicatorSelection[];
 
   constructor() {
     this.listings = this.cht.listings;

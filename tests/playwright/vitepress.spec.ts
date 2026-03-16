@@ -58,8 +58,9 @@ test.describe("VitePress Documentation Site", () => {
     await expect(toggle).toBeVisible();
 
     const before = await toggle.getAttribute("aria-checked");
+    expect(before, "toggle should have aria-checked before click").not.toBeNull();
     await toggle.click();
-    await expect(toggle).not.toHaveAttribute("aria-checked", before ?? "");
+    await expect(toggle).not.toHaveAttribute("aria-checked", before!);
   });
 
   test("quick example code block is visible", async ({ page }) => {

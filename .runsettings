@@ -6,13 +6,11 @@
         <Configuration>
           <!-- Exclude generated code from coverage analysis -->
           <ExcludeGeneratedCode>true</ExcludeGeneratedCode>
-          <!-- Exclude generated .g.cs files from inline mapping -->
-          <ModulePathsToExclude>
-            <!-- Exclude all generated files under obj directory -->
-            <ModulePath>.*\\obj\\.*</ModulePath>
-            <!-- Exclude Generators namespace -->
-            <ModulePath>.*Generators.*</ModulePath>
-          </ModulePathsToExclude>
+          <!-- Exclude generated and Generators code from coverage (Coverlet-compatible syntax) -->
+          <ExcludeByFile>
+            <Exclude>.*\\obj\\.*</Exclude>
+            <Exclude>.*Generators.*</Exclude>
+          </ExcludeByFile>
         </Configuration>
       </DataCollector>
     </DataCollectors>

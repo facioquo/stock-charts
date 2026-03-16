@@ -71,40 +71,76 @@ setup_nvm() {
     err "Failed to download nvm installer"
     return 1
   fi
-fi
-# Install if SKIP_NODE_INSTALL not set and the exact node binary isn't present in the target dir.
-if [ "${SKIP_NODE_INSTALL:-0}" = "1" ]; then
-  log "Skipping node install; using system node at $(command -v node)"
-else
-  if [[ ! -x "${NODE_INSTALL_DIR}/bin/node" ]]; then
-    log "Downloading and extracting ${url} -> ${NODE_INSTALL_DIR}"
-    sudo rm -rf "${NODE_INSTALL_DIR}"
-    sudo mkdir -p "${NODE_INSTALL_DIR}"
-    curl "${RETRY_CURL_ARGS[@]}" "$url" | sudo tar -xJ --strip-components=1 -C "${NODE_INSTALL_DIR}"
-  else
-    log "Node already present in ${NODE_INSTALL_DIR}"
+
+  # Execute the nvm installer
+  bash "$tmp_nvm" || { err "Failed to execute nvm installer"; return 1; }
+}
+
+# =========================================================================
+# Node.js
+# =========================================================================
+setup_node() {
+  local node_version="${NODE_VERSION:-24.14.0}"
+
+  # Try to use nvm if available
+  if command -v nvm &>/dev/null || [ -s "$HOME/.nvm/nvm.sh" ]; then
+    log "Installing Node.js v${node_version} via nvm"
+    setup_nvm || { err "nvm setup failed"; return 1; }
+    source "$HOME/.nvm/nvm.sh"
+    nvm install "$node_version" || { err "Failed to install Node $node_version"; return 1; }
+    nvm use "$node_version" || { err "Failed to activate Node $node_version"; return 1; }
+    log "Node: $(node --version)"
+    log "npm : $(npm --version)"
+    return 0
   fi
-fi
 
-# Ensure PATH for current script run if we installed Node here
-if [ "${SKIP_NODE_INSTALL:-0}" = "1" ]; then
-  log "Using system node; leaving PATH unchanged"
-else
-  # Prepend installed node to PATH so subsequent commands use it
-  export PATH="${NODE_INSTALL_DIR}/bin:${PATH}"
-fi
+  # Install if SKIP_NODE_INSTALL not set and the exact node binary isn't present in the target dir.
+  if [ "${SKIP_NODE_INSTALL:-0}" = "1" ]; then
+    log "Skipping node install; using system node at $(command -v node)"
+  else
+    if [[ ! -x "${NODE_INSTALL_DIR}/bin/node" ]]; then
+      log "Downloading and extracting ${NODEJS_URL} -> ${NODE_INSTALL_DIR}"
+      if can_sudo; then
+        sudo rm -rf "${NODE_INSTALL_DIR}"
+        sudo mkdir -p "${NODE_INSTALL_DIR}"
+        curl "${RETRY_CURL_ARGS[@]}" "${NODEJS_URL}" | sudo tar -xJ --strip-components=1 -C "${NODE_INSTALL_DIR}"
+      else
+        rm -rf "${NODE_INSTALL_DIR}"
+        mkdir -p "${NODE_INSTALL_DIR}"
+        curl "${RETRY_CURL_ARGS[@]}" "${NODEJS_URL}" | tar -xJ --strip-components=1 -C "${NODE_INSTALL_DIR}"
+      fi
+    else
+      log "Node already present in ${NODE_INSTALL_DIR}"
+    fi
+  fi
 
-# Ensure PATH for future shells if we installed Node here
-if [ "${SKIP_NODE_INSTALL:-0}" != "1" ]; then
-  if [[ ! -f "$PROFILE_SNIPPET" ]] || ! sudo grep -qF "${NODE_INSTALL_DIR}/bin" "$PROFILE_SNIPPET"; then
-    log "Writing ${PROFILE_SNIPPET} to persist Node on PATH"
-    sudo tee "$PROFILE_SNIPPET" >/dev/null <<EOF
+  # Ensure PATH for current script run if we installed Node here
+  if [ "${SKIP_NODE_INSTALL:-0}" = "1" ]; then
+    log "Using system node; leaving PATH unchanged"
+  else
+    # Prepend installed node to PATH so subsequent commands use it
+    export PATH="${NODE_INSTALL_DIR}/bin:${PATH}"
+  fi
+
+  # Ensure PATH for future shells if we installed Node here
+  if [ "${SKIP_NODE_INSTALL:-0}" != "1" ]; then
+    if [[ ! -f "$PROFILE_SNIPPET" ]] || ! grep -qF "${NODE_INSTALL_DIR}/bin" "$PROFILE_SNIPPET"; then
+      log "Writing ${PROFILE_SNIPPET} to persist Node on PATH"
+      if can_sudo; then
+        sudo tee "$PROFILE_SNIPPET" >/dev/null <<EOF
 # Node.js (installed by setup script)
 export PATH="${NODE_INSTALL_DIR}/bin:\$PATH"
 EOF
-    sudo chmod 0644 "$PROFILE_SNIPPET"
+        sudo chmod 0644 "$PROFILE_SNIPPET"
+      else
+        tee "$PROFILE_SNIPPET" >/dev/null <<EOF
+# Node.js (installed by setup script)
+export PATH="${NODE_INSTALL_DIR}/bin:\$PATH"
+EOF
+        chmod 0644 "$PROFILE_SNIPPET"
+      fi
+    fi
   fi
-fi
 
   log "Node: $(node --version)"
   log "npm : $(npm --version)"
@@ -208,8 +244,10 @@ setup_dotnet_tools() {
   fi
 
   log "Cleaning package manager caches and apt lists..."
-  sudo apt-get clean || true
-  sudo rm -rf /var/lib/apt/lists/* || true
+  if can_sudo; then
+    sudo apt-get clean || true
+    sudo rm -rf /var/lib/apt/lists/* || true
+  fi
 
   if command -v pnpm >/dev/null 2>&1; then
     pnpm store prune --loglevel=error || true

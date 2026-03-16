@@ -64,7 +64,7 @@ export function createDefaultSelection(
   });
 
   // Hydrate result placeholders with default colors, labels, and empty datasets.
-  listing.results.forEach((config: IndicatorResultConfig) => {
+  listing.results?.forEach((config: IndicatorResultConfig) => {
     const result: IndicatorResult = {
       label: config.tooltipTemplate,
       color: config.defaultColor,

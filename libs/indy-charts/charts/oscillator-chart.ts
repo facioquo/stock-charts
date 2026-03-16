@@ -70,7 +70,38 @@ export class OscillatorChart {
     this.settings = settings;
     if (!this.chart) return;
 
-    this.chart.options = baseOscillatorOptions(settings);
+    // Preserve theme-specific runtime options from render() that must persist
+    // across theme changes (tooltip filter for thresholds, y-axis suggested bounds)
+    const newOptions = baseOscillatorOptions(settings);
+    const existingOptions = this.chart.options;
+
+    // Preserve tooltip filter (filters out threshold datasets from tooltips)
+    if (
+      existingOptions?.plugins?.tooltip?.filter &&
+      newOptions.plugins?.tooltip
+    ) {
+      newOptions.plugins.tooltip.filter = existingOptions.plugins.tooltip.filter;
+    }
+
+    // Preserve y-axis suggested bounds (set by configureYAxis during render)
+    if (
+      existingOptions?.scales?.['y'] &&
+      typeof (existingOptions.scales['y'] as any)?.suggestedMin === 'number'
+    ) {
+      if (newOptions.scales?.['y']) {
+        (newOptions.scales['y'] as any).suggestedMin = (existingOptions.scales['y'] as any).suggestedMin;
+      }
+    }
+    if (
+      existingOptions?.scales?.['y'] &&
+      typeof (existingOptions.scales['y'] as any)?.suggestedMax === 'number'
+    ) {
+      if (newOptions.scales?.['y']) {
+        (newOptions.scales['y'] as any).suggestedMax = (existingOptions.scales['y'] as any).suggestedMax;
+      }
+    }
+
+    this.chart.options = newOptions;
     this.chart.update("none");
   }
 

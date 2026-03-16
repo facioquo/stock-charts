@@ -166,13 +166,26 @@ export class ChartManager {
     if (!this._overlayChart) return;
 
     // Slice indicator datasets to currentBarCount before adding to the windowed chart.
+    // Also slice style arrays (pointBackgroundColor, pointBorderColor, pointRotation)
+    // to keep them synchronized with the data length.
     const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
     if (fullDatasets) {
       const startIndex = Math.max(0, this._allQuotes.length - this._currentBarCount);
       selection.results.forEach((result, i) => {
-        const full = fullDatasets[i];
+        const full = fullDatasets[i] as ExtendedChartDataset;
         if (full && result.dataset) {
           result.dataset.data = [...full.data.slice(startIndex)];
+          // Slice style arrays if present with type casts
+          const ext = result.dataset as ExtendedChartDataset;
+          if (Array.isArray(full.pointBackgroundColor)) {
+            ext.pointBackgroundColor = [...(full.pointBackgroundColor as string[]).slice(startIndex)];
+          }
+          if (Array.isArray(full.pointBorderColor)) {
+            ext.pointBorderColor = [...(full.pointBorderColor as string[]).slice(startIndex)];
+          }
+          if (Array.isArray(full.pointRotation)) {
+            ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex)];
+          }
         }
       });
     }
@@ -290,6 +303,8 @@ export class ChartManager {
     // Update overlay indicator datasets to stay aligned with the windowed x-axis.
     // Mirror the oscillator loop below but for OVERLAY selections: retrieve each
     // indicator's full dataset from allProcessedDatasets and slice to startIndex.
+    // Also slice style arrays (pointBackgroundColor, pointBorderColor, pointRotation)
+    // to keep them synchronized with the data length.
     let overlayIndicatorsUpdated = false;
     this._selections.forEach(selection => {
       if (selection.chartType !== CHART_TYPES.OVERLAY) return;
@@ -298,9 +313,20 @@ export class ChartManager {
       if (!fullDatasets) return;
 
       selection.results.forEach((result, i) => {
-        const full = fullDatasets[i];
+        const full = fullDatasets[i] as ExtendedChartDataset;
         if (full && result.dataset) {
           result.dataset.data = [...full.data.slice(startIndex)];
+          // Slice style arrays if present with type casts
+          const ext = result.dataset as ExtendedChartDataset;
+          if (Array.isArray(full.pointBackgroundColor)) {
+            ext.pointBackgroundColor = [...(full.pointBackgroundColor as string[]).slice(startIndex)];
+          }
+          if (Array.isArray(full.pointBorderColor)) {
+            ext.pointBorderColor = [...(full.pointBorderColor as string[]).slice(startIndex)];
+          }
+          if (Array.isArray(full.pointRotation)) {
+            ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex)];
+          }
         }
       });
       overlayIndicatorsUpdated = true;

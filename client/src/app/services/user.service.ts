@@ -6,7 +6,7 @@ import type { UserSettings } from "../types/chart.types";
   providedIn: "root"
 })
 export class UserService {
-  settings!: UserSettings; // initialized in app.component.ts
+  settings!: UserSettings; // initialized by loadSettings() called in app.component.ts ngOnInit
 
   // platform detection for SSR safety
   private readonly platformId = inject(PLATFORM_ID);
