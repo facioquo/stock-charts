@@ -25,7 +25,12 @@ interface ControllerMetaLike {
     _startPixel: number;
     _endPixel: number;
     ticks: unknown[];
-    _length: number;
+    _length?: number;
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+    isHorizontal?: () => boolean;
     getPixelForTick: (index: number) => number;
     getPixelForValue: (value: number) => number;
     getLabelForValue: (value: number) => string;

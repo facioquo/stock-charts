@@ -5,13 +5,28 @@
  */
 
 interface ScaleLike {
-  _length: number;
+  _length?: number;
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+  isHorizontal?: () => boolean;
   ticks: unknown[];
   getPixelForTick: (index: number) => number;
 }
 
+function getScaleLength(scale: ScaleLike): number {
+  if (typeof scale._length === "number") {
+    return scale._length;
+  }
+  const horizontal = scale.isHorizontal
+    ? scale.isHorizontal()
+    : scale.right - scale.left >= scale.bottom - scale.top;
+  return horizontal ? scale.right - scale.left : scale.bottom - scale.top;
+}
+
 export function computeMinSampleSize(scale: ScaleLike, pixels: number[]): number {
-  let min = scale._length;
+  let min = getScaleLength(scale);
   let prev: number | undefined;
 
   for (let i = 1; i < pixels.length; ++i) {
