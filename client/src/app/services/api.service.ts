@@ -67,7 +67,8 @@ export class ApiService {
 
   // HELPERS
   requestHeader(): { headers?: HttpHeaders } {
-    const simpleHeaders = new HttpHeaders().set("Content-Type", "application/json");
+    // GET requests carry no body, so Accept is the appropriate header (not Content-Type).
+    const simpleHeaders = new HttpHeaders().set("Accept", "application/json");
 
     return { headers: simpleHeaders };
   }

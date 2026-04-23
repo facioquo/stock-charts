@@ -24,11 +24,9 @@ This example demonstrates:
 import {
   createApiClient,
   ChartManager,
+  createDefaultSelection,
   loadStaticIndicatorData,
-  setupIndyCharts,
-  type ExtendedChartDataset,
-  type IndicatorListing,
-  type IndicatorSelection
+  setupIndyCharts
 } from "@facioquo/indy-charts";
 
 setupIndyCharts();
@@ -42,56 +40,30 @@ const manager = new ChartManager({
     showTooltips: true
   }
 });
-manager.initializeOverlay(document.getElementById("main-chart") as HTMLCanvasElement, quotes, 250);
 
-function defaultSelection(listing: IndicatorListing): IndicatorSelection {
-  return {
-    ucid: crypto.randomUUID(),
-    uiid: listing.uiid,
-    label: listing.legendTemplate,
-    chartType: listing.chartType,
-    params: listing.parameters?.map(param => ({
-      paramName: param.paramName,
-      displayName: param.displayName,
-      minimum: param.minimum,
-      maximum: param.maximum,
-      value: param.defaultValue
-    })) ?? [],
-    results: listing.results.map(result => ({
-      label: result.tooltipTemplate,
-      displayName: result.displayName,
-      dataName: result.dataName,
-      color: result.defaultColor,
-      lineType: result.lineType,
-      lineWidth: result.lineWidth ?? 2,
-      order: listing.order,
-      dataset: { type: "line", data: [] } as ExtendedChartDataset
-    }))
-  };
-}
+const mainCanvas = document.getElementById("main-chart") as HTMLCanvasElement | null;
+const rsiCanvas = document.getElementById("rsi-chart") as HTMLCanvasElement | null;
+if (!mainCanvas || !rsiCanvas) throw new Error("Required canvas elements not found");
+
+manager.initializeOverlay(mainCanvas, quotes, 250);
 
 const emaListing = listings.find(x => x.uiid === "EMA");
 const rsiListing = listings.find(x => x.uiid === "RSI");
 if (!emaListing || !rsiListing) throw new Error("Required indicators not available");
 
-const emaSelection = defaultSelection(emaListing);
-const emaLookback = emaSelection.params.find(p => p.paramName === "lookbackPeriods");
-if (emaLookback) emaLookback.value = 20;
+// Use the library helper to hydrate defaults, then override parameters as needed.
+const emaSelection = createDefaultSelection(emaListing, { lookbackPeriods: 20 });
 
 const emaRows = loadStaticIndicatorData(await client.getSelectionData(emaSelection, emaListing));
 manager.processSelectionData(emaSelection, emaListing, emaRows);
 manager.displaySelection(emaSelection, emaListing);
 
-const rsiSelection = defaultSelection(rsiListing);
+const rsiSelection = createDefaultSelection(rsiListing);
 const rsiRows = loadStaticIndicatorData(await client.getSelectionData(rsiSelection, rsiListing));
 manager.processSelectionData(rsiSelection, rsiListing, rsiRows);
 manager.displaySelection(rsiSelection, rsiListing);
 
-manager.createOscillator(
-  document.getElementById("rsi-chart") as HTMLCanvasElement,
-  rsiSelection,
-  rsiListing
-);
+manager.createOscillator(rsiCanvas, rsiSelection, rsiListing);
 ```
 
 ## Available Indicators
@@ -120,15 +92,13 @@ Indicator parameters are supplied through `IndicatorSelection.params`, then
 submitted with `client.getSelectionData(selection, listing)`:
 
 ```typescript
-// macdListing and defaultSelection are defined in the recipe above
-const macdSelection = defaultSelection(macdListing);
-
-// Override the defaults using the parameter names provided by the listing
-for (const param of macdSelection.params) {
-  if (param.paramName.toLowerCase().includes("fast")) param.value = 12;
-  if (param.paramName.toLowerCase().includes("slow")) param.value = 26;
-  if (param.paramName.toLowerCase().includes("signal")) param.value = 9;
-}
+// macdListing is resolved from listings (see recipe above)
+// createDefaultSelection accepts parameter overrides keyed by paramName
+const macdSelection = createDefaultSelection(macdListing, {
+  fastPeriods: 12,
+  slowPeriods: 26,
+  signalPeriods: 9
+});
 
 const rawMacd = await client.getSelectionData(macdSelection, macdListing);
 const macdRows = loadStaticIndicatorData(rawMacd);
