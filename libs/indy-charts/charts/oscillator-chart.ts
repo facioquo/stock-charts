@@ -76,29 +76,19 @@ export class OscillatorChart {
     const existingOptions = this.chart.options;
 
     // Preserve tooltip filter (filters out threshold datasets from tooltips)
-    if (
-      existingOptions?.plugins?.tooltip?.filter &&
-      newOptions.plugins?.tooltip
-    ) {
+    if (existingOptions?.plugins?.tooltip?.filter && newOptions.plugins?.tooltip) {
       newOptions.plugins.tooltip.filter = existingOptions.plugins.tooltip.filter;
     }
 
     // Preserve y-axis suggested bounds (set by configureYAxis during render)
-    if (
-      existingOptions?.scales?.['y'] &&
-      typeof (existingOptions.scales['y'] as any)?.suggestedMin === 'number'
-    ) {
-      if (newOptions.scales?.['y']) {
-        (newOptions.scales['y'] as any).suggestedMin = (existingOptions.scales['y'] as any).suggestedMin;
-      }
+    type SuggestedBounds = { suggestedMin?: number; suggestedMax?: number };
+    const existingY = existingOptions?.scales?.["y"] as SuggestedBounds | undefined;
+    const newY = newOptions.scales?.["y"] as SuggestedBounds | undefined;
+    if (existingY && newY && typeof existingY.suggestedMin === "number") {
+      newY.suggestedMin = existingY.suggestedMin;
     }
-    if (
-      existingOptions?.scales?.['y'] &&
-      typeof (existingOptions.scales['y'] as any)?.suggestedMax === 'number'
-    ) {
-      if (newOptions.scales?.['y']) {
-        (newOptions.scales['y'] as any).suggestedMax = (existingOptions.scales['y'] as any).suggestedMax;
-      }
+    if (existingY && newY && typeof existingY.suggestedMax === "number") {
+      newY.suggestedMax = existingY.suggestedMax;
     }
 
     this.chart.options = newOptions;

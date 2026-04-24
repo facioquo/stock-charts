@@ -75,6 +75,7 @@ export class OverlayChart {
         chart.data.datasets.splice(dx, 1);
       }
     });
+    this.chart.update("none");
   }
 
   updateLegends(overlaySelections: IndicatorSelection[]): void {
@@ -115,7 +116,9 @@ export class OverlayChart {
 
     applyFinancialElementTheme(getFinancialPalette(settings.isDarkTheme ? "dark" : "light"));
 
-    this.chart.options = baseOverlayOptions(this.volumeAxisSize, settings);
+    this.chart.options = buildFinancialChartOptions(
+      baseOverlayOptions(this.volumeAxisSize, settings)
+    );
     this.chart.update("none");
   }
 

@@ -107,7 +107,7 @@ const managers = windows.map((barCount, index) => {
 window changes in your app by applying `setBarCount()` to each instance:
 
 ```typescript
-const managers = [manager1, manager2, manager3];
+const managers = [manager1, manager2];
 
 function applyWindow(barCount: number) {
   managers.forEach(manager => manager.setBarCount(barCount));

@@ -43,6 +43,10 @@ function destroyChart(): void {
   chart = null;
 }
 
+function isStale(token: number): boolean {
+  return disposed || token !== loadToken;
+}
+
 async function loadDemo(): Promise<void> {
   const token = ++loadToken;
   destroyChart();
@@ -61,12 +65,12 @@ async function loadDemo(): Promise<void> {
     setupIndyCharts();
     const quotes = await client.getQuotes();
 
-    if (disposed || token !== loadToken) return;
+    if (isStale(token)) return;
 
     phase.value = "ready";
     await nextTick();
 
-    if (disposed || token !== loadToken) return;
+    if (isStale(token)) return;
     if (!canvasRef.value) {
       throw new Error("Demo canvas is not available.");
     }
@@ -74,8 +78,9 @@ async function loadDemo(): Promise<void> {
     chart = new OverlayChart(canvasRef.value, currentSettings());
     chart.render(quotes.slice(-props.barCount));
   } catch {
-    if (disposed || token !== loadToken) return;
+    if (isStale(token)) return;
 
+    destroyChart();
     phase.value = "error";
     errorMessage.value =
       "Unable to load quote data from the Web API. Start the full stack demo task (Azure Storage, Functions, Web API, and VitePress).";

@@ -5,7 +5,7 @@
     "roslynator.dotnet.cli": {
       "version": "0.11.0",
       "commands": ["roslynator"],
-      "rollForward": false
+      "rollForward": true
     },
     "dotnet-outdated-tool": {
       "version": "4.7.0",

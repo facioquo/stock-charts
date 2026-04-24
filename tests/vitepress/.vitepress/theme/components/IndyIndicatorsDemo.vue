@@ -125,6 +125,8 @@ async function loadDemo(): Promise<void> {
   } catch (error) {
     if (disposed || token !== loadToken) return;
 
+    destroyManager();
+
     phase.value = "error";
     const detail = error instanceof Error ? ` (${error.message})` : "";
     errorMessage.value =

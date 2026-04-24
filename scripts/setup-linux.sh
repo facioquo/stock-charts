@@ -271,18 +271,39 @@ setup_dotnet_tools() {
   fi
 }
 
-# Ensure cleanup runs on script exit to keep images smaller
-trap cleanup EXIT
+# =========================================================================
+# Cleanup (runs on script exit)
+# =========================================================================
+cleanup() {
+  setup_dotnet_tools || true
+}
 
-# Begin environment setup after defining cleanup handler
+# =========================================================================
+# CodeRabbit CLI
+# =========================================================================
+setup_coderabbit() {
+  log "🐇 Installing CodeRabbit CLI"
+  if can_sudo; then
+    sudo apt-get install -y libsecret-1-0 libsecret-tools gnome-keyring dbus-user-session || true
+  else
+    apt-get install -y libsecret-1-0 libsecret-tools gnome-keyring dbus-user-session || true
+  fi
+  # nosemgrep: bash.curl.security.curl-pipe-bash
+  curl -fsSL https://cli.coderabbit.ai/install.sh | sh || warn "CodeRabbit CLI install failed"
+}
 
-# Install CodeRabbit CLI
-log "🐇 Installing CodeRabbit CLI"
-sudo apt-get install -y libsecret-1-0 libsecret-tools gnome-keyring dbus-user-session
-curl -fsSL https://cli.coderabbit.ai/install.sh | sh
+# =========================================================================
+# Main
+# =========================================================================
+main() {
+  # Ensure cleanup runs on script exit to keep images smaller
+  trap cleanup EXIT
 
-  # Cleanup
-  cleanup
+  apt_update
+  setup_node
+  setup_pnpm
+  setup_dotnet
+  setup_coderabbit
 
   log "✅ Environment setup complete!"
 }

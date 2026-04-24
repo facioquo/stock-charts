@@ -38,9 +38,9 @@ export function baseOverlayOptions(volumeAxisSize: number, settings: ChartSettin
 
   // define secondary y-axis for volume
   if (!options.scales) {
-    options.scales = {} as ChartOptions["scales"];
+    options.scales = {};
   }
-  (options.scales as Record<string, ScaleOptions>)["volumeAxis"] = {
+  options.scales["volumeAxis"] = {
     display: false,
     type: "linear",
     axis: "y",

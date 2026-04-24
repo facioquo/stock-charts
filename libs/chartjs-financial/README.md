@@ -88,17 +88,18 @@ Use the `buildVolumeDataset()` helper to create properly configured volume datas
 
 ### Factory Functions
 
-- `buildCandlestickDataset(data, options)`: Create a candlestick dataset
-- `buildVolumeDataset(data, options)`: Create a volume dataset
-- `buildFinancialChartOptions(config)`: Generate chart options
-- `applyFinancialElementTheme(element, theme)`: Apply theme to chart element
+- `buildCandlestickDataset(priceData, borderColor)`: Create a candlestick dataset from normalized OHLC points
+- `buildVolumeDataset(quotes, extraBars, palette)`: Create a volume dataset with up/down/unchanged candle coloring
+- `buildFinancialChartOptions(base)`: Wrap base chart options with financial-safe defaults (animations off, non-intersecting tooltip)
+- `applyFinancialElementTheme(palette)`: Apply a `FinancialPalette` to Chart.js global element defaults
+- `toFinancialDataPoint(quote)`: Convert a quote-like object to a `FinancialDataPoint`
 
 ### Theme
 
 - `COLORS`: Color constants for financial charts
-- `getCandleColor(data)`: Determine candle color based on price movement
-- `getVolumeColor(data)`: Determine volume bar color based on price movement
-- `getFinancialPalette(mode)`: Get color palette for light or dark theme
+- `getCandleColor(open, close, palette)`: Determine candle color based on price movement
+- `getVolumeColor(open, close, palette)`: Determine volume bar color based on price movement
+- `getFinancialPalette(mode)`: Get color palette for `'light'` or `'dark'` theme
 
 ## Types
 
@@ -111,7 +112,7 @@ Full TypeScript definitions are included:
 
 ## License
 
-MIT License - see LICENSE file for details.
+Apache-2.0 License - see LICENSE file for details.
 
 ## Credits
 

@@ -8,4 +8,4 @@ Project dependencies are strictly in this direction only: indy-charts → chartj
 
 Its integration is confirmed and depicted in our [test VitePress website](../../tests/vitepress).
 
-This library is published privately to GitHub packages for our organizational and will never be published to public registries.
+This library is published privately to GitHub Packages for our organization and will never be published to public registries.

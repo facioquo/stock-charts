@@ -1,5 +1,3 @@
-import type { ChartDataset } from "chart.js";
-
 import type {
   IndicatorListing,
   IndicatorParam,
@@ -73,7 +71,7 @@ export function createDefaultSelection(
       lineType: config.lineType,
       lineWidth: typeof config.lineWidth === "number" ? config.lineWidth : 2,
       order: config.order,
-      dataset: { type: "line", data: [] } as ChartDataset
+      dataset: { type: "line", data: [] }
     };
 
     selection.results.push(result);

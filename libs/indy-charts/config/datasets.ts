@@ -129,8 +129,9 @@ export function createThresholdDataset(
   // offset fill will only work between certain objects.
   const lineData: ScatterDataPoint[] = [];
 
-  (firstResult.dataset.data as ScatterDataPoint[]).forEach((d: ScatterDataPoint) => {
-    lineData.push({ x: d.x, y: threshold.value } as ScatterDataPoint);
+  const sourceData = firstResult.dataset.data as unknown as ScatterDataPoint[];
+  sourceData.forEach((d: ScatterDataPoint) => {
+    lineData.push({ x: d.x, y: threshold.value });
   });
 
   return {

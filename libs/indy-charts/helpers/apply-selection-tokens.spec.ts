@@ -1,11 +1,10 @@
-import type { ChartDataset } from "chart.js";
 import { describe, expect, it } from "vitest";
 
 import { applySelectionTokens } from "./apply-selection-tokens";
 import type { IndicatorSelection } from "../config";
 
 /** Stub dataset for test results. */
-const emptyDataset = { type: "line" as const, data: [] } as ChartDataset;
+const emptyDataset = { type: "line" as const, data: [] };
 
 /** Minimal selection with tokens for testing. */
 function makeSelection(overrides?: Partial<IndicatorSelection>): IndicatorSelection {
@@ -47,7 +46,7 @@ function makeSelection(overrides?: Partial<IndicatorSelection>): IndicatorSelect
       }
     ],
     ...overrides
-  } as IndicatorSelection;
+  };
 }
 
 describe("applySelectionTokens", () => {
@@ -75,7 +74,7 @@ describe("applySelectionTokens", () => {
 
   it("skips params with null value", () => {
     const selection = makeSelection();
-    selection.params[0].value = null as unknown as number;
+    selection.params[0].value = null as unknown as number | undefined;
     applySelectionTokens(selection);
 
     expect(selection.label).toBe("Bollinger Bands([P1],2)");
@@ -84,7 +83,7 @@ describe("applySelectionTokens", () => {
 
   it("skips params with undefined value", () => {
     const selection = makeSelection();
-    selection.params[0].value = undefined as unknown as number;
+    selection.params[0].value = undefined;
     applySelectionTokens(selection);
 
     expect(selection.label).toBe("Bollinger Bands([P1],2)");

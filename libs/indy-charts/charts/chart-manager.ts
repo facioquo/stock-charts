@@ -102,6 +102,15 @@ export class ChartManager {
     // Apply initial barCount slice for display.
     const startIndex = Math.max(0, allQuotes.length - barCount);
     this._overlayChart.applySlicedData(fullDatasets, startIndex);
+
+    // Re-attach previously registered overlay selections so they survive
+    // overlay re-initialization (e.g., theme/canvas reset). Without this,
+    // displaySelection() would silently skip these (duplicate ucid guard),
+    // leaving the chart without their datasets.
+    const overlaySelections = this._selections.filter(s => s.chartType === CHART_TYPES.OVERLAY);
+    overlaySelections.forEach(selection => {
+      this.displayOnOverlay(selection);
+    });
   }
 
   /**
@@ -178,7 +187,9 @@ export class ChartManager {
           // Slice style arrays if present with type casts
           const ext = result.dataset as ExtendedChartDataset;
           if (Array.isArray(full.pointBackgroundColor)) {
-            ext.pointBackgroundColor = [...(full.pointBackgroundColor as string[]).slice(startIndex)];
+            ext.pointBackgroundColor = [
+              ...(full.pointBackgroundColor as string[]).slice(startIndex)
+            ];
           }
           if (Array.isArray(full.pointBorderColor)) {
             ext.pointBorderColor = [...(full.pointBorderColor as string[]).slice(startIndex)];
@@ -319,7 +330,9 @@ export class ChartManager {
           // Slice style arrays if present with type casts
           const ext = result.dataset as ExtendedChartDataset;
           if (Array.isArray(full.pointBackgroundColor)) {
-            ext.pointBackgroundColor = [...(full.pointBackgroundColor as string[]).slice(startIndex)];
+            ext.pointBackgroundColor = [
+              ...(full.pointBackgroundColor as string[]).slice(startIndex)
+            ];
           }
           if (Array.isArray(full.pointBorderColor)) {
             ext.pointBorderColor = [...(full.pointBorderColor as string[]).slice(startIndex)];
