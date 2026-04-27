@@ -277,6 +277,18 @@ describe("ChartManager", () => {
       expect(mgr.settings).toEqual(defaultSettings);
     });
 
+    it("does not expose mutable settings references", () => {
+      const externalSettings: ChartSettings = { isDarkTheme: false, showTooltips: true };
+      const custom = new ChartManager({ settings: externalSettings });
+
+      externalSettings.isDarkTheme = true;
+      const exposedSettings = custom.settings;
+      exposedSettings.showTooltips = false;
+
+      expect(custom.settings).toEqual({ isDarkTheme: false, showTooltips: true });
+      custom.destroy();
+    });
+
     it("starts with empty selections and no overlay chart", () => {
       expect(mgr.selections).toHaveLength(0);
       expect(mgr.overlayChart).toBeUndefined();

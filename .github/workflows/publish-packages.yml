@@ -59,8 +59,8 @@ jobs:
           PACKAGE_VERSION=$(jq -r '.version' package.json)
           PACKAGE_NAME=$(jq -r '.name' package.json)
 
-          # Determine if this is a prerelease (contains alpha, rc, beta, etc.)
-          if [[ "$PACKAGE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-[a-zA-Z]+ ]]; then
+          # Determine if this is a prerelease (anything after the semver hyphen).
+          if [[ "$PACKAGE_VERSION" == *-* ]]; then
             NPM_TAG="next"
           else
             NPM_TAG="latest"
@@ -82,8 +82,8 @@ jobs:
           PACKAGE_VERSION=$(jq -r '.version' package.json)
           PACKAGE_NAME=$(jq -r '.name' package.json)
 
-          # Determine if this is a prerelease (contains alpha, rc, beta, etc.)
-          if [[ "$PACKAGE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-[a-zA-Z]+ ]]; then
+          # Determine if this is a prerelease (anything after the semver hyphen).
+          if [[ "$PACKAGE_VERSION" == *-* ]]; then
             NPM_TAG="next"
           else
             NPM_TAG="latest"

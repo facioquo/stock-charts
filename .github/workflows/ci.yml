@@ -12,6 +12,7 @@ concurrency:
 
 env:
   NODE_VERSION: 24.14.0
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
 jobs:
   test-backend:
@@ -121,6 +122,12 @@ jobs:
       - name: Run unit tests
         run: pnpm --filter @stock-charts/client run test:coverage
 
+      - name: Run library unit tests
+        run: pnpm run test:libs
+
+      - name: Run package consumption smoke test
+        run: pnpm run smoke:package-consumption
+
       - name: Upload frontend coverage to Codecov
         if: always()
         uses: codecov/codecov-action@v5
@@ -142,3 +149,9 @@ jobs:
 
       - name: Build site
         run: pnpm --filter @stock-charts/client run build.prod
+
+      - name: Install Playwright Chromium
+        run: pnpm --filter @stock-charts/playwright-tests exec playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: pnpm run test:e2e

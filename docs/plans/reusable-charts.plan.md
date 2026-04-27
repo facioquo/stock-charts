@@ -64,13 +64,16 @@ The core library extraction and VitePress documentation are complete:
   build-time/demo scenarios
 - **Build pipeline** — both libraries build via `tsc`, consumed via pnpm
   workspace linking
+- **External package-consumption smoke** — `pnpm run smoke:package-consumption`
+  packs both libraries, installs `@facioquo/indy-charts` into an isolated
+  VitePress consumer, and builds the consumer through the VitePress adapter
 - **Partial Angular integration** — `client/` imports from
   `@facioquo/chartjs-chart-financial` for financial primitives but does not
   delegate to `ChartManager`
 - **VitePress docs and demos** — installation guide, quick start, API client
-  docs, live `IndyOverlayDemo` and `IndyIndicatorsDemo` Vue components
-- **Playwright tests** — 12/12 VitePress content tests + 6/6 Angular website
-  tests passing (18 total)
+  docs, live `StockIndicatorChart` examples
+- **Playwright tests** — 11/11 VitePress content tests + 6/6 Angular website
+  tests passing (17 total)
 - **PR #454 review fixes** — partial-update index bug, `ChartManager.settings`
   encapsulation, business-day padding in `addExtraBars()`, and other CodeRabbit
   feedback addressed
@@ -110,8 +113,9 @@ The core library extraction and VitePress documentation are complete:
    `publish-packages.yml` workflow handles release-triggered publishing.
 
 8. ~~**`date-fns` peer dep version mismatch**~~ — **RESOLVED (Phase 1).** Updated
-   to `"date-fns": ">=2.19.0"`. VitePress date-fns alias still needed because
-   `chartjs-adapter-date-fns@3.0.0` itself declares `date-fns@^2` as peer.
+  to `"date-fns": ">=2.19.0"`. VitePress builds without a `date-fns` alias
+  when `@facioquo/indy-charts`, Chart.js packages, and `date-fns` are included
+  in `ssr.noExternal`.
 
 9. ~~**Minimal library test coverage**~~ — **RESOLVED (Phase 3).** 118
    library tests across 9 spec files: ChartManager (31), createApiClient (21),
@@ -130,7 +134,7 @@ never need Chart.js imports.
 
 - [x] Task 1.1: Move `defaultSelection()` into `@facioquo/indy-charts`
   - Extract from Angular `ChartService.defaultSelection()` and VitePress
-    `indy-demo-utils.ts` → `createDefaultSelection()` in the library.
+    demo selection setup → `createDefaultSelection()` in the library.
   - Given an `IndicatorListing`, produce an `IndicatorSelection` with default
     params and result placeholders. Accept optional param overrides.
   - Export from `libs/indy-charts/index.ts`.
@@ -153,9 +157,10 @@ never need Chart.js imports.
   - Update `@facioquo/indy-charts` peerDependencies to
     `"date-fns": ">=2.19.0"` (or `"^2.19.0 || ^3.0.0 || ^4.0.0"`) since only
     the adapter import is used internally.
-  - Verify VitePress demo builds without the Vite alias workaround.
-  - Remove the date-fns alias from `tests/vitepress/.vitepress/config.ts` if no
-    longer needed.
+  - Verified VitePress demo builds without the Vite alias workaround.
+  - `tests/vitepress/.vitepress/config.ts` uses `ssr.noExternal` for
+    `@facioquo/indy-charts`, `chartjs-adapter-date-fns`, `chart.js`, and
+    `date-fns`; no `date-fns` alias is required.
 
 ### Phase 2: Angular client refactor
 
@@ -287,13 +292,15 @@ Prepare libraries for consumption outside this workspace.
     with `--access restricted` using `GITHUB_TOKEN`.
   - Publish order: chartjs-chart-financial first (dependency of indy-charts).
 
-- [ ] Task 4.4: Validate external consumption
-  - The full validation workflow is covered by Phase 5 below.
-  - Smoke-test locally: `pnpm pack` both libraries, install tarballs in an
-    isolated `package.json`, import `setupIndyCharts`, confirm no missing
-    peer dep errors.
-  - Verify `pnpm pack --dry-run` tarball contents include only `dist/`,
-    `README.md`, `NOTICE` (chartjs-financial only), and `package.json`.
+- [x] Task 4.4: Validate external consumption
+  - Added `pnpm run smoke:package-consumption`.
+  - The smoke script builds and packs both libraries, installs the packed
+    `@facioquo/indy-charts` tarball into an isolated VitePress-style consumer,
+    maps the unpublished transitive `@facioquo/chartjs-chart-financial` package
+    to its packed tarball through a local pnpm override, and builds the consumer.
+  - The consumer imports only `@facioquo/indy-charts/vitepress` from its theme
+    and uses `<StockIndicatorChart indicator="rsi" />` from Markdown.
+  - Validated locally: `pnpm run smoke:package-consumption` passed.
 
 ### Phase 5: External VitePress documentation site integration
 
@@ -339,34 +346,38 @@ GitHub Packages before the external repo can install them.
 - [ ] Task 5.4: Configure VitePress `config.ts` for published package consumption
   - Unlike `tests/vitepress`, the external site must **not** use workspace
     path aliases that resolve to TypeScript source.
-  - Add `ssr.noExternal` for Chart.js family packages to prevent SSR
-    externalisation failures:
+  - Add `ssr.noExternal` for `@facioquo/indy-charts` and Chart.js family
+    packages to prevent SSR externalisation failures:
 
     ```typescript
     ssr: {
-      noExternal: ["chartjs-adapter-date-fns", "chart.js", "date-fns"]
+      noExternal: [
+        "@facioquo/indy-charts",
+        "chartjs-adapter-date-fns",
+        "chart.js",
+        "date-fns"
+      ]
     }
     ```
 
-  - Add a `date-fns` alias pinning the version installed in the site's own
-    `node_modules` (see `tests/vitepress/.vitepress/config.ts` for the
-    reference implementation — the `chartjs-adapter-date-fns@3.0.0` peer
-    dep mismatch still applies).
-  - Call `setupIndyCharts()` exactly once in `.vitepress/theme/index.ts`
-    inside the `enhanceApp` hook.
+  - Do not add a `date-fns` alias. Match the tested VitePress configuration by
+    relying on `ssr.noExternal` for `@facioquo/indy-charts`,
+    `chartjs-adapter-date-fns`, `chart.js`, and `date-fns`.
+  - Call `setupIndyChartsForVitePress(...)` from
+    `@facioquo/indy-charts/vitepress` exactly once in
+    `.vitepress/theme/index.ts` inside the `enhanceApp` hook.
 
-- [ ] Task 5.5: Port demo Vue components with the deployed API URL as default
-  - Copy `IndyOverlayDemo.vue` and `IndyIndicatorsDemo.vue` from
-    `tests/vitepress/.vitepress/theme/components/` into the external repo.
-  - Change the default `apiBaseUrl` prop from `https://localhost:5001` to
-    `https://stock-charts-api.azurewebsites.net` in both components.
-  - Copy `indy-demo-utils.ts` helper alongside the components (contains
-    `requireListing`, `setSelectionParams` used by `IndyIndicatorsDemo`).
-  - In Markdown pages, pass the `api-base-url` prop explicitly if the
-    default is ever overridden per-page:
+- [ ] Task 5.5: Port `StockIndicatorChart` usage with the deployed API URL as default
+  - Register `StockIndicatorChart` from `@facioquo/indy-charts/vitepress` in
+    the external VitePress theme.
+  - Configure the site-level `apiBaseUrl` default as
+    `https://stock-charts-api.azurewebsites.net`.
+  - In Markdown pages, pass the `api-base-url` prop explicitly if the default
+    is ever overridden per-page:
 
     ```markdown
-    <IndyOverlayDemo
+    <StockIndicatorChart
+      indicator="ema"
       api-base-url="https://stock-charts-api.azurewebsites.net"
     />
     ```
@@ -410,11 +421,11 @@ GitHub Packages before the external repo can install them.
 
 - [ ] Task 5.8: End-to-end validation against the deployed API
   - Deploy the external site and open it in a browser.
-  - Verify `IndyOverlayDemo` fetches quotes from
+  - Verify `StockIndicatorChart` fetches quotes from
     `https://stock-charts-api.azurewebsites.net/quotes` and renders an
     OHLC candlestick chart.
-  - Verify `IndyIndicatorsDemo` loads the indicator listings dropdown,
-    requests selection data, and draws both overlay and oscillator charts.
+  - Verify `StockIndicatorChart` requests selection data and draws both
+    overlay and oscillator examples.
   - Confirm no `Access-Control-Allow-Origin` errors in the browser console.
   - Confirm dark/light theme toggle re-renders charts correctly.
   - Run at least a manual smoke test against the URL before marking done.

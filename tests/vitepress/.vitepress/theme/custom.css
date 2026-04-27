@@ -136,11 +136,6 @@
   gap: 12px;
 }
 
-.indy-demo__osc-grid {
-  display: grid;
-  gap: 12px;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .indy-demo,
   .indy-demo__retry {

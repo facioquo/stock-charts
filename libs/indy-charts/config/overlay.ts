@@ -24,22 +24,17 @@ export function baseOverlayConfig(
 export function baseOverlayOptions(volumeAxisSize: number, settings: ChartSettings): ChartOptions {
   const options = baseChartOptions(settings);
 
-  // format y-axis (helper context)
-  if (!options.scales || !options.scales["y"]) return options;
-  const y = options.scales["y"] as CartesianScaleOptions;
+  options.scales ??= {};
 
-  // format primary y-axis labels
-  y.ticks.callback = (value, index, values) => {
-    // remove first and last y-axis labels
-    if (index === 0 || index === values.length - 1) return null;
-    // otherwise, add dollar sign
-    else return "$" + value;
-  };
+  const y = options.scales["y"] as CartesianScaleOptions | undefined;
+  if (y) {
+    y.ticks.callback = (value, index, values) => {
+      if (index === 0 || index === values.length - 1) return null;
+      return "$" + value;
+    };
+  }
 
   // define secondary y-axis for volume
-  if (!options.scales) {
-    options.scales = {};
-  }
   options.scales["volumeAxis"] = {
     display: false,
     type: "linear",

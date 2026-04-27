@@ -5,7 +5,6 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
-    "defaultMode": "bypassPermissions",
     "allow": [
       "Bash(python:*)",
       "Bash(gh pr view:*)",

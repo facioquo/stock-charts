@@ -75,11 +75,11 @@ function createCanvasContext(canvas: HTMLCanvasElement): CanvasRenderingContext2
  */
 function generateSampleQuotes(count: number): Quote[] {
   const quotes: Quote[] = [];
-  const startDate = new Date("2024-01-01");
+  const startTime = Date.UTC(2024, 0, 1);
 
   for (let i = 0; i < count; i++) {
-    const date = new Date(startDate);
-    date.setDate(date.getDate() + i);
+    const date = new Date(startTime);
+    date.setUTCDate(date.getUTCDate() + i);
 
     const basePrice = 100 + i * 0.5;
     quotes.push({

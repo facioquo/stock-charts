@@ -4,7 +4,7 @@ import { MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "v
 import { env } from "../../environments/environment";
 import backupIndicators from "../data/backup-indicators.json";
 import backupQuotes from "../data/backup-quotes.json"; // Added JSON quotes import
-import type { IndicatorListing, RawQuote } from "@facioquo/indy-charts";
+import type { IndicatorListing, IndicatorSelection, RawQuote } from "@facioquo/indy-charts";
 import { ApiService } from "./api.service";
 
 const BACKUP_INDICATORS = backupIndicators as IndicatorListing[];
@@ -160,6 +160,90 @@ describe("ApiService", () => {
       status: 500,
       statusText: "Internal Server Error"
     });
+  });
+
+  it("should request selection data from a root-relative endpoint against the API base URL", () => {
+    const listing: IndicatorListing = {
+      name: "Average Directional Index",
+      uiid: "ADX",
+      legendTemplate: "ADX([P1])",
+      endpoint: "/ADX/",
+      category: "trend",
+      chartType: "oscillator",
+      order: 0,
+      chartConfig: null,
+      parameters: [],
+      results: []
+    };
+    const selection: IndicatorSelection = {
+      ucid: "chart-1",
+      uiid: "ADX",
+      label: "ADX(14)",
+      chartType: "oscillator",
+      params: [
+        {
+          paramName: "lookbackPeriods",
+          displayName: "Lookback Periods",
+          minimum: 2,
+          maximum: 250,
+          value: 14
+        }
+      ],
+      results: []
+    };
+    const mockSelectionData = [{ date: "2024-01-01", adx: 25 }];
+
+    service.getSelectionData(selection, listing).subscribe(data => {
+      expect(data).toEqual(mockSelectionData);
+    });
+
+    const req = httpMock.expectOne(request => request.url === `${env.api}/ADX/`);
+    expect(req.request.method).toBe("GET");
+    expect(req.request.headers.get("Accept")).toBe("application/json");
+    expect(req.request.params.get("lookbackPeriods")).toBe("14");
+    req.flush(mockSelectionData);
+  });
+
+  it("should preserve absolute selection data endpoints from server listings", () => {
+    const endpoint = "https://stock-charts-api.example.test/ADX/";
+    const listing: IndicatorListing = {
+      name: "Average Directional Index",
+      uiid: "ADX",
+      legendTemplate: "ADX([P1])",
+      endpoint,
+      category: "trend",
+      chartType: "oscillator",
+      order: 0,
+      chartConfig: null,
+      parameters: [],
+      results: []
+    };
+    const selection: IndicatorSelection = {
+      ucid: "chart-1",
+      uiid: "ADX",
+      label: "ADX(14)",
+      chartType: "oscillator",
+      params: [
+        {
+          paramName: "lookbackPeriods",
+          displayName: "Lookback Periods",
+          minimum: 2,
+          maximum: 250,
+          value: 14
+        }
+      ],
+      results: []
+    };
+    const mockSelectionData = [{ date: "2024-01-01", adx: 25 }];
+
+    service.getSelectionData(selection, listing).subscribe(data => {
+      expect(data).toEqual(mockSelectionData);
+    });
+
+    const req = httpMock.expectOne(request => request.url === endpoint);
+    expect(req.request.method).toBe("GET");
+    expect(req.request.params.get("lookbackPeriods")).toBe("14");
+    req.flush(mockSelectionData);
   });
 
   it("client backup indicators should have valid data structure", () => {

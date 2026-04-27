@@ -161,6 +161,15 @@ describe("createApiClient", () => {
       expect(quotes).toEqual([]);
     });
 
+    it("throws and calls onError when a quote date is invalid", async () => {
+      mockFetchOk([rawQuote("not-a-date")]);
+
+      await expect(client.getQuotes()).rejects.toThrow(
+        'Invalid quote date at index 0: "not-a-date"'
+      );
+      expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(Error));
+    });
+
     it("throws and calls onError on HTTP error", async () => {
       mockFetchError(500, "Internal Server Error");
 
@@ -211,6 +220,20 @@ describe("createApiClient", () => {
       mockFetchOk([]);
       await client.getListings();
       expect(vi.mocked(fetch)).toHaveBeenCalledWith(`${BASE_URL}/indicators`);
+    });
+
+    it("uses configured endpoint overrides", async () => {
+      mockFetchOk([]);
+      const c = createApiClient({
+        baseUrl: BASE_URL,
+        endpoints: { quotes: "api/quotes", indicators: "api/indicators" }
+      });
+
+      await c.getQuotes();
+      await c.getListings();
+
+      expect(vi.mocked(fetch)).toHaveBeenNthCalledWith(1, `${BASE_URL}/api/quotes`);
+      expect(vi.mocked(fetch)).toHaveBeenNthCalledWith(2, `${BASE_URL}/api/indicators`);
     });
 
     it("throws and calls onError on HTTP error", async () => {

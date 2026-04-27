@@ -31,7 +31,12 @@ const client = createApiClient({
 
 const quotes = await client.getQuotes();
 
-const chart = new OverlayChart(document.getElementById("main-chart") as HTMLCanvasElement, {
+const canvas = document.getElementById("main-chart");
+if (!(canvas instanceof HTMLCanvasElement)) {
+  throw new Error("Chart canvas not found");
+}
+
+const chart = new OverlayChart(canvas, {
   isDarkTheme: false,
   showTooltips: true
 });
@@ -89,7 +94,33 @@ const staticRows = loadStaticIndicatorData(rawIndicatorRows);
 
 ## Usage with VitePress
 
-See the VitePress integration example in the `tests/vitepress` directory for a complete working example.
+Register the optional VitePress adapter once in `.vitepress/theme/index.ts`:
+
+```typescript
+import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
+
+export default {
+  enhanceApp({ app }) {
+    setupIndyChartsForVitePress(app, {
+      api: { baseUrl: "https://api.example.com" },
+      defaults: { barCount: 250, quoteCount: 250, showTooltips: true },
+      indicators: {
+        rsi: { uiid: "RSI", params: { lookbackPeriods: 14 }, results: ["rsi"] }
+      }
+    });
+  }
+};
+```
+
+Then use the global component from Markdown:
+
+```vue
+<ClientOnly>
+  <StockIndicatorChart indicator="rsi" />
+</ClientOnly>
+```
+
+The root `@facioquo/indy-charts` export remains framework-agnostic. Vue is only imported by the `@facioquo/indy-charts/vitepress` subpath.
 
 ## Types
 
@@ -111,7 +142,7 @@ See the VitePress integration example in the `tests/vitepress` directory for a c
 
 ## License
 
-MIT License - see LICENSE file for details.
+Apache-2.0 License - see the repository LICENSE file for details.
 
 ## Related Projects
 

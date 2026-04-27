@@ -6,7 +6,7 @@ Make sure you have Node.js 24+ installed.
 
 ## Install Dependencies
 
-Install the core libraries and their peer dependencies:
+Install the VitePress adapter package and its setup-level peer dependencies:
 
 ::: code-group
 
@@ -46,6 +46,7 @@ The main library providing:
 - Configuration builders
 - Data transformers
 - API client
+- VitePress adapter through `@facioquo/indy-charts/vitepress`
 
 ### Peer Dependencies
 
@@ -58,6 +59,17 @@ The main library providing:
 
 `@facioquo/indy-charts` depends on `@facioquo/chartjs-chart-financial`
 internally. Most consumers should not need to install it directly.
+
+### VitePress authoring imports
+
+Register charts once in `.vitepress/theme/index.ts` by importing
+`setupIndyChartsForVitePress` from `@facioquo/indy-charts/vitepress`.
+Markdown page authors should use `<StockIndicatorChart />` and should not import
+Chart.js, the API client, or `@facioquo/chartjs-chart-financial` directly.
+
+Vue is an optional peer dependency because only the VitePress subpath imports
+Vue. Consumers that use the root `@facioquo/indy-charts` APIs outside VitePress
+do not load the Vue adapter.
 
 ## TypeScript
 

@@ -242,7 +242,21 @@ export class ChartService implements OnDestroy {
   /** Persist current selections to localStorage (without chart references). */
   private cacheSelections(): void {
     try {
-      localStorage.setItem("selections", JSON.stringify([...this.selections]));
+      const selections = this.selections.map(selection => ({
+        ...selection,
+        params: selection.params.map(param => ({ ...param })),
+        results: selection.results.map(result => ({
+          label: result.label,
+          displayName: result.displayName,
+          dataName: result.dataName,
+          color: result.color,
+          lineType: result.lineType,
+          lineWidth: result.lineWidth,
+          order: result.order,
+          dataset: { type: "line" as const, data: [] }
+        }))
+      }));
+      localStorage.setItem("selections", JSON.stringify(selections));
     } catch {
       // localStorage may be unavailable (private browsing, quota exceeded, etc.)
     }

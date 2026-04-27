@@ -44,7 +44,7 @@ export class ChartManager {
 
   /** Current chart settings. Update via updateTheme() to propagate to all charts. */
   get settings(): ChartSettings {
-    return this._settings;
+    return { ...this._settings };
   }
 
   /** Read-only access to the overlay chart instance. */
@@ -73,7 +73,7 @@ export class ChartManager {
   }
 
   constructor(config: ChartManagerConfig) {
-    this._settings = config.settings;
+    this._settings = { ...config.settings };
     this.extraBars = config.extraBars ?? EXTRA_BARS;
   }
 
@@ -266,7 +266,7 @@ export class ChartManager {
    * Update theme across all charts.
    */
   updateTheme(settings: ChartSettings): void {
-    this._settings = settings;
+    this._settings = { ...settings };
 
     if (this._overlayChart) {
       this._overlayChart.updateTheme(settings);

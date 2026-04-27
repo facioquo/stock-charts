@@ -2,101 +2,89 @@
 
 This guide will help you create your first financial chart in minutes.
 
-## Step 1: HTML Setup
+## Step 1: Register the VitePress adapter
 
-Create a basic HTML structure with a single canvas element (the overlay chart
-renders both price and volume):
-
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>My First Chart</title>
-    <style>
-      .chart-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-      canvas {
-        width: 100%;
-        height: 400px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="chart-container">
-      <h1>Stock Chart</h1>
-      <canvas id="price-chart"></canvas>
-    </div>
-
-    <script type="module" src="/main.js"></script>
-  </body>
-</html>
-```
-
-## Step 2: Initialize Chart.js
-
-Initialize the library once (this registers Chart.js components, financial chart
-types, the annotation plugin, and the date adapter):
+Register the adapter once from `.vitepress/theme/index.ts`:
 
 ```typescript
-import { setupIndyCharts } from "@facioquo/indy-charts";
+import DefaultTheme from "vitepress/theme";
 
-setupIndyCharts();
-```
+import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
 
-## Step 3: Create API Client and Chart
-
-Create the API client and an `OverlayChart` instance:
-
-```typescript
-import { createApiClient, OverlayChart } from "@facioquo/indy-charts";
-
-const canvas = document.getElementById("price-chart") as HTMLCanvasElement;
-
-const client = createApiClient({
-  baseUrl: "https://localhost:5001",
-  onError: (context, error) => {
-    console.error(context, error);
+export default {
+  extends: DefaultTheme,
+  enhanceApp({ app }) {
+    setupIndyChartsForVitePress(app, {
+      api: { baseUrl: "https://localhost:5001" },
+      defaults: { barCount: 250, quoteCount: 250, showTooltips: true },
+      indicators: {
+        rsi: {
+          uiid: "RSI",
+          title: "RSI(14)",
+          params: { lookbackPeriods: 14 },
+          results: ["rsi"]
+        }
+      }
+    });
   }
-});
-
-const chart = new OverlayChart(canvas, {
-  isDarkTheme: false,
-  showTooltips: true
-});
+};
 ```
 
-## Step 4: Load Data and Render
+## Step 2: Add a chart to Markdown
 
-Load quotes from the API and render the last 250 bars:
+Use the global component in any Markdown page:
 
-```typescript
-const quotes = await client.getQuotes();
-chart.render(quotes.slice(-250));
+```vue
+<ClientOnly>
+  <StockIndicatorChart indicator="rsi" />
+</ClientOnly>
+```
+
+## Step 3: Override page-specific options
+
+Use `config` for page-specific titles, parameters, or displayed result series:
+
+```vue
+<ClientOnly>
+  <StockIndicatorChart
+    indicator="rsi"
+    :config="{ title: 'RSI(21)', params: { lookbackPeriods: 21 }, results: ['rsi'] }"
+  />
+</ClientOnly>
 ```
 
 ## Complete Example
 
-Here's the full code:
+Site setup:
 
 ```typescript
-import { createApiClient, OverlayChart, setupIndyCharts } from "@facioquo/indy-charts";
+import DefaultTheme from "vitepress/theme";
 
-setupIndyCharts();
+import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
 
-const canvas = document.getElementById("price-chart") as HTMLCanvasElement;
-const client = createApiClient({ baseUrl: "https://localhost:5001" });
-
-const chart = new OverlayChart(canvas, {
-  isDarkTheme: false,
-  showTooltips: true
-});
-
-const quotes = await client.getQuotes();
-chart.render(quotes.slice(-250));
+export default {
+  extends: DefaultTheme,
+  enhanceApp({ app }) {
+    setupIndyChartsForVitePress(app, {
+      api: { baseUrl: "https://localhost:5001" },
+      indicators: { ema: { uiid: "EMA", params: { lookbackPeriods: 20 } } }
+    });
+  }
+};
 ```
+
+Markdown page:
+
+```vue
+<ClientOnly>
+  <StockIndicatorChart indicator="ema" />
+</ClientOnly>
+```
+
+## Advanced API usage
+
+Use `createApiClient`, `OverlayChart`, and `ChartManager` directly when building
+custom applications outside the VitePress adapter.
 
 ## What's Next?
 

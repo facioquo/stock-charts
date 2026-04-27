@@ -42,19 +42,22 @@ features:
 ## Quick Example
 
 ```typescript
-import { createApiClient, OverlayChart, setupIndyCharts } from "@facioquo/indy-charts";
+import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
 
-setupIndyCharts();
+export default {
+  enhanceApp({ app }) {
+    setupIndyChartsForVitePress(app, {
+      api: { baseUrl: "https://localhost:5001" },
+      indicators: { ema: { uiid: "EMA", params: { lookbackPeriods: 20 } } }
+    });
+  }
+};
+```
 
-const client = createApiClient({ baseUrl: "https://localhost:5001" });
-const quotes = await client.getQuotes();
-
-const chart = new OverlayChart(document.getElementById("main-chart") as HTMLCanvasElement, {
-  isDarkTheme: false,
-  showTooltips: true
-});
-
-chart.render(quotes.slice(-250));
+```vue
+<ClientOnly>
+  <StockIndicatorChart indicator="ema" />
+</ClientOnly>
 ```
 
 ## Installation

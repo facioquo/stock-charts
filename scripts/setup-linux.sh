@@ -272,13 +272,6 @@ setup_dotnet_tools() {
 }
 
 # =========================================================================
-# Cleanup (runs on script exit)
-# =========================================================================
-cleanup() {
-  setup_dotnet_tools || true
-}
-
-# =========================================================================
 # CodeRabbit CLI
 # =========================================================================
 setup_coderabbit() {
@@ -296,14 +289,12 @@ setup_coderabbit() {
 # Main
 # =========================================================================
 main() {
-  # Ensure cleanup runs on script exit to keep images smaller
-  trap cleanup EXIT
-
   apt_update
   setup_node
   setup_pnpm
   setup_dotnet
   setup_coderabbit
+  setup_dotnet_tools
 
   log "✅ Environment setup complete!"
 }

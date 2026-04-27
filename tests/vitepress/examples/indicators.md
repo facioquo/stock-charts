@@ -15,55 +15,15 @@ This example demonstrates:
 > **Requires full stack demo services**: Start the Web API (and supporting services) with the VS Code task `Run: VitePress chart demo full stack`.
 
 <ClientOnly>
-  <IndyIndicatorsDemo />
+  <StockIndicatorChart indicator="rsi" />
 </ClientOnly>
 
-## ChartManager Recipe (Real API)
+## Normal authoring
 
-```typescript
-import {
-  createApiClient,
-  ChartManager,
-  createDefaultSelection,
-  loadStaticIndicatorData,
-  setupIndyCharts
-} from "@facioquo/indy-charts";
-
-setupIndyCharts();
-
-const client = createApiClient({ baseUrl: "https://localhost:5001" });
-const [quotes, listings] = await Promise.all([client.getQuotes(), client.getListings()]);
-
-const manager = new ChartManager({
-  settings: {
-    isDarkTheme: false,
-    showTooltips: true
-  }
-});
-
-const mainCanvas = document.getElementById("main-chart") as HTMLCanvasElement | null;
-const rsiCanvas = document.getElementById("rsi-chart") as HTMLCanvasElement | null;
-if (!mainCanvas || !rsiCanvas) throw new Error("Required canvas elements not found");
-
-manager.initializeOverlay(mainCanvas, quotes, 250);
-
-const emaListing = listings.find(x => x.uiid === "EMA");
-const rsiListing = listings.find(x => x.uiid === "RSI");
-if (!emaListing || !rsiListing) throw new Error("Required indicators not available");
-
-// Use the library helper to hydrate defaults, then override parameters as needed.
-const emaSelection = createDefaultSelection(emaListing, { lookbackPeriods: 20 });
-
-const emaRows = loadStaticIndicatorData(await client.getSelectionData(emaSelection, emaListing));
-manager.processSelectionData(emaSelection, emaListing, emaRows);
-manager.displaySelection(emaSelection, emaListing);
-
-const rsiSelection = createDefaultSelection(rsiListing);
-const rsiRows = loadStaticIndicatorData(await client.getSelectionData(rsiSelection, rsiListing));
-manager.processSelectionData(rsiSelection, rsiListing, rsiRows);
-manager.displaySelection(rsiSelection, rsiListing);
-
-manager.createOscillator(rsiCanvas, rsiSelection, rsiListing);
+```vue
+<ClientOnly>
+  <StockIndicatorChart indicator="rsi" />
+</ClientOnly>
 ```
 
 ## Available Indicators
@@ -86,61 +46,23 @@ Displayed in separate chart below:
 - **Stochastic**: Stochastic oscillator
 - **CCI**: Commodity Channel Index
 
-## Indicator Parameters
+## Custom indicator parameters
 
-Indicator parameters are supplied through `IndicatorSelection.params`, then
-submitted with `client.getSelectionData(selection, listing)`:
+Use the `config` prop when a page needs to override the site-level indicator registry:
 
-```typescript
-// macdListing is resolved from listings (see recipe above)
-// createDefaultSelection accepts parameter overrides keyed by paramName
-const macdSelection = createDefaultSelection(macdListing, {
-  fastPeriods: 12,
-  slowPeriods: 26,
-  signalPeriods: 9
-});
-
-const rawMacd = await client.getSelectionData(macdSelection, macdListing);
-const macdRows = loadStaticIndicatorData(rawMacd);
+```vue
+<ClientOnly>
+  <StockIndicatorChart
+    indicator="rsi"
+    :config="{ params: { lookbackPeriods: 21 }, title: 'RSI(21)', results: ['rsi'] }"
+  />
+</ClientOnly>
 ```
 
 ## Notes
 
-- The live demo above uses `ChartManager` with one overlay chart and two oscillator charts.
-- This page intentionally demonstrates real library method flow (`initializeOverlay`, `processSelectionData`, `displaySelection`, `createOscillator`) instead of simplified pseudo APIs.
-
-## Multiple Oscillators
-
-Display multiple oscillators:
-
-```typescript
-// Create additional canvas elements
-const rsiCanvas = document.getElementById("rsi-chart") as HTMLCanvasElement | null;
-const macdCanvas = document.getElementById("macd-chart") as HTMLCanvasElement | null;
-if (!rsiCanvas || !macdCanvas) throw new Error("Canvas elements not found");
-
-// Load data for each selection (ensure these are available before processing)
-const rsiData = loadStaticIndicatorData(await client.getSelectionData(rsiSelection, rsiListing));
-const macdData = loadStaticIndicatorData(await client.getSelectionData(macdSelection, macdListing));
-
-// Process data for each selection
-manager.processSelectionData(rsiSelection, rsiListing, rsiData);
-manager.processSelectionData(macdSelection, macdListing, macdData);
-manager.displaySelection(rsiSelection, rsiListing);
-manager.displaySelection(macdSelection, macdListing);
-
-// Create oscillator charts with the canvas elements
-const rsiOscillator = manager.createOscillator(
-  rsiCanvas,
-  rsiSelection,
-  rsiListing
-);
-const macdOscillator = manager.createOscillator(
-  macdCanvas,
-  macdSelection,
-  macdListing
-);
-```
+- The live demo above uses the VitePress adapter registered by the site theme.
+- Use additional `StockIndicatorChart` instances for additional indicators.
 
 ## Next Steps
 

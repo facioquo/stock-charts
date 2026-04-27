@@ -83,6 +83,8 @@ if (!("ResizeObserver" in window)) {
     disconnect(): void {}
   }
   (window as unknown as { ResizeObserver: typeof ResizeObserver }).ResizeObserver = ResizeObserver;
+  (globalThis as unknown as { ResizeObserver: typeof ResizeObserver }).ResizeObserver =
+    ResizeObserver;
 }
 
 // IntersectionObserver mock (lazy rendering, virtual scroll, sentinel elements).

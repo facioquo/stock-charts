@@ -53,16 +53,21 @@ export class ApiService {
     selection.params.forEach((p: IndicatorParam) => {
       params = params.set(p.paramName, String(p.value));
     });
-    return this.http.get<unknown[]>(listing.endpoint, { ...this.requestHeader(), params }).pipe(
-      catchError((error: HttpErrorResponse) => {
-        console.warn("Backend API unavailable, using empty data for indicator", {
-          uiid: selection.uiid,
-          status: error.status,
-          statusText: error.statusText
-        });
-        return of([]);
+    return this.http
+      .get<unknown[]>(this.buildApiUrl(listing.endpoint), {
+        ...this.requestHeader(),
+        params
       })
-    );
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.warn("Backend API unavailable, using empty data for indicator", {
+            uiid: selection.uiid,
+            status: error.status,
+            statusText: error.statusText
+          });
+          return of([]);
+        })
+      );
   }
 
   // HELPERS
@@ -71,6 +76,11 @@ export class ApiService {
     const simpleHeaders = new HttpHeaders().set("Accept", "application/json");
 
     return { headers: simpleHeaders };
+  }
+
+  private buildApiUrl(endpoint: string): string {
+    const baseUrl = env.api.endsWith("/") ? env.api : `${env.api}/`;
+    return new URL(endpoint, baseUrl).toString();
   }
 
   private toQuotes(raw: RawQuote[]): Quote[] {

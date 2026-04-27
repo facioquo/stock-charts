@@ -26,7 +26,7 @@ export function toFinancialDataPoint(quote: QuoteLike): FinancialDataPoint {
 export function buildCandlestickDataset(
   priceData: FinancialDataPoint[],
   borderColor: FinancialPalette["candleBorder"]
-): ChartDataset {
+): ChartDataset<"candlestick", FinancialDataPoint[]> {
   return {
     type: "candlestick",
     label: "Price",
@@ -34,7 +34,7 @@ export function buildCandlestickDataset(
     yAxisID: "y",
     borderColor: borderColor as unknown as string,
     order: 75
-  } as unknown as ChartDataset;
+  };
 }
 
 /** Builds a typed volume dataset with up/down/unchanged candle coloring. */

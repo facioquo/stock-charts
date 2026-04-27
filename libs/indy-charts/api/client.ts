@@ -26,6 +26,12 @@ export interface ApiClientConfig {
    */
   baseUrl: string;
 
+  /** Optional endpoint overrides for hosts that mount API routes elsewhere. */
+  endpoints?: {
+    quotes?: string;
+    indicators?: string;
+  };
+
   /**
    * Optional error callback invoked whenever a fetch operation throws or
    * receives a non-2xx response.  The error is **re-thrown** after the
@@ -72,14 +78,26 @@ export interface ApiClient {
 }
 
 function toQuotes(raw: RawQuote[]): Quote[] {
-  return raw.map(q => ({
-    date: new Date(q.date),
+  return raw.map((q, index) => ({
+    date: parseQuoteDate(q.date, index),
     open: q.open,
     high: q.high,
     low: q.low,
     close: q.close,
     volume: q.volume
   }));
+}
+
+function parseQuoteDate(value: string, index: number): Date {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(`Invalid quote date at index ${index}: "${value}"`);
+  }
+  return date;
+}
+
+function endpointUrl(baseUrl: string, endpoint: string): string {
+  return new URL(endpoint, baseUrl).toString();
 }
 
 /**
@@ -101,14 +119,14 @@ function toQuotes(raw: RawQuote[]): Quote[] {
  * ```
  */
 export function createApiClient(config: ApiClientConfig): ApiClient {
-  const { onError } = config;
+  const { endpoints, onError } = config;
   // Ensure baseUrl always ends with "/" so new URL(path, base) resolves correctly.
   const baseUrl = config.baseUrl.endsWith("/") ? config.baseUrl : `${config.baseUrl}/`;
 
   return {
     async getQuotes(): Promise<Quote[]> {
       try {
-        const response = await fetch(`${baseUrl}quotes`);
+        const response = await fetch(endpointUrl(baseUrl, endpoints?.quotes ?? "quotes"));
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
@@ -122,7 +140,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
 
     async getListings(): Promise<IndicatorListing[]> {
       try {
-        const response = await fetch(`${baseUrl}indicators`);
+        const response = await fetch(endpointUrl(baseUrl, endpoints?.indicators ?? "indicators"));
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }

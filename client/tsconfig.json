@@ -3,7 +3,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@facioquo/chartjs-chart-financial": ["../libs/chartjs-financial/index.ts"],
       "@facioquo/indy-charts": ["../libs/indy-charts/index.ts"]
