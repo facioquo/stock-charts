@@ -232,9 +232,17 @@ export class ChartService implements OnDestroy {
     body.appendChild(container);
 
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    if (!ctx) {
+      body.removeChild(container);
+      return;
+    }
 
-    this.chartManager.createOscillator(ctx, selection, listing);
+    try {
+      this.chartManager.createOscillator(ctx, selection, listing);
+    } catch (error) {
+      body.removeChild(container);
+      throw error;
+    }
 
     if (scrollToMe) this.util.scrollToEnd(container.id);
   }

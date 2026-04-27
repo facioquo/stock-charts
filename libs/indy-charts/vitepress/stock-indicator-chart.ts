@@ -164,9 +164,17 @@ export const StockIndicatorChart = defineComponent({
         const selection = createDefaultSelection(listing, config.params, `${rootId.value}-`);
         if (config.results?.length) {
           const wanted = new Set(config.results.map(result => result.toLowerCase()));
-          selection.results = selection.results.filter(result =>
+          const filtered = selection.results.filter(result =>
             wanted.has(result.dataName.toLowerCase())
           );
+          if (filtered.length === 0) {
+            console.warn(
+              `[indy-charts] None of the requested results [${config.results.join(", ")}] ` +
+                `match available result names for uiid "${config.uiid}". ` +
+                `Available: [${selection.results.map(r => r.dataName).join(", ")}].`
+            );
+          }
+          selection.results = filtered;
         }
         applySelectionTokens(selection);
 
