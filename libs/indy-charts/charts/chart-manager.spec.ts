@@ -342,6 +342,17 @@ describe("ChartManager", () => {
       expect(overlay.applySlicedData).toHaveBeenCalledWith(expect.any(Array), 70);
     });
 
+    it("normalizes the initial bar count before slicing", () => {
+      const quotes = makeQuotes(100);
+      const ctx = {} as CanvasRenderingContext2D;
+
+      mgr.initializeOverlay(ctx, quotes, 0);
+
+      const overlay = mgr.overlayChart as unknown as ReturnType<typeof createMockOverlay>;
+      expect(mgr.currentBarCount).toBe(1);
+      expect(overlay.applySlicedData).toHaveBeenCalledWith(expect.any(Array), 99);
+    });
+
     it("destroys a previous overlay before creating a new one", () => {
       const ctx = {} as CanvasRenderingContext2D;
       mgr.initializeOverlay(ctx, makeQuotes(50), 25);
@@ -377,13 +388,12 @@ describe("ChartManager", () => {
 
       mgr.initializeOverlay(ctx, quotes, 15);
       mgr.processSelectionData(selection, listing, makeIndicatorData(quotes));
+      mgr.displaySelection(selection, listing);
 
-      // Mutating the live dataset should not affect stored copy.
-      // Verify this indirectly by calling setBarCount (which relies on stored data).
-      // If data wasn't stored, setBarCount should be a no-op; if stored correctly,
-      // it should update currentBarCount to the requested value.
+      selection.results[0].dataset.data = [];
       mgr.setBarCount(20);
-      expect(mgr.currentBarCount).toBe(20);
+
+      expect(selection.results[0].dataset.data.length).toBeGreaterThan(0);
     });
   });
 

@@ -66,6 +66,8 @@ export default tseslint.config(
         "error",
         {
           patterns: [
+            "@facioquo/chartjs-chart-financial",
+            "@facioquo/chartjs-chart-financial/*",
             "**/assets/js/chartjs-chart-financial",
             "**/assets/js/chartjs-chart-financial.js"
           ]

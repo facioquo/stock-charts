@@ -472,4 +472,26 @@ describe("ChartService Smoke Tests", () => {
     resizeSubject.next({ width: 800, height: 600 });
     expect(mgr.currentBarCount).toBe(40);
   });
+
+  it("should skip unavailable default indicators during startup hydration", () => {
+    const listing = {
+      ...generateSampleIndicatorListing(),
+      uiid: "LINEAR",
+      legendTemplate: "LINEAR([P1])"
+    };
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const addSpy = vi.spyOn(service, "addSelectionWithoutScroll").mockImplementation(() => {});
+    service.listings = [listing];
+
+    (service as unknown as { loadDefaultSelections: () => void }).loadDefaultSelections();
+
+    expect(addSpy).toHaveBeenCalledTimes(1);
+    expect(addSpy.mock.calls[0]?.[0].uiid).toBe("LINEAR");
+    expect(warnSpy).toHaveBeenCalledWith(
+      "Skipping default indicator because listing was not found: BB"
+    );
+
+    warnSpy.mockRestore();
+    addSpy.mockRestore();
+  });
 });

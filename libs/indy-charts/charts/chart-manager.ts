@@ -89,7 +89,7 @@ export class ChartManager {
     barCount: number
   ): void {
     this._allQuotes = allQuotes;
-    this._currentBarCount = barCount;
+    this._currentBarCount = this.normalizeBarCount(barCount);
 
     this._overlayChart?.destroy();
     this._overlayChart = new OverlayChart(ctx, this._settings);
@@ -100,7 +100,7 @@ export class ChartManager {
     this._allProcessedDatasets.set("overlay-main", fullDatasets);
 
     // Apply initial barCount slice for display.
-    const startIndex = Math.max(0, allQuotes.length - barCount);
+    const startIndex = Math.max(0, allQuotes.length - this._currentBarCount);
     this._overlayChart.applySlicedData(fullDatasets, startIndex);
 
     // Re-attach previously registered overlay selections so they survive
@@ -292,12 +292,7 @@ export class ChartManager {
     if (this._allQuotes.length === 0) return;
 
     const totalQuotes = this._allQuotes.length;
-
-    // Normalize incoming barCount: coerce to finite integer, floor, and clamp
-    // into the valid range [1, totalQuotes]. This prevents zero/negative/
-    // non-integer values producing empty windows or invalid internal state.
-    let normalizedBarCount = Number.isFinite(barCount) ? Math.floor(barCount) : 1;
-    normalizedBarCount = Math.max(1, Math.min(normalizedBarCount, totalQuotes));
+    const normalizedBarCount = this.normalizeBarCount(barCount);
 
     if (normalizedBarCount === this._currentBarCount) return;
     this._currentBarCount = normalizedBarCount;
@@ -387,5 +382,12 @@ export class ChartManager {
     this._selections = [];
     this._allProcessedDatasets.clear();
     this._allQuotes = [];
+  }
+
+  private normalizeBarCount(barCount: number): number {
+    if (this._allQuotes.length === 0) return 1;
+
+    const normalized = Number.isFinite(barCount) ? Math.floor(barCount) : 1;
+    return Math.max(1, Math.min(normalized, this._allQuotes.length));
   }
 }

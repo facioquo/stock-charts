@@ -1,5 +1,6 @@
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
 import { TestBed } from "@angular/core/testing";
+import { firstValueFrom } from "rxjs";
 import { MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { env } from "../../environments/environment";
 import backupIndicators from "../data/backup-indicators.json";
@@ -244,6 +245,70 @@ describe("ApiService", () => {
     expect(req.request.method).toBe("GET");
     expect(req.request.params.get("lookbackPeriods")).toBe("14");
     req.flush(mockSelectionData);
+  });
+
+  it("should fallback to empty selection data only when backend is unavailable", async () => {
+    const listing: IndicatorListing = {
+      name: "Average Directional Index",
+      uiid: "ADX",
+      legendTemplate: "ADX([P1])",
+      endpoint: "/ADX/",
+      category: "trend",
+      chartType: "oscillator",
+      order: 0,
+      chartConfig: null,
+      parameters: [],
+      results: []
+    };
+    const selection: IndicatorSelection = {
+      ucid: "chart-1",
+      uiid: "ADX",
+      label: "ADX(14)",
+      chartType: "oscillator",
+      params: [],
+      results: []
+    };
+
+    const result = firstValueFrom(service.getSelectionData(selection, listing));
+    const req = httpMock.expectOne(request => request.url === `${env.api}/ADX/`);
+    req.error(new ProgressEvent("Network error"), {
+      status: 0,
+      statusText: "Unknown Error"
+    });
+
+    await expect(result).resolves.toEqual([]);
+  });
+
+  it("should rethrow selection data contract failures instead of returning no data", async () => {
+    const listing: IndicatorListing = {
+      name: "Average Directional Index",
+      uiid: "ADX",
+      legendTemplate: "ADX([P1])",
+      endpoint: "/ADX/",
+      category: "trend",
+      chartType: "oscillator",
+      order: 0,
+      chartConfig: null,
+      parameters: [],
+      results: []
+    };
+    const selection: IndicatorSelection = {
+      ucid: "chart-1",
+      uiid: "ADX",
+      label: "ADX(14)",
+      chartType: "oscillator",
+      params: [],
+      results: []
+    };
+
+    const result = firstValueFrom(service.getSelectionData(selection, listing));
+    const req = httpMock.expectOne(request => request.url === `${env.api}/ADX/`);
+    req.error(new ProgressEvent("Bad request"), {
+      status: 400,
+      statusText: "Bad Request"
+    });
+
+    await expect(result).rejects.toMatchObject({ status: 400 });
   });
 
   it("client backup indicators should have valid data structure", () => {

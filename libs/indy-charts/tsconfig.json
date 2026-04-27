@@ -17,8 +17,9 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "types": []
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules", "dist", "**/*.spec.ts", "eslint.config.ts"]
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "eslint.config.ts", "vitest.config.ts"]
 }

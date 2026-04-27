@@ -291,22 +291,36 @@ export class ChartService implements OnDestroy {
 
   /** Hydrate a set of sensible default indicators for first-time visitors. */
   private loadDefaultSelections(): void {
-    const def1 = this.defaultSelection("LINEAR");
-    const def1Param = def1.params.find(x => x.paramName === "lookbackPeriods");
-    if (def1Param) def1Param.value = 50;
-    this.addSelectionWithoutScroll(def1);
+    const defaults: Array<{ uiid: string; lookbackPeriods?: number }> = [
+      { uiid: "LINEAR", lookbackPeriods: 50 },
+      { uiid: "BB" },
+      { uiid: "RSI", lookbackPeriods: 5 },
+      { uiid: "ADX" },
+      { uiid: "SUPERTREND" },
+      { uiid: "MACD" },
+      { uiid: "MARUBOZU" }
+    ];
 
-    this.addSelectionWithoutScroll(this.defaultSelection("BB"));
+    defaults.forEach(({ uiid, lookbackPeriods }) => {
+      const selection = this.tryDefaultSelection(uiid);
+      if (!selection) return;
 
-    const def3 = this.defaultSelection("RSI");
-    const def3Param = def3.params.find(x => x.paramName === "lookbackPeriods");
-    if (def3Param) def3Param.value = 5;
-    this.addSelectionWithoutScroll(def3);
+      const lookbackParam = selection.params.find(x => x.paramName === "lookbackPeriods");
+      if (lookbackParam && lookbackPeriods !== undefined) {
+        lookbackParam.value = lookbackPeriods;
+      }
 
-    this.addSelectionWithoutScroll(this.defaultSelection("ADX"));
-    this.addSelectionWithoutScroll(this.defaultSelection("SUPERTREND"));
-    this.addSelectionWithoutScroll(this.defaultSelection("MACD"));
-    this.addSelectionWithoutScroll(this.defaultSelection("MARUBOZU"));
+      this.addSelectionWithoutScroll(selection);
+    });
+  }
+
+  private tryDefaultSelection(uiid: string): IndicatorSelection | undefined {
+    const listing = this.listings.find(x => x.uiid === uiid);
+    if (!listing) {
+      console.warn(`Skipping default indicator because listing was not found: ${uiid}`);
+      return undefined;
+    }
+    return createDefaultSelection(listing);
   }
 
   /** Format and log an HTTP error. */

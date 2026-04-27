@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { Observable, catchError, map, of } from "rxjs";
+import { Observable, catchError, map, of, throwError } from "rxjs";
 import { env } from "../../environments/environment";
 import backupIndicators from "../data/backup-indicators.json";
 import backupQuotes from "../data/backup-quotes.json";
@@ -60,6 +60,10 @@ export class ApiService {
       })
       .pipe(
         catchError((error: HttpErrorResponse) => {
+          if (!this.isTransientBackendUnavailable(error)) {
+            return throwError(() => error);
+          }
+
           console.warn("Backend API unavailable, using empty data for indicator", {
             uiid: selection.uiid,
             status: error.status,
@@ -81,6 +85,12 @@ export class ApiService {
   private buildApiUrl(endpoint: string): string {
     const baseUrl = env.api.endsWith("/") ? env.api : `${env.api}/`;
     return new URL(endpoint, baseUrl).toString();
+  }
+
+  private isTransientBackendUnavailable(error: HttpErrorResponse): boolean {
+    return (
+      error.status === 0 || error.status === 502 || error.status === 503 || error.status === 504
+    );
   }
 
   private toQuotes(raw: RawQuote[]): Quote[] {

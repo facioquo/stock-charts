@@ -243,6 +243,11 @@ setup_dotnet_tools() {
     return 0
   fi
 
+  if [ "${CI:-}" != "true" ] && [ "${CONTAINER:-}" != "1" ] && [ "${CLEAN_PACKAGE_CACHES:-0}" != "1" ]; then
+    log "Skipping package cache cleanup for local environment"
+    return 0
+  fi
+
   log "Cleaning package manager caches and apt lists..."
   if can_sudo; then
     sudo apt-get clean || true

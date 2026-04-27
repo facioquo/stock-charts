@@ -147,12 +147,8 @@ async function expectCanvasToBeNonBlank(canvas: Locator): Promise<void> {
           let visiblePixels = 0;
           for (let index = 0; index < pixels.length; index += 16) {
             const alpha = pixels[index + 3];
-            const red = pixels[index];
-            const green = pixels[index + 1];
-            const blue = pixels[index + 2];
-            if (alpha > 0 && (red < 245 || green < 245 || blue < 245)) {
-              visiblePixels += 1;
-            }
+            const darkestChannel = Math.min(pixels[index], pixels[index + 1], pixels[index + 2]);
+            visiblePixels += Number(alpha > 0 && darkestChannel < 245);
           }
           return visiblePixels > 20;
         }),

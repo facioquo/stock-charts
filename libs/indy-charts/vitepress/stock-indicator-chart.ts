@@ -59,6 +59,13 @@ function isAuthorFacingError(error: unknown): error is Error {
   );
 }
 
+function normalizeWindowSize(value: number, total: number): number {
+  if (total <= 0) return 0;
+
+  const normalized = Number.isFinite(value) ? Math.floor(value) : 1;
+  return Math.max(1, Math.min(normalized, total));
+}
+
 export const StockIndicatorChart = defineComponent({
   name: "StockIndicatorChart",
   props: {
@@ -144,7 +151,10 @@ export const StockIndicatorChart = defineComponent({
           throw new Error(`Indicator listing not found for uiid "${config.uiid}".`);
         }
 
-        const quoteCount = config.quoteCount ?? options.defaults?.quoteCount ?? DEFAULT_BAR_COUNT;
+        const quoteCount = normalizeWindowSize(
+          config.quoteCount ?? options.defaults?.quoteCount ?? DEFAULT_BAR_COUNT,
+          quotes.length
+        );
         const chartQuotes = quotes.slice(-quoteCount);
         if (chartQuotes.length === 0) {
           phase.value = "empty";
@@ -182,7 +192,7 @@ export const StockIndicatorChart = defineComponent({
         setupIndyCharts();
         const barCount =
           props.barCount ?? config.barCount ?? options.defaults?.barCount ?? DEFAULT_BAR_COUNT;
-        const normalizedBarCount = Math.max(1, Math.min(Math.floor(barCount), chartQuotes.length));
+        const normalizedBarCount = normalizeWindowSize(barCount, chartQuotes.length);
         const chartManager = new ChartManager({ settings: currentSettings() });
         manager = chartManager;
         chartManager.initializeOverlay(overlayCanvas.value, chartQuotes, normalizedBarCount);

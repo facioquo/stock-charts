@@ -1,3 +1,5 @@
+/* global console, process */
+
 import { mkdtempSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import path from "path";
@@ -7,18 +9,25 @@ const workspaceRoot = path.resolve(import.meta.dirname, "..");
 const tempRoot = mkdtempSync(path.join(tmpdir(), "indy-charts-consumer-"));
 const packDir = path.join(tempRoot, "tarballs");
 const consumerDir = path.join(tempRoot, "consumer");
+const pnpmCli = process.env["npm_execpath"];
 
-function run(command, args, cwd = workspaceRoot) {
-  const executable = process.platform === "win32" ? (process.env.ComSpec ?? "cmd.exe") : command;
-  const executableArgs = process.platform === "win32" ? ["/d", "/s", "/c", command, ...args] : args;
-  const result = spawnSync(executable, executableArgs, {
+if (!pnpmCli) {
+  throw new Error("Unable to locate the pnpm CLI. Run this smoke test through pnpm.");
+}
+
+function runPnpm(args, cwd = workspaceRoot) {
+  const result = spawnSync(process.execPath, [pnpmCli, ...args], {
     cwd,
     stdio: "inherit"
   });
 
+  if (result.error) {
+    throw result.error;
+  }
+
   if (result.status !== 0) {
     throw new Error(
-      `${command} ${args.join(" ")} failed with exit code ${result.status ?? "unknown"}`
+      `pnpm ${args.join(" ")} failed with exit code ${result.status ?? "unknown"}`
     );
   }
 }
@@ -43,7 +52,7 @@ try {
   mkdirSync(packDir, { recursive: true });
   mkdirSync(path.join(consumerDir, "docs", ".vitepress", "theme"), { recursive: true });
 
-  run("pnpm", [
+  runPnpm([
     "--filter",
     "@facioquo/chartjs-chart-financial",
     "--filter",
@@ -51,14 +60,14 @@ try {
     "run",
     "build"
   ]);
-  run("pnpm", [
+  runPnpm([
     "--filter",
     "@facioquo/chartjs-chart-financial",
     "pack",
     "--pack-destination",
     packDir
   ]);
-  run("pnpm", ["--filter", "@facioquo/indy-charts", "pack", "--pack-destination", packDir]);
+  runPnpm(["--filter", "@facioquo/indy-charts", "pack", "--pack-destination", packDir]);
 
   const financialTarball = packedTarball("@facioquo/chartjs-chart-financial");
   const indyChartsTarball = packedTarball("@facioquo/indy-charts");
@@ -141,8 +150,8 @@ export default {
 `
   );
 
-  run("pnpm", ["install", "--ignore-scripts"], consumerDir);
-  run("pnpm", ["run", "build"], consumerDir);
+  runPnpm(["install", "--ignore-scripts"], consumerDir);
+  runPnpm(["run", "build"], consumerDir);
   console.log("Packed VitePress consumer smoke test passed.");
 } finally {
   if (!process.env["INDY_CHARTS_SMOKE_KEEP_TEMP"]) {
