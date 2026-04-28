@@ -20,30 +20,16 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
 **All platforms:**
 
 - [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
-- [pnpm](https://pnpm.io/) (v10.30.3 or later) - Installed via platform package managers:
+- [pnpm](https://pnpm.io/) (v10 LTS or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
-  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.30.3 --activate`)
+  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm --activate`)
 - [Angular CLI](https://angular.dev/cli) - Installed globally during setup
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 
 **Note:** Azure Functions Core Tools is essential for running the backend Azure Functions locally (`func start` command). It is not installed automatically with Node or .NET SDK.
-
-**Add symlinks if you're not using GitHub Copilot** as your coding agent.
-
-If your AI coding vendor requires a unique configuration folder for custom agents or agent skills, create proper symlinks in your local environment from any **Linux/macOS** shell commandline. Example:
-
-```bash
-cd .cursor
-ln -s ../.agents/skills skills
-ln -s ../.github/agents agents
-```
-
-> [!WARNING]
-> **Windows OS**: Invoke `wsl` to use the WSL(Linux) shell.
-> This does not work properly in Windows terminals, including Git Bash for Windows.
 
 ### Platform-specific installation
 
@@ -81,9 +67,9 @@ Installs all prerequisites via [Homebrew](https://brew.sh/):
 bash scripts/setup-macos.sh
 ```
 
-**Linux** - `scripts/setup-linux.sh`
+**Linux** - `scripts/setup-environment.sh`
 
-Installs all prerequisites via apt-get:
+Installs all prerequisites:
 
 - Node.js v24 LTS
 - .NET SDK v10.0
@@ -91,7 +77,7 @@ Installs all prerequisites via apt-get:
 - Angular CLI (global)
 
 ```bash
-bash scripts/setup-linux.sh
+bash scripts/setup-environment.sh
 ```
 
 **Note:** Azure Functions Core Tools must be installed manually on Linux. See the [installation guide](https://learn.microsoft.com/azure/azure-functions/functions-run-local#linux).
@@ -128,7 +114,7 @@ After running the setup script or manual installation, verify all tools:
 
 ```bash
 node --version    # Should be v24+
-pnpm --version    # Should be 10.30.3+
+pnpm --version    # Should be 10+
 dotnet --version  # Should be 10.0+
 func --version    # Should be 4.x
 ```

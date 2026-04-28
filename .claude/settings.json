@@ -16,7 +16,5 @@
     ],
     "ask": ["Bash(git commit *)"],
     "deny": ["Bash(git push *)"]
-  },
-  "agentsDirectories": [".github/agents"],
-  "skillsDirectory": ".agents/skills"
+  }
 }

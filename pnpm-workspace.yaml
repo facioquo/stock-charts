@@ -1,7 +1,7 @@
 packages:
-  - client
   - libs/chartjs-financial
   - libs/indy-charts
+  - client
   - tests/playwright
   - tests/vitepress
 

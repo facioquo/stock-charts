@@ -17,25 +17,25 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 **All platforms:**
 
 - [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/) (v24.14.0 or later within the v24 line)
-- [pnpm](https://pnpm.io/) (v10.33.2 or later) - Installed via platform package managers:
+- [Node.js](https://nodejs.org/) (v24 LTS or later)
+- [pnpm](https://pnpm.io/) (v10 LTS or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
-  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.33.2 --activate`)
+  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm --activate`)
 - [Angular CLI](https://angular.dev/tools/cli) - Use the workspace CLI through `pnpm --filter @stock-charts/client exec ng`
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 
-**Quick setup (Linux/WSL):**
+**Quick setup (all platforms):**
 
 ```bash
-bash scripts/setup-linux.sh
+bash scripts/setup-environment.sh
 ```
 
-For other platforms, install the prerequisites above with the listed package managers, then run `pnpm install` from the repository root.
+For manual setup, install the prerequisites above with the listed package managers, then run `pnpm install` from the repository root.
 
-**Note:** The Linux/WSL setup script installs Node.js, .NET SDK, and pnpm. Azure Functions Core Tools is essential for running the backend Azure Functions locally (`func start` command) and must be [installed separately](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools).
+**Note:** Azure Functions Core Tools is essential for running the backend Azure Functions locally (`func start` command) and must be [installed separately](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools) on Linux.
 
 ### Setup and run
 
