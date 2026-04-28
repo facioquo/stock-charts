@@ -183,6 +183,7 @@ describe("ChartService Smoke Tests", () => {
   let guidCounter = 0;
   let canvasElement: HTMLCanvasElement;
   let oscillatorsZone: HTMLDivElement;
+  let spiesToRestore: any[] = [];
 
   /** Typed shortcut: access the private ChartManager for assertions. */
   function getChartManager(): ChartManager {
@@ -285,6 +286,18 @@ describe("ChartService Smoke Tests", () => {
     if (oscillatorsZone?.parentNode) {
       oscillatorsZone.parentNode.removeChild(oscillatorsZone);
     }
+    // Ensure tests do not leak localStorage state
+    localStorage.removeItem("selections");
+
+    // Restore any spies registered for global teardown
+    for (const s of spiesToRestore) {
+      try {
+        s?.mockRestore?.();
+      } catch {
+        // ignore restore errors
+      }
+    }
+    spiesToRestore.length = 0;
   });
 
   /**
@@ -497,9 +510,8 @@ describe("ChartService Smoke Tests", () => {
     expect(addSpy.mock.calls[0]?.[0].ucid).toBe("cached-001");
     expect(loadDefaultsSpy).not.toHaveBeenCalled();
 
-    addSpy.mockRestore();
-    loadDefaultsSpy.mockRestore();
-    localStorage.removeItem("selections");
+    // Defer restores and localStorage cleanup to shared afterEach
+    spiesToRestore.push(addSpy, loadDefaultsSpy);
   });
 
   it("should skip unavailable default indicators during startup hydration", () => {
