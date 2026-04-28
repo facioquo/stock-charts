@@ -183,6 +183,7 @@ describe("ChartService Smoke Tests", () => {
   let guidCounter = 0;
   let canvasElement: HTMLCanvasElement;
   let oscillatorsZone: HTMLDivElement;
+  const spiesToRestore: any[] = [];
 
   /** Typed shortcut: access the private ChartManager for assertions. */
   function getChartManager(): ChartManager {
@@ -285,6 +286,18 @@ describe("ChartService Smoke Tests", () => {
     if (oscillatorsZone?.parentNode) {
       oscillatorsZone.parentNode.removeChild(oscillatorsZone);
     }
+    // Ensure tests do not leak localStorage state
+    localStorage.removeItem("selections");
+
+    // Restore any spies registered for global teardown
+    for (const s of spiesToRestore) {
+      try {
+        s?.mockRestore?.();
+      } catch {
+        // ignore restore errors
+      }
+    }
+    spiesToRestore.length = 0;
   });
 
   /**
@@ -471,6 +484,34 @@ describe("ChartService Smoke Tests", () => {
     (mockWindowService.calculateOptimalBars as any).mockReturnValue(40);
     resizeSubject.next({ width: 800, height: 600 });
     expect(mgr.currentBarCount).toBe(40);
+  });
+
+  it("should not call loadDefaultSelections when cached selections exist (regression: duplicate series on reload)", () => {
+    const listing = generateSampleIndicatorListing();
+    service.listings = [listing];
+
+    const cachedSelection = {
+      ucid: "cached-001",
+      uiid: listing.uiid,
+      chartType: "overlay",
+      params: [],
+      results: []
+    };
+    localStorage.setItem("selections", JSON.stringify([cachedSelection]));
+
+    const addSpy = vi.spyOn(service, "addSelectionWithoutScroll").mockImplementation(() => {});
+    const loadDefaultsSpy = vi
+      .spyOn(service as unknown as { loadDefaultSelections: () => void }, "loadDefaultSelections")
+      .mockImplementation(() => {});
+
+    // Ensure these spies are always restored even if assertions fail
+    spiesToRestore.push(addSpy, loadDefaultsSpy);
+
+    (service as unknown as { loadSelections: () => void }).loadSelections();
+
+    expect(addSpy).toHaveBeenCalledTimes(1);
+    expect(addSpy.mock.calls[0]?.[0].ucid).toBe("cached-001");
+    expect(loadDefaultsSpy).not.toHaveBeenCalled();
   });
 
   it("should skip unavailable default indicators during startup hydration", () => {
