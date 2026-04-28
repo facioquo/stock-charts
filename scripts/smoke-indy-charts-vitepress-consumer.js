@@ -1,4 +1,4 @@
-/* global console, process */
+/* global process */
 
 import { mkdtempSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
