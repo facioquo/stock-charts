@@ -287,8 +287,15 @@ export class ChartService implements OnDestroy {
     try {
       const cached = JSON.parse(raw) as IndicatorSelection[] | null;
       if (cached?.length) {
+        const initialCount = this.selections.length;
         cached.forEach(selection => this.addSelectionWithoutScroll(selection));
-        return;
+        const finalCount = this.selections.length;
+
+        // Only return early if at least one selection was actually added
+        if (finalCount > initialCount) {
+          return;
+        }
+        // Otherwise fall through to load defaults
       }
     } catch {
       // Corrupted JSON — fall through to defaults
