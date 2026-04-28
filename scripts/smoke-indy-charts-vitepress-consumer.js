@@ -1,5 +1,3 @@
-/* global process */
-
 import { mkdtempSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import path from "path";
