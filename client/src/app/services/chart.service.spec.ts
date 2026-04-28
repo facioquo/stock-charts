@@ -504,14 +504,14 @@ describe("ChartService Smoke Tests", () => {
       .spyOn(service as unknown as { loadDefaultSelections: () => void }, "loadDefaultSelections")
       .mockImplementation(() => {});
 
+    // Ensure these spies are always restored even if assertions fail
+    spiesToRestore.push(addSpy, loadDefaultsSpy);
+
     (service as unknown as { loadSelections: () => void }).loadSelections();
 
     expect(addSpy).toHaveBeenCalledTimes(1);
     expect(addSpy.mock.calls[0]?.[0].ucid).toBe("cached-001");
     expect(loadDefaultsSpy).not.toHaveBeenCalled();
-
-    // Defer restores and localStorage cleanup to shared afterEach
-    spiesToRestore.push(addSpy, loadDefaultsSpy);
   });
 
   it("should skip unavailable default indicators during startup hydration", () => {
