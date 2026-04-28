@@ -183,7 +183,7 @@ describe("ChartService Smoke Tests", () => {
   let guidCounter = 0;
   let canvasElement: HTMLCanvasElement;
   let oscillatorsZone: HTMLDivElement;
-  let spiesToRestore: any[] = [];
+  const spiesToRestore: any[] = [];
 
   /** Typed shortcut: access the private ChartManager for assertions. */
   function getChartManager(): ChartManager {
