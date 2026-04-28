@@ -287,15 +287,13 @@ export class ChartService implements OnDestroy {
     try {
       const cached = JSON.parse(raw) as IndicatorSelection[] | null;
       if (cached?.length) {
-        const initialCount = this.selections.length;
+        // addSelectionWithoutScroll is asynchronous (HTTP-backed), so selections are
+        // not yet registered by the time the forEach returns. Checking the count
+        // immediately after would always see zero new entries and incorrectly fall
+        // through to loadDefaultSelections(), doubling every indicator on every reload.
+        // Simply return here — if cached selections exist, trust them.
         cached.forEach(selection => this.addSelectionWithoutScroll(selection));
-        const finalCount = this.selections.length;
-
-        // Only return early if at least one selection was actually added
-        if (finalCount > initialCount) {
-          return;
-        }
-        // Otherwise fall through to load defaults
+        return;
       }
     } catch {
       // Corrupted JSON — fall through to defaults

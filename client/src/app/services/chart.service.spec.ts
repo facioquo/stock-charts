@@ -473,6 +473,35 @@ describe("ChartService Smoke Tests", () => {
     expect(mgr.currentBarCount).toBe(40);
   });
 
+  it("should not call loadDefaultSelections when cached selections exist (regression: duplicate series on reload)", () => {
+    const listing = generateSampleIndicatorListing();
+    service.listings = [listing];
+
+    const cachedSelection = {
+      ucid: "cached-001",
+      uiid: listing.uiid,
+      chartType: "overlay",
+      params: [],
+      results: []
+    };
+    localStorage.setItem("selections", JSON.stringify([cachedSelection]));
+
+    const addSpy = vi.spyOn(service, "addSelectionWithoutScroll").mockImplementation(() => {});
+    const loadDefaultsSpy = vi
+      .spyOn(service as unknown as { loadDefaultSelections: () => void }, "loadDefaultSelections")
+      .mockImplementation(() => {});
+
+    (service as unknown as { loadSelections: () => void }).loadSelections();
+
+    expect(addSpy).toHaveBeenCalledTimes(1);
+    expect(addSpy.mock.calls[0]?.[0].ucid).toBe("cached-001");
+    expect(loadDefaultsSpy).not.toHaveBeenCalled();
+
+    addSpy.mockRestore();
+    loadDefaultsSpy.mockRestore();
+    localStorage.removeItem("selections");
+  });
+
   it("should skip unavailable default indicators during startup hydration", () => {
     const listing = {
       ...generateSampleIndicatorListing(),
