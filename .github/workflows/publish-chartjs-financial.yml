@@ -1,0 +1,75 @@
+name: "Publish @facioquo/chartjs-chart-financial"
+
+on:
+  push:
+    paths:
+      - 'libs/chartjs-financial/**'
+      - 'libs/chartjs-financial/package.json'
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 24
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    name: "Publish chartjs-chart-financial to GitHub Packages"
+    runs-on: ubuntu-latest
+    environment: pkg.github.com
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+          registry-url: https://npm.pkg.github.com
+          scope: "@facioquo"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build package
+        working-directory: libs/chartjs-financial
+        run: pnpm run build
+
+      - name: Run package tests
+        working-directory: libs/chartjs-financial
+        run: pnpm run test
+
+      - name: Publish @facioquo/chartjs-chart-financial
+        working-directory: libs/chartjs-financial
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PACKAGE_VERSION=$(jq -r '.version' package.json)
+          PACKAGE_NAME=$(jq -r '.name' package.json)
+
+          if [[ "$PACKAGE_VERSION" == *-* ]]; then
+            NPM_TAG="next"
+          else
+            NPM_TAG="latest"
+          fi
+
+          if npm view "$PACKAGE_NAME@$PACKAGE_VERSION" > /dev/null 2>&1; then
+            echo "Version $PACKAGE_VERSION already published; skipping publish."
+          else
+            echo "Publishing $PACKAGE_NAME@$PACKAGE_VERSION with tag '$NPM_TAG'"
+            pnpm publish --no-git-checks --access restricted --tag "$NPM_TAG"
+          fi
