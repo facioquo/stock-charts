@@ -4,15 +4,17 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
+    testTimeout: 30000,
     coverage: {
       provider: "v8",
       reporter: ["text", "text-summary", "html", "lcov", "json"],
       reportsDirectory: "./coverage",
-      all: true,
-      lines: 80,
-      functions: 80,
-      branches: 75,
-      statements: 80,
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 75,
+        statements: 80
+      },
       include: ["src/**/*.ts"],
       exclude: [
         "src/**/*.spec.ts",

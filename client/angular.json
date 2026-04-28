@@ -17,13 +17,11 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "aot": true,
             "outputPath": {
               "base": "dist/app"
             },
             "browser": "src/main.ts",
-            "index": "src/index.html",
-            "polyfills": ["src/polyfills.ts"],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "assets": ["src/assets", "src/_headers", "src/robots.txt", "src/sitemap.xml"],
             "styles": ["src/styles.scss"],
@@ -88,9 +86,11 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "tsconfig.spec.json",
+            "runnerConfig": true,
             "include": ["src/**/*.spec.ts"],
             "setupFiles": ["src/test-setup.ts"],
-            "coverage": false
+            "coverage": false,
+            "watch": false
           },
           "configurations": {
             "coverage": {

@@ -25,15 +25,27 @@ case "$mode" in
     # Capture exit code without triggering set -e by using || pattern
     pnpm --filter @stock-charts/client run lint <<<"n" || lint_exit=$?
 
+    # Lint libraries (TypeScript packages)
+    log "Running library linting checks..."
+    pnpm --filter './libs/**' run lint --max-warnings=0 || lib_lint_exit=$?
+
+    # Lint VitePress example
+    log "Running VitePress linting checks..."
+    pnpm --filter @stock-charts/vitepress-example run lint --max-warnings=0 || vitepress_lint_exit=$?
+
     # Format Angular code
     log "Checking Angular code formatting..."
     pnpm run format:web:check || format_exit=$?
+
+    # Format libraries (Prettier check)
+    log "Checking library code formatting..."
+    pnpm --filter './libs/**' run format:check || lib_format_exit=$?
 
     # Lint CSS files
     log "Running CSS linting checks..."
     pnpm run lint:css || css_lint_exit=$?
 
-    if [ "${lint_exit:-0}" -ne 0 ] || [ "${format_exit:-0}" -ne 0 ] || [ "${css_lint_exit:-0}" -ne 0 ]; then
+    if [ "${lint_exit:-0}" -ne 0 ] || [ "${lib_lint_exit:-0}" -ne 0 ] || [ "${vitepress_lint_exit:-0}" -ne 0 ] || [ "${format_exit:-0}" -ne 0 ] || [ "${lib_format_exit:-0}" -ne 0 ] || [ "${css_lint_exit:-0}" -ne 0 ]; then
       err "Angular linting or formatting issues detected"
       exit 1
     fi
@@ -48,15 +60,27 @@ case "$mode" in
     # Capture exit code without triggering set -e by using || pattern
     pnpm --filter @stock-charts/client run lint:fix <<<"n" || lint_exit=$?
 
+    # Fix libraries (TypeScript packages)
+    log "Running library linting fixes..."
+    pnpm --filter './libs/**' run lint:fix || lib_lint_exit=$?
+
+    # Fix VitePress example
+    log "Running VitePress linting fixes..."
+    pnpm --filter @stock-charts/vitepress-example run lint:fix || vitepress_lint_exit=$?
+
     # Format Angular code
     log "Formatting Angular code..."
     pnpm run format:web || format_exit=$?
+
+    # Format libraries (Prettier fix)
+    log "Formatting library code..."
+    pnpm --filter './libs/**' run format || lib_format_exit=$?
 
     # Fix CSS files
     log "Running CSS linting fixes..."
     pnpm run lint:css:fix || css_lint_exit=$?
 
-    if [ "${lint_exit:-0}" -ne 0 ] || [ "${format_exit:-0}" -ne 0 ] || [ "${css_lint_exit:-0}" -ne 0 ]; then
+    if [ "${lint_exit:-0}" -ne 0 ] || [ "${lib_lint_exit:-0}" -ne 0 ] || [ "${vitepress_lint_exit:-0}" -ne 0 ] || [ "${format_exit:-0}" -ne 0 ] || [ "${lib_format_exit:-0}" -ne 0 ] || [ "${css_lint_exit:-0}" -ne 0 ]; then
       err "Angular linting or formatting completed with issues (see output above)"
       # Don't exit 1 for fix mode - user can review and re-run check
     fi

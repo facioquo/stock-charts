@@ -1,4 +1,4 @@
-import { Quote } from "../pages/chart/chart.models";
+import type { Quote } from "@facioquo/indy-charts";
 
 /**
  * Simple seeded random number generator for deterministic quote generation

@@ -238,8 +238,8 @@ function runBenchmark() {
   complexService.allQuotes = generateTestQuotes(1000);
 
   const complexStart = performance.now();
-  const baseConfig = complexService.getOverlayChartConfig();
-  const indicators = complexService.addIndicatorData(5);
+  complexService.getOverlayChartConfig();
+  complexService.addIndicatorData(5);
   const complexEnd = performance.now();
 
   const complexDuration = complexEnd - complexStart;

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <!-- Exclude generated code from coverage analysis -->
+          <ExcludeGeneratedCode>true</ExcludeGeneratedCode>
+          <!-- Exclude generated and Generators code from coverage (Coverlet-compatible syntax) -->
+          <ExcludeByFile>
+            <Exclude>.*\\obj\\.*</Exclude>
+            <Exclude>.*Generators.*</Exclude>
+          </ExcludeByFile>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

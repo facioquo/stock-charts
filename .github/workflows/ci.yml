@@ -11,7 +11,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: 24.14.0
+  NODE_VERSION: 24
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  TESTINGPLATFORM_TELEMETRY_OPTOUT: 1
 
 jobs:
   test-backend:
@@ -109,6 +111,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build libraries
+        run: |
+          pnpm --filter @facioquo/chartjs-chart-financial run build
+          pnpm --filter @facioquo/indy-charts run build
+
       - name: Check web formatting
         run: pnpm run format:web:check
 
@@ -120,6 +127,12 @@ jobs:
 
       - name: Run unit tests
         run: pnpm --filter @stock-charts/client run test:coverage
+
+      - name: Run library unit tests
+        run: pnpm run test:libs
+
+      - name: Run package consumption smoke test
+        run: pnpm run smoke:package-consumption
 
       - name: Upload frontend coverage to Codecov
         if: always()
@@ -142,3 +155,9 @@ jobs:
 
       - name: Build site
         run: pnpm --filter @stock-charts/client run build.prod
+
+      - name: Install Playwright Chromium
+        run: pnpm --filter @stock-charts/playwright-tests exec playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: pnpm run test:e2e

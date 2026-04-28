@@ -8,6 +8,33 @@
  * (watch mode) do not throw or mask real browser APIs if they become available.
  */
 
+// ========================================================================
+// Angular Testing Infrastructure
+// ========================================================================
+import { destroyPlatform } from "@angular/core";
+import { getTestBed } from "@angular/core/testing";
+import {
+  BrowserDynamicTestingModule,
+  platformBrowserDynamicTesting
+} from "@angular/platform-browser-dynamic/testing";
+
+// Initialize Angular TestBed environment.
+// In Vitest worker pools the setup file is re-evaluated for each worker, so
+// TestBed may already be initialized when this module runs again.
+// The correct reset sequence is:
+//   1. resetTestEnvironment() — clears _isInitialized and provider state
+//   2. destroyPlatform()      — tears down the existing Angular platform
+//   3. initTestEnvironment()  — creates a fresh platform + test environment
+// This avoids the "Cannot set base providers because it has already been
+// called" error without needing a try-catch.
+getTestBed().resetTestEnvironment();
+destroyPlatform();
+getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
+
+// ========================================================================
+// Browser API Shims for jsdom
+// ========================================================================
+
 // Some libraries probe for the CSS object; jsdom may not define it.
 if (!("CSS" in window)) {
   Object.defineProperty(window, "CSS", { value: null });
@@ -19,7 +46,7 @@ if (typeof window.getComputedStyle !== "function") {
   Object.defineProperty(window, "getComputedStyle", {
     value: (elt: Element) => ({
       display: "block",
-      appearance: ["-webkit-appearance"],
+      appearance: "none",
       position: "static",
       getPropertyValue: (prop: string) => {
         if (prop === "transform") {
@@ -56,6 +83,8 @@ if (!("ResizeObserver" in window)) {
     disconnect(): void {}
   }
   (window as unknown as { ResizeObserver: typeof ResizeObserver }).ResizeObserver = ResizeObserver;
+  (globalThis as unknown as { ResizeObserver: typeof ResizeObserver }).ResizeObserver =
+    ResizeObserver;
 }
 
 // IntersectionObserver mock (lazy rendering, virtual scroll, sentinel elements).

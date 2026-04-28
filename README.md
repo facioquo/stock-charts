@@ -17,12 +17,12 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 **All platforms:**
 
 - [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/) (v24.13.1 LTS or later)
-- [pnpm](https://pnpm.io/) (v10.29.3 or later) - Installed via platform package managers:
+- [Node.js](https://nodejs.org/) (v24 LTS or later)
+- [pnpm](https://pnpm.io/) (v10 LTS or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
-  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm@10.29.3 --activate`)
-- [Angular CLI](https://angular.dev/tools/cli) - Installed globally during setup
+  - **Linux**: Corepack (`corepack enable && corepack prepare pnpm --activate`)
+- [Angular CLI](https://angular.dev/tools/cli) - Use the workspace CLI through `pnpm --filter @stock-charts/client exec ng`
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
@@ -33,17 +33,9 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 bash scripts/setup-environment.sh
 ```
 
-This script automatically detects your OS and runs the appropriate platform-specific setup.
+For manual setup, install the prerequisites above with the listed package managers, then run `pnpm install` from the repository root.
 
-**Platform-specific setup scripts:**
-
-- **macOS**: `scripts/setup-macos.sh` (Homebrew-based)
-- **Linux**: `scripts/setup-linux.sh` (apt-get-based)
-- **Windows**: `scripts/setup-windows.sh` (Git Bash with winget)
-
-**Note:** All setup scripts automatically install Node.js, .NET SDK, pnpm, and Angular CLI. Azure Functions Core Tools is installed automatically on macOS and Windows, but must be [installed manually on Linux](https://learn.microsoft.com/azure/azure-functions/functions-run-local#linux).
-
-**Note:** Azure Functions Core Tools is essential for running the backend Azure Functions locally (`func start` command). It is not installed automatically with Node or .NET SDK.
+**Note:** Azure Functions Core Tools is essential for running the backend Azure Functions locally (`func start` command) and must be [installed separately](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools) on Linux.
 
 ### Setup and run
 
@@ -55,7 +47,7 @@ pnpm install
 
 # Start development environment
 # Option 1: Use VS Code
-# Ctrl+Shift+P → "Tasks: Run Task" → "start-full-stack"
+# Ctrl+Shift+P → "Tasks: Run Task" → "Run: Full development stack"
 
 # Option 2: Manual start in separate terminals
 pnpm run azure:start  # Terminal 1: Storage emulator
@@ -66,9 +58,9 @@ pnpm start  # Terminal 4: Angular dev server
 
 **Access:** Website at <http://localhost:4200>, Web API at <https://localhost:5001>, Functions at <http://localhost:7071>
 
-## Financial Charts
+## Financial charts
 
-Financial chart support (`candlestick`, `ohlc`) is integrated as a typed, modular Chart.js extension under `client/src/chartjs/financial`.
+Financial chart support (`candlestick`, `ohlc`) is integrated as typed, modular Chart.js workspace packages under `libs/chartjs-financial` and `libs/indy-charts`.
 
 - Register once at startup with `registerFinancialCharts()` (already called from `client/src/main.ts`).
 - Use OHLC data points in `{ x, o, h, l, c }` shape where `x` is a timestamp.

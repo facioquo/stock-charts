@@ -19,12 +19,12 @@ import { TinyColor } from "@ctrl/tinycolor";
 
 import { ChartService } from "../../services/chart.service";
 
-import {
+import type {
   IndicatorListing,
   IndicatorParam,
   IndicatorResult,
   IndicatorSelection
-} from "../../pages/chart/chart.models";
+} from "@facioquo/indy-charts";
 
 import { MatTooltip } from "@angular/material/tooltip";
 import { FormsModule } from "@angular/forms";
@@ -87,7 +87,6 @@ export class PickConfigComponent {
   // ref: https://ng-matero.github.io/extensions/components/colorpicker
 
   selection: IndicatorSelection;
-  customPicker: MtxColorpicker;
   errorMessage: string | undefined;
   closeButtonLabel = "ADD";
 
