@@ -12,6 +12,16 @@ Enable developers to quickly evaluate and understand the Skender.Stock.Indicator
 2. Ensure seamless first-run experience for developers on all platforms through automated setup and clear documentation (not as important as #1)
 3. Maintain visual quality and performance that reflects real-world production requirements so developers can trust the library's capabilities (not as important as #2)
 
+## Pull request conventions
+
+PR titles must follow Conventional Commits format: `type: Subject`
+
+- `type` is lowercase: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`, `plan`
+- `Subject` starts with an uppercase letter
+- Example: `feat: Add API endpoint for market data`
+
+Ignore this convention for PRs labeled `bot`, `dependencies`, or `automated`.
+
 ## Repository structure
 
 ```text
