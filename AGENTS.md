@@ -12,14 +12,6 @@ Enable developers to quickly evaluate and understand the Skender.Stock.Indicator
 2. Ensure seamless first-run experience for developers on all platforms through automated setup and clear documentation (not as important as #1)
 3. Maintain visual quality and performance that reflects real-world production requirements so developers can trust the library's capabilities (not as important as #2)
 
-## Pull request conventions
-
-PR titles follow Conventional Commits format: `type: Subject` (no scope)
-
-- `type` is lowercase: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`, `plan`
-- `Subject` starts with an uppercase letter; keep total title length ≤ 65 characters
-- Ignore for PRs labeled `bot`, `dependencies`, or `automated`
-
 ## Repository structure
 
 ```text
@@ -311,3 +303,11 @@ When working on this codebase:
 - **Responsive design**: Ensure charts render correctly across device sizes
 - **Performance**: Optimize Chart.js rendering (disable animations for large datasets)
 - **Quality**: Zero tolerance for suppressed errors, skipped tests, or incomplete implementations
+
+## Pull request conventions
+
+PR titles follow Conventional Commits format: `type: Subject` (no scope)
+
+- `type` is lowercase: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`, `plan`
+- `Subject` starts with an uppercase letter; keep total title length ≤ 65 characters
+- Ignore for PRs labeled `bot`, `dependencies`, or `automated`
