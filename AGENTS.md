@@ -14,13 +14,11 @@ Enable developers to quickly evaluate and understand the Skender.Stock.Indicator
 
 ## Pull request conventions
 
-PR titles must follow Conventional Commits format: `type: Subject`
+PR titles follow Conventional Commits format: `type: Subject` (no scope)
 
 - `type` is lowercase: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`, `plan`
-- `Subject` starts with an uppercase letter
-- Example: `feat: Add API endpoint for market data`
-
-Ignore this convention for PRs labeled `bot`, `dependencies`, or `automated`.
+- `Subject` starts with an uppercase letter; keep total title length ≤ 65 characters
+- Ignore for PRs labeled `bot`, `dependencies`, or `automated`
 
 ## Repository structure
 
