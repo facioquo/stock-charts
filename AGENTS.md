@@ -46,7 +46,6 @@ stock-charts/
 ├── docs/                     # Documentation
 ├── scripts/                  # Setup and utility scripts
 └── .github/
-    ├── instructions/         # Auto-attached scoped instructions
     └── workflows/            # CI/CD configs
 ```
 
@@ -190,13 +189,10 @@ public class Service
 
 ## Technology conventions
 
-Scoped instruction files in `.github/instructions/` are automatically attached based on file patterns:
-
-- **angular.instructions.md** - Angular v21 patterns, signals, standalone components
-- **code-completion.instructions.md** - Pre-submission quality checklist (format, lint, build, test)
-- **pnpm-packages.instructions.md** - pnpm workspace dependency management
-- **nuget-packages.instructions.md** - Centralized NuGet package management
-- **markdown.instructions.md** - Markdown formatting and linting standards
+- **Angular v21**: signals, standalone components, native control flow
+- **pnpm packages**: pnpm workspace dependency management
+- **NuGet**: centralized NuGet package management
+- **Markdown**: sentence case, AGENTS.md as canonical source
 
 ## Project structure
 
@@ -234,7 +230,7 @@ Financial chart types (`candlestick`, `ohlc`, `volume`) are integrated as typed 
 
 ### ✅ Always do
 
-- Run full code completion checklist before marking work complete (see `.github/instructions/code-completion.instructions.md`)
+- Run full code completion checklist before marking work complete
 - Format all code: `pnpm run format` (zero warnings required)
 - Lint with zero errors: `pnpm run lint` (fix before commit)
 - Build successfully: `pnpm run build` and `dotnet build Charts.sln`
