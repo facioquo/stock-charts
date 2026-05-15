@@ -271,7 +271,8 @@ One-time setup:
 1. **Setup**: VS Code task "Setup: Dev environment"
 2. **Install**: Run `pnpm install` from root
 3. **Credentials** (optional): Configure Alpaca API credentials for real-time quote updates
-   - See [server/Functions/README.md](server/Functions/README.md) for configuration options
+   - Copy `.env.example` to `.env` at the repo root and fill in `ALPACA_KEY` and `ALPACA_SECRET`
+   - See [server/Functions/README.md](server/Functions/README.md) for details
    - Application works fully without credentials using backup quote data
    - No exceptions thrown when credentials are missing
 

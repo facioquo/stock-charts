@@ -10,13 +10,28 @@
  * For CLI use: node scripts/start-functions.js
  */
 
-import { existsSync, copyFileSync } from "fs";
+import { existsSync, copyFileSync, readFileSync } from "fs";
 import { spawn, spawnSync } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Load .env from repo root if present (credentials stay out of tracked config files)
+const envFile = path.join(__dirname, "..", ".env");
+if (existsSync(envFile)) {
+  const lines = readFileSync(envFile, "utf8").split("\n");
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eqIdx = trimmed.indexOf("=");
+    if (eqIdx < 1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    const value = trimmed.slice(eqIdx + 1).trim().replace(/^"|"$|^'|'$/g, "");
+    if (key && !(key in process.env)) process.env[key] = value;
+  }
+}
 
 const functionsDir = path.join(__dirname, "..", "server", "Functions");
 const settingsFile = path.join(functionsDir, "local.settings.json");
