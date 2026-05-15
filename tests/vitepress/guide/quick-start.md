@@ -25,7 +25,7 @@ Create an API client pointed at your stock-charts API endpoint:
 import { createApiClient } from "@facioquo/indy-charts";
 
 const api = createApiClient({
-  baseUrl: "https://localhost:5001"
+  baseUrl: "https://api.example.com"
 });
 ```
 
@@ -99,7 +99,7 @@ export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
     setupIndyChartsForVitePress(app, {
-      api: { baseUrl: "https://localhost:5001" },
+      api: { baseUrl: "https://api.example.com" },
       defaults: { barCount: 250, quoteCount: 250, showTooltips: true },
       indicators: {
         rsi: {

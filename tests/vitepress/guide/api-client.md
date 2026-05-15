@@ -9,7 +9,7 @@ fetching quotes and indicator data from the stock-charts Web API.
 import { createApiClient } from "@facioquo/indy-charts";
 
 const client = createApiClient({
-  baseUrl: "https://localhost:5001",
+  baseUrl: "https://api.example.com",
   onError: (context, error) => {
     console.error(context, error);
   }

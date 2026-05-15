@@ -12,8 +12,6 @@ This example demonstrates:
 
 ## Live Demo
 
-> **Requires full stack demo services**: Start the Web API (and supporting services) with the VS Code task `Run: VitePress chart demo full stack`.
-
 <ClientOnly>
   <StockIndicatorChart indicator="rsi" />
 </ClientOnly>

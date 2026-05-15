@@ -21,7 +21,7 @@ embedded demo. The code below uses real `@facioquo/indy-charts` APIs.
 import { ChartManager, createApiClient, setupIndyCharts } from "@facioquo/indy-charts";
 
 setupIndyCharts();
-const client = createApiClient({ baseUrl: "https://localhost:5001" });
+const client = createApiClient({ baseUrl: "https://api.example.com" });
 const quotes = await client.getQuotes();
 
 const settings = { isDarkTheme: false, showTooltips: true };

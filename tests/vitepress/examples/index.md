@@ -4,8 +4,6 @@ A simple candlestick chart with volume.
 
 ## Live Demo
 
-> **Requires full stack demo services**: Start the Web API (and supporting services) with the new VS Code task `Run: VitePress chart demo full stack`.
-
 <ClientOnly>
   <StockIndicatorChart indicator="ema" />
 </ClientOnly>

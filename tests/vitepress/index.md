@@ -47,7 +47,7 @@ import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
 export default {
   enhanceApp({ app }) {
     setupIndyChartsForVitePress(app, {
-      api: { baseUrl: "https://localhost:5001" },
+      api: { baseUrl: "https://api.example.com" },
       indicators: { ema: { uiid: "EMA", params: { lookbackPeriods: 20 } } }
     });
   }
