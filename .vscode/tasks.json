@@ -241,11 +241,18 @@
     },
     {
       "label": "Test: All tests",
-      "detail": "Run Website and Backend .NET unit tests",
-      "dependsOn": ["Test: Website", "Test: Backend .NET"],
+      "detail": "Run all unit tests: Website, Libs, and Backend .NET",
+      "dependsOn": ["Test: Website", "Test: Libs", "Test: Backend .NET"],
       "dependsOrder": "parallel",
       "group": "test",
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Test: Libs",
+      "detail": "Run Vitest unit tests for chartjs-financial and indy-charts libraries",
+      "type": "shell",
+      "command": "pnpm run test:libs",
+      "group": "test"
     },
     {
       "label": "Test: Website",

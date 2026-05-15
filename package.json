@@ -29,7 +29,7 @@
     "test:coverage": "pnpm --filter @stock-charts/client run test:coverage",
     "test:libs": "pnpm --filter @facioquo/chartjs-chart-financial --filter @facioquo/indy-charts run test",
     "pretest:dotnet": "dotnet tool restore && rm -rf server/coverage",
-    "test:dotnet": "dotnet test Charts.sln --settings .runsettings --collect:\"XPlat Code Coverage\" --results-directory ./server/coverage --logger trx && (dotnet tool run reportgenerator -reports:server/coverage/**/coverage.cobertura.xml -targetdir:server/coverage -reporttypes:lcov;TextSummary --skip:ObjectReport 2>&1 | grep -v 'LoggerMessage.g.cs' || true) && echo && cat server/coverage/Summary.txt",
+    "test:dotnet": "dotnet test Charts.sln --settings .runsettings --collect:\"XPlat Code Coverage\" --results-directory ./server/coverage --logger trx && (dotnet tool run reportgenerator -reports:server/coverage/**/coverage.cobertura.xml -targetdir:server/coverage -reporttypes:\"lcov;TextSummary\" --skip:ObjectReport 2>&1 | grep -v 'LoggerMessage.g.cs' || true) && echo && cat server/coverage/Summary.txt",
     "test:all": "pnpm --filter @stock-charts/client run test:coverage && pnpm run test:libs && pnpm run test:dotnet && pnpm run test:e2e",
     "smoke:package-consumption": "node scripts/smoke-indy-charts-vitepress-consumer.js",
     "lint": "bash scripts/website-lint.sh check && pnpm run lint:dotnet && pnpm run lint:md",
