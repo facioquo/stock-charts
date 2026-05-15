@@ -4,7 +4,7 @@
   "author": "facioquo",
   "license": "Apache-2.0",
   "type": "module",
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@11.1.2",
   "engines": {
     "node": ">=24 <25",
     "pnpm": ">=10"
@@ -61,14 +61,14 @@
   "devDependencies": {
     "azurite": "^3.35.0",
     "markdownlint-cli2": "^0.22.1",
-    "npm-check-updates": "^22.0.1",
-    "playwright": "1.59.1",
+    "npm-check-updates": "^22.2.0",
+    "playwright": "1.60.0",
     "postcss-scss": "^4.0.9",
     "prettier": "^3.8.3",
     "rimraf": "^6.1.3",
-    "stylelint": "^17.9.1",
+    "stylelint": "^17.11.1",
     "stylelint-config-standard": "^40.0.0",
-    "stylelint-scss": "^7.0.0",
+    "stylelint-scss": "^7.1.1",
     "typescript": "^6.0.3"
   }
 }

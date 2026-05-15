@@ -49,7 +49,7 @@
       "label": "Install: Packages (pnpm)",
       "detail": "Restore Node.js packages across workspaces",
       "type": "shell",
-      "command": "pnpm install"
+      "command": "pnpm install --config.confirmModulesPurge=false"
     },
     {
       "label": "Install: Packages (NuGet)",
@@ -74,7 +74,7 @@
       "label": "Update: Angular packages (client)",
       "detail": "Update dependencies using Angular CLI for the client website.",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client exec ng update @angular/cli @angular/core @angular/material angular-eslint --allow-dirty"
+      "command": "pnpm --filter @stock-charts/client run ng -- update @angular/cli @angular/core @angular/material angular-eslint --allow-dirty"
     },
     {
       "label": "Update: Node packages",

@@ -5,6 +5,12 @@ packages:
   - tests/playwright
   - tests/vitepress
 
+allowBuilds:
+  '@parcel/watcher': false
+  esbuild: false
+  lmdb: false
+  msgpackr-extract: false
+
 ignoredBuiltDependencies:
   - '@parcel/watcher'
   - esbuild
