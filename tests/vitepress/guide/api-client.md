@@ -1,9 +1,9 @@
-# API Client Configuration
+# API client configuration
 
 The `@facioquo/indy-charts` library includes a lightweight API client for
 fetching quotes and indicator data from the stock-charts Web API.
 
-## Basic Usage
+## Basic usage
 
 ```typescript
 import { createApiClient } from "@facioquo/indy-charts";
@@ -33,7 +33,7 @@ const client = createApiClient({
 });
 ```
 
-## Available Methods
+## Available methods
 
 ```typescript
 const quotes = await client.getQuotes();
@@ -46,7 +46,7 @@ const rows = await client.getSelectionData(selection, listing);
 - `getSelectionData(selection, listing)` fetches computed indicator rows using
   the listing endpoint and `selection.params`
 
-## Data Format
+## Data format
 
 The API expects quote data in the following format:
 
@@ -61,7 +61,7 @@ interface Quote {
 }
 ```
 
-## Next Steps
+## Next steps
 
 - [Basic example](/examples/)
 - [Adding indicators](/examples/indicators)

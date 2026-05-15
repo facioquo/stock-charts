@@ -39,7 +39,7 @@ features:
     details: Optimized for large datasets with efficient rendering and responsive chart updates.
 ---
 
-## Quick Example
+## Quick example
 
 ```typescript
 import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";

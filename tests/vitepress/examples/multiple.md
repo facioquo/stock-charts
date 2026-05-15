@@ -1,4 +1,4 @@
-# Multiple Charts
+# Multiple charts
 
 Example showing how to manage multiple independent charts.
 
@@ -15,7 +15,7 @@ This example demonstrates:
 This page is currently a **recipe page** (code example only), not a live
 embedded demo. The code below uses real `@facioquo/indy-charts` APIs.
 
-## Basic Multiple Charts
+## Basic multiple charts
 
 ```typescript
 import { ChartManager, createApiClient, setupIndyCharts } from "@facioquo/indy-charts";
@@ -45,7 +45,7 @@ manager2.initializeOverlay(
 );
 ```
 
-## HTML Layout
+## HTML layout
 
 ```html
 <div class="charts-grid">
@@ -81,7 +81,7 @@ manager2.initializeOverlay(
 </style>
 ```
 
-## Chart Comparison
+## Chart comparison
 
 Create a side-by-side comparison with a shared quote source and different
 window sizes:
@@ -101,7 +101,7 @@ const managers = windows.map((barCount, index) => {
 });
 ```
 
-## Coordinated Window Changes (Application-Level)
+## Coordinated window changes (application-level)
 
 `ChartManager` does not provide built-in synchronized zoom events. Coordinate
 window changes in your app by applying `setBarCount()` to each instance:
@@ -116,7 +116,7 @@ function applyWindow(barCount: number) {
 applyWindow(180);
 ```
 
-## Performance Considerations
+## Performance considerations
 
 When managing multiple charts:
 
@@ -129,7 +129,7 @@ When managing multiple charts:
 managers.forEach(manager => manager.destroy());
 ```
 
-## Next Steps
+## Next steps
 
 - Learn about [installation](/guide/installation)
 - Read the [quick-start guide](/guide/quick-start)

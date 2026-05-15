@@ -1,4 +1,4 @@
-# Quick Start
+# Quick start
 
 This guide shows how to render financial charts using `@facioquo/indy-charts` in any
 JavaScript or TypeScript project. [VitePress integration](#using-vitepress) is covered below.
@@ -133,7 +133,7 @@ Override per-page options with `:config`:
 </ClientOnly>
 ```
 
-## What's Next?
+## What's next?
 
 - See [basic example](/examples/) for a working demo
 - Learn about [indicators](/examples/indicators)

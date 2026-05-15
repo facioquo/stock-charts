@@ -4,7 +4,7 @@
 
 Make sure you have Node.js 24+ installed.
 
-## Install Dependencies
+## Install dependencies
 
 Install the VitePress adapter package and its setup-level peer dependencies:
 
@@ -36,7 +36,7 @@ yarn add @facioquo/indy-charts \
 
 :::
 
-## Package Overview
+## Package overview
 
 ### @facioquo/indy-charts
 
@@ -48,14 +48,14 @@ The main library providing:
 - API client
 - VitePress adapter through `@facioquo/indy-charts/vitepress`
 
-### Peer Dependencies
+### Peer dependencies
 
 - **chart.js**: Core charting library
 - **chartjs-adapter-date-fns**: Date handling for Chart.js
 - **chartjs-plugin-annotation**: Annotation support
 - **date-fns**: Date formatting utilities
 
-### Transitive Dependency
+### Transitive dependency
 
 `@facioquo/indy-charts` depends on `@facioquo/chartjs-chart-financial`
 internally. Most consumers should not need to install it directly.
@@ -75,6 +75,6 @@ do not load the Vue adapter.
 
 Both libraries include full TypeScript definitions. No additional `@types` packages needed.
 
-## Next Steps
+## Next steps
 
 Continue to [Quick Start](/guide/quick-start) to create your first chart.

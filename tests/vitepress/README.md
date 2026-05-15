@@ -1,4 +1,4 @@
-# VitePress Integration Example
+# VitePress integration example
 
 Minimal VitePress site demonstrating `@facioquo/indy-charts` integration.
 
@@ -11,14 +11,14 @@ This example shows how to use the indy-charts VitePress adapter in a documentati
 - Technical indicators
 - Multiple chart layouts
 
-## Getting Started
+## Getting started
 
 ### Prerequisites
 
 - Node.js 24+
 - pnpm (recommended)
 
-### Install Dependencies
+### Install dependencies
 
 From the repository root:
 
@@ -26,7 +26,7 @@ From the repository root:
 pnpm install
 ```
 
-### Run Development Server
+### Run development server
 
 ```bash
 cd tests/vitepress
@@ -35,19 +35,19 @@ pnpm run dev
 
 The site will be available at `http://localhost:4300`.
 
-### Build for Production
+### Build for production
 
 ```bash
 pnpm run build
 ```
 
-### Preview Production Build
+### Preview production build
 
 ```bash
 pnpm run preview
 ```
 
-## Project Structure
+## Project structure
 
 ```text
 tests/vitepress/
@@ -68,7 +68,7 @@ tests/vitepress/
 └── package.json
 ```
 
-## Key Features
+## Key features
 
 ### VitePress adapter (recommended pattern)
 
@@ -97,13 +97,13 @@ Markdown pages use the global component directly:
 </ClientOnly>
 ```
 
-### Live Examples
+### Live examples
 
 - `/examples/` renders a live overlay indicator chart through `StockIndicatorChart`
 - `/examples/indicators` renders a live oscillator chart through `StockIndicatorChart`
 - `/examples/multiple` is currently a recipe page (truthful code, no live embed)
 
-### TypeScript Support
+### TypeScript support
 
 Full TypeScript support with type checking enabled in VitePress config.
 
