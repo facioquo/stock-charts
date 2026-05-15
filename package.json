@@ -16,6 +16,8 @@
   "scripts": {
     "postinstall": "node scripts/setup-playwright-mcp.cjs",
     "clean": "rm -rf node_modules .azurite .codacy && pnpm -r run clean",
+    "deps:check": "ncu --deep --peer",
+    "deps:update": "ncu --deep --peer --upgrade",
     "prebuild": "node scripts/generate-backup-indicators.js",
     "build": "pnpm -r run build",
     "prebuild:prod": "node scripts/generate-backup-indicators.js",
@@ -54,9 +56,7 @@
     "azure:functions": "cd server/Functions && func start",
     "azure:check": "func --version && azurite --version",
     "azure:clean": "rimraf ./.azurite",
-    "stop:services": "node scripts/stop-services.js",
-    "deps:check": "ncu --deep --peer",
-    "deps:update": "ncu --deep --peer --upgrade"
+    "stop:services": "node scripts/stop-services.js"
   },
   "devDependencies": {
     "azurite": "^3.35.0",
