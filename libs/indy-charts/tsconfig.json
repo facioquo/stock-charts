@@ -3,8 +3,10 @@
     "outDir": "./dist",
     "rootDir": ".",
     "declaration": true,
-    // rollup-plugin-dts (used by tsup for DTS bundling) injects baseUrl:"." programmatically,
-    // which TypeScript 6 treats as TS5101. Remove when rollup-plugin-dts is updated.
+    // Used only by tsup (TypeScript 6.0.3 from root node_modules) — not read by the
+    // Angular client compiler, which uses client/tsconfig.json settings instead.
+    // rollup-plugin-dts injects baseUrl:"." programmatically, which TypeScript 6 treats
+    // as TS5101. Remove when rollup-plugin-dts is updated.
     "ignoreDeprecations": "6.0",
     "declarationMap": true,
     "sourceMap": true,
