@@ -47,7 +47,7 @@ const chart = new Chart(ctx, {
 });
 ```
 
-## Chart Types
+## Chart types
 
 ### Candlestick
 
@@ -79,14 +79,14 @@ const chart = new Chart(ctx, {
 
 Use the `buildVolumeDataset()` helper to create properly configured volume datasets.
 
-## API Reference
+## API reference
 
 ### Registration
 
 - `registerFinancialCharts()`: Register all financial chart types with Chart.js
 - `financialRegisterables`: Array of registerables for manual registration
 
-### Factory Functions
+### Factory functions
 
 - `buildCandlestickDataset(priceData, borderColor)`: Create a candlestick dataset from normalized OHLC points
 - `buildVolumeDataset(quotes, extraBars, palette)`: Create a volume dataset with up/down/unchanged candle coloring

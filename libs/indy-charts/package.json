@@ -38,16 +38,14 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "prebuild": "pnpm --filter @facioquo/chartjs-chart-financial run build",
+    "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write \"**/*.{ts,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,json,md}\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
-  },
-  "dependencies": {
-    "@facioquo/chartjs-chart-financial": "workspace:*"
   },
   "peerDependencies": {
     "chart.js": "^4.5.1",
@@ -62,12 +60,14 @@
     }
   },
   "devDependencies": {
+    "@facioquo/chartjs-chart-financial": "workspace:*",
     "@eslint/js": "^10.0.1",
     "@vitest/eslint-plugin": "^1.6.17",
     "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
     "jiti": "^2.7.0",
     "typescript-eslint": "^8.59.3",
+    "tsup": "^8.5.1",
     "vitest": "^4.1.6",
     "vue": "3.5.34"
   }

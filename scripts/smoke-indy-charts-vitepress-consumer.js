@@ -50,24 +50,9 @@ try {
   mkdirSync(packDir, { recursive: true });
   mkdirSync(path.join(consumerDir, "docs", ".vitepress", "theme"), { recursive: true });
 
-  runPnpm([
-    "--filter",
-    "@facioquo/chartjs-chart-financial",
-    "--filter",
-    "@facioquo/indy-charts",
-    "run",
-    "build"
-  ]);
-  runPnpm([
-    "--filter",
-    "@facioquo/chartjs-chart-financial",
-    "pack",
-    "--pack-destination",
-    packDir
-  ]);
+  runPnpm(["--filter", "@facioquo/indy-charts", "run", "build"]);
   runPnpm(["--filter", "@facioquo/indy-charts", "pack", "--pack-destination", packDir]);
 
-  const financialTarball = packedTarball("@facioquo/chartjs-chart-financial");
   const indyChartsTarball = packedTarball("@facioquo/indy-charts");
 
   writeFileSync(
@@ -89,14 +74,6 @@ try {
           vitepress: "2.0.0-alpha.16",
           vue: "3.5.33"
         },
-        pnpm: {
-          overrides: {
-            "@facioquo/chartjs-chart-financial@0.1.0": packageFileSpec(
-              consumerDir,
-              financialTarball
-            )
-          }
-        }
       },
       null,
       2

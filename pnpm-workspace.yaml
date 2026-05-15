@@ -10,11 +10,5 @@ allowBuilds:
   esbuild: false
   lmdb: false
   msgpackr-extract: false
-
-ignoredBuiltDependencies:
-  - '@parcel/watcher'
-  - esbuild
-  - lmdb
-  - msgpackr-extract
-  - unrs-resolver
-  - vue-demi
+  unrs-resolver: false
+  vue-demi: false

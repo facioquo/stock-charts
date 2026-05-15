@@ -52,8 +52,8 @@ bash scripts/setup-environment.sh  # Auto-detects OS and installs prerequisites
 pnpm install                   # Install all workspace dependencies
 
 # Development
-pnpm start                     # Start Angular dev server (http://localhost:4200)
-pnpm run azure:start          # Start Azurite storage emulator
+pnpm start                         # Start Angular dev server (http://localhost:4200)
+pnpm run azure:start               # Start Azurite storage emulator
 cd server/Functions && func start  # Start Azure Functions (http://localhost:7071)
 cd server/WebApi && dotnet run     # Start Web API (https://localhost:5001)
 
@@ -216,7 +216,7 @@ Financial chart types (`candlestick`, `ohlc`, `volume`) are integrated as typed 
 - **Theming**: `getFinancialPalette()` and `applyFinancialElementTheme()`
 - **Factories**: `buildCandlestickDataset()`, `buildVolumeDataset()`, `buildFinancialChartOptions()`
 - **Performance**: For 5k-10k candles, disable animations, use non-intersecting tooltip mode
-- **Attribution**: Derived from [chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial)
+- **Attribution**: Derived from [chartjs/chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial)
 
 ## Boundaries
 
