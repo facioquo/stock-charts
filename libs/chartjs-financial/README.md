@@ -2,7 +2,7 @@
 
 Financial charting extension for Chart.js. Provides candlestick, OHLC, and volume chart types.
 
-This is a modernized Chart.js financial plugin based on the original [chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) project.
+This is a modernized Chart.js financial plugin based on the original [chartjs/chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) project.
 
 ## Features
 
@@ -116,4 +116,4 @@ Apache-2.0 License - see LICENSE file for details.
 
 ## Credits
 
-Based on the original [chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) project by the Chart.js team.
+Based on the original [chartjs/chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) project by the Chart.js team.

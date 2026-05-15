@@ -66,7 +66,6 @@ Then use the global component from Markdown:
 
 Apache-2.0 License - see the repository LICENSE file for details.
 
-## Related Projects
+## Related projects
 
-- [@facioquo/chartjs-chart-financial](../chartjs-financial) - Chart.js financial chart types
-- [stock-charts](https://github.com/facioquo/stock-charts) - Full-featured Angular application
+- [@facioquo/stock-charts](https://github.com/facioquo/stock-charts) - Our demo Angular website using `@facioquo/indy-charts` and NuGet `Skender.Stock.Indicators`

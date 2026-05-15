@@ -9,3 +9,4 @@ coverage
 .vscode
 .idea
 *.log
+AGENTS.md
