@@ -3,31 +3,31 @@ layout: home
 
 hero:
   name: Indy Charts
-  text: Financial Charting Made Simple
+  text: Financial charting made simple
   tagline: Framework-agnostic financial charting library with technical indicators
   actions:
     - theme: brand
-      text: Get Started
+      text: Get started
       link: /guide/
     - theme: alt
-      text: View Examples
+      text: View examples
       link: /examples/
 
 features:
   - icon: 📊
-    title: Financial Charts
+    title: Financial charts
     details: Candlestick, OHLC, and volume charts built on Chart.js with full customization.
 
   - icon: 📈
-    title: Technical Indicators
+    title: Technical indicators
     details: Support for multiple indicators including SMA, EMA, RSI, MACD, and more.
 
   - icon: 🎨
-    title: Theme Support
+    title: Theme support
     details: Built-in light and dark themes with customizable color palettes.
 
   - icon: 🔧
-    title: Framework Agnostic
+    title: Framework agnostic
     details: Works with Vue, React, Angular, or vanilla JavaScript.
 
   - icon: 📦

@@ -20,19 +20,19 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: "Getting Started",
+        text: "Getting started",
         items: [
           { text: "Introduction", link: "/guide/" },
           { text: "Installation", link: "/guide/installation" },
-          { text: "Quick Start", link: "/guide/quick-start" }
+          { text: "Quick start", link: "/guide/quick-start" }
         ]
       },
       {
         text: "Examples",
         items: [
-          { text: "Basic Chart", link: "/examples/" },
-          { text: "With Indicators", link: "/examples/indicators" },
-          { text: "Multiple Charts", link: "/examples/multiple" }
+          { text: "Basic chart", link: "/examples/" },
+          { text: "With indicators", link: "/examples/indicators" },
+          { text: "Multiple charts", link: "/examples/multiple" }
         ]
       }
     ],
