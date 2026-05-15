@@ -62,10 +62,10 @@ The core library extraction and VitePress documentation are complete:
   `getSelectionData()` in `libs/indy-charts/api/`
 - **Static helpers** — `loadStaticQuotes()`, `loadStaticIndicatorData()` for
   build-time/demo scenarios
-- **Build pipeline** — both libraries build via `tsc`, consumed via pnpm
+- **Build pipeline** — chartjs-financial builds via `tsc`; indy-charts builds via `tsup` (bundles chartjs-financial into the output), consumed via pnpm
   workspace linking
 - **External package-consumption smoke** — `pnpm run smoke:package-consumption`
-  packs both libraries, installs `@facioquo/indy-charts` into an isolated
+  packs `@facioquo/indy-charts` (chartjs-financial is bundled into the output), installs `@facioquo/indy-charts` into an isolated
   VitePress consumer, and builds the consumer through the VitePress adapter
 - **Partial Angular integration** — `client/` imports from
   `@facioquo/chartjs-chart-financial` for financial primitives but does not
@@ -294,10 +294,9 @@ Prepare libraries for consumption outside this workspace.
 
 - [x] Task 4.4: Validate external consumption
   - Added `pnpm run smoke:package-consumption`.
-  - The smoke script builds and packs both libraries, installs the packed
-    `@facioquo/indy-charts` tarball into an isolated VitePress-style consumer,
-    maps the unpublished transitive `@facioquo/chartjs-chart-financial` package
-    to its packed tarball through a local pnpm override, and builds the consumer.
+  - The smoke script builds and packs `@facioquo/indy-charts` (chartjs-financial
+    is bundled into the output), installs the packed tarball into an isolated
+    VitePress-style consumer, and builds the consumer.
   - The consumer imports only `@facioquo/indy-charts/vitepress` from its theme
     and uses `<StockIndicatorChart indicator="rsi" />` from Markdown.
   - Validated locally: `pnpm run smoke:package-consumption` passed.

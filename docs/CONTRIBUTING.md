@@ -20,7 +20,7 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
 **All platforms:**
 
 - [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
-- [pnpm](https://pnpm.io/) (v10 LTS or later) - Installed via platform package managers:
+- [pnpm](https://pnpm.io/) (v11 LTS or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
   - **Linux**: Corepack (`corepack enable && corepack prepare pnpm --activate`)
@@ -31,90 +31,25 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
 
 **Note:** Azure Functions Core Tools is essential for running the backend Azure Functions locally (`func start` command). It is not installed automatically with Node or .NET SDK.
 
-### Platform-specific installation
+### Installation
 
-#### Quick setup (all platforms)
-
-Clone the repository and run the universal setup script that automatically detects your OS:
+Clone the repository and install dependencies:
 
 ```bash
 git clone https://github.com/facioquo/stock-charts.git
 cd stock-charts
-bash scripts/setup-environment.sh
+pnpm install
 ```
 
 Or use VS Code: `Ctrl+Shift+P` → "Tasks: Run Task" → "Setup: Dev environment"
 
-Manually install dependencies (alternative if not using the setup script):
-
-```bash
-pnpm install
-```
-
-#### Platform-specific scripts
-
-**macOS** - `scripts/setup-macos.sh`
-
-Installs all prerequisites via [Homebrew](https://brew.sh/):
-
-- Node.js v24 LTS
-- .NET SDK v10
-- Azure Functions Core Tools v4
-- pnpm v10 LTS (via Homebrew)
-- Angular CLI (global via pnpm)
-
-```bash
-bash scripts/setup-macos.sh
-```
-
-**Linux** - `scripts/setup-environment.sh`
-
-Installs all prerequisites:
-
-- Node.js v24 LTS
-- .NET SDK v10.0
-- pnpm v10 LTS (via Corepack)
-- Angular CLI (global)
-
-```bash
-bash scripts/setup-environment.sh
-```
-
-**Note:** Azure Functions Core Tools must be installed manually on Linux. See the [installation guide](https://learn.microsoft.com/azure/azure-functions/functions-run-local#linux).
-
-**Windows** - `scripts/setup-windows.sh`
-
-Installs all prerequisites via winget (requires Git Bash for Windows):
-
-- Node.js v24 LTS
-- .NET SDK v10.0
-- Azure Functions Core Tools v4
-- pnpm v10 LTS (via winget)
-- Angular CLI (global via pnpm)
-
-```bash
-bash scripts/setup-windows.sh
-```
-
-**Note:** Requires [Git Bash for Windows](https://git-scm.com/downloads) and [winget (Windows Package Manager)](https://aka.ms/getwinget).
-
-**Alternative: WSL2** (recommended for Windows developers)
-
-Use [Windows Subsystem for Linux 2](https://learn.microsoft.com/windows/wsl/install) with the Linux setup script:
-
-```bash
-wsl --install
-# After WSL setup, run the universal script
-bash scripts/setup-environment.sh
-```
-
 ### Verify installation
 
-After running the setup script or manual installation, verify all tools:
+After installation, verify all tools:
 
 ```bash
 node --version    # Should be v24+
-pnpm --version    # Should be 10+
+pnpm --version    # Should be 11+
 dotnet --version  # Should be 10.0+
 func --version    # Should be 4.x
 ```
@@ -133,7 +68,7 @@ pnpm install
 **Option 1: VS Code Tasks** (recommended)
 
 ```bash
-# Ctrl+Shift+P → "Tasks: Run Task" → "start-full-stack"
+# Ctrl+Shift+P → "Tasks: Run Task" → "Run: Full development stack"
 ```
 
 This starts all services: Azurite storage emulator, Azure Functions, Web API, and Angular dev server.

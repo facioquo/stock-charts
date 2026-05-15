@@ -18,7 +18,7 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 
 - [Git](https://git-scm.com/)
 - [Node.js](https://nodejs.org/) (v24 LTS or later)
-- [pnpm](https://pnpm.io/) (v10 LTS or later) - Installed via platform package managers:
+- [pnpm](https://pnpm.io/) (v11 LTS or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
   - **Linux**: Corepack (`corepack enable && corepack prepare pnpm --activate`)
@@ -27,13 +27,7 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 - [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 
-**Quick setup (all platforms):**
-
-```bash
-bash scripts/setup-environment.sh
-```
-
-For manual setup, install the prerequisites above with the listed package managers, then run `pnpm install` from the repository root.
+After installing the prerequisites above, run `pnpm install` from the repository root.
 
 **Note:** Azure Functions Core Tools is essential for running the backend Azure Functions locally (`func start` command) and must be [installed separately](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools) on Linux.
 
@@ -62,7 +56,7 @@ pnpm start  # Terminal 4: Angular dev server
 
 Financial chart support (`candlestick`, `ohlc`) is integrated as typed, modular Chart.js workspace packages under `libs/chartjs-financial` and `libs/indy-charts`.
 
-- Register once at startup with `registerFinancialCharts()` (already called from `client/src/main.ts`).
+- Register once at startup with `setupIndyCharts()` (already called from `client/src/main.ts`).
 - Use OHLC data points in `{ x, o, h, l, c }` shape where `x` is a timestamp.
 - Theme candle/volume colors via `getFinancialPalette()` + `applyFinancialElementTheme()`.
 - Use factories (`buildCandlestickDataset`, `buildVolumeDataset`, `buildFinancialChartOptions`) for consistent typed chart config.
