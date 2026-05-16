@@ -14,7 +14,8 @@
     "url": "https://github.com/facioquo/stock-charts/issues"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   },
   "engines": {
     "node": ">=22"

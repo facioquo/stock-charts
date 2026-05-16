@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'libs/indy-charts/**'
-      - 'libs/indy-charts/package.json'
   workflow_dispatch: {}
 
 concurrency:
@@ -27,22 +26,21 @@ jobs:
     environment: pkg.github.com
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Checkout sources
+        uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        uses: pnpm/action-setup@v6
         with:
           run_install: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
           registry-url: https://npm.pkg.github.com
-          scope: "@facioquo"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -63,10 +61,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Ensure pnpm can authenticate to GitHub Packages
-          echo "@facioquo:registry=https://npm.pkg.github.com" > .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> .npmrc
-
           PACKAGE_VERSION=$(jq -r '.version' package.json)
           PACKAGE_NAME=$(jq -r '.name' package.json)
 
@@ -80,5 +74,5 @@ jobs:
             echo "Version $PACKAGE_VERSION already published; skipping publish."
           else
             echo "Publishing $PACKAGE_NAME@$PACKAGE_VERSION with tag '$NPM_TAG'"
-            pnpm publish --no-git-checks --access restricted --tag "$NPM_TAG"
+            pnpm publish --no-git-checks --tag "$NPM_TAG"
           fi

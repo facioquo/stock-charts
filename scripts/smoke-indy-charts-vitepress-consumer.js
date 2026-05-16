@@ -68,9 +68,7 @@ try {
         dependencies: {
           "@facioquo/indy-charts": packageFileSpec(consumerDir, indyChartsTarball),
           "chart.js": "4.5.1",
-          "chartjs-adapter-date-fns": "3.0.0",
           "chartjs-plugin-annotation": "3.1.0",
-          "date-fns": "^4.1.0",
           vitepress: "2.0.0-alpha.16",
           vue: "3.5.33"
         },
@@ -88,7 +86,7 @@ export default defineConfig({
   title: "Packed indy-charts smoke test",
   vite: {
     ssr: {
-      noExternal: ["@facioquo/indy-charts", "chartjs-adapter-date-fns", "chart.js", "date-fns"]
+      noExternal: ["@facioquo/indy-charts", "chart.js"]
     }
   }
 });
