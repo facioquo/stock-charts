@@ -14,7 +14,12 @@ if (!pnpmCli) {
 }
 
 function runPnpm(args, cwd = workspaceRoot) {
-  const result = spawnSync(process.execPath, [pnpmCli, ...args], {
+  // pnpm may be a native binary (e.g. @pnpm/exe) rather than a JS wrapper.
+  // Run it directly in that case; otherwise invoke it via Node.js.
+  const isJsWrapper = pnpmCli.endsWith(".js") || pnpmCli.endsWith(".cjs");
+  const cmd = isJsWrapper ? process.execPath : pnpmCli;
+  const cmdArgs = isJsWrapper ? [pnpmCli, ...args] : args;
+  const result = spawnSync(cmd, cmdArgs, {
     cwd,
     stdio: "inherit"
   });

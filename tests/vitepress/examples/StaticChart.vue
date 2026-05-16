@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
 
-import { OverlayChart, loadStaticQuotes } from "@facioquo/indy-charts";
+import { OverlayChart, loadStaticQuotes, setupIndyCharts } from "@facioquo/indy-charts";
 
 import { SAMPLE_QUOTES } from "./sample-quotes";
 
@@ -17,6 +17,7 @@ function isDark(): boolean {
 
 function renderChart(): void {
   if (!canvasEl.value) return;
+  setupIndyCharts();
   overlayChart?.chart?.destroy();
   overlayChart = new OverlayChart(canvasEl.value, {
     isDarkTheme: isDark(),

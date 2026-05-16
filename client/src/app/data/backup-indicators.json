@@ -2,22 +2,13 @@
   {
     "name": "Accumulation Distribution Line (ADL)",
     "uiid": "ADL",
-    "legendTemplate": "ADL w/ SMA([P1])",
+    "legendTemplate": "ADL",
     "endpoint": "/ADL/",
     "category": "volume-based",
     "chartType": "oscillator",
     "order": 1,
     "chartConfig": null,
-    "parameters": [
-      {
-        "displayName": "SMA Periods",
-        "paramName": "smaPeriods",
-        "dataType": "int",
-        "minimum": 1,
-        "maximum": 50,
-        "defaultValue": 3
-      }
-    ],
+    "parameters": [],
     "results": [
       {
         "displayName": "ADL",
@@ -28,17 +19,6 @@
         "stack": null,
         "lineWidth": 2,
         "defaultColor": "#1E88E5",
-        "fill": null
-      },
-      {
-        "displayName": "SMA of ADL",
-        "tooltipTemplate": "ADL SMA([P1])",
-        "dataName": "adlSma",
-        "dataType": "number",
-        "lineType": "solid",
-        "stack": null,
-        "lineWidth": 2,
-        "defaultColor": "#DD2C00",
         "fill": null
       }
     ]
@@ -619,7 +599,7 @@
     ]
   },
   {
-    "name": "Bollinger Bands\u00ae",
+    "name": "Bollinger Bands®",
     "uiid": "BB",
     "legendTemplate": "BB([P1],[P2])",
     "endpoint": "/BB/",
@@ -686,7 +666,7 @@
     ]
   },
   {
-    "name": "Bollinger Bands\u00ae %B",
+    "name": "Bollinger Bands® %B",
     "uiid": "BB-PCTB",
     "legendTemplate": "BB([P1],[P2]) %B",
     "endpoint": "/BB/",
@@ -1248,7 +1228,7 @@
       "maximumYAxis": null,
       "thresholds": null
     },
-    "parameters": null,
+    "parameters": [],
     "results": [
       {
         "displayName": "DC PERIODS",
@@ -1606,7 +1586,7 @@
     "chartType": "overlay",
     "order": 1,
     "chartConfig": null,
-    "parameters": null,
+    "parameters": [],
     "results": [
       {
         "displayName": "HT Trendline",
@@ -2362,22 +2342,13 @@
   {
     "name": "On-Balance Volume (OBV)",
     "uiid": "OBV",
-    "legendTemplate": "OBV w/ SMA([P1])",
+    "legendTemplate": "OBV",
     "endpoint": "/OBV/",
     "category": "volume-based",
     "chartType": "oscillator",
     "order": 1,
     "chartConfig": null,
-    "parameters": [
-      {
-        "displayName": "SMA Periods",
-        "paramName": "smaPeriods",
-        "dataType": "int",
-        "minimum": 0,
-        "maximum": 250,
-        "defaultValue": 20
-      }
-    ],
+    "parameters": [],
     "results": [
       {
         "displayName": "OBV",
@@ -2388,17 +2359,6 @@
         "stack": null,
         "lineWidth": 2,
         "defaultColor": "#1E88E5",
-        "fill": null
-      },
-      {
-        "displayName": "SMA of OBV",
-        "tooltipTemplate": "OBV SMA([P1])",
-        "dataName": "obvSma",
-        "dataType": "number",
-        "lineType": "solid",
-        "stack": null,
-        "lineWidth": 2,
-        "defaultColor": "#DD2C00",
         "fill": null
       }
     ]
@@ -2417,7 +2377,7 @@
         "displayName": "Step Size",
         "paramName": "accelerationStep",
         "dataType": "number",
-        "minimum": 1e-6,
+        "minimum": 0.000001,
         "maximum": 2500,
         "defaultValue": 0.02
       },
@@ -2425,7 +2385,7 @@
         "displayName": "Max Factor",
         "paramName": "maxAccelerationFactor",
         "dataType": "number",
-        "minimum": 1e-6,
+        "minimum": 0.000001,
         "maximum": 2500,
         "defaultValue": 0.2
       }
@@ -2600,7 +2560,7 @@
   {
     "name": "Rate of Change",
     "uiid": "ROC",
-    "legendTemplate": "ROC([P1],[P2])",
+    "legendTemplate": "ROC([P1])",
     "endpoint": "/ROC/",
     "category": "oscillator",
     "chartType": "oscillator",
@@ -2614,37 +2574,18 @@
         "minimum": 1,
         "maximum": 250,
         "defaultValue": 14
-      },
-      {
-        "displayName": "SMA Periods",
-        "paramName": "smaPeriods",
-        "dataType": "int",
-        "minimum": 1,
-        "maximum": 50,
-        "defaultValue": 3
       }
     ],
     "results": [
       {
         "displayName": "Rate of Change",
-        "tooltipTemplate": "ROC([P1],[P2])",
+        "tooltipTemplate": "ROC([P1])",
         "dataName": "roc",
         "dataType": "number",
         "lineType": "solid",
         "stack": null,
         "lineWidth": 2,
         "defaultColor": "#1E88E5",
-        "fill": null
-      },
-      {
-        "displayName": "SMA of ROC",
-        "tooltipTemplate": "STO %D([P2])",
-        "dataName": "rocSma",
-        "dataType": "number",
-        "lineType": "solid",
-        "stack": null,
-        "lineWidth": 2,
-        "defaultColor": "#DD2C00",
         "fill": null
       }
     ]
@@ -2990,14 +2931,6 @@
         "minimum": 1,
         "maximum": 250,
         "defaultValue": 14
-      },
-      {
-        "displayName": "SMA Periods",
-        "paramName": "smaPeriods",
-        "dataType": "int",
-        "minimum": 1,
-        "maximum": 50,
-        "defaultValue": 3
       }
     ],
     "results": [
@@ -3010,17 +2943,6 @@
         "stack": null,
         "lineWidth": 2,
         "defaultColor": "#1E88E5",
-        "fill": null
-      },
-      {
-        "displayName": "SMA of Standard Deviation",
-        "tooltipTemplate": "STDEV([P1]) SMA",
-        "dataName": "stdDevSma",
-        "dataType": "number",
-        "lineType": "solid",
-        "stack": null,
-        "lineWidth": 2,
-        "defaultColor": "#DD2C00",
         "fill": null
       }
     ]
@@ -3603,7 +3525,7 @@
   {
     "name": "TRIX Oscillator",
     "uiid": "TRIX",
-    "legendTemplate": "TRIX([P1],[P2])",
+    "legendTemplate": "TRIX([P1])",
     "endpoint": "/TRIX/",
     "category": "oscillator",
     "chartType": "oscillator",
@@ -3628,37 +3550,18 @@
         "minimum": 1,
         "maximum": 250,
         "defaultValue": 14
-      },
-      {
-        "displayName": "Signal Periods",
-        "paramName": "signalPeriods",
-        "dataType": "int",
-        "minimum": 0,
-        "maximum": 50,
-        "defaultValue": 9
       }
     ],
     "results": [
       {
         "displayName": "TRIX",
-        "tooltipTemplate": "TRIX([P1],[P2])",
+        "tooltipTemplate": "TRIX([P1])",
         "dataName": "trix",
         "dataType": "number",
         "lineType": "solid",
         "stack": null,
         "lineWidth": 2,
         "defaultColor": "#1E88E5",
-        "fill": null
-      },
-      {
-        "displayName": "Signal",
-        "tooltipTemplate": "TRIX Signal",
-        "dataName": "signal",
-        "dataType": "number",
-        "lineType": "solid",
-        "stack": null,
-        "lineWidth": 2,
-        "defaultColor": "#DD2C00",
         "fill": null
       }
     ]
@@ -3672,7 +3575,7 @@
     "chartType": "oscillator",
     "order": 1,
     "chartConfig": null,
-    "parameters": null,
+    "parameters": [],
     "results": [
       {
         "displayName": "True Range",

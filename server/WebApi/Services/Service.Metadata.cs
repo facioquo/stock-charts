@@ -9,20 +9,10 @@ public static class Metadata
             new() {
                 Name = "Accumulation Distribution Line (ADL)",
                 Uiid = "ADL",
-                LegendTemplate = "ADL w/ SMA([P1])",
+                LegendTemplate = "ADL",
                 Endpoint = $"{baseUrl}/ADL/",
                 Category = "volume-based",
                 ChartType = "oscillator",
-                Parameters = [
-                    new() {
-                        DisplayName = "SMA Periods",
-                        ParamName = "smaPeriods",
-                        DataType = "int",
-                        DefaultValue = 3,
-                        Minimum = 1,
-                        Maximum = 50
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "ADL",
@@ -31,14 +21,6 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
-                    },
-                    new() {
-                        DisplayName = "SMA of ADL",
-                        TooltipTemplate = "ADL SMA([P1])",
-                        DataName = "adlSma",
-                        DataType = "number",
-                        LineType = "solid",
-                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -1659,7 +1641,7 @@ public static class Metadata
             new IndicatorListing {
                 Name = "Rate of Change",
                 Uiid = "ROC",
-                LegendTemplate = "ROC([P1],[P2])",
+                LegendTemplate = "ROC([P1])",
                 Endpoint = $"{baseUrl}/ROC/",
                 Category = "oscillator",
                 ChartType = "oscillator",
@@ -1672,32 +1654,16 @@ public static class Metadata
                         DefaultValue = 14,
                         Minimum = 1,
                         Maximum = 250
-                    },
-                    new() {
-                        DisplayName = "SMA Periods",
-                        ParamName = "smaPeriods",
-                        DataType = "int",
-                        DefaultValue = 3,
-                        Minimum = 1,
-                        Maximum = 50
                     }
                 ],
                 Results = [
                     new() {
                         DisplayName = "Rate of Change",
-                        TooltipTemplate = "ROC([P1],[P2])",
+                        TooltipTemplate = "ROC([P1])",
                         DataName = "roc",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
-                    },
-                    new() {
-                        DisplayName = "SMA of ROC",
-                        TooltipTemplate = "STO %D([P2])",
-                        DataName = "rocSma",
-                        DataType = "number",
-                        LineType = "solid",
-                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -1946,14 +1912,6 @@ public static class Metadata
                         DefaultValue = 14,
                         Minimum = 1,
                         Maximum = 250
-                    },
-                    new() {
-                        DisplayName = "SMA Periods",
-                        ParamName = "smaPeriods",
-                        DataType = "int",
-                        DefaultValue = 3,
-                        Minimum = 1,
-                        Maximum = 50
                     }
                 ],
                 Results = [
@@ -1964,14 +1922,6 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
-                    },
-                    new() {
-                        DisplayName = "SMA of Standard Deviation",
-                        TooltipTemplate = "STDEV([P1]) SMA",
-                        DataName = "stdDevSma",
-                        DataType = "number",
-                        LineType = "solid",
-                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -2936,20 +2886,10 @@ public static class Metadata
             new IndicatorListing {
                 Name = "On-Balance Volume (OBV)",
                 Uiid = "OBV",
-                LegendTemplate = "OBV w/ SMA([P1])",
+                LegendTemplate = "OBV",
                 Endpoint = $"{baseUrl}/OBV/",
                 Category = "volume-based",
                 ChartType = "oscillator",
-                Parameters = [
-                    new() {
-                        DisplayName = "SMA Periods",
-                        ParamName = "smaPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 0,
-                        Maximum = 250
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "OBV",
@@ -2958,14 +2898,6 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
-                    },
-                    new() {
-                        DisplayName = "SMA of OBV",
-                        TooltipTemplate = "OBV SMA([P1])",
-                        DataName = "obvSma",
-                        DataType = "number",
-                        LineType = "solid",
-                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },
@@ -3160,7 +3092,7 @@ public static class Metadata
             new IndicatorListing {
                 Name = "TRIX Oscillator",
                 Uiid = "TRIX",
-                LegendTemplate = "TRIX([P1],[P2])",
+                LegendTemplate = "TRIX([P1])",
                 Endpoint = $"{baseUrl}/TRIX/",
                 Category = "oscillator",
                 ChartType = "oscillator",
@@ -3183,32 +3115,16 @@ public static class Metadata
                         DefaultValue = 14,
                         Minimum = 1,
                         Maximum = 250
-                    },
-                    new() {
-                        DisplayName = "Signal Periods",
-                        ParamName = "signalPeriods",
-                        DataType = "int",
-                        DefaultValue = 9,
-                        Minimum = 0,
-                        Maximum = 50
                     }
                 ],
                 Results = [
                     new() {
                         DisplayName = "TRIX",
-                        TooltipTemplate = "TRIX([P1],[P2])",
+                        TooltipTemplate = "TRIX([P1])",
                         DataName = "trix",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
-                    },
-                    new() {
-                        DisplayName = "Signal",
-                        TooltipTemplate = "TRIX Signal",
-                        DataName = "signal",
-                        DataType = "number",
-                        LineType = "solid",
-                        DefaultColor = ChartColors.StandardRed
                     }
                 ]
             },

@@ -80,7 +80,7 @@ external repo can install them.
     its transitive dependency `@facioquo/chartjs-chart-financial`.
   - Install peer dependencies explicitly (pnpm requires it):
     `pnpm add chart.js chartjs-plugin-annotation`
-  - `chartjs-adapter-date-fns` and `date-fns` are bundled inside
+  - `chartjs-adapter-date-fns` and `date-fns` are included as dependencies of
     `@facioquo/indy-charts` and install automatically — do not add them
     explicitly.
   - Do not add `@facioquo/chartjs-chart-financial` as a direct dependency; it
@@ -91,7 +91,7 @@ external repo can install them.
     aliases that resolve to TypeScript source.
   - Add `ssr.noExternal` for `@facioquo/indy-charts` and Chart.js to prevent
     SSR externalisation failures. `chartjs-adapter-date-fns` and `date-fns` are
-    bundled inside the package and do not need separate entries:
+    included as dependencies of the package and do not need separate entries:
 
     ```typescript
     ssr: {

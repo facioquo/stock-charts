@@ -43,6 +43,13 @@ public class Storage : IStorage
     /// <returns>Task representing the async operation</returns>
     public async Task PutBlobAsync(string blobName, string content, CancellationToken ct = default)
     {
+        if (string.IsNullOrWhiteSpace(blobName))
+        {
+            throw new ArgumentException("Blob name cannot be null or whitespace.", nameof(blobName));
+        }
+
+        ArgumentNullException.ThrowIfNull(content);
+
         await using MemoryStream stream = new(Encoding.UTF8.GetBytes(content));
         await _blobClient.GetBlobClient(blobName).UploadAsync(stream, overwrite: true, ct);
     }

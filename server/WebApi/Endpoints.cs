@@ -95,8 +95,8 @@ public class Main(IQuoteService quoteService) : ControllerBase
     {
         try
         {
-            IReadOnlyList<Quote> quotes = (await quoteFeed.Get()).ToList();
-            IReadOnlyList<Quote> market = (await quoteFeed.Get("SPY")).ToList();
+            IReadOnlyList<Quote> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
+            IReadOnlyList<Quote> market = (await quoteFeed.Get("SPY", HttpContext.RequestAborted)).ToList();
             IEnumerable<BetaResult> results = quotes.ToBeta(market, lookbackPeriods, type).TakeLast(limitLast);
             return Ok(results);
         }

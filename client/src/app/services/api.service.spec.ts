@@ -38,9 +38,9 @@ describe("ApiService", () => {
   });
 
   it("should return quotes from API when available", () => {
-    const mockQuotes = [
+    const rawMock: RawQuote[] = [
       {
-        timestamp: new Date("2023-01-01"),
+        timestamp: "2023-01-01T00:00:00.000Z",
         open: 100,
         high: 105,
         low: 99,
@@ -50,12 +50,21 @@ describe("ApiService", () => {
     ];
 
     service.getQuotes().subscribe(quotes => {
-      expect(quotes).toEqual(mockQuotes);
+      expect(quotes).toEqual([
+        {
+          timestamp: new Date("2023-01-01T00:00:00.000Z"),
+          open: 100,
+          high: 105,
+          low: 99,
+          close: 103,
+          volume: 1000000
+        }
+      ]);
     });
 
     const req = httpMock.expectOne(`${env.api}/quotes`);
     expect(req.request.method).toBe("GET");
-    req.flush(mockQuotes);
+    req.flush(rawMock);
   });
 
   it("should fallback to client backup quotes when API fails", () => {
