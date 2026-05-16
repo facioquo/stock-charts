@@ -8,7 +8,7 @@
 - API client utilities and static data helpers
 - Pre-configured chart options
 
-Built on top of [@facioquo/chartjs-chart-financial](https://github.com/facioquo/stock-charts/tree/main/libs/chartjs-financial) and Chart.js.
+Built on top of [chart.js](https://chartjs.org).
 
 ## Features
 
