@@ -85,6 +85,24 @@
       "dependsOrder": "sequence"
     },
     {
+      "label": "Update: NuGet packages",
+      "detail": "Update NuGet packages to latest compatible versions using dotnet-outdated",
+      "type": "shell",
+      "command": "dotnet outdated Charts.sln --upgrade"
+    },
+    {
+      "label": "Update: NuGet packages (pre-release)",
+      "detail": "Update NuGet packages to latest versions including pre-releases using dotnet-outdated",
+      "type": "shell",
+      "command": "dotnet outdated Charts.sln --upgrade --pre-release Always"
+    },
+    {
+      "label": "Update: All packages",
+      "detail": "Update all Node, Angular, and NuGet packages to latest compatible versions",
+      "dependsOn": ["Update: Node packages", "Update: NuGet packages"],
+      "dependsOrder": "sequence"
+    },
+    {
       "label": "Build: All projects (incremental)",
       "detail": "Incremental build of Website and Backend .NET",
       "dependsOn": ["Build: Backend .NET (incremental)", "Build: Website"],
