@@ -215,9 +215,10 @@ removing ~1,000 lines of duplicated code.
   - Kept `tsconfig.json` path mapping — Angular's bundler resolves indy-charts
     to source, which imports chartjs-chart-financial; the path mapping is needed
     for TypeScript compilation.
-  - Kept `chart.js`, `chartjs-plugin-annotation`, `chartjs-adapter-date-fns`,
-    and `date-fns` in `package.json` — they are peer deps of indy-charts and
-    pnpm requires consumers to install peers explicitly.
+  - Kept `chart.js` and `chartjs-plugin-annotation` in `package.json` — they
+    are peer deps of indy-charts and pnpm requires consumers to install peers
+    explicitly. `chartjs-adapter-date-fns` and `date-fns` are bundled as direct
+    dependencies of indy-charts and do not need explicit installation.
   - Build, lint, and 76 tests all pass.
 
 - [x] Task 2.6: Update smoke tests for new architecture
@@ -338,7 +339,9 @@ GitHub Packages before the external repo can install them.
   - Run `pnpm add @facioquo/indy-charts` — installs the published package
     plus its transitive dependency `@facioquo/chartjs-chart-financial`.
   - Install peer dependencies explicitly (pnpm requires it):
-    `pnpm add chart.js chartjs-plugin-annotation chartjs-adapter-date-fns date-fns`
+    `pnpm add chart.js chartjs-plugin-annotation`
+  - `chartjs-adapter-date-fns` and `date-fns` are bundled inside `@facioquo/indy-charts`
+    and install automatically.
   - Do **not** add `@facioquo/chartjs-chart-financial` as a direct dependency;
     it is a transitive dep of `@facioquo/indy-charts`.
 

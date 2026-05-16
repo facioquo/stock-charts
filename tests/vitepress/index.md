@@ -84,15 +84,15 @@ Then use the global component from Markdown:
 ::: code-group
 
 ```bash [npm]
-npm install @facioquo/indy-charts chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
+npm install @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 ```bash [pnpm]
-pnpm add @facioquo/indy-charts chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
+pnpm add @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 ```bash [yarn]
-yarn add @facioquo/indy-charts chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
+yarn add @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 :::

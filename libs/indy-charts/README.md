@@ -5,7 +5,7 @@ Framework-agnostic financial charting library with technical indicators and stoc
 ## Installation
 
 ```bash
-npm install @facioquo/indy-charts chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
+npm install @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 ## Quick Start

@@ -6,32 +6,20 @@ Make sure you have Node.js 22+ installed.
 
 ## Install dependencies
 
-Install the VitePress adapter package and its setup-level peer dependencies:
+Install the package and its peer dependencies:
 
 ::: code-group
 
 ```bash [npm]
-npm install @facioquo/indy-charts \
-  chart.js \
-  chartjs-adapter-date-fns \
-  chartjs-plugin-annotation \
-  date-fns
+npm install @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 ```bash [pnpm]
-pnpm add @facioquo/indy-charts \
-  chart.js \
-  chartjs-adapter-date-fns \
-  chartjs-plugin-annotation \
-  date-fns
+pnpm add @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 ```bash [yarn]
-yarn add @facioquo/indy-charts \
-  chart.js \
-  chartjs-adapter-date-fns \
-  chartjs-plugin-annotation \
-  date-fns
+yarn add @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 :::
@@ -51,9 +39,12 @@ The main library providing:
 ### Peer dependencies
 
 - **chart.js**: Core charting library
-- **chartjs-adapter-date-fns**: Date handling for Chart.js
 - **chartjs-plugin-annotation**: Annotation support
-- **date-fns**: Date formatting utilities
+
+### Bundled dependencies
+
+`chartjs-adapter-date-fns` and `date-fns` are bundled inside `@facioquo/indy-charts`.
+You do not need to install them separately.
 
 ### Transitive dependency
 
