@@ -61,6 +61,11 @@ public partial class QuoteService(
             return quotes.OrderBy(x => x.Timestamp);
         }
 
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw;
+        }
+
         // failover to backup quotes for local development and testing
         catch (Exception ex)
         {
