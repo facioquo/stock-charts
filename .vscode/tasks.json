@@ -17,7 +17,7 @@
       "label": "Setup: Dev environment (linux)",
       "detail": "Install all development prerequisites (Node, .NET, Azure Functions Core Tools, pnpm)",
       "type": "shell",
-      "command": "bash scripts/setup-linux.sh",
+      "command": "bash .devcontainer/post-create.sh",
       "group": "none"
     },
     {

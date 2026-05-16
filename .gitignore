@@ -79,7 +79,6 @@ testem.log
 # ========================================
 # ENVIRONMENT & LOCAL CONFIGURATION
 # ========================================
-.env
 *.env
 *.env.local
 *.env.*.local

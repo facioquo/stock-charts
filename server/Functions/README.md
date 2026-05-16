@@ -10,34 +10,48 @@ This Azure Functions project handles scheduled data fetching and processing for 
 
 For local development, Azure Functions reads configuration from:
 
-1. **`.env`** - Repo-root env file (gitignored, template at `.env.example`)
-2. **`local.settings.json`** - Functions-specific settings (gitignored, template at `local.settings.example.json`)
-3. **Environment variables** - System or shell environment
-4. **Azure Key Vault** - Production secret management (when `KEY_VAULT_URL` configured)
+1. **`local.settings.json`** - Functions-specific settings (gitignored, template at `local.settings.example.json`)
+2. **Environment variables** - System or shell environment
+3. **Azure Key Vault** - Production secret management (when `KEY_VAULT_URL` configured)
 
 ### Alpaca API credentials (optional)
 
 The Functions project fetches real-time stock quotes from the [Alpaca Markets API](https://alpaca.markets/). **These credentials are optional** — the application falls back to backup quote data when they are absent.
 
-#### Setup: `.env` file (standard approach)
+#### Setup: `local.settings.json`
 
-Copy `.env.example` to `.env` at the repo root and fill in your credentials:
-
-```bash
-cp .env.example .env
-```
-
-```ini
-ALPACA_KEY=your-alpaca-api-key-here
-ALPACA_SECRET=your-alpaca-secret-here
-```
-
-The `start-functions.js` script loads `.env` automatically before starting the Functions host, so credentials are available without any additional steps.
-
-For dev containers, export the variables in your host shell before opening the container:
+Copy `local.settings.example.json` to `local.settings.json` and fill in your credentials:
 
 ```bash
-source .env && code .
+cp server/Functions/local.settings.example.json server/Functions/local.settings.json
+```
+
+Then edit `server/Functions/local.settings.json` and set `ALPACA_KEY` and `ALPACA_SECRET`:
+
+```json
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "KEY_VAULT_URL": "",
+    "FUNCTIONS_RUN_ON_STARTUP_ENABLED": "true",
+    "ALPACA_KEY": "your-alpaca-api-key-here",
+    "ALPACA_SECRET": "your-alpaca-secret-here"
+  }
+}
+```
+
+The `start-functions.js` script creates `local.settings.json` automatically from the example file if it doesn't exist, so you can also just copy and edit it manually.
+
+#### Dev container setup
+
+For dev containers, `devcontainer.json` uses `containerEnv` to inject credentials from the host shell at container creation time. Export the variables in your host shell before opening the container:
+
+```bash
+export ALPACA_KEY=your-alpaca-api-key-here
+export ALPACA_SECRET=your-alpaca-secret-here
+code .  # then "Reopen in Container"
 ```
 
 #### Get free API credentials

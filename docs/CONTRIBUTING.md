@@ -152,7 +152,3 @@ Contact us through the NuGet [Contact Owners](https://www.nuget.org/packages/Ske
 
 Thanks,
 Dave Skender
-
----
-
-Last updated: February 16, 2026
