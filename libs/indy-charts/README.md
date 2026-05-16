@@ -68,4 +68,4 @@ Apache-2.0 License - see the repository LICENSE file for details.
 
 ## Related projects
 
-- [@facioquo/stock-charts](https://github.com/facioquo/stock-charts) - Our demo Angular website using `@facioquo/indy-charts` and NuGet `Skender.Stock.Indicators`
+- [facioquo/stock-charts](https://github.com/facioquo/stock-charts) - website demonstrating use of `@facioquo/indy-charts` and NuGet `Skender.Stock.Indicators`
