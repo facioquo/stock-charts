@@ -4,12 +4,16 @@ import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
 import "./custom.css";
 
+const apiUrl =
+  (import.meta.env.VITE_API_URL as string | undefined) ??
+  "https://stock-charts-api.azurewebsites.net";
+
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
     setupIndyChartsForVue(app, {
       api: {
-        baseUrl: "https://localhost:5001"
+        baseUrl: apiUrl
       },
       defaults: {
         barCount: 250,

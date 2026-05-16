@@ -11,7 +11,7 @@ export function commonLegendAnnotation(
   yAdj: number = 0,
   settings: ChartSettings
 ): AnnotationOptions & LabelAnnotationOptions {
-  const fontColor = settings.isDarkTheme ? "#757575" : "#121316";
+  const fontColor = settings.isDarkTheme ? "#9E9E9E" : "#121316";
   const fillColor = settings.isDarkTheme ? "#12131680" : "#FAF9FD90";
 
   const legendFont: FontSpec = {

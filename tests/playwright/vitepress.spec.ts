@@ -160,7 +160,7 @@ async function expectCanvasToBeNonBlank(canvas: Locator): Promise<void> {
 test.describe("VitePress Documentation Site", () => {
   test("home page loads with correct title and heading", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle("Indy Charts Demo");
+    await expect(page).toHaveTitle("Indy Charts");
     await expect(page.getByRole("heading", { name: "Indy Charts", level: 1 })).toBeVisible();
   });
 
