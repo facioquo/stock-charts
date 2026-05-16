@@ -50,7 +50,7 @@ try {
   mkdirSync(packDir, { recursive: true });
   mkdirSync(path.join(consumerDir, "docs", ".vitepress", "theme"), { recursive: true });
 
-  runPnpm(["--filter", "@facioquo/indy-charts", "run", "build"]);
+  runPnpm(["--filter", "@facioquo/indy-charts...", "run", "build"]);
   runPnpm(["--filter", "@facioquo/indy-charts", "pack", "--pack-destination", packDir]);
 
   const indyChartsTarball = packedTarball("@facioquo/indy-charts");

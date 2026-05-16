@@ -4,7 +4,7 @@ public interface IStorage
 {
     Task InitializeAsync();
     Task InitializeAsync(CancellationToken cancellationToken);
-    Task PutBlobAsync(string blobName, string content);
+    Task PutBlobAsync(string blobName, string content, CancellationToken ct = default);
     BlobClient GetBlobClient(string blobName);
 }
 
@@ -41,10 +41,10 @@ public class Storage : IStorage
     /// <param name="blobName">Name of the blob</param>
     /// <param name="content">Content to upload</param>
     /// <returns>Task representing the async operation</returns>
-    public async Task PutBlobAsync(string blobName, string content)
+    public async Task PutBlobAsync(string blobName, string content, CancellationToken ct = default)
     {
         await using MemoryStream stream = new(Encoding.UTF8.GetBytes(content));
-        await _blobClient.GetBlobClient(blobName).UploadAsync(stream, overwrite: true);
+        await _blobClient.GetBlobClient(blobName).UploadAsync(stream, overwrite: true, ct);
     }
 
     /// <summary>

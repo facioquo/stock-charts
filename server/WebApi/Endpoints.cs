@@ -19,7 +19,7 @@ public class Main(IQuoteService quoteService) : ControllerBase
     [HttpGet("quotes")]
     public async Task<IActionResult> GetQuotes()
     {
-        IEnumerable<Quote> quotes = await quoteFeed.Get();
+        IEnumerable<Quote> quotes = await quoteFeed.Get(HttpContext.RequestAborted);
         return Ok(quotes.TakeLast(limitLast));
     }
 
@@ -37,7 +37,7 @@ public class Main(IQuoteService quoteService) : ControllerBase
     {
         try
         {
-            IReadOnlyList<Quote> quotes = (await quoteFeed.Get()).ToList();
+            IReadOnlyList<Quote> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
             IEnumerable<T> results = indicatorFunc(quotes).TakeLast(limitLast);
             return Ok(results);
         }
