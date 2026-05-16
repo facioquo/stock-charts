@@ -98,14 +98,7 @@ public class RandomQuotes : List<Quote>
 
         double volume = Price(_seed * 1000, _volatility * 2, drift: 0);
 
-        Quote quote = new() {
-            Date = timestamp,
-            Open = (decimal)open,
-            High = (decimal)high,
-            Low = (decimal)low,
-            Close = (decimal)close,
-            Volume = (decimal)volume
-        };
+        Quote quote = new(timestamp, (decimal)open, (decimal)high, (decimal)low, (decimal)close, (decimal)volume);
 
         Add(quote);
         _seed = close;

@@ -181,18 +181,11 @@ public partial class Jobs
         // compose
         foreach (IBar bar in barSet.Items)
         {
-            quotes.Add(new Quote {
-                Date = bar.TimeUtc,
-                Open = bar.Open,
-                High = bar.High,
-                Low = bar.Low,
-                Close = bar.Close,
-                Volume = bar.Volume
-            });
+            quotes.Add(new Quote(bar.TimeUtc, bar.Open, bar.High, bar.Low, bar.Close, bar.Volume));
         }
 
         string json = JsonSerializer
-            .Serialize(quotes.OrderBy(x => x.Date));
+            .Serialize(quotes.OrderBy(x => x.Timestamp));
 
         // store in Azure Blob Storage
         string blobName = $"{symbol}-DAILY.json";

@@ -53,14 +53,14 @@ function createMockOverlay(): Partial<OverlayChart> {
     render: vi.fn().mockImplementation((quotes: Quote[]) => {
       // Return full-length datasets so slicing can be validated.
       const priceData = quotes.map(q => ({
-        x: new Date(q.date).valueOf(),
+        x: new Date(q.timestamp).valueOf(),
         o: q.open,
         h: q.high,
         l: q.low,
         c: q.close
       }));
       const volumeData = quotes.map(q => ({
-        x: new Date(q.date).valueOf(),
+        x: new Date(q.timestamp).valueOf(),
         y: q.volume
       }));
       const bgColors = quotes.map(() => "#0f0");
@@ -126,7 +126,7 @@ function makeQuotes(count: number): Quote[] {
     d.setDate(d.getDate() + i);
     const base = 100 + i * 0.5;
     quotes.push({
-      date: d,
+      timestamp: d,
       open: base,
       high: base + 2,
       low: base - 2,
@@ -243,7 +243,7 @@ function makeSelection(listing: IndicatorListing, ucid: string): IndicatorSelect
 
 function makeIndicatorData(quotes: Quote[]): IndicatorDataRow[] {
   return quotes.map((q, index) => ({
-    date: q.date.toISOString(),
+    timestamp: q.timestamp.toISOString(),
     candle: q,
     sma: q.close * 0.99,
     rsi: 50 + (index % 10) // Deterministic value derived from index, not Math.random()

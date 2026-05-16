@@ -20,7 +20,7 @@ export function processQuoteData(quotes: Quote[]): {
 
   quotes.forEach((q: Quote) => {
     priceData.push({
-      x: new Date(q.date).valueOf(),
+      x: new Date(q.timestamp).valueOf(),
       o: q.open,
       h: q.high,
       l: q.low,
@@ -67,7 +67,7 @@ export function buildDataPoints(
     if (typeof yValue !== "number") {
       yValue = NaN;
     }
-    dataPoints.push({ x: new Date(row.date).valueOf(), y: yValue });
+    dataPoints.push({ x: new Date(row.timestamp).valueOf(), y: yValue });
   });
 
   return { dataPoints, pointColor, pointRotation };

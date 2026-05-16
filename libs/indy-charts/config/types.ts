@@ -14,7 +14,7 @@ export type ExtendedChartDataset = ChartDataset & {
 };
 
 export interface Quote {
-  date: Date;
+  timestamp: Date;
   open: number;
   high: number;
   low: number;
@@ -23,7 +23,7 @@ export interface Quote {
 }
 
 export interface RawQuote {
-  date: string;
+  timestamp: string;
   open: number;
   high: number;
   low: number;
@@ -32,7 +32,7 @@ export interface RawQuote {
 }
 
 export interface IndicatorDataRow {
-  date: string;
+  timestamp: string;
   candle: Quote;
   [key: string]: unknown; // For dynamic indicator result values
 }

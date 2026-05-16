@@ -83,7 +83,7 @@ function generateSampleQuotes(count: number): Quote[] {
 
     const basePrice = 100 + i * 0.5;
     quotes.push({
-      date,
+      timestamp: date,
       open: basePrice,
       high: basePrice + 2,
       low: basePrice - 2,
@@ -203,7 +203,7 @@ describe("ChartService Smoke Tests", () => {
       getListings: vi.fn(() => of([generateSampleIndicatorListing()])),
       getSelectionData: vi.fn((_selection: IndicatorSelection) => {
         const sampleData: IndicatorDataRow[] = generateSampleQuotes(100).map(q => ({
-          date: q.date.toISOString(),
+          timestamp: q.timestamp.toISOString(),
           candle: q,
           sma: q.close * 0.99
         }));

@@ -50,7 +50,7 @@ function generateBackupQuotes(seed: number = 12345): Quote[] {
     currentPrice = quote.close;
   }
 
-  return quotes.sort((a, b) => a.date.getTime() - b.date.getTime());
+  return quotes.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 }
 
 /**
@@ -106,7 +106,7 @@ function generateDailyQuote(
   const volume = Math.floor(baseVolume * volumeMultiplier);
 
   return {
-    date: new Date(date),
+    timestamp: new Date(date),
     open: Math.round(open * 100) / 100,
     high: Math.round(high * 100) / 100,
     low: Math.round(low * 100) / 100,

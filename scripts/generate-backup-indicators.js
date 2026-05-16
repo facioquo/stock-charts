@@ -21,11 +21,29 @@ async function fetchListings() {
   return res.json();
 }
 
+/** Strip server origin from endpoint URLs so backup listings use relative paths.
+ * `buildApiUrl()` in the Angular client uses `new URL(endpoint, baseUrl)`, which
+ * ignores `baseUrl` when `endpoint` is already an absolute URL — causing production
+ * requests to hit localhost instead of the configured API origin.
+ * Extracts pathname from any absolute URL; leaves relative paths unchanged.
+ */
+function normalizeEndpoints(listings) {
+  return listings.map(listing => {
+    try {
+      const url = new URL(listing.endpoint);
+      return { ...listing, endpoint: url.pathname + url.search + url.hash };
+    } catch {
+      return listing; // already relative, leave as-is
+    }
+  });
+}
+
 if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
   (async () => {
     console.log(`Fetching indicator listings from: ${apiBase}/indicators`);
     try {
-      const listings = await fetchListings();
+      const raw = await fetchListings();
+      const listings = normalizeEndpoints(raw);
       // Ensure output directory exists before writing snapshot
       fs.mkdirSync(dataDir, { recursive: true });
       fs.writeFileSync(jsonPath, JSON.stringify(listings, null, 2), 'utf8');

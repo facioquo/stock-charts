@@ -484,10 +484,10 @@
     },
     {
       "label": "Stop: VitePress chart demo dev server",
-      "detail": "Stop VitePress demo servers (dev port 4300, preview port 4301)",
+      "detail": "Stop VitePress demo servers (dev port 4300, preview port 4301, test preview port 4302)",
       "type": "shell",
       "command": "npx",
-      "args": ["kill-port", "4300", "4301"],
+      "args": ["kill-port", "4300", "4301", "4302"],
       "presentation": {
         "clear": true,
         "reveal": "always"

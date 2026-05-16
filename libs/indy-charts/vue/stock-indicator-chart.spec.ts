@@ -205,7 +205,7 @@ describe("StockIndicatorChart", () => {
           return Promise.resolve(
             responseJson([
               {
-                date: "2024-01-01T00:00:00.000Z",
+                timestamp: "2024-01-01T00:00:00.000Z",
                 open: 100,
                 high: 105,
                 low: 95,

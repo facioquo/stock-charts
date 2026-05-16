@@ -16,7 +16,7 @@ const BASE_URL = "https://api.example.com";
 
 function rawQuote(dateStr: string, close = 100): RawQuote {
   return {
-    date: dateStr,
+    timestamp: dateStr,
     open: close - 1,
     high: close + 1,
     low: close - 2,
@@ -144,8 +144,8 @@ describe("createApiClient", () => {
       const quotes = await client.getQuotes();
 
       expect(quotes).toHaveLength(2);
-      expect(quotes[0].date).toBeInstanceOf(Date);
-      expect(quotes[0].date.toISOString()).toBe("2024-01-01T00:00:00.000Z");
+      expect(quotes[0].timestamp).toBeInstanceOf(Date);
+      expect(quotes[0].timestamp.toISOString()).toBe("2024-01-01T00:00:00.000Z");
       expect(quotes[1].close).toBe(100);
     });
 
@@ -186,7 +186,7 @@ describe("createApiClient", () => {
 
     it("preserves all OHLCV fields", async () => {
       const raw: RawQuote[] = [
-        { date: "2024-06-15T00:00:00Z", open: 10, high: 20, low: 5, close: 15, volume: 9999 }
+        { timestamp: "2024-06-15T00:00:00Z", open: 10, high: 20, low: 5, close: 15, volume: 9999 }
       ];
       mockFetchOk(raw);
 
@@ -298,8 +298,8 @@ describe("createApiClient", () => {
 
     it("returns data array from API response", async () => {
       const data = [
-        { date: "2024-01-01", sma: 50.5 },
-        { date: "2024-01-02", sma: 51.0 }
+        { timestamp: "2024-01-01", sma: 50.5 },
+        { timestamp: "2024-01-02", sma: 51.0 }
       ];
       mockFetchOk(data);
 

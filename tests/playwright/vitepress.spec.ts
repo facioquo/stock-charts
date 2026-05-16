@@ -1,7 +1,7 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
 
 interface MockQuote {
-  date: string;
+  timestamp: string;
   open: number;
   high: number;
   low: number;
@@ -16,7 +16,7 @@ function createQuotes(count: number): MockQuote[] {
     date.setUTCDate(date.getUTCDate() + index);
     const base = 100 + index * 0.35;
     return {
-      date: date.toISOString(),
+      timestamp: date.toISOString(),
       open: base,
       high: base + 2,
       low: base - 2,
@@ -114,7 +114,7 @@ async function mockChartApi(page: Page): Promise<void> {
   await page.route("https://localhost:5001/ema**", route =>
     route.fulfill({
       json: mockQuotes.map((quote, index) => ({
-        date: quote.date,
+        timestamp: quote.timestamp,
         candle: quote,
         ema: quote.close - 1 + index / 200
       })),
@@ -124,7 +124,7 @@ async function mockChartApi(page: Page): Promise<void> {
   await page.route("https://localhost:5001/rsi**", route =>
     route.fulfill({
       json: mockQuotes.map((quote, index) => ({
-        date: quote.date,
+        timestamp: quote.timestamp,
         candle: quote,
         rsi: 45 + Math.sin(index / 5) * 20
       })),

@@ -3136,6 +3136,26 @@ public static class Metadata
                 ]
             },
 
+            // True Range
+            new IndicatorListing {
+                Name = "True Range",
+                Uiid = "TR",
+                LegendTemplate = "TR",
+                Endpoint = $"{baseUrl}/TR/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                Results = [
+                    new() {
+                        DisplayName = "True Range",
+                        TooltipTemplate = "TR",
+                        DataName = "tr",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
             // TRIX Oscillator
             new IndicatorListing {
                 Name = "TRIX Oscillator",
@@ -3747,26 +3767,6 @@ public static class Metadata
                         LineType = "solid",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardOrange
-                    }
-                ]
-            },
-
-            // Volume Weighted Average Price (VWAP)
-            new IndicatorListing {
-                Name = "Volume Weighted Average Price (VWAP)",
-                Uiid = "VWAP",
-                LegendTemplate = "VWAP",
-                Endpoint = $"{baseUrl}/VWAP/",
-                Category = "moving-average",
-                ChartType = "overlay",
-                Results = [
-                    new() {
-                        DisplayName = "VWAP",
-                        TooltipTemplate = "VWAP",
-                        DataName = "vwap",
-                        DataType = "number",
-                        LineType = "solid",
-                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },

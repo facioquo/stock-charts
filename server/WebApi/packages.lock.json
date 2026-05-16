@@ -47,9 +47,9 @@
       },
       "Skender.Stock.Indicators": {
         "type": "Direct",
-        "requested": "[2.7.1, )",
-        "resolved": "2.7.1",
-        "contentHash": "HsHVlg9Tcb1gUV50dpazlUh2Qy1F9NtG7Fe4pYcxgnnloW4Fdh8TQTA7IB5M7rWubEvtFgzx+1U1vI2LzJPWXg=="
+        "requested": "[3.0.0-preview.3.1, )",
+        "resolved": "3.0.0-preview.3.1",
+        "contentHash": "oBzrKgtwRRGfJyotPufP1tpNUnNeUgyiv58aY9E/Z4qaKfLL0pOqPUtcS9/5z/mnmhtyRCe/BKPkRKTD4kHUKw=="
       },
       "Azure.Storage.Common": {
         "type": "Transitive",

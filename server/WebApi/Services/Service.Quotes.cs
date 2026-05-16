@@ -57,7 +57,7 @@ public partial class QuoteService(
                 return QuoteBackup.BackupQuotes;
             }
 
-            return quotes.OrderBy(x => x.Date);
+            return quotes.OrderBy(x => x.Timestamp);
         }
 
         // failover to backup quotes for local development and testing

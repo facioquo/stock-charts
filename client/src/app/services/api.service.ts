@@ -96,7 +96,7 @@ export class ApiService {
   private toQuotes(raw: RawQuote[]): Quote[] {
     // Normalize RawQuote[] to Quote[] ensuring date field is a Date instance.
     return raw.map(q => ({
-      date: new Date(q.date),
+      timestamp: new Date(q.timestamp),
       open: q.open,
       high: q.high,
       low: q.low,

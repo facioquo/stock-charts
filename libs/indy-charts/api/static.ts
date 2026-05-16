@@ -6,7 +6,7 @@ import { Quote, RawQuote, IndicatorDataRow } from "../config/types";
  */
 export function loadStaticQuotes(raw: RawQuote[]): Quote[] {
   return raw.map(q => ({
-    date: new Date(q.date),
+    timestamp: new Date(q.timestamp),
     open: q.open,
     high: q.high,
     low: q.low,
