@@ -42,6 +42,23 @@ features:
 ## Quick example
 
 ```typescript
+import { createApiClient, OverlayChart, setupIndyCharts } from "@facioquo/indy-charts";
+
+setupIndyCharts();
+
+const client = createApiClient({ baseUrl: "https://api.example.com" });
+const quotes = await client.getQuotes();
+
+const canvas = document.getElementById("main-chart");
+if (!(canvas instanceof HTMLCanvasElement)) throw new Error("Chart canvas not found");
+
+const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true });
+chart.render(quotes.slice(-250));
+```
+
+**Using VitePress?** Register the adapter once in `.vitepress/theme/index.ts`:
+
+```typescript
 import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
 
 export default {
@@ -53,6 +70,8 @@ export default {
   }
 };
 ```
+
+Then use the global component from Markdown:
 
 ```vue
 <ClientOnly>
