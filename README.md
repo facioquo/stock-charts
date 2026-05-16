@@ -76,7 +76,7 @@ For AI coding agents (GitHub Copilot, Claude, etc.), see [AGENTS.md](AGENTS.md) 
 
 ## Development and contributing
 
-For detailed development setup, testing, linting, formatting, and contribution workflow, see [Contributing Guidelines](docs/CONTRIBUTING.md).
+For detailed development setup, testing, linting, formatting, and contribution workflow, see the [contributing guidelines](docs/CONTRIBUTING.md).
 
 ## License
 
