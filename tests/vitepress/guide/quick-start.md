@@ -1,12 +1,10 @@
 # Quick start
 
-This guide shows how to render financial charts using `@facioquo/indy-charts` in any
-JavaScript or TypeScript project. [VitePress integration](#using-vitepress) is covered below.
+This guide shows how to render financial charts using `@facioquo/indy-charts` in any JavaScript or TypeScript project. [VitePress integration](#using-vitepress) is covered below.
 
 ## Step 1: Initialize once
 
-Call `setupIndyCharts()` once at application startup to register all Chart.js components,
-financial chart types, and required plugins:
+Call `setupIndyCharts()` once at application startup to register all Chart.js components, financial chart types, and required plugins:
 
 ```typescript
 import { setupIndyCharts } from "@facioquo/indy-charts";
@@ -14,8 +12,7 @@ import { setupIndyCharts } from "@facioquo/indy-charts";
 setupIndyCharts();
 ```
 
-Call this before creating any chart instances — once per application lifecycle. Safe to call
-multiple times; subsequent calls are no-ops.
+Call this before creating any chart instances — once per application lifecycle. Safe to call multiple times; subsequent calls are no-ops.
 
 ## Step 2: Connect your API
 
@@ -83,9 +80,7 @@ Add the oscillator canvas to your HTML alongside the overlay canvas:
 
 ## Using VitePress
 
-The Vue adapter wraps the API above in a global `<StockIndicatorChart>` component,
-removing the need for manual canvas management. Works with VitePress, Nuxt, or any
-Vue 3 app.
+The Vue adapter wraps the API above in a global `<StockIndicatorChart>` component, removing the need for manual canvas management. Works with VitePress, Nuxt, or any Vue 3 app.
 
 ### Register the adapter
 

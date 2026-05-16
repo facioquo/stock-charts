@@ -36,8 +36,7 @@ chart.render(quotes.slice(-250));
 
 ## Usage with Vue
 
-Register the optional Vue adapter once in your app entry point
-(e.g. `.vitepress/theme/index.ts` for VitePress, or `main.ts` for plain Vue):
+Register the optional Vue adapter once in your app entry point (e.g. `.vitepress/theme/index.ts` for VitePress, or `main.ts` for plain Vue):
 
 ```typescript
 import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";

@@ -48,20 +48,13 @@ You do not need to install them separately.
 
 ### Transitive dependency
 
-`@facioquo/indy-charts` depends on `@facioquo/chartjs-chart-financial`
-internally. Most consumers should not need to install it directly.
+`@facioquo/indy-charts` depends on `@facioquo/chartjs-chart-financial` internally. Most consumers should not need to install it directly.
 
 ### Vue adapter
 
-Register charts once in your app entry (e.g. `main.ts` for plain Vue, or
-`.vitepress/theme/index.ts` for VitePress) by importing
-`setupIndyChartsForVue` from `@facioquo/indy-charts/vue`.
-Markdown page authors should use `<StockIndicatorChart />` and should not import
-Chart.js, the API client, or `@facioquo/chartjs-chart-financial` directly.
+Register charts once in your app entry (e.g. `main.ts` for plain Vue, or `.vitepress/theme/index.ts` for VitePress) by importing `setupIndyChartsForVue` from `@facioquo/indy-charts/vue`. Markdown page authors should use `<StockIndicatorChart />` and should not import Chart.js, the API client, or `@facioquo/chartjs-chart-financial` directly.
 
-Vue is an optional peer dependency because only the `/vue` subpath imports
-Vue. Consumers that use the root `@facioquo/indy-charts` APIs do not load
-the Vue adapter.
+Vue is an optional peer dependency because only the `/vue` subpath imports Vue. Consumers that use the root `@facioquo/indy-charts` APIs do not load the Vue adapter.
 
 ## TypeScript
 
