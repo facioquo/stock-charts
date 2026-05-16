@@ -56,14 +56,14 @@ const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true 
 chart.render(quotes.slice(-250));
 ```
 
-**Using VitePress?** Register the adapter once in `.vitepress/theme/index.ts`:
+**Using Vue?** Register the adapter once in your app entry point (e.g. `.vitepress/theme/index.ts` for VitePress, or `main.ts` for plain Vue):
 
 ```typescript
-import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
+import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
 export default {
   enhanceApp({ app }) {
-    setupIndyChartsForVitePress(app, {
+    setupIndyChartsForVue(app, {
       api: { baseUrl: "https://api.example.com" },
       indicators: { ema: { uiid: "EMA", params: { lookbackPeriods: 20 } } }
     });

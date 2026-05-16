@@ -99,12 +99,12 @@ export default defineConfig({
     path.join(consumerDir, "docs", ".vitepress", "theme", "index.ts"),
     `import DefaultTheme from "vitepress/theme";
 
-import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
+import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
-    setupIndyChartsForVitePress(app, {
+    setupIndyChartsForVue(app, {
       api: { baseUrl: "https://localhost:5001" },
       indicators: {
         rsi: { uiid: "RSI", params: { lookbackPeriods: 14 }, results: ["rsi"] }

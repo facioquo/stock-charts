@@ -297,7 +297,7 @@ Prepare libraries for consumption outside this workspace.
   - The smoke script builds and packs `@facioquo/indy-charts` (chartjs-financial
     is bundled into the output), installs the packed tarball into an isolated
     VitePress-style consumer, and builds the consumer.
-  - The consumer imports only `@facioquo/indy-charts/vitepress` from its theme
+  - The consumer imports only `@facioquo/indy-charts/vue` from its theme
     and uses `<StockIndicatorChart indicator="rsi" />` from Markdown.
   - Validated locally: `pnpm run smoke:package-consumption` passed.
 
@@ -362,12 +362,12 @@ GitHub Packages before the external repo can install them.
   - Do not add a `date-fns` alias. Match the tested VitePress configuration by
     relying on `ssr.noExternal` for `@facioquo/indy-charts`,
     `chartjs-adapter-date-fns`, `chart.js`, and `date-fns`.
-  - Call `setupIndyChartsForVitePress(...)` from
-    `@facioquo/indy-charts/vitepress` exactly once in
+  - Call `setupIndyChartsForVue(...)` from
+    `@facioquo/indy-charts/vue` exactly once in
     `.vitepress/theme/index.ts` inside the `enhanceApp` hook.
 
 - [ ] Task 5.5: Port `StockIndicatorChart` usage with the deployed API URL as default
-  - Register `StockIndicatorChart` from `@facioquo/indy-charts/vitepress` in
+  - Register `StockIndicatorChart` from `@facioquo/indy-charts/vue` in
     the external VitePress theme.
   - Configure the site-level `apiBaseUrl` default as
     `https://stock-charts-api.azurewebsites.net`.

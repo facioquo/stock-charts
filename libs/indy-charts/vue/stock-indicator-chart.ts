@@ -16,10 +16,10 @@ import { ChartManager } from "../charts";
 import type { IndicatorListing } from "../config";
 import { applySelectionTokens, createDefaultSelection } from "../helpers";
 import { setupIndyCharts } from "../setup";
-import { indyChartsVitePressOptionsKey } from "./context";
+import { indyChartsVueOptionsKey } from "./context";
 import {
   chartSettingsFromOptions,
-  type IndyChartsVitePressOptions,
+  type IndyChartsVueOptions,
   type StockIndicatorChartConfig,
   type StockIndicatorChartPhase
 } from "./types";
@@ -27,7 +27,7 @@ import {
 const DEFAULT_BAR_COUNT = 250;
 const DATA_UNAVAILABLE_ERROR_MESSAGE =
   "Chart data is currently unavailable. Check the API service and try again.";
-const MISSING_SETUP_ERROR_MESSAGE = "setupIndyChartsForVitePress() has not been called.";
+const MISSING_SETUP_ERROR_MESSAGE = "setupIndyChartsForVue() has not been called.";
 
 function slug(value: string): string {
   return value
@@ -41,7 +41,7 @@ function findListing(listings: IndicatorListing[], uiid: string): IndicatorListi
 }
 
 function registryConfig(
-  options: IndyChartsVitePressOptions,
+  options: IndyChartsVueOptions,
   indicator: string | undefined
 ): StockIndicatorChartConfig | undefined {
   const registry = options.indicators ?? {};
@@ -74,7 +74,7 @@ export const StockIndicatorChart = defineComponent({
     barCount: Number
   },
   setup(props) {
-    const options = inject(indyChartsVitePressOptionsKey);
+    const options = inject(indyChartsVueOptionsKey);
     const phase = ref<StockIndicatorChartPhase>("idle");
     const title = ref("Stock indicator chart");
     const errorMessage = ref("Chart data is unavailable.");

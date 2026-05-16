@@ -28,9 +28,9 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./vitepress": {
-      "types": "./dist/vitepress/index.d.ts",
-      "import": "./dist/vitepress/index.js"
+    "./vue": {
+      "types": "./dist/vue/index.d.ts",
+      "import": "./dist/vue/index.js"
     }
   },
   "files": [

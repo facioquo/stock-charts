@@ -75,11 +75,11 @@ tests/vitepress/
 The theme registers `StockIndicatorChart` once with site-level API and indicator defaults:
 
 ```typescript
-import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
+import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
 export default {
   enhanceApp({ app }) {
-    setupIndyChartsForVitePress(app, {
+    setupIndyChartsForVue(app, {
       api: { baseUrl: "https://localhost:5001" },
       indicators: {
         rsi: { uiid: "RSI", params: { lookbackPeriods: 14 }, results: ["rsi"] }
@@ -135,7 +135,7 @@ If you encounter module resolution issues, ensure:
 
 Check:
 
-- `setupIndyChartsForVitePress()` is called from `.vitepress/theme/index.ts`
+- `setupIndyChartsForVue()` is called from `.vitepress/theme/index.ts`
 - The adapter API `baseUrl` matches the running Web API (`https://localhost:5001` by default)
 - The requested indicator is registered in the adapter `indicators` config
 - Local Web API CORS includes VitePress dev/preview ports (`4300` / `4301`)

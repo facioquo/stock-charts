@@ -1,13 +1,13 @@
 import DefaultTheme from "vitepress/theme";
 
-import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
+import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
 import "./custom.css";
 
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
-    setupIndyChartsForVitePress(app, {
+    setupIndyChartsForVue(app, {
       api: {
         baseUrl: "https://localhost:5001"
       },

@@ -83,8 +83,9 @@ Add the oscillator canvas to your HTML alongside the overlay canvas:
 
 ## Using VitePress
 
-The VitePress adapter wraps the API above in a global `<StockIndicatorChart>` component,
-removing the need for manual canvas management.
+The Vue adapter wraps the API above in a global `<StockIndicatorChart>` component,
+removing the need for manual canvas management. Works with VitePress, Nuxt, or any
+Vue 3 app.
 
 ### Register the adapter
 
@@ -93,12 +94,12 @@ In `.vitepress/theme/index.ts`:
 ```typescript
 import DefaultTheme from "vitepress/theme";
 
-import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
+import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
-    setupIndyChartsForVitePress(app, {
+    setupIndyChartsForVue(app, {
       api: { baseUrl: "https://api.example.com" },
       defaults: { barCount: 250, quoteCount: 250, showTooltips: true },
       indicators: {

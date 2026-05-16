@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
   entry: {
     index: "index.ts",
-    "vitepress/index": "vitepress/index.ts"
+    "vue/index": "vue/index.ts"
   },
   format: ["esm"],
   dts: {

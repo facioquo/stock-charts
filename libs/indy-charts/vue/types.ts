@@ -1,7 +1,7 @@
 import type { ApiClientConfig } from "../api";
 import type { ChartSettings } from "../config";
 
-export type IndyChartsVitePressApiOptions = ApiClientConfig;
+export type IndyChartsVueApiOptions = ApiClientConfig;
 
 export interface StockIndicatorChartConfig {
   id?: string;
@@ -15,22 +15,23 @@ export interface StockIndicatorChartConfig {
 
 export type StockIndicatorChartRegistry = Record<string, StockIndicatorChartConfig>;
 
-export interface IndyChartsVitePressDefaults {
+export interface IndyChartsVueDefaults {
   indicator?: string;
   barCount?: number;
   quoteCount?: number;
   showTooltips?: boolean;
 }
 
-export interface IndyChartsVitePressThemeOptions {
+export interface IndyChartsVueThemeOptions {
   isDarkTheme?: boolean;
+  /** When `true`, syncs the chart theme with VitePress's dark mode toggle. */
   observeVitePressDarkMode?: boolean;
 }
 
-export interface IndyChartsVitePressOptions {
-  api: IndyChartsVitePressApiOptions;
-  defaults?: IndyChartsVitePressDefaults;
-  theme?: IndyChartsVitePressThemeOptions;
+export interface IndyChartsVueOptions {
+  api: IndyChartsVueApiOptions;
+  defaults?: IndyChartsVueDefaults;
+  theme?: IndyChartsVueThemeOptions;
   indicators?: StockIndicatorChartRegistry;
 }
 
@@ -43,7 +44,7 @@ export interface StockIndicatorChartProps {
 export type StockIndicatorChartPhase = "idle" | "loading" | "ready" | "empty" | "error";
 
 export function chartSettingsFromOptions(
-  options: IndyChartsVitePressOptions,
+  options: IndyChartsVueOptions,
   isDarkTheme: boolean
 ): ChartSettings {
   return {
