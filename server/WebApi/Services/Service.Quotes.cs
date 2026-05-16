@@ -29,8 +29,15 @@ public partial class QuoteService(
     /// <param name="ct">Cancellation token</param>
     public async Task<IEnumerable<Quote>> Get(string symbol, CancellationToken ct = default)
     {
-        string blobName = $"{symbol}-DAILY.json";
+        ArgumentNullException.ThrowIfNull(symbol);
 
+        symbol = symbol.Trim().ToUpperInvariant();
+        if (symbol is not "SPY" and not "QQQ")
+        {
+            throw new ArgumentException("symbol must be \"SPY\" or \"QQQ\".", nameof(symbol));
+        }
+
+        string blobName = $"{symbol}-DAILY.json";
         try
         {
             BlobClient blob = _storage.GetBlobClient(blobName);
