@@ -29,35 +29,15 @@ public class RandomQuotes : List<Quote>
     /// <param name="includeWeekends">Whether to include weekends in the generated data.</param>
     /// <exception cref="ArgumentException">Thrown when an invalid argument is provided.</exception>
     public RandomQuotes(
-        int bars = 250,
-        double volatility = 1.0,
-        double drift = 0.01,
-        double seed = 1000.0,
-        PeriodSize periodSize = PeriodSize.OneMinute,
-        bool includeWeekends = true)
+        int bars = 250, // NOSONAR S2360: constructor with many configurable options is intentional
+        double volatility = 1.0, // NOSONAR
+        double drift = 0.01, // NOSONAR
+        double seed = 1000.0, // NOSONAR
+        PeriodSize periodSize = PeriodSize.OneMinute, // NOSONAR
+        bool includeWeekends = true) // NOSONAR
     {
-        // validation
-        if (bars <= 0)
-        {
-            throw new ArgumentException("Number of bars must be greater than zero.", nameof(bars));
-        }
-
-        if (volatility <= 0)
-        {
-            throw new ArgumentException("Volatility must be greater than zero.", nameof(volatility));
-        }
-
-        if (seed <= 0)
-        {
-            throw new ArgumentException("Seed must be greater than zero.", nameof(seed));
-        }
-
         TimeSpan frequency = periodSize.ToTimeSpan();
-
-        if (!includeWeekends && (frequency < TimeSpan.FromHours(1) || frequency >= TimeSpan.FromDays(7)))
-        {
-            throw new ArgumentException("Weekends can only be excluded for period sizes between OneHour and less than OneWeek.", nameof(includeWeekends));
-        }
+        ValidateArgs(bars, volatility, seed, frequency, includeWeekends);
 
         _seed = seed;
         _volatility = volatility * 0.01;
@@ -76,6 +56,21 @@ public class RandomQuotes : List<Quote>
 
             date = date.Add(frequency);
         }
+    }
+
+    private static void ValidateArgs(int bars, double volatility, double seed, TimeSpan frequency, bool includeWeekends)
+    {
+        if (bars <= 0)
+            throw new ArgumentException("Number of bars must be greater than zero.", nameof(bars));
+
+        if (volatility <= 0)
+            throw new ArgumentException("Volatility must be greater than zero.", nameof(volatility));
+
+        if (seed <= 0)
+            throw new ArgumentException("Seed must be greater than zero.", nameof(seed));
+
+        if (!includeWeekends && (frequency < TimeSpan.FromHours(1) || frequency >= TimeSpan.FromDays(7)))
+            throw new ArgumentException("Weekends can only be excluded for period sizes between OneHour and less than OneWeek.", nameof(includeWeekends));
     }
 
     /// <summary>
@@ -113,8 +108,8 @@ public class RandomQuotes : List<Quote>
     /// <returns>A random price.</returns>
     private static double Price(double seed, double volatility, double drift)
     {
-        double u1 = 1.0 - _random.NextDouble();
-        double u2 = 1.0 - _random.NextDouble();
+        double u1 = 1.0 - _random.NextDouble(); // nosemgrep: csharp.crypto.rule-WeakRNG - intentional: market simulator, not cryptographic
+        double u2 = 1.0 - _random.NextDouble(); // nosemgrep
         double z = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
         return seed * Math.Exp(drift - (volatility * volatility * 0.5) + (volatility * z));
     }
