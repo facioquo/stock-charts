@@ -96,7 +96,7 @@ export class ApiService {
   private toQuotes(raw: RawQuote[]): Quote[] {
     // Normalize RawQuote[] to Quote[] ensuring timestamp is a valid Date instance.
     return raw.map((q, index) => ({
-      timestamp: this.parseTimestamp(q.timestamp, index),
+      timestamp: this.parseTimestamp(q.timestamp ?? q.date ?? "", index),
       open: q.open,
       high: q.high,
       low: q.low,

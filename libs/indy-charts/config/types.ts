@@ -23,7 +23,10 @@ export interface Quote {
 }
 
 export interface RawQuote {
-  timestamp: string;
+  /** Skender.Stock.Indicators v3+ field name */
+  timestamp?: string;
+  /** @deprecated Skender v2 field name — accepted for backward compatibility */
+  date?: string;
   open: number;
   high: number;
   low: number;
@@ -32,7 +35,10 @@ export interface RawQuote {
 }
 
 export interface IndicatorDataRow {
-  timestamp: string;
+  /** Skender.Stock.Indicators v3+ field name */
+  timestamp?: string;
+  /** @deprecated Skender v2 field name — accepted for backward compatibility */
+  date?: string;
   candle: Quote;
   [key: string]: unknown; // For dynamic indicator result values
 }

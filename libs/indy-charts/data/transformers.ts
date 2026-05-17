@@ -67,7 +67,7 @@ export function buildDataPoints(
     if (typeof yValue !== "number") {
       yValue = NaN;
     }
-    dataPoints.push({ x: new Date(row.timestamp).valueOf(), y: yValue });
+    dataPoints.push({ x: new Date((row.timestamp ?? row.date)!).valueOf(), y: yValue });
   });
 
   return { dataPoints, pointColor, pointRotation };

@@ -79,7 +79,7 @@ export interface ApiClient {
 
 function toQuotes(raw: RawQuote[]): Quote[] {
   return raw.map((q, index) => ({
-    timestamp: parseQuoteDate(q.timestamp, index),
+    timestamp: parseQuoteDate(q.timestamp ?? q.date ?? "", index),
     open: q.open,
     high: q.high,
     low: q.low,
