@@ -4,9 +4,12 @@ import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
 import "./custom.css";
 
-const apiUrl =
-  (import.meta.env.VITE_API_URL as string | undefined) ??
-  "https://stock-charts-api.azurewebsites.net";
+const PROD_API_URL = "https://stock-charts-api.azurewebsites.net";
+// VITE_API_URL is for local development only; production always uses the live API
+// (guards against CF Pages dashboard env var misconfiguration)
+const apiUrl = import.meta.env.DEV
+  ? ((import.meta.env.VITE_API_URL as string | undefined) ?? PROD_API_URL)
+  : PROD_API_URL;
 
 export default {
   extends: DefaultTheme,
