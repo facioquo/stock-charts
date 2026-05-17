@@ -13,10 +13,15 @@ IServiceCollection services = builder.Services;
 services.AddControllers();
 
 // Get CORS origins from appsettings (semicolon-separated list)
-// reminder: production origins defined in cloud host settings » API » CORS
-// so these are really only for localhost / development
+// reminder: Website origins for production are in cloud host settings » API » CORS
+// Demo origins supplement Website (CF Pages VitePress demo; not overridden by cloud host settings)
 string? allowedOriginConfig = configuration.GetValue<string>("CorsOrigins:Website");
-string[] allowedOrigins = allowedOriginConfig?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? [];
+string[] websiteOrigins = allowedOriginConfig?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? [];
+
+string? demoOriginConfig = configuration.GetValue<string>("CorsOrigins:Demo");
+string[] demoOrigins = demoOriginConfig?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? [];
+
+string[] allowedOrigins = [.. websiteOrigins, .. demoOrigins];
 
 if (allowedOrigins.Length > 0)
 {
