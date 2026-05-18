@@ -105,32 +105,34 @@ const mockListings = [
 ];
 
 async function mockChartApi(page: Page): Promise<void> {
-  await page.route("https://localhost:5001/quotes", route =>
-    route.fulfill({ json: mockQuotes, headers: { "access-control-allow-origin": "*" } })
-  );
-  await page.route("https://localhost:5001/indicators", route =>
-    route.fulfill({ json: mockListings, headers: { "access-control-allow-origin": "*" } })
-  );
-  await page.route("https://localhost:5001/ema**", route =>
-    route.fulfill({
-      json: mockQuotes.map((quote, index) => ({
-        timestamp: quote.timestamp,
-        candle: quote,
-        ema: quote.close - 1 + index / 200
-      })),
-      headers: { "access-control-allow-origin": "*" }
-    })
-  );
-  await page.route("https://localhost:5001/rsi**", route =>
-    route.fulfill({
-      json: mockQuotes.map((quote, index) => ({
-        timestamp: quote.timestamp,
-        candle: quote,
-        rsi: 45 + Math.sin(index / 5) * 20
-      })),
-      headers: { "access-control-allow-origin": "*" }
-    })
-  );
+  // Pre-compute response payloads once; reused for every intercepted origin.
+  const emaData = mockQuotes.map((quote, index) => ({
+    timestamp: quote.timestamp,
+    candle: quote,
+    ema: quote.close - 1 + index / 200
+  }));
+  const rsiData = mockQuotes.map((quote, index) => ({
+    timestamp: quote.timestamp,
+    candle: quote,
+    rsi: 45 + Math.sin(index / 5) * 20
+  }));
+
+  // Intercept both the local dev server and the production API origin so the
+  // mocks work whether the VitePress site was built in DEV or PROD mode.
+  for (const base of ["https://localhost:5001", "https://stock-charts-api.azurewebsites.net"]) {
+    await page.route(`${base}/quotes`, route =>
+      route.fulfill({ json: mockQuotes, headers: { "access-control-allow-origin": "*" } })
+    );
+    await page.route(`${base}/indicators`, route =>
+      route.fulfill({ json: mockListings, headers: { "access-control-allow-origin": "*" } })
+    );
+    await page.route(`${base}/ema**`, route =>
+      route.fulfill({ json: emaData, headers: { "access-control-allow-origin": "*" } })
+    );
+    await page.route(`${base}/rsi**`, route =>
+      route.fulfill({ json: rsiData, headers: { "access-control-allow-origin": "*" } })
+    );
+  }
 }
 
 async function expectCanvasToBeNonBlank(canvas: Locator): Promise<void> {
