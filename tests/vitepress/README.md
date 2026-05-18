@@ -33,7 +33,7 @@ cd tests/vitepress
 pnpm run dev
 ```
 
-The site will be available at `http://localhost:4300`.
+The site will be available locally at the address shown in your dev server output.
 
 ### Build for production
 
@@ -136,9 +136,9 @@ If you encounter module resolution issues, ensure:
 Check:
 
 - `setupIndyChartsForVue()` is called from `.vitepress/theme/index.ts`
-- The adapter API `baseUrl` matches the running Web API (`https://localhost:5001` by default)
+- The adapter API `baseUrl` matches the running Web API address
 - The requested indicator is registered in the adapter `indicators` config
-- Local Web API CORS includes VitePress dev/preview ports (`4300` / `4301`)
+- Local Web API CORS includes the VitePress dev and preview origins
 
 ## Resources
 
