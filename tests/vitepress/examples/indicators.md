@@ -59,8 +59,8 @@ Use the `config` prop when a page needs to override the site-level indicator reg
 
 ## Notes
 
-- The live demo above uses the VitePress adapter registered by the site theme.
-- Use additional `StockIndicatorChart` instances for additional indicators.
+- Add multiple `<StockIndicatorChart>` instances to display different indicators on the same page.
+- Charts automatically respect your site's dark/light theme preference.
 
 ## Next steps
 

@@ -1,13 +1,11 @@
 import { TestBed } from "@angular/core/testing";
 import { Meta, MetaDefinition, Title } from "@angular/platform-browser";
-import { Mock, vi } from "vitest";
-import { describe, expect, it, beforeEach, afterEach, vi as vitest } from "vitest";
+import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
+import type { Mock } from "vitest";
 import { UtilityService } from "./utility.service";
 
 describe("UtilityService", () => {
   let service: UtilityService;
-  let metaServiceMock: Mock;
-  let titleServiceMock: Mock;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -15,8 +13,6 @@ describe("UtilityService", () => {
     });
 
     service = TestBed.inject(UtilityService);
-    metaServiceMock = vi.spyOn(TestBed.inject(Meta), "getTag");
-    titleServiceMock = vi.spyOn(TestBed.inject(Title), "setTitle");
   });
 
   afterEach(() => {
@@ -48,12 +44,12 @@ describe("UtilityService", () => {
   describe("guid", () => {
     it("should generate a GUID with default prefix", () => {
       const result = service.guid();
-      expect(result).toMatch(/^chart[0-9a-f\-]{36}$/i);
+      expect(result).toMatch(/^chart[0-9a-f-]{36}$/i);
     });
 
     it("should generate a GUID with custom prefix", () => {
       const result = service.guid("custom");
-      expect(result).toMatch(/^custom[0-9a-f\-]{36}$/i);
+      expect(result).toMatch(/^custom[0-9a-f-]{36}$/i);
     });
 
     it("should generate unique GUIDs", () => {
@@ -64,7 +60,7 @@ describe("UtilityService", () => {
 
     it("should handle empty prefix", () => {
       const result = service.guid("");
-      expect(result).toMatch(/^[0-9a-f\-]{36}$/i);
+      expect(result).toMatch(/^[0-9a-f-]{36}$/i);
     });
   });
 

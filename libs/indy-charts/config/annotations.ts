@@ -3,6 +3,7 @@ import { AnnotationOptions, LabelAnnotationOptions, ScaleValue } from "chartjs-p
 
 import { ChartSettings } from "./types";
 import { FONT_FAMILY } from "./common";
+import { getThemeColors } from "./theme-colors";
 
 export function commonLegendAnnotation(
   labelText: string,
@@ -11,8 +12,7 @@ export function commonLegendAnnotation(
   yAdj: number = 0,
   settings: ChartSettings
 ): AnnotationOptions & LabelAnnotationOptions {
-  const fontColor = settings.isDarkTheme ? "#9E9E9E" : "#121316";
-  const fillColor = settings.isDarkTheme ? "#12131680" : "#FAF9FD90";
+  const themeColors = getThemeColors(settings);
 
   const legendFont: FontSpec = {
     family: FONT_FAMILY,
@@ -28,8 +28,8 @@ export function commonLegendAnnotation(
     content: [labelText],
     textAlign: "start",
     font: legendFont,
-    color: fontColor,
-    backgroundColor: fillColor,
+    color: themeColors.text,
+    backgroundColor: themeColors.background,
     padding: 0,
     position: "start",
     xScaleID: "x",

@@ -4,7 +4,7 @@ This guide shows how to render financial charts using `@facioquo/indy-charts` in
 
 ## Step 1: Initialize once
 
-Call `setupIndyCharts()` once at application startup to register all Chart.js components, financial chart types, and required plugins:
+Call `setupIndyCharts()` once at application startup to prepare the charting library:
 
 ```typescript
 import { setupIndyCharts } from "@facioquo/indy-charts";
@@ -12,7 +12,7 @@ import { setupIndyCharts } from "@facioquo/indy-charts";
 setupIndyCharts();
 ```
 
-Call this before creating any chart instances — once per application lifecycle. Safe to call multiple times; subsequent calls are no-ops.
+Call this before creating any charts. It's safe to call multiple times; subsequent calls have no effect.
 
 ## Step 2: Connect your API
 
@@ -80,21 +80,21 @@ Add the oscillator canvas to your HTML alongside the overlay canvas:
 
 ## Using VitePress
 
-The Vue adapter wraps the API above in a global `<StockIndicatorChart>` component, removing the need for manual canvas management. Works with VitePress, Nuxt, or any Vue 3 app.
+For VitePress sites, use the built-in `<StockIndicatorChart>` component—no manual canvas management needed. Configure it once in your theme.
 
-### Register the adapter
+### Set up the component
 
 In `.vitepress/theme/index.ts`:
 
 ```typescript
 import DefaultTheme from "vitepress/theme";
 
-import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
+import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
 
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
-    setupIndyChartsForVue(app, {
+    setupIndyChartsForVitePress(app, {
       api: { baseUrl: "https://api.example.com" },
       defaults: { barCount: 250, quoteCount: 250, showTooltips: true },
       indicators: {

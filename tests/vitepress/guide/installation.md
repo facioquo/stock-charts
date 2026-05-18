@@ -43,18 +43,12 @@ The main library providing:
 
 ### Bundled dependencies
 
-`chartjs-adapter-date-fns` and `date-fns` are bundled inside `@facioquo/indy-charts`.
-You do not need to install them separately.
+Date and time utilities are bundled inside `@facioquo/indy-charts`.
+You do not need to install additional date-handling packages.
 
-### Transitive dependency
+### Vue integration
 
-`@facioquo/indy-charts` depends on `@facioquo/chartjs-chart-financial` internally. Most consumers should not need to install it directly.
-
-### Vue adapter
-
-Register charts once in your app entry (e.g. `main.ts` for plain Vue, or `.vitepress/theme/index.ts` for VitePress) by importing `setupIndyChartsForVue` from `@facioquo/indy-charts/vue`. Markdown page authors should use `<StockIndicatorChart />` and should not import Chart.js, the API client, or `@facioquo/chartjs-chart-financial` directly.
-
-Vue is an optional peer dependency because only the `/vue` subpath imports Vue. Consumers that use the root `@facioquo/indy-charts` APIs do not load the Vue adapter.
+For Vue applications (including VitePress), register the chart library once in your app entry point. Vue developers should use the `<StockIndicatorChart />` component for simple, interactive charts without manual Chart.js configuration.
 
 ## TypeScript
 

@@ -18,10 +18,9 @@ A simple candlestick chart with volume.
 
 ## Key points
 
-1. **Client-only rendering**: VitePress embeds the demo inside `<ClientOnly>` to avoid SSR issues with `<canvas>`
-2. **Reusable component**: `StockIndicatorChart` handles data loading, resize, cleanup, and theme synchronization
-3. **Overlay indicator**: Renders price candlesticks, volume bars, and EMA on one chart
-4. **Full stack workflow**: The demo is designed for normal dev activity against the local Web API
+1. **Interactive demo**: Charts update in real-time and respond to theme changes
+2. **Candlestick chart**: Shows price action with volume bars and moving average overlay
+3. **Ready to use**: Copy the component usage and adapt to your data source
 
 ## Next steps
 
