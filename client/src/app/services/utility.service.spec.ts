@@ -196,22 +196,28 @@ describe("UtilityService", () => {
     it("should scroll element into view at start with default offset", async () => {
       service.scrollToStart("test-id");
 
-      await vi.waitFor(() => {
-        expect(getElementByIdSpy).toHaveBeenCalledWith("test-id");
-        expect(scrollIntoViewSpy).toHaveBeenCalledWith({
-          behavior: "smooth",
-          block: "start",
-          inline: "start"
-        });
-      }, { timeout: 300 });
+      await vi.waitFor(
+        () => {
+          expect(getElementByIdSpy).toHaveBeenCalledWith("test-id");
+          expect(scrollIntoViewSpy).toHaveBeenCalledWith({
+            behavior: "smooth",
+            block: "start",
+            inline: "start"
+          });
+        },
+        { timeout: 300 }
+      );
     });
 
     it("should scroll element into view with custom offset", async () => {
       service.scrollToStart("test-id", 100);
 
-      await vi.waitFor(() => {
-        expect(scrollIntoViewSpy).toHaveBeenCalled();
-      }, { timeout: 200 });
+      await vi.waitFor(
+        () => {
+          expect(scrollIntoViewSpy).toHaveBeenCalled();
+        },
+        { timeout: 200 }
+      );
     });
 
     it("should not scroll if element does not exist", async () => {
@@ -219,17 +225,23 @@ describe("UtilityService", () => {
 
       service.scrollToStart("non-existent-id");
 
-      await vi.waitFor(() => {
-        expect(scrollIntoViewSpy).not.toHaveBeenCalled();
-      }, { timeout: 300 });
+      await vi.waitFor(
+        () => {
+          expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+        },
+        { timeout: 300 }
+      );
     });
 
     it("should handle zero offset", async () => {
       service.scrollToStart("test-id", 0);
 
-      await vi.waitFor(() => {
-        expect(scrollIntoViewSpy).toHaveBeenCalled();
-      }, { timeout: 150 });
+      await vi.waitFor(
+        () => {
+          expect(scrollIntoViewSpy).toHaveBeenCalled();
+        },
+        { timeout: 150 }
+      );
     });
   });
 
@@ -248,22 +260,28 @@ describe("UtilityService", () => {
     it("should scroll element into view at end with default offset", async () => {
       service.scrollToEnd("test-id");
 
-      await vi.waitFor(() => {
-        expect(getElementByIdSpy).toHaveBeenCalledWith("test-id");
-        expect(scrollIntoViewSpy).toHaveBeenCalledWith({
-          behavior: "smooth",
-          block: "end",
-          inline: "end"
-        });
-      }, { timeout: 300 });
+      await vi.waitFor(
+        () => {
+          expect(getElementByIdSpy).toHaveBeenCalledWith("test-id");
+          expect(scrollIntoViewSpy).toHaveBeenCalledWith({
+            behavior: "smooth",
+            block: "end",
+            inline: "end"
+          });
+        },
+        { timeout: 300 }
+      );
     });
 
     it("should scroll element into view with custom offset", async () => {
       service.scrollToEnd("test-id", 100);
 
-      await vi.waitFor(() => {
-        expect(scrollIntoViewSpy).toHaveBeenCalled();
-      }, { timeout: 200 });
+      await vi.waitFor(
+        () => {
+          expect(scrollIntoViewSpy).toHaveBeenCalled();
+        },
+        { timeout: 200 }
+      );
     });
 
     it("should not scroll if element does not exist", async () => {
@@ -271,22 +289,28 @@ describe("UtilityService", () => {
 
       service.scrollToEnd("non-existent-id");
 
-      await vi.waitFor(() => {
-        expect(scrollIntoViewSpy).not.toHaveBeenCalled();
-      }, { timeout: 300 });
+      await vi.waitFor(
+        () => {
+          expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+        },
+        { timeout: 300 }
+      );
     });
 
     it("should use end positioning for scrolling", async () => {
       service.scrollToEnd("test-id");
 
-      await vi.waitFor(() => {
-        expect(scrollIntoViewSpy).toHaveBeenCalledWith(
-          expect.objectContaining({
-            block: "end",
-            inline: "end"
-          })
-        );
-      }, { timeout: 300 });
+      await vi.waitFor(
+        () => {
+          expect(scrollIntoViewSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+              block: "end",
+              inline: "end"
+            })
+          );
+        },
+        { timeout: 300 }
+      );
     });
   });
 });

@@ -49,8 +49,7 @@ public class MainEndpointsTests
 
         // Setup HttpContext for the controller
         var httpContext = new DefaultHttpContext();
-        _controller.ControllerContext = new ControllerContext
-        {
+        _controller.ControllerContext = new ControllerContext {
             HttpContext = httpContext
         };
 
@@ -72,8 +71,7 @@ public class MainEndpointsTests
         request.Scheme = "https";
         request.Host = new HostString("localhost:5001");
 
-        _controller.ControllerContext = new ControllerContext
-        {
+        _controller.ControllerContext = new ControllerContext {
             HttpContext = httpContext
         };
 
@@ -96,8 +94,7 @@ public class MainEndpointsTests
             .ReturnsAsync(sampleQuotes);
 
         var httpContext = new DefaultHttpContext();
-        _controller.ControllerContext = new ControllerContext
-        {
+        _controller.ControllerContext = new ControllerContext {
             HttpContext = httpContext
         };
 
@@ -118,8 +115,7 @@ public class MainEndpointsTests
             .ReturnsAsync(sampleQuotes);
 
         var httpContext = new DefaultHttpContext();
-        _controller.ControllerContext = new ControllerContext
-        {
+        _controller.ControllerContext = new ControllerContext {
             HttpContext = httpContext
         };
 
@@ -140,8 +136,7 @@ public class MainEndpointsTests
             .ReturnsAsync(sampleQuotes);
 
         var httpContext = new DefaultHttpContext();
-        _controller.ControllerContext = new ControllerContext
-        {
+        _controller.ControllerContext = new ControllerContext {
             HttpContext = httpContext
         };
 
@@ -162,8 +157,7 @@ public class MainEndpointsTests
             .ReturnsAsync(sampleQuotes);
 
         var httpContext = new DefaultHttpContext();
-        _controller.ControllerContext = new ControllerContext
-        {
+        _controller.ControllerContext = new ControllerContext {
             HttpContext = httpContext
         };
 
@@ -184,8 +178,7 @@ public class MainEndpointsTests
             .ReturnsAsync(sampleQuotes);
 
         var httpContext = new DefaultHttpContext();
-        _controller.ControllerContext = new ControllerContext
-        {
+        _controller.ControllerContext = new ControllerContext {
             HttpContext = httpContext
         };
 
@@ -206,8 +199,7 @@ public class MainEndpointsTests
             .ReturnsAsync(sampleQuotes);
 
         var httpContext = new DefaultHttpContext();
-        _controller.ControllerContext = new ControllerContext
-        {
+        _controller.ControllerContext = new ControllerContext {
             HttpContext = httpContext
         };
 
