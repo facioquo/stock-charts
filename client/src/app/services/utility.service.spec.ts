@@ -65,8 +65,15 @@ describe("UtilityService", () => {
   });
 
   describe("pushMetaTags", () => {
-    let metaMock: any;
-    let titleMock: any;
+    let metaMock: {
+      getTag: Mock;
+      addTag: Mock;
+      updateTag: Mock;
+    };
+
+    let titleMock: {
+      setTitle: Mock;
+    };
 
     beforeEach(() => {
       metaMock = {
@@ -79,9 +86,17 @@ describe("UtilityService", () => {
         setTitle: vi.fn()
       };
 
-      // Inject mocks
-      (service as any).meta = metaMock;
-      (service as any).title = titleMock;
+      // Reconfigure TestBed so UtilityService receives Title and Meta mocks via DI
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          UtilityService,
+          { provide: Meta, useValue: metaMock as unknown as Meta },
+          { provide: Title, useValue: titleMock as unknown as Title }
+        ]
+      });
+
+      service = TestBed.inject(UtilityService);
     });
 
     it("should add new meta tag when it does not exist", () => {
