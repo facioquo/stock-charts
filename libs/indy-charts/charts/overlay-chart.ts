@@ -22,6 +22,7 @@ const CHART_TYPES = {
 export class OverlayChart {
   chart: Chart | undefined;
   private volumeAxisSize = 0;
+  private _latestLegendSelections: IndicatorSelection[] = [];
 
   constructor(
     private readonly ctx: CanvasRenderingContext2D | HTMLCanvasElement,
@@ -50,11 +51,39 @@ export class OverlayChart {
     chartConfig.options = buildFinancialChartOptions(chartConfig.options ?? {});
     chartConfig.data = chartData;
 
+    // Re-anchor annotations after Chart.js ResizeObserver has committed the
+    // OHLC-derived scale bounds. queueMicrotask defers until after the
+    // synchronous chart.update('resize') call completes, avoiding re-entrancy.
+    if (chartConfig.options) {
+      chartConfig.options.onResize = () => {
+        if (this._latestLegendSelections.length > 0) {
+          queueMicrotask(() => {
+            this._applyLegendAnnotations();
+          });
+        }
+      };
+    }
+
     if (this.chart) this.chart.destroy();
     this.chart = new Chart(this.ctx, chartConfig);
 
     // Return deep copy of datasets for dynamic slicing (structuredClone preserves NaN)
     return structuredClone(chartData.datasets);
+  }
+
+  /**
+   * Build full-history datasets without creating a chart.
+   * Use when the chart was initialized with a sliced view but the full
+   * dataset is needed so setBarCount() can re-slice across the entire history.
+   */
+  buildFullDatasets(allQuotes: Quote[], extraBars: number = 7): ChartDataset[] {
+    const palette = getFinancialPalette(this.settings.isDarkTheme ? "dark" : "light");
+    const { priceData } = processQuoteData(allQuotes);
+    const datasets: ChartDataset[] = [
+      buildCandlestickDataset(priceData, palette.candleBorder),
+      buildVolumeDataset(allQuotes, extraBars, palette)
+    ];
+    return structuredClone(datasets);
   }
 
   addIndicatorDatasets(results: IndicatorResult[]): void {
@@ -82,11 +111,19 @@ export class OverlayChart {
     if (!this.chart) return;
     if (!this.chart.scales["x"] || !this.chart.scales["y"]) return;
 
+    this._latestLegendSelections = overlaySelections;
+    this._applyLegendAnnotations();
+  }
+
+  private _applyLegendAnnotations(): void {
+    if (!this.chart) return;
+    if (!this.chart.scales["x"] || !this.chart.scales["y"]) return;
+
     const xPos: ScaleValue = this.chart.scales["x"].min;
     const yPos: ScaleValue = this.chart.scales["y"].max;
     let adjY = 10;
 
-    const sorted = [...overlaySelections]
+    const sorted = [...this._latestLegendSelections]
       .filter(x => x.chartType === CHART_TYPES.OVERLAY)
       .sort((a, b) => a.label.localeCompare(b.label));
 

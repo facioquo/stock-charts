@@ -40,7 +40,7 @@ The returned colors apply to all UI elements:
 export interface ThemeColors {
   text: string;           // Axis label and annotation text color
   background: string;     // Background color for labels and annotations
-  grid: string;          // Grid line color
+  grid: string;           // Grid line color
 }
 ```
 

@@ -80,6 +80,24 @@ function createMockOverlay(): Partial<OverlayChart> {
     removeIndicatorDatasets: vi.fn(),
     updateLegends: vi.fn(),
     updateTheme: vi.fn(),
+    buildFullDatasets: vi.fn().mockImplementation((quotes: Quote[]) => {
+      const priceData = quotes.map(q => ({
+        x: new Date(q.timestamp).valueOf(),
+        o: q.open,
+        h: q.high,
+        l: q.low,
+        c: q.close
+      }));
+      const volumeData = quotes.map(q => ({
+        x: new Date(q.timestamp).valueOf(),
+        y: q.volume
+      }));
+      const bgColors = quotes.map(() => "#0f0");
+      return structuredClone([
+        { type: "candlestick" as const, data: priceData },
+        { type: "bar" as const, data: volumeData, backgroundColor: bgColors }
+      ]);
+    }),
     applySlicedData: vi.fn().mockImplementation(function (this: any, fullDS: any[], start: number) {
       // Simulate real applySlicedData: slice the chart's datasets
       if (this.chart) {
@@ -321,25 +339,33 @@ describe("ChartManager", () => {
       expect(mgr.currentBarCount).toBe(50);
     });
 
-    it("calls OverlayChart.render with the full quotes", () => {
+    it("calls OverlayChart.render with sliced quotes and buildFullDatasets with all quotes", () => {
       const quotes = makeQuotes(80);
       const ctx = {} as CanvasRenderingContext2D;
 
       mgr.initializeOverlay(ctx, quotes, 40);
 
       const overlay = mgr.overlayChart as unknown as ReturnType<typeof createMockOverlay>;
-      expect(overlay.render).toHaveBeenCalledWith(quotes, 7); // default extraBars
+      // render receives the visible slice only (last 40 of 80, startIndex=40)
+      const renderArg = vi.mocked(overlay.render!).mock.calls[0][0];
+      expect(renderArg).toHaveLength(40);
+      expect(vi.mocked(overlay.render!).mock.calls[0][1]).toBe(7); // default extraBars
+      // buildFullDatasets receives all quotes so full history is cached
+      expect(overlay.buildFullDatasets).toHaveBeenCalledWith(quotes, 7);
     });
 
-    it("applies initial bar-count slice via applySlicedData", () => {
+    it("renders with sliced quotes (no separate applySlicedData on init)", () => {
       const quotes = makeQuotes(100);
       const ctx = {} as CanvasRenderingContext2D;
 
       mgr.initializeOverlay(ctx, quotes, 30);
 
       const overlay = mgr.overlayChart as unknown as ReturnType<typeof createMockOverlay>;
-      // startIndex = 100 - 30 = 70
-      expect(overlay.applySlicedData).toHaveBeenCalledWith(expect.any(Array), 70);
+      // Chart is initialized with sliced data directly — no separate applySlicedData call
+      const renderArg = vi.mocked(overlay.render!).mock.calls[0][0];
+      // startIndex = 100 - 30 = 70; render receives last 30 quotes
+      expect(renderArg).toHaveLength(30);
+      expect(overlay.applySlicedData).not.toHaveBeenCalled();
     });
 
     it("normalizes the initial bar count before slicing", () => {
@@ -350,7 +376,10 @@ describe("ChartManager", () => {
 
       const overlay = mgr.overlayChart as unknown as ReturnType<typeof createMockOverlay>;
       expect(mgr.currentBarCount).toBe(1);
-      expect(overlay.applySlicedData).toHaveBeenCalledWith(expect.any(Array), 99);
+      // render receives last 1 quote (startIndex=99)
+      const renderArg = vi.mocked(overlay.render!).mock.calls[0][0];
+      expect(renderArg).toHaveLength(1);
+      expect(overlay.applySlicedData).not.toHaveBeenCalled();
     });
 
     it("destroys a previous overlay before creating a new one", () => {

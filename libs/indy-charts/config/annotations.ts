@@ -37,7 +37,8 @@ export function commonLegendAnnotation(
     xValue: xPos,
     yValue: yPos,
     xAdjust: 0,
-    yAdjust: yAdj
+    yAdjust: yAdj,
+    adjustScaleRange: false
   };
 
   return annotation;
