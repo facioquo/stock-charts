@@ -41,20 +41,28 @@ export const chartConfigSerializer: NewPlugin = {
     // Clone via JSON for deterministic deep copy of POJO data.
     const sanitized: ChartSerializable = JSON.parse(JSON.stringify(val)) as ChartSerializable;
 
+    const isIdKey = (key: string): boolean => key === "id" || key === "guid" || key === "_id";
+
+    const normalizeValue = (
+      key: string,
+      value: unknown,
+      recurse: (v: unknown) => unknown
+    ): unknown => {
+      if (isIdKey(key)) return "[DYNAMIC_ID]";
+      if (typeof value === "function") return "[Function]";
+      const lower = key.toLowerCase();
+      if (lower.includes("time") && typeof value === "number") return "[TIMESTAMP]";
+      if (lower.includes("color") && typeof value === "string") return value.toLowerCase();
+      return recurse(value);
+    };
+
     const normalize = (obj: unknown): unknown => {
       if (Array.isArray(obj)) return obj.map(normalize);
       if (obj && typeof obj === "object") {
         const source = obj as Record<string, unknown>;
         const normalized: Record<string, unknown> = {};
         for (const [key, value] of Object.entries(source)) {
-          const lower = key.toLowerCase();
-          if (key === "id" || key === "guid" || key === "_id") normalized[key] = "[DYNAMIC_ID]";
-          else if (typeof value === "function") normalized[key] = "[Function]";
-          else if (lower.includes("time") && typeof value === "number")
-            normalized[key] = "[TIMESTAMP]";
-          else if (lower.includes("color") && typeof value === "string")
-            normalized[key] = value.toLowerCase();
-          else normalized[key] = normalize(value);
+          normalized[key] = normalizeValue(key, value, normalize);
         }
         return normalized;
       }

@@ -6,7 +6,7 @@ import { getFinancialPalette } from "./theme/colors";
 describe("financial dataset factories", () => {
   it("converts quote to OHLC point shape", () => {
     const point = toFinancialDataPoint({
-      date: new Date("2025-08-17T00:00:00.000Z"),
+      timestamp: new Date("2025-08-17T00:00:00.000Z"),
       open: 100,
       high: 110,
       low: 95,
@@ -47,7 +47,7 @@ describe("financial dataset factories", () => {
     const palette = getFinancialPalette("light");
     const quotes = [
       {
-        date: new Date("2025-08-17T00:00:00.000Z"),
+        timestamp: new Date("2025-08-17T00:00:00.000Z"),
         open: 100,
         high: 110,
         low: 95,
@@ -55,7 +55,7 @@ describe("financial dataset factories", () => {
         volume: 5000
       },
       {
-        date: new Date("2025-08-18T00:00:00.000Z"),
+        timestamp: new Date("2025-08-18T00:00:00.000Z"),
         open: 105,
         high: 109,
         low: 98,
@@ -63,7 +63,7 @@ describe("financial dataset factories", () => {
         volume: 4000
       },
       {
-        date: new Date("2025-08-19T00:00:00.000Z"),
+        timestamp: new Date("2025-08-19T00:00:00.000Z"),
         open: 99,
         high: 100,
         low: 95,

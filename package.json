@@ -4,10 +4,9 @@
   "author": "facioquo",
   "license": "Apache-2.0",
   "type": "module",
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@11.1.2",
   "engines": {
-    "node": ">=24 <25",
-    "pnpm": ">=10"
+    "node": ">=24"
   },
   "repository": {
     "type": "git",
@@ -16,6 +15,8 @@
   "scripts": {
     "postinstall": "node scripts/setup-playwright-mcp.cjs",
     "clean": "rm -rf node_modules .azurite .codacy && pnpm -r run clean",
+    "deps:check": "ncu --deep --peer",
+    "deps:update": "ncu --deep --peer --upgrade",
     "prebuild": "node scripts/generate-backup-indicators.js",
     "build": "pnpm -r run build",
     "prebuild:prod": "node scripts/generate-backup-indicators.js",
@@ -28,7 +29,7 @@
     "test:coverage": "pnpm --filter @stock-charts/client run test:coverage",
     "test:libs": "pnpm --filter @facioquo/chartjs-chart-financial --filter @facioquo/indy-charts run test",
     "pretest:dotnet": "dotnet tool restore && rm -rf server/coverage",
-    "test:dotnet": "dotnet test Charts.sln --settings .runsettings --collect:\"XPlat Code Coverage\" --results-directory ./server/coverage --logger trx && (dotnet tool run reportgenerator -reports:server/coverage/**/coverage.cobertura.xml -targetdir:server/coverage -reporttypes:lcov;TextSummary --skip:ObjectReport 2>&1 | grep -v 'LoggerMessage.g.cs' || true) && echo && cat server/coverage/Summary.txt",
+    "test:dotnet": "dotnet test Charts.sln --settings .runsettings --collect:\"XPlat Code Coverage\" --results-directory ./server/coverage --logger trx && (dotnet tool run reportgenerator -reports:server/coverage/**/coverage.cobertura.xml -targetdir:server/coverage -reporttypes:\"lcov;TextSummary\" 2>&1 | grep -v 'LoggerMessage.g.cs' || true) && echo && cat server/coverage/Summary.txt",
     "test:all": "pnpm --filter @stock-charts/client run test:coverage && pnpm run test:libs && pnpm run test:dotnet && pnpm run test:e2e",
     "smoke:package-consumption": "node scripts/smoke-indy-charts-vitepress-consumer.js",
     "lint": "bash scripts/website-lint.sh check && pnpm run lint:dotnet && pnpm run lint:md",
@@ -54,21 +55,19 @@
     "azure:functions": "cd server/Functions && func start",
     "azure:check": "func --version && azurite --version",
     "azure:clean": "rimraf ./.azurite",
-    "stop:services": "node scripts/stop-services.js",
-    "deps:check": "ncu --deep --peer",
-    "deps:update": "ncu --deep --peer --upgrade"
+    "stop:services": "node scripts/stop-services.js"
   },
   "devDependencies": {
     "azurite": "^3.35.0",
     "markdownlint-cli2": "^0.22.1",
-    "npm-check-updates": "^22.0.1",
-    "playwright": "1.59.1",
+    "npm-check-updates": "^22.2.0",
+    "playwright": "1.60.0",
     "postcss-scss": "^4.0.9",
     "prettier": "^3.8.3",
     "rimraf": "^6.1.3",
-    "stylelint": "^17.9.1",
+    "stylelint": "^17.11.1",
     "stylelint-config-standard": "^40.0.0",
-    "stylelint-scss": "^7.0.0",
+    "stylelint-scss": "^7.1.1",
     "typescript": "^6.0.3"
   }
 }

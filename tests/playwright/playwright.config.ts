@@ -33,8 +33,8 @@ export default defineConfig({
     },
     {
       command:
-        "pnpm --filter @stock-charts/vitepress-example run build && pnpm --filter @stock-charts/vitepress-example run preview",
-      url: "http://localhost:4301",
+        "pnpm --filter @stock-charts/vitepress-example run build && pnpm --filter @stock-charts/vitepress-example run preview:test",
+      url: "http://localhost:4302",
       cwd: workspaceRoot,
       reuseExistingServer: !process.env["CI"],
       timeout: 180_000
@@ -49,7 +49,7 @@ export default defineConfig({
     {
       name: "vitepress",
       testMatch: ["vitepress.spec.ts"],
-      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:4301" }
+      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:4302" }
     }
   ]
 });

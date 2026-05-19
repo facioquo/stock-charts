@@ -1,9 +1,9 @@
 import { createRenderer, nextTick } from "vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { indyChartsVitePressOptionsKey } from "./context";
+import { indyChartsVueOptionsKey } from "./context";
 import { StockIndicatorChart } from "./stock-indicator-chart";
-import type { IndyChartsVitePressOptions } from "./types";
+import type { IndyChartsVueOptions } from "./types";
 
 type TestNode = TestElement | TestText;
 
@@ -124,7 +124,7 @@ function requestUrl(input: RequestInfo | URL): string {
   return input.url;
 }
 
-const defaultOptions: IndyChartsVitePressOptions = {
+const defaultOptions: IndyChartsVueOptions = {
   api: { baseUrl: "https://localhost:5001" },
   indicators: {
     rsi: { uiid: "RSI", results: ["rsi"] }
@@ -144,7 +144,7 @@ describe("StockIndicatorChart", () => {
     );
     const root = createTestElement("root");
     const app = renderer.createApp(StockIndicatorChart, { indicator: "rsi" });
-    app.provide(indyChartsVitePressOptionsKey, defaultOptions);
+    app.provide(indyChartsVueOptionsKey, defaultOptions);
 
     app.mount(root);
     await nextTick();
@@ -159,7 +159,7 @@ describe("StockIndicatorChart", () => {
     app.unmount();
   });
 
-  it("renders the setup error when VitePress options are missing", async () => {
+  it("renders the setup error when Vue options are missing", async () => {
     const root = createTestElement("root");
     const app = renderer.createApp(StockIndicatorChart, { indicator: "rsi" });
 
@@ -168,7 +168,7 @@ describe("StockIndicatorChart", () => {
 
     const error = findByTestId(root, "stock-indicator-chart-rsi-error");
     expect(error).toBeDefined();
-    expect(textContent(error!)).toContain("setupIndyChartsForVitePress() has not been called.");
+    expect(textContent(error!)).toContain("setupIndyChartsForVue() has not been called.");
 
     app.unmount();
   });
@@ -180,7 +180,7 @@ describe("StockIndicatorChart", () => {
     );
     const root = createTestElement("root");
     const app = renderer.createApp(StockIndicatorChart, { indicator: "rsi" });
-    app.provide(indyChartsVitePressOptionsKey, defaultOptions);
+    app.provide(indyChartsVueOptionsKey, defaultOptions);
 
     app.mount(root);
 
@@ -205,7 +205,7 @@ describe("StockIndicatorChart", () => {
           return Promise.resolve(
             responseJson([
               {
-                date: "2024-01-01T00:00:00.000Z",
+                timestamp: "2024-01-01T00:00:00.000Z",
                 open: 100,
                 high: 105,
                 low: 95,
@@ -223,7 +223,7 @@ describe("StockIndicatorChart", () => {
     );
     const root = createTestElement("root");
     const app = renderer.createApp(StockIndicatorChart, { indicator: "rsi" });
-    app.provide(indyChartsVitePressOptionsKey, defaultOptions);
+    app.provide(indyChartsVueOptionsKey, defaultOptions);
 
     app.mount(root);
 

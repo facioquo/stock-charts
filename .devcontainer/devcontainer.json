@@ -2,7 +2,7 @@
   "name": "Dev Container",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {
+    "ghcr.io/devcontainers/features/node:2": {
       "version": "24"
     },
     "ghcr.io/devcontainers/features/dotnet:2": {
@@ -31,8 +31,8 @@
         "dotjoshjohnson.xml",
         "EditorConfig.EditorConfig",
         "esbenp.prettier-vscode",
-        "GitHub.copilot-chat",
         "GitHub.vscode-github-actions",
+        "mikestead.dotenv",
         "ms-azuretools.vscode-azurefunctions",
         "ms-azuretools.vscode-azurestorage",
         "ms-azuretools.vscode-containers",

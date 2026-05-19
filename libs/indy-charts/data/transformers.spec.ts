@@ -14,7 +14,7 @@ import type { IndicatorDataRow, IndicatorListing, IndicatorResult, Quote } from 
 
 function makeQuote(dateStr: string, close = 100, volume = 1000): Quote {
   return {
-    date: new Date(dateStr),
+    timestamp: new Date(dateStr),
     open: close - 1,
     high: close + 2,
     low: close - 3,
@@ -67,7 +67,7 @@ function makeResult(overrides?: Partial<IndicatorResult>): IndicatorResult {
 
 function makeRow(dateStr: string, values: Record<string, unknown> = {}): IndicatorDataRow {
   return {
-    date: dateStr,
+    timestamp: dateStr,
     candle: makeQuote(dateStr),
     ...values
   };
@@ -235,7 +235,7 @@ describe("buildDataPoints", () => {
 
   it("applies candle point config for candlestick-pattern category", () => {
     const candle = makeQuote("2024-01-01", 100);
-    const data: IndicatorDataRow[] = [{ date: "2024-01-01", candle, signal: 42, match: 100 }];
+    const data: IndicatorDataRow[] = [{ timestamp: "2024-01-01", candle, signal: 42, match: 100 }];
     const result = makeResult({ dataName: "signal" });
     const listing = makeListing({ category: "candlestick-pattern" });
 
@@ -249,7 +249,7 @@ describe("buildDataPoints", () => {
 
   it("applies bearish candle config for match=-100", () => {
     const candle = makeQuote("2024-01-01", 100);
-    const data: IndicatorDataRow[] = [{ date: "2024-01-01", candle, signal: 42, match: -100 }];
+    const data: IndicatorDataRow[] = [{ timestamp: "2024-01-01", candle, signal: 42, match: -100 }];
     const result = makeResult({ dataName: "signal" });
     const listing = makeListing({ category: "candlestick-pattern" });
 

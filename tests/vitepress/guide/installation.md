@@ -2,41 +2,29 @@
 
 ## Prerequisites
 
-Make sure you have Node.js 24+ installed.
+Make sure you have Node.js 22+ installed.
 
-## Install Dependencies
+## Install dependencies
 
-Install the VitePress adapter package and its setup-level peer dependencies:
+Install the package and its peer dependencies:
 
 ::: code-group
 
 ```bash [npm]
-npm install @facioquo/indy-charts \
-  chart.js \
-  chartjs-adapter-date-fns \
-  chartjs-plugin-annotation \
-  date-fns
+npm install @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 ```bash [pnpm]
-pnpm add @facioquo/indy-charts \
-  chart.js \
-  chartjs-adapter-date-fns \
-  chartjs-plugin-annotation \
-  date-fns
+pnpm add @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 ```bash [yarn]
-yarn add @facioquo/indy-charts \
-  chart.js \
-  chartjs-adapter-date-fns \
-  chartjs-plugin-annotation \
-  date-fns
+yarn add @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 :::
 
-## Package Overview
+## Package overview
 
 ### @facioquo/indy-charts
 
@@ -46,35 +34,26 @@ The main library providing:
 - Configuration builders
 - Data transformers
 - API client
-- VitePress adapter through `@facioquo/indy-charts/vitepress`
+- Vue adapter through `@facioquo/indy-charts/vue` (also works with VitePress)
 
-### Peer Dependencies
+### Peer dependencies
 
 - **chart.js**: Core charting library
-- **chartjs-adapter-date-fns**: Date handling for Chart.js
 - **chartjs-plugin-annotation**: Annotation support
-- **date-fns**: Date formatting utilities
 
-### Transitive Dependency
+### Bundled dependencies
 
-`@facioquo/indy-charts` depends on `@facioquo/chartjs-chart-financial`
-internally. Most consumers should not need to install it directly.
+Date and time utilities are bundled inside `@facioquo/indy-charts`.
+You do not need to install additional date-handling packages.
 
-### VitePress authoring imports
+### Vue integration
 
-Register charts once in `.vitepress/theme/index.ts` by importing
-`setupIndyChartsForVitePress` from `@facioquo/indy-charts/vitepress`.
-Markdown page authors should use `<StockIndicatorChart />` and should not import
-Chart.js, the API client, or `@facioquo/chartjs-chart-financial` directly.
-
-Vue is an optional peer dependency because only the VitePress subpath imports
-Vue. Consumers that use the root `@facioquo/indy-charts` APIs outside VitePress
-do not load the Vue adapter.
+For Vue applications (including VitePress), register the chart library once in your app entry point. Vue developers should use the `<StockIndicatorChart />` component for simple, interactive charts without manual Chart.js configuration.
 
 ## TypeScript
 
 Both libraries include full TypeScript definitions. No additional `@types` packages needed.
 
-## Next Steps
+## Next steps
 
 Continue to [Quick Start](/guide/quick-start) to create your first chart.

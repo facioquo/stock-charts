@@ -1,10 +1,90 @@
-# Quick Start
+# Quick start
 
-This guide will help you create your first financial chart in minutes.
+This guide shows how to render financial charts using `@facioquo/indy-charts` in any JavaScript or TypeScript project. [VitePress integration](#using-vitepress) is covered below.
 
-## Step 1: Register the VitePress adapter
+## Step 1: Initialize once
 
-Register the adapter once from `.vitepress/theme/index.ts`:
+Call `setupIndyCharts()` once at application startup to prepare the charting library:
+
+```typescript
+import { setupIndyCharts } from "@facioquo/indy-charts";
+
+setupIndyCharts();
+```
+
+Call this before creating any charts. It's safe to call multiple times; subsequent calls have no effect.
+
+## Step 2: Connect your API
+
+Create an API client pointed at your stock-charts API endpoint:
+
+```typescript
+import { createApiClient } from "@facioquo/indy-charts";
+
+const api = createApiClient({
+  baseUrl: "https://api.example.com"
+});
+```
+
+See [API client configuration](/guide/api-client) for all options.
+
+## Step 3: Render a price chart
+
+Add a canvas element to your HTML:
+
+```html
+<canvas id="overlay-chart"></canvas>
+```
+
+Initialize the chart manager and overlay chart:
+
+```typescript
+import { ChartManager } from "@facioquo/indy-charts";
+
+const quotes = await api.getQuotes();
+const manager = new ChartManager({ settings: { isDarkTheme: false, showTooltips: true } });
+
+const overlayCanvas = document.getElementById("overlay-chart") as HTMLCanvasElement;
+manager.initializeOverlay(overlayCanvas, quotes, 250);
+```
+
+## Step 4: Add an indicator
+
+Fetch available indicators, create a selection, load its data, then add it to the chart:
+
+```typescript
+import { createDefaultSelection, loadStaticIndicatorData } from "@facioquo/indy-charts";
+
+const listings = await api.getListings();
+const listing = listings.find(l => l.uiid === "RSI")!;
+const selection = createDefaultSelection(listing, { lookbackPeriods: 14 });
+
+const rawData = await api.getSelectionData(selection, listing);
+const data = loadStaticIndicatorData(rawData);
+
+manager.processSelectionData(selection, listing, data);
+manager.displaySelection(selection, listing);
+
+// Oscillator indicators (RSI, MACD, etc.) render in a separate canvas panel
+if (listing.chartType === "oscillator") {
+  const rsiCanvas = document.getElementById("rsi-chart") as HTMLCanvasElement;
+  manager.createOscillator(rsiCanvas, selection, listing);
+}
+```
+
+Add the oscillator canvas to your HTML alongside the overlay canvas:
+
+```html
+<canvas id="rsi-chart"></canvas>
+```
+
+## Using VitePress
+
+For VitePress sites, use the built-in `<StockIndicatorChart>` component—no manual canvas management needed. Configure it once in your theme.
+
+### Set up the component
+
+In `.vitepress/theme/index.ts`:
 
 ```typescript
 import DefaultTheme from "vitepress/theme";
@@ -15,7 +95,7 @@ export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
     setupIndyChartsForVitePress(app, {
-      api: { baseUrl: "https://localhost:5001" },
+      api: { baseUrl: "https://api.example.com" },
       defaults: { barCount: 250, quoteCount: 250, showTooltips: true },
       indicators: {
         rsi: {
@@ -30,9 +110,7 @@ export default {
 };
 ```
 
-## Step 2: Add a chart to Markdown
-
-Use the global component in any Markdown page:
+### Add a chart to Markdown
 
 ```vue
 <ClientOnly>
@@ -40,53 +118,18 @@ Use the global component in any Markdown page:
 </ClientOnly>
 ```
 
-## Step 3: Override page-specific options
-
-Use `config` for page-specific titles, parameters, or displayed result series:
+Override per-page options with `:config`:
 
 ```vue
 <ClientOnly>
   <StockIndicatorChart
     indicator="rsi"
-    :config="{ title: 'RSI(21)', params: { lookbackPeriods: 21 }, results: ['rsi'] }"
+    :config="{ title: 'RSI(21)', params: { lookbackPeriods: 21 } }"
   />
 </ClientOnly>
 ```
 
-## Complete Example
-
-Site setup:
-
-```typescript
-import DefaultTheme from "vitepress/theme";
-
-import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
-
-export default {
-  extends: DefaultTheme,
-  enhanceApp({ app }) {
-    setupIndyChartsForVitePress(app, {
-      api: { baseUrl: "https://localhost:5001" },
-      indicators: { ema: { uiid: "EMA", params: { lookbackPeriods: 20 } } }
-    });
-  }
-};
-```
-
-Markdown page:
-
-```vue
-<ClientOnly>
-  <StockIndicatorChart indicator="ema" />
-</ClientOnly>
-```
-
-## Advanced API usage
-
-Use `createApiClient`, `OverlayChart`, and `ChartManager` directly when building
-custom applications outside the VitePress adapter.
-
-## What's Next?
+## What's next?
 
 - See [basic example](/examples/) for a working demo
 - Learn about [indicators](/examples/indicators)

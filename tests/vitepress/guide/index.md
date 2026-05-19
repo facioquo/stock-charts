@@ -8,18 +8,18 @@
 - API client utilities and static data helpers
 - Pre-configured chart options
 
-Built on top of [@facioquo/chartjs-chart-financial](https://github.com/facioquo/stock-charts/tree/main/libs/chartjs-financial) and Chart.js.
+Built on top of [chart.js](https://chartjs.org).
 
 ## Features
 
-### Chart Types
+### Chart types
 
 - **Candlestick Charts**: Classic Japanese candlestick visualization
 - **OHLC Charts**: Open-High-Low-Close bar charts
 - **Volume Charts**: Trading volume bars with color coding
 - **Line Charts**: Price trends and indicator overlays
 
-### Technical Indicators
+### Technical indicators
 
 Support for common indicators including:
 
@@ -30,7 +30,7 @@ Support for common indicators including:
 - Bollinger Bands
 - And more...
 
-### API Client
+### API client
 
 Built-in API client with:
 
@@ -56,7 +56,7 @@ The library is organized into modules:
 - **data/**: Data transformation utilities
 - **api/**: API client and data loading
 
-## Use Cases
+## Use cases
 
 Perfect for:
 
@@ -66,7 +66,7 @@ Perfect for:
 - Technical analysis tools
 - Educational projects
 
-## Browser Support
+## Browser support
 
 Works in all modern browsers that support:
 
@@ -74,7 +74,7 @@ Works in all modern browsers that support:
 - Canvas API
 - `fetch` API
 
-## Next Steps
+## Next steps
 
 - [Installation](/guide/installation) - Install the library
 - [Quick Start](/guide/quick-start) - Create your first chart

@@ -59,7 +59,7 @@ public partial class Jobs
     /// regardless of whether the current time falls within the market-hours schedule.
     /// </remarks>
     [Function("UpdateQuotes")]
-    public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5", RunOnStartup = true)] TimerInfo _)
+    public async Task Run([TimerTrigger("0 */1 08-18 * * 1-5", RunOnStartup = true)] TimerInfo _, CancellationToken ct)
     {
         // Guard: skip the very first (RunOnStartup) execution when FUNCTIONS_RUN_ON_STARTUP_ENABLED=false.
         // RunOnStartup=true fires immediately on every host start/scale-out; disabling it in production
@@ -81,8 +81,8 @@ public partial class Jobs
         // ~ extended market hours, every minute "0 */1 08-18 * * 1-5"
         // for dev: minutely "0 */1 * * * *"
         List<Task> tasks = new() {
-            StoreQuoteDaily("SPY"),
-            StoreQuoteDaily("QQQ")
+            StoreQuoteDaily("SPY", ct),
+            StoreQuoteDaily("QQQ", ct)
         };
         await Task.WhenAll(tasks);
 
@@ -154,10 +154,11 @@ public partial class Jobs
     /// STORE QUOTES: get and store historical quotes to blob storage provider.
     /// </summary>
     /// <param name="symbol">Security symbol</param>
+    /// <param name="ct">Cancellation token</param>
     /// <remarks>
     /// Assumes credentials have been validated before calling this method
     /// </remarks>
-    private async Task StoreQuoteDaily(string symbol)
+    private async Task StoreQuoteDaily(string symbol, CancellationToken ct = default)
     {
         // Credentials are pre-validated in Run method
         if (string.IsNullOrEmpty(_alpacaKey) || string.IsNullOrEmpty(_alpacaSecret))
@@ -174,29 +175,22 @@ public partial class Jobs
         DateTime from = into.Subtract(TimeSpan.FromDays(800));
 
         IPage<IBar> barSet = await alpacaDataClient.ListHistoricalBarsAsync(
-            new HistoricalBarsRequest(symbol, from, into, BarTimeFrame.Day));
+            new HistoricalBarsRequest(symbol, from, into, BarTimeFrame.Day), ct);
 
         List<Quote> quotes = new(barSet.Items.Count);
 
         // compose
         foreach (IBar bar in barSet.Items)
         {
-            quotes.Add(new Quote {
-                Date = bar.TimeUtc,
-                Open = bar.Open,
-                High = bar.High,
-                Low = bar.Low,
-                Close = bar.Close,
-                Volume = bar.Volume
-            });
+            quotes.Add(new Quote(bar.TimeUtc, bar.Open, bar.High, bar.Low, bar.Close, bar.Volume));
         }
 
         string json = JsonSerializer
-            .Serialize(quotes.OrderBy(x => x.Date));
+            .Serialize(quotes.OrderBy(x => x.Timestamp));
 
         // store in Azure Blob Storage
         string blobName = $"{symbol}-DAILY.json";
-        await _storage.PutBlobAsync(blobName, json);
+        await _storage.PutBlobAsync(blobName, json, ct);
         LogBlobUpdated(blobName);
     }
 

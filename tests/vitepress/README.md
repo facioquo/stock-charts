@@ -1,4 +1,4 @@
-# VitePress Integration Example
+# VitePress integration example
 
 Minimal VitePress site demonstrating `@facioquo/indy-charts` integration.
 
@@ -11,14 +11,14 @@ This example shows how to use the indy-charts VitePress adapter in a documentati
 - Technical indicators
 - Multiple chart layouts
 
-## Getting Started
+## Getting started
 
 ### Prerequisites
 
 - Node.js 24+
 - pnpm (recommended)
 
-### Install Dependencies
+### Install dependencies
 
 From the repository root:
 
@@ -26,28 +26,28 @@ From the repository root:
 pnpm install
 ```
 
-### Run Development Server
+### Run development server
 
 ```bash
 cd tests/vitepress
 pnpm run dev
 ```
 
-The site will be available at `http://localhost:4300`.
+The site will be available locally at the address shown in your dev server output.
 
-### Build for Production
+### Build for production
 
 ```bash
 pnpm run build
 ```
 
-### Preview Production Build
+### Preview production build
 
 ```bash
 pnpm run preview
 ```
 
-## Project Structure
+## Project structure
 
 ```text
 tests/vitepress/
@@ -68,18 +68,18 @@ tests/vitepress/
 └── package.json
 ```
 
-## Key Features
+## Key features
 
 ### VitePress adapter (recommended pattern)
 
 The theme registers `StockIndicatorChart` once with site-level API and indicator defaults:
 
 ```typescript
-import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
+import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
 export default {
   enhanceApp({ app }) {
-    setupIndyChartsForVitePress(app, {
+    setupIndyChartsForVue(app, {
       api: { baseUrl: "https://localhost:5001" },
       indicators: {
         rsi: { uiid: "RSI", params: { lookbackPeriods: 14 }, results: ["rsi"] }
@@ -97,13 +97,13 @@ Markdown pages use the global component directly:
 </ClientOnly>
 ```
 
-### Live Examples
+### Live examples
 
 - `/examples/` renders a live overlay indicator chart through `StockIndicatorChart`
 - `/examples/indicators` renders a live oscillator chart through `StockIndicatorChart`
 - `/examples/multiple` is currently a recipe page (truthful code, no live embed)
 
-### TypeScript Support
+### TypeScript support
 
 Full TypeScript support with type checking enabled in VitePress config.
 
@@ -135,10 +135,10 @@ If you encounter module resolution issues, ensure:
 
 Check:
 
-- `setupIndyChartsForVitePress()` is called from `.vitepress/theme/index.ts`
-- The adapter API `baseUrl` matches the running Web API (`https://localhost:5001` by default)
+- `setupIndyChartsForVue()` is called from `.vitepress/theme/index.ts`
+- The adapter API `baseUrl` matches the running Web API address
 - The requested indicator is registered in the adapter `indicators` config
-- Local Web API CORS includes VitePress dev/preview ports (`4300` / `4301`)
+- Local Web API CORS includes the VitePress dev and preview origins
 
 ## Resources
 

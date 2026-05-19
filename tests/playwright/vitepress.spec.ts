@@ -1,7 +1,7 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
 
 interface MockQuote {
-  date: string;
+  timestamp: string;
   open: number;
   high: number;
   low: number;
@@ -16,7 +16,7 @@ function createQuotes(count: number): MockQuote[] {
     date.setUTCDate(date.getUTCDate() + index);
     const base = 100 + index * 0.35;
     return {
-      date: date.toISOString(),
+      timestamp: date.toISOString(),
       open: base,
       high: base + 2,
       low: base - 2,
@@ -105,32 +105,34 @@ const mockListings = [
 ];
 
 async function mockChartApi(page: Page): Promise<void> {
-  await page.route("https://localhost:5001/quotes", route =>
-    route.fulfill({ json: mockQuotes, headers: { "access-control-allow-origin": "*" } })
-  );
-  await page.route("https://localhost:5001/indicators", route =>
-    route.fulfill({ json: mockListings, headers: { "access-control-allow-origin": "*" } })
-  );
-  await page.route("https://localhost:5001/ema**", route =>
-    route.fulfill({
-      json: mockQuotes.map((quote, index) => ({
-        date: quote.date,
-        candle: quote,
-        ema: quote.close - 1 + index / 200
-      })),
-      headers: { "access-control-allow-origin": "*" }
-    })
-  );
-  await page.route("https://localhost:5001/rsi**", route =>
-    route.fulfill({
-      json: mockQuotes.map((quote, index) => ({
-        date: quote.date,
-        candle: quote,
-        rsi: 45 + Math.sin(index / 5) * 20
-      })),
-      headers: { "access-control-allow-origin": "*" }
-    })
-  );
+  // Pre-compute response payloads once; reused for every intercepted origin.
+  const emaData = mockQuotes.map((quote, index) => ({
+    timestamp: quote.timestamp,
+    candle: quote,
+    ema: quote.close - 1 + index / 200
+  }));
+  const rsiData = mockQuotes.map((quote, index) => ({
+    timestamp: quote.timestamp,
+    candle: quote,
+    rsi: 45 + Math.sin(index / 5) * 20
+  }));
+
+  // Intercept both the local dev server and the production API origin so the
+  // mocks work whether the VitePress site was built in DEV or PROD mode.
+  for (const base of ["https://localhost:5001", "https://stock-charts-api.azurewebsites.net"]) {
+    await page.route(`${base}/quotes`, route =>
+      route.fulfill({ json: mockQuotes, headers: { "access-control-allow-origin": "*" } })
+    );
+    await page.route(`${base}/indicators`, route =>
+      route.fulfill({ json: mockListings, headers: { "access-control-allow-origin": "*" } })
+    );
+    await page.route(`${base}/ema**`, route =>
+      route.fulfill({ json: emaData, headers: { "access-control-allow-origin": "*" } })
+    );
+    await page.route(`${base}/rsi**`, route =>
+      route.fulfill({ json: rsiData, headers: { "access-control-allow-origin": "*" } })
+    );
+  }
 }
 
 async function expectCanvasToBeNonBlank(canvas: Locator): Promise<void> {
@@ -160,7 +162,7 @@ async function expectCanvasToBeNonBlank(canvas: Locator): Promise<void> {
 test.describe("VitePress Documentation Site", () => {
   test("home page loads with correct title and heading", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle("Indy Charts Demo");
+    await expect(page).toHaveTitle("Indy Charts");
     await expect(page.getByRole("heading", { name: "Indy Charts", level: 1 })).toBeVisible();
   });
 

@@ -12,7 +12,7 @@ public class UtilitiesTests
     public void ToTimeSpan_KnownMappings_ReturnsExpected(PeriodSize periodSize, int expectedMinutes)
     {
         // Arrange & Act
-        TimeSpan result = periodSize.ToTimeSpan();
+        TimeSpan result = Utilities.ToTimeSpan(periodSize);
 
         // Assert
         Assert.Equal(TimeSpan.FromMinutes(expectedMinutes), result);
@@ -25,7 +25,7 @@ public class UtilitiesTests
     public void ToTimeSpan_KnownHourMappings_ReturnsExpected(PeriodSize periodSize, int expectedHours)
     {
         // Arrange & Act
-        TimeSpan result = periodSize.ToTimeSpan();
+        TimeSpan result = Utilities.ToTimeSpan(periodSize);
 
         // Assert
         Assert.Equal(TimeSpan.FromHours(expectedHours), result);
@@ -37,7 +37,7 @@ public class UtilitiesTests
     public void ToTimeSpan_KnownDayMappings_ReturnsExpected(PeriodSize periodSize, int expectedDays)
     {
         // Arrange & Act
-        TimeSpan result = periodSize.ToTimeSpan();
+        TimeSpan result = Utilities.ToTimeSpan(periodSize);
 
         // Assert
         Assert.Equal(TimeSpan.FromDays(expectedDays), result);
@@ -50,7 +50,7 @@ public class UtilitiesTests
         const PeriodSize unsupportedPeriod = PeriodSize.Month;
 
         // Act & Assert
-        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(() => unsupportedPeriod.ToTimeSpan());
+        ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(() => Utilities.ToTimeSpan(unsupportedPeriod));
         Assert.Equal("periodSize", exception.ParamName);
         Assert.Contains("Unsupported PeriodSize value", exception.Message);
         Assert.Contains("Month", exception.Message);

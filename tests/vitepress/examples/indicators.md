@@ -1,4 +1,4 @@
-# Charts with Indicators
+# Charts with indicators
 
 Example showing how to add technical indicators to charts.
 
@@ -10,9 +10,7 @@ This example demonstrates:
 - Adding RSI (Relative Strength Index) oscillator
 - Customizing indicator parameters
 
-## Live Demo
-
-> **Requires full stack demo services**: Start the Web API (and supporting services) with the VS Code task `Run: VitePress chart demo full stack`.
+## Live demo
 
 <ClientOnly>
   <StockIndicatorChart indicator="rsi" />
@@ -26,9 +24,9 @@ This example demonstrates:
 </ClientOnly>
 ```
 
-## Available Indicators
+## Available indicators
 
-### Overlay Indicators
+### Overlay indicators
 
 Displayed on the main price chart:
 
@@ -37,7 +35,7 @@ Displayed on the main price chart:
 - **Bollinger Bands**: Volatility bands
 - **VWAP**: Volume Weighted Average Price
 
-### Oscillator Indicators
+### Oscillator indicators
 
 Displayed in separate chart below:
 
@@ -61,10 +59,10 @@ Use the `config` prop when a page needs to override the site-level indicator reg
 
 ## Notes
 
-- The live demo above uses the VitePress adapter registered by the site theme.
-- Use additional `StockIndicatorChart` instances for additional indicators.
+- Add multiple `<StockIndicatorChart>` instances to display different indicators on the same page.
+- Charts automatically respect your site's dark/light theme preference.
 
-## Next Steps
+## Next steps
 
 - Learn about [multiple charts](/examples/multiple)
 - Read the [quick-start guide](/guide/quick-start)

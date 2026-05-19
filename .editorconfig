@@ -14,6 +14,7 @@ double_quote_style = double       # Use double quotes for strings
 
 # Markdown files
 [*.md]
+max_line_length = off
 trim_trailing_whitespace = false
 
 # JSON, XML, and .NET projects
@@ -30,6 +31,7 @@ end_of_line = crlf                # Use CRLF for Windows specific files
 indent_size = 4                   # Use 4 spaces for .NET files
 tab_width = 4                     # Set tab width to 4 spaces
 
+# .NET and C# style and code analyis settings
 dotnet_sort_system_directives_first = true               # Place System.* usings before others
 dotnet_separate_import_directive_groups = false          # Don't add blank lines between using directives
 dotnet_style_prefer_single_quotes = false:suggestion     # Prefer double quotes
@@ -44,5 +46,5 @@ csharp_style_expression_bodied_methods = true:silent     # Allow expression-bodi
 csharp_style_expression_bodied_properties = true:silent  # Allow expression-bodied properties
 
 # Diagnostic overrides
-dotnet_diagnostic.IDE0058.severity = none     # Disable "use '_' discard" value warnings
-dotnet_diagnostic.CA1873.severity = warning   # Avoid potentially expensive logging
+dotnet_diagnostic.IDE0058.severity = none                # Disable "use '_' discard" value warnings
+dotnet_diagnostic.CA1873.severity = warning              # Avoid potentially expensive logging

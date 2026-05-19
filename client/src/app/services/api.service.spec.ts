@@ -38,23 +38,39 @@ describe("ApiService", () => {
   });
 
   it("should return quotes from API when available", () => {
-    const mockQuotes = [
-      { date: new Date("2023-01-01"), open: 100, high: 105, low: 99, close: 103, volume: 1000000 }
+    const rawMock: RawQuote[] = [
+      {
+        timestamp: "2023-01-01T00:00:00.000Z",
+        open: 100,
+        high: 105,
+        low: 99,
+        close: 103,
+        volume: 1000000
+      }
     ];
 
     service.getQuotes().subscribe(quotes => {
-      expect(quotes).toEqual(mockQuotes);
+      expect(quotes).toEqual([
+        {
+          timestamp: new Date("2023-01-01T00:00:00.000Z"),
+          open: 100,
+          high: 105,
+          low: 99,
+          close: 103,
+          volume: 1000000
+        }
+      ]);
     });
 
     const req = httpMock.expectOne(`${env.api}/quotes`);
     expect(req.request.method).toBe("GET");
-    req.flush(mockQuotes);
+    req.flush(rawMock);
   });
 
   it("should fallback to client backup quotes when API fails", () => {
     service.getQuotes().subscribe(quotes => {
       expect(quotes.length).toBeGreaterThan(0);
-      expect(quotes[0].date instanceof Date).toBe(true);
+      expect(quotes[0].timestamp instanceof Date).toBe(true);
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         "Backend API unavailable, using client-side backup quotes",
         expect.any(Object)
@@ -74,7 +90,7 @@ describe("ApiService", () => {
   it("should fallback to client backup quotes when API returns server error", () => {
     service.getQuotes().subscribe(quotes => {
       expect(quotes.length).toBeGreaterThan(0);
-      expect(quotes[0].date instanceof Date).toBe(true);
+      expect(quotes[0].timestamp instanceof Date).toBe(true);
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         "Backend API unavailable, using client-side backup quotes",
         expect.any(Object)
@@ -192,7 +208,7 @@ describe("ApiService", () => {
       ],
       results: []
     };
-    const mockSelectionData = [{ date: "2024-01-01", adx: 25 }];
+    const mockSelectionData = [{ timestamp: "2024-01-01", adx: 25 }];
 
     service.getSelectionData(selection, listing).subscribe(data => {
       expect(data).toEqual(mockSelectionData);
@@ -235,7 +251,7 @@ describe("ApiService", () => {
       ],
       results: []
     };
-    const mockSelectionData = [{ date: "2024-01-01", adx: 25 }];
+    const mockSelectionData = [{ timestamp: "2024-01-01", adx: 25 }];
 
     service.getSelectionData(selection, listing).subscribe(data => {
       expect(data).toEqual(mockSelectionData);

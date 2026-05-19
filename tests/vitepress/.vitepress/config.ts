@@ -1,7 +1,7 @@
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
-  title: "Indy Charts Demo",
+  title: "Indy Charts",
   description: "Financial charting with @facioquo/indy-charts",
   appearance: "dark",
 
@@ -20,19 +20,21 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: "Getting Started",
+        text: "Getting started",
         items: [
           { text: "Introduction", link: "/guide/" },
           { text: "Installation", link: "/guide/installation" },
-          { text: "Quick Start", link: "/guide/quick-start" }
+          { text: "Quick start", link: "/guide/quick-start" },
+          { text: "Theme customization", link: "/guide/themes" }
         ]
       },
       {
         text: "Examples",
         items: [
-          { text: "Basic Chart", link: "/examples/" },
-          { text: "With Indicators", link: "/examples/indicators" },
-          { text: "Multiple Charts", link: "/examples/multiple" }
+          { text: "Basic chart", link: "/examples/" },
+          { text: "With indicators", link: "/examples/indicators" },
+          { text: "Multiple charts", link: "/examples/multiple" },
+          { text: "Custom data", link: "/examples/custom-data" }
         ]
       }
     ],

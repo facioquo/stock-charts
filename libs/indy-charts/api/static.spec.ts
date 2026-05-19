@@ -8,7 +8,7 @@ import type { RawQuote } from "../config/types";
 
 function rawQuote(dateStr: string, close = 100): RawQuote {
   return {
-    date: dateStr,
+    timestamp: dateStr,
     open: close - 1,
     high: close + 1,
     low: close - 2,
@@ -26,13 +26,13 @@ describe("loadStaticQuotes", () => {
     const raw: RawQuote[] = [rawQuote("2024-01-15T00:00:00Z")];
     const [q] = loadStaticQuotes(raw);
 
-    expect(q.date).toBeInstanceOf(Date);
-    expect(q.date.toISOString()).toBe("2024-01-15T00:00:00.000Z");
+    expect(q.timestamp).toBeInstanceOf(Date);
+    expect(q.timestamp.toISOString()).toBe("2024-01-15T00:00:00.000Z");
   });
 
   it("preserves all OHLCV fields", () => {
     const raw: RawQuote[] = [
-      { date: "2024-06-01", open: 10, high: 20, low: 5, close: 15, volume: 9999 }
+      { timestamp: "2024-06-01", open: 10, high: 20, low: 5, close: 15, volume: 9999 }
     ];
     const [q] = loadStaticQuotes(raw);
 
@@ -66,13 +66,13 @@ describe("loadStaticQuotes", () => {
 describe("loadStaticIndicatorData", () => {
   it("returns typed array from raw data", () => {
     const raw = [
-      { date: "2024-01-01", sma: 50.5 },
-      { date: "2024-01-02", sma: 51.0 }
+      { timestamp: "2024-01-01", sma: 50.5 },
+      { timestamp: "2024-01-02", sma: 51.0 }
     ];
     const result = loadStaticIndicatorData(raw);
 
     expect(result).toHaveLength(2);
-    expect(result[0]).toHaveProperty("date", "2024-01-01");
+    expect(result[0]).toHaveProperty("timestamp", "2024-01-01");
   });
 
   it("returns empty array for empty input", () => {
@@ -80,9 +80,9 @@ describe("loadStaticIndicatorData", () => {
   });
 
   it("passes through data as-is without transformation", () => {
-    const raw = [{ date: "2024-01-01", sma: null, ema: 42 }];
+    const raw = [{ timestamp: "2024-01-01", sma: null, ema: 42 }];
     const result = loadStaticIndicatorData(raw);
 
-    expect(result[0]).toStrictEqual({ date: "2024-01-01", sma: null, ema: 42 });
+    expect(result[0]).toStrictEqual({ timestamp: "2024-01-01", sma: null, ema: 42 });
   });
 });

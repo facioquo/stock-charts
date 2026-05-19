@@ -30,10 +30,10 @@ function generateBackupQuotes(seed: number = 12345): Quote[] {
   // Generate exactly 1000 business days
   for (let dayOffset = 0; quotes.length < 1000; dayOffset++) {
     const currentDate = new Date(startDate);
-    currentDate.setDate(currentDate.getDate() + dayOffset);
+    currentDate.setUTCDate(currentDate.getUTCDate() + dayOffset);
 
     // Skip weekends (realistic stock market data)
-    if (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
+    if (currentDate.getUTCDay() === 0 || currentDate.getUTCDay() === 6) {
       continue;
     }
 
@@ -50,7 +50,7 @@ function generateBackupQuotes(seed: number = 12345): Quote[] {
     currentPrice = quote.close;
   }
 
-  return quotes.sort((a, b) => a.date.getTime() - b.date.getTime());
+  return quotes.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 }
 
 /**
@@ -106,7 +106,7 @@ function generateDailyQuote(
   const volume = Math.floor(baseVolume * volumeMultiplier);
 
   return {
-    date: new Date(date),
+    timestamp: new Date(date),
     open: Math.round(open * 100) / 100,
     high: Math.round(high * 100) / 100,
     low: Math.round(low * 100) / 100,
@@ -119,8 +119,8 @@ function generateDailyQuote(
  * Check if a given date is a major market holiday
  */
 function isMarketHoliday(date: Date): boolean {
-  const month = date.getMonth() + 1; // getMonth() is 0-based
-  const day = date.getDate();
+  const month = date.getUTCMonth() + 1; // getUTCMonth() is 0-based
+  const day = date.getUTCDate();
 
   // New Year's Day
   if (month === 1 && day === 1) return true;
@@ -132,10 +132,10 @@ function isMarketHoliday(date: Date): boolean {
   if (month === 12 && day === 25) return true;
 
   // Thanksgiving (4th Thursday in November) - simplified check
-  if (month === 11 && day >= 22 && day <= 28 && date.getDay() === 4) return true;
+  if (month === 11 && day >= 22 && day <= 28 && date.getUTCDay() === 4) return true;
 
   // Good Friday (varies, but typically in March/April) - simplified deterministic check
-  if (month === 3 && day === 25 && date.getDay() === 5) return true; // Fixed date for deterministic behavior
+  if (month === 3 && day === 25 && date.getUTCDay() === 5) return true; // Fixed date for deterministic behavior
 
   return false;
 }

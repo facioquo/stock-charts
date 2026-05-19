@@ -94,14 +94,22 @@ export class ApiService {
   }
 
   private toQuotes(raw: RawQuote[]): Quote[] {
-    // Normalize RawQuote[] to Quote[] ensuring date field is a Date instance.
-    return raw.map(q => ({
-      date: new Date(q.date),
+    // Normalize RawQuote[] to Quote[] ensuring timestamp is a valid Date instance.
+    return raw.map((q, index) => ({
+      timestamp: this.parseTimestamp(q.timestamp ?? q.date ?? "", index),
       open: q.open,
       high: q.high,
       low: q.low,
       close: q.close,
       volume: q.volume
     }));
+  }
+
+  private parseTimestamp(value: string, index: number): Date {
+    const timestamp = new Date(value);
+    if (Number.isNaN(timestamp.getTime())) {
+      throw new Error(`Invalid quote timestamp at index ${index}: "${value}"`);
+    }
+    return timestamp;
   }
 }

@@ -1,16 +1,14 @@
-# Basic Chart Example
+# Basic chart example
 
 A simple candlestick chart with volume.
 
-## Live Demo
-
-> **Requires full stack demo services**: Start the Web API (and supporting services) with the new VS Code task `Run: VitePress chart demo full stack`.
+## Live demo
 
 <ClientOnly>
   <StockIndicatorChart indicator="ema" />
 </ClientOnly>
 
-## Source Code
+## Source code
 
 ```vue
 <ClientOnly>
@@ -18,14 +16,13 @@ A simple candlestick chart with volume.
 </ClientOnly>
 ```
 
-## Key Points
+## Key points
 
-1. **Client-only rendering**: VitePress embeds the demo inside `<ClientOnly>` to avoid SSR issues with `<canvas>`
-2. **Reusable component**: `StockIndicatorChart` handles data loading, resize, cleanup, and theme synchronization
-3. **Overlay indicator**: Renders price candlesticks, volume bars, and EMA on one chart
-4. **Full stack workflow**: The demo is designed for normal dev activity against the local Web API
+1. **Interactive demo**: Charts update in real-time and respond to theme changes
+2. **Candlestick chart**: Shows price action with volume bars and moving average overlay
+3. **Ready to use**: Copy the component usage and adapt to your data source
 
-## Next Steps
+## Next steps
 
 - Add [technical indicators](/examples/indicators)
 - Create [multiple charts](/examples/multiple)

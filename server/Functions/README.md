@@ -10,46 +10,48 @@ This Azure Functions project handles scheduled data fetching and processing for 
 
 For local development, Azure Functions reads configuration from:
 
-1. **local.settings.json** - Local development settings (gitignored, placeholder values provided in `local.settings.example.json`)
+1. **`local.settings.json`** - Functions-specific settings (gitignored, template at `local.settings.example.json`)
 2. **Environment variables** - System or shell environment
-3. **User Secrets** - .NET User Secrets (secure local development)
-4. **Azure Key Vault** - Production secret management (when KEY_VAULT_URL configured)
+3. **Azure Key Vault** - Production secret management (when `KEY_VAULT_URL` configured)
 
 ### Alpaca API credentials (optional)
 
-The Functions project fetches real-time stock quotes from the [Alpaca Markets API](https://alpaca.markets/). **These credentials are optional for local development** - the application will gracefully fall back to backup quote data when credentials are not configured.
+The Functions project fetches real-time stock quotes from the [Alpaca Markets API](https://alpaca.markets/). **These credentials are optional** — the application falls back to backup quote data when they are absent.
 
-#### Option 1: Local settings file (quick start)
+#### Setup: `local.settings.json`
 
-Copy `local.settings.example.json` to `local.settings.json` and add your credentials:
+Copy `local.settings.example.json` to `local.settings.json` and fill in your credentials:
+
+```bash
+cp server/Functions/local.settings.example.json server/Functions/local.settings.json
+```
+
+Then edit `server/Functions/local.settings.json` and set `ALPACA_KEY` and `ALPACA_SECRET`:
 
 ```json
 {
+  "IsEncrypted": false,
   "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "KEY_VAULT_URL": "",
+    "FUNCTIONS_RUN_ON_STARTUP_ENABLED": "true",
     "ALPACA_KEY": "your-alpaca-api-key-here",
     "ALPACA_SECRET": "your-alpaca-secret-here"
   }
 }
 ```
 
-#### Option 2: Environment variables
+The `start-functions.js` script creates `local.settings.json` automatically from the example file if it doesn't exist, so you can also just copy and edit it manually.
+
+#### Dev container setup
+
+For dev containers, `devcontainer.json` uses `containerEnv` to inject credentials from the host shell at container creation time. Export the variables in your host shell before opening the container:
 
 ```bash
-# macOS/Linux
-export ALPACA_KEY="your-alpaca-api-key-here"
-export ALPACA_SECRET="your-alpaca-secret-here"
-
-# Windows (PowerShell)
-$env:ALPACA_KEY="your-alpaca-api-key-here"
-$env:ALPACA_SECRET="your-alpaca-secret-here"
-```
-
-#### Option 3: .NET User Secrets (recommended for local dev)
-
-```bash
-cd server/Functions
-dotnet user-secrets set "ALPACA_KEY" "your-alpaca-api-key-here"
-dotnet user-secrets set "ALPACA_SECRET" "your-alpaca-secret-here"
+export ALPACA_KEY=your-alpaca-api-key-here
+export ALPACA_SECRET=your-alpaca-secret-here
+code .  # then "Reopen in Container"
 ```
 
 #### Get free API credentials
@@ -60,10 +62,10 @@ dotnet user-secrets set "ALPACA_SECRET" "your-alpaca-secret-here"
 
 #### Behavior without credentials
 
-- Functions start successfully with warning log
+- Functions start successfully with a warning log
 - Quote updates are skipped
 - WebAPI automatically serves backup quote data
-- Full application functionality available for demo purposes
+- Full application functionality is available for demo purposes
 
 **Azure storage**: The project uses Azurite for local development, installed via npm (`azurite` package). Start with `pnpm run azure:start` or VS Code task "Run: Azure Storage".
 

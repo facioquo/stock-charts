@@ -2,7 +2,7 @@
 
 Financial charting extension for Chart.js. Provides candlestick, OHLC, and volume chart types.
 
-This is a modernized Chart.js financial plugin based on the original [chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) project.
+This is a modernized Chart.js financial plugin based on the original [chartjs/chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) project.
 
 ## Features
 
@@ -47,7 +47,7 @@ const chart = new Chart(ctx, {
 });
 ```
 
-## Chart Types
+## Chart types
 
 ### Candlestick
 
@@ -79,14 +79,14 @@ const chart = new Chart(ctx, {
 
 Use the `buildVolumeDataset()` helper to create properly configured volume datasets.
 
-## API Reference
+## API reference
 
 ### Registration
 
 - `registerFinancialCharts()`: Register all financial chart types with Chart.js
 - `financialRegisterables`: Array of registerables for manual registration
 
-### Factory Functions
+### Factory functions
 
 - `buildCandlestickDataset(priceData, borderColor)`: Create a candlestick dataset from normalized OHLC points
 - `buildVolumeDataset(quotes, extraBars, palette)`: Create a volume dataset with up/down/unchanged candle coloring
@@ -116,4 +116,4 @@ Apache-2.0 License - see LICENSE file for details.
 
 ## Credits
 
-Based on the original [chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) project by the Chart.js team.
+Based on the original [chartjs/chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial) project by the Chart.js team.

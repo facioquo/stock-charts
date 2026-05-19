@@ -15,7 +15,10 @@ export type {
   RawQuote
 } from "./types";
 
+export type { ThemeColors } from "./theme-colors";
+
 export { baseChartOptions, defaultXAxisOptions, FONT_FAMILY } from "./common";
+export { getThemeColors } from "./theme-colors";
 export { baseOverlayConfig, baseOverlayOptions } from "./overlay";
 export { baseOscillatorConfig, baseOscillatorOptions } from "./oscillator";
 export { baseDataset, createThresholdDataset } from "./datasets";

@@ -13,6 +13,6 @@ public record IndicatorListing
 
     public ChartConfig? ChartConfig { get; set; }
 
-    public ICollection<IndicatorParamConfig>? Parameters { get; set; }
+    public ICollection<IndicatorParamConfig> Parameters { get; set; } = [];
     public required ICollection<IndicatorResultConfig> Results { get; init; }
 }

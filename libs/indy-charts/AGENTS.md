@@ -1,6 +1,6 @@
 # Indicator charts (indy-charts)
 
-This Chart.js chart component is a standalone reusable library for use in generating simple depictions of indicators in documentation sites. In this repository, it must only depend on the [`@facioquo/chartjs-chart-financial`](../chartjs-financial/) package and no other elements in this workspace.
+This Chart.js chart component is a standalone reusable library for use in generating simple depictions of indicators in documentation sites. In this repository, it must only depend on the [`@facioquo/chartjs-chart-financial`](../chartjs-financial/) package and no other elements in this workspace. This package is a bundled devDependency — consumers of the published `@facioquo/indy-charts` do not need to install it separately.
 
 > Indirectly, this component does rely on the [REST API](../../server/) through configuration only.
 
@@ -9,3 +9,7 @@ Project dependencies are strictly in this direction only: indy-charts → chartj
 Its integration is confirmed and depicted in our [test VitePress website](../../tests/vitepress).
 
 This library is published privately to GitHub Packages for our organization and will never be published to public registries.
+
+## Versioning
+
+If any executable code paths in this folder are modified, increment the version in [package.json](package.json) according to normal semantic versioning protocols for major, minor, and patch increments. Incrementing version numbers should only occur once per pull request, not on every commit.

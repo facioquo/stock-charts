@@ -22,13 +22,14 @@ stock-charts/
 ├── client/                   # Angular frontend
 │   ├── src/
 │   │   ├── app/              # Angular components and services
-│   │   ├── chartjs/          # Chart.js extensions
-│   │   │   └── financial/    # Financial chart types (candlestick, OHLC)
 │   │   ├── environments/     # Environment configs
 │   │   └── styles/           # SCSS stylesheets
 │   ├── angular.json          # Angular config
 │   ├── tsconfig.json         # TypeScript config
 │   └── package.json          # Frontend dependencies
+├── libs/                     # Shared TypeScript libraries
+│   ├── chartjs-financial/    # Chart.js financial chart types (candlestick, OHLC, volume)
+│   └── indy-charts/          # Reusable financial indicator charts library
 ├── server/                   # .NET backend
 │   ├── Functions/            # Azure Functions
 │   ├── WebApi/               # REST API endpoints
@@ -44,16 +45,15 @@ stock-charts/
 ## Commands
 
 ```bash
-# Setup (automated - all platforms)
-bash scripts/setup-environment.sh  # Auto-detects OS and installs prerequisites
-# Or use VS Code: Ctrl+Shift+P → "Tasks: Run Task" → "Setup: Dev environment"
+# Setup
+# VS Code: Ctrl+Shift+P → "Tasks: Run Task" → "Setup: Dev environment"
 
 # Install dependencies
 pnpm install                   # Install all workspace dependencies
 
 # Development
-pnpm start                     # Start Angular dev server (http://localhost:4200)
-pnpm run azure:start          # Start Azurite storage emulator
+pnpm start                         # Start Angular dev server (http://localhost:4200)
+pnpm run azure:start               # Start Azurite storage emulator
 cd server/Functions && func start  # Start Azure Functions (http://localhost:7071)
 cd server/WebApi && dotnet run     # Start Web API (https://localhost:5001)
 
@@ -192,9 +192,9 @@ public class Service
 
 - **Angular v21**: Standalone components, signals-based reactivity, modern control flow (`@if`, `@for`, `@switch`)
 - **TypeScript**: Strict mode enabled, comprehensive type safety
-- **Chart.js v4+**: Financial chart extensions in `client/src/chartjs/financial/` (candlestick, OHLC, volume)
+- **Chart.js v4+**: Financial chart types in `libs/chartjs-financial/`; bundled into `@facioquo/indy-charts` dist
 - **Angular Material v21**: UI component library for consistent design
-- **pnpm workspaces**: Unified dependency management (root + client workspace)
+- **pnpm workspaces**: Unified dependency management across root and all workspace packages
 
 Client-side project dependencies are strictly in this direction only: client → indy-charts → chartjs-financial
 
@@ -208,15 +208,15 @@ Client-side project dependencies are strictly in this direction only: client →
 
 ### Financial charts integration
 
-Financial chart types (`candlestick`, `ohlc`, `volume`) are integrated as typed Chart.js extensions:
+Financial chart types (`candlestick`, `ohlc`, `volume`) are maintained in `libs/chartjs-financial/` and bundled into `@facioquo/indy-charts`:
 
-- **Location**: `client/src/chartjs/financial/`
-- **Registration**: `registerFinancialCharts()` called from `main.ts`
+- **Location**: `libs/chartjs-financial/`
+- **Registration**: `setupIndyCharts()` called from `main.ts`; `registerFinancialCharts()` is an internal detail of `@facioquo/indy-charts`
 - **Data shape**: OHLC points as `{ x: timestamp, o, h, l, c }`
 - **Theming**: `getFinancialPalette()` and `applyFinancialElementTheme()`
 - **Factories**: `buildCandlestickDataset()`, `buildVolumeDataset()`, `buildFinancialChartOptions()`
 - **Performance**: For 5k-10k candles, disable animations, use non-intersecting tooltip mode
-- **Attribution**: Derived from [chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial)
+- **Attribution**: Derived from [chartjs/chartjs-chart-financial](https://github.com/chartjs/chartjs-chart-financial)
 
 ## Boundaries
 
@@ -268,10 +268,11 @@ Financial chart types (`candlestick`, `ohlc`, `volume`) are integrated as typed 
 
 One-time setup:
 
-1. **Setup**: Run `bash scripts/setup-environment.sh` or VS Code task "Setup: Dev environment"
+1. **Setup**: VS Code task "Setup: Dev environment"
 2. **Install**: Run `pnpm install` from root
 3. **Credentials** (optional): Configure Alpaca API credentials for real-time quote updates
-   - See [server/Functions/README.md](server/Functions/README.md) for configuration options
+   - Copy `server/Functions/local.settings.example.json` to `local.settings.json` and fill in `ALPACA_KEY` and `ALPACA_SECRET`
+   - See [server/Functions/README.md](server/Functions/README.md) for details
    - Application works fully without credentials using backup quote data
    - No exceptions thrown when credentials are missing
 

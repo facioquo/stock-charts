@@ -3,31 +3,31 @@ layout: home
 
 hero:
   name: Indy Charts
-  text: Financial Charting Made Simple
+  text: Financial charting made simple
   tagline: Framework-agnostic financial charting library with technical indicators
   actions:
     - theme: brand
-      text: Get Started
+      text: Get started
       link: /guide/
     - theme: alt
-      text: View Examples
+      text: View examples
       link: /examples/
 
 features:
   - icon: 📊
-    title: Financial Charts
+    title: Financial charts
     details: Candlestick, OHLC, and volume charts built on Chart.js with full customization.
 
   - icon: 📈
-    title: Technical Indicators
+    title: Technical indicators
     details: Support for multiple indicators including SMA, EMA, RSI, MACD, and more.
 
   - icon: 🎨
-    title: Theme Support
+    title: Theme support
     details: Built-in light and dark themes with customizable color palettes.
 
   - icon: 🔧
-    title: Framework Agnostic
+    title: Framework agnostic
     details: Works with Vue, React, Angular, or vanilla JavaScript.
 
   - icon: 📦
@@ -39,20 +39,39 @@ features:
     details: Optimized for large datasets with efficient rendering and responsive chart updates.
 ---
 
-## Quick Example
+## Quick example
 
 ```typescript
-import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
+import { createApiClient, OverlayChart, setupIndyCharts } from "@facioquo/indy-charts";
+
+setupIndyCharts();
+
+const client = createApiClient({ baseUrl: "https://api.example.com" });
+const quotes = await client.getQuotes();
+
+const canvas = document.getElementById("main-chart");
+if (!(canvas instanceof HTMLCanvasElement)) throw new Error("Chart canvas not found");
+
+const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true });
+chart.render(quotes.slice(-250));
+```
+
+**Using Vue?** Register the adapter once in your app entry point (e.g. `.vitepress/theme/index.ts` for VitePress, or `main.ts` for plain Vue):
+
+```typescript
+import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
 export default {
   enhanceApp({ app }) {
-    setupIndyChartsForVitePress(app, {
-      api: { baseUrl: "https://localhost:5001" },
+    setupIndyChartsForVue(app, {
+      api: { baseUrl: "https://api.example.com" },
       indicators: { ema: { uiid: "EMA", params: { lookbackPeriods: 20 } } }
     });
   }
 };
 ```
+
+Then use the global component from Markdown:
 
 ```vue
 <ClientOnly>
@@ -65,15 +84,15 @@ export default {
 ::: code-group
 
 ```bash [npm]
-npm install @facioquo/indy-charts chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
+npm install @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 ```bash [pnpm]
-pnpm add @facioquo/indy-charts chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
+pnpm add @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 ```bash [yarn]
-yarn add @facioquo/indy-charts chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
+yarn add @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 :::

@@ -14,7 +14,8 @@
     "url": "https://github.com/facioquo/stock-charts/issues"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   },
   "engines": {
     "node": ">=22"
@@ -48,11 +49,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@vitest/eslint-plugin": "^1.6.16",
-    "eslint": "^10.2.1",
+    "@vitest/eslint-plugin": "^1.6.17",
+    "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
-    "jiti": "^2.6.1",
-    "typescript-eslint": "^8.59.1",
-    "vitest": "^4.1.5"
+    "jiti": "^2.7.0",
+    "typescript-eslint": "^8.59.3",
+    "vitest": "^4.1.6"
   }
 }

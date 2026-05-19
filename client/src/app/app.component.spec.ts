@@ -9,13 +9,13 @@ describe("AppComponent", () => {
    * TODO: Angular 21 + Vitest cannot resolve external templates/styles.
    * Known issue: https://github.com/angular/angular-cli/issues/32055
    *
-   * To fix, one of:
-   * 1. Install @analogjs/vite-plugin-angular and configure vitest.config.ts
-   * 2. Wait for official Angular CLI fix
-   * 3. Convert to inline template (violates project guidelines)
-   *
-   * This component has external templateUrl/styleUrls which Vitest
-   * cannot load without additional Vite plugin support.
+   * The component has external templateUrl/styleUrls which Vitest cannot load.
+   * TestBed.overrideComponent() doesn't work because the component metadata
+   * is locked before the override can apply. Workarounds:
+   * 1. Inject resolveComponentResources() manually (complex)
+   * 2. Install @analogjs/vite-plugin-angular (adds dependency)
+   * 3. Convert app.component to inline template (violates guidelines)
+   * 4. Skip component-level tests and rely on E2E tests
    */
   it.todo("should create and call loadSettings on init", async () => {
     const userServiceSpy = { loadSettings: vi.fn() } as { loadSettings: Mock };
@@ -23,13 +23,6 @@ describe("AppComponent", () => {
     await TestBed.configureTestingModule({
       imports: [RouterOutlet],
       providers: [{ provide: UserService, useValue: userServiceSpy }]
-    });
-
-    TestBed.overrideComponent(AppComponent, {
-      set: {
-        template: "<router-outlet></router-outlet>",
-        styles: []
-      }
     });
 
     await TestBed.compileComponents();

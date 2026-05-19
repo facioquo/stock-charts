@@ -4,7 +4,7 @@ import { FinancialDataPoint, FinancialPalette } from "./types/financial.types";
 import { getVolumeColor } from "./theme/colors";
 
 interface QuoteLike {
-  date: Date;
+  timestamp: Date;
   open: number;
   high: number;
   low: number;
@@ -14,7 +14,7 @@ interface QuoteLike {
 
 export function toFinancialDataPoint(quote: QuoteLike): FinancialDataPoint {
   return {
-    x: new Date(quote.date).valueOf(),
+    x: new Date(quote.timestamp).valueOf(),
     o: quote.open,
     h: quote.high,
     l: quote.low,
@@ -47,7 +47,7 @@ export function buildVolumeDataset(
   const volumeColors: string[] = [];
 
   quotes.forEach(quote => {
-    volumeData.push({ x: new Date(quote.date).valueOf(), y: quote.volume });
+    volumeData.push({ x: new Date(quote.timestamp).valueOf(), y: quote.volume });
     volumeColors.push(getVolumeColor(quote.open, quote.close, palette));
   });
 

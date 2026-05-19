@@ -4,8 +4,8 @@ namespace WebApi.Services;
 
 public interface IQuoteService
 {
-    Task<IEnumerable<Quote>> Get();
-    Task<IEnumerable<Quote>> Get(string symbol);
+    Task<IEnumerable<Quote>> Get(CancellationToken ct);
+    Task<IEnumerable<Quote>> Get(string symbol, CancellationToken ct);
 }
 
 public partial class QuoteService(
@@ -19,45 +19,33 @@ public partial class QuoteService(
     /// Get default quotes
     /// </summary>
     /// <returns cref="Quote">List of default quotes</returns>
-    public async Task<IEnumerable<Quote>> Get()
-        => await Get("QQQ");
+    public async Task<IEnumerable<Quote>> Get(CancellationToken ct)
+        => await Get("QQQ", ct);
 
     /// <summary>
     /// Get quotes for a specific symbol.
     /// </summary>
     /// <param name="symbol">"SPY" or "QQQ" only, for now</param>
-    public async Task<IEnumerable<Quote>> Get(string symbol)
+    /// <param name="ct">Cancellation token</param>
+    public async Task<IEnumerable<Quote>> Get(string symbol, CancellationToken ct)
     {
-        string blobName = $"{symbol}-DAILY.json";
+        ArgumentNullException.ThrowIfNull(symbol);
 
+        symbol = symbol.Trim().ToUpperInvariant();
+        if (symbol is not "SPY" and not "QQQ")
+        {
+            throw new ArgumentException("symbol must be \"SPY\" or \"QQQ\".", nameof(symbol));
+        }
+
+        string blobName = $"{symbol}-DAILY.json";
         try
         {
-            BlobClient blob = _storage.GetBlobClient(blobName);
+            return await TryGetBlobQuotesAsync(blobName, ct) ?? QuoteBackup.BackupQuotes;
+        }
 
-            if (!await blob.ExistsAsync())
-            {
-                LogBlobNotFound(blobName);
-                return QuoteBackup.BackupQuotes;
-            }
-
-            Response<BlobDownloadInfo> response = await blob.DownloadAsync();
-            await using Stream? stream = response?.Value.Content;
-
-            if (stream == null)
-            {
-                LogDownloadStreamNull(blobName);
-                return QuoteBackup.BackupQuotes;
-            }
-
-            List<Quote>? quotes = await JsonSerializer.DeserializeAsync<List<Quote>>(stream);
-
-            if (quotes == null || quotes.Count == 0)
-            {
-                LogNoQuotesFound(blobName);
-                return QuoteBackup.BackupQuotes;
-            }
-
-            return quotes.OrderBy(x => x.Date);
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw;
         }
 
         // failover to backup quotes for local development and testing
@@ -66,6 +54,36 @@ public partial class QuoteService(
             LogRetrieveQuotesFailed(ex, symbol);
             return QuoteBackup.BackupQuotes;
         }
+    }
+
+    private async Task<IEnumerable<Quote>?> TryGetBlobQuotesAsync(string blobName, CancellationToken ct)
+    {
+        BlobClient blob = _storage.GetBlobClient(blobName);
+
+        if (!await blob.ExistsAsync(ct))
+        {
+            LogBlobNotFound(blobName);
+            return null;
+        }
+
+        Response<BlobDownloadInfo> response = await blob.DownloadAsync(ct);
+        await using Stream? stream = response?.Value.Content;
+
+        if (stream == null)
+        {
+            LogDownloadStreamNull(blobName);
+            return null;
+        }
+
+        List<Quote>? quotes = await JsonSerializer.DeserializeAsync<List<Quote>>(stream, cancellationToken: ct);
+
+        if (quotes == null || quotes.Count == 0)
+        {
+            LogNoQuotesFound(blobName);
+            return null;
+        }
+
+        return quotes.OrderBy(x => x.Timestamp);
     }
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Blob {BlobName} not found, using backup data")]

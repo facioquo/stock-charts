@@ -9,6 +9,7 @@
     "dev": "pnpm run build:libs && vitepress dev --host 0.0.0.0 --port 4300",
     "build": "pnpm run build:libs && vitepress build",
     "preview": "vitepress preview --port 4301",
+    "preview:test": "vitepress preview --port 4302",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -21,11 +22,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.2.1",
+    "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
-    "jiti": "^2.6.1",
-    "typescript-eslint": "^8.59.1",
+    "jiti": "^2.7.0",
+    "typescript-eslint": "^8.59.3",
     "vitepress": "2.0.0-alpha.16",
-    "vue": "3.5.33"
+    "vue": "3.5.34"
   }
 }

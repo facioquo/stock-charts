@@ -1,53 +1,16 @@
-:root {
-  --indy-demo-border: color-mix(in srgb, var(--vp-c-divider) 72%, transparent);
-  --indy-demo-bg: color-mix(in srgb, var(--vp-c-bg-soft) 85%, white 15%);
-  --indy-demo-bg-alt: color-mix(in srgb, var(--vp-c-bg) 90%, var(--vp-c-bg-soft) 10%);
-  --indy-demo-shadow: 0 18px 42px rgb(15 23 42 / 8%);
-  --indy-demo-radius: 16px;
-}
-
-.dark {
-  --indy-demo-bg: color-mix(in srgb, var(--vp-c-bg-soft) 82%, black 18%);
-  --indy-demo-bg-alt: color-mix(in srgb, var(--vp-c-bg) 88%, black 12%);
-  --indy-demo-shadow: 0 16px 36px rgb(0 0 0 / 28%);
-}
-
 .indy-demo {
-  border: 1px solid var(--indy-demo-border);
-  border-radius: var(--indy-demo-radius);
-  background: linear-gradient(180deg, var(--indy-demo-bg), var(--indy-demo-bg-alt));
-  box-shadow: var(--indy-demo-shadow);
-  padding: 14px;
-  margin: 18px 0 24px;
+  margin: 8px 0 24px;
   overflow: hidden;
   max-width: 100%;
   box-sizing: border-box;
 }
 
 .indy-demo__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.indy-demo__title {
-  margin: 0;
-  font-size: 14px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--vp-c-text-2);
-}
-
-.indy-demo__hint {
-  margin: 0;
-  font-size: 12px;
-  color: var(--vp-c-text-3);
+  display: none;
 }
 
 .indy-demo__status {
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 10px 12px;
   font-size: 13px;
   line-height: 1.4;
@@ -85,20 +48,12 @@
 }
 
 .indy-demo__panel {
-  border: 1px solid var(--indy-demo-border);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--vp-c-bg) 94%, transparent);
-  padding: 10px;
   overflow: hidden;
   min-width: 0;
 }
 
 .indy-demo__panel-title {
-  margin: 0 0 8px;
-  font-size: 12px;
-  color: var(--vp-c-text-2);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  display: none;
 }
 
 .indy-demo__canvas-wrap {
@@ -108,22 +63,22 @@
 }
 
 .indy-demo__canvas-wrap--overlay {
-  aspect-ratio: 2.5;
+  aspect-ratio: 2;
 }
 
 @media (width <= 880px) {
   .indy-demo__canvas-wrap--overlay {
-    aspect-ratio: 2;
+    aspect-ratio: 1.6;
   }
 }
 
 .indy-demo__canvas-wrap--oscillator {
-  aspect-ratio: 10;
+  aspect-ratio: 6;
 }
 
 @media (width <= 880px) {
   .indy-demo__canvas-wrap--oscillator {
-    aspect-ratio: 8;
+    aspect-ratio: 5;
   }
 }
 

@@ -94,14 +94,20 @@ export class ChartManager {
     this._overlayChart?.destroy();
     this._overlayChart = new OverlayChart(ctx, this._settings);
 
-    // Render with full allQuotes so stored datasets cover complete history,
-    // enabling correct slicing when setBarCount() is called later.
-    const fullDatasets = this._overlayChart.render(allQuotes, this.extraBars);
-    this._allProcessedDatasets.set("overlay-main", fullDatasets);
-
-    // Apply initial barCount slice for display.
+    // Slice quotes to barCount so the chart is initialized with the visible
+    // data range only. This gives Chart.js correct y-axis bounds from the
+    // start, matching production behavior where charts always receive
+    // pre-sliced data. Rendering with all historical quotes first causes
+    // the y-axis to lock to the full price range (~$540–$950) even after
+    // a subsequent applySlicedData() + chart.update() call.
     const startIndex = Math.max(0, allQuotes.length - this._currentBarCount);
-    this._overlayChart.applySlicedData(fullDatasets, startIndex);
+    const slicedQuotes = allQuotes.slice(startIndex);
+    this._overlayChart.render(slicedQuotes, this.extraBars);
+
+    // Build and store the full-history datasets separately so setBarCount()
+    // can re-slice across the entire history without re-rendering the chart.
+    const fullDatasets = this._overlayChart.buildFullDatasets(allQuotes, this.extraBars);
+    this._allProcessedDatasets.set("overlay-main", fullDatasets);
 
     // Re-attach previously registered overlay selections so they survive
     // overlay re-initialization (e.g., theme/canvas reset). Without this,

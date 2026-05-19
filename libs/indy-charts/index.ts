@@ -16,7 +16,8 @@ export type {
   IndicatorResultConfig,
   IndicatorSelection,
   Quote,
-  RawQuote
+  RawQuote,
+  ThemeColors
 } from "./config";
 
 export {
@@ -28,7 +29,8 @@ export {
   baseOverlayOptions,
   commonLegendAnnotation,
   defaultXAxisOptions,
-  FONT_FAMILY
+  FONT_FAMILY,
+  getThemeColors
 } from "./config";
 
 // Chart abstractions

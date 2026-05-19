@@ -14,7 +14,12 @@ if (!pnpmCli) {
 }
 
 function runPnpm(args, cwd = workspaceRoot) {
-  const result = spawnSync(process.execPath, [pnpmCli, ...args], {
+  // pnpm may be a native binary (e.g. @pnpm/exe) rather than a JS wrapper.
+  // Run it directly in that case; otherwise invoke it via Node.js.
+  const isJsWrapper = pnpmCli.endsWith(".js") || pnpmCli.endsWith(".cjs");
+  const cmd = isJsWrapper ? process.execPath : pnpmCli;
+  const cmdArgs = isJsWrapper ? [pnpmCli, ...args] : args;
+  const result = spawnSync(cmd, cmdArgs, {
     cwd,
     stdio: "inherit"
   });
@@ -50,24 +55,9 @@ try {
   mkdirSync(packDir, { recursive: true });
   mkdirSync(path.join(consumerDir, "docs", ".vitepress", "theme"), { recursive: true });
 
-  runPnpm([
-    "--filter",
-    "@facioquo/chartjs-chart-financial",
-    "--filter",
-    "@facioquo/indy-charts",
-    "run",
-    "build"
-  ]);
-  runPnpm([
-    "--filter",
-    "@facioquo/chartjs-chart-financial",
-    "pack",
-    "--pack-destination",
-    packDir
-  ]);
+  runPnpm(["--filter", "@facioquo/indy-charts...", "run", "build"]);
   runPnpm(["--filter", "@facioquo/indy-charts", "pack", "--pack-destination", packDir]);
 
-  const financialTarball = packedTarball("@facioquo/chartjs-chart-financial");
   const indyChartsTarball = packedTarball("@facioquo/indy-charts");
 
   writeFileSync(
@@ -83,20 +73,10 @@ try {
         dependencies: {
           "@facioquo/indy-charts": packageFileSpec(consumerDir, indyChartsTarball),
           "chart.js": "4.5.1",
-          "chartjs-adapter-date-fns": "3.0.0",
           "chartjs-plugin-annotation": "3.1.0",
-          "date-fns": "^4.1.0",
           vitepress: "2.0.0-alpha.16",
           vue: "3.5.33"
         },
-        pnpm: {
-          overrides: {
-            "@facioquo/chartjs-chart-financial@0.1.0": packageFileSpec(
-              consumerDir,
-              financialTarball
-            )
-          }
-        }
       },
       null,
       2
@@ -111,7 +91,7 @@ export default defineConfig({
   title: "Packed indy-charts smoke test",
   vite: {
     ssr: {
-      noExternal: ["@facioquo/indy-charts", "chartjs-adapter-date-fns", "chart.js", "date-fns"]
+      noExternal: ["@facioquo/indy-charts", "chart.js"]
     }
   }
 });
@@ -122,12 +102,12 @@ export default defineConfig({
     path.join(consumerDir, "docs", ".vitepress", "theme", "index.ts"),
     `import DefaultTheme from "vitepress/theme";
 
-import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
+import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
-    setupIndyChartsForVitePress(app, {
+    setupIndyChartsForVue(app, {
       api: { baseUrl: "https://localhost:5001" },
       indicators: {
         rsi: { uiid: "RSI", params: { lookbackPeriods: 14 }, results: ["rsi"] }

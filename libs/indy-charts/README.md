@@ -5,7 +5,7 @@ Framework-agnostic financial charting library with technical indicators and stoc
 ## Installation
 
 ```bash
-npm install @facioquo/indy-charts chart.js chartjs-adapter-date-fns chartjs-plugin-annotation date-fns
+npm install @facioquo/indy-charts chart.js chartjs-plugin-annotation vue
 ```
 
 ## Quick Start
@@ -34,16 +34,16 @@ const chart = new OverlayChart(canvas, {
 chart.render(quotes.slice(-250));
 ```
 
-## Usage with VitePress
+## Usage with Vue
 
-Register the optional VitePress adapter once in `.vitepress/theme/index.ts`:
+Register the optional Vue adapter once in your app entry point (e.g. `.vitepress/theme/index.ts` for VitePress, or `main.ts` for plain Vue):
 
 ```typescript
-import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
+import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
 export default {
   enhanceApp({ app }) {
-    setupIndyChartsForVitePress(app, {
+    setupIndyChartsForVue(app, {
       api: { baseUrl: "https://api.example.com" },
       defaults: { barCount: 250, quoteCount: 250, showTooltips: true },
       indicators: {
@@ -66,7 +66,6 @@ Then use the global component from Markdown:
 
 Apache-2.0 License - see the repository LICENSE file for details.
 
-## Related Projects
+## Related projects
 
-- [@facioquo/chartjs-chart-financial](../chartjs-financial) - Chart.js financial chart types
-- [stock-charts](https://github.com/facioquo/stock-charts) - Full-featured Angular application
+- [facioquo/stock-charts](https://github.com/facioquo/stock-charts) - website demonstrating use of `@facioquo/indy-charts` and NuGet `Skender.Stock.Indicators`

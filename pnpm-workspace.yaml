@@ -5,10 +5,10 @@ packages:
   - tests/playwright
   - tests/vitepress
 
-ignoredBuiltDependencies:
-  - '@parcel/watcher'
-  - esbuild
-  - lmdb
-  - msgpackr-extract
-  - unrs-resolver
-  - vue-demi
+allowBuilds:
+  '@parcel/watcher': false
+  esbuild: false
+  lmdb: false
+  msgpackr-extract: false
+  unrs-resolver: false
+  vue-demi: false
