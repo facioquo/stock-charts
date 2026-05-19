@@ -350,6 +350,12 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public Task<IActionResult> GetVortex(int lookbackPeriods)
         => Get(quotes => quotes.ToVortex(lookbackPeriods));
 
+    [HttpGet("VWAP")]
+    public Task<IActionResult> GetVwap()
+        => Get(quotes => quotes.Count == 0
+            ? []
+            : quotes.ToVwap(quotes.TakeLast(limitLast).First().Timestamp));
+
     [HttpGet("VWMA")]
     public Task<IActionResult> GetVwma(int lookbackPeriods)
         => Get(quotes => quotes.ToVwma(lookbackPeriods));

@@ -3835,6 +3835,30 @@
     ]
   },
   {
+    "name": "Volume Weighted Average Price (VWAP)",
+    "uiid": "VWAP",
+    "legendTemplate": "VWAP",
+    "endpoint": "/VWAP/",
+    "category": "moving-average",
+    "chartType": "overlay",
+    "order": 1,
+    "chartConfig": null,
+    "parameters": [],
+    "results": [
+      {
+        "displayName": "VWAP",
+        "tooltipTemplate": "VWAP",
+        "dataName": "vwap",
+        "dataType": "number",
+        "lineType": "solid",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#1E88E5",
+        "fill": null
+      }
+    ]
+  },
+  {
     "name": "Volume Weighted Moving Average (VWMA)",
     "uiid": "VWMA",
     "legendTemplate": "VWMA([P1])",
