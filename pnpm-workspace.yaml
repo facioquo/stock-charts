@@ -5,6 +5,9 @@ packages:
   - tests/playwright
   - tests/vitepress
 
+minimumReleaseAge: 0
+minimumReleaseAgeStrict: false
+
 allowBuilds:
   '@parcel/watcher': false
   esbuild: false

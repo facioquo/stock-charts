@@ -21,6 +21,17 @@
       "group": "none"
     },
     {
+      "label": "Install: Chrome for Puppeteer",
+      "detail": "Install Chrome browser for Puppeteer-based accessibility testing",
+      "type": "shell",
+      "command": "pnpm dlx puppeteer browsers install chrome",
+      "presentation": {
+        "echo": false,
+        "clear": true,
+        "panel": "shared"
+      }
+    },
+    {
       "label": "Initialize: Pull, rebuild, and verify",
       "detail": "Pull latest, clean, rebuild, format, lint, and run tests",
       "dependsOn": [
