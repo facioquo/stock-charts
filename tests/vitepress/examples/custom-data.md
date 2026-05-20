@@ -14,8 +14,7 @@ Render a chart directly from your own quote data — no API required.
 
 ## How it works
 
-`OverlayChart` is a lower-level building block exported from `@facioquo/indy-charts`. Unlike
-`StockIndicatorChart`, it does not fetch data from an API — you supply the quotes directly.
+`OverlayChart` is a lower-level building block exported from `@facioquo/indy-charts`. Unlike `StockIndicatorChart`, it does not fetch data from an API — you supply the quotes directly.
 
 ```typescript
 import { OverlayChart, loadStaticQuotes } from "@facioquo/indy-charts";
@@ -92,8 +91,7 @@ onBeforeUnmount(() => {
 - **`RawQuote`**: input shape with ISO string `timestamp` and numeric OHLCV fields
 - **`loadStaticQuotes`**: converts `timestamp` strings to `Date` objects, returning `Quote[]`
 - **`OverlayChart`**: renders candlestick and volume directly onto a `<canvas>` element
-- **Theme sync**: re-create the chart on `document.documentElement` class changes to
-  follow the page's dark / light mode automatically
+- **Theme sync**: re-create the chart on `document.documentElement` class changes to follow the page's dark / light mode automatically
 - **Cleanup**: always call `chart.destroy()` in the component's unmount hook
 
 ## Next steps

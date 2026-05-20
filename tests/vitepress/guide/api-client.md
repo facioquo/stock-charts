@@ -1,7 +1,6 @@
 # API client configuration
 
-The `@facioquo/indy-charts` library includes a lightweight API client for
-fetching quotes and indicator data from the stock-charts Web API.
+The `@facioquo/indy-charts` library includes a lightweight API client for fetching quotes and indicator data from the stock-charts Web API.
 
 ## Basic usage
 
@@ -43,8 +42,7 @@ const rows = await client.getSelectionData(selection, listing);
 
 - `getQuotes()` fetches quote history from `GET /quotes`
 - `getListings()` fetches indicator metadata from `GET /indicators`
-- `getSelectionData(selection, listing)` fetches computed indicator rows using
-  the listing endpoint and `selection.params`
+- `getSelectionData(selection, listing)` fetches computed indicator rows using the listing endpoint and `selection.params`
 
 ## Data format
 
