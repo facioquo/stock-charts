@@ -21,7 +21,7 @@ export default {
       defaults: {
         barCount: 250,
         quoteCount: 250,
-        showTooltips: true
+        showTooltips: false
       },
       theme: {
         isDarkTheme: true,
