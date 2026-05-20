@@ -111,7 +111,9 @@ describe("ApiService", () => {
 
   it("client backup quotes should have realistic data structure", () => {
     const quotes = backupQuotes as ApiQuote[];
-    expect(quotes.length).toBeGreaterThanOrEqual(0);
+    expect(quotes.length).toBeGreaterThan(0);
+    expect(quotes[0]).toHaveProperty("open");
+    expect(quotes[0]).toHaveProperty("close");
   });
 
   it("should return indicators from API when available", () => {

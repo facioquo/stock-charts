@@ -8,13 +8,23 @@ export function loadStaticQuotes(
   raw: Array<{ timestamp: string | Date; open: number; high: number; low: number; close: number; volume: number }>
 ): Quote[] {
   return raw.map((q, index) => ({
-    timestamp: q.timestamp instanceof Date ? q.timestamp : parseTimestamp(q.timestamp, index),
+    timestamp: normalizeTimestamp(q.timestamp, index),
     open: q.open,
     high: q.high,
     low: q.low,
     close: q.close,
     volume: q.volume
   }));
+}
+
+function normalizeTimestamp(value: string | Date, index: number): Date {
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) {
+      throw new Error(`Invalid timestamp at index ${index}: "${value.toString()}"`);
+    }
+    return value;
+  }
+  return parseTimestamp(value, index);
 }
 
 function parseTimestamp(value: string, index: number): Date {

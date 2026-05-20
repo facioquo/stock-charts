@@ -57,9 +57,9 @@ describe("loadStaticQuotes", () => {
     ];
     const result = loadStaticQuotes(quotes);
 
-    expect(quotes).toHaveLength(3);
-    expect(quotes[0].close).toBe(50);
-    expect(quotes[2].close).toBe(70);
+    expect(result).toHaveLength(3);
+    expect(result[0].close).toBe(50);
+    expect(result[2].close).toBe(70);
   });
 });
 

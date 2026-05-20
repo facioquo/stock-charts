@@ -76,11 +76,29 @@ export interface ApiClient {
   getSelectionData(selection: IndicatorSelection, listing: IndicatorListing): Promise<unknown[]>;
 }
 
-function normalizeQuotes(quotes: Quote[]): Quote[] {
-  return quotes.map((q, index) => ({
-    ...q,
-    timestamp: q.timestamp instanceof Date ? q.timestamp : parseQuoteDate(q.timestamp, index)
-  }));
+function normalizeQuotes(quotes: unknown[]): Quote[] {
+  return quotes.map((q, index) => {
+    if (typeof q !== "object" || q === null) {
+      throw new Error(`Invalid quote at index ${index}: expected object, got ${typeof q}`);
+    }
+    const quote = q as Record<string, unknown>;
+    const timestamp = quote["timestamp"];
+    return {
+      open: quote["open"] as number,
+      high: quote["high"] as number,
+      low: quote["low"] as number,
+      close: quote["close"] as number,
+      volume: quote["volume"] as number,
+      timestamp: timestamp instanceof Date ? normalizeQuoteDate(timestamp, index) : parseQuoteDate(String(timestamp), index)
+    };
+  });
+}
+
+function normalizeQuoteDate(value: Date, index: number): Date {
+  if (Number.isNaN(value.getTime())) {
+    throw new Error(`Invalid quote date at index ${index}: "${value.toString()}"`);
+  }
+  return value;
 }
 
 function parseQuoteDate(value: string, index: number): Date {
@@ -125,8 +143,11 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        const quotes = (await response.json()) as Quote[];
-        return normalizeQuotes(quotes);
+        const body = await response.json() as unknown;
+        if (!Array.isArray(body)) {
+          throw new Error("Invalid quotes response: expected an array");
+        }
+        return normalizeQuotes(body);
       } catch (error) {
         onError?.("Error fetching quotes", error);
         throw error;

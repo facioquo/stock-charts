@@ -26,7 +26,7 @@ const quotes: Quote[] = [
 ];
 
 const canvas = document.getElementById("my-canvas") as HTMLCanvasElement;
-const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true });
+const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: false });
 chart.render(loadStaticQuotes(quotes));
 ```
 

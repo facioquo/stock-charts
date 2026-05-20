@@ -80,7 +80,7 @@ setupIndyChartsForVue(app, {
 });
 ```
 
-The resolution order is: per-instance prop → per-instance config (prop takes precedence when both are set) → site-wide theme → built-in defaults.
+The resolution order is: per-instance prop → per-instance config → site-wide theme → built-in defaults.
 
 ## Light and dark presets
 
