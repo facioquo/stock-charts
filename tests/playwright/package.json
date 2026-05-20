@@ -1,6 +1,7 @@
 {
   "name": "@stock-charts/playwright-tests",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "devDependencies": {
     "@playwright/test": "1.60.0"
