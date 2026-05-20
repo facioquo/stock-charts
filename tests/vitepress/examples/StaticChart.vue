@@ -21,7 +21,8 @@ function renderChart(): void {
   overlayChart?.chart?.destroy();
   overlayChart = new OverlayChart(canvasEl.value, {
     isDarkTheme: isDark(),
-    showTooltips: true
+    showTooltips: true,
+    background: isDark() ? "#1b1b1f80" : "#ffffff80"
   });
   overlayChart.render(quotes);
 }
