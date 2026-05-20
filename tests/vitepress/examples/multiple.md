@@ -42,7 +42,7 @@ Independent chart instances on the same page, each with its own data window. The
 ## Notes
 
 - Each `<StockIndicatorChart>` instance manages its own `ChartManager` and data lifecycle.
-- Quote data is fetched independently per instance. For large pages, pass a consistent `quoteCount` across instances to limit API calls.
+- Quote data is fetched independently per instance. For large pages, pass a consistent `quoteCount` across instances to limit the data volume per API call.
 
 ## Next steps
 
