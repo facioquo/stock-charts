@@ -20,14 +20,14 @@ Render a chart directly from your own quote data — no API required.
 import { OverlayChart, loadStaticQuotes } from "@facioquo/indy-charts";
 import type { Quote } from "@facioquo/indy-charts";
 
-const raw: Quote[] = [
+const quotes: Quote[] = [
   { timestamp: "2025-01-02", open: 180.00, high: 182.50, low: 179.20, close: 181.80, volume: 38500000 },
   // ... more bars
 ];
 
 const canvas = document.getElementById("my-canvas") as HTMLCanvasElement;
 const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true });
-chart.render(loadStaticQuotes(raw));
+chart.render(loadStaticQuotes(quotes));
 ```
 
 ## Source code
@@ -40,12 +40,12 @@ import { ref, onMounted, onBeforeUnmount } from "vue";
 import { OverlayChart, loadStaticQuotes } from "@facioquo/indy-charts";
 import type { Quote } from "@facioquo/indy-charts";
 
-const raw: Quote[] = [
+const quotes: Quote[] = [
   { timestamp: "2025-01-02", open: 180.00, high: 182.50, low: 179.20, close: 181.80, volume: 38500000 },
   // ... more bars
 ];
 
-const quotes = loadStaticQuotes(raw);
+const processedQuotes = loadStaticQuotes(quotes);
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 let overlayChart: OverlayChart | null = null;
 let observer: MutationObserver | null = null;
@@ -62,7 +62,7 @@ function renderChart() {
     showTooltips: false,
     background: isDark() ? "#1b1b1f80" : "#ffffff80"
   });
-  overlayChart.render(quotes);
+  overlayChart.render(processedQuotes);
 }
 
 onMounted(() => {

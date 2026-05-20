@@ -15,7 +15,7 @@ const BASE_URL = "https://api.example.com";
 
 type ApiQuote = { timestamp?: string; open: number; high: number; low: number; close: number; volume: number };
 
-function rawQuote(dateStr: string, close = 100): ApiQuote {
+function createQuote(dateStr: string, close = 100): ApiQuote {
   return {
     timestamp: dateStr,
     open: close - 1,
@@ -139,8 +139,8 @@ describe("createApiClient", () => {
 
   describe("getQuotes", () => {
     it("returns Quote[] with Date objects from raw ISO strings", async () => {
-      const raw: ApiQuote[] = [rawQuote("2024-01-01T00:00:00Z"), rawQuote("2024-01-02T00:00:00Z")];
-      mockFetchOk(raw);
+      const apiQuotes: ApiQuote[] = [createQuote("2024-01-01T00:00:00Z"), createQuote("2024-01-02T00:00:00Z")];
+      mockFetchOk(apiQuotes);
 
       const quotes = await client.getQuotes();
 
@@ -163,7 +163,7 @@ describe("createApiClient", () => {
     });
 
     it("throws and calls onError when a quote date is invalid", async () => {
-      mockFetchOk([rawQuote("not-a-date")]);
+      mockFetchOk([createQuote("not-a-date")]);
 
       await expect(client.getQuotes()).rejects.toThrow(
         'Invalid quote date at index 0: "not-a-date"'
@@ -186,10 +186,10 @@ describe("createApiClient", () => {
     });
 
     it("preserves all OHLCV fields", async () => {
-      const raw: ApiQuote[] = [
+      const apiQuotes: ApiQuote[] = [
         { timestamp: "2024-06-15T00:00:00Z", open: 10, high: 20, low: 5, close: 15, volume: 9999 }
       ];
-      mockFetchOk(raw);
+      mockFetchOk(apiQuotes);
 
       const [q] = await client.getQuotes();
       expect(q).toMatchObject({
