@@ -4,6 +4,7 @@ import { enUS } from "date-fns/locale";
 import { ChartOptions, ScaleOptions, TimeUnit } from "chart.js";
 
 import { ChartSettings } from "./types";
+import { getThemeColors } from "./theme-colors";
 
 export const FONT_FAMILY = "'Google Sans', Roboto, Verdana, Helvetica, Arial, sans-serif";
 
@@ -58,7 +59,7 @@ export function baseChartOptions(settings: ChartSettings): ChartOptions {
             lineHeight: 1
           },
           showLabelBackdrop: true,
-          backdropColor: settings.isDarkTheme ? "#12131680" : "#FAF9FD90",
+          backdropColor: getThemeColors(settings).background,
           backdropPadding: {
             top: 0,
             left: 5,

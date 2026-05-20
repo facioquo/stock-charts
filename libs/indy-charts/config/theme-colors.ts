@@ -24,7 +24,11 @@ export interface ThemeColors {
  * // returns { text: '#9E9E9E', background: '#12131680', grid: '#2E2E2E' }
  */
 export function getThemeColors(settings: ChartSettings): ThemeColors {
-  return settings.isDarkTheme ? DARK_COLORS : LIGHT_COLORS;
+  const defaults = settings.isDarkTheme ? DARK_COLORS : LIGHT_COLORS;
+  if (settings.background) {
+    return { ...defaults, background: settings.background };
+  }
+  return defaults;
 }
 
 const LIGHT_COLORS: ThemeColors = {

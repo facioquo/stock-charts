@@ -48,6 +48,8 @@ export interface IndicatorDataRow {
 export interface ChartSettings {
   isDarkTheme: boolean;
   showTooltips: boolean;
+  /** Optional override for annotation and axis-label backdrop background color. */
+  background?: string;
 }
 
 // LISTING

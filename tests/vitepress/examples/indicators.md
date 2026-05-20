@@ -1,22 +1,12 @@
-# Charts with indicators
+# Oscillator chart
 
-Example showing how to add technical indicators to charts.
+Oscillator indicators render as a standalone chart — no price chart required by default.
 
-## Overview
-
-This example demonstrates:
-
-- Adding EMA/SMA-style overlay indicators
-- Adding RSI (Relative Strength Index) oscillator
-- Customizing indicator parameters
-
-## Live demo
+## Standalone oscillator
 
 <ClientOnly>
   <StockIndicatorChart indicator="rsi" />
 </ClientOnly>
-
-## Normal authoring
 
 ```vue
 <ClientOnly>
@@ -24,46 +14,40 @@ This example demonstrates:
 </ClientOnly>
 ```
 
-## Available indicators
+## Oscillator paired with price chart
 
-### Overlay indicators
+Use `:with-overlay="true"` to show the price and volume chart above the oscillator.
 
-Displayed on the main price chart:
+<ClientOnly>
+  <StockIndicatorChart indicator="rsi" :with-overlay="true" />
+</ClientOnly>
 
-- **SMA**: Simple Moving Average
-- **EMA**: Exponential Moving Average
-- **Bollinger Bands**: Volatility bands
-- **VWAP**: Volume Weighted Average Price
+```vue
+<ClientOnly>
+  <StockIndicatorChart indicator="rsi" :with-overlay="true" />
+</ClientOnly>
+```
 
-### Oscillator indicators
+## Custom parameters
 
-Displayed in separate chart below:
-
-- **RSI**: Relative Strength Index (0-100)
-- **MACD**: Moving Average Convergence Divergence
-- **Stochastic**: Stochastic oscillator
-- **CCI**: Commodity Channel Index
-
-## Custom indicator parameters
-
-Use the `config` prop when a page needs to override the site-level indicator registry:
+Use the `config` prop to override registered indicator parameters:
 
 ```vue
 <ClientOnly>
   <StockIndicatorChart
     indicator="rsi"
-    :config="{ params: { lookbackPeriods: 21 }, title: 'RSI(21)', results: ['rsi'] }"
+    :config="{ params: { lookbackPeriods: 21 }, results: ['rsi'] }"
   />
 </ClientOnly>
 ```
 
 ## Notes
 
-- Add multiple `<StockIndicatorChart>` instances to display different indicators on the same page.
+- Oscillators render standalone by default. Add `:with-overlay="true"` to pair with the price chart.
 - Charts automatically respect your site's dark/light theme preference.
 
 ## Next steps
 
-- Learn about [multiple charts](/examples/multiple)
+- See [multiple charts](/examples/multiple) for independent chart instances on one page
 - Read the [quick-start guide](/guide/quick-start)
 - Explore [installation options](/guide/installation)

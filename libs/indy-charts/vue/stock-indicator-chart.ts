@@ -71,18 +71,22 @@ export const StockIndicatorChart = defineComponent({
   props: {
     indicator: String,
     config: Object as PropType<StockIndicatorChartConfig>,
-    barCount: Number
+    barCount: Number,
+    withOverlay: Boolean,
+    background: String
   },
   setup(props) {
     const options = inject(indyChartsVueOptionsKey);
     const phase = ref<StockIndicatorChartPhase>("idle");
-    const title = ref("Stock indicator chart");
     const errorMessage = ref("Chart data is unavailable.");
     const chartType = ref<string>("overlay");
     const overlayCanvas = ref<HTMLCanvasElement | null>(null);
     const oscillatorCanvas = ref<HTMLCanvasElement | null>(null);
     const rootId = computed(() => slug(props.config?.id ?? props.indicator ?? "chart"));
     const testIdPrefix = computed(() => `stock-indicator-chart-${rootId.value}`);
+    const showOverlayCanvas = computed(
+      () => chartType.value !== "oscillator" || props.withOverlay === true
+    );
 
     let manager: ChartManager | undefined;
     let loadToken = 0;
@@ -109,7 +113,8 @@ export const StockIndicatorChart = defineComponent({
       if (!options) {
         return { isDarkTheme: false, showTooltips: true };
       }
-      return chartSettingsFromOptions(options, isDarkTheme());
+      const background = props.background ?? props.config?.background;
+      return chartSettingsFromOptions(options, isDarkTheme(), background);
     }
 
     function resolvedConfig(): StockIndicatorChartConfig {
@@ -187,15 +192,13 @@ export const StockIndicatorChart = defineComponent({
           return;
         }
 
-        title.value = config.title ?? listing.name;
         chartType.value = listing.chartType;
         phase.value = "ready";
         await nextTick();
 
         if (disposed || token !== loadToken) return;
-        if (!overlayCanvas.value) {
-          throw new Error("Overlay chart canvas is not available.");
-        }
+        const isOscillator = listing.chartType === "oscillator";
+        const needsOverlay = !isOscillator || props.withOverlay === true;
 
         setupIndyCharts();
         const barCount =
@@ -203,11 +206,18 @@ export const StockIndicatorChart = defineComponent({
         const normalizedBarCount = normalizeWindowSize(barCount, chartQuotes.length);
         const chartManager = new ChartManager({ settings: currentSettings() });
         manager = chartManager;
-        chartManager.initializeOverlay(overlayCanvas.value, chartQuotes, normalizedBarCount);
+
+        if (needsOverlay) {
+          if (!overlayCanvas.value) {
+            throw new Error("Overlay chart canvas is not available.");
+          }
+          chartManager.initializeOverlay(overlayCanvas.value, chartQuotes, normalizedBarCount);
+        }
+
         chartManager.processSelectionData(selection, listing, chartRows);
         chartManager.displaySelection(selection, listing);
 
-        if (listing.chartType === "oscillator") {
+        if (isOscillator) {
           if (!oscillatorCanvas.value) {
             throw new Error("Oscillator chart canvas is not available.");
           }
@@ -250,7 +260,7 @@ export const StockIndicatorChart = defineComponent({
     });
 
     watch(
-      () => [props.indicator, props.barCount, props.config] as const,
+      () => [props.indicator, props.barCount, props.config, props.withOverlay] as const,
       () => {
         if (!disposed && phase.value !== "idle") {
           void loadChart();
@@ -259,15 +269,18 @@ export const StockIndicatorChart = defineComponent({
       { deep: true }
     );
 
+    watch(
+      () => [props.background, props.config?.background] as const,
+      () => {
+        updateTheme();
+      }
+    );
+
     return () =>
       h(
         "section",
         { class: "indy-demo stock-indicator-chart", "data-testid": `${testIdPrefix.value}-root` },
         [
-          h("div", { class: "indy-demo__header" }, [
-            h("p", { class: "indy-demo__title" }, title.value),
-            h("p", { class: "indy-demo__hint" }, phase.value === "ready" ? "Live API data" : "")
-          ]),
           phase.value === "loading"
             ? [
                 h(
@@ -285,13 +298,10 @@ export const StockIndicatorChart = defineComponent({
                     "data-testid": `${testIdPrefix.value}-loading-layout`
                   },
                   [
-                    h("div", { class: "indy-demo__panel" }, [
-                      h("p", { class: "indy-demo__panel-title" }, "Price + volume"),
-                      h("div", {
-                        class:
-                          "indy-demo__canvas-wrap indy-demo__canvas-wrap--overlay indy-demo__canvas-wrap--placeholder"
-                      })
-                    ])
+                    h("div", {
+                      class:
+                        "indy-demo__canvas-wrap indy-demo__canvas-wrap--overlay indy-demo__canvas-wrap--placeholder"
+                    })
                   ]
                 )
               ]
@@ -331,31 +341,27 @@ export const StockIndicatorChart = defineComponent({
             : null,
           phase.value === "ready"
             ? h("div", { class: "indy-demo__stack" }, [
-                h("div", { class: "indy-demo__panel" }, [
-                  h("p", { class: "indy-demo__panel-title" }, "Price + volume"),
-                  h("div", { class: "indy-demo__canvas-wrap indy-demo__canvas-wrap--overlay" }, [
-                    h("canvas", {
-                      ref: overlayCanvas,
-                      class: "indy-demo__canvas",
-                      "data-testid": `${testIdPrefix.value}-overlay-canvas`
-                    })
-                  ])
-                ]),
-                chartType.value === "oscillator"
-                  ? h("div", { class: "indy-demo__panel" }, [
-                      h("p", { class: "indy-demo__panel-title" }, title.value),
-                      h(
-                        "div",
-                        { class: "indy-demo__canvas-wrap indy-demo__canvas-wrap--oscillator" },
-                        [
-                          h("canvas", {
-                            ref: oscillatorCanvas,
-                            class: "indy-demo__canvas",
-                            "data-testid": `${testIdPrefix.value}-oscillator-canvas`
-                          })
-                        ]
-                      )
+                showOverlayCanvas.value
+                  ? h("div", { class: "indy-demo__canvas-wrap indy-demo__canvas-wrap--overlay" }, [
+                      h("canvas", {
+                        ref: overlayCanvas,
+                        class: "indy-demo__canvas",
+                        "data-testid": `${testIdPrefix.value}-overlay-canvas`
+                      })
                     ])
+                  : null,
+                chartType.value === "oscillator"
+                  ? h(
+                      "div",
+                      { class: "indy-demo__canvas-wrap indy-demo__canvas-wrap--oscillator" },
+                      [
+                        h("canvas", {
+                          ref: oscillatorCanvas,
+                          class: "indy-demo__canvas",
+                          "data-testid": `${testIdPrefix.value}-oscillator-canvas`
+                        })
+                      ]
+                    )
                   : null
               ])
             : null

@@ -31,8 +31,8 @@ export default defineConfig({
       {
         text: "Examples",
         items: [
-          { text: "Basic chart", link: "/examples/" },
-          { text: "With indicators", link: "/examples/indicators" },
+          { text: "Overlay chart", link: "/examples/" },
+          { text: "Oscillator chart", link: "/examples/indicators" },
           { text: "Multiple charts", link: "/examples/multiple" },
           { text: "Custom data", link: "/examples/custom-data" }
         ]

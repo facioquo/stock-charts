@@ -1,136 +1,51 @@
 # Multiple charts
 
-Example showing how to manage multiple independent charts.
+Independent chart instances on the same page, each with its own data window. The indicator's type determines rendering: overlay indicators (like EMA) appear on the price chart; oscillators (like RSI) render standalone; add `:with-overlay="true"` to pair an oscillator with the price chart.
 
-## Overview
+## Overlay chart
 
-This example demonstrates:
+<ClientOnly>
+  <StockIndicatorChart indicator="ema" />
+</ClientOnly>
 
-- Creating multiple chart managers
-- Reusing one quote source across views
-- Coordinating chart window sizes in application code
+## Standalone oscillator
 
-## Status
+<ClientOnly>
+  <StockIndicatorChart indicator="rsi" />
+</ClientOnly>
 
-This page is currently a **recipe page** (code example only), not a live
-embedded demo. The code below uses real `@facioquo/indy-charts` APIs.
+## Oscillator with price chart
 
-## Basic multiple charts
+<ClientOnly>
+  <StockIndicatorChart indicator="rsi" :with-overlay="true" />
+</ClientOnly>
 
-```typescript
-import { ChartManager, createApiClient, setupIndyCharts } from "@facioquo/indy-charts";
+## Source code
 
-setupIndyCharts();
-const client = createApiClient({ baseUrl: "https://api.example.com" });
-const quotes = await client.getQuotes();
+```vue
+<!-- Overlay chart (EMA on price) -->
+<ClientOnly>
+  <StockIndicatorChart indicator="ema" />
+</ClientOnly>
 
-const settings = { isDarkTheme: false, showTooltips: true };
-const manager1 = new ChartManager({
-  settings
-});
-const manager2 = new ChartManager({
-  settings
-});
+<!-- Standalone oscillator -->
+<ClientOnly>
+  <StockIndicatorChart indicator="rsi" />
+</ClientOnly>
 
-manager1.initializeOverlay(
-  document.getElementById("chart1-main") as HTMLCanvasElement,
-  quotes,
-  250
-);
-
-manager2.initializeOverlay(
-  document.getElementById("chart2-main") as HTMLCanvasElement,
-  quotes,
-  120
-);
+<!-- Oscillator paired with price chart -->
+<ClientOnly>
+  <StockIndicatorChart indicator="rsi" :with-overlay="true" />
+</ClientOnly>
 ```
 
-## HTML layout
+## Notes
 
-```html
-<div class="charts-grid">
-  <div class="chart-panel">
-    <h2>Longer Window (250 bars)</h2>
-    <canvas id="chart1-main"></canvas>
-  </div>
-
-  <div class="chart-panel">
-    <h2>Shorter Window (120 bars)</h2>
-    <canvas id="chart2-main"></canvas>
-  </div>
-</div>
-
-<style>
-  .charts-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    padding: 20px;
-  }
-
-  .chart-panel {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-  }
-
-  canvas {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-</style>
-```
-
-## Chart comparison
-
-Create a side-by-side comparison with a shared quote source and different
-window sizes:
-
-```typescript
-const quotes = await client.getQuotes();
-const windows = [250, 120, 60];
-
-const managers = windows.map((barCount, index) => {
-  const manager = new ChartManager({ settings });
-  manager.initializeOverlay(
-    document.getElementById(`chart${index}-main`) as HTMLCanvasElement,
-    quotes,
-    barCount
-  );
-  return manager;
-});
-```
-
-## Coordinated window changes (application-level)
-
-`ChartManager` does not provide built-in synchronized zoom events. Coordinate
-window changes in your app by applying `setBarCount()` to each instance:
-
-```typescript
-const managers = [manager1, manager2];
-
-function applyWindow(barCount: number) {
-  managers.forEach(manager => manager.setBarCount(barCount));
-}
-
-applyWindow(180);
-```
-
-## Performance considerations
-
-When managing multiple charts:
-
-1. **Lazy Loading**: Create charts only when visible
-2. **Virtual Scrolling**: For large grids of charts
-3. **Debounce Updates**: Batch data updates
-4. **Destroy Unused**: Clean up charts when switching views
-
-```typescript
-managers.forEach(manager => manager.destroy());
-```
+- Each `<StockIndicatorChart>` instance manages its own `ChartManager` and data lifecycle.
+- Shared quote data is fetched independently per instance. For large pages, pass a shared
+  `quoteCount` to limit API calls.
 
 ## Next steps
 
-- Learn about [installation](/guide/installation)
 - Read the [quick-start guide](/guide/quick-start)
-- Return to [guide index](/guide/)
+- Explore [installation options](/guide/installation)

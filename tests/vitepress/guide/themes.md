@@ -12,13 +12,13 @@ By default, charts automatically detect your site's theme:
 Colors are applied consistently to:
 
 - Axis labels and values
-- Annotation backgrounds
+- Annotation backgrounds (legend labels)
 - Grid lines
 - Chart grid colors
 
 ## Customizing theme colors
 
-For advanced use cases, you can customize the theme colors by using the `getThemeColors()` function:
+For advanced use cases, you can read the current theme colors using `getThemeColors()`:
 
 ```typescript
 import { getThemeColors } from "@facioquo/indy-charts";
@@ -38,11 +38,49 @@ The returned colors apply to all UI elements:
 
 ```typescript
 export interface ThemeColors {
-  text: string;           // Axis label and annotation text color
-  background: string;     // Background color for labels and annotations
-  grid: string;           // Grid line color
+  text: string;       // Axis label and annotation text color
+  background: string; // Background color for labels and annotations
+  grid: string;       // Grid line color
 }
 ```
+
+## Background color
+
+Annotation labels and mirrored axis-tick labels are rendered with a semi-transparent background that should match the chart's container background. The defaults work for standard VitePress themes, but if your page uses a custom background (for example, a colored card or a panel with a distinct surface color) you can override the background per chart or site-wide.
+
+### Per-instance override
+
+Pass `background` as a prop or inside `:config` to override for a single chart:
+
+```vue
+<!-- Prop -->
+<StockIndicatorChart indicator="rsi" background="#1a1b20cc" />
+
+<!-- Config object -->
+<StockIndicatorChart
+  indicator="rsi"
+  :config="{ background: '#1a1b20cc' }"
+/>
+```
+
+The value can be any CSS color string — hex, `rgba()`, or `hsla()` all work.
+
+### Site-wide override
+
+When your site uses the same custom background for all charts, set `darkBackground` and/or `lightBackground` in `setupIndyChartsForVue`:
+
+```typescript
+setupIndyChartsForVue(app, {
+  api: { baseUrl: "https://api.example.com" },
+  theme: {
+    observeVitePressDarkMode: true,
+    darkBackground: "#1a1b20cc",
+    lightBackground: "#f5f5f5e6"
+  }
+});
+```
+
+The resolution order is: per-instance prop → per-instance config (prop takes precedence when both are set) → site-wide theme → built-in defaults.
 
 ## Light and dark presets
 

@@ -1,6 +1,6 @@
-# Basic chart example
+# Overlay chart
 
-A simple candlestick chart with volume.
+A candlestick price chart with volume and an EMA overlay.
 
 ## Live demo
 
@@ -19,7 +19,7 @@ A simple candlestick chart with volume.
 ## Key points
 
 1. **Interactive demo**: Charts update in real-time and respond to theme changes
-2. **Candlestick chart**: Shows price action with volume bars and moving average overlay
+2. **Overlay indicator**: EMA is plotted on the price chart alongside volume bars
 3. **Ready to use**: Copy the component usage and adapt to your data source
 
 ## Next steps
