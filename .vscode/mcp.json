@@ -30,7 +30,7 @@
     "playwright": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@playwright/test", "run-test-mcp-server"]
+      "args": ["-y", "playwright", "run-test-mcp-server"]
     }
   },
   "inputs": [

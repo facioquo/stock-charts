@@ -113,7 +113,8 @@ export const StockIndicatorChart = defineComponent({
       if (!options) {
         return { isDarkTheme: false, showTooltips: true };
       }
-      const background = props.background ?? props.config?.background;
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- intentional: treats empty string as absent
+      const background = props.background || props.config?.background;
       return chartSettingsFromOptions(options, isDarkTheme(), background);
     }
 
