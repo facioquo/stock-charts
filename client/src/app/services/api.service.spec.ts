@@ -5,8 +5,10 @@ import { MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "v
 import { env } from "../../environments/environment";
 import backupIndicators from "../data/backup-indicators.json";
 import backupQuotes from "../data/backup-quotes.json"; // Added JSON quotes import
-import type { IndicatorListing, IndicatorSelection, RawQuote } from "@facioquo/indy-charts";
+import type { IndicatorListing, IndicatorSelection } from "@facioquo/indy-charts";
 import { ApiService } from "./api.service";
+
+type ApiQuote = { timestamp?: string; open: number; high: number; low: number; close: number; volume: number };
 
 const BACKUP_INDICATORS = backupIndicators as IndicatorListing[];
 
@@ -38,7 +40,7 @@ describe("ApiService", () => {
   });
 
   it("should return quotes from API when available", () => {
-    const rawMock: RawQuote[] = [
+    const rawMock: ApiQuote[] = [
       {
         timestamp: "2023-01-01T00:00:00.000Z",
         open: 100,
@@ -108,7 +110,7 @@ describe("ApiService", () => {
   });
 
   it("client backup quotes should have realistic data structure", () => {
-    const quotes = backupQuotes as RawQuote[];
+    const quotes = backupQuotes as ApiQuote[];
     expect(quotes.length).toBeGreaterThanOrEqual(0);
   });
 

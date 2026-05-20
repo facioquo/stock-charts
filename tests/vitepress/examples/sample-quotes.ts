@@ -1,10 +1,10 @@
-import type { RawQuote } from "@facioquo/indy-charts";
+import type { Quote } from "@facioquo/indy-charts";
 
 /**
  * Forty synthetic daily OHLCV bars (Jan 2 – Feb 28, 2025).
- * Demonstrates the {@link RawQuote} shape expected by `loadStaticQuotes`.
+ * Demonstrates the {@link Quote} shape expected by `loadStaticQuotes`.
  */
-export const SAMPLE_QUOTES: RawQuote[] = [
+export const SAMPLE_QUOTES: Quote[] = [
   { timestamp: "2025-01-02", open: 180.0, high: 182.5, low: 179.2, close: 181.8, volume: 38500000 },
   { timestamp: "2025-01-03", open: 181.8, high: 183.4, low: 180.5, close: 182.6, volume: 32100000 },
   { timestamp: "2025-01-06", open: 182.6, high: 184.2, low: 181.0, close: 183.4, volume: 29800000 },

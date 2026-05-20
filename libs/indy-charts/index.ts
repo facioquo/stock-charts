@@ -16,7 +16,6 @@ export type {
   IndicatorResultConfig,
   IndicatorSelection,
   Quote,
-  RawQuote,
   ThemeColors
 } from "./config";
 

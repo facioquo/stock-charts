@@ -2,8 +2,7 @@ import {
   IndicatorListing,
   IndicatorParam,
   IndicatorSelection,
-  Quote,
-  RawQuote
+  Quote
 } from "../config/types";
 
 /**
@@ -77,19 +76,15 @@ export interface ApiClient {
   getSelectionData(selection: IndicatorSelection, listing: IndicatorListing): Promise<unknown[]>;
 }
 
-function toQuotes(raw: RawQuote[]): Quote[] {
-  return raw.map((q, index) => ({
-    timestamp: parseQuoteDate(q.timestamp?.trim() ?? q.date?.trim() ?? "", index),
-    open: q.open,
-    high: q.high,
-    low: q.low,
-    close: q.close,
-    volume: q.volume
+function normalizeQuotes(quotes: Quote[]): Quote[] {
+  return quotes.map((q, index) => ({
+    ...q,
+    timestamp: q.timestamp instanceof Date ? q.timestamp : parseQuoteDate(q.timestamp, index)
   }));
 }
 
 function parseQuoteDate(value: string, index: number): Date {
-  const date = new Date(value);
+  const date = new Date(value.trim());
   if (Number.isNaN(date.getTime())) {
     throw new Error(`Invalid quote date at index ${index}: "${value}"`);
   }
@@ -130,8 +125,8 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        const raw = (await response.json()) as RawQuote[];
-        return toQuotes(raw);
+        const quotes = (await response.json()) as Quote[];
+        return normalizeQuotes(quotes);
       } catch (error) {
         onError?.("Error fetching quotes", error);
         throw error;

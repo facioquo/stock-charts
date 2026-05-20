@@ -8,8 +8,7 @@ import {
   IndicatorListing,
   IndicatorParam,
   IndicatorSelection,
-  Quote,
-  RawQuote
+  Quote
 } from "@facioquo/indy-charts";
 
 @Injectable({ providedIn: "root" })
@@ -17,7 +16,8 @@ export class ApiService {
   private readonly http = inject(HttpClient);
 
   getQuotes(): Observable<Quote[]> {
-    return this.http.get<RawQuote[]>(`${env.api}/quotes`, this.requestHeader()).pipe(
+    type ApiQuote = { timestamp?: string; date?: string; open: number; high: number; low: number; close: number; volume: number };
+    return this.http.get<ApiQuote[]>(`${env.api}/quotes`, this.requestHeader()).pipe(
       map(res => this.toQuotes(res)),
       catchError((error: HttpErrorResponse) => {
         console.warn("Backend API unavailable, using client-side backup quotes", {
@@ -26,7 +26,7 @@ export class ApiService {
           url: error.url,
           message: error.message
         });
-        return of(this.toQuotes(backupQuotes as RawQuote[]));
+        return of(this.toQuotes(backupQuotes as ApiQuote[]));
       })
     );
   }
@@ -93,8 +93,8 @@ export class ApiService {
     );
   }
 
-  private toQuotes(raw: RawQuote[]): Quote[] {
-    // Normalize RawQuote[] to Quote[] ensuring timestamp is a valid Date instance.
+  private toQuotes(raw: Array<{ timestamp?: string; date?: string; open: number; high: number; low: number; close: number; volume: number }>): Quote[] {
+    // Normalize API quote format to Quote[] ensuring timestamp is a valid Date instance.
     return raw.map((q, index) => ({
       timestamp: this.parseTimestamp(q.timestamp ?? q.date ?? "", index),
       open: q.open,

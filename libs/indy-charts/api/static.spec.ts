@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { loadStaticQuotes, loadStaticIndicatorData } from "./static";
-import type { RawQuote } from "../config/types";
+import type { Quote } from "../config/types";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function rawQuote(dateStr: string, close = 100): RawQuote {
+function rawQuote(dateStr: string, close = 100): { timestamp: string; open: number; high: number; low: number; close: number; volume: number } {
   return {
     timestamp: dateStr,
     open: close - 1,
@@ -23,7 +23,7 @@ function rawQuote(dateStr: string, close = 100): RawQuote {
 
 describe("loadStaticQuotes", () => {
   it("converts date strings to Date objects", () => {
-    const raw: RawQuote[] = [rawQuote("2024-01-15T00:00:00Z")];
+    const raw = [rawQuote("2024-01-15T00:00:00Z")];
     const [q] = loadStaticQuotes(raw);
 
     expect(q.timestamp).toBeInstanceOf(Date);
@@ -31,7 +31,7 @@ describe("loadStaticQuotes", () => {
   });
 
   it("preserves all OHLCV fields", () => {
-    const raw: RawQuote[] = [
+    const raw = [
       { timestamp: "2024-06-01", open: 10, high: 20, low: 5, close: 15, volume: 9999 }
     ];
     const [q] = loadStaticQuotes(raw);
@@ -50,7 +50,7 @@ describe("loadStaticQuotes", () => {
   });
 
   it("preserves array order", () => {
-    const raw: RawQuote[] = [
+    const raw = [
       rawQuote("2024-01-01", 50),
       rawQuote("2024-01-02", 60),
       rawQuote("2024-01-03", 70)

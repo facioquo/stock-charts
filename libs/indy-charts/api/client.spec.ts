@@ -4,8 +4,7 @@ import type { ApiClient } from "./client";
 import type {
   IndicatorListing,
   IndicatorParam,
-  IndicatorSelection,
-  RawQuote
+  IndicatorSelection
 } from "../config/types";
 
 // ---------------------------------------------------------------------------
@@ -14,7 +13,9 @@ import type {
 
 const BASE_URL = "https://api.example.com";
 
-function rawQuote(dateStr: string, close = 100): RawQuote {
+type ApiQuote = { timestamp?: string; open: number; high: number; low: number; close: number; volume: number };
+
+function rawQuote(dateStr: string, close = 100): ApiQuote {
   return {
     timestamp: dateStr,
     open: close - 1,
@@ -138,7 +139,7 @@ describe("createApiClient", () => {
 
   describe("getQuotes", () => {
     it("returns Quote[] with Date objects from raw ISO strings", async () => {
-      const raw: RawQuote[] = [rawQuote("2024-01-01T00:00:00Z"), rawQuote("2024-01-02T00:00:00Z")];
+      const raw: ApiQuote[] = [rawQuote("2024-01-01T00:00:00Z"), rawQuote("2024-01-02T00:00:00Z")];
       mockFetchOk(raw);
 
       const quotes = await client.getQuotes();
@@ -185,7 +186,7 @@ describe("createApiClient", () => {
     });
 
     it("preserves all OHLCV fields", async () => {
-      const raw: RawQuote[] = [
+      const raw: ApiQuote[] = [
         { timestamp: "2024-06-15T00:00:00Z", open: 10, high: 20, low: 5, close: 15, volume: 9999 }
       ];
       mockFetchOk(raw);

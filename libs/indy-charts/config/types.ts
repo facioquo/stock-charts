@@ -22,18 +22,6 @@ export interface Quote {
   volume: number;
 }
 
-export interface RawQuote {
-  /** Skender.Stock.Indicators v3+ field name */
-  timestamp?: string;
-  /** @deprecated Skender v2 field name — accepted for backward compatibility */
-  date?: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-}
-
 export interface IndicatorDataRow {
   /** Skender.Stock.Indicators v3+ field name */
   timestamp?: string;

@@ -11,8 +11,7 @@ export type {
   IndicatorResult,
   IndicatorResultConfig,
   IndicatorSelection,
-  Quote,
-  RawQuote
+  Quote
 } from "./types";
 
 export type { ThemeColors } from "./theme-colors";
