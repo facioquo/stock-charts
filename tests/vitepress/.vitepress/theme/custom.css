@@ -60,12 +60,12 @@
 }
 
 .indy-demo__canvas-wrap--oscillator {
-  aspect-ratio: 6;
+  aspect-ratio: 4;
 }
 
 @media (width <= 880px) {
   .indy-demo__canvas-wrap--oscillator {
-    aspect-ratio: 5;
+    aspect-ratio: 3;
   }
 }
 
