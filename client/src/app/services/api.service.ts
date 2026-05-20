@@ -4,19 +4,22 @@ import { Observable, catchError, map, of, throwError } from "rxjs";
 import { env } from "../../environments/environment";
 import backupIndicators from "../data/backup-indicators.json";
 import backupQuotes from "../data/backup-quotes.json";
-import {
-  IndicatorListing,
-  IndicatorParam,
-  IndicatorSelection,
-  Quote
-} from "@facioquo/indy-charts";
+import { IndicatorListing, IndicatorParam, IndicatorSelection, Quote } from "@facioquo/indy-charts";
 
 @Injectable({ providedIn: "root" })
 export class ApiService {
   private readonly http = inject(HttpClient);
 
   getQuotes(): Observable<Quote[]> {
-    type ApiQuote = { timestamp?: string; date?: string; open: number; high: number; low: number; close: number; volume: number };
+    type ApiQuote = {
+      timestamp?: string;
+      date?: string;
+      open: number;
+      high: number;
+      low: number;
+      close: number;
+      volume: number;
+    };
     return this.http.get<ApiQuote[]>(`${env.api}/quotes`, this.requestHeader()).pipe(
       map(res => this.toQuotes(res)),
       catchError((error: HttpErrorResponse) => {
@@ -93,7 +96,17 @@ export class ApiService {
     );
   }
 
-  private toQuotes(raw: Array<{ timestamp?: string; date?: string; open: number; high: number; low: number; close: number; volume: number }>): Quote[] {
+  private toQuotes(
+    raw: Array<{
+      timestamp?: string;
+      date?: string;
+      open: number;
+      high: number;
+      low: number;
+      close: number;
+      volume: number;
+    }>
+  ): Quote[] {
     // Normalize API quote format to Quote[] ensuring timestamp is a valid Date instance.
     return raw.map((q, index) => ({
       timestamp: this.parseTimestamp(q.timestamp ?? q.date ?? "", index),

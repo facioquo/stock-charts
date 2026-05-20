@@ -8,7 +8,14 @@ import backupQuotes from "../data/backup-quotes.json"; // Added JSON quotes impo
 import type { IndicatorListing, IndicatorSelection } from "@facioquo/indy-charts";
 import { ApiService } from "./api.service";
 
-type ApiQuote = { timestamp?: string; open: number; high: number; low: number; close: number; volume: number };
+type ApiQuote = {
+  timestamp?: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+};
 
 const BACKUP_INDICATORS = backupIndicators as IndicatorListing[];
 
