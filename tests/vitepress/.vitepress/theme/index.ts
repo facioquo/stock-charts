@@ -25,7 +25,9 @@ export default {
       },
       theme: {
         isDarkTheme: true,
-        observeVitePressDarkMode: true
+        observeVitePressDarkMode: true,
+        darkBackground: "#1b1b1f80",
+        lightBackground: "#ffffff80"
       },
       indicators: {
         ema: {
