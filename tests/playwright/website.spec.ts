@@ -130,10 +130,12 @@ test.describe("Stock Charts Angular Website", () => {
   });
 
   test("no critical console errors during full page lifecycle", async ({ page, errorCollection }) => {
-    const consoleLogs: string[] = [];
+    const consoleErrors: string[] = [];
 
     page.on("console", (msg) => {
-      consoleLogs.push(msg.text());
+      if (msg.type() === "error") {
+        consoleErrors.push(msg.text());
+      }
     });
 
     await page.goto("/");
@@ -147,7 +149,7 @@ test.describe("Stock Charts Angular Website", () => {
     await expect(oscillatorCanvases.first()).toBeVisible({ timeout: 15_000 });
 
     // Filter out known acceptable warnings (e.g., CORS in dev, etc.)
-    const criticalErrors = consoleLogs.filter(
+    const criticalErrors = consoleErrors.filter(
       msg =>
         !msg.includes("favicon") &&
         !msg.includes("service-worker") &&
