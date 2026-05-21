@@ -108,7 +108,10 @@ describe("createApiClient", () => {
 
   beforeEach(() => {
     onError = vi.fn();
-    client = createApiClient({ baseUrl: BASE_URL, onError });
+    client = createApiClient({
+      baseUrl: BASE_URL,
+      onError: onError as (context: string, error: unknown) => void
+    });
   });
 
   afterEach(() => {

@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-Make sure you have Node.js 22+ installed.
+Make sure you have Node.js 24+ installed.
 
 ## Install dependencies
 

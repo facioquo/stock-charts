@@ -46,11 +46,11 @@ const rows = await client.getSelectionData(selection, listing);
 
 ## Data format
 
-The API expects quote data in the following format:
+The API returns quote data in the following format:
 
 ```typescript
 interface Quote {
-  date: Date;
+  timestamp: Date;
   open: number;
   high: number;
   low: number;

@@ -160,7 +160,7 @@ public class ChartService
             request.EndDate,
             ct);
 
-        return quotes.Select(q => new OhlcData(q.Date, q.Open, q.High, q.Low, q.Close));
+        return quotes.Select(q => new OhlcData(q.Timestamp, q.Open, q.High, q.Low, q.Close));
     }
 }
 ```
@@ -174,7 +174,7 @@ public class Service
     public async Task<object> Get(string s, DateTime d1, DateTime d2)
     {
         var data = await _svc.GetData(s, d1, d2);
-        return data.Select(x => new { x.Date, x.Open, x.High, x.Low, x.Close });
+        return data.Select(x => new { x.Timestamp, x.Open, x.High, x.Low, x.Close });
     }
 }
 ```
