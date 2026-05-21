@@ -5,7 +5,14 @@ import { Quote, IndicatorDataRow } from "../config/types";
  * Accepts objects with ISO 8601 string or Date timestamps and normalizes them to Date objects.
  */
 export function loadStaticQuotes(
-  raw: Array<{ timestamp: string | Date; open: number; high: number; low: number; close: number; volume: number }>
+  raw: Array<{
+    timestamp: string | Date;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    volume: number;
+  }>
 ): Quote[] {
   return raw.map((q, index) => ({
     timestamp: normalizeTimestamp(q.timestamp, index),

@@ -1,9 +1,4 @@
-import {
-  IndicatorListing,
-  IndicatorParam,
-  IndicatorSelection,
-  Quote
-} from "../config/types";
+import { IndicatorListing, IndicatorParam, IndicatorSelection, Quote } from "../config/types";
 
 /**
  * Configuration for {@link createApiClient}.
@@ -89,7 +84,10 @@ function normalizeQuotes(quotes: unknown[]): Quote[] {
       low: quote["low"] as number,
       close: quote["close"] as number,
       volume: quote["volume"] as number,
-      timestamp: timestamp instanceof Date ? normalizeQuoteDate(timestamp, index) : parseQuoteDate(String(timestamp), index)
+      timestamp:
+        timestamp instanceof Date
+          ? normalizeQuoteDate(timestamp, index)
+          : parseQuoteDate(String(timestamp), index)
     };
   });
 }
@@ -143,7 +141,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        const body = await response.json() as unknown;
+        const body = (await response.json()) as unknown;
         if (!Array.isArray(body)) {
           throw new Error("Invalid quotes response: expected an array");
         }

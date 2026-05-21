@@ -1,12 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { loadStaticQuotes, loadStaticIndicatorData } from "./static";
-import type { Quote } from "../config/types";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function createQuote(dateStr: string, close = 100): { timestamp: string; open: number; high: number; low: number; close: number; volume: number } {
+function createQuote(
+  dateStr: string,
+  close = 100
+): { timestamp: string; open: number; high: number; low: number; close: number; volume: number } {
   return {
     timestamp: dateStr,
     open: close - 1,

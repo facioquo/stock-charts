@@ -1,11 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { createApiClient } from "./client";
 import type { ApiClient } from "./client";
-import type {
-  IndicatorListing,
-  IndicatorParam,
-  IndicatorSelection
-} from "../config/types";
+import type { IndicatorListing, IndicatorParam, IndicatorSelection } from "../config/types";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -13,7 +9,14 @@ import type {
 
 const BASE_URL = "https://api.example.com";
 
-type ApiQuote = { timestamp?: string; open: number; high: number; low: number; close: number; volume: number };
+type ApiQuote = {
+  timestamp?: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+};
 
 function createQuote(dateStr: string, close = 100): ApiQuote {
   return {
@@ -139,7 +142,10 @@ describe("createApiClient", () => {
 
   describe("getQuotes", () => {
     it("returns Quote[] with Date objects from raw ISO strings", async () => {
-      const apiQuotes: ApiQuote[] = [createQuote("2024-01-01T00:00:00Z"), createQuote("2024-01-02T00:00:00Z")];
+      const apiQuotes: ApiQuote[] = [
+        createQuote("2024-01-01T00:00:00Z"),
+        createQuote("2024-01-02T00:00:00Z")
+      ];
       mockFetchOk(apiQuotes);
 
       const quotes = await client.getQuotes();

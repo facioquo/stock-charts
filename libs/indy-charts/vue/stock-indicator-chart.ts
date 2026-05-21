@@ -261,16 +261,17 @@ export const StockIndicatorChart = defineComponent({
     });
 
     watch(
-      () => [
-        props.indicator,
-        props.barCount,
-        props.withOverlay,
-        props.config?.uiid,
-        props.config?.barCount,
-        props.config?.quoteCount,
-        props.config?.params,
-        props.config?.results
-      ] as const,
+      () =>
+        [
+          props.indicator,
+          props.barCount,
+          props.withOverlay,
+          props.config?.uiid,
+          props.config?.barCount,
+          props.config?.quoteCount,
+          props.config?.params,
+          props.config?.results
+        ] as const,
       () => {
         if (!disposed && phase.value !== "idle") {
           void loadChart();
