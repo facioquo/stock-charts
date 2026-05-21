@@ -1,5 +1,5 @@
 import { test, expect } from "./fixtures";
-import type { Locator, Page } from "`@playwright/test`";
+import type { Locator, Page } from "@playwright/test";
 
 interface MockQuote {
   timestamp: string;

@@ -12,8 +12,7 @@ export class ApiService {
 
   getQuotes(): Observable<Quote[]> {
     type ApiQuote = {
-      timestamp?: string;
-      date?: string;
+      timestamp: string;
       open: number;
       high: number;
       low: number;
@@ -98,8 +97,7 @@ export class ApiService {
 
   private toQuotes(
     raw: Array<{
-      timestamp?: string;
-      date?: string;
+      timestamp: string;
       open: number;
       high: number;
       low: number;
@@ -109,7 +107,7 @@ export class ApiService {
   ): Quote[] {
     // Normalize API quote format to Quote[] ensuring timestamp is a valid Date instance.
     return raw.map((q, index) => ({
-      timestamp: this.parseTimestamp(q.timestamp ?? q.date ?? "", index),
+      timestamp: this.parseTimestamp(q.timestamp, index),
       open: q.open,
       high: q.high,
       low: q.low,

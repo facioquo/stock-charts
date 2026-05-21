@@ -72,31 +72,42 @@ export interface ApiClient {
 }
 
 function normalizeQuotes(quotes: unknown[]): Quote[] {
+  function asFiniteNumber(value: unknown, field: string, index: number): number {
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+      throw new Error(
+        `Invalid quote at index ${index}: "${field}" must be a finite number, got ${typeof value}`
+      );
+    }
+    return value;
+  }
+
   return quotes.map((q, index) => {
     if (typeof q !== "object" || q === null) {
       throw new Error(`Invalid quote at index ${index}: expected object, got ${typeof q}`);
     }
 
     const quote = q as Record<string, unknown>;
-date"];
-    // Accept both 'timestamp' (Skender v3+) and 'date' (Skender v2, deprecated)
-     const rawDate = quote["timestamp"] ?? quote["date"];
+    const rawDate = quote["timestamp"];
     if (rawDate === undefined || rawDate === null) {
-      throw new Error(`Invalid quote at index ${index}: missing 'timestamp' or 'date' field`);
+      throw new Error(`Invalid quote at index ${index}: missing 'timestamp' field`);
     }
 
     return {
-      open: quote["open"] as number,
-      high: quote["high"] as number,
-      low: quote["low"] as number,
-      close: quote["close"] as number,
-      volume: quote["volume"] as number,
+      open: asFiniteNumber(quote["open"], "open", index),
+      high: asFiniteNumber(quote["high"], "high", index),
+      low: asFiniteNumber(quote["low"], "low", index),
+      close: asFiniteNumber(quote["close"], "close", index),
+      volume: asFiniteNumber(quote["volume"], "volume", index),
       timestamp:
         rawDate instanceof Date
           ? normalizeQuoteDate(rawDate, index)
           : typeof rawDate === "string"
-             ? parseQuoteDate(rawDate.trim(), index)
-             : (() => { throw new Error(`Invalid quote at index ${index}: 'timestamp'/'date' must be string or Date, got ${typeof rawDate}`); })()
+            ? parseQuoteDate(rawDate.trim(), index)
+            : (() => {
+                throw new Error(
+                  `Invalid quote at index ${index}: 'timestamp' must be string or Date, got ${typeof rawDate}`
+                );
+              })()
     };
   });
 }

@@ -9,7 +9,7 @@ import type { IndicatorListing, IndicatorSelection } from "@facioquo/indy-charts
 import { ApiService } from "./api.service";
 
 type ApiQuote = {
-  timestamp?: string;
+  timestamp: string;
   open: number;
   high: number;
   low: number;

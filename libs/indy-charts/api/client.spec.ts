@@ -10,9 +10,7 @@ import type { IndicatorListing, IndicatorParam, IndicatorSelection } from "../co
 const BASE_URL = "https://api.example.com";
 
 type ApiQuote = {
-  timestamp?: string;
-  /** @deprecated Skender v2 field name — accepted for backward compatibility */
-  date?: string;
+  timestamp: string;
   open: number;
   high: number;
   low: number;
@@ -191,35 +189,6 @@ describe("createApiClient", () => {
 
       await expect(client.getQuotes()).rejects.toThrow("Network failure");
       expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(Error));
-    });
-
-    it("accepts deprecated 'date' field when 'timestamp' is absent (Skender v2 compat)", async () => {
-      const v2Quotes: Array<Omit<ApiQuote, "timestamp">> = [
-        { date: "2024-03-01T00:00:00Z", open: 5, high: 7, low: 4, close: 6, volume: 500 }
-      ];
-      mockFetchOk(v2Quotes);
-
-      const quotes = await client.getQuotes();
-
-      expect(quotes).toHaveLength(1);
-      expect(quotes[0].timestamp).toBeInstanceOf(Date);
-      expect(quotes[0].timestamp.toISOString()).toBe("2024-03-01T00:00:00.000Z");
-    });
-
-    it("prefers 'timestamp' over 'date' when both are present", async () => {
-      const mixedQuote: ApiQuote = {
-        timestamp: "2024-04-01T00:00:00Z",
-        date: "2020-01-01T00:00:00Z",
-        open: 1,
-        high: 2,
-        low: 0,
-        close: 1,
-        volume: 100
-      };
-      mockFetchOk([mixedQuote]);
-
-      const [q] = await client.getQuotes();
-      expect(q.timestamp.toISOString()).toBe("2024-04-01T00:00:00.000Z");
     });
 
     it("preserves all OHLCV fields", async () => {
