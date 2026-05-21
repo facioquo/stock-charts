@@ -115,9 +115,13 @@
     },
     {
       "label": "Build: All projects (incremental)",
-      "detail": "Incremental build of Website and Backend .NET",
-      "dependsOn": ["Build: Backend .NET (incremental)", "Build: Website"],
-      "dependsOrder": "parallel",
+      "detail": "Incremental build of Libraries, Website, and Backend .NET",
+      "dependsOn": [
+        "Build: Libraries",
+        "Build: Backend .NET (incremental)",
+        "Build: Website"
+      ],
+      "dependsOrder": "sequence",
       "group": {
         "kind": "build",
         "isDefault": true
@@ -126,16 +130,25 @@
     },
     {
       "label": "Build: All projects (full rebuild)",
-      "detail": "Full hard-reset rebuild without incremental compilation",
+      "detail": "Full hard-reset rebuild of Libraries, Website, and Backend .NET",
       "dependsOn": [
         "Clean: All (hard reset)",
         "Install: All package dependencies",
+        "Build: Libraries",
         "Build: Backend .NET (non-incremental)",
         "Build: Website"
       ],
       "dependsOrder": "sequence",
       "group": "build",
       "problemMatcher": ["$tsc", "$msCompile"]
+    },
+    {
+      "label": "Build: Libraries",
+      "detail": "Build TypeScript libraries (chartjs-financial, indy-charts)",
+      "type": "shell",
+      "command": "pnpm --filter './libs/**' run build",
+      "group": "build",
+      "problemMatcher": "$tsc"
     },
     {
       "label": "Build: Website",
@@ -176,6 +189,7 @@
       "detail": "Run all linting and formatting checks (ESLint, Prettier, Roslynator, dotnet format, markdownlint, stylelint)",
       "dependsOn": [
         "Lint: Website (check)",
+        "Lint: Indy-Charts (check)",
         "Lint: Backend .NET (check)",
         "Lint: Markdown (check)",
         "Lint: Stylelint (check)"
@@ -197,6 +211,7 @@
       "detail": "Auto-fix Website (ESLint + Prettier), Backend (Roslynator + dotnet format), and CSS (stylelint) code",
       "dependsOn": [
         "Lint: Website (fix)",
+        "Lint: Indy-Charts (fix)",
         "Lint: Backend .NET (fix)",
         "Lint: Stylelint (fix)"
       ],
@@ -219,6 +234,22 @@
       "command": "bash scripts/website-lint.sh fix",
       "group": "none",
       "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Lint: Indy-Charts (check)",
+      "detail": "Check indy-charts TypeScript library code with ESLint",
+      "type": "shell",
+      "command": "pnpm --filter @facioquo/indy-charts run lint --max-warnings=0",
+      "group": "test",
+      "problemMatcher": "$eslint-stylish"
+    },
+    {
+      "label": "Lint: Indy-Charts (fix)",
+      "detail": "Auto-fix indy-charts TypeScript library code with ESLint",
+      "type": "shell",
+      "command": "pnpm --filter @facioquo/indy-charts run lint:fix",
+      "group": "none",
+      "problemMatcher": "$eslint-stylish"
     },
     {
       "label": "Lint: Backend .NET (check)",

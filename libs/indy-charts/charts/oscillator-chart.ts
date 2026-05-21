@@ -149,10 +149,12 @@ export class OscillatorChart {
       }
     });
 
-    if (this.chart) {
-      this.updateLegend(selection);
-      this.chart.update();
-    }
+    if (!this.chart) return;
+
+    this.updateLegend(selection);
+    // Use "none" mode to skip animations and immediately apply sliced data changes,
+    // ensuring oscillators respond synchronously to viewport resizing.
+    this.chart.update("none");
   }
 
   resize(): void {

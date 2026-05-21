@@ -69,20 +69,36 @@ function normalizeWindowSize(value: number, total: number): number {
 export const StockIndicatorChart = defineComponent({
   name: "StockIndicatorChart",
   props: {
-    indicator: String,
-    config: Object as PropType<StockIndicatorChartConfig>,
-    barCount: Number,
-    withOverlay: Boolean,
-    background: String
+    indicator: {
+      type: String,
+      required: false
+    },
+    config: {
+      type: Object as PropType<StockIndicatorChartConfig>,
+      required: false,
+      default: (): StockIndicatorChartConfig => ({})
+    },
+    barCount: {
+      type: Number,
+      required: false
+    },
+    withOverlay: {
+      type: Boolean,
+      required: false
+    },
+    background: {
+      type: String,
+      required: false
+    }
   },
   setup(props) {
-    const options = inject(indyChartsVueOptionsKey);
+    const options = inject<IndyChartsVueOptions>(indyChartsVueOptionsKey);
     const phase = ref<StockIndicatorChartPhase>("idle");
     const errorMessage = ref("Chart data is unavailable.");
     const chartType = ref<string>("overlay");
     const overlayCanvas = ref<HTMLCanvasElement | null>(null);
     const oscillatorCanvas = ref<HTMLCanvasElement | null>(null);
-    const rootId = computed(() => slug(props.config?.id ?? props.indicator ?? "chart"));
+    const rootId = computed(() => slug(props.config.id ?? props.indicator ?? "chart"));
     const testIdPrefix = computed(() => `stock-indicator-chart-${rootId.value}`);
     const showOverlayCanvas = computed(
       () => chartType.value !== "oscillator" || props.withOverlay === true
@@ -113,8 +129,8 @@ export const StockIndicatorChart = defineComponent({
       if (!options) {
         return { isDarkTheme: false, showTooltips: true };
       }
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- intentional: treats empty string as absent
-      const background = props.background || props.config?.background;
+
+      const background = props.background ?? props.config.background;
       return chartSettingsFromOptions(options, isDarkTheme(), background);
     }
 
@@ -124,11 +140,12 @@ export const StockIndicatorChart = defineComponent({
       }
 
       const indicator = props.indicator ?? options.defaults?.indicator;
-      const registered = registryConfig(options, indicator);
+      const registered = registryConfig(options, indicator) ?? {};
+      const config = props.config ?? {};
       return {
         ...registered,
-        ...props.config,
-        uiid: props.config?.uiid ?? registered?.uiid ?? indicator
+        ...config,
+        uiid: config.uiid ?? registered.uiid ?? indicator
       };
     }
 
@@ -266,11 +283,11 @@ export const StockIndicatorChart = defineComponent({
           props.indicator,
           props.barCount,
           props.withOverlay,
-          props.config?.uiid,
-          props.config?.barCount,
-          props.config?.quoteCount,
-          props.config?.params,
-          props.config?.results
+          props.config.uiid,
+          props.config.barCount,
+          props.config.quoteCount,
+          props.config.params,
+          props.config.results
         ] as const,
       () => {
         if (!disposed && phase.value !== "idle") {
@@ -281,7 +298,7 @@ export const StockIndicatorChart = defineComponent({
     );
 
     watch(
-      () => [props.background, props.config?.background] as const,
+      () => [props.background, props.config.background] as const,
       () => {
         updateTheme();
       }

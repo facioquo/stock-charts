@@ -1,7 +1,7 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import angular from "angular-eslint";
-import prettier from "eslint-plugin-prettier/recommended";
+import prettier from "eslint-config-prettier";
 import vitest from "@vitest/eslint-plugin";
 
 export default tseslint.config(
@@ -44,15 +44,6 @@ export default tseslint.config(
           style: "kebab-case"
         }
       ],
-      "prettier/prettier": [
-        "error",
-        {
-          singleQuote: false,
-          trailingComma: "none",
-          bracketSpacing: true,
-          arrowParens: "avoid"
-        }
-      ],
       quotes: ["error", "double", { avoidEscape: true }],
       "@typescript-eslint/no-unused-vars": [
         "warn",
@@ -78,8 +69,9 @@ export default tseslint.config(
   // Test files - relaxed rules
   {
     files: ["**/*.spec.ts"],
-    ...vitest.configs.recommended,
+    plugins: vitest.configs.recommended.plugins,
     rules: {
+      ...vitest.configs.recommended.rules,
       "@typescript-eslint/no-explicit-any": "off",
       "vitest/no-disabled-tests": "warn",
       "vitest/no-focused-tests": "warn",
@@ -89,7 +81,7 @@ export default tseslint.config(
   // HTML templates
   {
     files: ["**/*.html"],
-    extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
+    extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility, prettier],
     rules: {}
   }
 );

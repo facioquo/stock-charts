@@ -52,12 +52,12 @@ test.describe("Stock Charts Angular Website", () => {
     const loadingMsg = consoleLogs.find(msg => msg.includes("Loading charts with"));
     expect(loadingMsg, "Should log bar count during chart loading").toBeDefined();
 
-    // Extract bar count and verify it's within the expected range (20-500)
+    // Extract bar count and verify it's within the expected range (20-250)
     const match = loadingMsg!.match(/Loading charts with (\d+) bars/);
     expect(match, "Should contain numeric bar count").not.toBeNull();
     const barCount = parseInt(match![1], 10);
     expect(barCount, "Bar count should be at least 20").toBeGreaterThanOrEqual(20);
-    expect(barCount, "Bar count should be at most 500").toBeLessThanOrEqual(500);
+    expect(barCount, "Bar count should be at most 250").toBeLessThanOrEqual(250);
 
     // Verify no page errors occurred during chart loading
     expect(errorCollection.pageErrors, "No page errors should occur").toEqual([]);

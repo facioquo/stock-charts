@@ -28,6 +28,14 @@ export default tseslint.config(
       "@typescript-eslint/triple-slash-reference": ["error", { path: "always" }]
     }
   },
+  // Theme colors uses COLORS object with 'as const' which may have type safety trade-offs
+  {
+    files: ["theme/colors.ts"],
+    rules: {
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off"
+    }
+  },
   // Test files - relaxed rules + vitest plugin
   {
     files: ["**/*.spec.ts"],

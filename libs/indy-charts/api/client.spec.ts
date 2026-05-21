@@ -104,13 +104,13 @@ function mockFetchNetworkError(message: string): void {
 
 describe("createApiClient", () => {
   let client: ApiClient;
-  let onError: ReturnType<typeof vi.fn>;
+  let onError: ReturnType<typeof vi.fn<[context: string, error: unknown], void>>;
 
   beforeEach(() => {
-    onError = vi.fn();
+    onError = vi.fn<[context: string, error: unknown], void>();
     client = createApiClient({
       baseUrl: BASE_URL,
-      onError: onError as (context: string, error: unknown) => void
+      onError
     });
   });
 

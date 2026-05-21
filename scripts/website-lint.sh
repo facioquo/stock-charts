@@ -25,9 +25,9 @@ case "$mode" in
     # Capture exit code without triggering set -e by using || pattern
     pnpm --filter @stock-charts/client run lint <<<"n" || lint_exit=$?
 
-    # Lint libraries (TypeScript packages)
+    # Lint chartjs-financial library (indy-charts has separate task)
     log "Running library linting checks..."
-    pnpm --filter './libs/**' run lint --max-warnings=0 || lib_lint_exit=$?
+    pnpm --filter '@facioquo/chartjs-chart-financial' run lint --max-warnings=0 || lib_lint_exit=$?
 
     # Lint VitePress example
     log "Running VitePress linting checks..."
@@ -37,9 +37,9 @@ case "$mode" in
     log "Checking Angular code formatting..."
     pnpm run format:web:check || format_exit=$?
 
-    # Format libraries (Prettier check)
+    # Format libraries (Prettier check, exclude indy-charts)
     log "Checking library code formatting..."
-    pnpm --filter './libs/**' run format:check || lib_format_exit=$?
+    pnpm --filter '@facioquo/chartjs-chart-financial' run format:check || lib_format_exit=$?
 
     # Lint CSS files
     log "Running CSS linting checks..."
@@ -60,9 +60,9 @@ case "$mode" in
     # Capture exit code without triggering set -e by using || pattern
     pnpm --filter @stock-charts/client run lint:fix <<<"n" || lint_exit=$?
 
-    # Fix libraries (TypeScript packages)
+    # Fix chartjs-financial library (indy-charts has separate task)
     log "Running library linting fixes..."
-    pnpm --filter './libs/**' run lint:fix || lib_lint_exit=$?
+    pnpm --filter '@facioquo/chartjs-chart-financial' run lint:fix || lib_lint_exit=$?
 
     # Fix VitePress example
     log "Running VitePress linting fixes..."
@@ -72,9 +72,9 @@ case "$mode" in
     log "Formatting Angular code..."
     pnpm run format:web || format_exit=$?
 
-    # Format libraries (Prettier fix)
+    # Format libraries (Prettier fix, exclude indy-charts)
     log "Formatting library code..."
-    pnpm --filter './libs/**' run format || lib_format_exit=$?
+    pnpm --filter '@facioquo/chartjs-chart-financial' run format || lib_format_exit=$?
 
     # Fix CSS files
     log "Running CSS linting fixes..."

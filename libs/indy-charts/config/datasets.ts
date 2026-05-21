@@ -129,7 +129,9 @@ export function createThresholdDataset(
   // offset fill will only work between certain objects.
   const lineData: ScatterDataPoint[] = [];
 
-  const sourceData = firstResult.dataset.data as unknown as ScatterDataPoint[];
+  // Cast the dataset data to the expected type; firstResult.dataset.data is unsafe
+  // because it comes from dynamic Chart.js configuration
+  const sourceData: ScatterDataPoint[] = firstResult.dataset.data as ScatterDataPoint[];
   sourceData.forEach((d: ScatterDataPoint) => {
     lineData.push({ x: d.x, y: threshold.value });
   });

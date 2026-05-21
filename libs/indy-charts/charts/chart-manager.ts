@@ -216,6 +216,10 @@ export class ChartManager {
    * Consumer must provide the canvas context and call this after processSelectionData()
    * AND after displaySelection() so the selection is registered in this.selections.
    *
+   * Pre-slices datasets to currentBarCount before rendering so oscillators display
+   * the correct viewport window on initialization, improving responsiveness and
+   * consistency with overlay indicator behavior.
+   *
    * @throws {Error} if displaySelection() has not been called for this selection,
    *   because setBarCount() iterates this.selections and will silently skip any
    *   oscillator whose ucid is not present there.
@@ -233,6 +237,33 @@ export class ChartManager {
           `Call displaySelection() before createOscillator() to ensure setBarCount() ` +
           `can update this oscillator when the window changes.`
       );
+    }
+
+    // Pre-slice oscillator datasets to currentBarCount before rendering so initial
+    // axes are calculated from the windowed data range, not the full history.
+    // This ensures consistent behavior when toggling between charts.
+    const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
+    if (fullDatasets && this._allQuotes.length > 0) {
+      const startIndex = Math.max(0, this._allQuotes.length - this._currentBarCount);
+      selection.results.forEach((result, i) => {
+        const full = fullDatasets[i] as ExtendedChartDataset;
+        if (full && result.dataset) {
+          result.dataset.data = [...full.data.slice(startIndex)];
+          // Slice style arrays if present with type casts
+          const ext = result.dataset as ExtendedChartDataset;
+          if (Array.isArray(full.pointBackgroundColor)) {
+            ext.pointBackgroundColor = [
+              ...(full.pointBackgroundColor as string[]).slice(startIndex)
+            ];
+          }
+          if (Array.isArray(full.pointBorderColor)) {
+            ext.pointBorderColor = [...(full.pointBorderColor as string[]).slice(startIndex)];
+          }
+          if (Array.isArray(full.pointRotation)) {
+            ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex)];
+          }
+        }
+      });
     }
 
     this._oscillators.get(selection.ucid)?.destroy();
