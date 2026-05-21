@@ -25,15 +25,6 @@ export default tseslint.config(
       "@typescript-eslint/prefer-nullish-coalescing": "error"
     }
   },
-  // Setup and re-export files may use untyped library exports
-  {
-    files: ["setup.ts", "**/theme/colors.ts"],
-    rules: {
-      "@typescript-eslint/no-unsafe-call": "off",
-      "@typescript-eslint/no-unsafe-assignment": "off",
-      "@typescript-eslint/no-unsafe-member-access": "off"
-    }
-  },
   // Test files - relaxed rules + vitest plugin
   {
     files: ["**/*.spec.ts"],

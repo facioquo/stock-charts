@@ -151,9 +151,12 @@ export class OscillatorChart {
 
     if (!this.chart) return;
 
+    // Two-pass update: first pass applies sliced data and recalculates scale
+    // bounds; second pass renders the legend annotations (which read the fresh
+    // scales from the first pass). Collapsing to one pass would leave
+    // annotation positions stale.
+    this.chart.update("none");
     this.updateLegend(selection);
-    // Use "none" mode to skip animations and immediately apply sliced data changes,
-    // ensuring oscillators respond synchronously to viewport resizing.
     this.chart.update("none");
   }
 

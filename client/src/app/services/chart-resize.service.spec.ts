@@ -236,7 +236,11 @@ describe("Chart Resize Dimension Testing", () => {
       const initialBarCount = windowService.calculateOptimalBars();
 
       // Simulate window resize to width that would exceed MAX_BARS
-      Object.defineProperty(window, "innerWidth", { value: 1600 });
+      Object.defineProperty(window, "innerWidth", {
+        writable: true,
+        configurable: true,
+        value: 1600
+      });
 
       const newBarCount = windowService.calculateOptimalBars();
 

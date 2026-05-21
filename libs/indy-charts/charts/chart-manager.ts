@@ -243,8 +243,14 @@ export class ChartManager {
     // axes are calculated from the windowed data range, not the full history.
     // This ensures consistent behavior when toggling between charts.
     const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
-    if (fullDatasets && this._allQuotes.length > 0) {
-      const startIndex = Math.max(0, this._allQuotes.length - this._currentBarCount);
+    if (fullDatasets) {
+      // Use allQuotes length when available (overlay flow); fall back to dataset
+      // length for standalone oscillator flows that skip initializeOverlay().
+      const totalPoints =
+        this._allQuotes.length > 0
+          ? this._allQuotes.length
+          : Math.max(0, ...fullDatasets.map(ds => ds.data.length));
+      const startIndex = Math.max(0, totalPoints - this._currentBarCount);
       selection.results.forEach((result, i) => {
         const full = fullDatasets[i] as ExtendedChartDataset;
         if (full && result.dataset) {

@@ -41,6 +41,7 @@
   "scripts": {
     "prebuild": "pnpm --filter @facioquo/chartjs-chart-financial run build",
     "build": "tsup",
+    "prelint": "pnpm --filter @facioquo/chartjs-chart-financial run build",
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write \"**/*.{ts,json,md}\"",

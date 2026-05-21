@@ -25,9 +25,10 @@ case "$mode" in
     # Capture exit code without triggering set -e by using || pattern
     pnpm --filter @stock-charts/client run lint <<<"n" || lint_exit=$?
 
-    # Lint chartjs-financial library (indy-charts has separate task)
+    # Lint chartjs-financial and indy-charts libraries
     log "Running library linting checks..."
     pnpm --filter '@facioquo/chartjs-chart-financial' run lint --max-warnings=0 || lib_lint_exit=$?
+    pnpm --filter '@facioquo/indy-charts' run lint --max-warnings=0 || indy_lint_exit=$?
 
     # Lint VitePress example
     log "Running VitePress linting checks..."
@@ -37,15 +38,16 @@ case "$mode" in
     log "Checking Angular code formatting..."
     pnpm run format:web:check || format_exit=$?
 
-    # Format libraries (Prettier check, exclude indy-charts)
+    # Format libraries (Prettier check)
     log "Checking library code formatting..."
     pnpm --filter '@facioquo/chartjs-chart-financial' run format:check || lib_format_exit=$?
+    pnpm --filter '@facioquo/indy-charts' run format:check || indy_format_exit=$?
 
     # Lint CSS files
     log "Running CSS linting checks..."
     pnpm run lint:css || css_lint_exit=$?
 
-    if [ "${lint_exit:-0}" -ne 0 ] || [ "${lib_lint_exit:-0}" -ne 0 ] || [ "${vitepress_lint_exit:-0}" -ne 0 ] || [ "${format_exit:-0}" -ne 0 ] || [ "${lib_format_exit:-0}" -ne 0 ] || [ "${css_lint_exit:-0}" -ne 0 ]; then
+    if [ "${lint_exit:-0}" -ne 0 ] || [ "${lib_lint_exit:-0}" -ne 0 ] || [ "${indy_lint_exit:-0}" -ne 0 ] || [ "${vitepress_lint_exit:-0}" -ne 0 ] || [ "${format_exit:-0}" -ne 0 ] || [ "${lib_format_exit:-0}" -ne 0 ] || [ "${indy_format_exit:-0}" -ne 0 ] || [ "${css_lint_exit:-0}" -ne 0 ]; then
       err "Angular linting or formatting issues detected"
       exit 1
     fi
@@ -60,9 +62,10 @@ case "$mode" in
     # Capture exit code without triggering set -e by using || pattern
     pnpm --filter @stock-charts/client run lint:fix <<<"n" || lint_exit=$?
 
-    # Fix chartjs-financial library (indy-charts has separate task)
+    # Fix chartjs-financial and indy-charts libraries
     log "Running library linting fixes..."
     pnpm --filter '@facioquo/chartjs-chart-financial' run lint:fix || lib_lint_exit=$?
+    pnpm --filter '@facioquo/indy-charts' run lint:fix || indy_lint_exit=$?
 
     # Fix VitePress example
     log "Running VitePress linting fixes..."
@@ -72,15 +75,16 @@ case "$mode" in
     log "Formatting Angular code..."
     pnpm run format:web || format_exit=$?
 
-    # Format libraries (Prettier fix, exclude indy-charts)
+    # Format libraries (Prettier fix)
     log "Formatting library code..."
     pnpm --filter '@facioquo/chartjs-chart-financial' run format || lib_format_exit=$?
+    pnpm --filter '@facioquo/indy-charts' run format || indy_format_exit=$?
 
     # Fix CSS files
     log "Running CSS linting fixes..."
     pnpm run lint:css:fix || css_lint_exit=$?
 
-    if [ "${lint_exit:-0}" -ne 0 ] || [ "${lib_lint_exit:-0}" -ne 0 ] || [ "${vitepress_lint_exit:-0}" -ne 0 ] || [ "${format_exit:-0}" -ne 0 ] || [ "${lib_format_exit:-0}" -ne 0 ] || [ "${css_lint_exit:-0}" -ne 0 ]; then
+    if [ "${lint_exit:-0}" -ne 0 ] || [ "${lib_lint_exit:-0}" -ne 0 ] || [ "${indy_lint_exit:-0}" -ne 0 ] || [ "${vitepress_lint_exit:-0}" -ne 0 ] || [ "${format_exit:-0}" -ne 0 ] || [ "${lib_format_exit:-0}" -ne 0 ] || [ "${indy_format_exit:-0}" -ne 0 ] || [ "${css_lint_exit:-0}" -ne 0 ]; then
       err "Angular linting or formatting completed with issues (see output above)"
       # Don't exit 1 for fix mode - user can review and re-run check
     fi
