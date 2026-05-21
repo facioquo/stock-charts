@@ -76,9 +76,15 @@ function normalizeQuotes(quotes: unknown[]): Quote[] {
     if (typeof q !== "object" || q === null) {
       throw new Error(`Invalid quote at index ${index}: expected object, got ${typeof q}`);
     }
+
     const quote = q as Record<string, unknown>;
+date"];
     // Accept both 'timestamp' (Skender v3+) and 'date' (Skender v2, deprecated)
-    const rawDate = quote["timestamp"] ?? quote["date"];
+     const rawDate = quote["timestamp"] ?? quote["date"];
+    if (rawDate === undefined || rawDate === null) {
+      throw new Error(`Invalid quote at index ${index}: missing 'timestamp' or 'date' field`);
+    }
+
     return {
       open: quote["open"] as number,
       high: quote["high"] as number,
@@ -88,7 +94,9 @@ function normalizeQuotes(quotes: unknown[]): Quote[] {
       timestamp:
         rawDate instanceof Date
           ? normalizeQuoteDate(rawDate, index)
-          : parseQuoteDate(typeof rawDate === "string" ? rawDate.trim() : "", index)
+          : typeof rawDate === "string"
+             ? parseQuoteDate(rawDate.trim(), index)
+             : (() => { throw new Error(`Invalid quote at index ${index}: 'timestamp'/'date' must be string or Date, got ${typeof rawDate}`); })()
     };
   });
 }
