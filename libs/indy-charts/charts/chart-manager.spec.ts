@@ -546,6 +546,9 @@ describe("ChartManager", () => {
       expect(osc.render).toHaveBeenCalledWith(selection, listing);
       // applySlicedData must be called with startIndex = 100 - 50 = 50
       expect(osc.applySlicedData).toHaveBeenCalledWith(selection, expect.any(Array), 50);
+      const renderOrder = vi.mocked(osc.render).mock.invocationCallOrder[0];
+      const sliceOrder = vi.mocked(osc.applySlicedData).mock.invocationCallOrder[0];
+      expect(renderOrder).toBeLessThan(sliceOrder);
     });
   });
 
