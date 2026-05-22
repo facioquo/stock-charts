@@ -216,9 +216,11 @@ export class ChartManager {
    * Consumer must provide the canvas context and call this after processSelectionData()
    * AND after displaySelection() so the selection is registered in this.selections.
    *
-   * Pre-slices datasets to currentBarCount before rendering so oscillators display
-   * the correct viewport window on initialization, improving responsiveness and
-   * consistency with overlay indicator behavior.
+   * In overlay mode (when initializeOverlay() has been called), the oscillator renders
+   * with the full dataset so that OscillatorChart.fullThresholdDatasets stores the
+   * complete history. A viewport slice is then applied immediately via applySlicedData()
+   * so the initial display matches the overlay chart's time range. This two-step approach
+   * ensures subsequent resize calls can correctly re-slice from the full dataset.
    *
    * @throws {Error} if displaySelection() has not been called for this selection,
    *   because setBarCount() iterates this.selections and will silently skip any
@@ -239,42 +241,28 @@ export class ChartManager {
       );
     }
 
-    // Pre-slice oscillator datasets to currentBarCount before rendering so initial
-    // axes are calculated from the windowed data range, not the full history.
-    // This ensures consistent behavior when toggling between charts.
-    const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
-    if (fullDatasets) {
-      // Use allQuotes length when available (overlay flow); fall back to dataset
-      // length for standalone oscillator flows that skip initializeOverlay().
-      const totalPoints =
-        this._allQuotes.length > 0
-          ? this._allQuotes.length
-          : Math.max(0, ...fullDatasets.map(ds => ds.data.length));
-      const startIndex = Math.max(0, totalPoints - this._currentBarCount);
-      selection.results.forEach((result, i) => {
-        const full = fullDatasets[i] as ExtendedChartDataset;
-        if (full && result.dataset) {
-          result.dataset.data = [...full.data.slice(startIndex)];
-          // Slice style arrays if present with type casts
-          const ext = result.dataset as ExtendedChartDataset;
-          if (Array.isArray(full.pointBackgroundColor)) {
-            ext.pointBackgroundColor = [
-              ...(full.pointBackgroundColor as string[]).slice(startIndex)
-            ];
-          }
-          if (Array.isArray(full.pointBorderColor)) {
-            ext.pointBorderColor = [...(full.pointBorderColor as string[]).slice(startIndex)];
-          }
-          if (Array.isArray(full.pointRotation)) {
-            ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex)];
-          }
-        }
-      });
-    }
-
     this._oscillators.get(selection.ucid)?.destroy();
     const oscillator = new OscillatorChart(ctx, this._settings);
+
+    // Render with the full (unsliced) result.dataset.data from processSelectionData()
+    // so OscillatorChart.fullThresholdDatasets captures the complete history.
+    // This is required for subsequent setBarCount() calls to correctly re-slice
+    // threshold datasets to any window size, not just ones smaller than the initial slice.
     oscillator.render(selection, listing);
+
+    // In overlay mode, immediately apply the viewport slice so the oscillator's initial
+    // display matches the overlay chart's time range. Standalone oscillators (no overlay)
+    // skip this step and always show all their data.
+    if (this._allQuotes.length > 0) {
+      const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
+      if (fullDatasets) {
+        const startIndex = Math.max(0, this._allQuotes.length - this._currentBarCount);
+        if (startIndex > 0) {
+          oscillator.applySlicedData(selection, fullDatasets, startIndex);
+        }
+      }
+    }
+
     this._oscillators.set(selection.ucid, oscillator);
     return oscillator;
   }

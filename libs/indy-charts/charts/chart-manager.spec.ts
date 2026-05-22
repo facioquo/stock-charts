@@ -511,6 +511,42 @@ describe("ChartManager", () => {
       expect(first.destroy).toHaveBeenCalled();
       expect(mgr.oscillators.size).toBe(1);
     });
+
+    it("displays all data in standalone mode without overlay", () => {
+      // Without initializeOverlay, allQuotes is empty → standalone mode
+      const listing = makeOscillatorListing();
+      const selection = makeSelection(listing, "osc-standalone");
+      mgr.processSelectionData(selection, listing, makeIndicatorData(makeQuotes(30)));
+      mgr.displaySelection(selection, listing);
+
+      const ctx = {} as CanvasRenderingContext2D;
+      const osc = mgr.createOscillator(ctx, selection, listing);
+
+      // render must be called with full data so fullThresholdDatasets has all history
+      expect(osc.render).toHaveBeenCalledWith(selection, listing);
+      // applySlicedData must NOT be called — standalone oscillators show all their data
+      expect(osc.applySlicedData).not.toHaveBeenCalled();
+    });
+
+    it("applies viewport window matching overlay on initialization", () => {
+      // With an overlay initialized, the oscillator should immediately show the
+      // windowed time range that matches the overlay chart.
+      const ctx = {} as CanvasRenderingContext2D;
+      const quotes = makeQuotes(100);
+      mgr.initializeOverlay(ctx, quotes, 50); // allQuotes=100, currentBarCount=50
+
+      const listing = makeOscillatorListing();
+      const selection = makeSelection(listing, "osc-overlay-viewport");
+      mgr.processSelectionData(selection, listing, makeIndicatorData(quotes));
+      mgr.displaySelection(selection, listing);
+
+      const osc = mgr.createOscillator(ctx, selection, listing);
+
+      // render must be called first (with full data so fullThresholdDatasets stores complete history)
+      expect(osc.render).toHaveBeenCalledWith(selection, listing);
+      // applySlicedData must be called with startIndex = 100 - 50 = 50
+      expect(osc.applySlicedData).toHaveBeenCalledWith(selection, expect.any(Array), 50);
+    });
   });
 
   // ----- removeSelection -----
