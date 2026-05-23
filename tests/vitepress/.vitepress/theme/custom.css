@@ -1,3 +1,8 @@
+/* Reduce sidebar width by ~15% */
+:root {
+  --vp-sidebar-width: 230px;
+}
+
 .indy-demo {
   margin: 8px 0 24px;
   overflow: hidden;
