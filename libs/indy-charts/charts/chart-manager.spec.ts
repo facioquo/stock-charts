@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { Chart, ChartDataset } from "chart.js";
+
 import { ChartManager } from "./chart-manager";
 import type { OverlayChart } from "./overlay-chart";
 import type { OscillatorChart } from "./oscillator-chart";
@@ -10,6 +12,13 @@ import type {
   IndicatorSelection,
   Quote
 } from "../config/types";
+
+/**
+ * Subset of `Chart` that our mocked OverlayChart/OscillatorChart expose. Keeping
+ * a typed shape avoids `as any` while making it explicit which Chart.js fields
+ * the chart-manager logic actually reads.
+ */
+type MockChartShape = Pick<Chart, "data" | "options" | "scales" | "update" | "destroy">;
 
 // ---------------------------------------------------------------------------
 // Mocks – OverlayChart and OscillatorChart create real Chart.js instances
@@ -49,7 +58,7 @@ function createMockOverlay(): Partial<OverlayChart> {
       scales: { x: { min: 0 }, y: { max: 100 } },
       update: vi.fn(),
       destroy: vi.fn()
-    } as any,
+    } as unknown as Chart,
     render: vi.fn().mockImplementation((quotes: Quote[]) => {
       // Return full-length datasets so slicing can be validated.
       const priceData = quotes.map(q => ({
@@ -98,15 +107,19 @@ function createMockOverlay(): Partial<OverlayChart> {
         { type: "bar" as const, data: volumeData, backgroundColor: bgColors }
       ]);
     }),
-    applySlicedData: vi.fn().mockImplementation(function (this: any, fullDS: any[], start: number) {
+    applySlicedData: vi.fn().mockImplementation(function (
+      this: { chart?: MockChartShape },
+      fullDS: ChartDataset[],
+      start: number
+    ) {
       // Simulate real applySlicedData: slice the chart's datasets
-      if (this.chart) {
-        fullDS.forEach((full: any, i: number) => {
-          if (this.chart.data.datasets[i]) {
-            this.chart.data.datasets[i].data = full.data.slice(start);
-          }
-        });
-      }
+      if (!this.chart) return;
+      fullDS.forEach((full, i) => {
+        const target = this.chart?.data.datasets[i];
+        if (target && Array.isArray(full.data)) {
+          target.data = full.data.slice(start);
+        }
+      });
     }),
     resize: vi.fn(),
     destroy: vi.fn()
@@ -121,7 +134,7 @@ function createMockOscillator(): Partial<OscillatorChart> {
       scales: { x: { min: 0 }, y: { max: 100 } },
       update: vi.fn(),
       destroy: vi.fn()
-    } as any,
+    } as unknown as Chart,
     render: vi.fn(),
     updateLegend: vi.fn(),
     updateTheme: vi.fn(),
@@ -349,9 +362,9 @@ describe("ChartManager", () => {
       // render receives the visible slice only (last 40 of 80, startIndex=40)
       const renderArg = vi.mocked(overlay.render!).mock.calls[0][0];
       expect(renderArg).toHaveLength(40);
-      expect(vi.mocked(overlay.render!).mock.calls[0][1]).toBe(7); // default extraBars
+      expect(vi.mocked(overlay.render!).mock.calls[0][1]).toBe(6); // default extraBars
       // buildFullDatasets receives all quotes so full history is cached
-      expect(overlay.buildFullDatasets).toHaveBeenCalledWith(quotes, 7);
+      expect(overlay.buildFullDatasets).toHaveBeenCalledWith(quotes, 6);
     });
 
     it("renders with sliced quotes (no separate applySlicedData on init)", () => {
@@ -511,6 +524,44 @@ describe("ChartManager", () => {
       expect(first.destroy).toHaveBeenCalled();
       expect(mgr.oscillators.size).toBe(1);
     });
+
+    it("renders with full data and does not slice on initialization", () => {
+      // createOscillator always renders with the full dataset; subsequent
+      // setBarCount() calls handle viewport-aligned slicing. Consumers that
+      // need an initial viewport-aligned oscillator should pre-slice their
+      // quotes/rows before calling ChartManager (as the VitePress demo does).
+      const listing = makeOscillatorListing();
+      const selection = makeSelection(listing, "osc-standalone");
+      mgr.processSelectionData(selection, listing, makeIndicatorData(makeQuotes(30)));
+      mgr.displaySelection(selection, listing);
+
+      const ctx = {} as CanvasRenderingContext2D;
+      const osc = mgr.createOscillator(ctx, selection, listing);
+
+      // render must be called with full data so fullThresholdDatasets has all history
+      expect(osc.render).toHaveBeenCalledWith(selection, listing);
+      // applySlicedData must NOT be called on initial create
+      expect(osc.applySlicedData).not.toHaveBeenCalled();
+    });
+
+    it("does not slice oscillator on initial create even when overlay is windowed", () => {
+      // With an overlay initialized to a smaller window, the oscillator still
+      // renders with full data on creation. Window alignment is the consumer's
+      // responsibility (pre-slice quotes) or happens later via setBarCount().
+      const ctx = {} as CanvasRenderingContext2D;
+      const quotes = makeQuotes(100);
+      mgr.initializeOverlay(ctx, quotes, 50); // allQuotes=100, currentBarCount=50
+
+      const listing = makeOscillatorListing();
+      const selection = makeSelection(listing, "osc-overlay-viewport");
+      mgr.processSelectionData(selection, listing, makeIndicatorData(quotes));
+      mgr.displaySelection(selection, listing);
+
+      const osc = mgr.createOscillator(ctx, selection, listing);
+
+      expect(osc.render).toHaveBeenCalledWith(selection, listing);
+      expect(osc.applySlicedData).not.toHaveBeenCalled();
+    });
   });
 
   // ----- removeSelection -----
@@ -655,10 +706,10 @@ describe("ChartManager", () => {
       mgr.setBarCount(20);
 
       // After setBarCount(20), startIndex = 100 - 20 = 80
-      // Data has extra 7 bars appended, so total points = 107.
-      // Sliced from index 80 = 107 - 80 = 27 points.
+      // Data has extra 6 bars appended, so total points = 106.
+      // Sliced from index 80 = 106 - 80 = 26 points.
       const slicedLength = selection.results[0].dataset.data.length;
-      expect(slicedLength).toBeLessThanOrEqual(20 + 7); // +7 for extraBars
+      expect(slicedLength).toBeLessThanOrEqual(20 + 6); // +6 for extraBars
     });
 
     it("updates oscillator charts via applySlicedData", () => {
@@ -714,7 +765,7 @@ describe("ChartManager", () => {
 
       mgr.destroy();
 
-      expect((overlay as any)?.destroy).toHaveBeenCalled();
+      expect(overlay?.destroy).toHaveBeenCalled();
       expect(osc.destroy).toHaveBeenCalled();
       expect(mgr.overlayChart).toBeUndefined();
       expect(mgr.oscillators.size).toBe(0);

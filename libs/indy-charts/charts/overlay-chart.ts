@@ -1,6 +1,6 @@
-import { Chart, ChartData, ChartDataset } from "chart.js";
+import { Chart, type ChartData, type ChartDataset } from "chart.js";
 
-import { ScaleValue } from "chartjs-plugin-annotation";
+import { type ScaleValue } from "chartjs-plugin-annotation";
 
 import {
   applyFinancialElementTheme,
@@ -13,7 +13,12 @@ import {
 import { processQuoteData } from "../data/transformers";
 import { baseOverlayConfig, baseOverlayOptions } from "../config/overlay";
 import { commonLegendAnnotation } from "../config/annotations";
-import { ChartSettings, IndicatorResult, IndicatorSelection, Quote } from "../config/types";
+import {
+  type ChartSettings,
+  type IndicatorResult,
+  type IndicatorSelection,
+  type Quote
+} from "../config/types";
 
 const CHART_TYPES = {
   OVERLAY: "overlay"
@@ -33,7 +38,7 @@ export class OverlayChart {
    * Initialize the overlay chart with quote data.
    * Returns the full-resolution datasets for use in dynamic slicing.
    */
-  render(quotes: Quote[], extraBars: number = 7): ChartDataset[] {
+  render(quotes: Quote[], extraBars: number = 6): ChartDataset[] {
     const palette = getFinancialPalette(this.settings.isDarkTheme ? "dark" : "light");
     applyFinancialElementTheme(palette);
 
@@ -76,7 +81,7 @@ export class OverlayChart {
    * Use when the chart was initialized with a sliced view but the full
    * dataset is needed so setBarCount() can re-slice across the entire history.
    */
-  buildFullDatasets(allQuotes: Quote[], extraBars: number = 7): ChartDataset[] {
+  buildFullDatasets(allQuotes: Quote[], extraBars: number = 6): ChartDataset[] {
     const palette = getFinancialPalette(this.settings.isDarkTheme ? "dark" : "light");
     const { priceData } = processQuoteData(allQuotes);
     const datasets: ChartDataset[] = [

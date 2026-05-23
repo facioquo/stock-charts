@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 
-import { MatCheckbox, MatCheckboxChange } from "@angular/material/checkbox";
+import { MatCheckbox, type MatCheckboxChange } from "@angular/material/checkbox";
 import { MatDialog, MatDialogContent } from "@angular/material/dialog";
 import {
   MatList,
@@ -11,7 +11,7 @@ import {
   MatNavList,
   MatSelectionList
 } from "@angular/material/list";
-import { MatSlideToggle, MatSlideToggleChange } from "@angular/material/slide-toggle";
+import { MatSlideToggle, type MatSlideToggleChange } from "@angular/material/slide-toggle";
 
 import { ChartService } from "../../services/chart.service";
 import { UserService } from "../../services/user.service";

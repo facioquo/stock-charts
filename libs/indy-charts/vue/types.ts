@@ -11,6 +11,8 @@ export interface StockIndicatorChartConfig {
   results?: string[];
   barCount?: number;
   quoteCount?: number;
+  /** Per-instance background color for annotation and axis-label backdrops. */
+  background?: string;
 }
 
 export type StockIndicatorChartRegistry = Record<string, StockIndicatorChartConfig>;
@@ -26,6 +28,10 @@ export interface IndyChartsVueThemeOptions {
   isDarkTheme?: boolean;
   /** When `true`, syncs the chart theme with VitePress's dark mode toggle. */
   observeVitePressDarkMode?: boolean;
+  /** Background color used for annotation and axis-label backdrops in dark mode. */
+  darkBackground?: string;
+  /** Background color used for annotation and axis-label backdrops in light mode. */
+  lightBackground?: string;
 }
 
 export interface IndyChartsVueOptions {
@@ -39,16 +45,23 @@ export interface StockIndicatorChartProps {
   indicator?: string;
   config?: StockIndicatorChartConfig;
   barCount?: number;
+  withOverlay?: boolean;
+  /** Per-instance background color for annotation and axis-label backdrops. */
+  background?: string;
 }
 
 export type StockIndicatorChartPhase = "idle" | "loading" | "ready" | "empty" | "error";
 
 export function chartSettingsFromOptions(
   options: IndyChartsVueOptions,
-  isDarkTheme: boolean
+  isDarkTheme: boolean,
+  background?: string
 ): ChartSettings {
+  const themeBg = isDarkTheme ? options.theme?.darkBackground : options.theme?.lightBackground;
   return {
     isDarkTheme,
-    showTooltips: options.defaults?.showTooltips ?? true
+    showTooltips: options.defaults?.showTooltips ?? true,
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- intentional: treats empty string as absent (consistent with getThemeColors falsy check)
+    background: background || themeBg
   };
 }

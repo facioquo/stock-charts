@@ -1,9 +1,8 @@
 import {
-  IndicatorListing,
-  IndicatorParam,
-  IndicatorSelection,
-  Quote,
-  RawQuote
+  type IndicatorListing,
+  type IndicatorParam,
+  type IndicatorSelection,
+  type Quote
 } from "../config/types";
 
 /**
@@ -77,19 +76,59 @@ export interface ApiClient {
   getSelectionData(selection: IndicatorSelection, listing: IndicatorListing): Promise<unknown[]>;
 }
 
-function toQuotes(raw: RawQuote[]): Quote[] {
-  return raw.map((q, index) => ({
-    timestamp: parseQuoteDate(q.timestamp?.trim() ?? q.date?.trim() ?? "", index),
-    open: q.open,
-    high: q.high,
-    low: q.low,
-    close: q.close,
-    volume: q.volume
-  }));
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function normalizeQuotes(quotes: unknown[]): Quote[] {
+  function asFiniteNumber(value: unknown, field: string, index: number): number {
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+      throw new Error(
+        `Invalid quote at index ${index}: "${field}" must be a finite number, got ${typeof value}`
+      );
+    }
+    return value;
+  }
+
+  return quotes.map((q, index) => {
+    if (!isRecord(q)) {
+      throw new Error(`Invalid quote at index ${index}: expected object, got ${typeof q}`);
+    }
+
+    const rawDate = q["timestamp"];
+    if (rawDate === undefined || rawDate === null) {
+      throw new Error(`Invalid quote at index ${index}: missing 'timestamp' field`);
+    }
+
+    return {
+      open: asFiniteNumber(q["open"], "open", index),
+      high: asFiniteNumber(q["high"], "high", index),
+      low: asFiniteNumber(q["low"], "low", index),
+      close: asFiniteNumber(q["close"], "close", index),
+      volume: asFiniteNumber(q["volume"], "volume", index),
+      timestamp:
+        rawDate instanceof Date
+          ? normalizeQuoteDate(rawDate, index)
+          : typeof rawDate === "string"
+            ? parseQuoteDate(rawDate.trim(), index)
+            : (() => {
+                throw new Error(
+                  `Invalid quote at index ${index}: 'timestamp' must be string or Date, got ${typeof rawDate}`
+                );
+              })()
+    };
+  });
+}
+
+function normalizeQuoteDate(value: Date, index: number): Date {
+  if (Number.isNaN(value.getTime())) {
+    throw new Error(`Invalid quote date at index ${index}: "${value.toString()}"`);
+  }
+  return value;
 }
 
 function parseQuoteDate(value: string, index: number): Date {
-  const date = new Date(value);
+  const date = new Date(value.trim());
   if (Number.isNaN(date.getTime())) {
     throw new Error(`Invalid quote date at index ${index}: "${value}"`);
   }
@@ -130,8 +169,11 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        const raw = (await response.json()) as RawQuote[];
-        return toQuotes(raw);
+        const body = (await response.json()) as unknown;
+        if (!Array.isArray(body)) {
+          throw new Error("Invalid quotes response: expected an array");
+        }
+        return normalizeQuotes(body);
       } catch (error) {
         onError?.("Error fetching quotes", error);
         throw error;

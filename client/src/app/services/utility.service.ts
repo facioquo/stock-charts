@@ -1,5 +1,5 @@
 import { Injectable, inject } from "@angular/core";
-import { Meta, MetaDefinition, Title } from "@angular/platform-browser";
+import { Meta, type MetaDefinition, Title } from "@angular/platform-browser";
 import { v4 as Guid } from "uuid";
 
 @Injectable({

@@ -1,9 +1,10 @@
 import "chartjs-adapter-date-fns";
 import { enUS } from "date-fns/locale";
 
-import { ChartOptions, ScaleOptions, TimeUnit } from "chart.js";
+import { type ChartOptions, type ScaleOptions } from "chart.js";
 
-import { ChartSettings } from "./types";
+import { type ChartSettings } from "./types";
+import { getThemeColors } from "./theme-colors";
 
 export const FONT_FAMILY = "'Google Sans', Roboto, Verdana, Helvetica, Arial, sans-serif";
 
@@ -52,13 +53,14 @@ export function baseChartOptions(settings: ChartSettings): ChartOptions {
         ticks: {
           display: true,
           mirror: true,
+          color: getThemeColors(settings).text,
           font: {
             family: FONT_FAMILY,
             size: 12,
             lineHeight: 1
           },
           showLabelBackdrop: true,
-          backdropColor: settings.isDarkTheme ? "#12131680" : "#FAF9FD90",
+          backdropColor: getThemeColors(settings).background,
           backdropPadding: {
             top: 0,
             left: 5,
@@ -84,15 +86,13 @@ export function baseChartOptions(settings: ChartSettings): ChartOptions {
 }
 
 export function defaultXAxisOptions(): ScaleOptions {
-  const timeUnit = "day";
-
   const options: ScaleOptions = {
     alignToPixels: true,
     display: false,
     offset: false,
     type: "timeseries",
     time: {
-      unit: timeUnit as TimeUnit
+      unit: "day"
     },
     adapters: {
       date: {

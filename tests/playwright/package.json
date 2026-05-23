@@ -1,9 +1,10 @@
 {
   "name": "@stock-charts/playwright-tests",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "scripts": {
-    "test": "playwright test"
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@playwright/test": "1.60.0"

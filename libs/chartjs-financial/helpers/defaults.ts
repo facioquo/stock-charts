@@ -7,7 +7,7 @@
 import { Chart } from "chart.js";
 import { merge } from "chart.js/helpers";
 
-import { FinancialPalette } from "../types/financial.types";
+import { type FinancialPalette } from "../types/financial.types";
 
 const defaultPalette: FinancialPalette = {
   candle: {

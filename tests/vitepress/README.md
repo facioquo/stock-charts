@@ -4,12 +4,12 @@ Minimal VitePress site demonstrating `@facioquo/indy-charts` integration.
 
 ## Overview
 
-This example shows how to use the indy-charts VitePress adapter in a documentation site with:
+This example shows how to use the indy-charts Vue adapter in a documentation site with:
 
-- Basic candlestick charts
-- Volume charts
-- Technical indicators
-- Multiple chart layouts
+- Candlestick + volume overlay charts
+- Standalone oscillator indicators (RSI, MACD, etc.)
+- Oscillators paired with the price chart
+- Custom (no-API) charts driven by your own quote data
 
 ## Getting started
 
@@ -52,19 +52,23 @@ pnpm run preview
 ```text
 tests/vitepress/
 ├── .vitepress/
-│   ├── config.ts          # VitePress configuration
-│   └── theme/             # Adapter registration and styling
+│   ├── config.ts                 # VitePress configuration
+│   └── theme/                    # Adapter registration and styling
 │       ├── index.ts
-│       ├── custom.css
+│       └── custom.css
 ├── guide/
-│   ├── index.md           # Introduction
-│   ├── installation.md    # Installation guide
-│   └── quick-start.md     # Quick start guide
+│   ├── installation.md           # Install + first-chart verification
+│   ├── quick-start.md            # Step-by-step build
+│   └── themes.md                 # Theme customization
 ├── examples/
-│   ├── index.md           # Basic chart example
-│   ├── indicators.md      # Charts with indicators
-│   └── multiple.md        # Multiple charts example
-├── index.md               # Home page
+│   ├── index.md                  # Overlay (price + EMA)
+│   ├── indicators.md             # Oscillators
+│   ├── custom-data.md            # No-API, bring-your-own quotes
+│   ├── StaticChart.vue           # Demo component for custom-data
+│   └── sample-quotes.ts          # Quote fixture for the static demo
+├── reference/
+│   └── api-client.md             # ApiClient reference
+├── index.md                      # Home page (hero + live demos)
 └── package.json
 ```
 
@@ -99,9 +103,10 @@ Markdown pages use the global component directly:
 
 ### Live examples
 
-- `/examples/` renders a live overlay indicator chart through `StockIndicatorChart`
-- `/examples/indicators` renders a live oscillator chart through `StockIndicatorChart`
-- `/examples/multiple` is currently a recipe page (truthful code, no live embed)
+- `/` renders three live demos on the home page (overlay, standalone oscillator, oscillator with overlay)
+- `/examples/` renders the standalone overlay chart example
+- `/examples/indicators` renders the standalone oscillator example
+- `/examples/custom-data` renders a bring-your-own-quotes example
 
 ### TypeScript support
 
@@ -142,8 +147,8 @@ Check:
 
 ## Resources
 
-- [VitePress Documentation](https://vitepress.dev/)
-- [Indy Charts API Reference](https://github.com/facioquo/stock-charts/tree/reusable-charts/libs/indy-charts)
+- [VitePress documentation](https://vitepress.dev/)
+- [Indy Charts source](https://github.com/facioquo/stock-charts/tree/main/libs/indy-charts)
 
 ## License
 

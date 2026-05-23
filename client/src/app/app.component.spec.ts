@@ -1,6 +1,6 @@
 import { TestBed } from "@angular/core/testing";
 import { RouterOutlet } from "@angular/router";
-import { Mock, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { AppComponent } from "./app.component";
 import { UserService } from "./services/user.service";
 
@@ -18,7 +18,7 @@ describe("AppComponent", () => {
    * 4. Skip component-level tests and rely on E2E tests
    */
   it.todo("should create and call loadSettings on init", async () => {
-    const userServiceSpy = { loadSettings: vi.fn() } as { loadSettings: Mock };
+    const userServiceSpy = { loadSettings: vi.fn() };
 
     await TestBed.configureTestingModule({
       imports: [RouterOutlet],

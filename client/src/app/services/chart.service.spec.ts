@@ -1,19 +1,38 @@
 import "@angular/compiler"; // Required for JIT compilation in tests
-import { beforeEach, describe, expect, it, vi, afterEach } from "vitest";
+import { beforeEach, describe, expect, it, vi, afterEach, type MockInstance } from "vitest";
 import { of, Subject } from "rxjs";
 
 import { ChartManager, setupIndyCharts } from "@facioquo/indy-charts";
 import { ChartService } from "./chart.service";
-import { ApiService } from "./api.service";
-import { UserService } from "./user.service";
-import { UtilityService } from "./utility.service";
-import { WindowService } from "./window.service";
+import { type ApiService } from "./api.service";
+import { type UserService } from "./user.service";
+import { type UtilityService } from "./utility.service";
+import { type WindowService } from "./window.service";
 import type {
   IndicatorListing,
   Quote,
   IndicatorSelection,
   IndicatorDataRow
 } from "@facioquo/indy-charts";
+
+/**
+ * Private surface of ChartService that this spec manipulates directly. We
+ * sidestep Angular's `inject()` context to keep the test framework-agnostic;
+ * naming the private fields here keeps writes type-checked instead of using
+ * `as any`.
+ */
+interface ChartServicePrivate {
+  api: ApiService;
+  usr: UserService;
+  util: UtilityService;
+  window: WindowService;
+  destroy$: Subject<void>;
+  loading: { set: (v: unknown) => void; update: (fn: (v: unknown) => unknown) => void };
+  chartManager: ChartManager;
+  cacheSelections: () => void;
+  loadDefaultSelections: () => void;
+  loadSelections: () => void;
+}
 
 /**
  * Mock canvas context for Chart.js rendering.
@@ -183,11 +202,15 @@ describe("ChartService Smoke Tests", () => {
   let guidCounter = 0;
   let canvasElement: HTMLCanvasElement;
   let oscillatorsZone: HTMLDivElement;
-  const spiesToRestore: any[] = [];
+  const spiesToRestore: MockInstance[] = [];
 
   /** Typed shortcut: access the private ChartManager for assertions. */
   function getChartManager(): ChartManager {
-    return (service as unknown as { chartManager: ChartManager }).chartManager;
+    return privateOf(service).chartManager;
+  }
+
+  function privateOf(svc: ChartService): ChartServicePrivate {
+    return svc as unknown as ChartServicePrivate;
   }
 
   beforeEach(() => {
@@ -241,23 +264,24 @@ describe("ChartService Smoke Tests", () => {
 
     // Create service instance by mocking the internal properties directly.
     // This avoids the inject() context requirement.
-    service = Object.create(ChartService.prototype);
-    (service as any).api = mockApiService;
-    (service as any).usr = mockUserService;
-    (service as any).util = mockUtilityService;
-    (service as any).window = mockWindowService;
-    (service as any).destroy$ = new Subject<void>();
-    (service as any).loading = { set: vi.fn(), update: vi.fn() };
+    service = Object.create(ChartService.prototype) as ChartService;
+    const priv = privateOf(service);
+    priv.api = mockApiService;
+    priv.usr = mockUserService;
+    priv.util = mockUtilityService;
+    priv.window = mockWindowService;
+    priv.destroy$ = new Subject<void>();
+    priv.loading = { set: vi.fn(), update: vi.fn() };
 
     // Initialize ChartManager (mirrors constructor logic)
-    (service as any).chartManager = new ChartManager({
+    priv.chartManager = new ChartManager({
       settings: { isDarkTheme: false, showTooltips: true }
     });
 
     service.listings = [];
 
     // Mock cacheSelections to avoid localStorage side effects
-    (service as any).cacheSelections = vi.fn();
+    priv.cacheSelections = vi.fn();
 
     // Subscribe to window resize events
     const resizeObs = mockWindowService.getResizeObservable?.();
@@ -459,13 +483,13 @@ describe("ChartService Smoke Tests", () => {
     mgr.setBarCount(30);
     const after30 = getLen();
     expect(after30).toBeLessThan(initial);
-    expect(after30).toBeLessThanOrEqual(30 + 7); // +7 for extra bars
+    expect(after30).toBeLessThanOrEqual(30 + 6); // +6 for extra bars
 
     // Act: Expand to 70 bars
     mgr.setBarCount(70);
     const after70 = getLen();
     expect(after70).toBeGreaterThan(after30);
-    expect(after70).toBeLessThanOrEqual(70 + 7);
+    expect(after70).toBeLessThanOrEqual(70 + 6);
   });
 
   /**
@@ -481,38 +505,42 @@ describe("ChartService Smoke Tests", () => {
     mgr.setBarCount(70);
     expect(mgr.currentBarCount).toBe(70);
 
-    (mockWindowService.calculateOptimalBars as any).mockReturnValue(40);
+    vi.mocked(mockWindowService.calculateOptimalBars).mockReturnValue(40);
     resizeSubject.next({ width: 800, height: 600 });
     expect(mgr.currentBarCount).toBe(40);
   });
 
-  it("should not call loadDefaultSelections when cached selections exist (regression: duplicate series on reload)", () => {
-    const listing = generateSampleIndicatorListing();
-    service.listings = [listing];
+  it(
+    "should not call loadDefaultSelections when cached selections exist " +
+      "(regression: duplicate series on reload)",
+    () => {
+      const listing = generateSampleIndicatorListing();
+      service.listings = [listing];
 
-    const cachedSelection = {
-      ucid: "cached-001",
-      uiid: listing.uiid,
-      chartType: "overlay",
-      params: [],
-      results: []
-    };
-    localStorage.setItem("selections", JSON.stringify([cachedSelection]));
+      const cachedSelection = {
+        ucid: "cached-001",
+        uiid: listing.uiid,
+        chartType: "overlay",
+        params: [],
+        results: []
+      };
+      localStorage.setItem("selections", JSON.stringify([cachedSelection]));
 
-    const addSpy = vi.spyOn(service, "addSelectionWithoutScroll").mockImplementation(() => {});
-    const loadDefaultsSpy = vi
-      .spyOn(service as unknown as { loadDefaultSelections: () => void }, "loadDefaultSelections")
-      .mockImplementation(() => {});
+      const addSpy = vi.spyOn(service, "addSelectionWithoutScroll").mockImplementation(() => {});
+      const loadDefaultsSpy = vi
+        .spyOn(privateOf(service), "loadDefaultSelections")
+        .mockImplementation(() => {});
 
-    // Ensure these spies are always restored even if assertions fail
-    spiesToRestore.push(addSpy, loadDefaultsSpy);
+      // Ensure these spies are always restored even if assertions fail
+      spiesToRestore.push(addSpy, loadDefaultsSpy);
 
-    (service as unknown as { loadSelections: () => void }).loadSelections();
+      privateOf(service).loadSelections();
 
-    expect(addSpy).toHaveBeenCalledTimes(1);
-    expect(addSpy.mock.calls[0]?.[0].ucid).toBe("cached-001");
-    expect(loadDefaultsSpy).not.toHaveBeenCalled();
-  });
+      expect(addSpy).toHaveBeenCalledTimes(1);
+      expect(addSpy.mock.calls[0]?.[0].ucid).toBe("cached-001");
+      expect(loadDefaultsSpy).not.toHaveBeenCalled();
+    }
+  );
 
   it("should skip unavailable default indicators during startup hydration", () => {
     const listing = {
@@ -524,7 +552,7 @@ describe("ChartService Smoke Tests", () => {
     const addSpy = vi.spyOn(service, "addSelectionWithoutScroll").mockImplementation(() => {});
     service.listings = [listing];
 
-    (service as unknown as { loadDefaultSelections: () => void }).loadDefaultSelections();
+    privateOf(service).loadDefaultSelections();
 
     expect(addSpy).toHaveBeenCalledTimes(1);
     expect(addSpy.mock.calls[0]?.[0].uiid).toBe("LINEAR");

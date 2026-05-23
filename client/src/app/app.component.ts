@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from "@angular/core";
+import { ChangeDetectionStrategy, Component, type OnInit, inject } from "@angular/core";
 import { MatToolbar } from "@angular/material/toolbar";
 import { RouterOutlet } from "@angular/router";
 import { UserService } from "./services/user.service";

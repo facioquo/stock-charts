@@ -1,5 +1,5 @@
 import { TestBed } from "@angular/core/testing";
-import { Meta, MetaDefinition, Title } from "@angular/platform-browser";
+import { Meta, type MetaDefinition, Title } from "@angular/platform-browser";
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
 import type { Mock } from "vitest";
 import { UtilityService } from "./utility.service";
@@ -201,7 +201,7 @@ describe("UtilityService", () => {
       getElementByIdSpy = vi.spyOn(document, "getElementById");
       getElementByIdSpy.mockReturnValue({
         scrollIntoView: scrollIntoViewSpy
-      } as unknown as HTMLElement);
+      });
     });
 
     it("should scroll element into view at start with default offset", async () => {
@@ -265,7 +265,7 @@ describe("UtilityService", () => {
       getElementByIdSpy = vi.spyOn(document, "getElementById");
       getElementByIdSpy.mockReturnValue({
         scrollIntoView: scrollIntoViewSpy
-      } as unknown as HTMLElement);
+      });
     });
 
     it("should scroll element into view at end with default offset", async () => {

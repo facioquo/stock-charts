@@ -1,6 +1,6 @@
-import { ChartDataset, ScatterDataPoint } from "chart.js";
+import { type ChartDataset, type ScatterDataPoint } from "chart.js";
 
-import { FinancialDataPoint, FinancialPalette } from "./types/financial.types";
+import { type FinancialDataPoint, type FinancialPalette } from "./types/financial.types";
 import { getVolumeColor } from "./theme/colors";
 
 interface QuoteLike {
@@ -61,8 +61,15 @@ export function buildVolumeDataset(
   const maxTime = Number.isFinite(maxTimeCandidate) ? maxTimeCandidate : new Date().getTime();
 
   const nextDate = new Date(maxTime);
-  for (let i = 1; i < extraBars; i++) {
-    nextDate.setDate(nextDate.getDate() + 1);
+  for (let i = 0; i < extraBars; i++) {
+    // Advance to the next business day, skipping Saturday (6) and Sunday (0),
+    // so trailing volume padding aligns with the indicator/oscillator padding
+    // produced by indy-charts addExtraBars (which also skips weekends).
+    // UTC methods keep the padded dates deterministic across client timezones
+    // — local-time arithmetic would shift the cadence near midnight UTC.
+    do {
+      nextDate.setUTCDate(nextDate.getUTCDate() + 1);
+    } while (nextDate.getUTCDay() === 0 || nextDate.getUTCDay() === 6);
     volumeData.push({ x: new Date(nextDate).valueOf(), y: Number.NaN });
     volumeColors.push(palette.volume.unchanged);
   }

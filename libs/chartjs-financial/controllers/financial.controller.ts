@@ -8,7 +8,7 @@ import { BarController, defaults } from "chart.js";
 import { clipArea, isNullOrUndef, unclipArea } from "chart.js/helpers";
 
 import { computeMinSampleSize } from "../helpers/sample-size";
-import { FinancialDataPoint } from "../types/financial.types";
+import { type FinancialDataPoint } from "../types/financial.types";
 
 interface ParsedFinancialLike {
   x: number;

@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy, OnInit } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy, type OnInit } from "@angular/core";
 
 import { MatDialog } from "@angular/material/dialog";
 import { MatFabButton } from "@angular/material/button";

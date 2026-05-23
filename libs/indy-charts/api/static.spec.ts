@@ -1,12 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { loadStaticQuotes, loadStaticIndicatorData } from "./static";
-import type { RawQuote } from "../config/types";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function rawQuote(dateStr: string, close = 100): RawQuote {
+function createQuote(
+  dateStr: string,
+  close = 100
+): { timestamp: string; open: number; high: number; low: number; close: number; volume: number } {
   return {
     timestamp: dateStr,
     open: close - 1,
@@ -23,18 +25,18 @@ function rawQuote(dateStr: string, close = 100): RawQuote {
 
 describe("loadStaticQuotes", () => {
   it("converts date strings to Date objects", () => {
-    const raw: RawQuote[] = [rawQuote("2024-01-15T00:00:00Z")];
-    const [q] = loadStaticQuotes(raw);
+    const quotes = [createQuote("2024-01-15T00:00:00Z")];
+    const [q] = loadStaticQuotes(quotes);
 
     expect(q.timestamp).toBeInstanceOf(Date);
     expect(q.timestamp.toISOString()).toBe("2024-01-15T00:00:00.000Z");
   });
 
   it("preserves all OHLCV fields", () => {
-    const raw: RawQuote[] = [
+    const quotes = [
       { timestamp: "2024-06-01", open: 10, high: 20, low: 5, close: 15, volume: 9999 }
     ];
-    const [q] = loadStaticQuotes(raw);
+    const [q] = loadStaticQuotes(quotes);
 
     expect(q).toMatchObject({
       open: 10,
@@ -50,16 +52,16 @@ describe("loadStaticQuotes", () => {
   });
 
   it("preserves array order", () => {
-    const raw: RawQuote[] = [
-      rawQuote("2024-01-01", 50),
-      rawQuote("2024-01-02", 60),
-      rawQuote("2024-01-03", 70)
+    const quotes = [
+      createQuote("2024-01-01", 50),
+      createQuote("2024-01-02", 60),
+      createQuote("2024-01-03", 70)
     ];
-    const quotes = loadStaticQuotes(raw);
+    const result = loadStaticQuotes(quotes);
 
-    expect(quotes).toHaveLength(3);
-    expect(quotes[0].close).toBe(50);
-    expect(quotes[2].close).toBe(70);
+    expect(result).toHaveLength(3);
+    expect(result[0].close).toBe(50);
+    expect(result[2].close).toBe(70);
   });
 });
 

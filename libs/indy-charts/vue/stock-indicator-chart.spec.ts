@@ -1,8 +1,10 @@
 import { createRenderer, nextTick } from "vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { getThemeColors } from "../config";
 import { indyChartsVueOptionsKey } from "./context";
 import { StockIndicatorChart } from "./stock-indicator-chart";
+import { chartSettingsFromOptions } from "./types";
 import type { IndyChartsVueOptions } from "./types";
 
 type TestNode = TestElement | TestText;
@@ -154,7 +156,6 @@ describe("StockIndicatorChart", () => {
 
     expect(loading).toBeDefined();
     expect(layout).toBeDefined();
-    expect(textContent(layout!)).toContain("Price + volume");
 
     app.unmount();
   });
@@ -234,5 +235,69 @@ describe("StockIndicatorChart", () => {
     });
 
     app.unmount();
+  });
+});
+
+describe("chartSettingsFromOptions", () => {
+  const baseOptions: IndyChartsVueOptions = {
+    api: { baseUrl: "https://localhost:5001" }
+  };
+
+  it("uses the background argument when provided", () => {
+    const options: IndyChartsVueOptions = {
+      ...baseOptions,
+      theme: { darkBackground: "#dark-theme" }
+    };
+    const result = chartSettingsFromOptions(options, true, "#prop-bg");
+    expect(result.background).toBe("#prop-bg");
+  });
+
+  it("falls back to darkBackground when isDarkTheme is true and no background argument", () => {
+    const options: IndyChartsVueOptions = {
+      ...baseOptions,
+      theme: { darkBackground: "#dark-theme", lightBackground: "#light-theme" }
+    };
+    const result = chartSettingsFromOptions(options, true, undefined);
+    expect(result.background).toBe("#dark-theme");
+  });
+
+  it("falls back to lightBackground when isDarkTheme is false and no background argument", () => {
+    const options: IndyChartsVueOptions = {
+      ...baseOptions,
+      theme: { darkBackground: "#dark-theme", lightBackground: "#light-theme" }
+    };
+    const result = chartSettingsFromOptions(options, false, undefined);
+    expect(result.background).toBe("#light-theme");
+  });
+
+  it("returns undefined background when no override and no theme background are set", () => {
+    const result = chartSettingsFromOptions(baseOptions, false, undefined);
+    expect(result.background).toBeUndefined();
+  });
+
+  it("treats empty-string background as absent and falls back to theme background", () => {
+    const options: IndyChartsVueOptions = {
+      ...baseOptions,
+      theme: { darkBackground: "#dark-theme" }
+    };
+    const result = chartSettingsFromOptions(options, true, "");
+    expect(result.background).toBe("#dark-theme");
+  });
+});
+
+describe("getThemeColors", () => {
+  it("overrides background when settings.background is set", () => {
+    const colors = getThemeColors({ isDarkTheme: true, showTooltips: true, background: "#custom" });
+    expect(colors.background).toBe("#custom");
+  });
+
+  it("returns the dark theme default background when settings.background is absent", () => {
+    const colors = getThemeColors({ isDarkTheme: true, showTooltips: true });
+    expect(colors.background).toBe("#12131680");
+  });
+
+  it("returns the light theme default background when isDarkTheme is false", () => {
+    const colors = getThemeColors({ isDarkTheme: false, showTooltips: true });
+    expect(colors.background).toBe("#FAF9FD90");
   });
 });

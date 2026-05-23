@@ -13,6 +13,9 @@
     "cwd": "${workspaceFolder}"
   },
   "tasks": [
+    // ===================================
+    // DEV ENVIRONMENT SETUP
+    // ===================================
     {
       "label": "Setup: Dev environment (linux)",
       "detail": "Install all development prerequisites (Node, .NET, Azure Functions Core Tools, pnpm)",
@@ -20,6 +23,20 @@
       "command": "bash .devcontainer/post-create.sh",
       "group": "none"
     },
+    {
+      "label": "Setup: Chrome for Puppeteer",
+      "detail": "Install Chrome browser for Puppeteer-based accessibility testing",
+      "type": "shell",
+      "command": "pnpm dlx @puppeteer/browsers install chrome",
+      "presentation": {
+        "echo": false,
+        "clear": true,
+        "panel": "shared"
+      }
+    },
+    // ===================================
+    // INSTALL/UPDATE DEPENDENCIES
+    // ===================================
     {
       "label": "Initialize: Pull, rebuild, and verify",
       "detail": "Pull latest, clean, rebuild, format, lint, and run tests",
@@ -102,11 +119,18 @@
       "dependsOn": ["Update: Node packages", "Update: NuGet packages"],
       "dependsOrder": "sequence"
     },
+    // ===================================
+    // BUILD
+    // ===================================
     {
       "label": "Build: All projects (incremental)",
-      "detail": "Incremental build of Website and Backend .NET",
-      "dependsOn": ["Build: Backend .NET (incremental)", "Build: Website"],
-      "dependsOrder": "parallel",
+      "detail": "Incremental build of Libraries, Website, and Backend .NET",
+      "dependsOn": [
+        "Build: Libraries",
+        "Build: Backend .NET (incremental)",
+        "Build: Website"
+      ],
+      "dependsOrder": "sequence",
       "group": {
         "kind": "build",
         "isDefault": true
@@ -115,16 +139,25 @@
     },
     {
       "label": "Build: All projects (full rebuild)",
-      "detail": "Full hard-reset rebuild without incremental compilation",
+      "detail": "Full hard-reset rebuild of Libraries, Website, and Backend .NET",
       "dependsOn": [
         "Clean: All (hard reset)",
         "Install: All package dependencies",
+        "Build: Libraries",
         "Build: Backend .NET (non-incremental)",
         "Build: Website"
       ],
       "dependsOrder": "sequence",
       "group": "build",
       "problemMatcher": ["$tsc", "$msCompile"]
+    },
+    {
+      "label": "Build: Libraries",
+      "detail": "Build TypeScript libraries (chartjs-financial, indy-charts)",
+      "type": "shell",
+      "command": "pnpm --filter './libs/**' run build",
+      "group": "build",
+      "problemMatcher": "$tsc"
     },
     {
       "label": "Build: Website",
@@ -160,11 +193,15 @@
       "group": "build",
       "problemMatcher": "$msCompile"
     },
+    // ===================================
+    // LINT & TEST
+    // ===================================
     {
       "label": "Lint: All (check)",
       "detail": "Run all linting and formatting checks (ESLint, Prettier, Roslynator, dotnet format, markdownlint, stylelint)",
       "dependsOn": [
         "Lint: Website (check)",
+        "Lint: Indy-Charts (check)",
         "Lint: Backend .NET (check)",
         "Lint: Markdown (check)",
         "Lint: Stylelint (check)"
@@ -186,6 +223,7 @@
       "detail": "Auto-fix Website (ESLint + Prettier), Backend (Roslynator + dotnet format), and CSS (stylelint) code",
       "dependsOn": [
         "Lint: Website (fix)",
+        "Lint: Indy-Charts (fix)",
         "Lint: Backend .NET (fix)",
         "Lint: Stylelint (fix)"
       ],
@@ -197,7 +235,7 @@
       "label": "Lint: Website (check)",
       "detail": "Check Angular, library, and VitePress code with ESLint and Prettier",
       "type": "shell",
-      "command": "bash scripts/website-lint.sh check",
+      "command": "pnpm --filter @stock-charts/client run lint --max-warnings=0 && pnpm run format:web:check && pnpm run lint:css",
       "group": "test",
       "problemMatcher": "$eslint-stylish"
     },
@@ -205,15 +243,31 @@
       "label": "Lint: Website (fix)",
       "detail": "Auto-fix Angular, library, and VitePress code with ESLint and format with Prettier",
       "type": "shell",
-      "command": "bash scripts/website-lint.sh fix",
+      "command": "pnpm --filter @stock-charts/client run lint:fix && pnpm run format:web && pnpm run lint:css:fix",
       "group": "none",
       "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Lint: Indy-Charts (check)",
+      "detail": "Check indy-charts TypeScript library code with ESLint",
+      "type": "shell",
+      "command": "pnpm --filter @facioquo/indy-charts run lint --max-warnings=0",
+      "group": "test",
+      "problemMatcher": "$eslint-stylish"
+    },
+    {
+      "label": "Lint: Indy-Charts (fix)",
+      "detail": "Auto-fix indy-charts TypeScript library code with ESLint",
+      "type": "shell",
+      "command": "pnpm --filter @facioquo/indy-charts run lint:fix",
+      "group": "none",
+      "problemMatcher": "$eslint-stylish"
     },
     {
       "label": "Lint: Backend .NET (check)",
       "detail": "Check .NET code formatting with dotnet format (Roslynator optional)",
       "type": "shell",
-      "command": "bash scripts/dotnet-lint.sh check",
+      "command": "pnpm run lint:dotnet",
       "dependsOn": ["Build: Backend .NET (incremental)"],
       "dependsOrder": "sequence",
       "group": "test",
@@ -223,7 +277,7 @@
       "label": "Lint: Backend .NET (fix)",
       "detail": "Format Backend .NET with dotnet format (Roslynator optional)",
       "type": "shell",
-      "command": "bash scripts/dotnet-lint.sh fix",
+      "command": "pnpm run lint:dotnet:fix",
       "group": "none",
       "problemMatcher": "$msCompile"
     },
@@ -259,8 +313,13 @@
     },
     {
       "label": "Test: All tests",
-      "detail": "Run all unit tests: Website, Libs, and Backend .NET",
-      "dependsOn": ["Test: Website", "Test: Libs", "Test: Backend .NET"],
+      "detail": "Run all unit tests: Website, Libs, E2E, and Backend .NET",
+      "dependsOn": [
+        "Test: Website",
+        "Test: Libs",
+        "Test: Backend .NET",
+        "Test: E2E (Playwright)"
+      ],
       "dependsOrder": "parallel",
       "group": "test",
       "problemMatcher": "$msCompile"
@@ -292,7 +351,7 @@
       "label": "Test: E2E (Playwright)",
       "detail": "Run Playwright end-to-end tests (builds and previews VitePress site first)",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/playwright-tests run test",
+      "command": "pnpm run test:e2e",
       "group": "test",
       "presentation": {
         "reveal": "always",
@@ -300,34 +359,76 @@
         "panel": "dedicated"
       }
     },
+    // ===================================
+    // CODE REVIEW
+    // ===================================
     {
-      "label": "Review: CodeRabbit CLI (plain)",
-      "detail": "Perform a full code review with CodeRabbit CLI in plain text response mode",
+      "label": "Review: CodeRabbit (agent mode prompts)",
+      "detail": "Run CodeRabbit AI code reviewer with structured JSON output for AI agent integration",
       "type": "shell",
-      "command": "coderabbit",
-      "args": ["--plain"]
+      "command": "cr --agent",
+      "group": "test",
+      "windows": {
+        "type": "process",
+        "command": "wsl",
+        "args": [
+          "bash",
+          "-lc",
+          "cd \"$(wslpath '${workspaceFolder}')\" && cr --agent"
+        ]
+      }
     },
     {
-      "label": "Review: CodeRabbit CLI (prompt-only)",
-      "detail": "Perform a full code review with CodeRabbit CLI in prompt-only response mode",
+      "label": "Review: CodeRabbit CLI (agent mode prompts, uncommitted only)",
+      "detail": "Run CodeRabbit AI code review with structured JSON output for AI agent integration",
       "type": "shell",
-      "command": "coderabbit",
-      "args": ["--prompt-only"]
+      "command": "cr --agent --type uncommitted",
+      "group": "test",
+      "windows": {
+        "type": "process",
+        "command": "wsl",
+        "args": [
+          "bash",
+          "-lc",
+          "cd \"$(wslpath '${workspaceFolder}')\" && cr --agent --type uncommitted"
+        ]
+      }
     },
     {
-      "label": "Review: CodeRabbit CLI (uncommitted, plain)",
+      "label": "Review: CodeRabbit (explained)",
+      "detail": "Run CodeRabbit AI code reviewer with detailed plain-text feedback and fix suggestions",
+      "type": "shell",
+      "command": "cr --plain",
+      "group": "test",
+      "windows": {
+        "type": "process",
+        "command": "wsl",
+        "args": [
+          "bash",
+          "-lc",
+          "cd \"$(wslpath '${workspaceFolder}')\" && cr --plain"
+        ]
+      }
+    },
+    {
+      "label": "Review: CodeRabbit CLI (explained, uncommitted only)",
       "detail": "Perform a code review on uncommitted with CodeRabbit CLI in plain text response mode",
       "type": "shell",
-      "command": "coderabbit",
-      "args": ["--plain", "--type", "uncommitted"]
+      "command": "cr --plain --type uncommitted",
+      "group": "test",
+      "windows": {
+        "type": "process",
+        "command": "wsl",
+        "args": [
+          "bash",
+          "-lc",
+          "cd \"$(wslpath '${workspaceFolder}')\" && cr --plain --type uncommitted"
+        ]
+      }
     },
-    {
-      "label": "Review: CodeRabbit CLI (uncommitted, prompt-only)",
-      "detail": "Perform a code review on uncommitted with CodeRabbit CLI in prompt-only response mode",
-      "type": "shell",
-      "command": "coderabbit",
-      "args": ["--prompt-only", "--type", "uncommitted"]
-    },
+    // ===================================
+    // RUN/SERVE APPS
+    // ===================================
     {
       "label": "Run: Full development stack",
       "detail": "Start all Backend .NET services and Website dev server",
@@ -348,7 +449,9 @@
       "isBackground": true,
       "problemMatcher": {
         "owner": "azure-storage",
-        "pattern": { "regexp": "^$" },
+        "pattern": {
+          "regexp": "^$"
+        },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^Azurite .* service is starting",
@@ -372,7 +475,9 @@
       },
       "problemMatcher": {
         "owner": "azure-functions",
-        "pattern": { "regexp": "^$" },
+        "pattern": {
+          "regexp": "^$"
+        },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^.*Azure Functions",
@@ -392,7 +497,9 @@
       "group": "none",
       "problemMatcher": {
         "owner": "web-api",
-        "pattern": { "regexp": "^$" },
+        "pattern": {
+          "regexp": "^$"
+        },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^.*Building",
@@ -409,7 +516,9 @@
       "group": "none",
       "problemMatcher": {
         "owner": "website",
-        "pattern": { "regexp": "^$" },
+        "pattern": {
+          "regexp": "^$"
+        },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^.*Compiling",
@@ -426,7 +535,9 @@
       "group": "none",
       "problemMatcher": {
         "owner": "vitepress-demo",
-        "pattern": { "regexp": "^$" },
+        "pattern": {
+          "regexp": "^$"
+        },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^.*vitepress v",
@@ -525,10 +636,9 @@
         "reveal": "always"
       }
     },
-
-    // =========================================================================
+    // ===================================
     // CLEANUP
-    // =========================================================================
+    // ===================================
     {
       "label": "Clean: All (hard reset)",
       "detail": "Hard reset: composite of all clean tasks (deep clean)",
