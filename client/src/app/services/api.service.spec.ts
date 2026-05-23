@@ -410,6 +410,56 @@ describe("ApiService", () => {
     httpMock.expectNone(request => request.url === `${env.api}/RSI/`);
   });
 
+  it("re-arms live indicator fetches after a successful getQuotes response recovers the backend", async () => {
+    const listing: IndicatorListing = {
+      name: "Average Directional Index",
+      uiid: "ADX",
+      legendTemplate: "ADX([P1])",
+      endpoint: "/ADX/",
+      category: "trend",
+      chartType: "oscillator",
+      order: 0,
+      chartConfig: null,
+      parameters: [],
+      results: []
+    };
+    const selection: IndicatorSelection = {
+      ucid: "chart-1",
+      uiid: "ADX",
+      label: "ADX(14)",
+      chartType: "oscillator",
+      params: [],
+      results: []
+    };
+
+    // Step 1: getQuotes errors → backup mode is armed
+    const firstQuotes = firstValueFrom(service.getQuotes());
+    httpMock.expectOne(`${env.api}/quotes`).error(new ProgressEvent("Network error"), {
+      status: 0,
+      statusText: "Network Error"
+    });
+    await firstQuotes;
+
+    // Sanity: indicator fetch is short-circuited while backup is armed
+    await expect(firstValueFrom(service.getSelectionData(selection, listing))).resolves.toEqual([]);
+    httpMock.expectNone(request => request.url === `${env.api}/ADX/`);
+
+    // Step 2: getQuotes succeeds → backup mode must clear
+    const secondQuotes = firstValueFrom(service.getQuotes());
+    httpMock
+      .expectOne(`${env.api}/quotes`)
+      .flush([
+        { timestamp: "2024-01-01T00:00:00.000Z", open: 1, high: 2, low: 0, close: 1, volume: 10 }
+      ]);
+    await secondQuotes;
+
+    // Step 3: indicator fetch now reaches the live endpoint
+    const indicatorRequest = firstValueFrom(service.getSelectionData(selection, listing));
+    const req = httpMock.expectOne(request => request.url === `${env.api}/ADX/`);
+    req.flush([{ timestamp: "2024-01-01", adx: 22 }]);
+    await expect(indicatorRequest).resolves.toEqual([{ timestamp: "2024-01-01", adx: 22 }]);
+  });
+
   it("client backup indicators should have valid data structure", () => {
     expect(BACKUP_INDICATORS.length).toBeGreaterThan(5);
     const firstIndicator = BACKUP_INDICATORS[0];

@@ -90,9 +90,12 @@ export function addExtraBars(dataPoints: ScatterDataPoint[], extraBars: number):
   for (let i = 0; i < extraBars; i++) {
     // Advance to the next business day, skipping Saturday (6) and Sunday (0),
     // so extra bars align with expected trading sessions on daily charts.
+    // UTC methods keep the padded dates deterministic across client timezones —
+    // local-time arithmetic would shift the cadence near midnight UTC and let
+    // overlay vs oscillator x-axes drift apart on browsers in different zones.
     do {
-      baseDate.setDate(baseDate.getDate() + 1);
-    } while (baseDate.getDay() === 0 || baseDate.getDay() === 6);
+      baseDate.setUTCDate(baseDate.getUTCDate() + 1);
+    } while (baseDate.getUTCDay() === 0 || baseDate.getUTCDay() === 6);
     dataPoints.push({ x: baseDate.valueOf(), y: NaN });
   }
 }

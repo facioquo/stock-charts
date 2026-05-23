@@ -15,7 +15,8 @@ export class ApiService {
    * data. While active, `getSelectionData` short-circuits to `[]` so oscillator
    * and overlay indicators do not render their live timestamps against stale
    * (or absent) backup quotes — keeping fallback behavior consistent across
-   * chart types.
+   * chart types. Reset to `false` whenever a live quotes or listings response
+   * succeeds so the app recovers automatically once the backend returns.
    */
   private backupActive = false;
 
@@ -29,7 +30,14 @@ export class ApiService {
       volume: number;
     };
     return this.http.get<ApiQuote[]>(`${env.api}/quotes`, this.requestHeader()).pipe(
-      map(res => this.toQuotes(res)),
+      map(res => {
+        // Clear backup mode only after the response has been normalized
+        // successfully — a schema-error throw inside toQuotes still routes
+        // to catchError and re-arms backup mode below.
+        const quotes = this.toQuotes(res);
+        this.backupActive = false;
+        return quotes;
+      }),
       catchError((error: HttpErrorResponse) => {
         this.backupActive = true;
         console.warn("Backend API unavailable, using client-side backup quotes", {
@@ -45,6 +53,10 @@ export class ApiService {
 
   getListings(): Observable<IndicatorListing[]> {
     return this.http.get<IndicatorListing[]>(`${env.api}/indicators`, this.requestHeader()).pipe(
+      map(listings => {
+        this.backupActive = false;
+        return listings;
+      }),
       catchError((error: HttpErrorResponse) => {
         this.backupActive = true;
         console.warn("Backend API unavailable, using client-side backup indicators", {

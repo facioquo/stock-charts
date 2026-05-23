@@ -156,13 +156,15 @@ Override per-page options with `:config`:
 </ClientOnly>
 ```
 
-Pair an oscillator with the price chart by setting `:with-overlay="true"`:
+Have a single component render **both** the price chart and the oscillator stacked together by setting `:with-overlay="true"` — no separate price-chart component required:
 
 ```vue
 <ClientOnly>
   <StockIndicatorChart indicator="rsi" :with-overlay="true" />
 </ClientOnly>
 ```
+
+The instance manages its own price/volume canvas above the RSI panel; it does not look at adjacent siblings.
 
 ## What's next?
 

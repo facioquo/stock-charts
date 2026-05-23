@@ -54,7 +54,7 @@ pnpm start  # Terminal 4: Angular dev server
 
 ## Financial charts
 
-Financial chart support (`candlestick`, `ohlc`) is integrated as typed, modular Chart.js workspace packages under `libs/chartjs-financial` and `libs/indy-charts`.
+Financial chart support (`candlestick`, `ohlc`, `volume`) is integrated as typed, modular Chart.js workspace packages under `libs/chartjs-financial` and `libs/indy-charts`.
 
 - Register once at startup with `setupIndyCharts()` (already called from `client/src/main.ts`).
 - Use OHLC data points in `{ x, o, h, l, c }` shape where `x` is a timestamp.

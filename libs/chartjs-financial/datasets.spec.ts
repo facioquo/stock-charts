@@ -103,10 +103,10 @@ describe("financial dataset factories", () => {
 
     const dataset = buildVolumeDataset(quotes, 1, palette);
     const extra = dataset.data[1];
-    const extraDay = new Date(extra?.x ?? 0).getDay();
+    const extraDay = new Date(extra?.x ?? 0).getUTCDay();
 
     expect(dataset.data).toHaveLength(2);
-    expect(extraDay).not.toBe(0); // not Sunday
-    expect(extraDay).not.toBe(6); // not Saturday
+    expect(extraDay).not.toBe(0); // not Sunday (UTC)
+    expect(extraDay).not.toBe(6); // not Saturday (UTC)
   });
 });

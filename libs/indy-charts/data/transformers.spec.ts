@@ -289,10 +289,11 @@ describe("addExtraBars", () => {
     const extraDates = dataPoints.slice(1).map(dp => new Date(dp.x as number));
 
     extraDates.forEach(d => {
-      // addExtraBars uses getDay() (local time), so assert with getDay()
-      const day = d.getDay();
-      expect(day).not.toBe(0); // not Sunday
-      expect(day).not.toBe(6); // not Saturday
+      // addExtraBars uses UTC day arithmetic so the cadence is deterministic
+      // across client timezones — assert with getUTCDay() to match.
+      const day = d.getUTCDay();
+      expect(day).not.toBe(0); // not Sunday (UTC)
+      expect(day).not.toBe(6); // not Saturday (UTC)
     });
   });
 
@@ -344,8 +345,8 @@ describe("addExtraBars", () => {
     addExtraBars(dataPoints, 1);
 
     const nextDate = new Date(dataPoints[1].x as number);
-    // Should be Monday (day 1)
-    expect(nextDate.getDay()).toBe(1);
+    // Should be Monday (day 1) in UTC — addExtraBars advances via setUTCDate.
+    expect(nextDate.getUTCDay()).toBe(1);
   });
 });
 

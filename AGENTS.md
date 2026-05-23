@@ -35,7 +35,11 @@ stock-charts/
 │   ├── WebApi/               # REST API endpoints
 │   │   ├── Models/           # Data models
 │   │   └── Services/         # Business logic
+│   ├── WebApi.Tests/         # xUnit tests for the Web API
 │   └── Directory.Packages.props  # Centralized NuGet versions
+├── tests/
+│   ├── playwright/           # End-to-end tests against client + VitePress
+│   └── vitepress/            # Docs site (Cloudflare Pages) + indy-charts integration host
 ├── docs/                     # Documentation
 ├── scripts/                  # Setup and utility scripts
 └── .github/
@@ -203,7 +207,7 @@ Client-side project dependencies are strictly in this direction only: client →
 - **C# / .NET 10**: Latest language features, record types for DTOs
 - **Azure Functions**: Isolated worker model for data processing
 - **ASP.NET Core Web API**: REST endpoints for chart data
-- **Entity Framework**: Data access layer (if applicable)
+- **Skender.Stock.Indicators**: NuGet library used in `server/WebApi/Services/` to compute every indicator the API serves
 - **Directory.Packages.props**: Centralized NuGet version management
 
 ### Financial charts integration
@@ -211,7 +215,7 @@ Client-side project dependencies are strictly in this direction only: client →
 Financial chart types (`candlestick`, `ohlc`, `volume`) are maintained in `libs/chartjs-financial/` and bundled into `@facioquo/indy-charts`:
 
 - **Location**: `libs/chartjs-financial/`
-- **Registration**: `setupIndyCharts()` called from `main.ts`; `registerFinancialCharts()` is an internal detail of `@facioquo/indy-charts`
+- **Registration**: `setupIndyCharts()` is called once from `client/src/main.ts` (or `setupIndyChartsForVue()` from the Vue/VitePress adapter). `registerFinancialCharts()` is a public export of `@facioquo/chartjs-chart-financial` but indy-charts callers do not invoke it directly — `setupIndyCharts` handles registration internally.
 - **Data shape**: OHLC points as `{ x: timestamp, o, h, l, c }`
 - **Theming**: `getFinancialPalette()` and `applyFinancialElementTheme()`
 - **Factories**: `buildCandlestickDataset()`, `buildVolumeDataset()`, `buildFinancialChartOptions()`

@@ -64,12 +64,12 @@ export function buildVolumeDataset(
   for (let i = 0; i < extraBars; i++) {
     // Advance to the next business day, skipping Saturday (6) and Sunday (0),
     // so trailing volume padding aligns with the indicator/oscillator padding
-    // produced by indy-charts addExtraBars (which also skips weekends). Without
-    // matching weekday cadence + count, oscillator x-axes extend one bar
-    // farther right than the overlay.
+    // produced by indy-charts addExtraBars (which also skips weekends).
+    // UTC methods keep the padded dates deterministic across client timezones
+    // — local-time arithmetic would shift the cadence near midnight UTC.
     do {
-      nextDate.setDate(nextDate.getDate() + 1);
-    } while (nextDate.getDay() === 0 || nextDate.getDay() === 6);
+      nextDate.setUTCDate(nextDate.getUTCDate() + 1);
+    } while (nextDate.getUTCDay() === 0 || nextDate.getUTCDay() === 6);
     volumeData.push({ x: new Date(nextDate).valueOf(), y: Number.NaN });
     volumeColors.push(palette.volume.unchanged);
   }

@@ -42,6 +42,9 @@ Without an API to compute indicators server-side, you can do it inline. EMA is j
 
 ```typescript
 function computeEma(closes: number[], period: number): number[] {
+  if (!Number.isInteger(period) || period <= 0) {
+    throw new Error(`EMA period must be a positive integer, got ${period}`);
+  }
   const k = 2 / (period + 1);
   const result: number[] = new Array(closes.length).fill(NaN);
   if (closes.length < period) return result;
@@ -103,6 +106,9 @@ const quotes: Quote[] = loadStaticQuotes([
 ]);
 
 function computeEma(closes: number[], period: number): number[] {
+  if (!Number.isInteger(period) || period <= 0) {
+    throw new Error(`EMA period must be a positive integer, got ${period}`);
+  }
   const k = 2 / (period + 1);
   const result: number[] = new Array(closes.length).fill(NaN);
   if (closes.length < period) return result;
