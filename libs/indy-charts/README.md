@@ -57,8 +57,13 @@ setupIndyCharts();
 const api = createApiClient({ baseUrl: "https://api.example.com" });
 const [quotes, listings] = await Promise.all([api.getQuotes(), api.getListings()]);
 
+const priceCanvas = document.getElementById("price-chart");
+if (!(priceCanvas instanceof HTMLCanvasElement)) {
+  throw new Error("Price chart canvas not found");
+}
+
 const manager = new ChartManager({ settings: { isDarkTheme: false, showTooltips: true } });
-manager.initializeOverlay(document.getElementById("price-chart") as HTMLCanvasElement, quotes, 250);
+manager.initializeOverlay(priceCanvas, quotes, 250);
 
 // Overlay indicator (EMA) renders on the price canvas.
 const ema = listings.find(l => l.uiid === "EMA")!;
@@ -79,7 +84,12 @@ manager.processSelectionData(
   loadStaticIndicatorData(await api.getSelectionData(rsiSel, rsi))
 );
 manager.displaySelection(rsiSel, rsi);
-manager.createOscillator(document.getElementById("rsi-chart") as HTMLCanvasElement, rsiSel, rsi);
+
+const rsiCanvas = document.getElementById("rsi-chart");
+if (!(rsiCanvas instanceof HTMLCanvasElement)) {
+  throw new Error("RSI chart canvas not found");
+}
+manager.createOscillator(rsiCanvas, rsiSel, rsi);
 ```
 
 ## Usage with Vue 3 / VitePress
