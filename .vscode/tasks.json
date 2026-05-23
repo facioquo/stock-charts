@@ -223,7 +223,7 @@
       "label": "Lint: Website (check)",
       "detail": "Check Angular, library, and VitePress code with ESLint and Prettier",
       "type": "shell",
-      "command": "bash scripts/website-lint.sh check",
+      "command": "pnpm --filter @stock-charts/client run lint --max-warnings=0 && pnpm run format:web:check && pnpm run lint:css",
       "group": "test",
       "problemMatcher": "$eslint-stylish"
     },
@@ -231,7 +231,7 @@
       "label": "Lint: Website (fix)",
       "detail": "Auto-fix Angular, library, and VitePress code with ESLint and format with Prettier",
       "type": "shell",
-      "command": "bash scripts/website-lint.sh fix",
+      "command": "pnpm --filter @stock-charts/client run lint:fix && pnpm run format:web && pnpm run lint:css:fix",
       "group": "none",
       "problemMatcher": "$tsc"
     },
@@ -255,7 +255,7 @@
       "label": "Lint: Backend .NET (check)",
       "detail": "Check .NET code formatting with dotnet format (Roslynator optional)",
       "type": "shell",
-      "command": "bash scripts/dotnet-lint.sh check",
+      "command": "pnpm run lint:dotnet",
       "dependsOn": ["Build: Backend .NET (incremental)"],
       "dependsOrder": "sequence",
       "group": "test",
@@ -265,7 +265,7 @@
       "label": "Lint: Backend .NET (fix)",
       "detail": "Format Backend .NET with dotnet format (Roslynator optional)",
       "type": "shell",
-      "command": "bash scripts/dotnet-lint.sh fix",
+      "command": "pnpm run lint:dotnet:fix",
       "group": "none",
       "problemMatcher": "$msCompile"
     },

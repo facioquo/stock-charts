@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "chartjs-adapter-date-fns": "^3.0.0",
-    "date-fns": "^4.2.1"
+    "date-fns": "^4.3.0"
   },
   "peerDependencies": {
     "chart.js": "^4.5.1",
