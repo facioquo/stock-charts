@@ -3,83 +3,76 @@ layout: home
 
 hero:
   name: Indy Charts
-  text: Financial charting made simple
-  tagline: Framework-agnostic financial charting library with technical indicators
+  text: Financial charting, batteries included
+  tagline: Candlesticks, volume, and ten-plus technical indicators on Chart.js — Vue, React, Angular, or vanilla JS.
   actions:
     - theme: brand
-      text: Get started
-      link: /guide/
+      text: Install
+      link: /guide/installation
     - theme: alt
-      text: View examples
-      link: /examples/
+      text: Quick start
+      link: /guide/quick-start
+    - theme: alt
+      text: API reference
+      link: /reference/api-client
 
 features:
   - icon: 📊
-    title: Financial charts
-    details: Candlestick, OHLC, and volume charts built on Chart.js with full customization.
+    title: Price + volume charts
+    details: Candlestick and volume rendered in one canvas, with sensible defaults out of the box.
+    link: /examples/
+    linkText: See overlay example
 
   - icon: 📈
-    title: Technical indicators
-    details: Support for multiple indicators including SMA, EMA, RSI, MACD, and more.
+    title: Built-in indicators
+    details: SMA, EMA, RSI, MACD, Bollinger Bands, and more. Standalone oscillators or paired with the price chart.
+    link: /examples/indicators
+    linkText: See oscillator example
 
   - icon: 🎨
-    title: Theme support
-    details: Built-in light and dark themes with customizable color palettes.
+    title: Light + dark themes
+    details: Auto-syncs with VitePress dark mode. Per-instance or site-wide background overrides.
+    link: /guide/themes
+    linkText: Theme docs
 
-  - icon: 🔧
-    title: Framework agnostic
-    details: Works with Vue, React, Angular, or vanilla JavaScript.
+  - icon: 🔌
+    title: Bring your own data
+    details: Use the bundled API client or hand the chart pre-loaded Quote[] — no API required.
+    link: /examples/custom-data
+    linkText: Static data example
 
   - icon: 📦
-    title: TypeScript
-    details: Full TypeScript support with comprehensive type definitions.
+    title: TypeScript first
+    details: Strict types, ES2020 target, Canvas + fetch APIs only. Runs in every modern browser.
 
   - icon: ⚡
-    title: Performance
-    details: Optimized for large datasets with efficient rendering and responsive chart updates.
+    title: 250+ bars, instant pan
+    details: Tuned for large daily-quote datasets with non-intersecting tooltips and animation-free updates.
 ---
 
-## Quick example
+## See it in action
 
-```typescript
-import { createApiClient, OverlayChart, setupIndyCharts } from "@facioquo/indy-charts";
+A price chart with an EMA overlay:
 
-setupIndyCharts();
-
-const client = createApiClient({ baseUrl: "https://api.example.com" });
-const quotes = await client.getQuotes();
-
-const canvas = document.getElementById("main-chart");
-if (!(canvas instanceof HTMLCanvasElement)) throw new Error("Chart canvas not found");
-
-const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true });
-chart.render(quotes.slice(-250));
-```
-
-**Using Vue?** Register the adapter once in your app entry point (e.g. `.vitepress/theme/index.ts` for VitePress, or `main.ts` for plain Vue):
-
-```typescript
-import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
-
-export default {
-  enhanceApp({ app }) {
-    setupIndyChartsForVue(app, {
-      api: { baseUrl: "https://api.example.com" },
-      indicators: { ema: { uiid: "EMA", params: { lookbackPeriods: 20 } } }
-    });
-  }
-};
-```
-
-Then use the global component from Markdown:
-
-```vue
 <ClientOnly>
-  <StockIndicatorChart indicator="ema" />
+  <StockIndicatorChart indicator="ema" :config="{ id: 'home-ema-overlay' }" />
 </ClientOnly>
-```
 
-## Installation
+A standalone RSI oscillator:
+
+<ClientOnly>
+  <StockIndicatorChart indicator="rsi" :config="{ id: 'home-rsi-standalone' }" />
+</ClientOnly>
+
+An oscillator paired with the price chart (`:with-overlay="true"`):
+
+<ClientOnly>
+  <StockIndicatorChart indicator="rsi" :with-overlay="true" :config="{ id: 'home-rsi-with-overlay' }" />
+</ClientOnly>
+
+Each instance is independent and manages its own `ChartManager`. Drop as many as you want on a page.
+
+## Install
 
 ::: code-group
 
@@ -96,3 +89,46 @@ yarn add @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
 :::
+
+## Use it
+
+In any TS/JS project:
+
+```typescript
+import { createApiClient, OverlayChart, setupIndyCharts } from "@facioquo/indy-charts";
+
+setupIndyCharts();
+
+const client = createApiClient({ baseUrl: "https://api.example.com" });
+const quotes = await client.getQuotes();
+
+const canvas = document.getElementById("chart") as HTMLCanvasElement;
+const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true });
+chart.render(quotes.slice(-250));
+```
+
+In Vue / VitePress, register the adapter once and use the global component:
+
+```typescript
+// .vitepress/theme/index.ts (or main.ts)
+import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
+
+export default {
+  enhanceApp({ app }) {
+    setupIndyChartsForVue(app, {
+      api: { baseUrl: "https://api.example.com" },
+      indicators: { ema: { uiid: "EMA", params: { lookbackPeriods: 20 } } }
+    });
+  }
+};
+```
+
+```vue
+<ClientOnly>
+  <StockIndicatorChart indicator="ema" />
+</ClientOnly>
+```
+
+## Under the hood
+
+Built on [Chart.js](https://chartjs.org). Runs anywhere ES2020 + Canvas + `fetch` are available — every browser shipped in the last few years. Source: [github.com/facioquo/stock-charts](https://github.com/facioquo/stock-charts).

@@ -21,30 +21,39 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: "Home", link: "/" },
-      { text: "Guide", link: "/guide/" },
-      { text: "Examples", link: "/examples/" }
+      { text: "Guide", link: "/guide/installation" },
+      { text: "Examples", link: "/examples/" },
+      { text: "Reference", link: "/reference/api-client" }
     ],
 
-    sidebar: [
-      {
-        text: "Getting started",
-        items: [
-          { text: "Introduction", link: "/guide/" },
-          { text: "Installation", link: "/guide/installation" },
-          { text: "Quick start", link: "/guide/quick-start" },
-          { text: "Theme customization", link: "/guide/themes" }
-        ]
-      },
-      {
-        text: "Examples",
-        items: [
-          { text: "Overlay chart", link: "/examples/" },
-          { text: "Oscillator chart", link: "/examples/indicators" },
-          { text: "Multiple charts", link: "/examples/multiple" },
-          { text: "Custom data", link: "/examples/custom-data" }
-        ]
-      }
-    ],
+    sidebar: {
+      "/guide/": [
+        {
+          text: "Getting started",
+          items: [
+            { text: "Installation", link: "/guide/installation" },
+            { text: "Quick start", link: "/guide/quick-start" },
+            { text: "Theme customization", link: "/guide/themes" }
+          ]
+        }
+      ],
+      "/examples/": [
+        {
+          text: "Examples",
+          items: [
+            { text: "Overlay chart", link: "/examples/" },
+            { text: "Oscillator chart", link: "/examples/indicators" },
+            { text: "Custom data", link: "/examples/custom-data" }
+          ]
+        }
+      ],
+      "/reference/": [
+        {
+          text: "Reference",
+          items: [{ text: "API client", link: "/reference/api-client" }]
+        }
+      ]
+    },
 
     socialLinks: [{ icon: "github", link: "https://github.com/facioquo/stock-charts" }]
   }

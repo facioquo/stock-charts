@@ -63,4 +63,4 @@ interface Quote {
 
 - [Basic example](/examples/)
 - [Adding indicators](/examples/indicators)
-- [Multiple charts](/examples/multiple)
+- [Custom data](/examples/custom-data)

@@ -26,7 +26,7 @@ const api = createApiClient({
 });
 ```
 
-See [API client configuration](/guide/api-client) for all options.
+See [API client reference](/reference/api-client) for all options.
 
 ## Step 3: Render a price chart
 
@@ -89,12 +89,12 @@ In `.vitepress/theme/index.ts`:
 ```typescript
 import DefaultTheme from "vitepress/theme";
 
-import { setupIndyChartsForVitePress } from "@facioquo/indy-charts/vitepress";
+import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
-    setupIndyChartsForVitePress(app, {
+    setupIndyChartsForVue(app, {
       api: { baseUrl: "https://api.example.com" },
       defaults: { barCount: 250, quoteCount: 250, showTooltips: true },
       indicators: {
@@ -133,5 +133,5 @@ Override per-page options with `:config`:
 
 - See [basic example](/examples/) for a working demo
 - Learn about [indicators](/examples/indicators)
-- Explore [multiple charts](/examples/multiple)
-- Read about [API client configuration](/guide/api-client)
+- Supply [custom data](/examples/custom-data)
+- Read the [API client reference](/reference/api-client)

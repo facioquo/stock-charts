@@ -1,12 +1,13 @@
 # Installation
 
+Install the library, then verify it works with a minimal chart. The full step-by-step lives in [Quick start](/guide/quick-start).
+
 ## Prerequisites
 
-Make sure you have Node.js 24+ installed.
+- **Node.js 24+** for tooling
+- A modern browser (ES2020, Canvas API, `fetch`)
 
-## Install dependencies
-
-Install the package and its peer dependencies:
+## Install
 
 ::: code-group
 
@@ -24,36 +25,49 @@ yarn add @facioquo/indy-charts chart.js chartjs-plugin-annotation
 
 :::
 
-## Package overview
+`chart.js` and `chartjs-plugin-annotation` are peer dependencies. Date utilities are bundled — you do **not** need a separate date library.
 
-### @facioquo/indy-charts
+## First chart (verify)
 
-The main library providing:
+Render a candlestick + volume chart against your API to confirm everything is wired up. Replace `https://api.example.com` with your stock-charts WebApi URL.
 
-- Chart abstractions (ChartManager, OverlayChart, OscillatorChart)
-- Configuration builders
-- Data transformers
-- API client
-- Vue adapter through `@facioquo/indy-charts/vue` (also works with VitePress)
+```html
+<canvas id="overlay-chart" style="height:400px"></canvas>
+```
 
-### Peer dependencies
+```typescript
+import {
+  createApiClient,
+  OverlayChart,
+  setupIndyCharts
+} from "@facioquo/indy-charts";
 
-- **chart.js**: Core charting library
-- **chartjs-plugin-annotation**: Annotation support
+setupIndyCharts();
 
-### Bundled dependencies
+const client = createApiClient({ baseUrl: "https://api.example.com" });
+const quotes = await client.getQuotes();
 
-Date and time utilities are bundled inside `@facioquo/indy-charts`.
-You do not need to install additional date-handling packages.
+const canvas = document.getElementById("overlay-chart") as HTMLCanvasElement;
+const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true });
+chart.render(quotes.slice(-250));
+```
 
-### Vue integration
+If the chart renders, you're set. If not, check the browser console — most errors are missing peer deps or a wrong API URL.
 
-For Vue applications (including VitePress), register the chart library once in your app entry point. Vue developers should use the `<StockIndicatorChart />` component for simple, interactive charts without manual Chart.js configuration.
+## What you get
 
-## TypeScript
+| Module | Purpose |
+| --- | --- |
+| `ChartManager`, `OverlayChart`, `OscillatorChart` | High-level chart classes |
+| `createApiClient` | Typed REST client for quotes + indicators |
+| `loadStaticQuotes`, `loadStaticIndicatorData` | Use your own data, no API needed |
+| `setupIndyCharts`, `setupIndyChartsForVue` | One-time registration of Chart.js controllers |
+| `getThemeColors`, `getFinancialPalette` | Theme + candlestick color helpers |
 
-Both libraries include full TypeScript definitions. No additional `@types` packages needed.
+TypeScript definitions ship in the package — no `@types/` install required.
 
 ## Next steps
 
-Continue to [Quick Start](/guide/quick-start) to create your first chart.
+- [Quick start](/guide/quick-start) — build a chart with indicators, step by step
+- [Custom data](/examples/custom-data) — render without an API
+- [API client reference](/reference/api-client)

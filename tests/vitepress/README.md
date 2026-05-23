@@ -99,9 +99,10 @@ Markdown pages use the global component directly:
 
 ### Live examples
 
-- `/examples/` renders a live overlay indicator chart through `StockIndicatorChart`
-- `/examples/indicators` renders a live oscillator chart through `StockIndicatorChart`
-- `/examples/multiple` is currently a recipe page (truthful code, no live embed)
+- `/` renders three live demos on the home page (overlay, standalone oscillator, oscillator with overlay)
+- `/examples/` renders the standalone overlay chart example
+- `/examples/indicators` renders the standalone oscillator example
+- `/examples/custom-data` renders a bring-your-own-quotes example
 
 ### TypeScript support
 
