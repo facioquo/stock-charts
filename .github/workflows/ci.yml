@@ -183,7 +183,7 @@ jobs:
           fail_ci_if_error: false
 
       - name: Upload frontend coverage artifacts
-        if: github.event_name == 'pull_request' && always()
+        if: github.event_name == 'pull_request' && (success() || failure())
         uses: actions/upload-artifact@v7
         with:
           name: frontend-coverage-report
