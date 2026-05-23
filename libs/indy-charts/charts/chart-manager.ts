@@ -169,6 +169,9 @@ export class ChartManager {
 
   /**
    * Display a processed selection on the appropriate chart.
+   *
+   * @throws {Error} if `selection.ucid` collides with the reserved internal key
+   *   used by the overlay's candlestick+volume cache entry.
    */
   displaySelection(selection: IndicatorSelection, listing: IndicatorListing): void {
     if (selection.ucid === OVERLAY_MAIN_KEY) {
@@ -245,6 +248,9 @@ export class ChartManager {
    * @throws {Error} if displaySelection() has not been called for this selection,
    *   because setBarCount() iterates this.selections and will silently skip any
    *   oscillator whose ucid is not present there.
+   * @throws {Error} if processSelectionData() has not been called — the dataset
+   *   cache must be populated so the windowed slice has data to render. Validated
+   *   in every viewport state so failures are not viewport-dependent.
    */
   createOscillator(
     ctx: CanvasRenderingContext2D | HTMLCanvasElement,

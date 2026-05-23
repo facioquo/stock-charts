@@ -16,9 +16,7 @@
   "dependencies": {
     "@facioquo/indy-charts": "workspace:*",
     "chart.js": "4.5.1",
-    "chartjs-adapter-date-fns": "3.0.0",
-    "chartjs-plugin-annotation": "3.1.0",
-    "date-fns": "^4.3.0"
+    "chartjs-plugin-annotation": "3.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
