@@ -80,7 +80,7 @@ The resolution order is: per-instance prop → per-instance config → site-wide
 ## Light and dark presets
 
 | Element | Light | Dark |
-|---------|-------|------|
+| --- | --- | --- |
 | **Text** | `#121316` | `#808080` |
 | **Background** | `#FAF9FD90` | `#12131680` |
 | **Grid** | `#E0E0E0` | `#2E2E2E` |

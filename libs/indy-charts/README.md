@@ -58,11 +58,7 @@ const api = createApiClient({ baseUrl: "https://api.example.com" });
 const [quotes, listings] = await Promise.all([api.getQuotes(), api.getListings()]);
 
 const manager = new ChartManager({ settings: { isDarkTheme: false, showTooltips: true } });
-manager.initializeOverlay(
-  document.getElementById("price-chart") as HTMLCanvasElement,
-  quotes,
-  250
-);
+manager.initializeOverlay(document.getElementById("price-chart") as HTMLCanvasElement, quotes, 250);
 
 // Overlay indicator (EMA) renders on the price canvas.
 const ema = listings.find(l => l.uiid === "EMA")!;
@@ -83,11 +79,7 @@ manager.processSelectionData(
   loadStaticIndicatorData(await api.getSelectionData(rsiSel, rsi))
 );
 manager.displaySelection(rsiSel, rsi);
-manager.createOscillator(
-  document.getElementById("rsi-chart") as HTMLCanvasElement,
-  rsiSel,
-  rsi
-);
+manager.createOscillator(document.getElementById("rsi-chart") as HTMLCanvasElement, rsiSel, rsi);
 ```
 
 ## Usage with Vue 3 / VitePress
@@ -125,16 +117,16 @@ Use the global component from Markdown / templates:
 
 ## Public exports
 
-| Export | Purpose |
-| --- | --- |
-| `setupIndyCharts()` | Register Chart.js controllers + financial chart types (call once at startup) |
-| `ChartManager` | Lifecycle orchestrator for overlay + oscillator charts and viewport changes |
-| `OverlayChart`, `OscillatorChart` | Lower-level chart classes if you don't need `ChartManager` |
-| `createApiClient(config)` | Typed `fetch` client for `GET /quotes`, `GET /indicators`, indicator data |
-| `loadStaticQuotes`, `loadStaticIndicatorData` | Normalize bring-your-own quote and indicator arrays |
-| `createDefaultSelection`, `applySelectionTokens`, `calculateOptimalBars` | Selection / viewport helpers |
-| `getThemeColors`, `baseOverlayConfig`, `baseOscillatorConfig` | Theme + config building blocks |
-| `setupIndyChartsForVue` (`/vue` subpath) | Vue 3 adapter that registers `<StockIndicatorChart>` globally |
+| Export                                                                   | Purpose                                                                      |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `setupIndyCharts()`                                                      | Register Chart.js controllers + financial chart types (call once at startup) |
+| `ChartManager`                                                           | Lifecycle orchestrator for overlay + oscillator charts and viewport changes  |
+| `OverlayChart`, `OscillatorChart`                                        | Lower-level chart classes if you don't need `ChartManager`                   |
+| `createApiClient(config)`                                                | Typed `fetch` client for `GET /quotes`, `GET /indicators`, indicator data    |
+| `loadStaticQuotes`, `loadStaticIndicatorData`                            | Normalize bring-your-own quote and indicator arrays                          |
+| `createDefaultSelection`, `applySelectionTokens`, `calculateOptimalBars` | Selection / viewport helpers                                                 |
+| `getThemeColors`, `baseOverlayConfig`, `baseOscillatorConfig`            | Theme + config building blocks                                               |
+| `setupIndyChartsForVue` (`/vue` subpath)                                 | Vue 3 adapter that registers `<StockIndicatorChart>` globally                |
 
 Full TypeScript definitions ship with the package — no `@types/` install required.
 
