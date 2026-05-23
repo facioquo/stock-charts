@@ -38,7 +38,7 @@ const LIGHT_COLORS: ThemeColors = {
 };
 
 const DARK_COLORS: ThemeColors = {
-  text: "#B0B0B0",
+  text: "#808080",
   background: "#12131680",
   grid: "#2E2E2E"
 };
