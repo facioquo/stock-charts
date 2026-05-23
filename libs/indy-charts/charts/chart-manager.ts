@@ -28,6 +28,14 @@ const CATEGORIES = {
   CANDLESTICK_PATTERN: "candlestick-pattern"
 } as const;
 
+/**
+ * Reserved cache key for the overlay's candlestick + volume datasets in
+ * `_allProcessedDatasets`. No `IndicatorSelection.ucid` may collide with this
+ * — a collision would mis-cast candlestick data as indicator data in
+ * `applySlicedData`.
+ */
+const OVERLAY_MAIN_KEY = "overlay-main";
+
 export interface ChartManagerConfig {
   settings: ChartSettings;
   extraBars?: number;
@@ -108,7 +116,7 @@ export class ChartManager {
     // Build and store the full-history datasets separately so setBarCount()
     // can re-slice across the entire history without re-rendering the chart.
     const fullDatasets = this._overlayChart.buildFullDatasets(allQuotes, this.extraBars);
-    this._allProcessedDatasets.set("overlay-main", fullDatasets);
+    this._allProcessedDatasets.set(OVERLAY_MAIN_KEY, fullDatasets);
 
     // Re-attach previously registered overlay selections so they survive
     // overlay re-initialization (e.g., theme/canvas reset). Without this,
@@ -163,6 +171,12 @@ export class ChartManager {
    * Display a processed selection on the appropriate chart.
    */
   displaySelection(selection: IndicatorSelection, listing: IndicatorListing): void {
+    if (selection.ucid === OVERLAY_MAIN_KEY) {
+      throw new Error(
+        `displaySelection: ucid "${OVERLAY_MAIN_KEY}" is reserved for internal use; ` +
+          `pick a different ucid for this selection.`
+      );
+    }
     if (this._selections.some(s => s.ucid === selection.ucid)) return;
     this._selections.push(selection);
 
@@ -247,6 +261,20 @@ export class ChartManager {
       );
     }
 
+    // Guard: processSelectionData() must have populated the dataset cache.
+    // Validated unconditionally (not only under a windowed overlay) so the
+    // failure mode doesn't depend on viewport state — otherwise the same
+    // missing-precondition bug would throw on mobile and silently render a
+    // broken chart on desktop.
+    const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
+    if (!fullDatasets) {
+      throw new Error(
+        `createOscillator: selection "${selection.ucid}" has no processed datasets. ` +
+          `Call processSelectionData() before createOscillator() so the oscillator ` +
+          `has data to render.`
+      );
+    }
+
     this._oscillators.get(selection.ucid)?.destroy();
     const oscillator = new OscillatorChart(ctx, this._settings);
     oscillator.render(selection, listing);
@@ -258,17 +286,6 @@ export class ChartManager {
     // future setBarCount() calls.
     const totalQuotes = this._allQuotes.length;
     if (totalQuotes > 0 && this._currentBarCount < totalQuotes) {
-      const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
-      if (!fullDatasets) {
-        // processSelectionData() populates this cache; reaching here means a
-        // caller skipped it, which would also leave selection.results[].dataset
-        // empty. Fail loudly instead of silently rendering an unaligned chart.
-        throw new Error(
-          `createOscillator: selection "${selection.ucid}" has no processed datasets. ` +
-            `Call processSelectionData() before createOscillator() so the oscillator can ` +
-            `align with the current viewport window.`
-        );
-      }
       const startIndex = totalQuotes - this._currentBarCount;
       oscillator.applySlicedData(selection, fullDatasets as IndicatorDataset[], startIndex);
     }
@@ -340,7 +357,7 @@ export class ChartManager {
     const startIndex = Math.max(0, totalQuotes - normalizedBarCount);
 
     // Update overlay main datasets (candlestick + volume)
-    const fullMainDatasets = this._allProcessedDatasets.get("overlay-main");
+    const fullMainDatasets = this._allProcessedDatasets.get(OVERLAY_MAIN_KEY);
     if (this._overlayChart && fullMainDatasets) {
       this._overlayChart.applySlicedData(fullMainDatasets, startIndex);
       this._overlayChart.updateLegends(this._selections);
@@ -393,7 +410,7 @@ export class ChartManager {
       if (!fullDatasets || !oscillator) return;
 
       // Cached datasets for an oscillator selection are always indicator datasets
-      // (the heterogeneous cache also holds candlestick+volume under "overlay-main").
+      // (the heterogeneous cache also holds candlestick+volume under OVERLAY_MAIN_KEY).
       oscillator.applySlicedData(selection, fullDatasets as IndicatorDataset[], startIndex);
     });
   }

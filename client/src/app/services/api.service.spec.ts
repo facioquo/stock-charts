@@ -274,7 +274,13 @@ describe("ApiService", () => {
     req.flush(mockSelectionData);
   });
 
-  it("should fallback to timestamp-aligned backup rows when backend is transiently unavailable", async () => {
+  it("should fallback to empty selection data when backend is transiently unavailable", async () => {
+    // Quotes/listings are still live in this path, so candlesticks are at live
+    // timestamps. Returning backup rows (2016-2019 dates) would diverge from
+    // those just as badly as the original today-dated trailing bars did, so
+    // the transient path keeps the empty-array contract and leaves the
+    // overlay's other live datasets to anchor the x-axis. `backupActive` is
+    // NOT armed here — that's reserved for quotes/listings fallbacks.
     const listing: IndicatorListing = {
       name: "Average Directional Index",
       uiid: "ADX",
@@ -303,10 +309,15 @@ describe("ApiService", () => {
       statusText: "Unknown Error"
     });
 
-    const rows = (await result) as Array<{ timestamp: string }>;
-    const backup = backupQuotes as ApiQuote[];
-    expect(rows).toHaveLength(backup.length);
-    expect(rows[0].timestamp).toBe(backup[0].timestamp);
+    await expect(result).resolves.toEqual([]);
+
+    // Subsequent indicator requests must still hit the live API — a transient
+    // indicator failure does NOT arm session-wide backup mode.
+    const followup = firstValueFrom(service.getSelectionData(selection, listing));
+    httpMock
+      .expectOne(request => request.url === `${env.api}/ADX/`)
+      .flush([{ timestamp: "2024-01-01", adx: 22 }]);
+    await expect(followup).resolves.toEqual([{ timestamp: "2024-01-01", adx: 22 }]);
   });
 
   it("should rethrow selection data contract failures instead of returning no data", async () => {
@@ -427,10 +438,17 @@ describe("ApiService", () => {
     httpMock.expectNone(request => request.url === `${env.api}/RSI/`);
   });
 
-  it("re-arms live indicator fetches after a single transient indicator failure self-heals", async () => {
-    // Quotes/listings are only fetched at bootstrap, so a transient 502 on a
-    // single indicator must NOT keep the rest of the session stuck on backup
-    // data. A subsequent successful indicator response should clear the flag.
+  it("returns a fresh array reference from backup fallback so downstream mutation can't corrupt the cache", async () => {
+    // backupSelectionRows() memoizes its payload but must hand each caller a
+    // distinct array so an accidental sort/splice/pop downstream can't
+    // permanently scramble the rows for every subsequent request.
+    const quotes$ = firstValueFrom(service.getQuotes());
+    httpMock.expectOne(`${env.api}/quotes`).error(new ProgressEvent("Network error"), {
+      status: 0,
+      statusText: "Network Error"
+    });
+    await quotes$;
+
     const listing: IndicatorListing = {
       name: "Average Directional Index",
       uiid: "ADX",
@@ -452,55 +470,22 @@ describe("ApiService", () => {
       results: []
     };
 
-    // First indicator request hits a transient 502 — backup mode arms and
-    // backup rows are returned without re-trying.
-    const firstReq = firstValueFrom(service.getSelectionData(selection, listing));
-    httpMock.expectOne(request => request.url === `${env.api}/ADX/`).error(
-      new ProgressEvent("Bad Gateway"),
-      {
-        status: 502,
-        statusText: "Bad Gateway"
-      }
-    );
-    const firstRows = (await firstReq) as Array<{ timestamp: string }>;
-    expect(firstRows.length).toBe((backupQuotes as ApiQuote[]).length);
+    const first = (await firstValueFrom(service.getSelectionData(selection, listing))) as Array<{
+      timestamp: string;
+    }>;
+    const second = (await firstValueFrom(service.getSelectionData(selection, listing))) as Array<{
+      timestamp: string;
+    }>;
 
-    // While backupActive=true, calls short-circuit to backup rows without HTTP.
-    const shortCircuited = (await firstValueFrom(
-      service.getSelectionData(selection, listing)
-    )) as Array<{ timestamp: string }>;
-    expect(shortCircuited.length).toBe((backupQuotes as ApiQuote[]).length);
-    httpMock.expectNone(request => request.url === `${env.api}/ADX/`);
+    expect(first).not.toBe(second);
+    expect(first).toEqual(second);
 
-    // Wait — backupActive only clears on a successful HTTP response. So we
-    // need to first force the short-circuit OFF by making a getQuotes succeed,
-    // OR (per the new contract) by having the indicator fetch itself succeed.
-    // The new behavior is that a successful indicator response clears the flag.
-    // To exercise it we have to bypass the short-circuit, which only quotes/
-    // listings can do. So this test verifies recovery via a successful indicator
-    // response AFTER quotes have re-armed live mode.
-    const quotes$ = firstValueFrom(service.getQuotes());
-    httpMock
-      .expectOne(`${env.api}/quotes`)
-      .flush([
-        { timestamp: "2024-01-01T00:00:00.000Z", open: 1, high: 2, low: 0, close: 1, volume: 10 }
-      ]);
-    await quotes$;
-
-    // Indicator now reaches the live endpoint and a successful response keeps
-    // the flag cleared for any subsequent transient-only failures.
-    const liveReq = firstValueFrom(service.getSelectionData(selection, listing));
-    httpMock
-      .expectOne(request => request.url === `${env.api}/ADX/`)
-      .flush([{ timestamp: "2024-01-01", adx: 22 }]);
-    await expect(liveReq).resolves.toEqual([{ timestamp: "2024-01-01", adx: 22 }]);
-
-    // Confirm the success-path clear: another indicator request goes live.
-    const secondLiveReq = firstValueFrom(service.getSelectionData(selection, listing));
-    httpMock
-      .expectOne(request => request.url === `${env.api}/ADX/`)
-      .flush([{ timestamp: "2024-01-02", adx: 23 }]);
-    await expect(secondLiveReq).resolves.toEqual([{ timestamp: "2024-01-02", adx: 23 }]);
+    // Mutating the first reference must not bleed into the second call.
+    first.length = 0;
+    const third = (await firstValueFrom(service.getSelectionData(selection, listing))) as Array<{
+      timestamp: string;
+    }>;
+    expect(third.length).toBe((backupQuotes as ApiQuote[]).length);
   });
 
   it("re-arms live indicator fetches after a successful getQuotes response recovers the backend", async () => {

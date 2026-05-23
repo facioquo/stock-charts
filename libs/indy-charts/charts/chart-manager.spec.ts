@@ -484,6 +484,19 @@ describe("ChartManager", () => {
       expect(mgr.selections).toHaveLength(1);
       expect(mgr.oscillators.size).toBe(0); // not yet — consumer calls createOscillator
     });
+
+    it("rejects the reserved 'overlay-main' ucid", () => {
+      // Internal _allProcessedDatasets cache keys both the overlay candlestick
+      // bundle (under "overlay-main") and per-selection indicator datasets
+      // (under selection.ucid). A collision would mis-cast candlestick data as
+      // indicator data inside applySlicedData. Guard at the displaySelection
+      // boundary so consumers learn about the conflict immediately.
+      const listing = makeOscillatorListing();
+      const colliding = makeSelection(listing, "overlay-main");
+      mgr.processSelectionData(colliding, listing, makeIndicatorData(makeQuotes(30)));
+
+      expect(() => mgr.displaySelection(colliding, listing)).toThrow(/reserved for internal use/);
+    });
   });
 
   // ----- createOscillator -----
@@ -511,23 +524,30 @@ describe("ChartManager", () => {
       expect(() => mgr.createOscillator(ctx, selection, listing)).toThrow(/not been registered/);
     });
 
-    it("throws when processSelectionData was skipped under a windowed overlay", () => {
-      // Reaching createOscillator without populated processed datasets while
-      // the overlay is windowed would silently render an oscillator that can't
-      // be aligned. Fail loudly so consumers fix their ordering.
+    it("throws when processSelectionData was skipped (regardless of windowing)", () => {
+      // Reaching createOscillator without populated processed datasets is a
+      // contract violation in every viewport state — failing only under a
+      // windowed overlay would produce works-on-desktop / throws-on-mobile
+      // ticket noise. Verify the throw fires both with and without a window.
       const ctx = {} as CanvasRenderingContext2D;
-      mgr.initializeOverlay(ctx, makeQuotes(100), 50);
-
       const listing = makeOscillatorListing();
-      const selection = makeSelection(listing, "osc-missing-cache");
-      // NOTE: no processSelectionData call.
-      // Have to register the selection manually so the upstream registration
-      // check passes — we want to trip the dataset-cache check, not the prior one.
-      mgr.displaySelection(selection, listing);
 
-      expect(() => mgr.createOscillator(ctx, selection, listing)).toThrow(
+      // Case 1: windowed overlay
+      mgr.initializeOverlay(ctx, makeQuotes(100), 50);
+      const windowedSel = makeSelection(listing, "osc-missing-windowed");
+      mgr.displaySelection(windowedSel, listing);
+      expect(() => mgr.createOscillator(ctx, windowedSel, listing)).toThrow(
         /has no processed datasets/
       );
+
+      // Case 2: no overlay at all (allQuotes empty → currentBarCount === 0)
+      const fresh = new ChartManager({ settings: defaultSettings });
+      const standaloneSel = makeSelection(listing, "osc-missing-standalone");
+      fresh.displaySelection(standaloneSel, listing);
+      expect(() => fresh.createOscillator(ctx, standaloneSel, listing)).toThrow(
+        /has no processed datasets/
+      );
+      fresh.destroy();
     });
 
     it("destroys a previous oscillator for the same ucid", () => {
@@ -582,10 +602,12 @@ describe("ChartManager", () => {
       expect(osc.render).toHaveBeenCalledWith(selection, listing);
       // startIndex = 100 - 50 = 50
       expect(osc.applySlicedData).toHaveBeenCalledWith(selection, expect.any(Array), 50);
-      // Verify the cached (non-empty) datasets were passed, not a stray empty array —
-      // catches a regression where _allProcessedDatasets.get(ucid) returns the wrong key.
+      // Verify the cached datasets were passed (non-empty and same shape as the
+      // selection's results so a wrong-key regression on _allProcessedDatasets
+      // would fail this assertion, not just slip through expect.any(Array)).
       const passedDatasets = vi.mocked(osc.applySlicedData).mock.calls[0][1];
-      expect(passedDatasets.length).toBeGreaterThan(0);
+      expect(passedDatasets.length).toBe(selection.results.length);
+      expect(passedDatasets.every(ds => Array.isArray(ds.data) && ds.data.length > 0)).toBe(true);
     });
 
     it("does not slice on initial create when currentBarCount covers all quotes", () => {

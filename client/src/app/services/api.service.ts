@@ -16,15 +16,19 @@ export class ApiService {
   private readonly http = inject(HttpClient);
 
   /**
-   * Set to `true` once a quotes/listings/indicator fetch falls back to bundled
-   * backup data. While active, `getSelectionData` short-circuits to backup-quote-
-   * aligned empty indicator rows (one per backup quote, with the candle attached)
-   * so overlay and oscillator indicator x-axes align with the candlestick range
-   * instead of stretching to today's date. Reset to `false` on ANY successful
-   * live response (quotes, listings, or indicator) so a session that hit a
-   * single transient indicator 502 self-heals as soon as the backend recovers
-   * — without this, quotes/listings only load at bootstrap and the app would
-   * stay pinned to backup for the rest of the session.
+   * Armed when **quotes or listings** fall back to bundled backup data,
+   * signalling that the overlay candlesticks are at 2016-2019 timestamps and
+   * any live indicator response would diverge. While active, `getSelectionData`
+   * short-circuits to backup-quote-aligned empty rows so every chart's x-axis
+   * stays pinned to the candlestick range.
+   *
+   * Cleared only by a successful quotes/listings response — these load once at
+   * bootstrap, so backup mode persists for the session unless the user reloads.
+   * A transient indicator failure (e.g. one 502 on `/RSI/`) does NOT arm this
+   * flag: quotes/listings are still live, candlesticks are at live timestamps,
+   * and backup rows at 2016 dates would diverge from those just as badly as
+   * today-dated `addExtraBars()` did. That path returns `[]` instead, letting
+   * the overlay's other live datasets anchor the x-axis.
    */
   private backupActive = false;
 
@@ -107,26 +111,21 @@ export class ApiService {
         params
       })
       .pipe(
-        map(data => {
-          // Self-heal: a successful indicator response means the backend is
-          // alive again, so future requests should hit the live API.
-          this.backupActive = false;
-          return data;
-        }),
         catchError((error: HttpErrorResponse) => {
           if (!this.isTransientBackendUnavailable(error)) {
             return throwError(() => error);
           }
 
-          this.backupActive = true;
-          console.warn(
-            "Backend API unavailable, using timestamp-aligned empty data for indicator",
-            {
-              uiid: selection.uiid,
-              status: error.status
-            }
-          );
-          return of(this.backupSelectionRows());
+          // Do NOT arm backupActive here — quotes/listings are still live, so
+          // the candlesticks are at live timestamps. Returning backup rows
+          // (2016-2019) would diverge from those just like the original
+          // `[]` + today-dated `addExtraBars()` did. Empty array lets the
+          // overlay's other live datasets keep the x-axis anchored.
+          console.warn("Backend API unavailable, using empty data for indicator", {
+            uiid: selection.uiid,
+            status: error.status
+          });
+          return of([]);
         })
       );
   }
@@ -139,24 +138,25 @@ export class ApiService {
    * gets `undefined`, coerces it to NaN, and emits a gap; candlestick-pattern
    * indicators additionally read `row.candle` for high/low anchoring.
    *
-   * Memoized — backup quotes are static JSON bundled at build time, so the
-   * synthesized rows can be reused across every short-circuit and transient-
-   * fallback call without rebuilding. Returned array is treated as read-only
-   * by callers (RxJS `of` only emits it; downstream consumers iterate).
+   * Returns a **fresh array** wrapping a memoized payload — the row objects
+   * are reused (they're effectively immutable POJOs read by indy-charts), but
+   * each caller receives its own array reference so an accidental in-place
+   * sort/splice downstream can't corrupt the cache for subsequent requests.
    */
   private backupSelectionRows(): Array<{ timestamp: string; candle: unknown }> {
-    if (this._backupRows) return this._backupRows;
-    type BackupQuote = {
-      timestamp: string;
-      open: number;
-      high: number;
-      low: number;
-      close: number;
-      volume: number;
-    };
-    const quotes = backupQuotes as BackupQuote[];
-    this._backupRows = quotes.map(q => ({ timestamp: q.timestamp, candle: q }));
-    return this._backupRows;
+    if (!this._backupRows) {
+      type BackupQuote = {
+        timestamp: string;
+        open: number;
+        high: number;
+        low: number;
+        close: number;
+        volume: number;
+      };
+      const quotes = backupQuotes as BackupQuote[];
+      this._backupRows = quotes.map(q => ({ timestamp: q.timestamp, candle: q }));
+    }
+    return [...this._backupRows];
   }
 
   requestHeader(): { headers?: HttpHeaders } {
