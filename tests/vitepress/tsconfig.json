@@ -5,8 +5,7 @@
     "moduleResolution": "bundler",
     "strict": true,
     "skipLibCheck": true,
-    "lib": ["ES2022", "DOM"],
-    "types": ["node"]
+    "lib": ["ES2022", "DOM"]
   },
   "include": ["**/*.ts", "**/*.vue", "env.d.ts", ".vitepress/**/*.ts"]
 }

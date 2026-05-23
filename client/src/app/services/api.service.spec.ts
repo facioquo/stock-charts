@@ -338,6 +338,78 @@ describe("ApiService", () => {
     await expect(result).rejects.toMatchObject({ status: 400 });
   });
 
+  it("returns empty selection data without an HTTP request after quotes fell back to backup", async () => {
+    // First call: getQuotes errors → triggers backup mode
+    const quotes$ = firstValueFrom(service.getQuotes());
+    const quotesReq = httpMock.expectOne(`${env.api}/quotes`);
+    quotesReq.error(new ProgressEvent("Network error"), {
+      status: 0,
+      statusText: "Network Error"
+    });
+    await quotes$;
+
+    // Subsequent getSelectionData must NOT issue an HTTP request and must
+    // resolve to [] — this keeps overlay + oscillator behavior consistent
+    // when the live API is unavailable.
+    const listing: IndicatorListing = {
+      name: "Average Directional Index",
+      uiid: "ADX",
+      legendTemplate: "ADX([P1])",
+      endpoint: "/ADX/",
+      category: "trend",
+      chartType: "oscillator",
+      order: 0,
+      chartConfig: null,
+      parameters: [],
+      results: []
+    };
+    const selection: IndicatorSelection = {
+      ucid: "chart-1",
+      uiid: "ADX",
+      label: "ADX(14)",
+      chartType: "oscillator",
+      params: [],
+      results: []
+    };
+
+    await expect(firstValueFrom(service.getSelectionData(selection, listing))).resolves.toEqual([]);
+    httpMock.expectNone(request => request.url === `${env.api}/ADX/`);
+  });
+
+  it("returns empty selection data without an HTTP request after listings fell back to backup", async () => {
+    const listings$ = firstValueFrom(service.getListings());
+    const listingsReq = httpMock.expectOne(`${env.api}/indicators`);
+    listingsReq.error(new ProgressEvent("Server error"), {
+      status: 500,
+      statusText: "Internal Server Error"
+    });
+    await listings$;
+
+    const listing: IndicatorListing = {
+      name: "Relative Strength Index",
+      uiid: "RSI",
+      legendTemplate: "RSI([P1])",
+      endpoint: "/RSI/",
+      category: "oscillator",
+      chartType: "oscillator",
+      order: 0,
+      chartConfig: null,
+      parameters: [],
+      results: []
+    };
+    const selection: IndicatorSelection = {
+      ucid: "chart-rsi",
+      uiid: "RSI",
+      label: "RSI(14)",
+      chartType: "oscillator",
+      params: [],
+      results: []
+    };
+
+    await expect(firstValueFrom(service.getSelectionData(selection, listing))).resolves.toEqual([]);
+    httpMock.expectNone(request => request.url === `${env.api}/RSI/`);
+  });
+
   it("client backup indicators should have valid data structure", () => {
     expect(BACKUP_INDICATORS.length).toBeGreaterThan(5);
     const firstIndicator = BACKUP_INDICATORS[0];

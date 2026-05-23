@@ -1,7 +1,9 @@
 import DefaultTheme from "vitepress/theme";
+import type { App } from "vue";
 
 import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 
+// @ts-expect-error - CSS file import for side effects
 import "./custom.css";
 
 const PROD_API_URL = "https://stock-charts-api.azurewebsites.net";
@@ -15,7 +17,7 @@ const apiUrl = import.meta.env.DEV
 
 export default {
   extends: DefaultTheme,
-  enhanceApp({ app }) {
+  enhanceApp({ app }: { app: App }) {
     setupIndyChartsForVue(app, {
       api: {
         baseUrl: apiUrl

@@ -10,6 +10,15 @@ import { IndicatorListing, IndicatorParam, IndicatorSelection, Quote } from "@fa
 export class ApiService {
   private readonly http = inject(HttpClient);
 
+  /**
+   * Set to `true` once a quotes-or-listings fetch falls back to bundled backup
+   * data. While active, `getSelectionData` short-circuits to `[]` so oscillator
+   * and overlay indicators do not render their live timestamps against stale
+   * (or absent) backup quotes — keeping fallback behavior consistent across
+   * chart types.
+   */
+  private backupActive = false;
+
   getQuotes(): Observable<Quote[]> {
     type ApiQuote = {
       timestamp: string;
@@ -22,6 +31,7 @@ export class ApiService {
     return this.http.get<ApiQuote[]>(`${env.api}/quotes`, this.requestHeader()).pipe(
       map(res => this.toQuotes(res)),
       catchError((error: HttpErrorResponse) => {
+        this.backupActive = true;
         console.warn("Backend API unavailable, using client-side backup quotes", {
           status: error.status,
           statusText: error.statusText,
@@ -36,6 +46,7 @@ export class ApiService {
   getListings(): Observable<IndicatorListing[]> {
     return this.http.get<IndicatorListing[]>(`${env.api}/indicators`, this.requestHeader()).pipe(
       catchError((error: HttpErrorResponse) => {
+        this.backupActive = true;
         console.warn("Backend API unavailable, using client-side backup indicators", {
           status: error.status,
           statusText: error.statusText,
@@ -51,6 +62,17 @@ export class ApiService {
     selection: IndicatorSelection,
     listing: IndicatorListing
   ): Observable<unknown[]> {
+    // When quotes or listings fell back to backup data, indicator results from
+    // the live API would render with current timestamps against backup quote
+    // dates — producing the visually-inconsistent overlay vs oscillator behavior
+    // seen on Cloudflare Pages PR previews before the API has been redeployed.
+    if (this.backupActive) {
+      console.warn("Backup data active, returning empty data for indicator", {
+        uiid: selection.uiid
+      });
+      return of([]);
+    }
+
     let params = new HttpParams();
     selection.params.forEach((p: IndicatorParam) => {
       params = params.set(p.paramName, String(p.value));
@@ -66,6 +88,7 @@ export class ApiService {
             return throwError(() => error);
           }
 
+          this.backupActive = true;
           console.warn("Backend API unavailable, using empty data for indicator", {
             uiid: selection.uiid,
             status: error.status,

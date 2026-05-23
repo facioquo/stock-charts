@@ -5,6 +5,6 @@
     "outDir": "./out-tsc/app",
     "types": []
   },
-  "include": ["src/**/*.ts", "eslint.config.ts"],
+  "include": ["src/**/*.ts", "src/**/*.json", "eslint.config.ts"],
   "exclude": ["src/**/*.spec.ts", "src/test-setup.ts", "src/test-utils/**"]
 }

@@ -40,7 +40,7 @@ describe("financial dataset factories", () => {
 
     expect(dataset.type).toBe("candlestick");
     expect(dataset.data).toHaveLength(1);
-    expect(dataset.order).toBe(75);
+    expect((dataset as unknown as Record<string, unknown>).order).toBe(75);
   });
 
   it("builds volume dataset with up/down/unchanged colors and extra bars", () => {
