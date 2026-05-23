@@ -13,6 +13,9 @@
     "cwd": "${workspaceFolder}"
   },
   "tasks": [
+    // ===================================
+    // DEV ENVIRONMENT SETUP
+    // ===================================
     {
       "label": "Setup: Dev environment (linux)",
       "detail": "Install all development prerequisites (Node, .NET, Azure Functions Core Tools, pnpm)",
@@ -21,7 +24,7 @@
       "group": "none"
     },
     {
-      "label": "Install: Chrome for Puppeteer",
+      "label": "Setup: Chrome for Puppeteer",
       "detail": "Install Chrome browser for Puppeteer-based accessibility testing",
       "type": "shell",
       "command": "pnpm dlx @puppeteer/browsers install chrome",
@@ -31,6 +34,9 @@
         "panel": "shared"
       }
     },
+    // ===================================
+    // INSTALL/UPDATE DEPENDENCIES
+    // ===================================
     {
       "label": "Initialize: Pull, rebuild, and verify",
       "detail": "Pull latest, clean, rebuild, format, lint, and run tests",
@@ -113,6 +119,9 @@
       "dependsOn": ["Update: Node packages", "Update: NuGet packages"],
       "dependsOrder": "sequence"
     },
+    // ===================================
+    // BUILD
+    // ===================================
     {
       "label": "Build: All projects (incremental)",
       "detail": "Incremental build of Libraries, Website, and Backend .NET",
@@ -184,6 +193,9 @@
       "group": "build",
       "problemMatcher": "$msCompile"
     },
+    // ===================================
+    // LINT & TEST
+    // ===================================
     {
       "label": "Lint: All (check)",
       "detail": "Run all linting and formatting checks (ESLint, Prettier, Roslynator, dotnet format, markdownlint, stylelint)",
@@ -342,34 +354,76 @@
         "panel": "dedicated"
       }
     },
+    // ===================================
+    // CODE REVIEW
+    // ===================================
     {
-      "label": "Review: CodeRabbit CLI (plain)",
-      "detail": "Perform a full code review with CodeRabbit CLI in plain text response mode",
+      "label": "Review: CodeRabbit (agent mode prompts)",
+      "detail": "Run CodeRabbit AI code reviewer with structured JSON output for AI agent integration",
       "type": "shell",
-      "command": "coderabbit",
-      "args": ["--plain"]
+      "command": "cr --agent",
+      "group": "test",
+      "windows": {
+        "type": "process",
+        "command": "wsl",
+        "args": [
+          "bash",
+          "-lc",
+          "cd \"$(wslpath '${workspaceFolder}')\" && cr --agent"
+        ]
+      }
     },
     {
-      "label": "Review: CodeRabbit CLI (prompt-only)",
-      "detail": "Perform a full code review with CodeRabbit CLI in prompt-only response mode",
+      "label": "Review: CodeRabbit CLI (agent mode prompts, uncommitted only)",
+      "detail": "Run CodeRabbit AI code review with structured JSON output for AI agent integration",
       "type": "shell",
-      "command": "coderabbit",
-      "args": ["--prompt-only"]
+      "command": "cr --agent --type uncommitted",
+      "group": "test",
+      "windows": {
+        "type": "process",
+        "command": "wsl",
+        "args": [
+          "bash",
+          "-lc",
+          "cd \"$(wslpath '${workspaceFolder}')\" && cr --agent --type uncommitted"
+        ]
+      }
     },
     {
-      "label": "Review: CodeRabbit CLI (uncommitted, plain)",
+      "label": "Review: CodeRabbit (explained)",
+      "detail": "Run CodeRabbit AI code reviewer with detailed plain-text feedback and fix suggestions",
+      "type": "shell",
+      "command": "cr --plain",
+      "group": "test",
+      "windows": {
+        "type": "process",
+        "command": "wsl",
+        "args": [
+          "bash",
+          "-lc",
+          "cd \"$(wslpath '${workspaceFolder}')\" && cr --plain"
+        ]
+      }
+    },
+    {
+      "label": "Review: CodeRabbit CLI (explained, uncommitted only)",
       "detail": "Perform a code review on uncommitted with CodeRabbit CLI in plain text response mode",
       "type": "shell",
-      "command": "coderabbit",
-      "args": ["--plain", "--type", "uncommitted"]
+      "command": "cr --plain --type uncommitted",
+      "group": "test",
+      "windows": {
+        "type": "process",
+        "command": "wsl",
+        "args": [
+          "bash",
+          "-lc",
+          "cd \"$(wslpath '${workspaceFolder}')\" && cr --plain --type uncommitted"
+        ]
+      }
     },
-    {
-      "label": "Review: CodeRabbit CLI (uncommitted, prompt-only)",
-      "detail": "Perform a code review on uncommitted with CodeRabbit CLI in prompt-only response mode",
-      "type": "shell",
-      "command": "coderabbit",
-      "args": ["--prompt-only", "--type", "uncommitted"]
-    },
+    // ===================================
+    // RUN/SERVE APPS
+    // ===================================
     {
       "label": "Run: Full development stack",
       "detail": "Start all Backend .NET services and Website dev server",
@@ -390,7 +444,9 @@
       "isBackground": true,
       "problemMatcher": {
         "owner": "azure-storage",
-        "pattern": { "regexp": "^$" },
+        "pattern": {
+          "regexp": "^$"
+        },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^Azurite .* service is starting",
@@ -414,7 +470,9 @@
       },
       "problemMatcher": {
         "owner": "azure-functions",
-        "pattern": { "regexp": "^$" },
+        "pattern": {
+          "regexp": "^$"
+        },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^.*Azure Functions",
@@ -434,7 +492,9 @@
       "group": "none",
       "problemMatcher": {
         "owner": "web-api",
-        "pattern": { "regexp": "^$" },
+        "pattern": {
+          "regexp": "^$"
+        },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^.*Building",
@@ -451,7 +511,9 @@
       "group": "none",
       "problemMatcher": {
         "owner": "website",
-        "pattern": { "regexp": "^$" },
+        "pattern": {
+          "regexp": "^$"
+        },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^.*Compiling",
@@ -468,7 +530,9 @@
       "group": "none",
       "problemMatcher": {
         "owner": "vitepress-demo",
-        "pattern": { "regexp": "^$" },
+        "pattern": {
+          "regexp": "^$"
+        },
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^.*vitepress v",
@@ -567,10 +631,9 @@
         "reveal": "always"
       }
     },
-
-    // =========================================================================
+    // ===================================
     // CLEANUP
-    // =========================================================================
+    // ===================================
     {
       "label": "Clean: All (hard reset)",
       "detail": "Hard reset: composite of all clean tasks (deep clean)",
