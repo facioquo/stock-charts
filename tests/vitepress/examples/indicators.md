@@ -5,7 +5,7 @@ Oscillator indicators (RSI, MACD, Stochastic, etc.) render as a standalone chart
 ## Standalone oscillator
 
 <ClientOnly>
-  <StockIndicatorChart indicator="rsi" :config="{ id: 'rsi-standalone' }" />
+  <StockIndicatorChart indicator="rsi" id="rsi-standalone" />
 </ClientOnly>
 
 ::: code-group
@@ -52,7 +52,7 @@ manager.createOscillator(canvas, selection, listing);
 ## Oscillator paired with price chart
 
 <ClientOnly>
-  <StockIndicatorChart indicator="rsi" :with-overlay="true" :config="{ id: 'rsi-with-overlay' }" />
+  <StockIndicatorChart indicator="rsi" :with-overlay="true" id="rsi-with-overlay" />
 </ClientOnly>
 
 When paired, you need **two canvases** — one for the price/volume overlay and one for the oscillator panel below it.

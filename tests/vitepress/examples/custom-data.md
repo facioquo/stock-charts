@@ -20,9 +20,9 @@ The chart above plots OHLC + volume from a hard-coded `Quote[]` array, with an E
 
 ```typescript
 import { OverlayChart, loadStaticQuotes } from "@facioquo/indy-charts";
-import type { Quote } from "@facioquo/indy-charts";
+import type { RawQuote } from "@facioquo/indy-charts";
 
-const quotes: Quote[] = [
+const quotes: RawQuote[] = [
   { timestamp: "2025-01-02", open: 180.00, high: 182.50, low: 179.20, close: 181.80, volume: 38500000 },
   // ... more bars
 ];
@@ -96,14 +96,16 @@ import {
   OverlayChart,
   loadStaticQuotes,
   setupIndyCharts,
-  type Quote
+  type Quote,
+  type RawQuote
 } from "@facioquo/indy-charts";
 import type { ChartDataset, ScatterDataPoint } from "chart.js";
 
-const quotes: Quote[] = loadStaticQuotes([
+const rawQuotes: RawQuote[] = [
   { timestamp: "2025-01-02", open: 180.00, high: 182.50, low: 179.20, close: 181.80, volume: 38500000 },
   // ... more bars
-]);
+];
+const quotes: Quote[] = loadStaticQuotes(rawQuotes);
 
 function computeEma(closes: number[], period: number): number[] {
   if (!Number.isInteger(period) || period <= 0) {
@@ -184,12 +186,12 @@ onBeforeUnmount(() => {
 
 ## Key points
 
-- **`Quote`**: input shape with ISO string `timestamp` and numeric OHLCV fields
-- **`loadStaticQuotes`**: converts `timestamp` strings to `Date` objects, returning `Quote[]`
+- **`RawQuote`**: input shape with ISO string (or `Date`) `timestamp` and numeric OHLCV fields — type your fixture arrays as `RawQuote[]`
+- **`loadStaticQuotes`**: converts `RawQuote[]` to `Quote[]` (normalizes timestamps to `Date` objects)
 - **`OverlayChart`**: renders candlestick and volume directly onto a `<canvas>` element
 - **Custom indicators**: push your own `ChartDataset` onto `chart.data.datasets` after `render()`, then call `chart.update("none")`. Any Chart.js dataset shape works — line, dot, bar, etc.
 - **Theme sync**: re-create the chart on `document.documentElement` class changes to follow the page's dark / light mode automatically
-- **Cleanup**: always call `chart.destroy()` in the component's unmount hook
+- **Cleanup**: always call `chart.destroy()` (the wrapper) in the component's unmount hook — never `chart.chart?.destroy()` (Chart.js only), which leaks the wrapper's cached state
 
 ## Next steps
 
