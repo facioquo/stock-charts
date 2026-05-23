@@ -142,7 +142,7 @@ export function createThresholdDataset(
     data: lineData,
     yAxisID: "y",
     pointRadius: 0,
-    borderWidth: 2.5,
+    borderWidth: 1.5,
     borderDash: threshold.style === "dash" ? [5, 2] : [],
     borderColor: threshold.color,
     backgroundColor: threshold.color,
