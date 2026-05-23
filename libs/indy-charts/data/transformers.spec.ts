@@ -260,6 +260,32 @@ describe("buildDataPoints", () => {
     expect(pointColor[0]).toBe("#DD2C00"); // COLORS.RED
     expect(pointRotation[0]).toBe(180);
   });
+
+  it("falls back to neutral candle config when match is not a number", () => {
+    const candle = makeQuote("2024-01-01", 100);
+    const data: IndicatorDataRow[] = [
+      // Non-numeric `match` (string here, but also covers null/undefined/missing)
+      // should coerce to 0 → neutral default config.
+      { timestamp: "2024-01-01", candle, signal: 42, match: "bullish" }
+    ];
+    const result = makeResult({ dataName: "signal" });
+    const listing = makeListing({ category: "candlestick-pattern" });
+
+    const { pointColor, pointRotation } = buildDataPoints(data, result, listing);
+
+    expect(pointColor[0]).toBe("#9E9E9E"); // COLORS.GRAY (default match=0)
+    expect(pointRotation[0]).toBe(0);
+  });
+
+  it("throws when a row has neither `timestamp` nor `date`", () => {
+    const data: IndicatorDataRow[] = [{ candle: makeQuote("2024-01-01"), sma: 50 }];
+    const result = makeResult({ dataName: "sma" });
+    const listing = makeListing();
+
+    expect(() => buildDataPoints(data, result, listing)).toThrow(
+      /Indicator row missing both 'timestamp' and 'date' fields/
+    );
+  });
 });
 
 // ---------------------------------------------------------------------------

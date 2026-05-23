@@ -180,6 +180,25 @@ describe("createApiClient", () => {
       expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(Error));
     });
 
+    it("throws when a quote element is null or non-object", async () => {
+      mockFetchOk([null]);
+      await expect(client.getQuotes()).rejects.toThrow(
+        "Invalid quote at index 0: expected object, got object"
+      );
+
+      mockFetchOk(["not-an-object"]);
+      await expect(client.getQuotes()).rejects.toThrow(
+        "Invalid quote at index 0: expected object, got string"
+      );
+    });
+
+    it("throws when response is not an array", async () => {
+      mockFetchOk({ notAnArray: true });
+      await expect(client.getQuotes()).rejects.toThrow(
+        "Invalid quotes response: expected an array"
+      );
+    });
+
     it("throws and calls onError on HTTP error", async () => {
       mockFetchError(500, "Internal Server Error");
 
