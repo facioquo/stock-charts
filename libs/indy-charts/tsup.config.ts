@@ -1,5 +1,5 @@
 import { defineConfig } from "tsup";
-import { copyFileSync } from "fs";
+import { copyFile } from "fs/promises";
 import { resolve } from "path";
 
 export default defineConfig({
@@ -15,7 +15,6 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   onSuccess: async () => {
-    await Promise.resolve();
-    copyFileSync(resolve("README.md"), resolve("dist/README.md"));
+    await copyFile(resolve("README.md"), resolve("dist/README.md"));
   }
 });
