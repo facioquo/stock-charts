@@ -16,7 +16,7 @@ import { buildDataPoints, addExtraBars } from "../data/transformers";
 import { OverlayChart } from "./overlay-chart";
 import { OscillatorChart } from "./oscillator-chart";
 
-const EXTRA_BARS = 7;
+const EXTRA_BARS = 6;
 
 const CHART_TYPES = {
   OVERLAY: "overlay",
