@@ -1,31 +1,9 @@
-import { test, expect, type Page, type ConsoleMessage } from "@playwright/test";
-
-/**
- * Collects console errors and page errors for debugging chart issues.
- */
-function collectErrors(page: Page): { consoleErrors: string[]; pageErrors: string[] } {
-  const consoleErrors: string[] = [];
-  const pageErrors: string[] = [];
-
-  page.on("console", (msg: ConsoleMessage) => {
-    if (msg.type() === "error") {
-      consoleErrors.push(msg.text());
-    }
-  });
-
-  page.on("pageerror", (error: Error) => {
-    pageErrors.push(`${error.name}: ${error.message}`);
-  });
-
-  return { consoleErrors, pageErrors };
-}
+import { test, expect } from "./fixtures";
 
 test.describe("Stock Charts Angular Website", () => {
   test.describe.configure({ timeout: 30_000 });
 
-  test("home page loads and navigates to chart page", async ({ page }) => {
-    const { pageErrors } = collectErrors(page);
-
+  test("home page loads and navigates to chart page", async ({ page, errorCollection }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
@@ -34,12 +12,10 @@ test.describe("Stock Charts Angular Website", () => {
     await expect(appRoot).toBeVisible();
 
     // Report any JS errors
-    expect(pageErrors, "No page errors should occur on load").toEqual([]);
+    expect(errorCollection.pageErrors, "No page errors should occur on load").toEqual([]);
   });
 
-  test("main overlay chart canvas renders", async ({ page }) => {
-    const { pageErrors } = collectErrors(page);
-
+  test("main overlay chart canvas renders", async ({ page, errorCollection }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
@@ -58,19 +34,17 @@ test.describe("Stock Charts Angular Website", () => {
     expect(box!.height).toBeGreaterThan(50);
 
     // Report any JS errors
-    expect(pageErrors, "No page errors should occur during chart rendering").toEqual([]);
+    expect(
+      errorCollection.pageErrors,
+      "No page errors should occur during chart rendering"
+    ).toEqual([]);
   });
 
-  test("chart loads with correct bar count logged", async ({ page }) => {
+  test("chart loads with correct bar count logged", async ({ page, errorCollection }) => {
     const consoleLogs: string[] = [];
-    const pageErrors: string[] = [];
 
-    page.on("console", (msg: ConsoleMessage) => {
+    page.on("console", msg => {
       consoleLogs.push(msg.text());
-    });
-
-    page.on("pageerror", (error: Error) => {
-      pageErrors.push(`${error.name}: ${error.message}`);
     });
 
     await page.goto("/");
@@ -91,12 +65,10 @@ test.describe("Stock Charts Angular Website", () => {
     expect(barCount, "Bar count should be at most 500").toBeLessThanOrEqual(500);
 
     // Verify no page errors occurred during chart loading
-    expect(pageErrors, "No page errors should occur").toEqual([]);
+    expect(errorCollection.pageErrors, "No page errors should occur").toEqual([]);
   });
 
-  test("chart canvas has painted content (not blank)", async ({ page }) => {
-    const { pageErrors } = collectErrors(page);
-
+  test("chart canvas has painted content (not blank)", async ({ page, errorCollection }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
@@ -136,12 +108,10 @@ test.describe("Stock Charts Angular Website", () => {
     });
 
     expect(hasContent, "Chart canvas should have painted content (not blank)").toBe(true);
-    expect(pageErrors, "No page errors should occur").toEqual([]);
+    expect(errorCollection.pageErrors, "No page errors should occur").toEqual([]);
   });
 
-  test("oscillator charts render in oscillators zone", async ({ page }) => {
-    const { pageErrors } = collectErrors(page);
-
+  test("oscillator charts render in oscillators zone", async ({ page, errorCollection }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
@@ -161,11 +131,20 @@ test.describe("Stock Charts Angular Website", () => {
     const count = await oscillatorCanvases.count();
     expect(count, "At least one oscillator chart should render").toBeGreaterThan(0);
 
-    expect(pageErrors, "No page errors should occur").toEqual([]);
+    expect(errorCollection.pageErrors, "No page errors should occur").toEqual([]);
   });
 
-  test("no critical console errors during full page lifecycle", async ({ page }) => {
-    const { consoleErrors, pageErrors } = collectErrors(page);
+  test("no critical console errors during full page lifecycle", async ({
+    page,
+    errorCollection
+  }) => {
+    const consoleErrors: string[] = [];
+
+    page.on("console", msg => {
+      if (msg.type() === "error") {
+        consoleErrors.push(msg.text());
+      }
+    });
 
     await page.goto("/");
     await page.waitForLoadState("networkidle");
@@ -189,7 +168,7 @@ test.describe("Stock Charts Angular Website", () => {
     );
 
     // Page errors are always critical
-    expect(pageErrors, "No uncaught page errors").toEqual([]);
+    expect(errorCollection.pageErrors, "No uncaught page errors").toEqual([]);
 
     // Console errors should be minimal
     expect(criticalErrors, "No critical console errors should occur").toEqual([]);

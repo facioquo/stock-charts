@@ -1,14 +1,15 @@
-import { ChartDataset } from "chart.js";
+import { type ChartDataset } from "chart.js";
 
 import {
-  ChartSettings,
-  ExtendedChartDataset,
-  IndicatorDataRow,
-  IndicatorListing,
-  IndicatorResult,
-  IndicatorResultConfig,
-  IndicatorSelection,
-  Quote
+  type ChartSettings,
+  type ExtendedChartDataset,
+  type IndicatorDataRow,
+  type IndicatorDataset,
+  type IndicatorListing,
+  type IndicatorResult,
+  type IndicatorResultConfig,
+  type IndicatorSelection,
+  type Quote
 } from "../config/types";
 
 import { baseDataset } from "../config/datasets";
@@ -16,7 +17,7 @@ import { buildDataPoints, addExtraBars } from "../data/transformers";
 import { OverlayChart } from "./overlay-chart";
 import { OscillatorChart } from "./oscillator-chart";
 
-const EXTRA_BARS = 7;
+const EXTRA_BARS = 6;
 
 const CHART_TYPES = {
   OVERLAY: "overlay",
@@ -190,8 +191,10 @@ export class ChartManager {
         const full = fullDatasets[i] as ExtendedChartDataset;
         if (full && result.dataset) {
           result.dataset.data = [...full.data.slice(startIndex)];
-          // Slice style arrays if present with type casts
           const ext = result.dataset as ExtendedChartDataset;
+          // Chart.js permits Scriptable / scalar forms for these fields on
+          // its base type, so guard at runtime before slicing — the
+          // `as number[]` / `as string[]` casts only quiet the compiler.
           if (Array.isArray(full.pointBackgroundColor)) {
             ext.pointBackgroundColor = [
               ...(full.pointBackgroundColor as string[]).slice(startIndex)
@@ -215,6 +218,13 @@ export class ChartManager {
    * Create an oscillator chart for a selection.
    * Consumer must provide the canvas context and call this after processSelectionData()
    * AND after displaySelection() so the selection is registered in this.selections.
+   *
+   * The oscillator renders with the full (unsliced) result.dataset.data from
+   * processSelectionData() so OscillatorChart.fullThresholdDatasets captures the
+   * complete history. Subsequent setBarCount() calls re-slice from this full
+   * dataset to any window size. Consumers that want the oscillator's initial
+   * view to match a windowed overlay should pre-slice their quotes/rows before
+   * passing them in to ChartManager (as the VitePress demo does).
    *
    * @throws {Error} if displaySelection() has not been called for this selection,
    *   because setBarCount() iterates this.selections and will silently skip any
@@ -328,7 +338,6 @@ export class ChartManager {
         const full = fullDatasets[i] as ExtendedChartDataset;
         if (full && result.dataset) {
           result.dataset.data = [...full.data.slice(startIndex)];
-          // Slice style arrays if present with type casts
           const ext = result.dataset as ExtendedChartDataset;
           if (Array.isArray(full.pointBackgroundColor)) {
             ext.pointBackgroundColor = [
@@ -359,7 +368,9 @@ export class ChartManager {
       const oscillator = this._oscillators.get(selection.ucid);
       if (!fullDatasets || !oscillator) return;
 
-      oscillator.applySlicedData(selection, fullDatasets, startIndex);
+      // Cached datasets for an oscillator selection are always indicator datasets
+      // (the heterogeneous cache also holds candlestick+volume under "overlay-main").
+      oscillator.applySlicedData(selection, fullDatasets as IndicatorDataset[], startIndex);
     });
   }
 

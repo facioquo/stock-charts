@@ -1,6 +1,6 @@
-import { HttpErrorResponse } from "@angular/common/http";
-import { inject, Injectable, OnDestroy, signal } from "@angular/core";
-import { catchError, map, Observable, Subject, takeUntil } from "rxjs";
+import { type HttpErrorResponse } from "@angular/common/http";
+import { inject, Injectable, type OnDestroy, signal } from "@angular/core";
+import { catchError, map, type Observable, Subject, takeUntil } from "rxjs";
 
 import {
   applySelectionTokens,

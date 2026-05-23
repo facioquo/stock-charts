@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ScatterDataPoint } from "chart.js";
+import { type ScatterDataPoint } from "chart.js";
 import {
   processQuoteData,
   buildDataPoints,
@@ -260,6 +260,44 @@ describe("buildDataPoints", () => {
     expect(pointColor[0]).toBe("#DD2C00"); // COLORS.RED
     expect(pointRotation[0]).toBe(180);
   });
+
+  it("falls back to neutral candle config when match is not a number", () => {
+    const candle = makeQuote("2024-01-01", 100);
+    const data: IndicatorDataRow[] = [
+      // Non-numeric `match` (string here, but also covers null/undefined/missing)
+      // should coerce to 0 → neutral default config.
+      { timestamp: "2024-01-01", candle, signal: 42, match: "bullish" }
+    ];
+    const result = makeResult({ dataName: "signal" });
+    const listing = makeListing({ category: "candlestick-pattern" });
+
+    const { pointColor, pointRotation } = buildDataPoints(data, result, listing);
+
+    expect(pointColor[0]).toBe("#9E9E9E"); // COLORS.GRAY (default match=0)
+    expect(pointRotation[0]).toBe(0);
+  });
+
+  it("throws when a row has neither `timestamp` nor `date`", () => {
+    const data: IndicatorDataRow[] = [{ candle: makeQuote("2024-01-01"), sma: 50 }];
+    const result = makeResult({ dataName: "sma" });
+    const listing = makeListing();
+
+    expect(() => buildDataPoints(data, result, listing)).toThrow(
+      /Indicator row missing both 'timestamp' and 'date' fields/
+    );
+  });
+
+  it("throws on an invalid timestamp string rather than silently emitting NaN", () => {
+    const data: IndicatorDataRow[] = [
+      { timestamp: "not-a-date", candle: makeQuote("2024-01-01"), sma: 50 }
+    ];
+    const result = makeResult({ dataName: "sma" });
+    const listing = makeListing();
+
+    expect(() => buildDataPoints(data, result, listing)).toThrow(
+      /Indicator row has invalid timestamp for "sma": not-a-date/
+    );
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -289,10 +327,11 @@ describe("addExtraBars", () => {
     const extraDates = dataPoints.slice(1).map(dp => new Date(dp.x as number));
 
     extraDates.forEach(d => {
-      // addExtraBars uses getDay() (local time), so assert with getDay()
-      const day = d.getDay();
-      expect(day).not.toBe(0); // not Sunday
-      expect(day).not.toBe(6); // not Saturday
+      // addExtraBars uses UTC day arithmetic so the cadence is deterministic
+      // across client timezones — assert with getUTCDay() to match.
+      const day = d.getUTCDay();
+      expect(day).not.toBe(0); // not Sunday (UTC)
+      expect(day).not.toBe(6); // not Saturday (UTC)
     });
   });
 
@@ -344,8 +383,8 @@ describe("addExtraBars", () => {
     addExtraBars(dataPoints, 1);
 
     const nextDate = new Date(dataPoints[1].x as number);
-    // Should be Monday (day 1)
-    expect(nextDate.getDay()).toBe(1);
+    // Should be Monday (day 1) in UTC — addExtraBars advances via setUTCDate.
+    expect(nextDate.getUTCDay()).toBe(1);
   });
 });
 

@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
-import { HttpErrorResponse } from "@angular/common/http";
+import { type HttpErrorResponse } from "@angular/common/http";
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -14,7 +14,7 @@ import {
   MtxColorpickerInput,
   MtxColorpickerToggle
 } from "@ng-matero/extensions/colorpicker";
-import { ColorEvent } from "ngx-color";
+import { type ColorEvent } from "ngx-color";
 import { TinyColor } from "@ctrl/tinycolor";
 
 import { ChartService } from "../../services/chart.service";

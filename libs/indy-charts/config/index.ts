@@ -5,15 +5,18 @@ export type {
   ChartThreshold,
   ExtendedChartDataset,
   IndicatorDataRow,
+  IndicatorDataset,
   IndicatorListing,
   IndicatorParam,
   IndicatorParamConfig,
   IndicatorResult,
   IndicatorResultConfig,
   IndicatorSelection,
-  Quote,
-  RawQuote
+  Quote
 } from "./types";
+
+/** @deprecated Use Quote instead. */
+export type { Quote as RawQuote } from "./types";
 
 export type { ThemeColors } from "./theme-colors";
 

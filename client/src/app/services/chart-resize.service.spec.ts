@@ -1,5 +1,5 @@
 import { TestBed } from "@angular/core/testing";
-import { Mock, beforeEach, describe, expect, it, vi } from "vitest";
+import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 import { WindowService } from "./window.service";
 
 // Mock Chart.js interface for dimension tracking
@@ -235,15 +235,19 @@ describe("Chart Resize Dimension Testing", () => {
 
       const initialBarCount = windowService.calculateOptimalBars();
 
-      // Simulate window resize
-      Object.defineProperty(window, "innerWidth", { value: 1600 });
+      // Simulate window resize to larger width
+      Object.defineProperty(window, "innerWidth", {
+        writable: true,
+        configurable: true,
+        value: 1600
+      });
 
       const newBarCount = windowService.calculateOptimalBars();
 
-      // Verify bar count increased with larger window
-      expect(newBarCount).toBeGreaterThan(initialBarCount);
+      // Verify bar count capped at maximum when window is large
       expect(initialBarCount).toBe(240); // 1200 / 5
-      expect(newBarCount).toBe(320); // 1600 / 5
+      expect(newBarCount).toBe(320); // 1600 / 5 = 320, under MAX_BARS (500)
+      expect(newBarCount).toBeGreaterThanOrEqual(initialBarCount);
     });
 
     it("should maintain chart aspect ratios during resize", () => {

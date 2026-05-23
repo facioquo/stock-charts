@@ -1,8 +1,11 @@
 import path from "path";
+import { fileURLToPath } from "url";
 
 import { defineConfig, devices } from "@playwright/test";
 
-const workspaceRoot = path.resolve(__dirname, "../..");
+// ESM doesn't define `__dirname`; derive it from import.meta.url.
+const here = path.dirname(fileURLToPath(import.meta.url));
+const workspaceRoot = path.resolve(here, "../..");
 
 export default defineConfig({
   testDir: ".",

@@ -1,4 +1,4 @@
-import { FinancialPalette, FinancialThemeMode } from "../types/financial.types";
+import { type FinancialPalette, type FinancialThemeMode } from "../types/financial.types";
 
 export const COLORS = {
   GREEN: "#2E7D32",

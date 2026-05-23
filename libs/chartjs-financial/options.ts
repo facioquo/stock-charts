@@ -1,6 +1,6 @@
-import { Chart, ChartOptions } from "chart.js";
+import { Chart, type ChartOptions } from "chart.js";
 
-import { FinancialPalette } from "./types/financial.types";
+import { type FinancialPalette } from "./types/financial.types";
 import { setFinancialDefaults } from "./helpers/defaults";
 
 interface CandlestickElementDefaults {

@@ -119,6 +119,11 @@ jobs:
       - name: Lint
         run: pnpm --filter @stock-charts/client run lint
 
+      - name: Lint libraries
+        run: |
+          pnpm --filter '@facioquo/chartjs-chart-financial' run lint --max-warnings=0
+          pnpm --filter '@facioquo/indy-charts' run lint --max-warnings=0
+
       - name: Lint CSS
         run: pnpm run lint:css
 

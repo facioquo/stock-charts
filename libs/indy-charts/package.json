@@ -1,6 +1,6 @@
 {
   "name": "@facioquo/indy-charts",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Framework-agnostic financial charting library with technical indicators and stock market data visualization",
   "author": "facioquo",
   "license": "Apache-2.0",
@@ -41,16 +41,17 @@
   "scripts": {
     "prebuild": "pnpm --filter @facioquo/chartjs-chart-financial run build",
     "build": "tsup",
+    "prelint": "pnpm --filter @facioquo/chartjs-chart-financial run build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "format": "prettier --write \"**/*.{ts,json,md}\"",
-    "format:check": "prettier --check \"**/*.{ts,json,md}\"",
+    "format": "prettier --write \"**/*.{ts,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,json}\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "chartjs-adapter-date-fns": "^3.0.0",
-    "date-fns": "^4.0.0"
+    "date-fns": "^4.3.0"
   },
   "peerDependencies": {
     "chart.js": "^4.5.1",
@@ -69,9 +70,9 @@
     "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
     "jiti": "^2.7.0",
-    "typescript-eslint": "^8.59.3",
+    "typescript-eslint": "^8.59.4",
     "tsup": "^8.5.1",
-    "vitest": "^4.1.6",
+    "vitest": "^4.1.7",
     "vue": "3.5.34"
   }
 }

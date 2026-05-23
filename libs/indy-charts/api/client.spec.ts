@@ -1,12 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { createApiClient } from "./client";
 import type { ApiClient } from "./client";
-import type {
-  IndicatorListing,
-  IndicatorParam,
-  IndicatorSelection,
-  RawQuote
-} from "../config/types";
+import type { IndicatorListing, IndicatorParam, IndicatorSelection } from "../config/types";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -14,7 +9,16 @@ import type {
 
 const BASE_URL = "https://api.example.com";
 
-function rawQuote(dateStr: string, close = 100): RawQuote {
+type ApiQuote = {
+  timestamp: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+};
+
+function createQuote(dateStr: string, close = 100): ApiQuote {
   return {
     timestamp: dateStr,
     open: close - 1,
@@ -100,11 +104,14 @@ function mockFetchNetworkError(message: string): void {
 
 describe("createApiClient", () => {
   let client: ApiClient;
-  let onError: ReturnType<typeof vi.fn>;
+  let onError: ReturnType<typeof vi.fn<[context: string, error: unknown], void>>;
 
   beforeEach(() => {
-    onError = vi.fn();
-    client = createApiClient({ baseUrl: BASE_URL, onError });
+    onError = vi.fn<[context: string, error: unknown], void>();
+    client = createApiClient({
+      baseUrl: BASE_URL,
+      onError
+    });
   });
 
   afterEach(() => {
@@ -138,8 +145,11 @@ describe("createApiClient", () => {
 
   describe("getQuotes", () => {
     it("returns Quote[] with Date objects from raw ISO strings", async () => {
-      const raw: RawQuote[] = [rawQuote("2024-01-01T00:00:00Z"), rawQuote("2024-01-02T00:00:00Z")];
-      mockFetchOk(raw);
+      const apiQuotes: ApiQuote[] = [
+        createQuote("2024-01-01T00:00:00Z"),
+        createQuote("2024-01-02T00:00:00Z")
+      ];
+      mockFetchOk(apiQuotes);
 
       const quotes = await client.getQuotes();
 
@@ -162,12 +172,31 @@ describe("createApiClient", () => {
     });
 
     it("throws and calls onError when a quote date is invalid", async () => {
-      mockFetchOk([rawQuote("not-a-date")]);
+      mockFetchOk([createQuote("not-a-date")]);
 
       await expect(client.getQuotes()).rejects.toThrow(
         'Invalid quote date at index 0: "not-a-date"'
       );
       expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(Error));
+    });
+
+    it("throws when a quote element is null or non-object", async () => {
+      mockFetchOk([null]);
+      await expect(client.getQuotes()).rejects.toThrow(
+        "Invalid quote at index 0: expected object, got object"
+      );
+
+      mockFetchOk(["not-an-object"]);
+      await expect(client.getQuotes()).rejects.toThrow(
+        "Invalid quote at index 0: expected object, got string"
+      );
+    });
+
+    it("throws when response is not an array", async () => {
+      mockFetchOk({ notAnArray: true });
+      await expect(client.getQuotes()).rejects.toThrow(
+        "Invalid quotes response: expected an array"
+      );
     });
 
     it("throws and calls onError on HTTP error", async () => {
@@ -185,10 +214,10 @@ describe("createApiClient", () => {
     });
 
     it("preserves all OHLCV fields", async () => {
-      const raw: RawQuote[] = [
+      const apiQuotes: ApiQuote[] = [
         { timestamp: "2024-06-15T00:00:00Z", open: 10, high: 20, low: 5, close: 15, volume: 9999 }
       ];
-      mockFetchOk(raw);
+      mockFetchOk(apiQuotes);
 
       const [q] = await client.getQuotes();
       expect(q).toMatchObject({

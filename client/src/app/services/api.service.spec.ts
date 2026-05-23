@@ -1,12 +1,21 @@
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
 import { TestBed } from "@angular/core/testing";
 import { firstValueFrom } from "rxjs";
-import { MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { type MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { env } from "../../environments/environment";
 import backupIndicators from "../data/backup-indicators.json";
 import backupQuotes from "../data/backup-quotes.json"; // Added JSON quotes import
-import type { IndicatorListing, IndicatorSelection, RawQuote } from "@facioquo/indy-charts";
+import type { IndicatorListing, IndicatorSelection } from "@facioquo/indy-charts";
 import { ApiService } from "./api.service";
+
+type ApiQuote = {
+  timestamp: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+};
 
 const BACKUP_INDICATORS = backupIndicators as IndicatorListing[];
 
@@ -38,7 +47,7 @@ describe("ApiService", () => {
   });
 
   it("should return quotes from API when available", () => {
-    const rawMock: RawQuote[] = [
+    const rawMock: ApiQuote[] = [
       {
         timestamp: "2023-01-01T00:00:00.000Z",
         open: 100,
@@ -108,8 +117,10 @@ describe("ApiService", () => {
   });
 
   it("client backup quotes should have realistic data structure", () => {
-    const quotes = backupQuotes as RawQuote[];
-    expect(quotes.length).toBeGreaterThanOrEqual(0);
+    const quotes = backupQuotes as ApiQuote[];
+    expect(quotes.length).toBeGreaterThan(0);
+    expect(quotes[0]).toHaveProperty("open");
+    expect(quotes[0]).toHaveProperty("close");
   });
 
   it("should return indicators from API when available", () => {
@@ -325,6 +336,128 @@ describe("ApiService", () => {
     });
 
     await expect(result).rejects.toMatchObject({ status: 400 });
+  });
+
+  it("returns empty selection data without an HTTP request after quotes fell back to backup", async () => {
+    // First call: getQuotes errors → triggers backup mode
+    const quotes$ = firstValueFrom(service.getQuotes());
+    const quotesReq = httpMock.expectOne(`${env.api}/quotes`);
+    quotesReq.error(new ProgressEvent("Network error"), {
+      status: 0,
+      statusText: "Network Error"
+    });
+    await quotes$;
+
+    // Subsequent getSelectionData must NOT issue an HTTP request and must
+    // resolve to [] — this keeps overlay + oscillator behavior consistent
+    // when the live API is unavailable.
+    const listing: IndicatorListing = {
+      name: "Average Directional Index",
+      uiid: "ADX",
+      legendTemplate: "ADX([P1])",
+      endpoint: "/ADX/",
+      category: "trend",
+      chartType: "oscillator",
+      order: 0,
+      chartConfig: null,
+      parameters: [],
+      results: []
+    };
+    const selection: IndicatorSelection = {
+      ucid: "chart-1",
+      uiid: "ADX",
+      label: "ADX(14)",
+      chartType: "oscillator",
+      params: [],
+      results: []
+    };
+
+    await expect(firstValueFrom(service.getSelectionData(selection, listing))).resolves.toEqual([]);
+    httpMock.expectNone(request => request.url === `${env.api}/ADX/`);
+  });
+
+  it("returns empty selection data without an HTTP request after listings fell back to backup", async () => {
+    const listings$ = firstValueFrom(service.getListings());
+    const listingsReq = httpMock.expectOne(`${env.api}/indicators`);
+    listingsReq.error(new ProgressEvent("Server error"), {
+      status: 500,
+      statusText: "Internal Server Error"
+    });
+    await listings$;
+
+    const listing: IndicatorListing = {
+      name: "Relative Strength Index",
+      uiid: "RSI",
+      legendTemplate: "RSI([P1])",
+      endpoint: "/RSI/",
+      category: "oscillator",
+      chartType: "oscillator",
+      order: 0,
+      chartConfig: null,
+      parameters: [],
+      results: []
+    };
+    const selection: IndicatorSelection = {
+      ucid: "chart-rsi",
+      uiid: "RSI",
+      label: "RSI(14)",
+      chartType: "oscillator",
+      params: [],
+      results: []
+    };
+
+    await expect(firstValueFrom(service.getSelectionData(selection, listing))).resolves.toEqual([]);
+    httpMock.expectNone(request => request.url === `${env.api}/RSI/`);
+  });
+
+  it("re-arms live indicator fetches after a successful getQuotes response recovers the backend", async () => {
+    const listing: IndicatorListing = {
+      name: "Average Directional Index",
+      uiid: "ADX",
+      legendTemplate: "ADX([P1])",
+      endpoint: "/ADX/",
+      category: "trend",
+      chartType: "oscillator",
+      order: 0,
+      chartConfig: null,
+      parameters: [],
+      results: []
+    };
+    const selection: IndicatorSelection = {
+      ucid: "chart-1",
+      uiid: "ADX",
+      label: "ADX(14)",
+      chartType: "oscillator",
+      params: [],
+      results: []
+    };
+
+    // Step 1: getQuotes errors → backup mode is armed
+    const firstQuotes = firstValueFrom(service.getQuotes());
+    httpMock.expectOne(`${env.api}/quotes`).error(new ProgressEvent("Network error"), {
+      status: 0,
+      statusText: "Network Error"
+    });
+    await firstQuotes;
+
+    // Sanity: indicator fetch is short-circuited while backup is armed
+    await expect(firstValueFrom(service.getSelectionData(selection, listing))).resolves.toEqual([]);
+    httpMock.expectNone(request => request.url === `${env.api}/ADX/`);
+
+    // Step 2: getQuotes succeeds → backup mode must clear
+    const secondQuotes = firstValueFrom(service.getQuotes());
+    httpMock
+      .expectOne(`${env.api}/quotes`)
+      .flush([
+        { timestamp: "2024-01-01T00:00:00.000Z", open: 1, high: 2, low: 0, close: 1, volume: 10 }
+      ]);
+    await secondQuotes;
+
+    // Step 3: indicator fetch now reaches the live endpoint
+    const indicatorRequest = firstValueFrom(service.getSelectionData(selection, listing));
+    const req = httpMock.expectOne(request => request.url === `${env.api}/ADX/`);
+    req.flush([{ timestamp: "2024-01-01", adx: 22 }]);
+    await expect(indicatorRequest).resolves.toEqual([{ timestamp: "2024-01-01", adx: 22 }]);
   });
 
   it("client backup indicators should have valid data structure", () => {

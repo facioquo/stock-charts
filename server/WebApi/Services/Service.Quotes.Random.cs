@@ -61,16 +61,24 @@ public class RandomQuotes : List<Quote>
     private static void ValidateArgs(int bars, double volatility, double seed, TimeSpan frequency, bool includeWeekends)
     {
         if (bars <= 0)
+        {
             throw new ArgumentException("Number of bars must be greater than zero.", nameof(bars));
+        }
 
         if (volatility <= 0)
+        {
             throw new ArgumentException("Volatility must be greater than zero.", nameof(volatility));
+        }
 
         if (seed <= 0)
+        {
             throw new ArgumentException("Seed must be greater than zero.", nameof(seed));
+        }
 
         if (!includeWeekends && (frequency < TimeSpan.FromHours(1) || frequency >= TimeSpan.FromDays(7)))
+        {
             throw new ArgumentException("Weekends can only be excluded for period sizes between OneHour and less than OneWeek.", nameof(includeWeekends));
+        }
     }
 
     /// <summary>

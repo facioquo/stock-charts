@@ -1,12 +1,13 @@
+/* Reduce sidebar width by ~15% */
+:root {
+  --vp-sidebar-width: 230px;
+}
+
 .indy-demo {
   margin: 8px 0 24px;
   overflow: hidden;
   max-width: 100%;
   box-sizing: border-box;
-}
-
-.indy-demo__header {
-  display: none;
 }
 
 .indy-demo__status {
@@ -47,15 +48,6 @@
   border-color: var(--vp-c-brand-1);
 }
 
-.indy-demo__panel {
-  overflow: hidden;
-  min-width: 0;
-}
-
-.indy-demo__panel-title {
-  display: none;
-}
-
 .indy-demo__canvas-wrap {
   position: relative;
   width: 100%;
@@ -63,22 +55,22 @@
 }
 
 .indy-demo__canvas-wrap--overlay {
-  aspect-ratio: 2;
+  aspect-ratio: 2.5;
 }
 
 @media (width <= 880px) {
   .indy-demo__canvas-wrap--overlay {
-    aspect-ratio: 1.6;
+    aspect-ratio: 2;
   }
 }
 
 .indy-demo__canvas-wrap--oscillator {
-  aspect-ratio: 6;
+  aspect-ratio: 4;
 }
 
 @media (width <= 880px) {
   .indy-demo__canvas-wrap--oscillator {
-    aspect-ratio: 5;
+    aspect-ratio: 3;
   }
 }
 

@@ -1,4 +1,5 @@
-import { test, expect, type Locator, type Page } from "@playwright/test";
+import { test, expect } from "./fixtures";
+import type { Locator, Page } from "@playwright/test";
 
 interface MockQuote {
   timestamp: string;
@@ -168,21 +169,30 @@ test.describe("VitePress Documentation Site", () => {
 
   test("home page shows hero description and CTAs", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("Financial Charting Made Simple")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Get Started" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "View Examples" })).toBeVisible();
+    await expect(page.getByText("Financial charting, batteries included")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Install", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Quick start" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "API reference" })).toBeVisible();
   });
 
   test("home page shows all feature cards", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: "Financial Charts", level: 2 })).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Technical Indicators", level: 2 })
+      page.getByRole("heading", { name: "Price + volume charts", level: 2 })
     ).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Theme Support", level: 2 })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Framework Agnostic", level: 2 })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "TypeScript", level: 2 })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Performance", level: 2 })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Built-in indicators", level: 2 })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Light + dark themes", level: 2 })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Bring your own data", level: 2 })
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "TypeScript first", level: 2 })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "250+ bars, instant pan", level: 2 })
+    ).toBeVisible();
   });
 
   test("navigation links are present", async ({ page }) => {
@@ -222,15 +232,15 @@ test.describe("VitePress Documentation Site", () => {
     await expect(toggle).not.toHaveAttribute("aria-checked", before!);
   });
 
-  test("quick example code block is visible", async ({ page }) => {
+  test("usage code block is visible", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: "Quick Example" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Use it" })).toBeVisible();
     await expect(page.locator("code").first()).toBeVisible();
   });
 
-  test("installation section shows package manager tabs", async ({ page }) => {
+  test("install section shows package manager tabs", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: "Installation" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Install", level: 2 })).toBeVisible();
     await expect(page.getByRole("radio", { name: "npm", exact: true })).toBeChecked();
     await expect(page.getByRole("radio", { name: "pnpm", exact: true })).toBeVisible();
     await expect(page.getByRole("radio", { name: "yarn", exact: true })).toBeVisible();
@@ -248,11 +258,24 @@ test.describe("VitePress Documentation Site", () => {
   test("indicators page renders nonblank overlay and oscillator charts", async ({ page }) => {
     await mockChartApi(page);
     await page.goto("/examples/indicators");
-    const root = page.getByTestId("stock-indicator-chart-rsi-root");
-    await expect(root).toBeVisible();
 
-    await expect(page.getByTestId("stock-indicator-chart-rsi-error")).toHaveCount(0);
-    await expectCanvasToBeNonBlank(page.getByTestId("stock-indicator-chart-rsi-overlay-canvas"));
-    await expectCanvasToBeNonBlank(page.getByTestId("stock-indicator-chart-rsi-oscillator-canvas"));
+    // Standalone oscillator (no overlay canvas)
+    const standaloneRoot = page.getByTestId("stock-indicator-chart-rsi-standalone-root");
+    await expect(standaloneRoot).toBeVisible();
+    await expect(page.getByTestId("stock-indicator-chart-rsi-standalone-error")).toHaveCount(0);
+    await expectCanvasToBeNonBlank(
+      page.getByTestId("stock-indicator-chart-rsi-standalone-oscillator-canvas")
+    );
+
+    // Oscillator paired with overlay price chart
+    const overlayRoot = page.getByTestId("stock-indicator-chart-rsi-with-overlay-root");
+    await expect(overlayRoot).toBeVisible();
+    await expect(page.getByTestId("stock-indicator-chart-rsi-with-overlay-error")).toHaveCount(0);
+    await expectCanvasToBeNonBlank(
+      page.getByTestId("stock-indicator-chart-rsi-with-overlay-overlay-canvas")
+    );
+    await expectCanvasToBeNonBlank(
+      page.getByTestId("stock-indicator-chart-rsi-with-overlay-oscillator-canvas")
+    );
   });
 });

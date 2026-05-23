@@ -1,6 +1,11 @@
-import { CartesianScaleOptions, ChartConfiguration, ChartOptions, ScaleOptions } from "chart.js";
+import {
+  type CartesianScaleOptions,
+  type ChartConfiguration,
+  type ChartOptions,
+  type ScaleOptions
+} from "chart.js";
 
-import { ChartSettings } from "./types";
+import { type ChartSettings } from "./types";
 import { baseChartOptions } from "./common";
 
 export function baseOverlayConfig(
@@ -10,13 +15,13 @@ export function baseOverlayConfig(
   // Root chart type changed from "line" to "candlestick" so Chart.js
   // calculates y-axis bounds from OHLC values; using "line" caused empty
   // overlay (scale collapsed in production build).
-  const config = {
+  const config: ChartConfiguration = {
     type: "candlestick",
     data: {
       datasets: []
     },
     options: baseOverlayOptions(volumeAxisSize, settings)
-  } as unknown as ChartConfiguration;
+  };
 
   return config;
 }

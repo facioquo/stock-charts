@@ -22,16 +22,27 @@ export default tseslint.config(
       ],
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-floating-promises": "error",
-      "@typescript-eslint/prefer-nullish-coalescing": "error"
+      "@typescript-eslint/no-non-null-assertion": "error",
+      "@typescript-eslint/no-unnecessary-type-assertion": "error",
+      "@typescript-eslint/prefer-nullish-coalescing": "error",
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { prefer: "type-imports", fixStyle: "inline-type-imports" }
+      ]
     }
   },
-  // Test files - relaxed rules + vitest plugin
+  // Test files - keep no-explicit-any as a warning so structural mocks can
+  // opt in deliberately; unsafe-* must stay off because vitest mocks return
+  // `any`-typed values from the plugin's recommended config. Non-null
+  // assertions are common in tests where mock fixtures are known to be
+  // populated, so we allow them here only.
   {
     files: ["**/*.spec.ts"],
     plugins: vitest.configs.recommended.plugins,
     rules: {
       ...vitest.configs.recommended.rules,
-      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-call": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
