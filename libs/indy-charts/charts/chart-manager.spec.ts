@@ -349,9 +349,9 @@ describe("ChartManager", () => {
       // render receives the visible slice only (last 40 of 80, startIndex=40)
       const renderArg = vi.mocked(overlay.render!).mock.calls[0][0];
       expect(renderArg).toHaveLength(40);
-      expect(vi.mocked(overlay.render!).mock.calls[0][1]).toBe(7); // default extraBars
+      expect(vi.mocked(overlay.render!).mock.calls[0][1]).toBe(6); // default extraBars
       // buildFullDatasets receives all quotes so full history is cached
-      expect(overlay.buildFullDatasets).toHaveBeenCalledWith(quotes, 7);
+      expect(overlay.buildFullDatasets).toHaveBeenCalledWith(quotes, 6);
     });
 
     it("renders with sliced quotes (no separate applySlicedData on init)", () => {

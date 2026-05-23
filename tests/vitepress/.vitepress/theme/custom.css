@@ -50,12 +50,12 @@
 }
 
 .indy-demo__canvas-wrap--overlay {
-  aspect-ratio: 2;
+  aspect-ratio: 2.5;
 }
 
 @media (width <= 880px) {
   .indy-demo__canvas-wrap--overlay {
-    aspect-ratio: 1.6;
+    aspect-ratio: 2;
   }
 }
 
