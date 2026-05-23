@@ -26,7 +26,7 @@ const CHART_TYPES = {
 
 export class OverlayChart {
   /**
-   * Underlying Chart.js instance. Read-only access (theme tweaks, dataset
+   * Underlying Chart.js instance. Read access (theme tweaks, dataset
    * inspection) is supported. **Do not call `chart.destroy()` directly** — use
    * {@link OverlayChart.destroy} so library-level state (legend selections,
    * volume-axis cache) is released alongside the Chart.js teardown.
@@ -209,14 +209,16 @@ export class OverlayChart {
 
   /**
    * Tear down this OverlayChart and its underlying Chart.js instance. Releases
-   * theme observers, legend caches, and the canvas binding. Always call this
-   * from your component's unmount hook — not `chart.destroy()`, which leaves
-   * library-level state orphaned.
+   * the cached legend selections, the volume-axis cache, and the Chart.js
+   * canvas binding. Always call this from your component's unmount hook — not
+   * `chart.destroy()`, which leaves library-level state orphaned.
    */
   destroy(): void {
     if (this.chart) {
       this.chart.destroy();
       this.chart = undefined;
     }
+    this._latestLegendSelections = [];
+    this.volumeAxisSize = 0;
   }
 }

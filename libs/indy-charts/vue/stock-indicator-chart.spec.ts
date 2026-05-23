@@ -225,9 +225,30 @@ describe("StockIndicatorChart", () => {
     app.mount(root);
     await nextTick();
 
-    expect(findByTestId(root, "stock-indicator-chart-rsi-fast-root")).toBeDefined();
+    const rootSection = findByTestId(root, "stock-indicator-chart-rsi-fast-root");
+    expect(rootSection).toBeDefined();
+    expect(rootSection?.props["id"]).toBe("rsi-fast");
     expect(findByTestId(root, "stock-indicator-chart-rsi-fast-loading")).toBeDefined();
     expect(findByTestId(root, "stock-indicator-chart-rsi-root")).toBeUndefined();
+
+    app.unmount();
+  });
+
+  it("falls back to id=\"chart\" when id/config.id/indicator slugify to empty", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => new Promise<Response>(() => undefined))
+    );
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, { id: "---" });
+    app.provide(indyChartsVueOptionsKey, defaultOptions);
+
+    app.mount(root);
+    await nextTick();
+
+    const section = findByTestId(root, "stock-indicator-chart-chart-root");
+    expect(section).toBeDefined();
+    expect(section?.props["id"]).toBe("chart");
 
     app.unmount();
   });

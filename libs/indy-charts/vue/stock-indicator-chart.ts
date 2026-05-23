@@ -97,9 +97,10 @@ export const StockIndicatorChart = defineComponent({
     const chartType = ref<string>("overlay");
     const overlayCanvas = ref<HTMLCanvasElement | null>(null);
     const oscillatorCanvas = ref<HTMLCanvasElement | null>(null);
-    const rootId = computed(() =>
-      slug(props.id ?? props.config.id ?? props.indicator ?? "chart")
-    );
+    const rootId = computed(() => {
+      const normalized = slug(props.id ?? props.config.id ?? props.indicator ?? "chart");
+      return normalized || "chart";
+    });
     const testIdPrefix = computed(() => `${STOCK_INDICATOR_CHART_TESTID_PREFIX}-${rootId.value}`);
     const showOverlayCanvas = computed(
       () => chartType.value !== "oscillator" || props.withOverlay === true
@@ -309,7 +310,11 @@ export const StockIndicatorChart = defineComponent({
     return () =>
       h(
         "section",
-        { class: "indy-demo stock-indicator-chart", "data-testid": `${testIdPrefix.value}-root` },
+        {
+          id: rootId.value,
+          class: "indy-demo stock-indicator-chart",
+          "data-testid": `${testIdPrefix.value}-root`
+        },
         [
           phase.value === "loading"
             ? [

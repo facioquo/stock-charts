@@ -149,7 +149,7 @@ function isDark() {
 function renderChart() {
   if (!canvasEl.value) return;
   setupIndyCharts();
-  overlayChart?.chart?.destroy();
+  overlayChart?.destroy();
   overlayChart = new OverlayChart(canvasEl.value, {
     isDarkTheme: isDark(),
     showTooltips: false,
@@ -172,7 +172,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   observer?.disconnect();
   observer = null;
-  overlayChart?.chart?.destroy();
+  overlayChart?.destroy();
   overlayChart = null;
 });
 </script>

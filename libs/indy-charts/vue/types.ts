@@ -45,10 +45,15 @@ export interface StockIndicatorChartProps {
   indicator?: string;
   /**
    * Stable identifier for this chart instance. Drives the root element id and
-   * the `data-testid` prefix (`stock-indicator-chart-<slug(id)>`). Overrides
-   * `config.id` and falls back to `indicator` when omitted. Use this to mount
-   * multiple instances of the same indicator on a single page with distinct
-   * test/CSS hooks.
+   * the `data-testid` prefix (`stock-indicator-chart-<slug(id)>`). Resolution
+   * order is `id` → `config.id` → `indicator`, with `undefined`/missing values
+   * skipped (an empty string is treated as a present value and slugified to
+   * the `"chart"` fallback). Use this to mount multiple instances of the same
+   * indicator on a single page with distinct test/CSS hooks. Treat as
+   * effectively set-once: the DOM `id`/`data-testid` updates immediately on
+   * change, but internal selection tokens are namespaced at chart-creation
+   * time and retain the previous prefix until the chart reloads for an
+   * unrelated reason.
    */
   id?: string;
   config?: StockIndicatorChartConfig;
