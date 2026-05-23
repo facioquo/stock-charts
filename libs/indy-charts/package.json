@@ -9,6 +9,7 @@
     "url": "https://github.com/facioquo/stock-charts.git",
     "directory": "libs/indy-charts"
   },
+  "readme": "README.md",
   "homepage": "https://github.com/facioquo/stock-charts/tree/main/libs/indy-charts#readme",
   "bugs": {
     "url": "https://github.com/facioquo/stock-charts/issues"

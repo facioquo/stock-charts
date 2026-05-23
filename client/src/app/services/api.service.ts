@@ -16,14 +16,20 @@ export class ApiService {
   private readonly http = inject(HttpClient);
 
   /**
-   * Set to `true` once a quotes-or-listings fetch falls back to bundled backup
-   * data. While active, `getSelectionData` short-circuits to `[]` so oscillator
-   * and overlay indicators do not render their live timestamps against stale
-   * (or absent) backup quotes — keeping fallback behavior consistent across
-   * chart types. Reset to `false` whenever a live quotes or listings response
-   * succeeds so the app recovers automatically once the backend returns.
+   * Set to `true` once a quotes/listings/indicator fetch falls back to bundled
+   * backup data. While active, `getSelectionData` short-circuits to backup-quote-
+   * aligned empty indicator rows (one per backup quote, with the candle attached)
+   * so overlay and oscillator indicator x-axes align with the candlestick range
+   * instead of stretching to today's date. Reset to `false` on ANY successful
+   * live response (quotes, listings, or indicator) so a session that hit a
+   * single transient indicator 502 self-heals as soon as the backend recovers
+   * — without this, quotes/listings only load at bootstrap and the app would
+   * stay pinned to backup for the rest of the session.
    */
   private backupActive = false;
+
+  /** Lazily-built timestamp-aligned rows for backup-mode `getSelectionData`. */
+  private _backupRows: Array<{ timestamp: string; candle: unknown }> | undefined;
 
   getQuotes(): Observable<Quote[]> {
     type ApiQuote = {
@@ -47,7 +53,6 @@ export class ApiService {
         this.backupActive = true;
         console.warn("Backend API unavailable, using client-side backup quotes", {
           status: error.status,
-          statusText: error.statusText,
           url: error.url,
           message: error.message
         });
@@ -66,7 +71,6 @@ export class ApiService {
         this.backupActive = true;
         console.warn("Backend API unavailable, using client-side backup indicators", {
           status: error.status,
-          statusText: error.statusText,
           url: error.url,
           message: error.message
         });
@@ -83,11 +87,14 @@ export class ApiService {
     // the live API would render with current timestamps against backup quote
     // dates — producing the visually-inconsistent overlay vs oscillator behavior
     // seen on Cloudflare Pages PR previews before the API has been redeployed.
+    // Returning rows aligned to backup quote timestamps (with the candle for
+    // candlestick-pattern indicators) keeps every chart's x-axis pinned to the
+    // candlestick range; NaN y-values render as gaps so no spurious line is drawn.
     if (this.backupActive) {
-      console.warn("Backup data active, returning empty data for indicator", {
+      console.warn("Backup data active, returning timestamp-aligned empty data for indicator", {
         uiid: selection.uiid
       });
-      return of([]);
+      return of(this.backupSelectionRows());
     }
 
     let params = new HttpParams();
@@ -100,23 +107,58 @@ export class ApiService {
         params
       })
       .pipe(
+        map(data => {
+          // Self-heal: a successful indicator response means the backend is
+          // alive again, so future requests should hit the live API.
+          this.backupActive = false;
+          return data;
+        }),
         catchError((error: HttpErrorResponse) => {
           if (!this.isTransientBackendUnavailable(error)) {
             return throwError(() => error);
           }
 
           this.backupActive = true;
-          console.warn("Backend API unavailable, using empty data for indicator", {
-            uiid: selection.uiid,
-            status: error.status,
-            statusText: error.statusText
-          });
-          return of([]);
+          console.warn(
+            "Backend API unavailable, using timestamp-aligned empty data for indicator",
+            {
+              uiid: selection.uiid,
+              status: error.status
+            }
+          );
+          return of(this.backupSelectionRows());
         })
       );
   }
 
   // HELPERS
+
+  /**
+   * Build one indicator row per backup quote, carrying only the timestamp and
+   * candle. `buildDataPoints` in indy-charts reads `row[result.dataName]`,
+   * gets `undefined`, coerces it to NaN, and emits a gap; candlestick-pattern
+   * indicators additionally read `row.candle` for high/low anchoring.
+   *
+   * Memoized — backup quotes are static JSON bundled at build time, so the
+   * synthesized rows can be reused across every short-circuit and transient-
+   * fallback call without rebuilding. Returned array is treated as read-only
+   * by callers (RxJS `of` only emits it; downstream consumers iterate).
+   */
+  private backupSelectionRows(): Array<{ timestamp: string; candle: unknown }> {
+    if (this._backupRows) return this._backupRows;
+    type BackupQuote = {
+      timestamp: string;
+      open: number;
+      high: number;
+      low: number;
+      close: number;
+      volume: number;
+    };
+    const quotes = backupQuotes as BackupQuote[];
+    this._backupRows = quotes.map(q => ({ timestamp: q.timestamp, candle: q }));
+    return this._backupRows;
+  }
+
   requestHeader(): { headers?: HttpHeaders } {
     // GET requests carry no body, so Accept is the appropriate header (not Content-Type).
     const simpleHeaders = new HttpHeaders().set("Accept", "application/json");

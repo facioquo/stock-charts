@@ -219,12 +219,14 @@ export class ChartManager {
    * Consumer must provide the canvas context and call this after processSelectionData()
    * AND after displaySelection() so the selection is registered in this.selections.
    *
-   * The oscillator renders with the full (unsliced) result.dataset.data from
-   * processSelectionData() so OscillatorChart.fullThresholdDatasets captures the
-   * complete history. Subsequent setBarCount() calls re-slice from this full
-   * dataset to any window size. Consumers that want the oscillator's initial
-   * view to match a windowed overlay should pre-slice their quotes/rows before
-   * passing them in to ChartManager (as the VitePress demo does).
+   * Renders with the full (unsliced) result.dataset.data so OscillatorChart's
+   * fullThresholdDatasets capture complete history for later re-slicing. Then,
+   * when an overlay has been initialized with a smaller window, applies the
+   * same slice immediately so the new oscillator's x-axis coincides with the
+   * windowed overlay from the first paint. Without this, oscillators created
+   * after `initializeOverlay` (or after a window resize race) would render
+   * spanning the full quote history while the overlay shows only the last
+   * `currentBarCount` candles — visibly misaligned at mobile breakpoints.
    *
    * @throws {Error} if displaySelection() has not been called for this selection,
    *   because setBarCount() iterates this.selections and will silently skip any
@@ -249,6 +251,28 @@ export class ChartManager {
     const oscillator = new OscillatorChart(ctx, this._settings);
     oscillator.render(selection, listing);
     this._oscillators.set(selection.ucid, oscillator);
+
+    // Align the freshly rendered oscillator with the current viewport window.
+    // render() captures full-history threshold datasets internally; this slice
+    // only narrows what's drawn, leaving the cached full datasets intact for
+    // future setBarCount() calls.
+    const totalQuotes = this._allQuotes.length;
+    if (totalQuotes > 0 && this._currentBarCount < totalQuotes) {
+      const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
+      if (!fullDatasets) {
+        // processSelectionData() populates this cache; reaching here means a
+        // caller skipped it, which would also leave selection.results[].dataset
+        // empty. Fail loudly instead of silently rendering an unaligned chart.
+        throw new Error(
+          `createOscillator: selection "${selection.ucid}" has no processed datasets. ` +
+            `Call processSelectionData() before createOscillator() so the oscillator can ` +
+            `align with the current viewport window.`
+        );
+      }
+      const startIndex = totalQuotes - this._currentBarCount;
+      oscillator.applySlicedData(selection, fullDatasets as IndicatorDataset[], startIndex);
+    }
+
     return oscillator;
   }
 

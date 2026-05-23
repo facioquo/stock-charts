@@ -189,7 +189,10 @@ export class OverlayChart {
       }
     }
 
-    this.chart.update();
+    // Match OscillatorChart.applySlicedData which also uses "none" — both charts
+    // share the same setBarCount() trigger, so they must update with identical
+    // semantics to avoid one snapping while the other transitions.
+    this.chart.update("none");
   }
 
   resize(): void {
