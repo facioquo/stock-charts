@@ -5,10 +5,12 @@ Framework-agnostic financial charting library with technical indicators and stoc
 ## Installation
 
 ```bash
-npm install @facioquo/indy-charts chart.js chartjs-plugin-annotation vue
+npm install @facioquo/indy-charts chart.js chartjs-plugin-annotation
 ```
 
-## Quick Start
+Add `vue` only if you intend to use the Vue adapter (`@facioquo/indy-charts/vue`) — most non-Vue consumers do not need it.
+
+## Quick start
 
 ```typescript
 import { createApiClient, OverlayChart, setupIndyCharts } from "@facioquo/indy-charts";
@@ -34,7 +36,7 @@ const chart = new OverlayChart(canvas, {
 chart.render(quotes.slice(-250));
 ```
 
-## Usage with Vue
+## Usage with Vue 3 / VitePress
 
 Register the optional Vue adapter once in your app entry point (e.g. `.vitepress/theme/index.ts` for VitePress, or `main.ts` for plain Vue):
 

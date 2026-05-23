@@ -19,7 +19,9 @@ This is a modernized Chart.js financial plugin based on the original [chartjs/ch
 npm install @facioquo/chartjs-chart-financial chart.js
 ```
 
-## Quick Start
+> If you are using [`@facioquo/indy-charts`](../indy-charts), this package is bundled — you do not need to install it separately or call `registerFinancialCharts()`. `setupIndyCharts()` handles registration.
+
+## Quick start
 
 ```typescript
 import { Chart, registerables } from "chart.js";

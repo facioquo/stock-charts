@@ -16,31 +16,26 @@ Colors are applied consistently to:
 - Grid lines
 - Chart grid colors
 
-## Customizing theme colors
+## Reading theme colors
 
-For advanced use cases, you can read the current theme colors using `getThemeColors()`:
+When you need the same palette outside of a chart (custom legends, side panels, etc.), call `getThemeColors()` with the same `ChartSettings` you pass to `ChartManager`:
 
 ```typescript
 import { getThemeColors } from "@facioquo/indy-charts";
 
-// Get colors for your current theme
-const colors = getThemeColors({ 
-  isDarkTheme: true,
-  showTooltips: true 
-});
-
-// colors.text = "#9E9E9E"
-// colors.background = "#12131680"
-// colors.grid = "#2E2E2E"
+const colors = getThemeColors({ isDarkTheme: true, showTooltips: false });
+// colors.text       === "#808080"
+// colors.background === "#12131680"
+// colors.grid       === "#2E2E2E"
 ```
 
-The returned colors apply to all UI elements:
+`showTooltips` is required by `ChartSettings` but is not used by `getThemeColors`. Override the background by setting `settings.background` — the returned `colors.background` will reflect it.
 
 ```typescript
-export interface ThemeColors {
-  text: string;       // Axis label and annotation text color
-  background: string; // Background color for labels and annotations
-  grid: string;       // Grid line color
+interface ThemeColors {
+  text: string;       // Axis labels and annotation text
+  background: string; // Annotation backdrops and mirrored axis labels
+  grid: string;       // Grid lines
 }
 ```
 
@@ -86,7 +81,7 @@ The resolution order is: per-instance prop → per-instance config → site-wide
 
 | Element | Light | Dark |
 |---------|-------|------|
-| **Text** | `#121316` | `#9E9E9E` |
+| **Text** | `#121316` | `#808080` |
 | **Background** | `#FAF9FD90` | `#12131680` |
 | **Grid** | `#E0E0E0` | `#2E2E2E` |
 
