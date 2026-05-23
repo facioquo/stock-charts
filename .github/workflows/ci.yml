@@ -14,9 +14,18 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   TESTINGPLATFORM_TELEMETRY_OPTOUT: 1
 
+# Default to read-only access to repo contents; jobs that need more (e.g.
+# dorny/test-reporter writing check runs) override at the job level.
+permissions:
+  contents: read
+
 jobs:
   test-backend:
     runs-on: ubuntu-latest
+    permissions:
+      # dorny/test-reporter writes a check run with the parsed .trx results.
+      contents: read
+      checks: write
 
     steps:
       - name: Checkout sources
