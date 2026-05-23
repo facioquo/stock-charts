@@ -5,7 +5,7 @@ Oscillator indicators render as a standalone chart — no price chart required b
 ## Standalone oscillator
 
 <ClientOnly>
-  <StockIndicatorChart indicator="rsi" />
+  <StockIndicatorChart indicator="rsi" :config="{ id: 'rsi-standalone' }" />
 </ClientOnly>
 
 ```vue
@@ -19,7 +19,7 @@ Oscillator indicators render as a standalone chart — no price chart required b
 Use `:with-overlay="true"` to show the price and volume chart above the oscillator.
 
 <ClientOnly>
-  <StockIndicatorChart indicator="rsi" :with-overlay="true" />
+  <StockIndicatorChart indicator="rsi" :with-overlay="true" :config="{ id: 'rsi-with-overlay' }" />
 </ClientOnly>
 
 ```vue

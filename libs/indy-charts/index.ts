@@ -18,9 +18,13 @@
  * // Initialize overlay (candlestick) chart
  * manager.initializeOverlay(canvas, quotes, 100);
  *
- * // Add indicator overlays
- * const selection = createDefaultSelection();
- * manager.addOverlayIndicators(selection);
+ * // Build a selection from a listing, populate its datasets, and display it
+ * const selection = createDefaultSelection(listing);
+ * manager.processSelectionData(selection, listing, indicatorRows);
+ * manager.displaySelection(selection, listing);
+ *
+ * // For oscillator indicators, also create the dedicated subchart
+ * // manager.createOscillator(oscillatorCanvas, selection, listing);
  *
  * // Handle viewport changes
  * manager.setBarCount(newBarCount);
@@ -31,10 +35,14 @@
  * ### ChartManager
  * Central orchestrator for chart lifecycle:
  * - `initializeOverlay(ctx, quotes, barCount)` - Create candlestick/OHLC overlay chart
- * - `addOverlayIndicators(selection)` - Add technical indicators to overlay
- * - `addOscillator(selection)` - Create separate oscillator subchart
- * - `setBarCount(count)` - Update viewport window (triggers oscillator pre-slicing)
+ * - `processSelectionData(selection, listing, rows)` - Build datasets for a selection
+ * - `displaySelection(selection, listing)` - Add overlay indicator datasets to the
+ *   overlay chart and register the selection so window/theme updates apply to it
+ * - `createOscillator(ctx, selection, listing)` - Create a separate oscillator subchart
+ *   (call after `displaySelection` so window updates can re-slice it)
+ * - `setBarCount(count)` - Update viewport window (re-slices overlay indicators and oscillators)
  * - `updateTheme(settings)` - Apply theme changes to all charts
+ * - `removeSelection(ucid)` - Remove a selection and tear down its chart
  * - `destroy()` - Clean up all chart resources
  *
  * ### Key Patterns
@@ -70,13 +78,15 @@
  *
  * ### Helpers
  * - `calculateOptimalBars(width)` - Compute bar count for viewport width
- * - `createDefaultSelection()` - Create initial indicator selection
- * - `applySelectionTokens()` - Apply visual styling to selections
+ * - `createDefaultSelection(listing, paramOverrides?, idPrefix?)` - Build an
+ *   `IndicatorSelection` seeded from a listing's defaults and optional overrides
+ * - `applySelectionTokens(selection)` - Apply legend/tooltip token styling to a selection
  *
  * ### API
- * - `createApiClient(config)` - Create HTTP client for backend
- * - `ApiClient` - Lightweight fetch-based HTTP client
- * - `loadStaticQuotes()` - Load pre-packaged backup quotes
+ * - `createApiClient(config)` - Create a lightweight `fetch`-based `ApiClient`
+ * - `ApiClient` - Interface exposing `getQuotes`, `getListings`, `getSelectionData`
+ * - `loadStaticQuotes(raw)` - Normalize string/Date timestamps in static quote data
+ * - `loadStaticIndicatorData(rows)` - Pass through indicator rows for SSG/static use
  *
  * ## Performance Considerations
  *

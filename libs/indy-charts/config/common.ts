@@ -53,6 +53,7 @@ export function baseChartOptions(settings: ChartSettings): ChartOptions {
         ticks: {
           display: true,
           mirror: true,
+          color: getThemeColors(settings).text,
           font: {
             family: FONT_FAMILY,
             size: 12,

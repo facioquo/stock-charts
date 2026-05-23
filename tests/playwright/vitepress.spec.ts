@@ -249,11 +249,24 @@ test.describe("VitePress Documentation Site", () => {
   test("indicators page renders nonblank overlay and oscillator charts", async ({ page }) => {
     await mockChartApi(page);
     await page.goto("/examples/indicators");
-    const root = page.getByTestId("stock-indicator-chart-rsi-root");
-    await expect(root).toBeVisible();
 
-    await expect(page.getByTestId("stock-indicator-chart-rsi-error")).toHaveCount(0);
-    await expectCanvasToBeNonBlank(page.getByTestId("stock-indicator-chart-rsi-overlay-canvas"));
-    await expectCanvasToBeNonBlank(page.getByTestId("stock-indicator-chart-rsi-oscillator-canvas"));
+    // Standalone oscillator (no overlay canvas)
+    const standaloneRoot = page.getByTestId("stock-indicator-chart-rsi-standalone-root");
+    await expect(standaloneRoot).toBeVisible();
+    await expect(page.getByTestId("stock-indicator-chart-rsi-standalone-error")).toHaveCount(0);
+    await expectCanvasToBeNonBlank(
+      page.getByTestId("stock-indicator-chart-rsi-standalone-oscillator-canvas")
+    );
+
+    // Oscillator paired with overlay price chart
+    const overlayRoot = page.getByTestId("stock-indicator-chart-rsi-with-overlay-root");
+    await expect(overlayRoot).toBeVisible();
+    await expect(page.getByTestId("stock-indicator-chart-rsi-with-overlay-error")).toHaveCount(0);
+    await expectCanvasToBeNonBlank(
+      page.getByTestId("stock-indicator-chart-rsi-with-overlay-overlay-canvas")
+    );
+    await expectCanvasToBeNonBlank(
+      page.getByTestId("stock-indicator-chart-rsi-with-overlay-oscillator-canvas")
+    );
   });
 });

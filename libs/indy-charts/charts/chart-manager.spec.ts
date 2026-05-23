@@ -512,8 +512,11 @@ describe("ChartManager", () => {
       expect(mgr.oscillators.size).toBe(1);
     });
 
-    it("displays all data in standalone mode without overlay", () => {
-      // Without initializeOverlay, allQuotes is empty → standalone mode
+    it("renders with full data and does not slice on initialization", () => {
+      // createOscillator always renders with the full dataset; subsequent
+      // setBarCount() calls handle viewport-aligned slicing. Consumers that
+      // need an initial viewport-aligned oscillator should pre-slice their
+      // quotes/rows before calling ChartManager (as the VitePress demo does).
       const listing = makeOscillatorListing();
       const selection = makeSelection(listing, "osc-standalone");
       mgr.processSelectionData(selection, listing, makeIndicatorData(makeQuotes(30)));
@@ -524,13 +527,14 @@ describe("ChartManager", () => {
 
       // render must be called with full data so fullThresholdDatasets has all history
       expect(osc.render).toHaveBeenCalledWith(selection, listing);
-      // applySlicedData must NOT be called — standalone oscillators show all their data
+      // applySlicedData must NOT be called on initial create
       expect(osc.applySlicedData).not.toHaveBeenCalled();
     });
 
-    it("applies viewport window matching overlay on initialization", () => {
-      // With an overlay initialized, the oscillator should immediately show the
-      // windowed time range that matches the overlay chart.
+    it("does not slice oscillator on initial create even when overlay is windowed", () => {
+      // With an overlay initialized to a smaller window, the oscillator still
+      // renders with full data on creation. Window alignment is the consumer's
+      // responsibility (pre-slice quotes) or happens later via setBarCount().
       const ctx = {} as CanvasRenderingContext2D;
       const quotes = makeQuotes(100);
       mgr.initializeOverlay(ctx, quotes, 50); // allQuotes=100, currentBarCount=50
@@ -542,13 +546,8 @@ describe("ChartManager", () => {
 
       const osc = mgr.createOscillator(ctx, selection, listing);
 
-      // render must be called first (with full data so fullThresholdDatasets stores complete history)
       expect(osc.render).toHaveBeenCalledWith(selection, listing);
-      // applySlicedData must be called with startIndex = 100 - 50 = 50
-      expect(osc.applySlicedData).toHaveBeenCalledWith(selection, expect.any(Array), 50);
-      const renderOrder = vi.mocked(osc.render).mock.invocationCallOrder[0];
-      const sliceOrder = vi.mocked(osc.applySlicedData).mock.invocationCallOrder[0];
-      expect(renderOrder).toBeLessThan(sliceOrder);
+      expect(osc.applySlicedData).not.toHaveBeenCalled();
     });
   });
 

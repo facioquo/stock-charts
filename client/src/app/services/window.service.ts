@@ -68,7 +68,7 @@ export class WindowService {
     const width = containerWidth ?? this.getWindowSize().width;
     const pixelsPerBar = 5;
     const minBars = 20; // Minimum reasonable number of bars
-    const maxBars = 250; // Maximum to avoid performance issues and improve readability
+    const maxBars = 500; // Maximum to avoid performance issues
 
     const calculatedBars = Math.floor(width / pixelsPerBar);
     return Math.max(minBars, Math.min(maxBars, calculatedBars));

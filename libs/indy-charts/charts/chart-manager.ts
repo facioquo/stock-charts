@@ -216,11 +216,12 @@ export class ChartManager {
    * Consumer must provide the canvas context and call this after processSelectionData()
    * AND after displaySelection() so the selection is registered in this.selections.
    *
-   * In overlay mode (when initializeOverlay() has been called), the oscillator renders
-   * with the full dataset so that OscillatorChart.fullThresholdDatasets stores the
-   * complete history. A viewport slice is then applied immediately via applySlicedData()
-   * so the initial display matches the overlay chart's time range. This two-step approach
-   * ensures subsequent resize calls can correctly re-slice from the full dataset.
+   * The oscillator renders with the full (unsliced) result.dataset.data from
+   * processSelectionData() so OscillatorChart.fullThresholdDatasets captures the
+   * complete history. Subsequent setBarCount() calls re-slice from this full
+   * dataset to any window size. Consumers that want the oscillator's initial
+   * view to match a windowed overlay should pre-slice their quotes/rows before
+   * passing them in to ChartManager (as the VitePress demo does).
    *
    * @throws {Error} if displaySelection() has not been called for this selection,
    *   because setBarCount() iterates this.selections and will silently skip any
@@ -243,26 +244,7 @@ export class ChartManager {
 
     this._oscillators.get(selection.ucid)?.destroy();
     const oscillator = new OscillatorChart(ctx, this._settings);
-
-    // Render with the full (unsliced) result.dataset.data from processSelectionData()
-    // so OscillatorChart.fullThresholdDatasets captures the complete history.
-    // This is required for subsequent setBarCount() calls to correctly re-slice
-    // threshold datasets to any window size, not just ones smaller than the initial slice.
     oscillator.render(selection, listing);
-
-    // In overlay mode, immediately apply the viewport slice so the oscillator's initial
-    // display matches the overlay chart's time range. Standalone oscillators (no overlay)
-    // skip this step and always show all their data.
-    if (this._allQuotes.length > 0) {
-      const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
-      if (fullDatasets) {
-        const startIndex = Math.max(0, this._allQuotes.length - this._currentBarCount);
-        if (startIndex > 0) {
-          oscillator.applySlicedData(selection, fullDatasets, startIndex);
-        }
-      }
-    }
-
     this._oscillators.set(selection.ucid, oscillator);
     return oscillator;
   }

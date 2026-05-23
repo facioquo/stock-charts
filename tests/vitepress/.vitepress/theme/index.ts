@@ -5,10 +5,12 @@ import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 import "./custom.css";
 
 const PROD_API_URL = "https://stock-charts-api.azurewebsites.net";
+const LOCAL_API_URL = "https://localhost:5001";
 // VITE_API_URL is for local development only; production always uses the live API
-// (guards against CF Pages dashboard env var misconfiguration)
+// (guards against CF Pages dashboard env var misconfiguration). Dev defaults to
+// the locally-hosted WebApi so `pnpm dev` works without setting VITE_API_URL.
 const apiUrl = import.meta.env.DEV
-  ? ((import.meta.env.VITE_API_URL as string | undefined) ?? PROD_API_URL)
+  ? ((import.meta.env.VITE_API_URL as string | undefined) ?? LOCAL_API_URL)
   : PROD_API_URL;
 
 export default {

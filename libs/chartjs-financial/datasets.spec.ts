@@ -76,13 +76,37 @@ describe("financial dataset factories", () => {
     const colors = dataset.backgroundColor as string[];
 
     expect(dataset.type).toBe("bar");
-    expect(dataset.data).toHaveLength(5);
+    expect(dataset.data).toHaveLength(6);
     expect(colors).toEqual([
       palette.volume.up,
       palette.volume.down,
       palette.volume.unchanged,
       palette.volume.unchanged,
+      palette.volume.unchanged,
       palette.volume.unchanged
     ]);
+  });
+
+  it("skips weekends when padding trailing volume bars", () => {
+    const palette = getFinancialPalette("light");
+    // 2025-08-22 is a Friday — next bar should be Monday 2025-08-25, not Saturday
+    const quotes = [
+      {
+        timestamp: new Date("2025-08-22T00:00:00.000Z"),
+        open: 100,
+        high: 110,
+        low: 95,
+        close: 105,
+        volume: 5000
+      }
+    ];
+
+    const dataset = buildVolumeDataset(quotes, 1, palette);
+    const extra = dataset.data[1];
+    const extraDay = new Date(extra?.x ?? 0).getDay();
+
+    expect(dataset.data).toHaveLength(2);
+    expect(extraDay).not.toBe(0); // not Sunday
+    expect(extraDay).not.toBe(6); // not Saturday
   });
 });

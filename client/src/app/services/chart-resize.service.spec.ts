@@ -246,7 +246,7 @@ describe("Chart Resize Dimension Testing", () => {
 
       // Verify bar count capped at maximum when window is large
       expect(initialBarCount).toBe(240); // 1200 / 5
-      expect(newBarCount).toBe(250); // 1600 / 5 = 320, clamped to MAX_BARS (250)
+      expect(newBarCount).toBe(320); // 1600 / 5 = 320, under MAX_BARS (500)
       expect(newBarCount).toBeGreaterThanOrEqual(initialBarCount);
     });
 

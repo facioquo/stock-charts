@@ -4,6 +4,8 @@ test.describe("Stock Charts Angular Website", () => {
   test.describe.configure({ timeout: 30_000 });
 
   test("home page loads and navigates to chart page", async ({ page, errorCollection }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
 
     // The app should be visible
     const appRoot = page.locator("app-root");
@@ -32,13 +34,16 @@ test.describe("Stock Charts Angular Website", () => {
     expect(box!.height).toBeGreaterThan(50);
 
     // Report any JS errors
-    expect(errorCollection.pageErrors, "No page errors should occur during chart rendering").toEqual([]);
+    expect(
+      errorCollection.pageErrors,
+      "No page errors should occur during chart rendering"
+    ).toEqual([]);
   });
 
   test("chart loads with correct bar count logged", async ({ page, errorCollection }) => {
     const consoleLogs: string[] = [];
 
-    page.on("console", (msg) => {
+    page.on("console", msg => {
       consoleLogs.push(msg.text());
     });
 
@@ -52,12 +57,12 @@ test.describe("Stock Charts Angular Website", () => {
     const loadingMsg = consoleLogs.find(msg => msg.includes("Loading charts with"));
     expect(loadingMsg, "Should log bar count during chart loading").toBeDefined();
 
-    // Extract bar count and verify it's within the expected range (20-250)
+    // Extract bar count and verify it's within the expected range (20-500)
     const match = loadingMsg!.match(/Loading charts with (\d+) bars/);
     expect(match, "Should contain numeric bar count").not.toBeNull();
     const barCount = parseInt(match![1], 10);
     expect(barCount, "Bar count should be at least 20").toBeGreaterThanOrEqual(20);
-    expect(barCount, "Bar count should be at most 250").toBeLessThanOrEqual(250);
+    expect(barCount, "Bar count should be at most 500").toBeLessThanOrEqual(500);
 
     // Verify no page errors occurred during chart loading
     expect(errorCollection.pageErrors, "No page errors should occur").toEqual([]);
@@ -129,10 +134,13 @@ test.describe("Stock Charts Angular Website", () => {
     expect(errorCollection.pageErrors, "No page errors should occur").toEqual([]);
   });
 
-  test("no critical console errors during full page lifecycle", async ({ page, errorCollection }) => {
+  test("no critical console errors during full page lifecycle", async ({
+    page,
+    errorCollection
+  }) => {
     const consoleErrors: string[] = [];
 
-    page.on("console", (msg) => {
+    page.on("console", msg => {
       if (msg.type() === "error") {
         consoleErrors.push(msg.text());
       }

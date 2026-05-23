@@ -35,7 +35,7 @@ describe("WindowService - Chart Resizing", () => {
 
       const result = service.calculateOptimalBars(largeWidth);
 
-      expect(result).toBe(250); // Should use maximum
+      expect(result).toBe(500); // Should use maximum
     });
 
     it("should use window width when no container width provided", () => {

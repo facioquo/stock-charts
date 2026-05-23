@@ -5,19 +5,19 @@ Independent chart instances on the same page, each with its own data window. The
 ## Overlay chart
 
 <ClientOnly>
-  <StockIndicatorChart indicator="ema" />
+  <StockIndicatorChart indicator="ema" :config="{ id: 'ema-overlay' }" />
 </ClientOnly>
 
 ## Standalone oscillator
 
 <ClientOnly>
-  <StockIndicatorChart indicator="rsi" />
+  <StockIndicatorChart indicator="rsi" :config="{ id: 'rsi-standalone' }" />
 </ClientOnly>
 
 ## Oscillator with price chart
 
 <ClientOnly>
-  <StockIndicatorChart indicator="rsi" :with-overlay="true" />
+  <StockIndicatorChart indicator="rsi" :with-overlay="true" :config="{ id: 'rsi-with-overlay' }" />
 </ClientOnly>
 
 ## Source code

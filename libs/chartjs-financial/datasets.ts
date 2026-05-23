@@ -61,8 +61,15 @@ export function buildVolumeDataset(
   const maxTime = Number.isFinite(maxTimeCandidate) ? maxTimeCandidate : new Date().getTime();
 
   const nextDate = new Date(maxTime);
-  for (let i = 1; i < extraBars; i++) {
-    nextDate.setDate(nextDate.getDate() + 1);
+  for (let i = 0; i < extraBars; i++) {
+    // Advance to the next business day, skipping Saturday (6) and Sunday (0),
+    // so trailing volume padding aligns with the indicator/oscillator padding
+    // produced by indy-charts addExtraBars (which also skips weekends). Without
+    // matching weekday cadence + count, oscillator x-axes extend one bar
+    // farther right than the overlay.
+    do {
+      nextDate.setDate(nextDate.getDate() + 1);
+    } while (nextDate.getDay() === 0 || nextDate.getDay() === 6);
     volumeData.push({ x: new Date(nextDate).valueOf(), y: Number.NaN });
     volumeColors.push(palette.volume.unchanged);
   }
