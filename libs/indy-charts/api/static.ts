@@ -1,4 +1,4 @@
-import { Quote, IndicatorDataRow } from "../config/types";
+import { type Quote, type IndicatorDataRow } from "../config/types";
 
 /**
  * Load static quote data synchronously (for VitePress SSG or build-time rendering).

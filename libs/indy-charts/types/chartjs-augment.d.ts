@@ -6,9 +6,9 @@
  */
 
 import {
-  BarControllerChartOptions,
-  BarControllerDatasetOptions,
-  CartesianScaleTypeRegistry
+  type BarControllerChartOptions,
+  type BarControllerDatasetOptions,
+  type CartesianScaleTypeRegistry
 } from "chart.js";
 
 import type { FinancialDataPoint, FinancialParsedData } from "@facioquo/chartjs-chart-financial";

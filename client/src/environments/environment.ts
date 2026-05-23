@@ -1,4 +1,4 @@
-import { EnvConfig } from "./environment.interface";
+import { type EnvConfig } from "./environment.interface";
 
 export const env: EnvConfig = {
   production: false,

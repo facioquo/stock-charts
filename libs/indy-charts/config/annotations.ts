@@ -1,7 +1,11 @@
-import { FontSpec } from "chart.js";
-import { AnnotationOptions, LabelAnnotationOptions, ScaleValue } from "chartjs-plugin-annotation";
+import { type FontSpec } from "chart.js";
+import {
+  type AnnotationOptions,
+  type LabelAnnotationOptions,
+  type ScaleValue
+} from "chartjs-plugin-annotation";
 
-import { ChartSettings } from "./types";
+import { type ChartSettings } from "./types";
 import { FONT_FAMILY } from "./common";
 import { getThemeColors } from "./theme-colors";
 

@@ -1,13 +1,24 @@
-import { ChartDataset } from "chart.js";
+import { type ChartDataset, type ScatterDataPoint } from "chart.js";
 
 // CHARTS
 
 /**
- * Extended dataset interface for candlestick pattern datasets that carry
- * per-point visual properties not present on the base ChartDataset type.
- * Used internally by ChartManager and OscillatorChart.
+ * Indicator datasets are line or bar series of `{ x, y }` points. Pinning the
+ * data shape lets callers (e.g. createThresholdDataset) read `dataset.data` as
+ * `ScatterDataPoint[]` without casts, and keeps the shape consistent with
+ * `buildDataPoints` / `addExtraBars` output.
  */
-export type ExtendedChartDataset = ChartDataset & {
+export type IndicatorDataset = ChartDataset<"line" | "bar", ScatterDataPoint[]>;
+
+/**
+ * Candlestick-pattern indicators set per-point style arrays
+ * (`pointRotation`, `pointBackgroundColor`, `pointBorderColor`). These live on
+ * Chart.js's "line" dataset only — the `"line" | "bar"` union in
+ * IndicatorDataset narrows them away — so this extension re-adds them as
+ * optional for the candlestick-pattern code path. Use IndicatorDataset for
+ * everything else.
+ */
+export type ExtendedChartDataset = IndicatorDataset & {
   pointRotation?: number[];
   pointBackgroundColor?: string[];
   pointBorderColor?: string[];
@@ -123,5 +134,5 @@ export interface IndicatorResult {
   lineType: string;
   lineWidth: number;
   order: number;
-  dataset: ChartDataset;
+  dataset: IndicatorDataset;
 }

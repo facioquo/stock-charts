@@ -1,6 +1,6 @@
-import { ChartDataset, ScatterDataPoint } from "chart.js";
+import { type ChartDataset, type ScatterDataPoint } from "chart.js";
 
-import { FinancialDataPoint, FinancialPalette } from "./types/financial.types";
+import { type FinancialDataPoint, type FinancialPalette } from "./types/financial.types";
 import { getVolumeColor } from "./theme/colors";
 
 interface QuoteLike {

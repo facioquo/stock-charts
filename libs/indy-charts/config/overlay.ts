@@ -1,6 +1,11 @@
-import { CartesianScaleOptions, ChartConfiguration, ChartOptions, ScaleOptions } from "chart.js";
+import {
+  type CartesianScaleOptions,
+  type ChartConfiguration,
+  type ChartOptions,
+  type ScaleOptions
+} from "chart.js";
 
-import { ChartSettings } from "./types";
+import { type ChartSettings } from "./types";
 import { baseChartOptions } from "./common";
 
 export function baseOverlayConfig(

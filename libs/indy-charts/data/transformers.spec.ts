@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ScatterDataPoint } from "chart.js";
+import { type ScatterDataPoint } from "chart.js";
 import {
   processQuoteData,
   buildDataPoints,

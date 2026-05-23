@@ -1,6 +1,6 @@
-import { CartesianScaleOptions, ChartConfiguration, ChartOptions } from "chart.js";
+import { type CartesianScaleOptions, type ChartConfiguration, type ChartOptions } from "chart.js";
 
-import { ChartSettings } from "./types";
+import { type ChartSettings } from "./types";
 import { baseChartOptions } from "./common";
 
 export function baseOscillatorConfig(settings: ChartSettings): ChartConfiguration {

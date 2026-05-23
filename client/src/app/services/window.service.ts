@@ -1,5 +1,5 @@
 import { Injectable, signal } from "@angular/core";
-import { Observable, Subject, debounceTime, distinctUntilChanged } from "rxjs";
+import { type Observable, Subject, debounceTime, distinctUntilChanged } from "rxjs";
 
 @Injectable({
   providedIn: "root"

@@ -24,7 +24,7 @@
     "start": "pnpm --filter @stock-charts/client run start",
     "serve": "pnpm --filter @stock-charts/client run serve",
     "test": "pnpm -r run test",
-    "test:e2e": "pnpm --filter @stock-charts/playwright-tests run test",
+    "test:e2e": "pnpm --filter @stock-charts/playwright-tests run test:e2e",
     "test:watch": "pnpm -r run test:watch",
     "test:coverage": "pnpm --filter @stock-charts/client run test:coverage",
     "test:libs": "pnpm --filter @facioquo/chartjs-chart-financial --filter @facioquo/indy-charts run test",

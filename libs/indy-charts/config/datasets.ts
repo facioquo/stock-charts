@@ -1,13 +1,18 @@
-import { ChartDataset, ScatterDataPoint } from "chart.js";
+import { type ScatterDataPoint } from "chart.js";
 
-import { ChartThreshold, IndicatorResult, IndicatorResultConfig } from "./types";
+import {
+  type ChartThreshold,
+  type IndicatorDataset,
+  type IndicatorResult,
+  type IndicatorResultConfig
+} from "./types";
 
 const THRESHOLD_ORDER_OFFSET = 100;
 
-export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): ChartDataset {
+export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): IndicatorDataset {
   switch (r.lineType) {
     case "solid": {
-      const lineDataset: ChartDataset = {
+      const lineDataset: IndicatorDataset = {
         label: r.label,
         type: "line",
         data: [],
@@ -30,7 +35,7 @@ export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): Chart
     }
 
     case "dash": {
-      const dashDataset: ChartDataset = {
+      const dashDataset: IndicatorDataset = {
         label: r.label,
         type: "line",
         data: [],
@@ -46,7 +51,7 @@ export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): Chart
     }
 
     case "dots": {
-      const dotsDataset: ChartDataset = {
+      const dotsDataset: IndicatorDataset = {
         label: r.label,
         type: "line",
         data: [],
@@ -62,7 +67,7 @@ export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): Chart
     }
 
     case "bar": {
-      const barDataset: ChartDataset = {
+      const barDataset: IndicatorDataset = {
         label: r.label,
         type: "bar",
         data: [],
@@ -80,7 +85,7 @@ export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): Chart
     }
 
     case "pointer": {
-      const ptDataset: ChartDataset = {
+      const ptDataset: IndicatorDataset = {
         label: r.label,
         type: "line",
         data: [],
@@ -100,7 +105,7 @@ export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): Chart
     case "none": {
       // hide instead of exclude 'none' lines,
       // otherwise, it breaks line offset fill
-      const noneDataset: ChartDataset = {
+      const noneDataset: IndicatorDataset = {
         label: r.label,
         type: "line",
         data: [],
@@ -124,17 +129,13 @@ export function createThresholdDataset(
   threshold: ChartThreshold,
   firstResult: IndicatorResult,
   index: number
-): ChartDataset {
+): IndicatorDataset {
   // note: thresholds can't be annotated lines since
   // offset fill will only work between certain objects.
-  const lineData: ScatterDataPoint[] = [];
-
-  // Cast the dataset data to the expected type; firstResult.dataset.data is unsafe
-  // because it comes from dynamic Chart.js configuration
-  const sourceData: ScatterDataPoint[] = firstResult.dataset.data as ScatterDataPoint[];
-  sourceData.forEach((d: ScatterDataPoint) => {
-    lineData.push({ x: d.x, y: threshold.value });
-  });
+  const lineData: ScatterDataPoint[] = firstResult.dataset.data.map(d => ({
+    x: d.x,
+    y: threshold.value
+  }));
 
   return {
     label: "threshold",

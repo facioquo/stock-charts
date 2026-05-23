@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { Chart, ChartDataset } from "chart.js";
+
 import { ChartManager } from "./chart-manager";
 import type { OverlayChart } from "./overlay-chart";
 import type { OscillatorChart } from "./oscillator-chart";
@@ -10,6 +12,13 @@ import type {
   IndicatorSelection,
   Quote
 } from "../config/types";
+
+/**
+ * Subset of `Chart` that our mocked OverlayChart/OscillatorChart expose. Keeping
+ * a typed shape avoids `as any` while making it explicit which Chart.js fields
+ * the chart-manager logic actually reads.
+ */
+type MockChartShape = Pick<Chart, "data" | "options" | "scales" | "update" | "destroy">;
 
 // ---------------------------------------------------------------------------
 // Mocks – OverlayChart and OscillatorChart create real Chart.js instances
@@ -49,7 +58,7 @@ function createMockOverlay(): Partial<OverlayChart> {
       scales: { x: { min: 0 }, y: { max: 100 } },
       update: vi.fn(),
       destroy: vi.fn()
-    } as any,
+    } as unknown as Chart,
     render: vi.fn().mockImplementation((quotes: Quote[]) => {
       // Return full-length datasets so slicing can be validated.
       const priceData = quotes.map(q => ({
@@ -98,15 +107,19 @@ function createMockOverlay(): Partial<OverlayChart> {
         { type: "bar" as const, data: volumeData, backgroundColor: bgColors }
       ]);
     }),
-    applySlicedData: vi.fn().mockImplementation(function (this: any, fullDS: any[], start: number) {
+    applySlicedData: vi.fn().mockImplementation(function (
+      this: { chart?: MockChartShape },
+      fullDS: ChartDataset[],
+      start: number
+    ) {
       // Simulate real applySlicedData: slice the chart's datasets
-      if (this.chart) {
-        fullDS.forEach((full: any, i: number) => {
-          if (this.chart.data.datasets[i]) {
-            this.chart.data.datasets[i].data = full.data.slice(start);
-          }
-        });
-      }
+      if (!this.chart) return;
+      fullDS.forEach((full, i) => {
+        const target = this.chart?.data.datasets[i];
+        if (target && Array.isArray(full.data)) {
+          target.data = full.data.slice(start);
+        }
+      });
     }),
     resize: vi.fn(),
     destroy: vi.fn()
@@ -121,7 +134,7 @@ function createMockOscillator(): Partial<OscillatorChart> {
       scales: { x: { min: 0 }, y: { max: 100 } },
       update: vi.fn(),
       destroy: vi.fn()
-    } as any,
+    } as unknown as Chart,
     render: vi.fn(),
     updateLegend: vi.fn(),
     updateTheme: vi.fn(),
@@ -693,10 +706,10 @@ describe("ChartManager", () => {
       mgr.setBarCount(20);
 
       // After setBarCount(20), startIndex = 100 - 20 = 80
-      // Data has extra 7 bars appended, so total points = 107.
-      // Sliced from index 80 = 107 - 80 = 27 points.
+      // Data has extra 6 bars appended, so total points = 106.
+      // Sliced from index 80 = 106 - 80 = 26 points.
       const slicedLength = selection.results[0].dataset.data.length;
-      expect(slicedLength).toBeLessThanOrEqual(20 + 7); // +7 for extraBars
+      expect(slicedLength).toBeLessThanOrEqual(20 + 6); // +6 for extraBars
     });
 
     it("updates oscillator charts via applySlicedData", () => {
@@ -752,7 +765,7 @@ describe("ChartManager", () => {
 
       mgr.destroy();
 
-      expect((overlay as any)?.destroy).toHaveBeenCalled();
+      expect(overlay?.destroy).toHaveBeenCalled();
       expect(osc.destroy).toHaveBeenCalled();
       expect(mgr.overlayChart).toBeUndefined();
       expect(mgr.oscillators.size).toBe(0);

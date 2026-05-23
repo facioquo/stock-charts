@@ -1,14 +1,15 @@
-import { ChartDataset } from "chart.js";
+import { type ChartDataset } from "chart.js";
 
 import {
-  ChartSettings,
-  ExtendedChartDataset,
-  IndicatorDataRow,
-  IndicatorListing,
-  IndicatorResult,
-  IndicatorResultConfig,
-  IndicatorSelection,
-  Quote
+  type ChartSettings,
+  type ExtendedChartDataset,
+  type IndicatorDataRow,
+  type IndicatorDataset,
+  type IndicatorListing,
+  type IndicatorResult,
+  type IndicatorResultConfig,
+  type IndicatorSelection,
+  type Quote
 } from "../config/types";
 
 import { baseDataset } from "../config/datasets";
@@ -190,17 +191,19 @@ export class ChartManager {
         const full = fullDatasets[i] as ExtendedChartDataset;
         if (full && result.dataset) {
           result.dataset.data = [...full.data.slice(startIndex)];
-          // Slice style arrays if present with type casts
           const ext = result.dataset as ExtendedChartDataset;
-          if (Array.isArray(full.pointBackgroundColor)) {
+          // `as number[]` / `as string[]` narrow Chart.js's wider Scriptable
+          // union (which slice() preserves through intersection) back to the
+          // shapes ExtendedChartDataset declares.
+          if (full.pointBackgroundColor) {
             ext.pointBackgroundColor = [
               ...(full.pointBackgroundColor as string[]).slice(startIndex)
             ];
           }
-          if (Array.isArray(full.pointBorderColor)) {
+          if (full.pointBorderColor) {
             ext.pointBorderColor = [...(full.pointBorderColor as string[]).slice(startIndex)];
           }
-          if (Array.isArray(full.pointRotation)) {
+          if (full.pointRotation) {
             ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex)];
           }
         }
@@ -335,17 +338,16 @@ export class ChartManager {
         const full = fullDatasets[i] as ExtendedChartDataset;
         if (full && result.dataset) {
           result.dataset.data = [...full.data.slice(startIndex)];
-          // Slice style arrays if present with type casts
           const ext = result.dataset as ExtendedChartDataset;
-          if (Array.isArray(full.pointBackgroundColor)) {
+          if (full.pointBackgroundColor) {
             ext.pointBackgroundColor = [
               ...(full.pointBackgroundColor as string[]).slice(startIndex)
             ];
           }
-          if (Array.isArray(full.pointBorderColor)) {
+          if (full.pointBorderColor) {
             ext.pointBorderColor = [...(full.pointBorderColor as string[]).slice(startIndex)];
           }
-          if (Array.isArray(full.pointRotation)) {
+          if (full.pointRotation) {
             ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex)];
           }
         }
@@ -366,7 +368,9 @@ export class ChartManager {
       const oscillator = this._oscillators.get(selection.ucid);
       if (!fullDatasets || !oscillator) return;
 
-      oscillator.applySlicedData(selection, fullDatasets, startIndex);
+      // Cached datasets for an oscillator selection are always indicator datasets
+      // (the heterogeneous cache also holds candlestick+volume under "overlay-main").
+      oscillator.applySlicedData(selection, fullDatasets as IndicatorDataset[], startIndex);
     });
   }
 

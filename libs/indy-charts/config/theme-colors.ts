@@ -1,4 +1,4 @@
-import { ChartSettings } from "./types";
+import { type ChartSettings } from "./types";
 
 /**
  * Theme-aware color palette for chart UI elements (axis labels, annotations, grid).

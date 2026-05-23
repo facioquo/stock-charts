@@ -1,5 +1,5 @@
 import { TestBed } from "@angular/core/testing";
-import { Mock, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { type Mock, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MediaQueryService } from "./media-query.service";
 
 describe("MediaQueryService", () => {

@@ -22,7 +22,13 @@ export default tseslint.config(
       ],
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-non-null-assertion": "error",
+      "@typescript-eslint/no-unnecessary-type-assertion": "error",
       "@typescript-eslint/prefer-nullish-coalescing": "error",
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { prefer: "type-imports", fixStyle: "inline-type-imports" }
+      ],
       // Allow /// <reference path="..."> for .d.ts module augmentation files
       // that cannot be imported with standard ES import syntax
       "@typescript-eslint/triple-slash-reference": ["error", { path: "always" }]
@@ -36,15 +42,15 @@ export default tseslint.config(
       "@typescript-eslint/no-unsafe-assignment": "off"
     }
   },
-  // Test files - relaxed rules + vitest plugin
+  // Test files - keep `any` discouraged (warn) but allow non-null assertions
+  // and unsafe-* operations that vitest mocks naturally produce.
   {
     files: ["**/*.spec.ts"],
     ...vitest.configs.recommended,
     rules: {
-      // preserve vitest recommended rules, then override specific entries
       ...vitest.configs.recommended.rules,
-      "@typescript-eslint/no-explicit-any": "off",
-      // relax some vitest rules for local tests
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-non-null-assertion": "off",
       "vitest/no-disabled-tests": "warn",
       "vitest/no-focused-tests": "warn",
       "vitest/no-identical-title": "error"

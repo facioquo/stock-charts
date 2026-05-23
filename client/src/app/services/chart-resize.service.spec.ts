@@ -1,5 +1,5 @@
 import { TestBed } from "@angular/core/testing";
-import { Mock, beforeEach, describe, expect, it, vi } from "vitest";
+import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 import { WindowService } from "./window.service";
 
 // Mock Chart.js interface for dimension tracking
@@ -235,7 +235,7 @@ describe("Chart Resize Dimension Testing", () => {
 
       const initialBarCount = windowService.calculateOptimalBars();
 
-      // Simulate window resize to width that would exceed MAX_BARS
+      // Simulate window resize to larger width
       Object.defineProperty(window, "innerWidth", {
         writable: true,
         configurable: true,

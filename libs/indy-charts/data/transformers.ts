@@ -1,8 +1,13 @@
-import { ScatterDataPoint } from "chart.js";
+import { type ScatterDataPoint } from "chart.js";
 
-import { FinancialDataPoint } from "../types/financial.types";
+import { type FinancialDataPoint } from "../types/financial.types";
 import { COLORS } from "../theme/colors";
-import { IndicatorDataRow, IndicatorListing, IndicatorResult, Quote } from "../config/types";
+import {
+  type IndicatorDataRow,
+  type IndicatorListing,
+  type IndicatorResult,
+  type Quote
+} from "../config/types";
 
 const CANDLE_HIGH_MULTIPLIER = 1.01;
 const CANDLE_LOW_MULTIPLIER = 0.99;
@@ -54,7 +59,9 @@ export function buildDataPoints(
 
     // apply candle pointers
     if (yValue !== undefined && listing.category === CATEGORIES.CANDLESTICK_PATTERN) {
-      const candleConfig = getCandlePointConfiguration(row["match"] as number, row.candle);
+      const rawMatch = row["match"];
+      const matchValue = typeof rawMatch === "number" ? rawMatch : 0;
+      const candleConfig = getCandlePointConfiguration(matchValue, row.candle);
       yValue = candleConfig.yValue;
       pointColor.push(candleConfig.color);
       pointRotation.push(candleConfig.rotation);
@@ -67,7 +74,13 @@ export function buildDataPoints(
     if (typeof yValue !== "number") {
       yValue = NaN;
     }
-    dataPoints.push({ x: new Date((row.timestamp ?? row.date)!).valueOf(), y: yValue });
+    const timestampSource = row.timestamp ?? row.date;
+    if (timestampSource == null) {
+      throw new Error(
+        `Indicator row missing both 'timestamp' and 'date' fields for "${result.dataName}"`
+      );
+    }
+    dataPoints.push({ x: new Date(timestampSource).valueOf(), y: yValue });
   });
 
   return { dataPoints, pointColor, pointRotation };

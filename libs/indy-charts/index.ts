@@ -112,6 +112,7 @@ export type {
   ChartThreshold,
   ExtendedChartDataset,
   IndicatorDataRow,
+  IndicatorDataset,
   IndicatorListing,
   IndicatorParam,
   IndicatorParamConfig,

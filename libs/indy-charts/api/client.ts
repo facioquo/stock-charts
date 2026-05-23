@@ -1,4 +1,9 @@
-import { IndicatorListing, IndicatorParam, IndicatorSelection, Quote } from "../config/types";
+import {
+  type IndicatorListing,
+  type IndicatorParam,
+  type IndicatorSelection,
+  type Quote
+} from "../config/types";
 
 /**
  * Configuration for {@link createApiClient}.
@@ -71,6 +76,10 @@ export interface ApiClient {
   getSelectionData(selection: IndicatorSelection, listing: IndicatorListing): Promise<unknown[]>;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
 function normalizeQuotes(quotes: unknown[]): Quote[] {
   function asFiniteNumber(value: unknown, field: string, index: number): number {
     if (typeof value !== "number" || !Number.isFinite(value)) {
@@ -82,22 +91,21 @@ function normalizeQuotes(quotes: unknown[]): Quote[] {
   }
 
   return quotes.map((q, index) => {
-    if (typeof q !== "object" || q === null) {
+    if (!isRecord(q)) {
       throw new Error(`Invalid quote at index ${index}: expected object, got ${typeof q}`);
     }
 
-    const quote = q as Record<string, unknown>;
-    const rawDate = quote["timestamp"];
+    const rawDate = q["timestamp"];
     if (rawDate === undefined || rawDate === null) {
       throw new Error(`Invalid quote at index ${index}: missing 'timestamp' field`);
     }
 
     return {
-      open: asFiniteNumber(quote["open"], "open", index),
-      high: asFiniteNumber(quote["high"], "high", index),
-      low: asFiniteNumber(quote["low"], "low", index),
-      close: asFiniteNumber(quote["close"], "close", index),
-      volume: asFiniteNumber(quote["volume"], "volume", index),
+      open: asFiniteNumber(q["open"], "open", index),
+      high: asFiniteNumber(q["high"], "high", index),
+      low: asFiniteNumber(q["low"], "low", index),
+      close: asFiniteNumber(q["close"], "close", index),
+      volume: asFiniteNumber(q["volume"], "volume", index),
       timestamp:
         rawDate instanceof Date
           ? normalizeQuoteDate(rawDate, index)

@@ -1,10 +1,15 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from "@angular/common/http";
+import { HttpClient, type HttpErrorResponse, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { Observable, catchError, map, of, throwError } from "rxjs";
+import { type Observable, catchError, map, of, throwError } from "rxjs";
 import { env } from "../../environments/environment";
 import backupIndicators from "../data/backup-indicators.json";
 import backupQuotes from "../data/backup-quotes.json";
-import { IndicatorListing, IndicatorParam, IndicatorSelection, Quote } from "@facioquo/indy-charts";
+import {
+  type IndicatorListing,
+  type IndicatorParam,
+  type IndicatorSelection,
+  type Quote
+} from "@facioquo/indy-charts";
 
 @Injectable({ providedIn: "root" })
 export class ApiService {

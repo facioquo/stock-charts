@@ -1,22 +1,23 @@
-import { Chart, ChartConfiguration, ChartDataset, ChartTypeRegistry, TooltipItem } from "chart.js";
+import { Chart, type ChartConfiguration, type ChartTypeRegistry, type TooltipItem } from "chart.js";
 
-import { ScaleValue } from "chartjs-plugin-annotation";
+import { type ScaleValue } from "chartjs-plugin-annotation";
 
 import { baseOscillatorConfig, baseOscillatorOptions } from "../config/oscillator";
 import { createThresholdDataset } from "../config/datasets";
 import { commonLegendAnnotation } from "../config/annotations";
 import {
-  ChartSettings,
-  ChartThreshold,
-  ExtendedChartDataset,
-  IndicatorListing,
-  IndicatorResult,
-  IndicatorSelection
+  type ChartSettings,
+  type ChartThreshold,
+  type ExtendedChartDataset,
+  type IndicatorDataset,
+  type IndicatorListing,
+  type IndicatorResult,
+  type IndicatorSelection
 } from "../config/types";
 
 export class OscillatorChart {
   chart: Chart | undefined;
-  private fullThresholdDatasets: ChartDataset[] = [];
+  private fullThresholdDatasets: IndicatorDataset[] = [];
 
   constructor(
     private readonly ctx: CanvasRenderingContext2D | HTMLCanvasElement,
@@ -100,7 +101,7 @@ export class OscillatorChart {
    */
   applySlicedData(
     selection: IndicatorSelection,
-    fullDatasets: ChartDataset[],
+    fullDatasets: IndicatorDataset[],
     startIndex: number
   ): void {
     // Slice threshold datasets (inserted before selection datasets in render)
@@ -119,27 +120,24 @@ export class OscillatorChart {
     selection.results.forEach((result: IndicatorResult, resultIndex: number) => {
       if (!result.dataset || !fullDatasets[resultIndex]) return;
 
-      const fullDataset = fullDatasets[resultIndex];
+      const fullDataset = fullDatasets[resultIndex] as ExtendedChartDataset;
       if (!fullDataset.data || !Array.isArray(fullDataset.data)) return;
 
       result.dataset.data = [...fullDataset.data.slice(startIndex)];
+      const ext = result.dataset as ExtendedChartDataset;
 
-      // Slice array properties
-      const ext = fullDataset as ExtendedChartDataset;
-      const resExt = result.dataset as ExtendedChartDataset;
-
-      if (ext.pointRotation && Array.isArray(ext.pointRotation)) {
-        resExt.pointRotation = ext.pointRotation
-          .slice(startIndex)
-          .map(v => (typeof v === "number" ? v : NaN));
+      if (fullDataset.pointRotation) {
+        ext.pointRotation = [...(fullDataset.pointRotation as number[]).slice(startIndex)];
       }
 
-      if (ext.pointBackgroundColor && Array.isArray(ext.pointBackgroundColor)) {
-        resExt.pointBackgroundColor = [...(ext.pointBackgroundColor as string[]).slice(startIndex)];
+      if (fullDataset.pointBackgroundColor) {
+        ext.pointBackgroundColor = [
+          ...(fullDataset.pointBackgroundColor as string[]).slice(startIndex)
+        ];
       }
 
-      if (ext.pointBorderColor && Array.isArray(ext.pointBorderColor)) {
-        resExt.pointBorderColor = [...(ext.pointBorderColor as string[]).slice(startIndex)];
+      if (fullDataset.pointBorderColor) {
+        ext.pointBorderColor = [...(fullDataset.pointBorderColor as string[]).slice(startIndex)];
       }
 
       if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {

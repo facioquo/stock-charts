@@ -8,7 +8,7 @@ import { defaults } from "chart.js";
 import { valueOrDefault } from "chart.js/helpers";
 
 import { FinancialElement } from "./financial.element";
-import { FinancialColorSet } from "../types/financial.types";
+import { type FinancialColorSet } from "../types/financial.types";
 
 interface CandlestickElementLike extends FinancialElement {
   color?: FinancialColorSet;
