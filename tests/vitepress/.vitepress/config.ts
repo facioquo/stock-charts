@@ -14,7 +14,11 @@ export default defineConfig({
 
   vite: {
     ssr: {
-      noExternal: ["@facioquo/indy-charts", "chartjs-adapter-date-fns", "chart.js", "date-fns"]
+      // Bundle indy-charts and Chart.js into the SSR output so VitePress can
+      // evaluate the chart components during static generation. Date helpers
+      // (chartjs-adapter-date-fns + date-fns) ship as runtime deps of
+      // @facioquo/indy-charts and don't need explicit non-externalisation.
+      noExternal: ["@facioquo/indy-charts", "chart.js"]
     }
   },
 

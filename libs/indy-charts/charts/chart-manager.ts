@@ -28,6 +28,14 @@ const CATEGORIES = {
   CANDLESTICK_PATTERN: "candlestick-pattern"
 } as const;
 
+/**
+ * Reserved cache key for the overlay's candlestick + volume datasets in
+ * `_allProcessedDatasets`. No `IndicatorSelection.ucid` may collide with this
+ * — a collision would mis-cast candlestick data as indicator data in
+ * `applySlicedData`.
+ */
+const OVERLAY_MAIN_KEY = "overlay-main";
+
 export interface ChartManagerConfig {
   settings: ChartSettings;
   extraBars?: number;
@@ -108,7 +116,7 @@ export class ChartManager {
     // Build and store the full-history datasets separately so setBarCount()
     // can re-slice across the entire history without re-rendering the chart.
     const fullDatasets = this._overlayChart.buildFullDatasets(allQuotes, this.extraBars);
-    this._allProcessedDatasets.set("overlay-main", fullDatasets);
+    this._allProcessedDatasets.set(OVERLAY_MAIN_KEY, fullDatasets);
 
     // Re-attach previously registered overlay selections so they survive
     // overlay re-initialization (e.g., theme/canvas reset). Without this,
@@ -161,8 +169,17 @@ export class ChartManager {
 
   /**
    * Display a processed selection on the appropriate chart.
+   *
+   * @throws {Error} if `selection.ucid` collides with the reserved internal key
+   *   used by the overlay's candlestick+volume cache entry.
    */
   displaySelection(selection: IndicatorSelection, listing: IndicatorListing): void {
+    if (selection.ucid === OVERLAY_MAIN_KEY) {
+      throw new Error(
+        `displaySelection: ucid "${OVERLAY_MAIN_KEY}" is reserved for internal use; ` +
+          `pick a different ucid for this selection.`
+      );
+    }
     if (this._selections.some(s => s.ucid === selection.ucid)) return;
     this._selections.push(selection);
 
@@ -219,16 +236,21 @@ export class ChartManager {
    * Consumer must provide the canvas context and call this after processSelectionData()
    * AND after displaySelection() so the selection is registered in this.selections.
    *
-   * The oscillator renders with the full (unsliced) result.dataset.data from
-   * processSelectionData() so OscillatorChart.fullThresholdDatasets captures the
-   * complete history. Subsequent setBarCount() calls re-slice from this full
-   * dataset to any window size. Consumers that want the oscillator's initial
-   * view to match a windowed overlay should pre-slice their quotes/rows before
-   * passing them in to ChartManager (as the VitePress demo does).
+   * Renders with the full (unsliced) result.dataset.data so OscillatorChart's
+   * fullThresholdDatasets capture complete history for later re-slicing. Then,
+   * when an overlay has been initialized with a smaller window, applies the
+   * same slice immediately so the new oscillator's x-axis coincides with the
+   * windowed overlay from the first paint. Without this, oscillators created
+   * after `initializeOverlay` (or after a window resize race) would render
+   * spanning the full quote history while the overlay shows only the last
+   * `currentBarCount` candles — visibly misaligned at mobile breakpoints.
    *
    * @throws {Error} if displaySelection() has not been called for this selection,
    *   because setBarCount() iterates this.selections and will silently skip any
    *   oscillator whose ucid is not present there.
+   * @throws {Error} if processSelectionData() has not been called — the dataset
+   *   cache must be populated so the windowed slice has data to render. Validated
+   *   in every viewport state so failures are not viewport-dependent.
    */
   createOscillator(
     ctx: CanvasRenderingContext2D | HTMLCanvasElement,
@@ -245,10 +267,35 @@ export class ChartManager {
       );
     }
 
+    // Guard: processSelectionData() must have populated the dataset cache.
+    // Validated unconditionally (not only under a windowed overlay) so the
+    // failure mode doesn't depend on viewport state — otherwise the same
+    // missing-precondition bug would throw on mobile and silently render a
+    // broken chart on desktop.
+    const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
+    if (!fullDatasets) {
+      throw new Error(
+        `createOscillator: selection "${selection.ucid}" has no processed datasets. ` +
+          `Call processSelectionData() before createOscillator() so the oscillator ` +
+          `has data to render.`
+      );
+    }
+
     this._oscillators.get(selection.ucid)?.destroy();
     const oscillator = new OscillatorChart(ctx, this._settings);
     oscillator.render(selection, listing);
     this._oscillators.set(selection.ucid, oscillator);
+
+    // Align the freshly rendered oscillator with the current viewport window.
+    // render() captures full-history threshold datasets internally; this slice
+    // only narrows what's drawn, leaving the cached full datasets intact for
+    // future setBarCount() calls.
+    const totalQuotes = this._allQuotes.length;
+    if (totalQuotes > 0 && this._currentBarCount < totalQuotes) {
+      const startIndex = totalQuotes - this._currentBarCount;
+      oscillator.applySlicedData(selection, fullDatasets as IndicatorDataset[], startIndex);
+    }
+
     return oscillator;
   }
 
@@ -316,7 +363,7 @@ export class ChartManager {
     const startIndex = Math.max(0, totalQuotes - normalizedBarCount);
 
     // Update overlay main datasets (candlestick + volume)
-    const fullMainDatasets = this._allProcessedDatasets.get("overlay-main");
+    const fullMainDatasets = this._allProcessedDatasets.get(OVERLAY_MAIN_KEY);
     if (this._overlayChart && fullMainDatasets) {
       this._overlayChart.applySlicedData(fullMainDatasets, startIndex);
       this._overlayChart.updateLegends(this._selections);
@@ -369,7 +416,7 @@ export class ChartManager {
       if (!fullDatasets || !oscillator) return;
 
       // Cached datasets for an oscillator selection are always indicator datasets
-      // (the heterogeneous cache also holds candlestick+volume under "overlay-main").
+      // (the heterogeneous cache also holds candlestick+volume under OVERLAY_MAIN_KEY).
       oscillator.applySlicedData(selection, fullDatasets as IndicatorDataset[], startIndex);
     });
   }
