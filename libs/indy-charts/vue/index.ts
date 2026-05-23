@@ -5,6 +5,11 @@ import { StockIndicatorChart } from "./stock-indicator-chart";
 import type { IndyChartsVueOptions } from "./types";
 
 export { StockIndicatorChart } from "./stock-indicator-chart";
+export {
+  getTestIdPrefix,
+  slug,
+  STOCK_INDICATOR_CHART_TESTID_PREFIX
+} from "./slug";
 export type {
   IndyChartsVueApiOptions,
   IndyChartsVueDefaults,

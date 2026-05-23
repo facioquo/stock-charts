@@ -43,6 +43,14 @@ export interface IndyChartsVueOptions {
 
 export interface StockIndicatorChartProps {
   indicator?: string;
+  /**
+   * Stable identifier for this chart instance. Drives the root element id and
+   * the `data-testid` prefix (`stock-indicator-chart-<slug(id)>`). Overrides
+   * `config.id` and falls back to `indicator` when omitted. Use this to mount
+   * multiple instances of the same indicator on a single page with distinct
+   * test/CSS hooks.
+   */
+  id?: string;
   config?: StockIndicatorChartConfig;
   barCount?: number;
   withOverlay?: boolean;

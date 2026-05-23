@@ -17,6 +17,7 @@ import type { IndicatorListing } from "../config";
 import { applySelectionTokens, createDefaultSelection } from "../helpers";
 import { setupIndyCharts } from "../setup";
 import { indyChartsVueOptionsKey } from "./context";
+import { slug, STOCK_INDICATOR_CHART_TESTID_PREFIX } from "./slug";
 import {
   chartSettingsFromOptions,
   type IndyChartsVueOptions,
@@ -28,13 +29,6 @@ const DEFAULT_BAR_COUNT = 250;
 const DATA_UNAVAILABLE_ERROR_MESSAGE =
   "Chart data is currently unavailable. Check the API service and try again.";
 const MISSING_SETUP_ERROR_MESSAGE = "setupIndyChartsForVue() has not been called.";
-
-function slug(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
 
 function findListing(listings: IndicatorListing[], uiid: string): IndicatorListing | undefined {
   return listings.find(listing => listing.uiid.toLowerCase() === uiid.toLowerCase());
@@ -73,6 +67,10 @@ export const StockIndicatorChart = defineComponent({
       type: String,
       required: false
     },
+    id: {
+      type: String,
+      required: false
+    },
     config: {
       type: Object as PropType<StockIndicatorChartConfig>,
       required: false,
@@ -94,12 +92,15 @@ export const StockIndicatorChart = defineComponent({
   setup(props) {
     const options = inject<IndyChartsVueOptions>(indyChartsVueOptionsKey);
     const phase = ref<StockIndicatorChartPhase>("idle");
-    const errorMessage = ref("Chart data is unavailable.");
+    const errorMessage = ref(DATA_UNAVAILABLE_ERROR_MESSAGE);
+    const errorKind = ref<"author" | "data">("data");
     const chartType = ref<string>("overlay");
     const overlayCanvas = ref<HTMLCanvasElement | null>(null);
     const oscillatorCanvas = ref<HTMLCanvasElement | null>(null);
-    const rootId = computed(() => slug(props.config.id ?? props.indicator ?? "chart"));
-    const testIdPrefix = computed(() => `stock-indicator-chart-${rootId.value}`);
+    const rootId = computed(() =>
+      slug(props.id ?? props.config.id ?? props.indicator ?? "chart")
+    );
+    const testIdPrefix = computed(() => `${STOCK_INDICATOR_CHART_TESTID_PREFIX}-${rootId.value}`);
     const showOverlayCanvas = computed(
       () => chartType.value !== "oscillator" || props.withOverlay === true
     );
@@ -153,7 +154,8 @@ export const StockIndicatorChart = defineComponent({
       const token = ++loadToken;
       destroyChart();
       phase.value = "loading";
-      errorMessage.value = "Chart data is unavailable.";
+      errorMessage.value = DATA_UNAVAILABLE_ERROR_MESSAGE;
+      errorKind.value = "data";
 
       try {
         if (!options) {
@@ -245,9 +247,9 @@ export const StockIndicatorChart = defineComponent({
         if (disposed || token !== loadToken) return;
         destroyChart();
         phase.value = "error";
-        errorMessage.value = isAuthorFacingError(error)
-          ? error.message
-          : DATA_UNAVAILABLE_ERROR_MESSAGE;
+        const authorFacing = isAuthorFacingError(error);
+        errorMessage.value = authorFacing ? error.message : DATA_UNAVAILABLE_ERROR_MESSAGE;
+        errorKind.value = authorFacing ? "author" : "data";
       }
     }
 
@@ -349,7 +351,8 @@ export const StockIndicatorChart = defineComponent({
                 "div",
                 {
                   class: "indy-demo__status indy-demo__status--error",
-                  "data-testid": `${testIdPrefix.value}-error`
+                  "data-testid": `${testIdPrefix.value}-error`,
+                  "data-error-kind": errorKind.value
                 },
                 [
                   h("span", errorMessage.value),

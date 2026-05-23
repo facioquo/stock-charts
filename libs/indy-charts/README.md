@@ -39,7 +39,19 @@ if (!(canvas instanceof HTMLCanvasElement)) {
 
 const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true });
 chart.render(quotes.slice(-250));
+
+// In your component's unmount / cleanup hook:
+chart.destroy(); // NOT chart.chart?.destroy() — see "Teardown contract" below
 ```
+
+### Teardown contract
+
+`OverlayChart`, `OscillatorChart`, and `ChartManager` all expose a `destroy()`
+method that tears down both the wrapping library state (theme listeners,
+threshold caches, legend annotations) **and** the underlying Chart.js
+instance. Always call the wrapper's `destroy()` — never reach into
+`chart.chart?.destroy()`, which only tears down Chart.js and leaks the
+library-level state.
 
 For indicators, the responsive viewport, and oscillator subcharts, use `ChartManager`:
 

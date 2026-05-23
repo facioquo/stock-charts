@@ -16,6 +16,12 @@ import {
 } from "../config/types";
 
 export class OscillatorChart {
+  /**
+   * Underlying Chart.js instance. Read-only access (theme tweaks, dataset
+   * inspection) is supported. **Do not call `chart.destroy()` directly** — use
+   * {@link OscillatorChart.destroy} so library-level state (threshold dataset
+   * caches, legend annotations) is released alongside the Chart.js teardown.
+   */
   chart: Chart | undefined;
   private fullThresholdDatasets: IndicatorDataset[] = [];
 
@@ -167,6 +173,12 @@ export class OscillatorChart {
     this.chart.update("resize");
   }
 
+  /**
+   * Tear down this OscillatorChart and its underlying Chart.js instance.
+   * Releases threshold dataset caches, legend annotations, and the canvas
+   * binding. Always call this from your component's unmount hook — not
+   * `chart.destroy()`, which leaves library-level state orphaned.
+   */
   destroy(): void {
     if (this.chart) {
       this.chart.destroy();

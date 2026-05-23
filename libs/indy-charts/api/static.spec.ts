@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { loadStaticQuotes, loadStaticIndicatorData } from "./static";
+import { loadStaticQuotes, loadStaticIndicatorData, type RawQuote } from "./static";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -62,6 +62,18 @@ describe("loadStaticQuotes", () => {
     expect(result).toHaveLength(3);
     expect(result[0].close).toBe(50);
     expect(result[2].close).toBe(70);
+  });
+
+  it("accepts an explicit RawQuote[] fixture", () => {
+    const fixture: RawQuote[] = [
+      { timestamp: "2024-02-01T00:00:00Z", open: 1, high: 2, low: 0, close: 1.5, volume: 10 },
+      { timestamp: new Date("2024-02-02T00:00:00Z"), open: 2, high: 3, low: 1, close: 2.5, volume: 20 }
+    ];
+    const result = loadStaticQuotes(fixture);
+
+    expect(result).toHaveLength(2);
+    expect(result[0].timestamp.toISOString()).toBe("2024-02-01T00:00:00.000Z");
+    expect(result[1].timestamp.toISOString()).toBe("2024-02-02T00:00:00.000Z");
   });
 });
 
