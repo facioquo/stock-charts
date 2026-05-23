@@ -192,18 +192,18 @@ export class ChartManager {
         if (full && result.dataset) {
           result.dataset.data = [...full.data.slice(startIndex)];
           const ext = result.dataset as ExtendedChartDataset;
-          // `as number[]` / `as string[]` narrow Chart.js's wider Scriptable
-          // union (which slice() preserves through intersection) back to the
-          // shapes ExtendedChartDataset declares.
-          if (full.pointBackgroundColor) {
+          // Chart.js permits Scriptable / scalar forms for these fields on
+          // its base type, so guard at runtime before slicing — the
+          // `as number[]` / `as string[]` casts only quiet the compiler.
+          if (Array.isArray(full.pointBackgroundColor)) {
             ext.pointBackgroundColor = [
               ...(full.pointBackgroundColor as string[]).slice(startIndex)
             ];
           }
-          if (full.pointBorderColor) {
+          if (Array.isArray(full.pointBorderColor)) {
             ext.pointBorderColor = [...(full.pointBorderColor as string[]).slice(startIndex)];
           }
-          if (full.pointRotation) {
+          if (Array.isArray(full.pointRotation)) {
             ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex)];
           }
         }
@@ -339,15 +339,15 @@ export class ChartManager {
         if (full && result.dataset) {
           result.dataset.data = [...full.data.slice(startIndex)];
           const ext = result.dataset as ExtendedChartDataset;
-          if (full.pointBackgroundColor) {
+          if (Array.isArray(full.pointBackgroundColor)) {
             ext.pointBackgroundColor = [
               ...(full.pointBackgroundColor as string[]).slice(startIndex)
             ];
           }
-          if (full.pointBorderColor) {
+          if (Array.isArray(full.pointBorderColor)) {
             ext.pointBorderColor = [...(full.pointBorderColor as string[]).slice(startIndex)];
           }
-          if (full.pointRotation) {
+          if (Array.isArray(full.pointRotation)) {
             ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex)];
           }
         }

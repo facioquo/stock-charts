@@ -313,8 +313,13 @@
     },
     {
       "label": "Test: All tests",
-      "detail": "Run all unit tests: Website, Libs, and Backend .NET",
-      "dependsOn": ["Test: Website", "Test: Libs", "Test: Backend .NET"],
+      "detail": "Run all unit tests: Website, Libs, E2E, and Backend .NET",
+      "dependsOn": [
+        "Test: Website",
+        "Test: Libs",
+        "Test: Backend .NET",
+        "Test: E2E (Playwright)"
+      ],
       "dependsOrder": "parallel",
       "group": "test",
       "problemMatcher": "$msCompile"
@@ -346,7 +351,7 @@
       "label": "Test: E2E (Playwright)",
       "detail": "Run Playwright end-to-end tests (builds and previews VitePress site first)",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/playwright-tests run test",
+      "command": "pnpm run test:e2e",
       "group": "test",
       "presentation": {
         "reveal": "always",

@@ -126,17 +126,20 @@ export class OscillatorChart {
       result.dataset.data = [...fullDataset.data.slice(startIndex)];
       const ext = result.dataset as ExtendedChartDataset;
 
-      if (fullDataset.pointRotation) {
+      // Chart.js permits Scriptable / scalar forms for these fields on its
+      // base type, so guard at runtime before slicing — the `as number[]` /
+      // `as string[]` casts only quiet the compiler.
+      if (Array.isArray(fullDataset.pointRotation)) {
         ext.pointRotation = [...(fullDataset.pointRotation as number[]).slice(startIndex)];
       }
 
-      if (fullDataset.pointBackgroundColor) {
+      if (Array.isArray(fullDataset.pointBackgroundColor)) {
         ext.pointBackgroundColor = [
           ...(fullDataset.pointBackgroundColor as string[]).slice(startIndex)
         ];
       }
 
-      if (fullDataset.pointBorderColor) {
+      if (Array.isArray(fullDataset.pointBorderColor)) {
         ext.pointBorderColor = [...(fullDataset.pointBorderColor as string[]).slice(startIndex)];
       }
 

@@ -80,7 +80,13 @@ export function buildDataPoints(
         `Indicator row missing both 'timestamp' and 'date' fields for "${result.dataName}"`
       );
     }
-    dataPoints.push({ x: new Date(timestampSource).valueOf(), y: yValue });
+    const x = new Date(timestampSource).valueOf();
+    if (!Number.isFinite(x)) {
+      throw new Error(
+        `Indicator row has invalid timestamp for "${result.dataName}": ${String(timestampSource)}`
+      );
+    }
+    dataPoints.push({ x, y: yValue });
   });
 
   return { dataPoints, pointColor, pointRotation };

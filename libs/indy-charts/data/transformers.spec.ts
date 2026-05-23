@@ -286,6 +286,18 @@ describe("buildDataPoints", () => {
       /Indicator row missing both 'timestamp' and 'date' fields/
     );
   });
+
+  it("throws on an invalid timestamp string rather than silently emitting NaN", () => {
+    const data: IndicatorDataRow[] = [
+      { timestamp: "not-a-date", candle: makeQuote("2024-01-01"), sma: 50 }
+    ];
+    const result = makeResult({ dataName: "sma" });
+    const listing = makeListing();
+
+    expect(() => buildDataPoints(data, result, listing)).toThrow(
+      /Indicator row has invalid timestamp for "sma": not-a-date/
+    );
+  });
 });
 
 // ---------------------------------------------------------------------------
