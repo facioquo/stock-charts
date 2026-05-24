@@ -216,8 +216,11 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        const data = (await response.json()) as RawIndicatorRow[];
-        return data;
+        const body = (await response.json()) as unknown;
+        if (!Array.isArray(body)) {
+          throw new Error("Invalid selection data response: expected an array");
+        }
+        return body as RawIndicatorRow[];
       } catch (error) {
         onError?.("Error fetching selection data", error);
         throw error;

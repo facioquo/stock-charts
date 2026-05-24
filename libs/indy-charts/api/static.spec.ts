@@ -115,4 +115,16 @@ describe("loadStaticIndicatorData", () => {
     expect(result).toHaveLength(2);
     expect(result[1]).toMatchObject({ sma: 100.5, ema: 99.7 });
   });
+
+  it("preserves the deprecated `date` alias for v2 fixtures", () => {
+    const fixture: RawIndicatorRow[] = [
+      { date: "2024-03-01", sma: 100.0 },
+      { date: "2024-03-02", sma: 100.5, ema: 99.7 }
+    ];
+    const result = loadStaticIndicatorData(fixture);
+
+    expect(result).toHaveLength(2);
+    expect(result[0]).toMatchObject({ date: "2024-03-01", sma: 100.0 });
+    expect(result[1]).toMatchObject({ date: "2024-03-02", sma: 100.5, ema: 99.7 });
+  });
 });
