@@ -79,16 +79,15 @@ export function buildDataPoints(
     if (typeof yValue !== "number") {
       yValue = NaN;
     }
-    const timestampSource = row.timestamp ?? row.date;
-    if (timestampSource == null) {
+    if (row.timestamp == null) {
       throw new Error(
-        `Indicator row missing both 'timestamp' and 'date' fields for "${result.dataName}"`
+        `Indicator row missing 'timestamp' field for "${result.dataName}"`
       );
     }
-    const x = new Date(timestampSource).valueOf();
+    const x = new Date(row.timestamp).valueOf();
     if (!Number.isFinite(x)) {
       throw new Error(
-        `Indicator row has invalid timestamp for "${result.dataName}": ${String(timestampSource)}`
+        `Indicator row has invalid timestamp for "${result.dataName}": ${String(row.timestamp)}`
       );
     }
     dataPoints.push({ x, y: yValue });

@@ -43,17 +43,13 @@ export interface Quote {
 
 /**
  * Indicator data row as returned by the API or supplied as a static fixture.
- * Carries a timestamp (`timestamp` for Skender v3+; `date` is the v2 alias
- * preserved for backward compatibility) and an arbitrary set of indicator
+ * Carries a `timestamp` (string or Date) and an arbitrary set of indicator
  * result fields keyed by `dataName`. `candle` is populated on wire responses
  * and consumed only by the CANDLESTICK_PATTERN category; fixtures for other
  * indicators may omit it.
  */
 export interface IndicatorDataRow {
-  /** Skender.Stock.Indicators v3+ field name */
   timestamp?: Date | string;
-  /** @deprecated Skender v2 field name — accepted for backward compatibility */
-  date?: string;
   candle?: Quote;
   [key: string]: unknown; // For dynamic indicator result values
 }

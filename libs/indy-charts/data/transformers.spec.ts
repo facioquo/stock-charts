@@ -277,13 +277,13 @@ describe("buildDataPoints", () => {
     expect(pointRotation[0]).toBe(0);
   });
 
-  it("throws when a row has neither `timestamp` nor `date`", () => {
+  it("throws when a row is missing `timestamp`", () => {
     const data: IndicatorDataRow[] = [{ candle: makeQuote("2024-01-01"), sma: 50 }];
     const result = makeResult({ dataName: "sma" });
     const listing = makeListing();
 
     expect(() => buildDataPoints(data, result, listing)).toThrow(
-      /Indicator row missing both 'timestamp' and 'date' fields/
+      /Indicator row missing 'timestamp' field/
     );
   });
 

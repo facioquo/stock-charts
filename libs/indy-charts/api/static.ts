@@ -38,8 +38,7 @@ function parseTimestamp(value: string, index: number): Date {
 /**
  * Load static indicator data synchronously (for VitePress SSG or build-time
  * rendering). Pass-through helper — `IndicatorDataRow[]` rows are already in
- * the shape downstream transformers expect (they handle the `timestamp` /
- * deprecated `date` alias).
+ * the shape downstream transformers expect.
  */
 export function loadStaticIndicatorData(data: IndicatorDataRow[]): IndicatorDataRow[] {
   return data;
