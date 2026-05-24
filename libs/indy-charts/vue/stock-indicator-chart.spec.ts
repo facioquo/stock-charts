@@ -174,6 +174,21 @@ describe("StockIndicatorChart", () => {
     app.unmount();
   });
 
+  it("tags author-facing errors with data-error-kind=\"author\"", async () => {
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, { indicator: "rsi" });
+    // Intentionally omit provide() — triggers MISSING_SETUP_ERROR_MESSAGE, which is author-facing.
+
+    app.mount(root);
+    await nextTick();
+
+    const error = findByTestId(root, "stock-indicator-chart-rsi-error");
+    expect(error).toBeDefined();
+    expect(error?.props["data-error-kind"]).toBe("author");
+
+    app.unmount();
+  });
+
   it("renders a stable unavailable message for recoverable API failures", async () => {
     vi.stubGlobal(
       "fetch",
@@ -192,7 +207,70 @@ describe("StockIndicatorChart", () => {
         "Chart data is currently unavailable. Check the API service and try again."
       );
       expect(textContent(error!)).not.toContain("ECONNREFUSED");
+      expect(error?.props["data-error-kind"]).toBe("data");
     });
+
+    app.unmount();
+  });
+
+  it("uses the top-level id prop for the data-testid prefix", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => new Promise<Response>(() => undefined))
+    );
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, { indicator: "rsi", id: "rsi-fast" });
+    app.provide(indyChartsVueOptionsKey, defaultOptions);
+
+    app.mount(root);
+    await nextTick();
+
+    const rootSection = findByTestId(root, "stock-indicator-chart-rsi-fast-root");
+    expect(rootSection).toBeDefined();
+    expect(rootSection?.props["id"]).toBe("rsi-fast");
+    expect(findByTestId(root, "stock-indicator-chart-rsi-fast-loading")).toBeDefined();
+    expect(findByTestId(root, "stock-indicator-chart-rsi-root")).toBeUndefined();
+
+    app.unmount();
+  });
+
+  it("falls back to id=\"chart\" when id/config.id/indicator slugify to empty", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => new Promise<Response>(() => undefined))
+    );
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, { id: "---" });
+    app.provide(indyChartsVueOptionsKey, defaultOptions);
+
+    app.mount(root);
+    await nextTick();
+
+    const section = findByTestId(root, "stock-indicator-chart-chart-root");
+    expect(section).toBeDefined();
+    expect(section?.props["id"]).toBe("chart");
+
+    app.unmount();
+  });
+
+  it("prefers the top-level id prop over config.id", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => new Promise<Response>(() => undefined))
+    );
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, {
+      indicator: "rsi",
+      id: "outer",
+      config: { id: "inner" }
+    });
+    app.provide(indyChartsVueOptionsKey, defaultOptions);
+
+    app.mount(root);
+    await nextTick();
+
+    expect(findByTestId(root, "stock-indicator-chart-outer-root")).toBeDefined();
+    expect(findByTestId(root, "stock-indicator-chart-inner-root")).toBeUndefined();
 
     app.unmount();
   });

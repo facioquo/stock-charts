@@ -15,9 +15,6 @@ export type {
   Quote
 } from "./types";
 
-/** @deprecated Use Quote instead. */
-export type { Quote as RawQuote } from "./types";
-
 export type { ThemeColors } from "./theme-colors";
 
 export { baseChartOptions, defaultXAxisOptions, FONT_FAMILY } from "./common";

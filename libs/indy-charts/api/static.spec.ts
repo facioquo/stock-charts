@@ -1,14 +1,13 @@
 import { describe, it, expect } from "vitest";
+
+import { type IndicatorDataRow, type Quote } from "../config/types";
 import { loadStaticQuotes, loadStaticIndicatorData } from "./static";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function createQuote(
-  dateStr: string,
-  close = 100
-): { timestamp: string; open: number; high: number; low: number; close: number; volume: number } {
+function createQuote(dateStr: string, close = 100): Quote {
   return {
     timestamp: dateStr,
     open: close - 1,
@@ -17,6 +16,13 @@ function createQuote(
     close,
     volume: 500
   };
+}
+
+function assertDate(value: Date | string): Date {
+  if (!(value instanceof Date)) {
+    throw new Error(`Expected normalized Date, got string "${value}"`);
+  }
+  return value;
 }
 
 // ---------------------------------------------------------------------------
@@ -29,7 +35,7 @@ describe("loadStaticQuotes", () => {
     const [q] = loadStaticQuotes(quotes);
 
     expect(q.timestamp).toBeInstanceOf(Date);
-    expect(q.timestamp.toISOString()).toBe("2024-01-15T00:00:00.000Z");
+    expect(assertDate(q.timestamp).toISOString()).toBe("2024-01-15T00:00:00.000Z");
   });
 
   it("preserves all OHLCV fields", () => {
@@ -63,6 +69,18 @@ describe("loadStaticQuotes", () => {
     expect(result[0].close).toBe(50);
     expect(result[2].close).toBe(70);
   });
+
+  it("accepts a Quote[] fixture with mixed string/Date timestamps", () => {
+    const fixture: Quote[] = [
+      { timestamp: "2024-02-01T00:00:00Z", open: 1, high: 2, low: 0, close: 1.5, volume: 10 },
+      { timestamp: new Date("2024-02-02T00:00:00Z"), open: 2, high: 3, low: 1, close: 2.5, volume: 20 }
+    ];
+    const result = loadStaticQuotes(fixture);
+
+    expect(result).toHaveLength(2);
+    expect(assertDate(result[0].timestamp).toISOString()).toBe("2024-02-01T00:00:00.000Z");
+    expect(assertDate(result[1].timestamp).toISOString()).toBe("2024-02-02T00:00:00.000Z");
+  });
 });
 
 describe("loadStaticIndicatorData", () => {
@@ -87,4 +105,16 @@ describe("loadStaticIndicatorData", () => {
 
     expect(result[0]).toStrictEqual({ timestamp: "2024-01-01", sma: null, ema: 42 });
   });
+
+  it("accepts an explicit IndicatorDataRow[] fixture", () => {
+    const fixture: IndicatorDataRow[] = [
+      { timestamp: "2024-03-01", sma: 100.0 },
+      { timestamp: "2024-03-02", sma: 100.5, ema: 99.7 }
+    ];
+    const result = loadStaticIndicatorData(fixture);
+
+    expect(result).toHaveLength(2);
+    expect(result[1]).toMatchObject({ sma: 100.5, ema: 99.7 });
+  });
+
 });

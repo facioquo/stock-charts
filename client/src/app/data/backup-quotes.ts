@@ -50,7 +50,7 @@ function generateBackupQuotes(seed: number = 12345): Quote[] {
     currentPrice = quote.close;
   }
 
-  return quotes.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+  return quotes.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 }
 
 /**

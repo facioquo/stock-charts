@@ -1,20 +1,13 @@
 import { type Quote, type IndicatorDataRow } from "../config/types";
 
 /**
- * Load static quote data synchronously (for VitePress SSG or build-time rendering).
- * Accepts objects with ISO 8601 string or Date timestamps and normalizes them to Date objects.
+ * Load static quote data synchronously (for VitePress SSG or build-time
+ * rendering). Accepts `Quote[]` with either ISO string or `Date` timestamps
+ * (per the `Quote.timestamp: Date | string` contract) and returns a new
+ * array with timestamps normalized to `Date` instances.
  */
-export function loadStaticQuotes(
-  raw: Array<{
-    timestamp: string | Date;
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-    volume: number;
-  }>
-): Quote[] {
-  return raw.map((q, index) => ({
+export function loadStaticQuotes(quotes: Quote[]): Quote[] {
+  return quotes.map((q, index) => ({
     timestamp: normalizeTimestamp(q.timestamp, index),
     open: q.open,
     high: q.high,
@@ -24,7 +17,7 @@ export function loadStaticQuotes(
   }));
 }
 
-function normalizeTimestamp(value: string | Date, index: number): Date {
+function normalizeTimestamp(value: Date | string, index: number): Date {
   if (value instanceof Date) {
     if (Number.isNaN(value.getTime())) {
       throw new Error(`Invalid timestamp at index ${index}: "${value.toString()}"`);
@@ -43,9 +36,10 @@ function parseTimestamp(value: string, index: number): Date {
 }
 
 /**
- * Load static indicator data synchronously (for VitePress SSG or build-time rendering).
- * Passes through data as-is since indicator results are already in the correct format.
+ * Load static indicator data synchronously (for VitePress SSG or build-time
+ * rendering). Pass-through helper — `IndicatorDataRow[]` rows are already in
+ * the shape downstream transformers expect.
  */
-export function loadStaticIndicatorData(data: unknown[]): IndicatorDataRow[] {
-  return data as IndicatorDataRow[];
+export function loadStaticIndicatorData(data: IndicatorDataRow[]): IndicatorDataRow[] {
+  return data;
 }

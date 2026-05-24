@@ -1,8 +1,9 @@
 import type { Quote } from "@facioquo/indy-charts";
 
 /**
- * Forty synthetic daily OHLCV bars (Jan 2 – Feb 28, 2025).
- * Demonstrates the {@link Quote} shape expected by `loadStaticQuotes`.
+ * Forty synthetic daily OHLCV bars (Jan 2 – Feb 28, 2025). The fixture uses
+ * ISO string timestamps; `Quote.timestamp` is `Date | string`, and
+ * `loadStaticQuotes` normalizes to `Date` instances on consumption.
  */
 export const SAMPLE_QUOTES: Quote[] = [
   { timestamp: "2025-01-02", open: 180.0, high: 182.5, low: 179.2, close: 181.8, volume: 38500000 },

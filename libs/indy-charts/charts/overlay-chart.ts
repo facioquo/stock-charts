@@ -25,9 +25,20 @@ const CHART_TYPES = {
 } as const;
 
 export class OverlayChart {
-  chart: Chart | undefined;
+  private _chart: Chart | undefined;
   private volumeAxisSize = 0;
   private _latestLegendSelections: IndicatorSelection[] = [];
+
+  /**
+   * Underlying Chart.js instance. Exposed read-only — assigning to this field
+   * is a TypeScript error. Read access (theme tweaks, dataset inspection) is
+   * supported. **Do not call `chart.destroy()` directly** — use
+   * {@link OverlayChart.destroy} so library-level state (legend selections,
+   * volume-axis cache) is released alongside the Chart.js teardown.
+   */
+  get chart(): Chart | undefined {
+    return this._chart;
+  }
 
   constructor(
     private readonly ctx: CanvasRenderingContext2D | HTMLCanvasElement,
@@ -69,8 +80,8 @@ export class OverlayChart {
       };
     }
 
-    if (this.chart) this.chart.destroy();
-    this.chart = new Chart(this.ctx, chartConfig);
+    if (this._chart) this._chart.destroy();
+    this._chart = new Chart(this.ctx, chartConfig);
 
     // Return deep copy of datasets for dynamic slicing (structuredClone preserves NaN)
     return structuredClone(chartData.datasets);
@@ -92,48 +103,48 @@ export class OverlayChart {
   }
 
   addIndicatorDatasets(results: IndicatorResult[]): void {
-    if (!this.chart) return;
-    const chart = this.chart;
+    if (!this._chart) return;
+    const chart = this._chart;
     results.forEach((r: IndicatorResult) => {
       chart.data.datasets.push(r.dataset);
     });
-    this.chart.update("none");
+    this._chart.update("none");
   }
 
   removeIndicatorDatasets(results: IndicatorResult[]): void {
-    if (!this.chart) return;
-    const chart = this.chart;
+    if (!this._chart) return;
+    const chart = this._chart;
     results.forEach((result: IndicatorResult) => {
       const dx = chart.data.datasets.indexOf(result.dataset, 0);
       if (dx !== -1) {
         chart.data.datasets.splice(dx, 1);
       }
     });
-    this.chart.update("none");
+    this._chart.update("none");
   }
 
   updateLegends(overlaySelections: IndicatorSelection[]): void {
-    if (!this.chart) return;
-    if (!this.chart.scales["x"] || !this.chart.scales["y"]) return;
+    if (!this._chart) return;
+    if (!this._chart.scales["x"] || !this._chart.scales["y"]) return;
 
     this._latestLegendSelections = overlaySelections;
     this._applyLegendAnnotations();
   }
 
   private _applyLegendAnnotations(): void {
-    if (!this.chart) return;
-    if (!this.chart.scales["x"] || !this.chart.scales["y"]) return;
+    if (!this._chart) return;
+    if (!this._chart.scales["x"] || !this._chart.scales["y"]) return;
 
-    const xPos: ScaleValue = this.chart.scales["x"].min;
-    const yPos: ScaleValue = this.chart.scales["y"].max;
+    const xPos: ScaleValue = this._chart.scales["x"].min;
+    const yPos: ScaleValue = this._chart.scales["y"].max;
     let adjY = 10;
 
     const sorted = [...this._latestLegendSelections]
       .filter(x => x.chartType === CHART_TYPES.OVERLAY)
       .sort((a, b) => a.label.localeCompare(b.label));
 
-    if (this.chart.options?.plugins?.annotation) {
-      this.chart.options.plugins.annotation.annotations = sorted
+    if (this._chart.options?.plugins?.annotation) {
+      this._chart.options.plugins.annotation.annotations = sorted
         .filter(selection => selection.results.length > 0 && selection.results[0] !== undefined)
         .map((selection: IndicatorSelection, index: number) => {
           const annotation = commonLegendAnnotation(
@@ -148,38 +159,38 @@ export class OverlayChart {
           adjY += 15; // LEGEND_Y_OFFSET
           return annotation;
         });
-      this.chart.update("none");
+      this._chart.update("none");
     }
   }
 
   updateTheme(settings: ChartSettings): void {
     this.settings = settings;
-    if (!this.chart) return;
+    if (!this._chart) return;
 
     applyFinancialElementTheme(getFinancialPalette(settings.isDarkTheme ? "dark" : "light"));
 
-    this.chart.options = buildFinancialChartOptions(
+    this._chart.options = buildFinancialChartOptions(
       baseOverlayOptions(this.volumeAxisSize, settings)
     );
-    this.chart.update("none");
+    this._chart.update("none");
   }
 
   /**
    * Apply sliced datasets from pre-computed full datasets.
    */
   applySlicedData(fullMainDatasets: ChartDataset[], startIndex: number): void {
-    if (!this.chart) return;
+    if (!this._chart) return;
 
     // Price dataset (candlestick - index 0)
     const fullPrice = fullMainDatasets[0];
-    const currentPrice = this.chart.data.datasets[0];
+    const currentPrice = this._chart.data.datasets[0];
     if (fullPrice && currentPrice && fullPrice.type === "candlestick") {
       currentPrice.data = [...fullPrice.data.slice(startIndex)];
     }
 
     // Volume dataset (bar - index 1)
     const fullVolume = fullMainDatasets[1];
-    const currentVolume = this.chart.data.datasets[1];
+    const currentVolume = this._chart.data.datasets[1];
     if (fullVolume && currentVolume && fullVolume.type === "bar") {
       currentVolume.data = [...fullVolume.data.slice(startIndex)];
       if (fullVolume.backgroundColor && Array.isArray(fullVolume.backgroundColor)) {
@@ -192,19 +203,27 @@ export class OverlayChart {
     // Match OscillatorChart.applySlicedData which also uses "none" — both charts
     // share the same setBarCount() trigger, so they must update with identical
     // semantics to avoid one snapping while the other transitions.
-    this.chart.update("none");
+    this._chart.update("none");
   }
 
   resize(): void {
-    if (!this.chart) return;
-    this.chart.resize();
-    this.chart.update("resize");
+    if (!this._chart) return;
+    this._chart.resize();
+    this._chart.update("resize");
   }
 
+  /**
+   * Tear down this OverlayChart and its underlying Chart.js instance. Releases
+   * the cached legend selections, the volume-axis cache, and the Chart.js
+   * canvas binding. Always call this from your component's unmount hook — not
+   * `chart.destroy()`, which leaves library-level state orphaned.
+   */
   destroy(): void {
-    if (this.chart) {
-      this.chart.destroy();
-      this.chart = undefined;
+    if (this._chart) {
+      this._chart.destroy();
+      this._chart = undefined;
     }
+    this._latestLegendSelections = [];
+    this.volumeAxisSize = 0;
   }
 }
