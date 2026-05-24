@@ -61,7 +61,7 @@ If the chart renders, you're set. If not, check the browser console — most err
 | `ChartManager`, `OverlayChart`, `OscillatorChart` | High-level chart classes |
 | `createApiClient` | Typed REST client for quotes + indicators |
 | `loadStaticQuotes`, `loadStaticIndicatorData` | Use your own data, no API needed |
-| `RawQuote` (type) | Input shape for `loadStaticQuotes` — type fixture arrays as `RawQuote[]` |
+| `RawQuote`, `RawIndicatorRow` (types) | Input shapes for the static loaders — type fixture arrays explicitly |
 | `setupIndyCharts`, `setupIndyChartsForVue` | One-time registration of Chart.js controllers |
 | `getThemeColors`, `getFinancialPalette` | Theme + candlestick color helpers |
 

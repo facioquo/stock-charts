@@ -4,6 +4,7 @@ import {
   type IndicatorSelection,
   type Quote
 } from "../config/types";
+import { type RawIndicatorRow } from "./static";
 
 /**
  * Configuration for {@link createApiClient}.
@@ -73,7 +74,10 @@ export interface ApiClient {
    * @returns Resolved array of raw data rows for the indicator series.
    * @throws  Re-throws any network or HTTP error (after calling `onError`).
    */
-  getSelectionData(selection: IndicatorSelection, listing: IndicatorListing): Promise<unknown[]>;
+  getSelectionData(
+    selection: IndicatorSelection,
+    listing: IndicatorListing
+  ): Promise<RawIndicatorRow[]>;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -197,7 +201,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
     async getSelectionData(
       selection: IndicatorSelection,
       listing: IndicatorListing
-    ): Promise<unknown[]> {
+    ): Promise<RawIndicatorRow[]> {
       const endpointUrl = new URL(listing.endpoint, baseUrl);
       selection.params.forEach((p: IndicatorParam) => {
         if (p.value != null) {
@@ -212,7 +216,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        const data = (await response.json()) as unknown[];
+        const data = (await response.json()) as RawIndicatorRow[];
         return data;
       } catch (error) {
         onError?.("Error fetching selection data", error);

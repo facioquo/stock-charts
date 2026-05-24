@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { loadStaticQuotes, loadStaticIndicatorData, type RawQuote } from "./static";
+import {
+  loadStaticQuotes,
+  loadStaticIndicatorData,
+  type RawIndicatorRow,
+  type RawQuote
+} from "./static";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -98,5 +103,16 @@ describe("loadStaticIndicatorData", () => {
     const result = loadStaticIndicatorData(raw);
 
     expect(result[0]).toStrictEqual({ timestamp: "2024-01-01", sma: null, ema: 42 });
+  });
+
+  it("accepts an explicit RawIndicatorRow[] fixture", () => {
+    const fixture: RawIndicatorRow[] = [
+      { timestamp: "2024-03-01", sma: 100.0 },
+      { timestamp: "2024-03-02", sma: 100.5, ema: 99.7 }
+    ];
+    const result = loadStaticIndicatorData(fixture);
+
+    expect(result).toHaveLength(2);
+    expect(result[1]).toMatchObject({ sma: 100.5, ema: 99.7 });
   });
 });

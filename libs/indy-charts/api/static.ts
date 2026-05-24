@@ -49,9 +49,22 @@ function parseTimestamp(value: string, index: number): Date {
 }
 
 /**
+ * Raw input shape accepted by {@link loadStaticIndicatorData}. Each row
+ * carries a timestamp (ISO string or `Date`) and an arbitrary set of
+ * indicator result fields keyed by the indicator's `dataName`. The library
+ * does not transform these rows — they pass through to chart datasets as-is.
+ */
+export interface RawIndicatorRow {
+  timestamp?: string | Date;
+  /** @deprecated Skender v2 field name — accepted for backward compatibility */
+  date?: string;
+  [key: string]: unknown;
+}
+
+/**
  * Load static indicator data synchronously (for VitePress SSG or build-time rendering).
  * Passes through data as-is since indicator results are already in the correct format.
  */
-export function loadStaticIndicatorData(data: unknown[]): IndicatorDataRow[] {
-  return data as IndicatorDataRow[];
+export function loadStaticIndicatorData(data: RawIndicatorRow[]): IndicatorDataRow[] {
+  return data as unknown as IndicatorDataRow[];
 }
