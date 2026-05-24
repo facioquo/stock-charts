@@ -12,7 +12,7 @@ Render a candlestick + volume chart **and** a technical indicator overlay direct
   <StaticChart />
 </ClientOnly>
 
-The chart above plots OHLC + volume from a hard-coded `Quote[]` array, with an EMA(20) line computed locally. Everything below ships in the page bundle — no network calls.
+The chart above plots OHLC + volume from a hard-coded `RawQuote[]` array (normalized to `Quote[]` via `loadStaticQuotes`), with an EMA(20) line computed locally. Everything below ships in the page bundle — no network calls.
 
 ## How it works
 
@@ -20,19 +20,20 @@ The chart above plots OHLC + volume from a hard-coded `Quote[]` array, with an E
 
 ```typescript
 import { OverlayChart, loadStaticQuotes } from "@facioquo/indy-charts";
-import type { RawQuote } from "@facioquo/indy-charts";
+import type { Quote, RawQuote } from "@facioquo/indy-charts";
 
 const rawQuotes: RawQuote[] = [
   { timestamp: "2025-01-02", open: 180.00, high: 182.50, low: 179.20, close: 181.80, volume: 38500000 },
   // ... more bars
 ];
+const quotes: Quote[] = loadStaticQuotes(rawQuotes);
 
 const canvas = document.getElementById("my-canvas") as HTMLCanvasElement;
 const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: false });
-chart.render(loadStaticQuotes(rawQuotes));
+chart.render(quotes);
 
 // Push an EMA(20) line onto the existing chart.
-chart.chart?.data.datasets.push(buildEmaDataset(rawQuotes, 20));
+chart.chart?.data.datasets.push(buildEmaDataset(quotes, 20));
 chart.chart?.update("none");
 ```
 
