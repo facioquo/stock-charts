@@ -12,7 +12,7 @@ Render a candlestick + volume chart **and** a technical indicator overlay direct
   <StaticChart />
 </ClientOnly>
 
-The chart above plots OHLC + volume from a hard-coded `Quote[]` array, with an EMA(20) line computed locally. Everything below ships in the page bundle — no network calls.
+The chart above plots OHLC + volume from a hard-coded `Quote[]` array (ISO string timestamps normalized to `Date` via `loadStaticQuotes`), with an EMA(20) line computed locally. Everything below ships in the page bundle — no network calls.
 
 ## How it works
 
@@ -22,14 +22,15 @@ The chart above plots OHLC + volume from a hard-coded `Quote[]` array, with an E
 import { OverlayChart, loadStaticQuotes } from "@facioquo/indy-charts";
 import type { Quote } from "@facioquo/indy-charts";
 
-const quotes: Quote[] = [
+// Quote.timestamp accepts ISO strings or Date instances.
+const quotes: Quote[] = loadStaticQuotes([
   { timestamp: "2025-01-02", open: 180.00, high: 182.50, low: 179.20, close: 181.80, volume: 38500000 },
   // ... more bars
-];
+]);
 
 const canvas = document.getElementById("my-canvas") as HTMLCanvasElement;
 const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: false });
-chart.render(loadStaticQuotes(quotes));
+chart.render(quotes);
 
 // Push an EMA(20) line onto the existing chart.
 chart.chart?.data.datasets.push(buildEmaDataset(quotes, 20));
@@ -100,6 +101,7 @@ import {
 } from "@facioquo/indy-charts";
 import type { ChartDataset, ScatterDataPoint } from "chart.js";
 
+// Quote.timestamp accepts ISO strings or Date instances.
 const quotes: Quote[] = loadStaticQuotes([
   { timestamp: "2025-01-02", open: 180.00, high: 182.50, low: 179.20, close: 181.80, volume: 38500000 },
   // ... more bars
@@ -149,7 +151,7 @@ function isDark() {
 function renderChart() {
   if (!canvasEl.value) return;
   setupIndyCharts();
-  overlayChart?.chart?.destroy();
+  overlayChart?.destroy();
   overlayChart = new OverlayChart(canvasEl.value, {
     isDarkTheme: isDark(),
     showTooltips: false,
@@ -172,7 +174,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   observer?.disconnect();
   observer = null;
-  overlayChart?.chart?.destroy();
+  overlayChart?.destroy();
   overlayChart = null;
 });
 </script>
@@ -184,12 +186,12 @@ onBeforeUnmount(() => {
 
 ## Key points
 
-- **`Quote`**: input shape with ISO string `timestamp` and numeric OHLCV fields
-- **`loadStaticQuotes`**: converts `timestamp` strings to `Date` objects, returning `Quote[]`
+- **`Quote`**: single OHLCV bar — `timestamp` accepts an ISO string or `Date` instance, the rest are numeric. Type your fixture arrays as `Quote[]`.
+- **`loadStaticQuotes`**: normalizes `Quote.timestamp` to a `Date` (no-op when already a Date)
 - **`OverlayChart`**: renders candlestick and volume directly onto a `<canvas>` element
 - **Custom indicators**: push your own `ChartDataset` onto `chart.data.datasets` after `render()`, then call `chart.update("none")`. Any Chart.js dataset shape works — line, dot, bar, etc.
 - **Theme sync**: re-create the chart on `document.documentElement` class changes to follow the page's dark / light mode automatically
-- **Cleanup**: always call `chart.destroy()` in the component's unmount hook
+- **Cleanup**: always call `chart.destroy()` (the wrapper) in the component's unmount hook — never `chart.chart?.destroy()` (Chart.js only), which leaks the wrapper's cached state
 
 ## Next steps
 

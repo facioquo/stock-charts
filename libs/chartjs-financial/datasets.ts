@@ -4,7 +4,7 @@ import { type FinancialDataPoint, type FinancialPalette } from "./types/financia
 import { getVolumeColor } from "./theme/colors";
 
 interface QuoteLike {
-  timestamp: Date;
+  timestamp: Date | string;
   open: number;
   high: number;
   low: number;

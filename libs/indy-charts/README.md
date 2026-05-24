@@ -39,7 +39,19 @@ if (!(canvas instanceof HTMLCanvasElement)) {
 
 const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true });
 chart.render(quotes.slice(-250));
+
+// In your component's unmount / cleanup hook:
+chart.destroy(); // NOT chart.chart?.destroy() — see "Teardown contract" below
 ```
+
+### Teardown contract
+
+`OverlayChart`, `OscillatorChart`, and `ChartManager` all expose a `destroy()`
+method that releases the wrapper's cached state (legend selections, threshold
+datasets, full quote/dataset history on `ChartManager`) **and** tears down
+the underlying Chart.js instance. Always call the wrapper's `destroy()` —
+never reach into `chart.chart?.destroy()`, which only tears down Chart.js
+and leaks the wrapper's cached state.
 
 For indicators, the responsive viewport, and oscillator subcharts, use `ChartManager`:
 
@@ -140,7 +152,7 @@ Use the global component from Markdown / templates. Each instance is self-contai
 | `ChartManager` | Lifecycle orchestrator for overlay + oscillator charts and viewport changes |
 | `OverlayChart`, `OscillatorChart` | Lower-level chart classes if you don't need `ChartManager` |
 | `createApiClient(config)` | Typed `fetch` client for `GET /quotes`, `GET /indicators`, indicator data |
-| `loadStaticQuotes`, `loadStaticIndicatorData` | Normalize bring-your-own quote and indicator arrays |
+| `loadStaticQuotes`, `loadStaticIndicatorData` | Accept bring-your-own `Quote[]` / `IndicatorDataRow[]` (timestamps as string or Date) |
 | `createDefaultSelection`, `applySelectionTokens`, `calculateOptimalBars` | Selection / viewport helpers |
 | `getThemeColors`, `baseOverlayConfig`, `baseOscillatorConfig` | Theme + config building blocks |
 | `setupIndyChartsForVue` (`/vue` subpath) | Vue 3 adapter that registers `<StockIndicatorChart>` globally |

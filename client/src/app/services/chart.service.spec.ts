@@ -226,7 +226,7 @@ describe("ChartService Smoke Tests", () => {
       getListings: vi.fn(() => of([generateSampleIndicatorListing()])),
       getSelectionData: vi.fn((_selection: IndicatorSelection) => {
         const sampleData: IndicatorDataRow[] = generateSampleQuotes(100).map(q => ({
-          timestamp: q.timestamp.toISOString(),
+          timestamp: new Date(q.timestamp).toISOString(),
           candle: q,
           sma: q.close * 0.99
         }));

@@ -154,8 +154,9 @@ describe("createApiClient", () => {
       const quotes = await client.getQuotes();
 
       expect(quotes).toHaveLength(2);
-      expect(quotes[0].timestamp).toBeInstanceOf(Date);
-      expect(quotes[0].timestamp.toISOString()).toBe("2024-01-01T00:00:00.000Z");
+      const firstTimestamp = quotes[0].timestamp;
+      expect(firstTimestamp).toBeInstanceOf(Date);
+      expect((firstTimestamp as Date).toISOString()).toBe("2024-01-01T00:00:00.000Z");
       expect(quotes[1].close).toBe(100);
     });
 

@@ -1,3 +1,9 @@
+---
+next:
+  text: Overlay chart
+  link: /examples/
+---
+
 # Theme customization
 
 The library includes built-in light and dark themes that automatically adapt to your application's appearance preference.

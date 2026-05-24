@@ -1,6 +1,6 @@
 {
   "name": "@facioquo/indy-charts",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "description": "Framework-agnostic financial charting library with technical indicators and stock market data visualization",
   "author": "facioquo",
   "license": "Apache-2.0",
@@ -9,6 +9,7 @@
     "url": "https://github.com/facioquo/stock-charts.git",
     "directory": "libs/indy-charts"
   },
+  "readme": "README.md",
   "homepage": "https://github.com/facioquo/stock-charts/tree/main/libs/indy-charts#readme",
   "bugs": {
     "url": "https://github.com/facioquo/stock-charts/issues"

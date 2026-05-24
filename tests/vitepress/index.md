@@ -55,19 +55,19 @@ features:
 A price chart with an EMA overlay:
 
 <ClientOnly>
-  <StockIndicatorChart indicator="ema" :config="{ id: 'home-ema-overlay' }" />
+  <StockIndicatorChart indicator="ema" id="home-ema-overlay" />
 </ClientOnly>
 
 A standalone RSI oscillator:
 
 <ClientOnly>
-  <StockIndicatorChart indicator="rsi" :config="{ id: 'home-rsi-standalone' }" />
+  <StockIndicatorChart indicator="rsi" id="home-rsi-standalone" />
 </ClientOnly>
 
 An oscillator paired with the price chart (`:with-overlay="true"`):
 
 <ClientOnly>
-  <StockIndicatorChart indicator="rsi" :with-overlay="true" :config="{ id: 'home-rsi-with-overlay' }" />
+  <StockIndicatorChart indicator="rsi" :with-overlay="true" id="home-rsi-with-overlay" />
 </ClientOnly>
 
 Each instance is independent and manages its own `ChartManager`. Drop as many as you want on a page.

@@ -14,10 +14,18 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   TESTINGPLATFORM_TELEMETRY_OPTOUT: 1
 
+# Default to read-only access to repo contents; jobs that need more (e.g.
+# dorny/test-reporter writing check runs) override at the job level.
+permissions:
+  contents: read
+
 jobs:
   test-backend:
-    name: "Backend"
     runs-on: ubuntu-latest
+    permissions:
+      # dorny/test-reporter writes a check run with the parsed .trx results.
+      contents: read
+      checks: write
 
     steps:
       - name: Checkout sources
@@ -85,8 +93,7 @@ jobs:
             server/coverage/*.trx
             server/coverage/lcov.info
 
-  test-website:
-    name: "Website"
+  test-libraries:
     runs-on: ubuntu-latest
 
     steps:
@@ -113,28 +120,58 @@ jobs:
           pnpm --filter @facioquo/chartjs-chart-financial run build
           pnpm --filter @facioquo/indy-charts run build
 
-      - name: Check web formatting
-        run: pnpm run format:web:check
-
-      - name: Lint
-        run: pnpm --filter @stock-charts/client run lint
-
       - name: Lint libraries
         run: |
           pnpm --filter '@facioquo/chartjs-chart-financial' run lint --max-warnings=0
           pnpm --filter '@facioquo/indy-charts' run lint --max-warnings=0
-
-      - name: Lint CSS
-        run: pnpm run lint:css
-
-      - name: Run unit tests
-        run: pnpm --filter @stock-charts/client run test:coverage
 
       - name: Run library unit tests
         run: pnpm run test:libs
 
       - name: Run package consumption smoke test
         run: pnpm run smoke:package-consumption
+
+  test-website:
+    needs: [test-libraries]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build libraries
+        # Client consumes @facioquo/indy-charts via workspace:* and imports from
+        # its dist/, so libs must be built before the Angular build/test steps.
+        run: |
+          pnpm --filter @facioquo/chartjs-chart-financial run build
+          pnpm --filter @facioquo/indy-charts run build
+
+      - name: Check web formatting
+        run: pnpm run format:web:check
+
+      - name: Lint client
+        run: pnpm --filter @stock-charts/client run lint
+
+      - name: Lint CSS
+        run: pnpm run lint:css
+
+      - name: Run client unit tests with coverage
+        run: pnpm --filter @stock-charts/client run test:coverage
 
       - name: Upload frontend coverage to Codecov
         if: always()
@@ -145,21 +182,56 @@ jobs:
           name: frontend-coverage
           fail_ci_if_error: false
 
-      - name: Upload coverage artifacts
-        if: github.event_name == 'pull_request' && always()
+      - name: Upload frontend coverage artifacts
+        if: github.event_name == 'pull_request' && (success() || failure())
         uses: actions/upload-artifact@v7
         with:
-          name: code-coverage-reports
-          path: |
-            client/coverage/
-            server/coverage/lcov.info
-            server/coverage/*.trx
+          name: frontend-coverage-report
+          path: client/coverage/
 
-      - name: Build site
+      - name: Build production site
         run: pnpm --filter @stock-charts/client run build.prod
+
+  test-e2e:
+    runs-on: ubuntu-latest
+    needs: [test-libraries, test-website]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build libraries
+        # Angular dev server (used by Playwright's webServer config) runs from
+        # source but needs the consumed library dist/ output to exist.
+        run: |
+          pnpm --filter @facioquo/chartjs-chart-financial run build
+          pnpm --filter @facioquo/indy-charts run build
 
       - name: Install Playwright Chromium
         run: pnpm --filter @stock-charts/playwright-tests exec playwright install --with-deps chromium
 
       - name: Run E2E tests
         run: pnpm run test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: tests/playwright/playwright-report/
+          retention-days: 3

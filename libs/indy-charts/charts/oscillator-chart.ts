@@ -16,8 +16,19 @@ import {
 } from "../config/types";
 
 export class OscillatorChart {
-  chart: Chart | undefined;
+  private _chart: Chart | undefined;
   private fullThresholdDatasets: IndicatorDataset[] = [];
+
+  /**
+   * Underlying Chart.js instance. Exposed read-only — assigning to this field
+   * is a TypeScript error. Read access (theme tweaks, dataset inspection) is
+   * supported. **Do not call `chart.destroy()` directly** — use
+   * {@link OscillatorChart.destroy} so library-level state (threshold dataset
+   * caches, legend annotations) is released alongside the Chart.js teardown.
+   */
+  get chart(): Chart | undefined {
+    return this._chart;
+  }
 
   constructor(
     private readonly ctx: CanvasRenderingContext2D | HTMLCanvasElement,
@@ -44,37 +55,37 @@ export class OscillatorChart {
     });
 
     // Create chart
-    if (this.chart) this.chart.destroy();
-    this.chart = new Chart(this.ctx, chartConfig);
+    if (this._chart) this._chart.destroy();
+    this._chart = new Chart(this.ctx, chartConfig);
 
     // Add legend (after scales are drawn)
-    this.chart.update("none");
+    this._chart.update("none");
     this.updateLegend(selection);
-    this.chart.update("none");
+    this._chart.update("none");
   }
 
   updateLegend(selection: IndicatorSelection): void {
-    if (!this.chart) return;
+    if (!this._chart) return;
 
-    if (!this.chart.scales["x"] || !this.chart.scales["y"]) return;
-    const xPos: ScaleValue = this.chart.scales["x"].min;
-    const yPos: ScaleValue = this.chart.scales["y"].max;
+    if (!this._chart.scales["x"] || !this._chart.scales["y"]) return;
+    const xPos: ScaleValue = this._chart.scales["x"].min;
+    const yPos: ScaleValue = this._chart.scales["y"].max;
 
     const annotation = commonLegendAnnotation(selection.label, xPos, yPos, 1, this.settings);
 
-    if (this.chart.options?.plugins?.annotation) {
-      this.chart.options.plugins.annotation.annotations = { annotation };
+    if (this._chart.options?.plugins?.annotation) {
+      this._chart.options.plugins.annotation.annotations = { annotation };
     }
   }
 
   updateTheme(settings: ChartSettings): void {
     this.settings = settings;
-    if (!this.chart) return;
+    if (!this._chart) return;
 
     // Preserve theme-specific runtime options from render() that must persist
     // across theme changes (tooltip filter for thresholds, y-axis suggested bounds)
     const newOptions = baseOscillatorOptions(settings);
-    const existingOptions = this.chart.options;
+    const existingOptions = this._chart.options;
 
     // Preserve tooltip filter (filters out threshold datasets from tooltips)
     if (existingOptions?.plugins?.tooltip?.filter && newOptions.plugins?.tooltip) {
@@ -92,8 +103,8 @@ export class OscillatorChart {
       newY.suggestedMax = existingY.suggestedMax;
     }
 
-    this.chart.options = newOptions;
-    this.chart.update("none");
+    this._chart.options = newOptions;
+    this._chart.update("none");
   }
 
   /**
@@ -106,12 +117,12 @@ export class OscillatorChart {
   ): void {
     // Slice threshold datasets (inserted before selection datasets in render)
     this.fullThresholdDatasets.forEach((fullDataset, i) => {
-      if (!this.chart?.data.datasets[i]) return;
+      if (!this._chart?.data.datasets[i]) return;
       if (fullDataset.data && Array.isArray(fullDataset.data)) {
-        this.chart.data.datasets[i].data = [...fullDataset.data.slice(startIndex)];
+        this._chart.data.datasets[i].data = [...fullDataset.data.slice(startIndex)];
       }
       if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
-        this.chart.data.datasets[i].backgroundColor = [
+        this._chart.data.datasets[i].backgroundColor = [
           ...(fullDataset.backgroundColor as string[]).slice(startIndex)
         ];
       }
@@ -150,28 +161,35 @@ export class OscillatorChart {
       }
     });
 
-    if (!this.chart) return;
+    if (!this._chart) return;
 
     // Two-pass update: first pass applies sliced data and recalculates scale
     // bounds; second pass renders the legend annotations (which read the fresh
     // scales from the first pass). Collapsing to one pass would leave
     // annotation positions stale.
-    this.chart.update("none");
+    this._chart.update("none");
     this.updateLegend(selection);
-    this.chart.update("none");
+    this._chart.update("none");
   }
 
   resize(): void {
-    if (!this.chart) return;
-    this.chart.resize();
-    this.chart.update("resize");
+    if (!this._chart) return;
+    this._chart.resize();
+    this._chart.update("resize");
   }
 
+  /**
+   * Tear down this OscillatorChart and its underlying Chart.js instance.
+   * Releases the cached threshold datasets and the Chart.js canvas binding.
+   * Always call this from your component's unmount hook — not
+   * `chart.destroy()`, which leaves library-level state orphaned.
+   */
   destroy(): void {
-    if (this.chart) {
-      this.chart.destroy();
-      this.chart = undefined;
+    if (this._chart) {
+      this._chart.destroy();
+      this._chart = undefined;
     }
+    this.fullThresholdDatasets = [];
   }
 
   private configureThresholds(

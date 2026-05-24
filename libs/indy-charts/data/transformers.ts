@@ -57,8 +57,13 @@ export function buildDataPoints(
     const rawValue: unknown = row[result.dataName];
     let yValue = typeof rawValue === "number" ? rawValue : undefined;
 
-    // apply candle pointers
-    if (yValue !== undefined && listing.category === CATEGORIES.CANDLESTICK_PATTERN) {
+    // apply candle pointers (CANDLESTICK_PATTERN rows include a `candle` field
+    // from the API; skip the styling if a fixture-supplied row omits it)
+    if (
+      yValue !== undefined &&
+      listing.category === CATEGORIES.CANDLESTICK_PATTERN &&
+      row.candle
+    ) {
       const rawMatch = row["match"];
       const matchValue = typeof rawMatch === "number" ? rawMatch : 0;
       const candleConfig = getCandlePointConfiguration(matchValue, row.candle);
@@ -74,16 +79,15 @@ export function buildDataPoints(
     if (typeof yValue !== "number") {
       yValue = NaN;
     }
-    const timestampSource = row.timestamp ?? row.date;
-    if (timestampSource == null) {
+    if (row.timestamp == null) {
       throw new Error(
-        `Indicator row missing both 'timestamp' and 'date' fields for "${result.dataName}"`
+        `Indicator row missing 'timestamp' field for "${result.dataName}"`
       );
     }
-    const x = new Date(timestampSource).valueOf();
+    const x = new Date(row.timestamp).valueOf();
     if (!Number.isFinite(x)) {
       throw new Error(
-        `Indicator row has invalid timestamp for "${result.dataName}": ${String(timestampSource)}`
+        `Indicator row has invalid timestamp for "${result.dataName}": ${String(row.timestamp)}`
       );
     }
     dataPoints.push({ x, y: yValue });

@@ -274,7 +274,13 @@ describe("ApiService", () => {
     req.flush(mockSelectionData);
   });
 
-  it("should fallback to empty selection data only when backend is unavailable", async () => {
+  it("should fallback to empty selection data when backend is transiently unavailable", async () => {
+    // Quotes/listings are still live in this path, so candlesticks are at live
+    // timestamps. Returning backup rows (2016-2019 dates) would diverge from
+    // those just as badly as the original today-dated trailing bars did, so
+    // the transient path keeps the empty-array contract and leaves the
+    // overlay's other live datasets to anchor the x-axis. `backupActive` is
+    // NOT armed here — that's reserved for quotes/listings fallbacks.
     const listing: IndicatorListing = {
       name: "Average Directional Index",
       uiid: "ADX",
@@ -304,6 +310,14 @@ describe("ApiService", () => {
     });
 
     await expect(result).resolves.toEqual([]);
+
+    // Subsequent indicator requests must still hit the live API — a transient
+    // indicator failure does NOT arm session-wide backup mode.
+    const followup = firstValueFrom(service.getSelectionData(selection, listing));
+    httpMock
+      .expectOne(request => request.url === `${env.api}/ADX/`)
+      .flush([{ timestamp: "2024-01-01", adx: 22 }]);
+    await expect(followup).resolves.toEqual([{ timestamp: "2024-01-01", adx: 22 }]);
   });
 
   it("should rethrow selection data contract failures instead of returning no data", async () => {
@@ -338,7 +352,7 @@ describe("ApiService", () => {
     await expect(result).rejects.toMatchObject({ status: 400 });
   });
 
-  it("returns empty selection data without an HTTP request after quotes fell back to backup", async () => {
+  it("returns timestamp-aligned backup rows without an HTTP request after quotes fell back to backup", async () => {
     // First call: getQuotes errors → triggers backup mode
     const quotes$ = firstValueFrom(service.getQuotes());
     const quotesReq = httpMock.expectOne(`${env.api}/quotes`);
@@ -349,8 +363,9 @@ describe("ApiService", () => {
     await quotes$;
 
     // Subsequent getSelectionData must NOT issue an HTTP request and must
-    // resolve to [] — this keeps overlay + oscillator behavior consistent
-    // when the live API is unavailable.
+    // resolve to rows aligned with backup quote timestamps. Anchoring the
+    // x-axis to the candlestick range keeps overlay/oscillator charts
+    // visually consistent when the live API is unavailable.
     const listing: IndicatorListing = {
       name: "Average Directional Index",
       uiid: "ADX",
@@ -372,11 +387,20 @@ describe("ApiService", () => {
       results: []
     };
 
-    await expect(firstValueFrom(service.getSelectionData(selection, listing))).resolves.toEqual([]);
+    const rows = (await firstValueFrom(service.getSelectionData(selection, listing))) as Array<{
+      timestamp: string;
+      candle: { timestamp: string };
+    }>;
+
+    const backup = backupQuotes as ApiQuote[];
+    expect(rows).toHaveLength(backup.length);
+    expect(rows[0].timestamp).toBe(backup[0].timestamp);
+    expect(rows[0].candle.timestamp).toBe(backup[0].timestamp);
+    expect(rows.at(-1)?.timestamp).toBe(backup.at(-1)?.timestamp);
     httpMock.expectNone(request => request.url === `${env.api}/ADX/`);
   });
 
-  it("returns empty selection data without an HTTP request after listings fell back to backup", async () => {
+  it("returns timestamp-aligned backup rows without an HTTP request after listings fell back to backup", async () => {
     const listings$ = firstValueFrom(service.getListings());
     const listingsReq = httpMock.expectOne(`${env.api}/indicators`);
     listingsReq.error(new ProgressEvent("Server error"), {
@@ -406,8 +430,62 @@ describe("ApiService", () => {
       results: []
     };
 
-    await expect(firstValueFrom(service.getSelectionData(selection, listing))).resolves.toEqual([]);
+    const rows = (await firstValueFrom(service.getSelectionData(selection, listing))) as Array<{
+      timestamp: string;
+    }>;
+
+    expect(rows.length).toBe((backupQuotes as ApiQuote[]).length);
     httpMock.expectNone(request => request.url === `${env.api}/RSI/`);
+  });
+
+  it("returns a fresh array reference from backup fallback so downstream mutation can't corrupt the cache", async () => {
+    // backupSelectionRows() memoizes its payload but must hand each caller a
+    // distinct array so an accidental sort/splice/pop downstream can't
+    // permanently scramble the rows for every subsequent request.
+    const quotes$ = firstValueFrom(service.getQuotes());
+    httpMock.expectOne(`${env.api}/quotes`).error(new ProgressEvent("Network error"), {
+      status: 0,
+      statusText: "Network Error"
+    });
+    await quotes$;
+
+    const listing: IndicatorListing = {
+      name: "Average Directional Index",
+      uiid: "ADX",
+      legendTemplate: "ADX([P1])",
+      endpoint: "/ADX/",
+      category: "trend",
+      chartType: "oscillator",
+      order: 0,
+      chartConfig: null,
+      parameters: [],
+      results: []
+    };
+    const selection: IndicatorSelection = {
+      ucid: "chart-1",
+      uiid: "ADX",
+      label: "ADX(14)",
+      chartType: "oscillator",
+      params: [],
+      results: []
+    };
+
+    const first = (await firstValueFrom(service.getSelectionData(selection, listing))) as Array<{
+      timestamp: string;
+    }>;
+    const second = (await firstValueFrom(service.getSelectionData(selection, listing))) as Array<{
+      timestamp: string;
+    }>;
+
+    expect(first).not.toBe(second);
+    expect(first).toEqual(second);
+
+    // Mutating the first reference must not bleed into the second call.
+    first.length = 0;
+    const third = (await firstValueFrom(service.getSelectionData(selection, listing))) as Array<{
+      timestamp: string;
+    }>;
+    expect(third.length).toBe((backupQuotes as ApiQuote[]).length);
   });
 
   it("re-arms live indicator fetches after a successful getQuotes response recovers the backend", async () => {
@@ -441,7 +519,10 @@ describe("ApiService", () => {
     await firstQuotes;
 
     // Sanity: indicator fetch is short-circuited while backup is armed
-    await expect(firstValueFrom(service.getSelectionData(selection, listing))).resolves.toEqual([]);
+    const armedRows = (await firstValueFrom(
+      service.getSelectionData(selection, listing)
+    )) as Array<{ timestamp: string }>;
+    expect(armedRows.length).toBe((backupQuotes as ApiQuote[]).length);
     httpMock.expectNone(request => request.url === `${env.api}/ADX/`);
 
     // Step 2: getQuotes succeeds → backup mode must clear

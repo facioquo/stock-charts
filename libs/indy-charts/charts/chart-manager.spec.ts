@@ -274,7 +274,7 @@ function makeSelection(listing: IndicatorListing, ucid: string): IndicatorSelect
 
 function makeIndicatorData(quotes: Quote[]): IndicatorDataRow[] {
   return quotes.map((q, index) => ({
-    timestamp: q.timestamp.toISOString(),
+    timestamp: new Date(q.timestamp).toISOString(),
     candle: q,
     sma: q.close * 0.99,
     rsi: 50 + (index % 10) // Deterministic value derived from index, not Math.random()
@@ -484,6 +484,19 @@ describe("ChartManager", () => {
       expect(mgr.selections).toHaveLength(1);
       expect(mgr.oscillators.size).toBe(0); // not yet — consumer calls createOscillator
     });
+
+    it("rejects the reserved 'overlay-main' ucid", () => {
+      // Internal _allProcessedDatasets cache keys both the overlay candlestick
+      // bundle (under "overlay-main") and per-selection indicator datasets
+      // (under selection.ucid). A collision would mis-cast candlestick data as
+      // indicator data inside applySlicedData. Guard at the displaySelection
+      // boundary so consumers learn about the conflict immediately.
+      const listing = makeOscillatorListing();
+      const colliding = makeSelection(listing, "overlay-main");
+      mgr.processSelectionData(colliding, listing, makeIndicatorData(makeQuotes(30)));
+
+      expect(() => mgr.displaySelection(colliding, listing)).toThrow(/reserved for internal use/);
+    });
   });
 
   // ----- createOscillator -----
@@ -511,6 +524,32 @@ describe("ChartManager", () => {
       expect(() => mgr.createOscillator(ctx, selection, listing)).toThrow(/not been registered/);
     });
 
+    it("throws when processSelectionData was skipped (regardless of windowing)", () => {
+      // Reaching createOscillator without populated processed datasets is a
+      // contract violation in every viewport state — failing only under a
+      // windowed overlay would produce works-on-desktop / throws-on-mobile
+      // ticket noise. Verify the throw fires both with and without a window.
+      const ctx = {} as CanvasRenderingContext2D;
+      const listing = makeOscillatorListing();
+
+      // Case 1: windowed overlay
+      mgr.initializeOverlay(ctx, makeQuotes(100), 50);
+      const windowedSel = makeSelection(listing, "osc-missing-windowed");
+      mgr.displaySelection(windowedSel, listing);
+      expect(() => mgr.createOscillator(ctx, windowedSel, listing)).toThrow(
+        /has no processed datasets/
+      );
+
+      // Case 2: no overlay at all (allQuotes empty → currentBarCount === 0)
+      const fresh = new ChartManager({ settings: defaultSettings });
+      const standaloneSel = makeSelection(listing, "osc-missing-standalone");
+      fresh.displaySelection(standaloneSel, listing);
+      expect(() => fresh.createOscillator(ctx, standaloneSel, listing)).toThrow(
+        /has no processed datasets/
+      );
+      fresh.destroy();
+    });
+
     it("destroys a previous oscillator for the same ucid", () => {
       const listing = makeOscillatorListing();
       const selection = makeSelection(listing, "osc-replace");
@@ -525,11 +564,10 @@ describe("ChartManager", () => {
       expect(mgr.oscillators.size).toBe(1);
     });
 
-    it("renders with full data and does not slice on initialization", () => {
-      // createOscillator always renders with the full dataset; subsequent
-      // setBarCount() calls handle viewport-aligned slicing. Consumers that
-      // need an initial viewport-aligned oscillator should pre-slice their
-      // quotes/rows before calling ChartManager (as the VitePress demo does).
+    it("renders with full data and does not slice when no overlay window is set", () => {
+      // Without an initialized overlay (allQuotes is empty), createOscillator
+      // renders with the full dataset and does not slice. Threshold datasets
+      // captured during render retain full history for future setBarCount() calls.
       const listing = makeOscillatorListing();
       const selection = makeSelection(listing, "osc-standalone");
       mgr.processSelectionData(selection, listing, makeIndicatorData(makeQuotes(30)));
@@ -540,20 +578,47 @@ describe("ChartManager", () => {
 
       // render must be called with full data so fullThresholdDatasets has all history
       expect(osc.render).toHaveBeenCalledWith(selection, listing);
-      // applySlicedData must NOT be called on initial create
+      // No overlay → no window to align to → no slice on init
       expect(osc.applySlicedData).not.toHaveBeenCalled();
     });
 
-    it("does not slice oscillator on initial create even when overlay is windowed", () => {
-      // With an overlay initialized to a smaller window, the oscillator still
-      // renders with full data on creation. Window alignment is the consumer's
-      // responsibility (pre-slice quotes) or happens later via setBarCount().
+    it("slices oscillator on initial create to align with a windowed overlay", () => {
+      // With an overlay initialized to a smaller window, createOscillator must
+      // immediately apply the current viewport slice so the new oscillator's
+      // x-axis matches the overlay from the first paint — fixing the race
+      // where oscillators created during/after a resize would otherwise span
+      // the full quote history.
       const ctx = {} as CanvasRenderingContext2D;
       const quotes = makeQuotes(100);
       mgr.initializeOverlay(ctx, quotes, 50); // allQuotes=100, currentBarCount=50
 
       const listing = makeOscillatorListing();
       const selection = makeSelection(listing, "osc-overlay-viewport");
+      mgr.processSelectionData(selection, listing, makeIndicatorData(quotes));
+      mgr.displaySelection(selection, listing);
+
+      const osc = mgr.createOscillator(ctx, selection, listing);
+
+      expect(osc.render).toHaveBeenCalledWith(selection, listing);
+      // startIndex = 100 - 50 = 50
+      expect(osc.applySlicedData).toHaveBeenCalledWith(selection, expect.any(Array), 50);
+      // Verify the cached datasets were passed (non-empty and same shape as the
+      // selection's results so a wrong-key regression on _allProcessedDatasets
+      // would fail this assertion, not just slip through expect.any(Array)).
+      const passedDatasets = vi.mocked(osc.applySlicedData).mock.calls[0][1];
+      expect(passedDatasets.length).toBe(selection.results.length);
+      expect(passedDatasets.every(ds => Array.isArray(ds.data) && ds.data.length > 0)).toBe(true);
+    });
+
+    it("does not slice on initial create when currentBarCount covers all quotes", () => {
+      // When the viewport already fits every quote, slicing would be a no-op
+      // and skipping it avoids an unnecessary chart.update pass.
+      const ctx = {} as CanvasRenderingContext2D;
+      const quotes = makeQuotes(50);
+      mgr.initializeOverlay(ctx, quotes, 50); // allQuotes=50, currentBarCount=50
+
+      const listing = makeOscillatorListing();
+      const selection = makeSelection(listing, "osc-full-window");
       mgr.processSelectionData(selection, listing, makeIndicatorData(quotes));
       mgr.displaySelection(selection, listing);
 

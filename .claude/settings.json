@@ -6,15 +6,12 @@
   },
   "permissions": {
     "allow": [
-      "Bash(python:*)",
-      "Bash(gh pr view:*)",
-      "Bash(gh pr diff:*)",
       "Bash(ncu *)",
       "Bash(npm *)",
       "Bash(pnpm *)",
       "Bash(ng *)"
     ],
-    "ask": ["Bash(git commit *)", "Bash(git push *)"],
+    "ask": [],
     "deny": []
   }
 }
