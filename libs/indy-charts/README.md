@@ -152,7 +152,7 @@ Use the global component from Markdown / templates. Each instance is self-contai
 | `ChartManager` | Lifecycle orchestrator for overlay + oscillator charts and viewport changes |
 | `OverlayChart`, `OscillatorChart` | Lower-level chart classes if you don't need `ChartManager` |
 | `createApiClient(config)` | Typed `fetch` client for `GET /quotes`, `GET /indicators`, indicator data |
-| `loadStaticQuotes`, `loadStaticIndicatorData` | Normalize bring-your-own quote and indicator arrays |
+| `loadStaticQuotes`, `loadStaticIndicatorData` | Accept bring-your-own `Quote[]` / `IndicatorDataRow[]` (timestamps as string or Date) |
 | `createDefaultSelection`, `applySelectionTokens`, `calculateOptimalBars` | Selection / viewport helpers |
 | `getThemeColors`, `baseOverlayConfig`, `baseOscillatorConfig` | Theme + config building blocks |
 | `setupIndyChartsForVue` (`/vue` subpath) | Vue 3 adapter that registers `<StockIndicatorChart>` globally |

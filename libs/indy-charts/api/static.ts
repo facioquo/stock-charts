@@ -6,8 +6,8 @@ import { type Quote, type IndicatorDataRow } from "../config/types";
  * (per the `Quote.timestamp: Date | string` contract) and returns a new
  * array with timestamps normalized to `Date` instances.
  */
-export function loadStaticQuotes(raw: Quote[]): Quote[] {
-  return raw.map((q, index) => ({
+export function loadStaticQuotes(quotes: Quote[]): Quote[] {
+  return quotes.map((q, index) => ({
     timestamp: normalizeTimestamp(q.timestamp, index),
     open: q.open,
     high: q.high,

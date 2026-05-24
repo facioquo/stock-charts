@@ -85,8 +85,8 @@
  * ### API
  * - `createApiClient(config)` - Create a lightweight `fetch`-based `ApiClient`
  * - `ApiClient` - Interface exposing `getQuotes`, `getListings`, `getSelectionData`
- * - `loadStaticQuotes(raw)` - Normalize string/Date timestamps in static quote data
- * - `loadStaticIndicatorData(rows)` - Pass through indicator rows for SSG/static use
+ * - `loadStaticQuotes(quotes)` - Accept `Quote[]` (string or Date timestamps), return `Quote[]` with timestamps as Date
+ * - `loadStaticIndicatorData(rows)` - Pass-through helper for `IndicatorDataRow[]`
  *
  * ## Performance Considerations
  *
