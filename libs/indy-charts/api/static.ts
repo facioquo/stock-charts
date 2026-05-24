@@ -1,25 +1,12 @@
 import { type Quote, type IndicatorDataRow } from "../config/types";
 
 /**
- * Raw input shape accepted by {@link loadStaticQuotes}. Timestamps may be
- * either ISO 8601 strings or `Date` instances; everything else is OHLCV
- * numbers. Use this when typing static fixture arrays for bring-your-own-data
- * pages so the fixture type and the loader signature stay in lockstep.
+ * Load static quote data synchronously (for VitePress SSG or build-time
+ * rendering). Accepts `Quote[]` with either ISO string or `Date` timestamps
+ * (per the `Quote.timestamp: Date | string` contract) and returns a new
+ * array with timestamps normalized to `Date` instances.
  */
-export interface RawQuote {
-  timestamp: string | Date;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-}
-
-/**
- * Load static quote data synchronously (for VitePress SSG or build-time rendering).
- * Accepts objects with ISO 8601 string or Date timestamps and normalizes them to Date objects.
- */
-export function loadStaticQuotes(raw: RawQuote[]): Quote[] {
+export function loadStaticQuotes(raw: Quote[]): Quote[] {
   return raw.map((q, index) => ({
     timestamp: normalizeTimestamp(q.timestamp, index),
     open: q.open,
@@ -30,7 +17,7 @@ export function loadStaticQuotes(raw: RawQuote[]): Quote[] {
   }));
 }
 
-function normalizeTimestamp(value: string | Date, index: number): Date {
+function normalizeTimestamp(value: Date | string, index: number): Date {
   if (value instanceof Date) {
     if (Number.isNaN(value.getTime())) {
       throw new Error(`Invalid timestamp at index ${index}: "${value.toString()}"`);
@@ -49,22 +36,11 @@ function parseTimestamp(value: string, index: number): Date {
 }
 
 /**
- * Raw input shape accepted by {@link loadStaticIndicatorData}. Each row
- * carries a timestamp (ISO string or `Date`) and an arbitrary set of
- * indicator result fields keyed by the indicator's `dataName`. The library
- * does not transform these rows — they pass through to chart datasets as-is.
+ * Load static indicator data synchronously (for VitePress SSG or build-time
+ * rendering). Pass-through helper — `IndicatorDataRow[]` rows are already in
+ * the shape downstream transformers expect (they handle the `timestamp` /
+ * deprecated `date` alias).
  */
-export interface RawIndicatorRow {
-  timestamp?: string | Date;
-  /** @deprecated Skender v2 field name — accepted for backward compatibility */
-  date?: string;
-  [key: string]: unknown;
-}
-
-/**
- * Load static indicator data synchronously (for VitePress SSG or build-time rendering).
- * Passes through data as-is since indicator results are already in the correct format.
- */
-export function loadStaticIndicatorData(data: RawIndicatorRow[]): IndicatorDataRow[] {
-  return data as unknown as IndicatorDataRow[];
+export function loadStaticIndicatorData(data: IndicatorDataRow[]): IndicatorDataRow[] {
+  return data;
 }

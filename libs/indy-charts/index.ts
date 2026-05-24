@@ -142,7 +142,7 @@ export type { ChartManagerConfig } from "./charts";
 
 // API client
 export { createApiClient, loadStaticQuotes, loadStaticIndicatorData } from "./api";
-export type { ApiClient, ApiClientConfig, RawIndicatorRow, RawQuote } from "./api";
+export type { ApiClient, ApiClientConfig } from "./api";
 
 // Selection and sizing helpers
 export { applySelectionTokens, calculateOptimalBars, createDefaultSelection } from "./helpers";

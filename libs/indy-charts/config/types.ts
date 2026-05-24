@@ -24,8 +24,16 @@ export type ExtendedChartDataset = IndicatorDataset & {
   pointBorderColor?: string[];
 };
 
+/**
+ * Single source of truth for an OHLCV bar, mirroring the
+ * Skender.Stock.Indicators .NET `Quote` model. `timestamp` accepts either a
+ * `Date` instance or an ISO 8601 string so the same type works for in-memory
+ * data, JSON fixtures, and wire responses without a parallel "raw" type.
+ * The library normalizes to `Date` at consumption sites that need date
+ * arithmetic (see `data/transformers.ts`).
+ */
 export interface Quote {
-  timestamp: Date;
+  timestamp: Date | string;
   open: number;
   high: number;
   low: number;
@@ -33,12 +41,20 @@ export interface Quote {
   volume: number;
 }
 
+/**
+ * Indicator data row as returned by the API or supplied as a static fixture.
+ * Carries a timestamp (`timestamp` for Skender v3+; `date` is the v2 alias
+ * preserved for backward compatibility) and an arbitrary set of indicator
+ * result fields keyed by `dataName`. `candle` is populated on wire responses
+ * and consumed only by the CANDLESTICK_PATTERN category; fixtures for other
+ * indicators may omit it.
+ */
 export interface IndicatorDataRow {
   /** Skender.Stock.Indicators v3+ field name */
-  timestamp?: string;
+  timestamp?: Date | string;
   /** @deprecated Skender v2 field name — accepted for backward compatibility */
   date?: string;
-  candle: Quote;
+  candle?: Quote;
   [key: string]: unknown; // For dynamic indicator result values
 }
 

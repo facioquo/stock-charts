@@ -57,8 +57,13 @@ export function buildDataPoints(
     const rawValue: unknown = row[result.dataName];
     let yValue = typeof rawValue === "number" ? rawValue : undefined;
 
-    // apply candle pointers
-    if (yValue !== undefined && listing.category === CATEGORIES.CANDLESTICK_PATTERN) {
+    // apply candle pointers (CANDLESTICK_PATTERN rows include a `candle` field
+    // from the API; skip the styling if a fixture-supplied row omits it)
+    if (
+      yValue !== undefined &&
+      listing.category === CATEGORIES.CANDLESTICK_PATTERN &&
+      row.candle
+    ) {
       const rawMatch = row["match"];
       const matchValue = typeof rawMatch === "number" ? rawMatch : 0;
       const candleConfig = getCandlePointConfiguration(matchValue, row.candle);

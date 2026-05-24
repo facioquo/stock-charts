@@ -274,7 +274,7 @@ function makeSelection(listing: IndicatorListing, ucid: string): IndicatorSelect
 
 function makeIndicatorData(quotes: Quote[]): IndicatorDataRow[] {
   return quotes.map((q, index) => ({
-    timestamp: q.timestamp.toISOString(),
+    timestamp: new Date(q.timestamp).toISOString(),
     candle: q,
     sma: q.close * 0.99,
     rsi: 50 + (index % 10) // Deterministic value derived from index, not Math.random()

@@ -1,10 +1,10 @@
 import {
+  type IndicatorDataRow,
   type IndicatorListing,
   type IndicatorParam,
   type IndicatorSelection,
   type Quote
 } from "../config/types";
-import { type RawIndicatorRow } from "./static";
 
 /**
  * Configuration for {@link createApiClient}.
@@ -77,7 +77,7 @@ export interface ApiClient {
   getSelectionData(
     selection: IndicatorSelection,
     listing: IndicatorListing
-  ): Promise<RawIndicatorRow[]>;
+  ): Promise<IndicatorDataRow[]>;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -201,7 +201,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
     async getSelectionData(
       selection: IndicatorSelection,
       listing: IndicatorListing
-    ): Promise<RawIndicatorRow[]> {
+    ): Promise<IndicatorDataRow[]> {
       const endpointUrl = new URL(listing.endpoint, baseUrl);
       selection.params.forEach((p: IndicatorParam) => {
         if (p.value != null) {
@@ -220,7 +220,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (!Array.isArray(body)) {
           throw new Error("Invalid selection data response: expected an array");
         }
-        return body as RawIndicatorRow[];
+        return body as IndicatorDataRow[];
       } catch (error) {
         onError?.("Error fetching selection data", error);
         throw error;

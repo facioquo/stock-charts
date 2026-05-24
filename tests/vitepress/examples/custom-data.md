@@ -12,7 +12,7 @@ Render a candlestick + volume chart **and** a technical indicator overlay direct
   <StaticChart />
 </ClientOnly>
 
-The chart above plots OHLC + volume from a hard-coded `RawQuote[]` array (normalized to `Quote[]` via `loadStaticQuotes`), with an EMA(20) line computed locally. Everything below ships in the page bundle — no network calls.
+The chart above plots OHLC + volume from a hard-coded `Quote[]` array (ISO string timestamps normalized to `Date` via `loadStaticQuotes`), with an EMA(20) line computed locally. Everything below ships in the page bundle — no network calls.
 
 ## How it works
 
@@ -20,13 +20,13 @@ The chart above plots OHLC + volume from a hard-coded `RawQuote[]` array (normal
 
 ```typescript
 import { OverlayChart, loadStaticQuotes } from "@facioquo/indy-charts";
-import type { Quote, RawQuote } from "@facioquo/indy-charts";
+import type { Quote } from "@facioquo/indy-charts";
 
-const rawQuotes: RawQuote[] = [
+// Quote.timestamp accepts ISO strings or Date instances.
+const quotes: Quote[] = loadStaticQuotes([
   { timestamp: "2025-01-02", open: 180.00, high: 182.50, low: 179.20, close: 181.80, volume: 38500000 },
   // ... more bars
-];
-const quotes: Quote[] = loadStaticQuotes(rawQuotes);
+]);
 
 const canvas = document.getElementById("my-canvas") as HTMLCanvasElement;
 const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: false });
@@ -97,16 +97,15 @@ import {
   OverlayChart,
   loadStaticQuotes,
   setupIndyCharts,
-  type Quote,
-  type RawQuote
+  type Quote
 } from "@facioquo/indy-charts";
 import type { ChartDataset, ScatterDataPoint } from "chart.js";
 
-const rawQuotes: RawQuote[] = [
+// Quote.timestamp accepts ISO strings or Date instances.
+const quotes: Quote[] = loadStaticQuotes([
   { timestamp: "2025-01-02", open: 180.00, high: 182.50, low: 179.20, close: 181.80, volume: 38500000 },
   // ... more bars
-];
-const quotes: Quote[] = loadStaticQuotes(rawQuotes);
+]);
 
 function computeEma(closes: number[], period: number): number[] {
   if (!Number.isInteger(period) || period <= 0) {
@@ -187,8 +186,8 @@ onBeforeUnmount(() => {
 
 ## Key points
 
-- **`RawQuote`**: input shape with ISO string (or `Date`) `timestamp` and numeric OHLCV fields — type your fixture arrays as `RawQuote[]`
-- **`loadStaticQuotes`**: converts `RawQuote[]` to `Quote[]` (normalizes timestamps to `Date` objects)
+- **`Quote`**: single OHLCV bar — `timestamp` accepts an ISO string or `Date` instance, the rest are numeric. Type your fixture arrays as `Quote[]`.
+- **`loadStaticQuotes`**: normalizes `Quote.timestamp` to a `Date` (no-op when already a Date)
 - **`OverlayChart`**: renders candlestick and volume directly onto a `<canvas>` element
 - **Custom indicators**: push your own `ChartDataset` onto `chart.data.datasets` after `render()`, then call `chart.update("none")`. Any Chart.js dataset shape works — line, dot, bar, etc.
 - **Theme sync**: re-create the chart on `document.documentElement` class changes to follow the page's dark / light mode automatically
