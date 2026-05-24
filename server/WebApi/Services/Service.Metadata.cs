@@ -2371,6 +2371,27 @@ public static class Metadata
                 ]
             },
 
+            // Volume Weighted Average Price (VWAP)
+            new IndicatorListing {
+                Name = "Volume Weighted Average Price (VWAP)",
+                Uiid = "VWAP",
+                LegendTemplate = "VWAP",
+                Endpoint = $"{baseUrl}/VWAP/",
+                Category = "moving-average",
+                ChartType = "overlay",
+                Parameters = [],
+                Results = [
+                    new() {
+                        DisplayName = "VWAP",
+                        TooltipTemplate = "VWAP",
+                        DataName = "vwap",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
             // Williams Alligator
             new IndicatorListing {
                 Name = "Williams Alligator",

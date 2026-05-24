@@ -208,6 +208,70 @@ public class MainEndpointsTests
         Assert.IsType<OkObjectResult>(result);
     }
 
+    [Fact]
+    public async Task GetVwap_WithValidQuotes_ReturnsOkResult()
+    {
+        // Arrange — generate enough quotes so TakeLast(limitLast) has a first element
+        var sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        var httpContext = new DefaultHttpContext();
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = httpContext
+        };
+
+        // Act
+        var result = await _controller.GetVwap();
+
+        // Assert
+        Assert.IsType<OkObjectResult>(result);
+        var okResult = (OkObjectResult)result;
+        Assert.NotNull(okResult.Value);
+    }
+
+    [Fact]
+    public async Task GetVwap_WithFewerThanLimitLastQuotes_ReturnsOkResult()
+    {
+        // Arrange — fewer quotes than the limitLast window; all should be visible
+        var sampleQuotes = GenerateSampleQuotes(50);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        var httpContext = new DefaultHttpContext();
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = httpContext
+        };
+
+        // Act
+        var result = await _controller.GetVwap();
+
+        // Assert
+        Assert.IsType<OkObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetVwap_WithEmptyQuotes_ReturnsOkEmptyResult()
+    {
+        // Arrange
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        var httpContext = new DefaultHttpContext();
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = httpContext
+        };
+
+        // Act — should not throw despite empty collection
+        var result = await _controller.GetVwap();
+
+        // Assert
+        Assert.IsType<OkObjectResult>(result);
+    }
+
     /// <summary>
     /// Helper to generate sample quote data for tests.
     /// </summary>
