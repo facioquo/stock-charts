@@ -235,3 +235,14 @@ jobs:
           name: playwright-report
           path: tests/playwright/playwright-report/
           retention-days: 3
+
+  lint-and-test:
+    runs-on: ubuntu-slim
+    needs: [test-backend, test-libraries, test-website, test-e2e]
+    if: always()
+    steps:
+      - name: Verify required jobs succeeded
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "One or more required jobs did not succeed."
+          exit 1
