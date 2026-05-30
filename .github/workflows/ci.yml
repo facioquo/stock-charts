@@ -237,7 +237,7 @@ jobs:
           retention-days: 3
 
   lint-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: [test-backend, test-libraries, test-website, test-e2e]
     if: always()
     steps:
