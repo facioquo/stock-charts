@@ -350,6 +350,13 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public Task<IActionResult> GetVortex(int lookbackPeriods)
         => Get(quotes => quotes.ToVortex(lookbackPeriods));
 
+    // VWAP anchors to the first candle of the visible window — the same
+    // limitLast slice every endpoint returns — so the line always begins at
+    // the leftmost visible candle instead of accumulating from the dataset
+    // origin (which detaches it from anything on screen). The empty-input
+    // guard avoids calling First() on an empty slice.
+    // Future: once intraday data is available, anchor per trading session
+    // (daily reset) rather than to the visible window.
     [HttpGet("VWAP")]
     public Task<IActionResult> GetVwap()
         => Get(quotes => quotes.Count == 0
