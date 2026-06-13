@@ -225,10 +225,19 @@ public class MainEndpointsTests
         // Act
         var result = await _controller.GetVwap();
 
-        // Assert
-        Assert.IsType<OkObjectResult>(result);
-        var okResult = (OkObjectResult)result;
-        Assert.NotNull(okResult.Value);
+        // Assert — anchor is the first of the last limitLast (120) quotes, so the
+        // sliced response carries exactly 120 results, every one with a computed
+        // (non-null) VWAP. A bare status-code check would let a regression that
+        // returns fewer rows or leaks pre-anchor nulls pass silently.
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var vwap = Assert.IsAssignableFrom<IEnumerable<VwapResult>>(okResult.Value).ToList();
+        Assert.Equal(120, vwap.Count);
+        Assert.All(vwap, r => Assert.NotNull(r.Vwap));
+        // Anchor contract: the line must begin at the first candle of the visible
+        // window. A regression that anchors at the dataset origin (the prior bug
+        // that stretched the shared x-axis and crushed every chart) would surface
+        // here as a mismatched first timestamp.
+        Assert.Equal(sampleQuotes.TakeLast(120).First().Timestamp, vwap.First().Timestamp);
     }
 
     [Fact]
@@ -248,8 +257,14 @@ public class MainEndpointsTests
         // Act
         var result = await _controller.GetVwap();
 
-        // Assert
-        Assert.IsType<OkObjectResult>(result);
+        // Assert — fewer quotes than the window means the anchor falls on the
+        // first quote, so all 50 rows are visible and every VWAP is computed.
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var vwap = Assert.IsAssignableFrom<IEnumerable<VwapResult>>(okResult.Value).ToList();
+        Assert.Equal(50, vwap.Count);
+        Assert.All(vwap, r => Assert.NotNull(r.Vwap));
+        // With fewer quotes than the window, the anchor falls on the very first quote.
+        Assert.Equal(sampleQuotes.First().Timestamp, vwap.First().Timestamp);
     }
 
     [Fact]
@@ -268,8 +283,10 @@ public class MainEndpointsTests
         // Act — should not throw despite empty collection
         var result = await _controller.GetVwap();
 
-        // Assert
-        Assert.IsType<OkObjectResult>(result);
+        // Assert — empty input is guarded before First(), yielding an empty 200.
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var vwap = Assert.IsAssignableFrom<IEnumerable<VwapResult>>(okResult.Value).ToList();
+        Assert.Empty(vwap);
     }
 
     /// <summary>
