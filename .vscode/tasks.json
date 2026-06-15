@@ -89,9 +89,13 @@
     },
     {
       "label": "Update: Angular packages (client)",
-      "detail": "Update dependencies using Angular CLI for the client website.",
+      "detail": "Update Angular dependencies (uses ncu + pnpm install due to ng update incompatibility with pnpm workspaces)",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run ng -- update @angular/cli @angular/core @angular/material angular-eslint --allow-dirty"
+      "command": "cd client && npx npm-check-updates '@angular/*' angular-eslint typescript --upgrade && cd .. && pnpm install",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
     },
     {
       "label": "Update: Node packages",
