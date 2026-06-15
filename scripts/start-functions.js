@@ -75,17 +75,16 @@ function spawnFuncDirect() {
 }
 
 /**
- * Windows fallback: .cmd files need cmd.exe to run; use an explicit cmd.exe invocation
- * instead of shell:true so the command string is never interpreted by a shell.
- * On Windows, use shell:true with a single string command to let the system find func.cmd properly.
+ * Windows fallback: .cmd files need cmd.exe to run; use cmd.exe explicitly with /c flag
+ * and pass arguments as an array to avoid shell injection and deprecation warnings.
+ * This is more secure than shell:true while still supporting Windows .cmd files.
  */
 function spawnFuncViaCmd() {
   try {
-    // Use shell:true with command as a single string to avoid DEP0190 deprecation warning
-    return spawn("func start", {
+    return spawn("cmd.exe", ["/c", "func", "start"], {
       cwd: functionsDir,
       stdio: "inherit",
-      shell: true
+      shell: false
     });
   } catch (err) {
     return { syncError: err };
