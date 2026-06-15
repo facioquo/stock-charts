@@ -89,9 +89,13 @@
     },
     {
       "label": "Update: Angular packages (client)",
-      "detail": "Update dependencies using Angular CLI for the client website.",
+      "detail": "Update Angular dependencies with migrations (captures current version, updates packages, runs migrations)",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run ng -- update @angular/cli @angular/core @angular/material angular-eslint --allow-dirty"
+      "command": "cd client && OLD_NG=$(node -p \"require('./package.json').dependencies['@angular/core'].replace(/[~^]/, '')\") && npx npm-check-updates '@angular/*' angular-eslint typescript --upgrade && cd .. && pnpm install && cd client && ng update @angular/core --migrate-only --from=$OLD_NG --allow-dirty",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
     },
     {
       "label": "Update: Node packages",

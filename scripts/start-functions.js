@@ -75,8 +75,9 @@ function spawnFuncDirect() {
 }
 
 /**
- * Windows fallback: .cmd files need cmd.exe to run; use an explicit cmd.exe invocation
- * instead of shell:true so the command string is never interpreted by a shell.
+ * Windows fallback: .cmd files need cmd.exe to run; use cmd.exe explicitly with /c flag
+ * and pass arguments as an array to avoid shell injection and deprecation warnings.
+ * This is more secure than shell:true while still supporting Windows .cmd files.
  */
 function spawnFuncViaCmd() {
   try {
@@ -103,19 +104,18 @@ function spawnNpxFallback() {
   }
 }
 
-let funcProcess = spawnFuncDirect();
+let funcProcess;
 
-if (funcProcess && funcProcess.syncError) {
-  // On Windows, .cmd wrappers require cmd.exe; retry with explicit cmd.exe invocation.
-  if (process.platform === "win32") {
-    console.warn(`Direct spawn failed (${funcProcess.syncError.code}). Retrying via cmd.exe...`);
-    funcProcess = spawnFuncViaCmd();
-  }
+// On Windows, .cmd files need cmd.exe; skip direct spawn and use cmd.exe immediately
+if (process.platform === "win32") {
+  funcProcess = spawnFuncViaCmd();
+} else {
+  funcProcess = spawnFuncDirect();
 }
 
 if (funcProcess && funcProcess.syncError) {
   // Try npx fallback to run Azure Functions Core Tools if available via npm.
-  console.warn("Shell fallback failed. Trying 'npx azure-functions-core-tools@4' as a fallback...");
+  console.warn("Spawn failed. Trying 'npx azure-functions-core-tools@4' as a fallback...");
   funcProcess = spawnNpxFallback();
 }
 
