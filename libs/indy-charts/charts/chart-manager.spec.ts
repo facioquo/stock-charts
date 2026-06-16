@@ -422,6 +422,59 @@ describe("ChartManager", () => {
       expect(selection.results[0].dataset.data.length).toBeGreaterThan(0);
     });
 
+    it("colors histogram bars per the <dataName>IsExpanding flags", () => {
+      // Gator-style oscillator: two bar histograms whose color encodes whether
+      // each bar is expanding (green) or contracting (red), per the standard
+      // depiction — not a single static color per series.
+      const listing = makeOscillatorListing({
+        uiid: "GATOR",
+        category: "price-trend",
+        chartConfig: null,
+        parameters: [],
+        results: [
+          {
+            dataName: "upper",
+            displayName: "Upper",
+            tooltipTemplate: "Upper",
+            defaultColor: "#2E7D32",
+            lineType: "bar",
+            lineWidth: 2,
+            dataType: "number",
+            stack: "gator",
+            order: 1
+          },
+          {
+            dataName: "lower",
+            displayName: "Lower",
+            tooltipTemplate: "Lower",
+            defaultColor: "#DD2C00",
+            lineType: "bar",
+            lineWidth: 2,
+            dataType: "number",
+            stack: "gator",
+            order: 2
+          }
+        ]
+      });
+      const selection = makeSelection(listing, "gator-1");
+      const quotes = makeQuotes(4);
+      const data: IndicatorDataRow[] = quotes.map((q, i) => ({
+        timestamp: new Date(q.timestamp).toISOString(),
+        upper: 5 + i,
+        lower: -(5 + i),
+        upperIsExpanding: i % 2 === 0,
+        lowerIsExpanding: i % 2 === 1
+      }));
+
+      mgr.processSelectionData(selection, listing, data);
+
+      const upperBg = selection.results[0].dataset.backgroundColor as string[];
+      const lowerBg = selection.results[1].dataset.backgroundColor as string[];
+      expect(selection.results[0].dataset.type).toBe("bar");
+      expect(upperBg.slice(0, 4)).toEqual(["#2E7D32", "#DD2C00", "#2E7D32", "#DD2C00"]);
+      expect(lowerBg.slice(0, 4)).toEqual(["#DD2C00", "#2E7D32", "#DD2C00", "#2E7D32"]);
+    });
+
     it("stores a deep copy for later resizing", () => {
       const listing = makeOverlayListing();
       const selection = makeSelection(listing, "sel-2");

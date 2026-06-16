@@ -48,10 +48,12 @@ export function buildDataPoints(
   dataPoints: ScatterDataPoint[];
   pointColor: string[];
   pointRotation: number[];
+  hasConditionalColor: boolean;
 } {
   const dataPoints: ScatterDataPoint[] = [];
   const pointColor: string[] = [];
   const pointRotation: number[] = [];
+  let hasConditionalColor = false;
 
   data.forEach(row => {
     const rawValue: unknown = row[result.dataName];
@@ -66,9 +68,20 @@ export function buildDataPoints(
       yValue = candleConfig.yValue;
       pointColor.push(candleConfig.color);
       pointRotation.push(candleConfig.rotation);
+      hasConditionalColor = true;
     } else {
-      const resultConfig = listing.results.find(x => x.dataName === result.dataName);
-      pointColor.push(resultConfig?.defaultColor ?? COLORS.GRAY);
+      // expanding/contracting series (e.g. the Gator Oscillator) carry a
+      // companion `<dataName>IsExpanding` boolean per row; color each bar green
+      // while the histogram is widening and red while it is narrowing — the
+      // standard depiction — rather than a single static series color.
+      const expandingColor = resolveExpandingColor(row, result.dataName);
+      if (expandingColor) {
+        pointColor.push(expandingColor);
+        hasConditionalColor = true;
+      } else {
+        const resultConfig = listing.results.find(x => x.dataName === result.dataName);
+        pointColor.push(resultConfig?.defaultColor ?? COLORS.GRAY);
+      }
       pointRotation.push(0);
     }
 
@@ -87,7 +100,22 @@ export function buildDataPoints(
     dataPoints.push({ x, y: yValue });
   });
 
-  return { dataPoints, pointColor, pointRotation };
+  return { dataPoints, pointColor, pointRotation, hasConditionalColor };
+}
+
+/**
+ * Resolve the per-bar color for an expanding/contracting histogram series.
+ *
+ * Series such as the Gator Oscillator expose a `<dataName>IsExpanding` boolean
+ * alongside each value (e.g. `upper` → `upperIsExpanding`). When present, the
+ * bar is green while the value is growing and red while it is shrinking.
+ * Returns `undefined` for series without the companion flag so callers fall
+ * back to the configured static color.
+ */
+function resolveExpandingColor(row: IndicatorDataRow, dataName: string): string | undefined {
+  const flag = row[`${dataName}IsExpanding`];
+  if (typeof flag !== "boolean") return undefined;
+  return flag ? COLORS.GREEN : COLORS.RED;
 }
 
 export function addExtraBars(dataPoints: ScatterDataPoint[], extraBars: number): void {

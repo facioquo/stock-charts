@@ -24,10 +24,6 @@ const CHART_TYPES = {
   OSCILLATOR: "oscillator"
 } as const;
 
-const CATEGORIES = {
-  CANDLESTICK_PATTERN: "candlestick-pattern"
-} as const;
-
 /**
  * Reserved cache key for the overlay's candlestick + volume datasets in
  * `_allProcessedDatasets`. No `IndicatorSelection.ucid` may collide with this
@@ -144,14 +140,25 @@ export class ChartManager {
       if (!resultConfig) return;
 
       const dataset = baseDataset(result, resultConfig);
-      const { dataPoints, pointColor, pointRotation } = buildDataPoints(data, result, listing);
+      const { dataPoints, pointColor, pointRotation, hasConditionalColor } = buildDataPoints(
+        data,
+        result,
+        listing
+      );
       addExtraBars(dataPoints, this.extraBars);
 
-      if (listing.category === CATEGORIES.CANDLESTICK_PATTERN && dataset.type !== "bar") {
+      // Per-point coloring: candlestick-pattern markers and expanding/contracting
+      // histograms (e.g. Gator) vary color per row. Bars apply it via
+      // `backgroundColor`; point/line series via the point color arrays.
+      if (hasConditionalColor) {
         const ext = dataset as ExtendedChartDataset;
-        ext.pointRotation = pointRotation;
-        ext.pointBackgroundColor = pointColor;
-        ext.pointBorderColor = pointColor;
+        if (dataset.type === "bar") {
+          ext.backgroundColor = pointColor;
+        } else {
+          ext.pointRotation = pointRotation;
+          ext.pointBackgroundColor = pointColor;
+          ext.pointBorderColor = pointColor;
+        }
       }
 
       dataset.data = dataPoints;
