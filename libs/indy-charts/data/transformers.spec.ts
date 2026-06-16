@@ -367,6 +367,58 @@ describe("buildDataPoints", () => {
       /Indicator row has invalid timestamp for "sma": not-a-date/
     );
   });
+
+  // Segmented level lines (e.g. weekly Pivot Points): the value is flat within
+  // a window and steps at each boundary. The first point of every new window is
+  // replaced with NaN so Chart.js breaks the line, rendering one horizontal
+  // segment per window. Replacing (not inserting) keeps the data index-aligned.
+  it("breaks segmented level lines at each window boundary", () => {
+    // two flat windows (10, then 20) — boundary at the first 20.
+    const data: IndicatorDataRow[] = [
+      makeRow("2024-01-01", { pp: 10 }),
+      makeRow("2024-01-02", { pp: 10 }),
+      makeRow("2024-01-03", { pp: 20 }),
+      makeRow("2024-01-04", { pp: 20 })
+    ];
+    const result = makeResult({ dataName: "pp" });
+    const listing = makeListing({
+      results: [
+        {
+          displayName: "Pivot Point",
+          tooltipTemplate: "",
+          dataName: "pp",
+          dataType: "number",
+          lineType: "solid",
+          segmented: true,
+          stack: "",
+          lineWidth: 2,
+          defaultColor: "#FF0000",
+          order: 0
+        }
+      ]
+    });
+
+    const { dataPoints } = buildDataPoints(data, result, listing);
+    const ys = dataPoints.map(p => p.y);
+
+    expect(ys[0]).toBe(10); // first window kept whole
+    expect(ys[1]).toBe(10);
+    expect(Number.isNaN(ys[2])).toBe(true); // boundary point nulled to break line
+    expect(ys[3]).toBe(20); // remainder of the new window
+  });
+
+  it("does not break ordinary (non-segmented) lines when values change", () => {
+    const data: IndicatorDataRow[] = [
+      makeRow("2024-01-01", { sma: 10 }),
+      makeRow("2024-01-02", { sma: 20 })
+    ];
+    const result = makeResult({ dataName: "sma" });
+    const listing = makeListing(); // segmented not set
+
+    const { dataPoints } = buildDataPoints(data, result, listing);
+
+    expect(dataPoints.map(p => p.y)).toEqual([10, 20]);
+  });
 });
 
 // ---------------------------------------------------------------------------

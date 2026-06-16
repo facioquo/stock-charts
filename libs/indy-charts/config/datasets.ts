@@ -1,4 +1,4 @@
-import { type ScatterDataPoint, type ScriptableLineSegmentContext } from "chart.js";
+import { type ScatterDataPoint } from "chart.js";
 
 import {
   type ChartThreshold,
@@ -8,24 +8,6 @@ import {
 } from "./types";
 
 const THRESHOLD_ORDER_OFFSET = 100;
-
-/**
- * Per-segment styling for piecewise-constant level lines (e.g. weekly Pivot
- * Points). The value is flat within a window and steps at each window boundary;
- * painting the boundary segment transparent leaves one visible horizontal
- * segment per window — matching the reference rendering — without inserting gap
- * points that would break the 1:1 timestamp alignment overlay windowing relies
- * on. Adjacent points share a value within a window (visible) and differ only
- * across a boundary (hidden).
- */
-function segmentLevelLine(color: string): {
-  borderColor: (ctx: ScriptableLineSegmentContext) => string;
-} {
-  return {
-    borderColor: (ctx: ScriptableLineSegmentContext): string =>
-      ctx.p0.parsed.y === ctx.p1.parsed.y ? color : "transparent"
-  };
-}
 
 export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): IndicatorDataset {
   switch (r.lineType) {
@@ -39,7 +21,6 @@ export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): Indic
         borderWidth: r.lineWidth,
         borderColor: r.color,
         backgroundColor: r.color,
-        ...(c.segmented ? { segment: segmentLevelLine(r.color) } : {}),
         fill:
           c.fill == null
             ? false
@@ -64,7 +45,6 @@ export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): Indic
         borderDash: [3, 2],
         borderColor: r.color,
         backgroundColor: r.color,
-        ...(c.segmented ? { segment: segmentLevelLine(r.color) } : {}),
         order: r.order
       };
       return dashDataset;
