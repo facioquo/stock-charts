@@ -16,7 +16,8 @@ if (!pnpmCli) {
 function runPnpm(args, cwd = workspaceRoot) {
   // pnpm may be a native binary (e.g. @pnpm/exe) rather than a JS wrapper.
   // Run it directly in that case; otherwise invoke it via Node.js.
-  const isJsWrapper = pnpmCli.endsWith(".js") || pnpmCli.endsWith(".cjs");
+  const isJsWrapper =
+    pnpmCli.endsWith(".js") || pnpmCli.endsWith(".cjs") || pnpmCli.endsWith(".mjs");
   const cmd = isJsWrapper ? process.execPath : pnpmCli;
   const cmdArgs = isJsWrapper ? [pnpmCli, ...args] : args;
   const result = spawnSync(cmd, cmdArgs, {
@@ -29,9 +30,7 @@ function runPnpm(args, cwd = workspaceRoot) {
   }
 
   if (result.status !== 0) {
-    throw new Error(
-      `pnpm ${args.join(" ")} failed with exit code ${result.status ?? "unknown"}`
-    );
+    throw new Error(`pnpm ${args.join(" ")} failed with exit code ${result.status ?? "unknown"}`);
   }
 }
 
@@ -76,7 +75,7 @@ try {
           "chartjs-plugin-annotation": "3.1.0",
           vitepress: "2.0.0-alpha.16",
           vue: "3.5.33"
-        },
+        }
       },
       null,
       2
