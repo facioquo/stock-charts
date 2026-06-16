@@ -65,11 +65,16 @@ function registryConfig(
   return indicator ? registry[indicator] : undefined;
 }
 
-/** Normalize the `with` prop/config value to a list of non-empty indicator names. */
+/**
+ * Normalize the `with` prop/config value to a de-duplicated list of non-empty
+ * indicator names. Duplicates are dropped so the same companion is not fetched
+ * and rendered twice.
+ */
 function normalizeWithList(value: string | string[] | undefined): string[] {
   if (value == null) return [];
   const list = Array.isArray(value) ? value : [value];
-  return list.map(name => name.trim()).filter(name => name.length > 0);
+  const trimmed = list.map(name => name.trim()).filter(name => name.length > 0);
+  return [...new Set(trimmed)];
 }
 
 function isAuthorFacingError(error: unknown): error is Error {
@@ -214,13 +219,18 @@ export const StockIndicatorChart = defineComponent({
         { config: primary, name: props.indicator ?? options.defaults?.indicator ?? "chart" }
       ];
 
+      // Track resolved uiids (case-insensitive) so a companion that duplicates
+      // the primary — or another companion — is not fetched and rendered twice.
+      const seenUiids = new Set<string>();
+      if (primary.uiid) seenUiids.add(primary.uiid.toLowerCase());
+
       const companions = normalizeWithList(props.with ?? props.config.with);
       for (const name of companions) {
         const registered = registryConfig(options, name) ?? {};
-        indicators.push({
-          config: { ...registered, uiid: registered.uiid ?? name },
-          name
-        });
+        const uiid = registered.uiid ?? name;
+        if (seenUiids.has(uiid.toLowerCase())) continue;
+        seenUiids.add(uiid.toLowerCase());
+        indicators.push({ config: { ...registered, uiid }, name });
       }
 
       return indicators;
@@ -286,40 +296,46 @@ export const StockIndicatorChart = defineComponent({
           return;
         }
 
-        const prepared: PreparedIndicator[] = [];
-        for (const indicator of indicators) {
-          const uiid = indicator.config.uiid;
-          if (!uiid) {
-            throw new Error("A chart indicator or config.uiid is required.");
-          }
+        // Load every indicator's selection data concurrently. Promise.all
+        // preserves order, so the primary stays first and oscillator panes keep
+        // a deterministic order. A rejected fetch (e.g. an unknown listing)
+        // surfaces through the outer try/catch as the error state.
+        const results = await Promise.all(
+          indicators.map(async (indicator): Promise<PreparedIndicator | null> => {
+            const uiid = indicator.config.uiid;
+            if (!uiid) {
+              throw new Error("A chart indicator or config.uiid is required.");
+            }
 
-          const listing = findListing(listings, uiid);
-          if (!listing) {
-            throw new Error(`Indicator listing not found for uiid "${uiid}".`);
-          }
+            const listing = findListing(listings, uiid);
+            if (!listing) {
+              throw new Error(`Indicator listing not found for uiid "${uiid}".`);
+            }
 
-          const selection = buildSelection(indicator.config, listing);
-          const rows = loadStaticIndicatorData(await client.getSelectionData(selection, listing));
-          if (disposed || token !== loadToken) return;
+            const selection = buildSelection(indicator.config, listing);
+            const rows = loadStaticIndicatorData(await client.getSelectionData(selection, listing));
 
-          const chartRows = rows.slice(-chartQuotes.length);
-          if (chartRows.length === 0) {
-            // A companion with no data is skipped so the rest of the chart still
-            // renders; an empty primary collapses the chart to the empty state.
-            console.warn(
-              `[indy-charts] No data returned for indicator "${indicator.name}" (uiid "${uiid}").`
-            );
-            continue;
-          }
+            const chartRows = rows.slice(-chartQuotes.length);
+            if (chartRows.length === 0) {
+              // A companion with no data is skipped so the rest of the chart
+              // still renders; an empty primary collapses to the empty state.
+              console.warn(
+                `[indy-charts] No data returned for indicator "${indicator.name}" (uiid "${uiid}").`
+              );
+              return null;
+            }
 
-          prepared.push({
-            selection,
-            listing,
-            chartRows,
-            isOscillator: listing.chartType === OSCILLATOR_CHART_TYPE
-          });
-        }
+            return {
+              selection,
+              listing,
+              chartRows,
+              isOscillator: listing.chartType === OSCILLATOR_CHART_TYPE
+            };
+          })
+        );
+        if (disposed || token !== loadToken) return;
 
+        const prepared = results.filter((item): item is PreparedIndicator => item !== null);
         if (prepared.length === 0) {
           phase.value = "empty";
           return;

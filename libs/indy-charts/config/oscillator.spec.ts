@@ -44,6 +44,17 @@ describe("baseOscillatorOptions", () => {
       expect(callback(1, 1, values)).not.toBeNull();
     });
 
+    it("drops the first and last labels at exactly the threshold (4 ticks)", () => {
+      const callback = yTickCallback();
+      const values = ticks(4);
+
+      expect(callback(0, 0, values)).toBeNull();
+      expect(callback(3, 3, values)).toBeNull();
+      // exactly two interior labels remain
+      expect(callback(1, 1, values)).not.toBeNull();
+      expect(callback(2, 2, values)).not.toBeNull();
+    });
+
     it("drops the first and last labels once enough gridlines exist", () => {
       const callback = yTickCallback();
       const values = ticks(6);

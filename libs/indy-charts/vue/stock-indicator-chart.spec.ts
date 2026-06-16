@@ -545,8 +545,35 @@ describe("StockIndicatorChart composition (with prop)", () => {
     });
 
     expect(findByTestId(root, "stock-indicator-chart-pctb-only-overlay-canvas")).toBeUndefined();
+    expect(managerSpies.instances).toHaveLength(1);
     const mgr = managerSpies.instances[0];
     expect(mgr.initializeOverlay).not.toHaveBeenCalled();
+    expect(mgr.createOscillator).toHaveBeenCalledTimes(1);
+
+    app.unmount();
+  });
+
+  it("de-duplicates a companion that repeats the primary indicator", async () => {
+    managerSpies.instances.length = 0;
+    vi.stubGlobal("fetch", bollingerFetch());
+
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, {
+      indicator: "bb",
+      with: ["bb", "bbPctB", "bbPctB"],
+      id: "bb-dedup"
+    });
+    app.provide(indyChartsVueOptionsKey, bollingerOptions);
+    app.mount(root);
+
+    await vi.waitFor(() => {
+      expect(findByTestId(root, "stock-indicator-chart-bb-dedup-oscillator-canvas")).toBeDefined();
+    });
+
+    expect(managerSpies.instances).toHaveLength(1);
+    const mgr = managerSpies.instances[0];
+    // BB (overlay) + %B (oscillator) only — duplicates collapse away.
+    expect(mgr.displaySelection).toHaveBeenCalledTimes(2);
     expect(mgr.createOscillator).toHaveBeenCalledTimes(1);
 
     app.unmount();
