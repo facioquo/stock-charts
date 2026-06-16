@@ -2819,7 +2819,7 @@ public static class Metadata
                         TooltipTemplate = "FORCE([P1])",
                         DataName = "forceIndex",
                         DataType = "number",
-                        LineType = "solid",
+                        LineType = "bar",
                         DefaultColor = ChartColors.StandardBlue
                     }
                 ]

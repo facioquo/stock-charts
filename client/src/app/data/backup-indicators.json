@@ -1549,7 +1549,7 @@
         "tooltipTemplate": "FORCE([P1])",
         "dataName": "forceIndex",
         "dataType": "number",
-        "lineType": "solid",
+        "lineType": "bar",
         "stack": null,
         "lineWidth": 2,
         "defaultColor": "#1E88E5",
