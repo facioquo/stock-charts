@@ -4087,7 +4087,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         Segmented = true,
-                        DefaultColor = ChartColors.StandardBlue
+                        DefaultColor = ChartColors.DarkGray
                     },
                     new() {
                         DisplayName = "S1",
