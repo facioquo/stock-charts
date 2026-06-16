@@ -194,6 +194,14 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public Task<IActionResult> GetGator()
         => Get(quotes => quotes.ToGator());
 
+    [HttpGet("HL2")]
+    public Task<IActionResult> GetHl2()
+        => Get(quotes => quotes.Use(CandlePart.HL2));
+
+    [HttpGet("HLC3")]
+    public Task<IActionResult> GetHlc3()
+        => Get(quotes => quotes.Use(CandlePart.HLC3));
+
     [HttpGet("HMA")]
     public Task<IActionResult> GetHma(int lookbackPeriods)
         => Get(quotes => quotes.ToHma(lookbackPeriods));
@@ -246,6 +254,26 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public Task<IActionResult> GetObv()
         => Get(quotes => quotes.ToObv());
 
+    [HttpGet("OC2")]
+    public Task<IActionResult> GetOc2()
+        => Get(quotes => quotes.Use(CandlePart.OC2));
+
+    [HttpGet("OHL3")]
+    public Task<IActionResult> GetOhl3()
+        => Get(quotes => quotes.Use(CandlePart.OHL3));
+
+    [HttpGet("OHLC4")]
+    public Task<IActionResult> GetOhlc4()
+        => Get(quotes => quotes.Use(CandlePart.OHLC4));
+
+    [HttpGet("PIVOT-POINTS")]
+    public Task<IActionResult> GetPivotPoints()
+        => Get(quotes => quotes.ToPivotPoints(PeriodSize.Week));
+
+    [HttpGet("PIVOTS")]
+    public Task<IActionResult> GetPivots(int leftSpan, int rightSpan, int maxTrendPeriods)
+        => Get(quotes => quotes.ToPivots(leftSpan, rightSpan, maxTrendPeriods));
+
     [HttpGet("PMO")]
     public Task<IActionResult> GetPmo(int timePeriods, int smoothPeriods, int signalPeriods)
         => Get(quotes => quotes.ToPmo(timePeriods, smoothPeriods, signalPeriods));
@@ -265,6 +293,10 @@ public class Main(IQuoteService quoteService) : ControllerBase
     [HttpGet("ROCWB")]
     public Task<IActionResult> GetRocWb(int lookbackPeriods, int emaPeriods, int stdDevPeriods)
         => Get(quotes => quotes.ToRocWb(lookbackPeriods, emaPeriods, stdDevPeriods));
+
+    [HttpGet("ROLLING-PIVOTS")]
+    public Task<IActionResult> GetRollingPivots(int windowPeriods, int offsetPeriods)
+        => Get(quotes => quotes.ToRollingPivots(windowPeriods, offsetPeriods));
 
     [HttpGet("RSI")]
     public Task<IActionResult> GetRsi(int lookbackPeriods)

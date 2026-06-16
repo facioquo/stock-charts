@@ -24,10 +24,6 @@ const CHART_TYPES = {
   OSCILLATOR: "oscillator"
 } as const;
 
-const CATEGORIES = {
-  CANDLESTICK_PATTERN: "candlestick-pattern"
-} as const;
-
 /**
  * Reserved cache key for the overlay's candlestick + volume datasets in
  * `_allProcessedDatasets`. No `IndicatorSelection.ucid` may collide with this
@@ -144,14 +140,25 @@ export class ChartManager {
       if (!resultConfig) return;
 
       const dataset = baseDataset(result, resultConfig);
-      const { dataPoints, pointColor, pointRotation } = buildDataPoints(data, result, listing);
+      const { dataPoints, pointColor, pointRotation, hasConditionalColor } = buildDataPoints(
+        data,
+        result,
+        listing
+      );
       addExtraBars(dataPoints, this.extraBars);
 
-      if (listing.category === CATEGORIES.CANDLESTICK_PATTERN && dataset.type !== "bar") {
+      // Per-point coloring: candlestick-pattern markers and expanding/contracting
+      // histograms (e.g. Gator) vary color per row. Bars apply it via
+      // `backgroundColor`; point/line series via the point color arrays.
+      if (hasConditionalColor) {
         const ext = dataset as ExtendedChartDataset;
-        ext.pointRotation = pointRotation;
-        ext.pointBackgroundColor = pointColor;
-        ext.pointBorderColor = pointColor;
+        if (dataset.type === "bar") {
+          ext.backgroundColor = pointColor;
+        } else {
+          ext.pointRotation = pointRotation;
+          ext.pointBackgroundColor = pointColor;
+          ext.pointBorderColor = pointColor;
+        }
       }
 
       dataset.data = dataPoints;
@@ -199,8 +206,8 @@ export class ChartManager {
     if (!this._overlayChart) return;
 
     // Slice indicator datasets to currentBarCount before adding to the windowed chart.
-    // Also slice style arrays (pointBackgroundColor, pointBorderColor, pointRotation)
-    // to keep them synchronized with the data length.
+    // Also slice style arrays (pointBackgroundColor, pointBorderColor, pointRotation,
+    // and bar backgroundColor) to keep them synchronized with the data length.
     const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
     if (fullDatasets) {
       const startIndex = Math.max(0, this._allQuotes.length - this._currentBarCount);
@@ -222,6 +229,12 @@ export class ChartManager {
           }
           if (Array.isArray(full.pointRotation)) {
             ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex)];
+          }
+          // Bar histograms (e.g. expanding/contracting series) carry a per-bar
+          // backgroundColor array; slice it alongside the data so colors stay
+          // aligned with the visible window.
+          if (Array.isArray(full.backgroundColor)) {
+            ext.backgroundColor = [...(full.backgroundColor as string[]).slice(startIndex)];
           }
         }
       });
@@ -372,8 +385,8 @@ export class ChartManager {
     // Update overlay indicator datasets to stay aligned with the windowed x-axis.
     // Mirror the oscillator loop below but for OVERLAY selections: retrieve each
     // indicator's full dataset from allProcessedDatasets and slice to startIndex.
-    // Also slice style arrays (pointBackgroundColor, pointBorderColor, pointRotation)
-    // to keep them synchronized with the data length.
+    // Also slice style arrays (pointBackgroundColor, pointBorderColor, pointRotation,
+    // and bar backgroundColor) to keep them synchronized with the data length.
     let overlayIndicatorsUpdated = false;
     this._selections.forEach(selection => {
       if (selection.chartType !== CHART_TYPES.OVERLAY) return;
@@ -396,6 +409,12 @@ export class ChartManager {
           }
           if (Array.isArray(full.pointRotation)) {
             ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex)];
+          }
+          // Bar histograms (e.g. expanding/contracting series) carry a per-bar
+          // backgroundColor array; slice it alongside the data so colors stay
+          // aligned with the visible window.
+          if (Array.isArray(full.backgroundColor)) {
+            ext.backgroundColor = [...(full.backgroundColor as string[]).slice(startIndex)];
           }
         }
       });

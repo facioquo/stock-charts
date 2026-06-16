@@ -277,6 +277,75 @@ describe("buildDataPoints", () => {
     expect(pointRotation[0]).toBe(0);
   });
 
+  // Expanding/contracting histogram tests (e.g. Gator Oscillator)
+
+  it("colors expanding histogram bars green and contracting bars red", () => {
+    const data: IndicatorDataRow[] = [
+      { timestamp: "2024-01-01", upper: 5, upperIsExpanding: true },
+      { timestamp: "2024-01-02", upper: 3, upperIsExpanding: false }
+    ];
+    const result = makeResult({ dataName: "upper" });
+    const listing = makeListing({
+      category: "price-trend",
+      results: [
+        {
+          displayName: "Upper",
+          tooltipTemplate: "",
+          dataName: "upper",
+          dataType: "number",
+          lineType: "bar",
+          stack: "gator",
+          lineWidth: 2,
+          defaultColor: "#000000",
+          order: 0
+        }
+      ]
+    });
+
+    const { pointColor, hasConditionalColor } = buildDataPoints(data, result, listing);
+
+    expect(hasConditionalColor).toBe(true);
+    expect(pointColor[0]).toBe("#2E7D32"); // COLORS.GREEN (expanding)
+    expect(pointColor[1]).toBe("#DD2C00"); // COLORS.RED (contracting)
+  });
+
+  it("uses the static color and flags no conditional color without an expanding field", () => {
+    const data = [makeRow("2024-01-01", { sma: 50 })];
+    const result = makeResult({ dataName: "sma" });
+    const listing = makeListing({ category: "overlay" });
+
+    const { pointColor, hasConditionalColor } = buildDataPoints(data, result, listing);
+
+    expect(hasConditionalColor).toBe(false);
+    expect(pointColor[0]).toBe("#FF0000"); // listing result defaultColor
+  });
+
+  it("ignores a non-boolean expanding field and falls back to the static color", () => {
+    const data: IndicatorDataRow[] = [{ timestamp: "2024-01-01", upper: 5, upperIsExpanding: 1 }];
+    const result = makeResult({ dataName: "upper" });
+    const listing = makeListing({
+      category: "price-trend",
+      results: [
+        {
+          displayName: "Upper",
+          tooltipTemplate: "",
+          dataName: "upper",
+          dataType: "number",
+          lineType: "bar",
+          stack: "gator",
+          lineWidth: 2,
+          defaultColor: "#123456",
+          order: 0
+        }
+      ]
+    });
+
+    const { pointColor, hasConditionalColor } = buildDataPoints(data, result, listing);
+
+    expect(hasConditionalColor).toBe(false);
+    expect(pointColor[0]).toBe("#123456");
+  });
+
   it("throws when a row is missing `timestamp`", () => {
     const data: IndicatorDataRow[] = [{ candle: makeQuote("2024-01-01"), sma: 50 }];
     const result = makeResult({ dataName: "sma" });

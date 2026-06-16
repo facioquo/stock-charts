@@ -422,6 +422,59 @@ describe("ChartManager", () => {
       expect(selection.results[0].dataset.data.length).toBeGreaterThan(0);
     });
 
+    it("colors histogram bars per the <dataName>IsExpanding flags", () => {
+      // Gator-style oscillator: two bar histograms whose color encodes whether
+      // each bar is expanding (green) or contracting (red), per the standard
+      // depiction — not a single static color per series.
+      const listing = makeOscillatorListing({
+        uiid: "GATOR",
+        category: "price-trend",
+        chartConfig: null,
+        parameters: [],
+        results: [
+          {
+            dataName: "upper",
+            displayName: "Upper",
+            tooltipTemplate: "Upper",
+            defaultColor: "#2E7D32",
+            lineType: "bar",
+            lineWidth: 2,
+            dataType: "number",
+            stack: "gator",
+            order: 1
+          },
+          {
+            dataName: "lower",
+            displayName: "Lower",
+            tooltipTemplate: "Lower",
+            defaultColor: "#DD2C00",
+            lineType: "bar",
+            lineWidth: 2,
+            dataType: "number",
+            stack: "gator",
+            order: 2
+          }
+        ]
+      });
+      const selection = makeSelection(listing, "gator-1");
+      const quotes = makeQuotes(4);
+      const data: IndicatorDataRow[] = quotes.map((q, i) => ({
+        timestamp: new Date(q.timestamp).toISOString(),
+        upper: 5 + i,
+        lower: -(5 + i),
+        upperIsExpanding: i % 2 === 0,
+        lowerIsExpanding: i % 2 === 1
+      }));
+
+      mgr.processSelectionData(selection, listing, data);
+
+      const upperBg = selection.results[0].dataset.backgroundColor as string[];
+      const lowerBg = selection.results[1].dataset.backgroundColor as string[];
+      expect(selection.results[0].dataset.type).toBe("bar");
+      expect(upperBg.slice(0, 4)).toEqual(["#2E7D32", "#DD2C00", "#2E7D32", "#DD2C00"]);
+      expect(lowerBg.slice(0, 4)).toEqual(["#DD2C00", "#2E7D32", "#DD2C00", "#2E7D32"]);
+    });
+
     it("stores a deep copy for later resizing", () => {
       const listing = makeOverlayListing();
       const selection = makeSelection(listing, "sel-2");
@@ -775,6 +828,50 @@ describe("ChartManager", () => {
       // Sliced from index 80 = 106 - 80 = 26 points.
       const slicedLength = selection.results[0].dataset.data.length;
       expect(slicedLength).toBeLessThanOrEqual(20 + 6); // +6 for extraBars
+    });
+
+    it("slices a bar dataset's backgroundColor array in sync with the window", () => {
+      const ctx = {} as CanvasRenderingContext2D;
+      const quotes = makeQuotes(100);
+      mgr.initializeOverlay(ctx, quotes, 50);
+
+      // Overlay bar histogram with per-bar expanding/contracting colors. The
+      // backgroundColor array must follow the window like the data and point
+      // arrays, otherwise colors would shift relative to the visible bars.
+      const listing = makeOverlayListing({
+        uiid: "GATOR-OVERLAY",
+        category: "price-trend",
+        parameters: [],
+        results: [
+          {
+            dataName: "upper",
+            displayName: "Upper",
+            tooltipTemplate: "Upper",
+            defaultColor: "#000000",
+            lineType: "bar",
+            lineWidth: 2,
+            dataType: "number",
+            stack: "g",
+            order: 1
+          }
+        ]
+      });
+      const selection = makeSelection(listing, "bg-slice");
+      const data: IndicatorDataRow[] = quotes.map((q, i) => ({
+        timestamp: new Date(q.timestamp).toISOString(),
+        upper: i,
+        upperIsExpanding: i % 2 === 0
+      }));
+      mgr.processSelectionData(selection, listing, data);
+      mgr.displaySelection(selection, listing);
+
+      mgr.setBarCount(20);
+
+      // startIndex = 100 - 20 = 80; the color array (one per quote, no extra
+      // bars) slices to 20 entries, still aligned to the visible bars.
+      const bg = selection.results[0].dataset.backgroundColor as string[];
+      expect(bg).toHaveLength(20);
+      expect(bg[0]).toBe("#2E7D32"); // quote 80 is expanding → green
     });
 
     it("updates oscillator charts via applySlicedData", () => {

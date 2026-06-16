@@ -2819,7 +2819,7 @@ public static class Metadata
                         TooltipTemplate = "FORCE([P1])",
                         DataName = "forceIndex",
                         DataType = "number",
-                        LineType = "solid",
+                        LineType = "bar",
                         DefaultColor = ChartColors.StandardBlue
                     }
                 ]
@@ -3909,6 +3909,365 @@ public static class Metadata
                         DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
+                        DefaultColor = ChartColors.StandardGreen
+                    }
+                ]
+            },
+
+            // Quote transform: Median Price (HL2)
+            new IndicatorListing {
+                Name = "Median Price (HL2)",
+                Uiid = "HL2",
+                LegendTemplate = "HL2",
+                Endpoint = $"{baseUrl}/HL2/",
+                Category = "price-transform",
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "HL2",
+                        TooltipTemplate = "HL2",
+                        DataName = "value",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Quote transform: Typical Price (HLC3)
+            new IndicatorListing {
+                Name = "Typical Price (HLC3)",
+                Uiid = "HLC3",
+                LegendTemplate = "HLC3",
+                Endpoint = $"{baseUrl}/HLC3/",
+                Category = "price-transform",
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "HLC3",
+                        TooltipTemplate = "HLC3",
+                        DataName = "value",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Quote transform: Open-Close Average (OC2)
+            new IndicatorListing {
+                Name = "Open-Close Average (OC2)",
+                Uiid = "OC2",
+                LegendTemplate = "OC2",
+                Endpoint = $"{baseUrl}/OC2/",
+                Category = "price-transform",
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "OC2",
+                        TooltipTemplate = "OC2",
+                        DataName = "value",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Quote transform: Open-High-Low Average (OHL3)
+            new IndicatorListing {
+                Name = "Open-High-Low Average (OHL3)",
+                Uiid = "OHL3",
+                LegendTemplate = "OHL3",
+                Endpoint = $"{baseUrl}/OHL3/",
+                Category = "price-transform",
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "OHL3",
+                        TooltipTemplate = "OHL3",
+                        DataName = "value",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Quote transform: Average Price (OHLC4)
+            new IndicatorListing {
+                Name = "Average Price (OHLC4)",
+                Uiid = "OHLC4",
+                LegendTemplate = "OHLC4",
+                Endpoint = $"{baseUrl}/OHLC4/",
+                Category = "price-transform",
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "OHLC4",
+                        TooltipTemplate = "OHLC4",
+                        DataName = "value",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Gator Oscillator (derived from Williams Alligator)
+            new IndicatorListing {
+                Name = "Gator Oscillator",
+                Uiid = "GATOR",
+                LegendTemplate = "GATOR",
+                Endpoint = $"{baseUrl}/GATOR/",
+                Category = "price-trend",
+                ChartType = "oscillator",
+                Results = [
+                    new() {
+                        DisplayName = "Upper",
+                        TooltipTemplate = "Upper",
+                        DataName = "upper",
+                        DataType = "number",
+                        LineType = "bar",
+                        Stack = "gator",
+                        DefaultColor = ChartColors.StandardGreen
+                    },
+                    new() {
+                        DisplayName = "Lower",
+                        TooltipTemplate = "Lower",
+                        DataName = "lower",
+                        DataType = "number",
+                        LineType = "bar",
+                        Stack = "gator",
+                        DefaultColor = ChartColors.StandardRed
+                    }
+                ]
+            },
+
+            // Pivot Points (weekly window)
+            new IndicatorListing {
+                Name = "Pivot Points (week)",
+                Uiid = "PIVOT-POINTS",
+                LegendTemplate = "PIVOT POINTS(WEEK)",
+                Endpoint = $"{baseUrl}/PIVOT-POINTS/",
+                Category = "price-channel",
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "R3",
+                        TooltipTemplate = "Resistance 3",
+                        DataName = "r3",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardRed
+                    },
+                    new() {
+                        DisplayName = "R2",
+                        TooltipTemplate = "Resistance 2",
+                        DataName = "r2",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardRed
+                    },
+                    new() {
+                        DisplayName = "R1",
+                        TooltipTemplate = "Resistance 1",
+                        DataName = "r1",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardRed
+                    },
+                    new() {
+                        DisplayName = "Pivot Point",
+                        TooltipTemplate = "Pivot Point",
+                        DataName = "pp",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "S1",
+                        TooltipTemplate = "Support 1",
+                        DataName = "s1",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardGreen
+                    },
+                    new() {
+                        DisplayName = "S2",
+                        TooltipTemplate = "Support 2",
+                        DataName = "s2",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardGreen
+                    },
+                    new() {
+                        DisplayName = "S3",
+                        TooltipTemplate = "Support 3",
+                        DataName = "s3",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardGreen
+                    }
+                ]
+            },
+
+            // Pivots (Williams Fractal swing highs/lows with trend lines)
+            new IndicatorListing {
+                Name = "Pivots (Williams Fractal)",
+                Uiid = "PIVOTS",
+                LegendTemplate = "PIVOTS([P1],[P2],[P3])",
+                Endpoint = $"{baseUrl}/PIVOTS/",
+                Category = "price-pattern",
+                ChartType = "overlay",
+                Order = Order.Front,
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Left Span",
+                        ParamName = "leftSpan",
+                        DataType = "int",
+                        DefaultValue = 2,
+                        Minimum = 2,
+                        Maximum = 50
+                    },
+                    new() {
+                        DisplayName = "Right Span",
+                        ParamName = "rightSpan",
+                        DataType = "int",
+                        DefaultValue = 2,
+                        Minimum = 2,
+                        Maximum = 50
+                    },
+                    new() {
+                        DisplayName = "Max Trend Periods",
+                        ParamName = "maxTrendPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 3,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "High Point",
+                        TooltipTemplate = "High Point",
+                        DataName = "highPoint",
+                        DataType = "number",
+                        LineType = "dots",
+                        LineWidth = 3,
+                        DefaultColor = ChartColors.StandardRed
+                    },
+                    new() {
+                        DisplayName = "Low Point",
+                        TooltipTemplate = "Low Point",
+                        DataName = "lowPoint",
+                        DataType = "number",
+                        LineType = "dots",
+                        LineWidth = 3,
+                        DefaultColor = ChartColors.StandardGreen
+                    },
+                    new() {
+                        DisplayName = "High Trend Line",
+                        TooltipTemplate = "High Trend Line",
+                        DataName = "highLine",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardRed
+                    },
+                    new() {
+                        DisplayName = "Low Trend Line",
+                        TooltipTemplate = "Low Trend Line",
+                        DataName = "lowLine",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardGreen
+                    }
+                ]
+            },
+
+            // Rolling Pivot Points
+            new IndicatorListing {
+                Name = "Rolling Pivot Points",
+                Uiid = "ROLLING-PIVOTS",
+                LegendTemplate = "ROLLING PIVOTS([P1],[P2])",
+                Endpoint = $"{baseUrl}/ROLLING-PIVOTS/",
+                Category = "price-channel",
+                ChartType = "overlay",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Window Periods",
+                        ParamName = "windowPeriods",
+                        DataType = "int",
+                        DefaultValue = 11,
+                        Minimum = 1,
+                        Maximum = 250
+                    },
+                    new() {
+                        DisplayName = "Offset Periods",
+                        ParamName = "offsetPeriods",
+                        DataType = "int",
+                        DefaultValue = 9,
+                        Minimum = 0,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "R3",
+                        TooltipTemplate = "Resistance 3",
+                        DataName = "r3",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardRed
+                    },
+                    new() {
+                        DisplayName = "R2",
+                        TooltipTemplate = "Resistance 2",
+                        DataName = "r2",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardRed
+                    },
+                    new() {
+                        DisplayName = "R1",
+                        TooltipTemplate = "Resistance 1",
+                        DataName = "r1",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardRed
+                    },
+                    new() {
+                        DisplayName = "Pivot Point",
+                        TooltipTemplate = "Pivot Point",
+                        DataName = "pp",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "S1",
+                        TooltipTemplate = "Support 1",
+                        DataName = "s1",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardGreen
+                    },
+                    new() {
+                        DisplayName = "S2",
+                        TooltipTemplate = "Support 2",
+                        DataName = "s2",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardGreen
+                    },
+                    new() {
+                        DisplayName = "S3",
+                        TooltipTemplate = "Support 3",
+                        DataName = "s3",
+                        DataType = "number",
+                        LineType = "dash",
                         DefaultColor = ChartColors.StandardGreen
                     }
                 ]
