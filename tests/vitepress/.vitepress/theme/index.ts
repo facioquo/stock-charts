@@ -44,6 +44,17 @@ export default {
           title: "RSI(14)",
           params: { lookbackPeriods: 14 },
           results: ["rsi"]
+        },
+        bb: {
+          uiid: "BB",
+          title: "Bollinger Bands(20,2)",
+          params: { lookbackPeriods: 20, standardDeviations: 2 }
+        },
+        bbPctB: {
+          uiid: "BB-PCTB",
+          title: "Bollinger Bands %B(20,2)",
+          params: { lookbackPeriods: 20, standardDeviations: 2 },
+          results: ["percentB"]
         }
       }
     });

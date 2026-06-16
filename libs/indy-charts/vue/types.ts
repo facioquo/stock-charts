@@ -11,6 +11,12 @@ export interface StockIndicatorChartConfig {
   results?: string[];
   barCount?: number;
   quoteCount?: number;
+  /**
+   * Companion indicator name(s) to compose into the same chart. Overlay-type
+   * companions render on the shared price panel; oscillator-type companions
+   * render as aligned panes beneath it. The `with` prop takes precedence.
+   */
+  with?: string | string[];
   /** Per-instance background color for annotation and axis-label backdrops. */
   background?: string;
 }
@@ -59,6 +65,17 @@ export interface StockIndicatorChartProps {
   config?: StockIndicatorChartConfig;
   barCount?: number;
   withOverlay?: boolean;
+  /**
+   * Companion indicator name(s) to compose into the same chart under one
+   * `ChartManager`, sharing the price panel's windowed x-axis. Overlay-type
+   * companions render on the price panel; oscillator-type companions render as
+   * vertically aligned panes beneath it. Accepts a single name or an array.
+   *
+   * Example: `<StockIndicatorChart indicator="bb" with="bbPctB" />` renders the
+   * Bollinger Bands overlay on the price panel and the %B oscillator aligned
+   * below it. Takes precedence over `config.with`.
+   */
+  with?: string | string[];
   /** Per-instance background color for annotation and axis-label backdrops. */
   background?: string;
 }

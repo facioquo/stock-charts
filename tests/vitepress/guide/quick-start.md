@@ -166,6 +166,17 @@ Have a single component render **both** the price chart and the oscillator stack
 
 The instance manages its own price/volume canvas above the RSI panel; it does not look at adjacent siblings.
 
+To pair an **overlay indicator** (e.g. Bollinger Bands) with its **companion oscillator** (e.g. %B) in one aligned chart, use the `with` prop — both render under a single `ChartManager`, sharing the price panel's x-axis:
+
+```vue
+<ClientOnly>
+  <StockIndicatorChart indicator="bb" with="bbPctB" />
+</ClientOnly>
+```
+
+> [!warning]
+> X-axis alignment requires **one** component (one `ChartManager`). Two separate `<StockIndicatorChart>` instances stacked on a page do not share x-axis geometry — a standalone oscillator auto-ranges to its own data. Use `with` or `:with-overlay="true"` to keep panels aligned.
+
 ## What's next?
 
 - See the [overlay example](/examples/) for a working live demo

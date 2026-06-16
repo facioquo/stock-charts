@@ -73,7 +73,14 @@ describe("loadStaticQuotes", () => {
   it("accepts a Quote[] fixture with mixed string/Date timestamps", () => {
     const fixture: Quote[] = [
       { timestamp: "2024-02-01T00:00:00Z", open: 1, high: 2, low: 0, close: 1.5, volume: 10 },
-      { timestamp: new Date("2024-02-02T00:00:00Z"), open: 2, high: 3, low: 1, close: 2.5, volume: 20 }
+      {
+        timestamp: new Date("2024-02-02T00:00:00Z"),
+        open: 2,
+        high: 3,
+        low: 1,
+        close: 2.5,
+        volume: 20
+      }
     ];
     const result = loadStaticQuotes(fixture);
 
@@ -116,5 +123,4 @@ describe("loadStaticIndicatorData", () => {
     expect(result).toHaveLength(2);
     expect(result[1]).toMatchObject({ sma: 100.5, ema: 99.7 });
   });
-
 });
