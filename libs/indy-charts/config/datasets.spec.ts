@@ -55,6 +55,46 @@ describe("baseDataset", () => {
       baseDataset(makeResult({ lineType: "spline" }), makeResultConfig({ lineType: "spline" }))
     ).toThrow(/Unsupported lineType: "spline"/);
   });
+
+  it("omits per-segment styling when segmented is not set", () => {
+    const solid = baseDataset(makeResult({ lineType: "solid" }), makeResultConfig());
+    const dash = baseDataset(
+      makeResult({ lineType: "dash" }),
+      makeResultConfig({ lineType: "dash" })
+    );
+    expect((solid as { segment?: unknown }).segment).toBeUndefined();
+    expect((dash as { segment?: unknown }).segment).toBeUndefined();
+  });
+
+  // Segmented level lines (e.g. weekly Pivot Points) render one horizontal
+  // segment per window: the segment between equal-value points is painted in
+  // the line color, while the boundary riser (differing values) is hidden.
+  it.each(["solid", "dash"])("hides the boundary riser for segmented %s level lines", lineType => {
+    const ds = baseDataset(
+      makeResult({ lineType, color: "#1E88E5" }),
+      makeResultConfig({ lineType, segmented: true })
+    );
+
+    const segment = (
+      ds as {
+        segment?: { borderColor: (ctx: unknown) => string };
+      }
+    ).segment;
+    expect(segment).toBeDefined();
+
+    const within = { p0: { parsed: { y: 270 } }, p1: { parsed: { y: 270 } } };
+    const boundary = { p0: { parsed: { y: 270 } }, p1: { parsed: { y: 255 } } };
+    expect(segment?.borderColor(within)).toBe("#1E88E5");
+    expect(segment?.borderColor(boundary)).toBe("transparent");
+  });
+
+  it("retains the dashed border for segmented dash level lines", () => {
+    const ds = baseDataset(
+      makeResult({ lineType: "dash" }),
+      makeResultConfig({ lineType: "dash", segmented: true })
+    );
+    expect(ds.borderDash).toEqual([3, 2]);
+  });
 });
 
 describe("createThresholdDataset", () => {

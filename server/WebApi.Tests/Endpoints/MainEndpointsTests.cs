@@ -522,6 +522,30 @@ public class MainEndpointsTests
         Assert.Equal(120, pivots.Count);
     }
 
+    [Fact]
+    public void PivotPointsListing_MarksAllLevelsSegmented()
+    {
+        // weekly Pivot Points are piecewise-constant level lines: the client
+        // renders one horizontal segment per week, so every result opts in.
+        var listing = Metadata
+            .IndicatorListing("https://localhost")
+            .Single(l => l.Uiid == "PIVOT-POINTS");
+
+        Assert.All(listing.Results, r => Assert.True(r.Segmented));
+    }
+
+    [Fact]
+    public void RollingPivotsListing_LeavesLevelsContinuous()
+    {
+        // rolling pivots recompute every bar (no flat windows), so they render
+        // as ordinary continuous lines and must not be segmented.
+        var listing = Metadata
+            .IndicatorListing("https://localhost")
+            .Single(l => l.Uiid == "ROLLING-PIVOTS");
+
+        Assert.All(listing.Results, r => Assert.False(r.Segmented));
+    }
+
     /// <summary>
     /// Helper to generate sample quote data for tests.
     /// </summary>

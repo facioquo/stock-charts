@@ -4059,6 +4059,7 @@ public static class Metadata
                         DataName = "r3",
                         DataType = "number",
                         LineType = "dash",
+                        Segmented = true,
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
@@ -4067,6 +4068,7 @@ public static class Metadata
                         DataName = "r2",
                         DataType = "number",
                         LineType = "dash",
+                        Segmented = true,
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
@@ -4075,6 +4077,7 @@ public static class Metadata
                         DataName = "r1",
                         DataType = "number",
                         LineType = "dash",
+                        Segmented = true,
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
@@ -4083,6 +4086,7 @@ public static class Metadata
                         DataName = "pp",
                         DataType = "number",
                         LineType = "solid",
+                        Segmented = true,
                         DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
@@ -4091,6 +4095,7 @@ public static class Metadata
                         DataName = "s1",
                         DataType = "number",
                         LineType = "dash",
+                        Segmented = true,
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
@@ -4099,6 +4104,7 @@ public static class Metadata
                         DataName = "s2",
                         DataType = "number",
                         LineType = "dash",
+                        Segmented = true,
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
@@ -4107,6 +4113,7 @@ public static class Metadata
                         DataName = "s3",
                         DataType = "number",
                         LineType = "dash",
+                        Segmented = true,
                         DefaultColor = ChartColors.StandardGreen
                     }
                 ]
