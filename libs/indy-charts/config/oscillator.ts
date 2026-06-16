@@ -3,6 +3,19 @@ import { type CartesianScaleOptions, type ChartConfiguration, type ChartOptions 
 import { type ChartSettings } from "./types";
 import { baseChartOptions } from "./common";
 
+/**
+ * Minimum number of y-axis ticks an oscillator pane must generate before the
+ * first and last (boundary) labels are dropped.
+ *
+ * The boundary labels are normally suppressed because, with `ticks.mirror`, the
+ * topmost/bottommost label can clip against the pane edge. But oscillator panes
+ * are short (the docs use `aspect-ratio: 6`), so Chart.js often fits only two or
+ * three gridlines. Dropping both ends there leaves zero or one visible label —
+ * the "right axis isn't shown" symptom. Keep every label until the pane has
+ * enough ticks to spare the bounds. See issue #495.
+ */
+const MIN_TICKS_TO_TRIM_BOUNDS = 4;
+
 export function baseOscillatorConfig(settings: ChartSettings): ChartConfiguration {
   const config: ChartConfiguration = {
     type: "line",
@@ -32,8 +45,11 @@ export function baseOscillatorOptions(settings: ChartSettings): ChartOptions {
     const numValue = typeof value === "string" ? parseFloat(value) : value;
     const v = Math.abs(numValue);
 
-    // remove first and last y-axis labels
-    if (index === 0 || index === values.length - 1) return null;
+    // Drop the first and last y-axis labels only when the pane has enough
+    // gridlines to spare them; on short panes keep the bounds visible so the
+    // axis range is still readable (issue #495).
+    if (values.length >= MIN_TICKS_TO_TRIM_BOUNDS && (index === 0 || index === values.length - 1))
+      return null;
     // otherwise, condense large/small display values
     else if (v > 10000000000) return Math.trunc(numValue / 1000000000) + "B";
     else if (v > 10000000) return Math.trunc(numValue / 1000000) + "M";

@@ -102,6 +102,117 @@ const mockListings = [
         order: 1
       }
     ]
+  },
+  {
+    name: "Bollinger Bands®",
+    uiid: "BB",
+    legendTemplate: "BB([P1],[P2])",
+    endpoint: "BB/",
+    category: "price-channel",
+    chartType: "overlay",
+    order: 3,
+    chartConfig: null,
+    parameters: [
+      {
+        displayName: "Lookback periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 20,
+        minimum: 2,
+        maximum: 250
+      },
+      {
+        displayName: "Standard deviations",
+        paramName: "standardDeviations",
+        dataType: "number",
+        defaultValue: 2,
+        minimum: 0.01,
+        maximum: 10
+      }
+    ],
+    results: [
+      {
+        displayName: "Upper Band",
+        tooltipTemplate: "Upper",
+        dataName: "upperBand",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: 1,
+        defaultColor: "#9ca3af",
+        order: 1
+      },
+      {
+        displayName: "Centerline",
+        tooltipTemplate: "Center",
+        dataName: "sma",
+        dataType: "number",
+        lineType: "dash",
+        stack: "",
+        lineWidth: 1,
+        defaultColor: "#9ca3af",
+        order: 2
+      },
+      {
+        displayName: "Lower Band",
+        tooltipTemplate: "Lower",
+        dataName: "lowerBand",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: 1,
+        defaultColor: "#9ca3af",
+        order: 3
+      }
+    ]
+  },
+  {
+    name: "Bollinger Bands® %B",
+    uiid: "BB-PCTB",
+    legendTemplate: "BB([P1],[P2]) %B",
+    endpoint: "BB/",
+    category: "oscillator",
+    chartType: "oscillator",
+    order: 4,
+    chartConfig: {
+      minimumYAxis: 0,
+      maximumYAxis: 1,
+      thresholds: [
+        { value: 1, color: "#dc2626", style: "dash", fill: null },
+        { value: 0, color: "#16a34a", style: "dash", fill: null }
+      ]
+    },
+    parameters: [
+      {
+        displayName: "Lookback periods",
+        paramName: "lookbackPeriods",
+        dataType: "int",
+        defaultValue: 20,
+        minimum: 2,
+        maximum: 250
+      },
+      {
+        displayName: "Standard deviations",
+        paramName: "standardDeviations",
+        dataType: "number",
+        defaultValue: 2,
+        minimum: 0.01,
+        maximum: 10
+      }
+    ],
+    results: [
+      {
+        displayName: "%B",
+        tooltipTemplate: "%B: $VALUE",
+        dataName: "percentB",
+        dataType: "number",
+        lineType: "solid",
+        stack: "",
+        lineWidth: 2,
+        defaultColor: "#2563eb",
+        order: 1
+      }
+    ]
   }
 ];
 
@@ -116,6 +227,14 @@ async function mockChartApi(page: Page): Promise<void> {
     timestamp: quote.timestamp,
     candle: quote,
     rsi: 45 + Math.sin(index / 5) * 20
+  }));
+  const bbData = mockQuotes.map((quote, index) => ({
+    timestamp: quote.timestamp,
+    candle: quote,
+    upperBand: quote.close + 4,
+    sma: quote.close,
+    lowerBand: quote.close - 4,
+    percentB: 0.5 + Math.sin(index / 5) * 0.4
   }));
 
   // Intercept both the local dev server and the production API origin so the
@@ -132,6 +251,9 @@ async function mockChartApi(page: Page): Promise<void> {
     );
     await page.route(`${base}/rsi**`, route =>
       route.fulfill({ json: rsiData, headers: { "access-control-allow-origin": "*" } })
+    );
+    await page.route(`${base}/BB/**`, route =>
+      route.fulfill({ json: bbData, headers: { "access-control-allow-origin": "*" } })
     );
   }
 }
@@ -277,5 +399,32 @@ test.describe("VitePress Documentation Site", () => {
     await expectCanvasToBeNonBlank(
       page.getByTestId("stock-indicator-chart-rsi-with-overlay-oscillator-canvas")
     );
+  });
+
+  test("composed chart aligns an overlay indicator with its companion oscillator", async ({
+    page
+  }) => {
+    await mockChartApi(page);
+    await page.goto("/examples/indicators");
+
+    const root = page.getByTestId("stock-indicator-chart-bb-combo-root");
+    await expect(root).toBeVisible();
+    await expect(page.getByTestId("stock-indicator-chart-bb-combo-error")).toHaveCount(0);
+
+    // One component renders both the Bollinger Bands overlay (price panel) and
+    // the %B oscillator pane beneath it.
+    const overlay = page.getByTestId("stock-indicator-chart-bb-combo-overlay-canvas");
+    const oscillator = page.getByTestId("stock-indicator-chart-bb-combo-oscillator-canvas");
+    await expectCanvasToBeNonBlank(overlay);
+    await expectCanvasToBeNonBlank(oscillator);
+
+    // The panels share one ChartManager, so their plot areas align horizontally:
+    // both canvases must have the same left edge and width (issue #494/#496).
+    const overlayBox = await overlay.boundingBox();
+    const oscillatorBox = await oscillator.boundingBox();
+    expect(overlayBox).not.toBeNull();
+    expect(oscillatorBox).not.toBeNull();
+    expect(Math.abs(overlayBox!.x - oscillatorBox!.x)).toBeLessThanOrEqual(1);
+    expect(Math.abs(overlayBox!.width - oscillatorBox!.width)).toBeLessThanOrEqual(1);
   });
 });
