@@ -368,7 +368,7 @@ describe("buildDataPoints", () => {
     );
   });
 
-  // Segmented level lines (e.g. weekly Pivot Points): the value is flat within
+  // Segmented level lines (e.g. monthly Pivot Points): the value is flat within
   // a window and steps at each boundary. The first point of every new window is
   // replaced with NaN so Chart.js breaks the line, rendering one horizontal
   // segment per window. Replacing (not inserting) keeps the data index-aligned.

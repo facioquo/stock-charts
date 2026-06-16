@@ -4044,11 +4044,11 @@ public static class Metadata
                 ]
             },
 
-            // Pivot Points (weekly window)
+            // Pivot Points (monthly window)
             new IndicatorListing {
-                Name = "Pivot Points (week)",
+                Name = "Pivot Points (month)",
                 Uiid = "PIVOT-POINTS",
-                LegendTemplate = "PIVOT POINTS(WEEK)",
+                LegendTemplate = "PIVOT POINTS(MONTH)",
                 Endpoint = $"{baseUrl}/PIVOT-POINTS/",
                 Category = "price-channel",
                 ChartType = "overlay",

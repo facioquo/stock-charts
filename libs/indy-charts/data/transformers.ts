@@ -57,7 +57,7 @@ export function buildDataPoints(
 
   const resultConfig = listing.results.find(x => x.dataName === result.dataName);
 
-  // Segmented level lines (e.g. weekly Pivot Points) hold a constant value
+  // Segmented level lines (e.g. monthly Pivot Points) hold a constant value
   // within each window and step at each boundary. Replacing the first value of
   // every new window with NaN makes Chart.js break the line there (gaps are not
   // spanned by default), so each window renders as its own horizontal segment

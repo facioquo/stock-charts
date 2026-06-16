@@ -438,7 +438,7 @@ public class MainEndpointsTests
     [Fact]
     public async Task GetPivotPoints_WithValidQuotes_ReturnsOkResult()
     {
-        // Arrange — weekly pivot points need at least two windows of warmup.
+        // Arrange — monthly pivot points need at least two windows of warmup.
         List<Quote> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
@@ -525,8 +525,8 @@ public class MainEndpointsTests
     [Fact]
     public void PivotPointsListing_MarksAllLevelsSegmented()
     {
-        // weekly Pivot Points are piecewise-constant level lines: the client
-        // renders one horizontal segment per week, so every result opts in.
+        // monthly Pivot Points are piecewise-constant level lines: the client
+        // renders one horizontal segment per month, so every result opts in.
         var listing = Metadata
             .IndicatorListing("https://localhost")
             .Single(l => l.Uiid == "PIVOT-POINTS");

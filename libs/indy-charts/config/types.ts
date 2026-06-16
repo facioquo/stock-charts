@@ -94,7 +94,7 @@ export interface IndicatorResultConfig {
   dataType: string;
   lineType: string;
   /**
-   * Piecewise-constant level line (e.g. weekly Pivot Points): the value is flat
+   * Piecewise-constant level line (e.g. monthly Pivot Points): the value is flat
    * within a window and steps at each boundary. When set, the line renders as a
    * separate horizontal segment per window — the boundary riser is hidden —
    * matching the reference rendering without inserting gap points. Absent

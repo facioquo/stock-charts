@@ -2618,9 +2618,9 @@
     ]
   },
   {
-    "name": "Pivot Points (week)",
+    "name": "Pivot Points (month)",
     "uiid": "PIVOT-POINTS",
-    "legendTemplate": "PIVOT POINTS(WEEK)",
+    "legendTemplate": "PIVOT POINTS(MONTH)",
     "endpoint": "/PIVOT-POINTS/",
     "category": "price-channel",
     "chartType": "overlay",

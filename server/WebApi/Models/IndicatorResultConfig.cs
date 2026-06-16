@@ -12,7 +12,7 @@ public record IndicatorResultConfig
     public required string LineType { get; init; }
 
     /// <summary>
-    /// Marks a piecewise-constant level line (e.g. weekly Pivot Points) whose
+    /// Marks a piecewise-constant level line (e.g. monthly Pivot Points) whose
     /// value is flat within a window and steps at each window boundary. The
     /// client renders each window as a separate horizontal segment by hiding the
     /// boundary riser, rather than drawing a continuous stepped line. Omitted
