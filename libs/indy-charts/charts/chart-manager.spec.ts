@@ -830,6 +830,50 @@ describe("ChartManager", () => {
       expect(slicedLength).toBeLessThanOrEqual(20 + 6); // +6 for extraBars
     });
 
+    it("slices a bar dataset's backgroundColor array in sync with the window", () => {
+      const ctx = {} as CanvasRenderingContext2D;
+      const quotes = makeQuotes(100);
+      mgr.initializeOverlay(ctx, quotes, 50);
+
+      // Overlay bar histogram with per-bar expanding/contracting colors. The
+      // backgroundColor array must follow the window like the data and point
+      // arrays, otherwise colors would shift relative to the visible bars.
+      const listing = makeOverlayListing({
+        uiid: "GATOR-OVERLAY",
+        category: "price-trend",
+        parameters: [],
+        results: [
+          {
+            dataName: "upper",
+            displayName: "Upper",
+            tooltipTemplate: "Upper",
+            defaultColor: "#000000",
+            lineType: "bar",
+            lineWidth: 2,
+            dataType: "number",
+            stack: "g",
+            order: 1
+          }
+        ]
+      });
+      const selection = makeSelection(listing, "bg-slice");
+      const data: IndicatorDataRow[] = quotes.map((q, i) => ({
+        timestamp: new Date(q.timestamp).toISOString(),
+        upper: i,
+        upperIsExpanding: i % 2 === 0
+      }));
+      mgr.processSelectionData(selection, listing, data);
+      mgr.displaySelection(selection, listing);
+
+      mgr.setBarCount(20);
+
+      // startIndex = 100 - 20 = 80; the color array (one per quote, no extra
+      // bars) slices to 20 entries, still aligned to the visible bars.
+      const bg = selection.results[0].dataset.backgroundColor as string[];
+      expect(bg).toHaveLength(20);
+      expect(bg[0]).toBe("#2E7D32"); // quote 80 is expanding → green
+    });
+
     it("updates oscillator charts via applySlicedData", () => {
       const ctx = {} as CanvasRenderingContext2D;
       const quotes = makeQuotes(100);
