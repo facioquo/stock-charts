@@ -411,6 +411,117 @@ public class MainEndpointsTests
             Assert.Equal((double)(pair.Second.Open + pair.Second.High + pair.Second.Low + pair.Second.Close) / 4, pair.First.Value, 6));
     }
 
+    [Fact]
+    public async Task GetGator_WithValidQuotes_ReturnsOkResult()
+    {
+        // Arrange — Gator derives from the Alligator, which needs ~121 periods
+        // of warmup, so generate well beyond that.
+        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act
+        IActionResult result = await _controller.GetGator();
+
+        // Assert — the catalog exposes upper/lower histograms; confirm the
+        // endpoint returns the GatorResult series for the visible window.
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<GatorResult> gator = Assert.IsAssignableFrom<IEnumerable<GatorResult>>(okResult.Value).ToList();
+        Assert.Equal(120, gator.Count);
+    }
+
+    [Fact]
+    public async Task GetPivotPoints_WithValidQuotes_ReturnsOkResult()
+    {
+        // Arrange — weekly pivot points need at least two windows of warmup.
+        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act
+        IActionResult result = await _controller.GetPivotPoints();
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<PivotPointsResult> pivots = Assert.IsAssignableFrom<IEnumerable<PivotPointsResult>>(okResult.Value).ToList();
+        Assert.Equal(120, pivots.Count);
+    }
+
+    [Fact]
+    public async Task GetPivots_WithValidParameters_ReturnsOkResult()
+    {
+        // Arrange
+        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act — leftSpan, rightSpan, maxTrendPeriods
+        IActionResult result = await _controller.GetPivots(2, 2, 20);
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<PivotsResult> pivots = Assert.IsAssignableFrom<IEnumerable<PivotsResult>>(okResult.Value).ToList();
+        Assert.Equal(120, pivots.Count);
+    }
+
+    [Fact]
+    public async Task GetPivots_WithInvalidParameters_ReturnsBadRequest()
+    {
+        // Arrange
+        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act — maxTrendPeriods must exceed leftSpan; the library throws and the
+        // Get<T> helper surfaces it as a 400 rather than a 500.
+        IActionResult result = await _controller.GetPivots(2, 2, 1);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task GetRollingPivots_WithValidParameters_ReturnsOkResult()
+    {
+        // Arrange
+        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act — windowPeriods, offsetPeriods
+        IActionResult result = await _controller.GetRollingPivots(11, 9);
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<RollingPivotsResult> pivots = Assert.IsAssignableFrom<IEnumerable<RollingPivotsResult>>(okResult.Value).ToList();
+        Assert.Equal(120, pivots.Count);
+    }
+
     /// <summary>
     /// Helper to generate sample quote data for tests.
     /// </summary>

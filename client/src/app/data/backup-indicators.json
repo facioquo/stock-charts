@@ -1602,6 +1602,41 @@
     ]
   },
   {
+    "name": "Gator Oscillator",
+    "uiid": "GATOR",
+    "legendTemplate": "GATOR",
+    "endpoint": "/GATOR/",
+    "category": "price-trend",
+    "chartType": "oscillator",
+    "order": 1,
+    "chartConfig": null,
+    "parameters": [],
+    "results": [
+      {
+        "displayName": "Upper",
+        "tooltipTemplate": "Upper",
+        "dataName": "upper",
+        "dataType": "number",
+        "lineType": "bar",
+        "stack": "gator",
+        "lineWidth": 2,
+        "defaultColor": "#2E7D32",
+        "fill": null
+      },
+      {
+        "displayName": "Lower",
+        "tooltipTemplate": "Lower",
+        "dataName": "lower",
+        "dataType": "number",
+        "lineType": "bar",
+        "stack": "gator",
+        "lineWidth": 2,
+        "defaultColor": "#DD2C00",
+        "fill": null
+      }
+    ]
+  },
+  {
     "name": "Hilbert Transform Instantaneous Trendline",
     "uiid": "HT Trendline",
     "legendTemplate": "HT TRENDLINE",
@@ -2583,6 +2618,178 @@
     ]
   },
   {
+    "name": "Pivot Points (week)",
+    "uiid": "PIVOT-POINTS",
+    "legendTemplate": "PIVOT POINTS(WEEK)",
+    "endpoint": "/PIVOT-POINTS/",
+    "category": "price-channel",
+    "chartType": "overlay",
+    "order": 1,
+    "chartConfig": null,
+    "parameters": [],
+    "results": [
+      {
+        "displayName": "R3",
+        "tooltipTemplate": "Resistance 3",
+        "dataName": "r3",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#DD2C00",
+        "fill": null
+      },
+      {
+        "displayName": "R2",
+        "tooltipTemplate": "Resistance 2",
+        "dataName": "r2",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#DD2C00",
+        "fill": null
+      },
+      {
+        "displayName": "R1",
+        "tooltipTemplate": "Resistance 1",
+        "dataName": "r1",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#DD2C00",
+        "fill": null
+      },
+      {
+        "displayName": "Pivot Point",
+        "tooltipTemplate": "Pivot Point",
+        "dataName": "pp",
+        "dataType": "number",
+        "lineType": "solid",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#1E88E5",
+        "fill": null
+      },
+      {
+        "displayName": "S1",
+        "tooltipTemplate": "Support 1",
+        "dataName": "s1",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#2E7D32",
+        "fill": null
+      },
+      {
+        "displayName": "S2",
+        "tooltipTemplate": "Support 2",
+        "dataName": "s2",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#2E7D32",
+        "fill": null
+      },
+      {
+        "displayName": "S3",
+        "tooltipTemplate": "Support 3",
+        "dataName": "s3",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#2E7D32",
+        "fill": null
+      }
+    ]
+  },
+  {
+    "name": "Pivots (Williams Fractal)",
+    "uiid": "PIVOTS",
+    "legendTemplate": "PIVOTS([P1],[P2],[P3])",
+    "endpoint": "/PIVOTS/",
+    "category": "price-pattern",
+    "chartType": "overlay",
+    "order": 1,
+    "chartConfig": null,
+    "parameters": [
+      {
+        "displayName": "Left Span",
+        "paramName": "leftSpan",
+        "dataType": "int",
+        "minimum": 2,
+        "maximum": 50,
+        "defaultValue": 2
+      },
+      {
+        "displayName": "Right Span",
+        "paramName": "rightSpan",
+        "dataType": "int",
+        "minimum": 2,
+        "maximum": 50,
+        "defaultValue": 2
+      },
+      {
+        "displayName": "Max Trend Periods",
+        "paramName": "maxTrendPeriods",
+        "dataType": "int",
+        "minimum": 3,
+        "maximum": 250,
+        "defaultValue": 20
+      }
+    ],
+    "results": [
+      {
+        "displayName": "High Point",
+        "tooltipTemplate": "High Point",
+        "dataName": "highPoint",
+        "dataType": "number",
+        "lineType": "dots",
+        "stack": null,
+        "lineWidth": 3,
+        "defaultColor": "#DD2C00",
+        "fill": null
+      },
+      {
+        "displayName": "Low Point",
+        "tooltipTemplate": "Low Point",
+        "dataName": "lowPoint",
+        "dataType": "number",
+        "lineType": "dots",
+        "stack": null,
+        "lineWidth": 3,
+        "defaultColor": "#2E7D32",
+        "fill": null
+      },
+      {
+        "displayName": "High Trend Line",
+        "tooltipTemplate": "High Trend Line",
+        "dataName": "highLine",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#DD2C00",
+        "fill": null
+      },
+      {
+        "displayName": "Low Trend Line",
+        "tooltipTemplate": "Low Trend Line",
+        "dataName": "lowLine",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#2E7D32",
+        "fill": null
+      }
+    ]
+  },
+  {
     "name": "Price Momentum Oscillator (PMO)",
     "uiid": "PMO",
     "legendTemplate": "PMO([P1],[P2],[P3])",
@@ -2833,6 +3040,113 @@
         "stack": null,
         "lineWidth": 2,
         "defaultColor": "#1E88E5",
+        "fill": null
+      }
+    ]
+  },
+  {
+    "name": "Rolling Pivot Points",
+    "uiid": "ROLLING-PIVOTS",
+    "legendTemplate": "ROLLING PIVOTS([P1],[P2])",
+    "endpoint": "/ROLLING-PIVOTS/",
+    "category": "price-channel",
+    "chartType": "overlay",
+    "order": 1,
+    "chartConfig": null,
+    "parameters": [
+      {
+        "displayName": "Window Periods",
+        "paramName": "windowPeriods",
+        "dataType": "int",
+        "minimum": 1,
+        "maximum": 250,
+        "defaultValue": 11
+      },
+      {
+        "displayName": "Offset Periods",
+        "paramName": "offsetPeriods",
+        "dataType": "int",
+        "minimum": 0,
+        "maximum": 250,
+        "defaultValue": 9
+      }
+    ],
+    "results": [
+      {
+        "displayName": "R3",
+        "tooltipTemplate": "Resistance 3",
+        "dataName": "r3",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#DD2C00",
+        "fill": null
+      },
+      {
+        "displayName": "R2",
+        "tooltipTemplate": "Resistance 2",
+        "dataName": "r2",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#DD2C00",
+        "fill": null
+      },
+      {
+        "displayName": "R1",
+        "tooltipTemplate": "Resistance 1",
+        "dataName": "r1",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#DD2C00",
+        "fill": null
+      },
+      {
+        "displayName": "Pivot Point",
+        "tooltipTemplate": "Pivot Point",
+        "dataName": "pp",
+        "dataType": "number",
+        "lineType": "solid",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#1E88E5",
+        "fill": null
+      },
+      {
+        "displayName": "S1",
+        "tooltipTemplate": "Support 1",
+        "dataName": "s1",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#2E7D32",
+        "fill": null
+      },
+      {
+        "displayName": "S2",
+        "tooltipTemplate": "Support 2",
+        "dataName": "s2",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#2E7D32",
+        "fill": null
+      },
+      {
+        "displayName": "S3",
+        "tooltipTemplate": "Support 3",
+        "dataName": "s3",
+        "dataType": "number",
+        "lineType": "dash",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#2E7D32",
         "fill": null
       }
     ]
