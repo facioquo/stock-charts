@@ -3912,6 +3912,106 @@ public static class Metadata
                         DefaultColor = ChartColors.StandardGreen
                     }
                 ]
+            },
+
+            // Quote transform: Median Price (HL2)
+            new IndicatorListing {
+                Name = "Median Price (HL2)",
+                Uiid = "HL2",
+                LegendTemplate = "HL2",
+                Endpoint = $"{baseUrl}/HL2/",
+                Category = "price-transform",
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "HL2",
+                        TooltipTemplate = "HL2",
+                        DataName = "value",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Quote transform: Typical Price (HLC3)
+            new IndicatorListing {
+                Name = "Typical Price (HLC3)",
+                Uiid = "HLC3",
+                LegendTemplate = "HLC3",
+                Endpoint = $"{baseUrl}/HLC3/",
+                Category = "price-transform",
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "HLC3",
+                        TooltipTemplate = "HLC3",
+                        DataName = "value",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Quote transform: Open-Close Average (OC2)
+            new IndicatorListing {
+                Name = "Open-Close Average (OC2)",
+                Uiid = "OC2",
+                LegendTemplate = "OC2",
+                Endpoint = $"{baseUrl}/OC2/",
+                Category = "price-transform",
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "OC2",
+                        TooltipTemplate = "OC2",
+                        DataName = "value",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Quote transform: Open-High-Low Average (OHL3)
+            new IndicatorListing {
+                Name = "Open-High-Low Average (OHL3)",
+                Uiid = "OHL3",
+                LegendTemplate = "OHL3",
+                Endpoint = $"{baseUrl}/OHL3/",
+                Category = "price-transform",
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "OHL3",
+                        TooltipTemplate = "OHL3",
+                        DataName = "value",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Quote transform: Average Price (OHLC4)
+            new IndicatorListing {
+                Name = "Average Price (OHLC4)",
+                Uiid = "OHLC4",
+                LegendTemplate = "OHLC4",
+                Endpoint = $"{baseUrl}/OHLC4/",
+                Category = "price-transform",
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "OHLC4",
+                        TooltipTemplate = "OHLC4",
+                        DataName = "value",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
             }
         ];
 

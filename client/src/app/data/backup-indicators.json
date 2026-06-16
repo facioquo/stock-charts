@@ -371,6 +371,30 @@
     ]
   },
   {
+    "name": "Average Price (OHLC4)",
+    "uiid": "OHLC4",
+    "legendTemplate": "OHLC4",
+    "endpoint": "/OHLC4/",
+    "category": "price-transform",
+    "chartType": "overlay",
+    "order": 1,
+    "chartConfig": null,
+    "parameters": [],
+    "results": [
+      {
+        "displayName": "OHLC4",
+        "tooltipTemplate": "OHLC4",
+        "dataName": "value",
+        "dataType": "number",
+        "lineType": "solid",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#1E88E5",
+        "fill": null
+      }
+    ]
+  },
+  {
     "name": "Average True Range (ATR)",
     "uiid": "ATR",
     "legendTemplate": "ATR([P1])",
@@ -2081,6 +2105,30 @@
     ]
   },
   {
+    "name": "Median Price (HL2)",
+    "uiid": "HL2",
+    "legendTemplate": "HL2",
+    "endpoint": "/HL2/",
+    "category": "price-transform",
+    "chartType": "overlay",
+    "order": 1,
+    "chartConfig": null,
+    "parameters": [],
+    "results": [
+      {
+        "displayName": "HL2",
+        "tooltipTemplate": "HL2",
+        "dataName": "value",
+        "dataType": "number",
+        "lineType": "solid",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#1E88E5",
+        "fill": null
+      }
+    ]
+  },
+  {
     "name": "MESA Adaptive Moving Average (MAMA)",
     "uiid": "MAMA",
     "legendTemplate": "MAMA([P1],[P2])",
@@ -2354,6 +2402,54 @@
         "displayName": "OBV",
         "tooltipTemplate": "OBV",
         "dataName": "obv",
+        "dataType": "number",
+        "lineType": "solid",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#1E88E5",
+        "fill": null
+      }
+    ]
+  },
+  {
+    "name": "Open-Close Average (OC2)",
+    "uiid": "OC2",
+    "legendTemplate": "OC2",
+    "endpoint": "/OC2/",
+    "category": "price-transform",
+    "chartType": "overlay",
+    "order": 1,
+    "chartConfig": null,
+    "parameters": [],
+    "results": [
+      {
+        "displayName": "OC2",
+        "tooltipTemplate": "OC2",
+        "dataName": "value",
+        "dataType": "number",
+        "lineType": "solid",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#1E88E5",
+        "fill": null
+      }
+    ]
+  },
+  {
+    "name": "Open-High-Low Average (OHL3)",
+    "uiid": "OHL3",
+    "legendTemplate": "OHL3",
+    "endpoint": "/OHL3/",
+    "category": "price-transform",
+    "chartType": "overlay",
+    "order": 1,
+    "chartConfig": null,
+    "parameters": [],
+    "results": [
+      {
+        "displayName": "OHL3",
+        "tooltipTemplate": "OHL3",
+        "dataName": "value",
         "dataType": "number",
         "lineType": "solid",
         "stack": null,
@@ -3671,6 +3767,30 @@
         "stack": null,
         "lineWidth": 2,
         "defaultColor": "#DD2C00",
+        "fill": null
+      }
+    ]
+  },
+  {
+    "name": "Typical Price (HLC3)",
+    "uiid": "HLC3",
+    "legendTemplate": "HLC3",
+    "endpoint": "/HLC3/",
+    "category": "price-transform",
+    "chartType": "overlay",
+    "order": 1,
+    "chartConfig": null,
+    "parameters": [],
+    "results": [
+      {
+        "displayName": "HLC3",
+        "tooltipTemplate": "HLC3",
+        "dataName": "value",
+        "dataType": "number",
+        "lineType": "solid",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#1E88E5",
         "fill": null
       }
     ]

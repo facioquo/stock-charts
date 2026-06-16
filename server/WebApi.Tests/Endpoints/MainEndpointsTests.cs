@@ -289,6 +289,128 @@ public class MainEndpointsTests
         Assert.Empty(vwap);
     }
 
+    [Fact]
+    public async Task GetHl2_ComputesMedianPrice_ReturnsOkResult()
+    {
+        // Arrange — HL2 = (high + low) / 2. With the sample generator
+        // (high = base + 2, low = base - 2) the median collapses to base.
+        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act
+        IActionResult result = await _controller.GetHl2();
+
+        // Assert — the visible window carries the limitLast slice, every value
+        // computed from the expected (high + low) / 2 formula.
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<TimeValue> values = Assert.IsAssignableFrom<IEnumerable<TimeValue>>(okResult.Value).ToList();
+        Assert.Equal(120, values.Count);
+        Assert.All(values.Zip(sampleQuotes.TakeLast(120)), pair =>
+            Assert.Equal((double)(pair.Second.High + pair.Second.Low) / 2, pair.First.Value, 6));
+    }
+
+    [Fact]
+    public async Task GetHlc3_ComputesTypicalPrice_ReturnsOkResult()
+    {
+        // Arrange — HLC3 = (high + low + close) / 3.
+        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act
+        IActionResult result = await _controller.GetHlc3();
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<TimeValue> values = Assert.IsAssignableFrom<IEnumerable<TimeValue>>(okResult.Value).ToList();
+        Assert.Equal(120, values.Count);
+        Assert.All(values.Zip(sampleQuotes.TakeLast(120)), pair =>
+            Assert.Equal((double)(pair.Second.High + pair.Second.Low + pair.Second.Close) / 3, pair.First.Value, 6));
+    }
+
+    [Fact]
+    public async Task GetOc2_ComputesOpenCloseAverage_ReturnsOkResult()
+    {
+        // Arrange — OC2 = (open + close) / 2.
+        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act
+        IActionResult result = await _controller.GetOc2();
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<TimeValue> values = Assert.IsAssignableFrom<IEnumerable<TimeValue>>(okResult.Value).ToList();
+        Assert.Equal(120, values.Count);
+        Assert.All(values.Zip(sampleQuotes.TakeLast(120)), pair =>
+            Assert.Equal((double)(pair.Second.Open + pair.Second.Close) / 2, pair.First.Value, 6));
+    }
+
+    [Fact]
+    public async Task GetOhl3_ComputesOpenHighLowAverage_ReturnsOkResult()
+    {
+        // Arrange — OHL3 = (open + high + low) / 3.
+        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act
+        IActionResult result = await _controller.GetOhl3();
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<TimeValue> values = Assert.IsAssignableFrom<IEnumerable<TimeValue>>(okResult.Value).ToList();
+        Assert.Equal(120, values.Count);
+        Assert.All(values.Zip(sampleQuotes.TakeLast(120)), pair =>
+            Assert.Equal((double)(pair.Second.Open + pair.Second.High + pair.Second.Low) / 3, pair.First.Value, 6));
+    }
+
+    [Fact]
+    public async Task GetOhlc4_ComputesAveragePrice_ReturnsOkResult()
+    {
+        // Arrange — OHLC4 = (open + high + low + close) / 4.
+        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act
+        IActionResult result = await _controller.GetOhlc4();
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<TimeValue> values = Assert.IsAssignableFrom<IEnumerable<TimeValue>>(okResult.Value).ToList();
+        Assert.Equal(120, values.Count);
+        Assert.All(values.Zip(sampleQuotes.TakeLast(120)), pair =>
+            Assert.Equal((double)(pair.Second.Open + pair.Second.High + pair.Second.Low + pair.Second.Close) / 4, pair.First.Value, 6));
+    }
+
     /// <summary>
     /// Helper to generate sample quote data for tests.
     /// </summary>
