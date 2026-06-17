@@ -124,4 +124,51 @@ describe("createDefaultSelection", () => {
 
     expect(selection.results[0].lineWidth).toBe(2);
   });
+
+  it("assigns sequential order values when API omits per-result order", () => {
+    const listing = makeListing({
+      order: 50,
+      results: [
+        {
+          dataName: "macd",
+          displayName: "MACD",
+          tooltipTemplate: "MACD",
+          defaultColor: "#1E88E5",
+          lineType: "solid",
+          lineWidth: 2,
+          dataType: "number",
+          stack: "",
+          order: undefined
+        },
+        {
+          dataName: "signal",
+          displayName: "Signal",
+          tooltipTemplate: "Signal",
+          defaultColor: "#FFA726",
+          lineType: "solid",
+          lineWidth: 2,
+          dataType: "number",
+          stack: "",
+          order: undefined
+        },
+        {
+          dataName: "histogram",
+          displayName: "Histogram",
+          tooltipTemplate: "Histogram",
+          defaultColor: "#66BB6A",
+          lineType: "solid",
+          lineWidth: 2,
+          dataType: "number",
+          stack: "",
+          order: undefined
+        }
+      ]
+    });
+    const selection = createDefaultSelection(listing);
+
+    // Each result should get listing.order + index
+    expect(selection.results[0].order).toBe(50); // listing.order + 0
+    expect(selection.results[1].order).toBe(51); // listing.order + 1
+    expect(selection.results[2].order).toBe(52); // listing.order + 2
+  });
 });
