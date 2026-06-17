@@ -4209,6 +4209,7 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/ROLLING-PIVOTS/",
                 Category = "price-channel",
                 ChartType = "overlay",
+                Order = Order.BehindPrice,
                 Parameters =
                 [
                     new() {

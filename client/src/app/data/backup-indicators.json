@@ -3058,7 +3058,7 @@
     "endpoint": "/ROLLING-PIVOTS/",
     "category": "price-channel",
     "chartType": "overlay",
-    "order": 1,
+    "order": 80,
     "chartConfig": null,
     "parameters": [
       {
