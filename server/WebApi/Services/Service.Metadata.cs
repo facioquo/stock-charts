@@ -4052,6 +4052,7 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/PIVOT-POINTS/",
                 Category = "price-channel",
                 ChartType = "overlay",
+                Order = Order.BehindPrice,
                 Results = [
                     new() {
                         DisplayName = "R3",
@@ -4059,6 +4060,7 @@ public static class Metadata
                         DataName = "r3",
                         DataType = "number",
                         LineType = "dash",
+                        LineWidth = 1,
                         Segmented = true,
                         DefaultColor = ChartColors.StandardRed
                     },
@@ -4068,6 +4070,7 @@ public static class Metadata
                         DataName = "r2",
                         DataType = "number",
                         LineType = "dash",
+                        LineWidth = 1,
                         Segmented = true,
                         DefaultColor = ChartColors.StandardRed
                     },
@@ -4077,6 +4080,7 @@ public static class Metadata
                         DataName = "r1",
                         DataType = "number",
                         LineType = "dash",
+                        LineWidth = 1,
                         Segmented = true,
                         DefaultColor = ChartColors.StandardRed
                     },
@@ -4086,6 +4090,7 @@ public static class Metadata
                         DataName = "pp",
                         DataType = "number",
                         LineType = "solid",
+                        LineWidth = 1,
                         Segmented = true,
                         DefaultColor = ChartColors.DarkGray
                     },
@@ -4095,6 +4100,7 @@ public static class Metadata
                         DataName = "s1",
                         DataType = "number",
                         LineType = "dash",
+                        LineWidth = 1,
                         Segmented = true,
                         DefaultColor = ChartColors.StandardGreen
                     },
@@ -4104,6 +4110,7 @@ public static class Metadata
                         DataName = "s2",
                         DataType = "number",
                         LineType = "dash",
+                        LineWidth = 1,
                         Segmented = true,
                         DefaultColor = ChartColors.StandardGreen
                     },
@@ -4113,6 +4120,7 @@ public static class Metadata
                         DataName = "s3",
                         DataType = "number",
                         LineType = "dash",
+                        LineWidth = 1,
                         Segmented = true,
                         DefaultColor = ChartColors.StandardGreen
                     }

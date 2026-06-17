@@ -2624,7 +2624,7 @@
     "endpoint": "/PIVOT-POINTS/",
     "category": "price-channel",
     "chartType": "overlay",
-    "order": 1,
+    "order": 80,
     "chartConfig": null,
     "parameters": [],
     "results": [
@@ -2636,7 +2636,7 @@
         "lineType": "dash",
         "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#DD2C00",
         "fill": null
       },
@@ -2648,7 +2648,7 @@
         "lineType": "dash",
         "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#DD2C00",
         "fill": null
       },
@@ -2660,7 +2660,7 @@
         "lineType": "dash",
         "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#DD2C00",
         "fill": null
       },
@@ -2672,7 +2672,7 @@
         "lineType": "solid",
         "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#616161CC",
         "fill": null
       },
@@ -2684,7 +2684,7 @@
         "lineType": "dash",
         "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#2E7D32",
         "fill": null
       },
@@ -2696,7 +2696,7 @@
         "lineType": "dash",
         "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#2E7D32",
         "fill": null
       },
@@ -2708,7 +2708,7 @@
         "lineType": "dash",
         "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#2E7D32",
         "fill": null
       }
