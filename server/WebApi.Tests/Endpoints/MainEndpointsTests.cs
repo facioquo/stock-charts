@@ -212,25 +212,25 @@ public class MainEndpointsTests
     public async Task GetVwap_WithValidQuotes_ReturnsOkResult()
     {
         // Arrange — generate enough quotes so TakeLast(limitLast) has a first element
-        var sampleQuotes = GenerateSampleQuotes(150);
+        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
 
-        var httpContext = new DefaultHttpContext();
+        DefaultHttpContext httpContext = new();
         _controller.ControllerContext = new ControllerContext {
             HttpContext = httpContext
         };
 
         // Act
-        var result = await _controller.GetVwap();
+        IActionResult result = await _controller.GetVwap();
 
         // Assert — anchor is the first of the last limitLast (120) quotes, so the
         // sliced response carries exactly 120 results, every one with a computed
         // (non-null) VWAP. A bare status-code check would let a regression that
         // returns fewer rows or leaks pre-anchor nulls pass silently.
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var vwap = Assert.IsAssignableFrom<IEnumerable<VwapResult>>(okResult.Value).ToList();
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<VwapResult> vwap = Assert.IsType<IEnumerable<VwapResult>>(okResult.Value, exactMatch: false).ToList();
         Assert.Equal(120, vwap.Count);
         Assert.All(vwap, r => Assert.NotNull(r.Vwap));
         // Anchor contract: the line must begin at the first candle of the visible
@@ -244,23 +244,23 @@ public class MainEndpointsTests
     public async Task GetVwap_WithFewerThanLimitLastQuotes_ReturnsOkResult()
     {
         // Arrange — fewer quotes than the limitLast window; all should be visible
-        var sampleQuotes = GenerateSampleQuotes(50);
+        List<Quote> sampleQuotes = GenerateSampleQuotes(50);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
 
-        var httpContext = new DefaultHttpContext();
+        DefaultHttpContext httpContext = new();
         _controller.ControllerContext = new ControllerContext {
             HttpContext = httpContext
         };
 
         // Act
-        var result = await _controller.GetVwap();
+        IActionResult result = await _controller.GetVwap();
 
         // Assert — fewer quotes than the window means the anchor falls on the
         // first quote, so all 50 rows are visible and every VWAP is computed.
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var vwap = Assert.IsAssignableFrom<IEnumerable<VwapResult>>(okResult.Value).ToList();
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<VwapResult> vwap = Assert.IsType<IEnumerable<VwapResult>>(okResult.Value, exactMatch: false).ToList();
         Assert.Equal(50, vwap.Count);
         Assert.All(vwap, r => Assert.NotNull(r.Vwap));
         // With fewer quotes than the window, the anchor falls on the very first quote.
@@ -275,17 +275,17 @@ public class MainEndpointsTests
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
 
-        var httpContext = new DefaultHttpContext();
+        DefaultHttpContext httpContext = new();
         _controller.ControllerContext = new ControllerContext {
             HttpContext = httpContext
         };
 
         // Act — should not throw despite empty collection
-        var result = await _controller.GetVwap();
+        IActionResult result = await _controller.GetVwap();
 
         // Assert — empty input is guarded before First(), yielding an empty 200.
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var vwap = Assert.IsAssignableFrom<IEnumerable<VwapResult>>(okResult.Value).ToList();
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<VwapResult> vwap = Assert.IsType<IEnumerable<VwapResult>>(okResult.Value, exactMatch: false).ToList();
         Assert.Empty(vwap);
     }
 
@@ -309,7 +309,7 @@ public class MainEndpointsTests
         // Assert — the visible window carries the limitLast slice, every value
         // computed from the expected (high + low) / 2 formula.
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
-        List<TimeValue> values = Assert.IsAssignableFrom<IEnumerable<TimeValue>>(okResult.Value).ToList();
+        List<TimeValue> values = Assert.IsType<IEnumerable<TimeValue>>(okResult.Value, exactMatch: false).ToList();
         Assert.Equal(120, values.Count);
         Assert.All(values.Zip(sampleQuotes.TakeLast(120)), pair =>
             Assert.Equal((double)(pair.Second.High + pair.Second.Low) / 2, pair.First.Value, 6));
@@ -333,7 +333,7 @@ public class MainEndpointsTests
 
         // Assert
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
-        List<TimeValue> values = Assert.IsAssignableFrom<IEnumerable<TimeValue>>(okResult.Value).ToList();
+        List<TimeValue> values = Assert.IsType<IEnumerable<TimeValue>>(okResult.Value, exactMatch: false).ToList();
         Assert.Equal(120, values.Count);
         Assert.All(values.Zip(sampleQuotes.TakeLast(120)), pair =>
             Assert.Equal((double)(pair.Second.High + pair.Second.Low + pair.Second.Close) / 3, pair.First.Value, 6));
@@ -357,7 +357,7 @@ public class MainEndpointsTests
 
         // Assert
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
-        List<TimeValue> values = Assert.IsAssignableFrom<IEnumerable<TimeValue>>(okResult.Value).ToList();
+        List<TimeValue> values = Assert.IsType<IEnumerable<TimeValue>>(okResult.Value, exactMatch: false).ToList();
         Assert.Equal(120, values.Count);
         Assert.All(values.Zip(sampleQuotes.TakeLast(120)), pair =>
             Assert.Equal((double)(pair.Second.Open + pair.Second.Close) / 2, pair.First.Value, 6));
@@ -381,7 +381,7 @@ public class MainEndpointsTests
 
         // Assert
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
-        List<TimeValue> values = Assert.IsAssignableFrom<IEnumerable<TimeValue>>(okResult.Value).ToList();
+        List<TimeValue> values = Assert.IsType<IEnumerable<TimeValue>>(okResult.Value, exactMatch: false).ToList();
         Assert.Equal(120, values.Count);
         Assert.All(values.Zip(sampleQuotes.TakeLast(120)), pair =>
             Assert.Equal((double)(pair.Second.Open + pair.Second.High + pair.Second.Low) / 3, pair.First.Value, 6));
@@ -405,7 +405,7 @@ public class MainEndpointsTests
 
         // Assert
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
-        List<TimeValue> values = Assert.IsAssignableFrom<IEnumerable<TimeValue>>(okResult.Value).ToList();
+        List<TimeValue> values = Assert.IsType<IEnumerable<TimeValue>>(okResult.Value, exactMatch: false).ToList();
         Assert.Equal(120, values.Count);
         Assert.All(values.Zip(sampleQuotes.TakeLast(120)), pair =>
             Assert.Equal((double)(pair.Second.Open + pair.Second.High + pair.Second.Low + pair.Second.Close) / 4, pair.First.Value, 6));
@@ -431,7 +431,7 @@ public class MainEndpointsTests
         // Assert — the catalog exposes upper/lower histograms; confirm the
         // endpoint returns the GatorResult series for the visible window.
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
-        List<GatorResult> gator = Assert.IsAssignableFrom<IEnumerable<GatorResult>>(okResult.Value).ToList();
+        List<GatorResult> gator = Assert.IsType<IEnumerable<GatorResult>>(okResult.Value, exactMatch: false).ToList();
         Assert.Equal(120, gator.Count);
     }
 
@@ -453,7 +453,7 @@ public class MainEndpointsTests
 
         // Assert
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
-        List<PivotPointsResult> pivots = Assert.IsAssignableFrom<IEnumerable<PivotPointsResult>>(okResult.Value).ToList();
+        List<PivotPointsResult> pivots = Assert.IsType<IEnumerable<PivotPointsResult>>(okResult.Value, exactMatch: false).ToList();
         Assert.Equal(120, pivots.Count);
     }
 
@@ -475,7 +475,7 @@ public class MainEndpointsTests
 
         // Assert
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
-        List<PivotsResult> pivots = Assert.IsAssignableFrom<IEnumerable<PivotsResult>>(okResult.Value).ToList();
+        List<PivotsResult> pivots = Assert.IsType<IEnumerable<PivotsResult>>(okResult.Value, exactMatch: false).ToList();
         Assert.Equal(120, pivots.Count);
     }
 
@@ -518,7 +518,7 @@ public class MainEndpointsTests
 
         // Assert
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
-        List<RollingPivotsResult> pivots = Assert.IsAssignableFrom<IEnumerable<RollingPivotsResult>>(okResult.Value).ToList();
+        List<RollingPivotsResult> pivots = Assert.IsType<IEnumerable<RollingPivotsResult>>(okResult.Value, exactMatch: false).ToList();
         Assert.Equal(120, pivots.Count);
     }
 
@@ -527,7 +527,7 @@ public class MainEndpointsTests
     {
         // monthly Pivot Points are piecewise-constant level lines: the client
         // renders one horizontal segment per month, so every result opts in.
-        var listing = Metadata
+        Models.IndicatorListing listing = Metadata
             .IndicatorListing("https://localhost")
             .Single(l => l.Uiid == "PIVOT-POINTS");
 
@@ -542,7 +542,7 @@ public class MainEndpointsTests
     {
         // rolling pivots recompute every bar (no flat windows), so they render
         // as ordinary continuous lines and must not be segmented.
-        var listing = Metadata
+        Models.IndicatorListing listing = Metadata
             .IndicatorListing("https://localhost")
             .Single(l => l.Uiid == "ROLLING-PIVOTS");
 
