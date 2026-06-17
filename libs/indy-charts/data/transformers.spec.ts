@@ -73,6 +73,26 @@ function makeRow(dateStr: string, values: Record<string, unknown> = {}): Indicat
   };
 }
 
+/** Listing with one segmented level-line result (e.g. a pivot point level). */
+function makeSegmentedListing(dataName: string): IndicatorListing {
+  return makeListing({
+    results: [
+      {
+        displayName: dataName,
+        tooltipTemplate: "",
+        dataName,
+        dataType: "number",
+        lineType: "solid",
+        segmented: true,
+        stack: "",
+        lineWidth: 2,
+        defaultColor: "#FF0000",
+        order: 0
+      }
+    ]
+  });
+}
+
 // ---------------------------------------------------------------------------
 // processQuoteData
 // ---------------------------------------------------------------------------
@@ -418,6 +438,69 @@ describe("buildDataPoints", () => {
     const { dataPoints } = buildDataPoints(data, result, listing);
 
     expect(dataPoints.map(p => p.y)).toEqual([10, 20]);
+  });
+
+  it("preserves the first real value after a leading null warmup window", () => {
+    // pivots have no value until a full prior window exists (leading nulls).
+    const data: IndicatorDataRow[] = [
+      makeRow("2024-01-01", {}),
+      makeRow("2024-01-02", {}),
+      makeRow("2024-01-03", { pp: 10 }),
+      makeRow("2024-01-04", { pp: 10 })
+    ];
+
+    const { dataPoints } = buildDataPoints(
+      data,
+      makeResult({ dataName: "pp" }),
+      makeSegmentedListing("pp")
+    );
+    const ys = dataPoints.map(p => p.y);
+
+    expect(Number.isNaN(ys[0])).toBe(true); // warmup
+    expect(Number.isNaN(ys[1])).toBe(true);
+    expect(ys[2]).toBe(10); // first real value is a window start, not a boundary
+    expect(ys[3]).toBe(10);
+  });
+
+  it("resumes level tracking across a mid-series gap without a false break", () => {
+    // a missing day inside a window must not be mistaken for a window boundary.
+    const data: IndicatorDataRow[] = [
+      makeRow("2024-01-01", { pp: 10 }),
+      makeRow("2024-01-02", {}),
+      makeRow("2024-01-03", { pp: 10 }),
+      makeRow("2024-01-04", { pp: 20 })
+    ];
+
+    const { dataPoints } = buildDataPoints(
+      data,
+      makeResult({ dataName: "pp" }),
+      makeSegmentedListing("pp")
+    );
+    const ys = dataPoints.map(p => p.y);
+
+    expect(ys[0]).toBe(10);
+    expect(Number.isNaN(ys[1])).toBe(true); // the gap itself
+    expect(ys[2]).toBe(10); // same window resumes — not nulled as a boundary
+    expect(Number.isNaN(ys[3])).toBe(true); // genuine boundary into the 20 window
+  });
+
+  it("breaks every step when the level changes on consecutive points", () => {
+    const data: IndicatorDataRow[] = [
+      makeRow("2024-01-01", { pp: 10 }),
+      makeRow("2024-01-02", { pp: 20 }),
+      makeRow("2024-01-03", { pp: 30 })
+    ];
+
+    const { dataPoints } = buildDataPoints(
+      data,
+      makeResult({ dataName: "pp" }),
+      makeSegmentedListing("pp")
+    );
+    const ys = dataPoints.map(p => p.y);
+
+    expect(ys[0]).toBe(10);
+    expect(Number.isNaN(ys[1])).toBe(true);
+    expect(Number.isNaN(ys[2])).toBe(true);
   });
 });
 

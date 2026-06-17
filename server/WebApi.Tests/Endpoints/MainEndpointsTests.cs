@@ -531,6 +531,9 @@ public class MainEndpointsTests
             .IndicatorListing("https://localhost")
             .Single(l => l.Uiid == "PIVOT-POINTS");
 
+        // assert the count first so Assert.All cannot pass vacuously on an
+        // empty result set (7 levels: R3-R1, PP, S1-S3).
+        Assert.Equal(7, listing.Results.Count);
         Assert.All(listing.Results, r => Assert.True(r.Segmented));
     }
 
@@ -543,6 +546,9 @@ public class MainEndpointsTests
             .IndicatorListing("https://localhost")
             .Single(l => l.Uiid == "ROLLING-PIVOTS");
 
+        // assert the count first so Assert.All cannot pass vacuously on an
+        // empty result set (7 levels: R3-R1, PP, S1-S3).
+        Assert.Equal(7, listing.Results.Count);
         Assert.All(listing.Results, r => Assert.False(r.Segmented));
     }
 

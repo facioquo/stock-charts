@@ -64,6 +64,11 @@ export function buildDataPoints(
   // instead of a continuous staircase. Replacing — rather than inserting — keeps
   // the dataset index-aligned with quotes, which window slicing and the
   // structuredClone resize cache both depend on.
+  //
+  // Intended only for piecewise-constant series where each level persists for
+  // multiple consecutive points (e.g. weekly/monthly pivots). On a series that
+  // changes every point, every value after the first would be NaN'd away, so do
+  // not set `segmented` on continuous indicators (EMA, rolling pivots, etc.).
   const segmented = resultConfig?.segmented === true;
   let previousLevel: number | undefined;
 
