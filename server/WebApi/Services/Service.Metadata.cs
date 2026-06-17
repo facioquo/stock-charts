@@ -4236,6 +4236,7 @@ public static class Metadata
                         DataName = "r3",
                         DataType = "number",
                         LineType = "dash",
+                        LineWidth = 1,
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
@@ -4244,6 +4245,7 @@ public static class Metadata
                         DataName = "r2",
                         DataType = "number",
                         LineType = "dash",
+                        LineWidth = 1,
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
@@ -4252,6 +4254,7 @@ public static class Metadata
                         DataName = "r1",
                         DataType = "number",
                         LineType = "dash",
+                        LineWidth = 1,
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
@@ -4260,6 +4263,7 @@ public static class Metadata
                         DataName = "pp",
                         DataType = "number",
                         LineType = "solid",
+                        LineWidth = 1,
                         DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
@@ -4268,6 +4272,7 @@ public static class Metadata
                         DataName = "s1",
                         DataType = "number",
                         LineType = "dash",
+                        LineWidth = 1,
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
@@ -4276,6 +4281,7 @@ public static class Metadata
                         DataName = "s2",
                         DataType = "number",
                         LineType = "dash",
+                        LineWidth = 1,
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
@@ -4284,6 +4290,7 @@ public static class Metadata
                         DataName = "s3",
                         DataType = "number",
                         LineType = "dash",
+                        LineWidth = 1,
                         DefaultColor = ChartColors.StandardGreen
                     }
                 ]
