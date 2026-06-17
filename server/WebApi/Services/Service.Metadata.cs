@@ -504,7 +504,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
-                        DefaultColor = ChartColors.DarkGray,
+                        DefaultColor = ChartColors.StandardOrange,
                         Fill = new ChartFill {
                             Target = "+2",
                             ColorAbove = ChartColors.DarkGrayTransparent,
@@ -518,7 +518,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
-                        DefaultColor = ChartColors.DarkGray
+                        DefaultColor = ChartColors.StandardOrange
                     },
                     new() {
                         DisplayName = "Lower Band",
@@ -527,7 +527,7 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
-                        DefaultColor = ChartColors.DarkGray
+                        DefaultColor = ChartColors.StandardOrange
                     }
                 ]
             },
