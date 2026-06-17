@@ -105,7 +105,14 @@ export interface IndicatorResultConfig {
   lineWidth: number | null;
   defaultColor: string;
   fill?: ChartFill | null;
-  order: number;
+  /**
+   * Optional per-result z-order override (Chart.js dataset `order`: lower draws
+   * on top, higher draws behind). The API does not currently emit this, so it is
+   * absent in practice and the series falls back to the listing's `order` (the
+   * z-order for the whole indicator). Present here for an eventual per-result
+   * override without a breaking type change.
+   */
+  order?: number;
 }
 
 export interface ChartConfig {
