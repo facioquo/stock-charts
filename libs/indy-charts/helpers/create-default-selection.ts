@@ -62,7 +62,7 @@ export function createDefaultSelection(
   });
 
   // Hydrate result placeholders with default colors, labels, and empty datasets.
-  listing.results?.forEach((config: IndicatorResultConfig) => {
+  listing.results?.forEach((config: IndicatorResultConfig, index: number) => {
     const result: IndicatorResult = {
       label: config.tooltipTemplate,
       color: config.defaultColor,
@@ -72,9 +72,10 @@ export function createDefaultSelection(
       lineWidth: typeof config.lineWidth === "number" ? config.lineWidth : 2,
       // Z-order: lower draws on top, higher draws behind (price candles are
       // 75/76), so e.g. Order.BehindPrice (80) renders the series behind the
-      // candles. Falls back to the listing's order, which is the z-order for the
-      // whole indicator; a result may override it with its own `order`.
-      order: config.order ?? listing.order,
+      // candles. When the API omits per-result order, assign sequential values
+      // starting from the listing's order to ensure each result has a unique
+      // z-order (critical for multi-result indicators like MACD, oscillators).
+      order: config.order ?? listing.order + index,
       dataset: { type: "line", data: [] }
     };
 
