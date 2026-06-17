@@ -268,7 +268,7 @@ public class Main(IQuoteService quoteService) : ControllerBase
 
     [HttpGet("PIVOT-POINTS")]
     public Task<IActionResult> GetPivotPoints()
-        => Get(quotes => quotes.ToPivotPoints(PeriodSize.Week));
+        => Get(quotes => quotes.ToPivotPoints(PeriodSize.Month));
 
     [HttpGet("PIVOTS")]
     public Task<IActionResult> GetPivots(int leftSpan, int rightSpan, int maxTrendPeriods)

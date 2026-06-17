@@ -70,7 +70,11 @@ export function createDefaultSelection(
       displayName: config.displayName,
       lineType: config.lineType,
       lineWidth: typeof config.lineWidth === "number" ? config.lineWidth : 2,
-      order: config.order,
+      // Z-order: lower draws on top, higher draws behind (price candles are
+      // 75/76), so e.g. Order.BehindPrice (80) renders the series behind the
+      // candles. Falls back to the listing's order, which is the z-order for the
+      // whole indicator; a result may override it with its own `order`.
+      order: config.order ?? listing.order,
       dataset: { type: "line", data: [] }
     };
 

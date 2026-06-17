@@ -93,11 +93,26 @@ export interface IndicatorResultConfig {
   dataName: string;
   dataType: string;
   lineType: string;
+  /**
+   * Piecewise-constant level line (e.g. monthly Pivot Points): the value is flat
+   * within a window and steps at each boundary. When set, the line renders as a
+   * separate horizontal segment per window — the boundary riser is hidden —
+   * matching the reference rendering without inserting gap points. Absent
+   * (false) for ordinary continuous series.
+   */
+  segmented?: boolean;
   stack: string;
   lineWidth: number | null;
   defaultColor: string;
   fill?: ChartFill | null;
-  order: number;
+  /**
+   * Optional per-result z-order override (Chart.js dataset `order`: lower draws
+   * on top, higher draws behind). The API does not currently emit this, so it is
+   * absent in practice and the series falls back to the listing's `order` (the
+   * z-order for the whole indicator). Present here for an eventual per-result
+   * override without a breaking type change.
+   */
+  order?: number;
 }
 
 export interface ChartConfig {

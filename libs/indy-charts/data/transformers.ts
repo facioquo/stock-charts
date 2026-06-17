@@ -55,6 +55,23 @@ export function buildDataPoints(
   const pointRotation: number[] = [];
   let hasConditionalColor = false;
 
+  const resultConfig = listing.results.find(x => x.dataName === result.dataName);
+
+  // Segmented level lines (e.g. monthly Pivot Points) hold a constant value
+  // within each window and step at each boundary. Replacing the first value of
+  // every new window with NaN makes Chart.js break the line there (gaps are not
+  // spanned by default), so each window renders as its own horizontal segment
+  // instead of a continuous staircase. Replacing — rather than inserting — keeps
+  // the dataset index-aligned with quotes, which window slicing and the
+  // structuredClone resize cache both depend on.
+  //
+  // Intended only for piecewise-constant series where each level persists for
+  // multiple consecutive points (e.g. weekly/monthly pivots). On a series that
+  // changes every point, every value after the first would be NaN'd away, so do
+  // not set `segmented` on continuous indicators (EMA, rolling pivots, etc.).
+  const segmented = resultConfig?.segmented === true;
+  let previousLevel: number | undefined;
+
   data.forEach(row => {
     const rawValue: unknown = row[result.dataName];
     let yValue = typeof rawValue === "number" ? rawValue : undefined;
@@ -79,7 +96,6 @@ export function buildDataPoints(
         pointColor.push(expandingColor);
         hasConditionalColor = true;
       } else {
-        const resultConfig = listing.results.find(x => x.dataName === result.dataName);
         pointColor.push(resultConfig?.defaultColor ?? COLORS.GRAY);
       }
       pointRotation.push(0);
@@ -87,6 +103,13 @@ export function buildDataPoints(
 
     if (typeof yValue !== "number") {
       yValue = NaN;
+    } else if (segmented) {
+      // break the line at each window boundary (where the level steps)
+      const isBoundary = previousLevel !== undefined && yValue !== previousLevel;
+      previousLevel = yValue;
+      if (isBoundary) {
+        yValue = NaN;
+      }
     }
     if (row.timestamp == null) {
       throw new Error(`Indicator row missing 'timestamp' field for "${result.dataName}"`);

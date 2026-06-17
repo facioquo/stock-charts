@@ -2618,13 +2618,13 @@
     ]
   },
   {
-    "name": "Pivot Points (week)",
+    "name": "Pivot Points (month)",
     "uiid": "PIVOT-POINTS",
-    "legendTemplate": "PIVOT POINTS(WEEK)",
+    "legendTemplate": "PIVOT POINTS(MONTH)",
     "endpoint": "/PIVOT-POINTS/",
     "category": "price-channel",
     "chartType": "overlay",
-    "order": 1,
+    "order": 80,
     "chartConfig": null,
     "parameters": [],
     "results": [
@@ -2634,8 +2634,9 @@
         "dataName": "r3",
         "dataType": "number",
         "lineType": "dash",
+        "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#DD2C00",
         "fill": null
       },
@@ -2645,8 +2646,9 @@
         "dataName": "r2",
         "dataType": "number",
         "lineType": "dash",
+        "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#DD2C00",
         "fill": null
       },
@@ -2656,8 +2658,9 @@
         "dataName": "r1",
         "dataType": "number",
         "lineType": "dash",
+        "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#DD2C00",
         "fill": null
       },
@@ -2667,9 +2670,10 @@
         "dataName": "pp",
         "dataType": "number",
         "lineType": "solid",
+        "segmented": true,
         "stack": null,
-        "lineWidth": 2,
-        "defaultColor": "#1E88E5",
+        "lineWidth": 1,
+        "defaultColor": "#616161CC",
         "fill": null
       },
       {
@@ -2678,8 +2682,9 @@
         "dataName": "s1",
         "dataType": "number",
         "lineType": "dash",
+        "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#2E7D32",
         "fill": null
       },
@@ -2689,8 +2694,9 @@
         "dataName": "s2",
         "dataType": "number",
         "lineType": "dash",
+        "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#2E7D32",
         "fill": null
       },
@@ -2700,8 +2706,9 @@
         "dataName": "s3",
         "dataType": "number",
         "lineType": "dash",
+        "segmented": true,
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#2E7D32",
         "fill": null
       }
@@ -3051,7 +3058,7 @@
     "endpoint": "/ROLLING-PIVOTS/",
     "category": "price-channel",
     "chartType": "overlay",
-    "order": 1,
+    "order": 80,
     "chartConfig": null,
     "parameters": [
       {

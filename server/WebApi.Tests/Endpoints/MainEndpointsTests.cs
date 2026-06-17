@@ -438,7 +438,7 @@ public class MainEndpointsTests
     [Fact]
     public async Task GetPivotPoints_WithValidQuotes_ReturnsOkResult()
     {
-        // Arrange — weekly pivot points need at least two windows of warmup.
+        // Arrange — monthly pivot points need at least two windows of warmup.
         List<Quote> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
@@ -520,6 +520,36 @@ public class MainEndpointsTests
         OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
         List<RollingPivotsResult> pivots = Assert.IsAssignableFrom<IEnumerable<RollingPivotsResult>>(okResult.Value).ToList();
         Assert.Equal(120, pivots.Count);
+    }
+
+    [Fact]
+    public void PivotPointsListing_MarksAllLevelsSegmented()
+    {
+        // monthly Pivot Points are piecewise-constant level lines: the client
+        // renders one horizontal segment per month, so every result opts in.
+        var listing = Metadata
+            .IndicatorListing("https://localhost")
+            .Single(l => l.Uiid == "PIVOT-POINTS");
+
+        // assert the count first so Assert.All cannot pass vacuously on an
+        // empty result set (7 levels: R3-R1, PP, S1-S3).
+        Assert.Equal(7, listing.Results.Count);
+        Assert.All(listing.Results, r => Assert.True(r.Segmented));
+    }
+
+    [Fact]
+    public void RollingPivotsListing_LeavesLevelsContinuous()
+    {
+        // rolling pivots recompute every bar (no flat windows), so they render
+        // as ordinary continuous lines and must not be segmented.
+        var listing = Metadata
+            .IndicatorListing("https://localhost")
+            .Single(l => l.Uiid == "ROLLING-PIVOTS");
+
+        // assert the count first so Assert.All cannot pass vacuously on an
+        // empty result set (7 levels: R3-R1, PP, S1-S3).
+        Assert.Equal(7, listing.Results.Count);
+        Assert.All(listing.Results, r => Assert.False(r.Segmented));
     }
 
     /// <summary>
