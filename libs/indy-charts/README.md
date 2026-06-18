@@ -57,6 +57,15 @@ the underlying Chart.js instance. Always call the wrapper's `destroy()` —
 never reach into `chart.chart?.destroy()`, which only tears down Chart.js
 and leaks the wrapper's cached state.
 
+### Chart settings
+
+All chart classes accept a `ChartSettings` object:
+
+- **`isDarkTheme`**: applies dark or light color palette
+- **`showTooltips`**: enables/disables hover tooltips
+- **`showRightAxisLabels`** (optional, defaults to `true`): controls right-axis tick labels. Set to `false` for cleaner standalone charts. Gridlines remain visible regardless.
+- **`background`** (optional): overrides annotation and axis-label backdrop color
+
 For indicators, the responsive viewport, and oscillator subcharts, use `ChartManager`:
 
 ```typescript
