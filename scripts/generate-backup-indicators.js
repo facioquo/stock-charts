@@ -65,7 +65,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
         console.error("Fetch failed and no existing snapshot is present:", err.message);
         process.exit(1);
       }
-      console.log("Error:", err)
+      console.log("Error:", err);
     }
   })();
 }
