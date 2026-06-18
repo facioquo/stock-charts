@@ -658,7 +658,7 @@
         "lineType": "solid",
         "stack": null,
         "lineWidth": 1,
-        "defaultColor": "#616161CC",
+        "defaultColor": "#EF6C00",
         "fill": {
           "target": "+2",
           "colorAbove": "#61616110",
@@ -673,7 +673,7 @@
         "lineType": "dash",
         "stack": null,
         "lineWidth": 1,
-        "defaultColor": "#616161CC",
+        "defaultColor": "#EF6C00",
         "fill": null
       },
       {
@@ -684,7 +684,7 @@
         "lineType": "solid",
         "stack": null,
         "lineWidth": 1,
-        "defaultColor": "#616161CC",
+        "defaultColor": "#EF6C00",
         "fill": null
       }
     ]
@@ -2715,7 +2715,7 @@
     ]
   },
   {
-    "name": "Pivots (Williams Fractal)",
+    "name": "Pivots",
     "uiid": "PIVOTS",
     "legendTemplate": "PIVOTS([P1],[P2],[P3])",
     "endpoint": "/PIVOTS/",
@@ -3086,7 +3086,7 @@
         "dataType": "number",
         "lineType": "dash",
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#DD2C00",
         "fill": null
       },
@@ -3097,7 +3097,7 @@
         "dataType": "number",
         "lineType": "dash",
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#DD2C00",
         "fill": null
       },
@@ -3108,7 +3108,7 @@
         "dataType": "number",
         "lineType": "dash",
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#DD2C00",
         "fill": null
       },
@@ -3119,7 +3119,7 @@
         "dataType": "number",
         "lineType": "solid",
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#1E88E5",
         "fill": null
       },
@@ -3130,7 +3130,7 @@
         "dataType": "number",
         "lineType": "dash",
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#2E7D32",
         "fill": null
       },
@@ -3141,7 +3141,7 @@
         "dataType": "number",
         "lineType": "dash",
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#2E7D32",
         "fill": null
       },
@@ -3152,7 +3152,7 @@
         "dataType": "number",
         "lineType": "dash",
         "stack": null,
-        "lineWidth": 2,
+        "lineWidth": 1,
         "defaultColor": "#2E7D32",
         "fill": null
       }

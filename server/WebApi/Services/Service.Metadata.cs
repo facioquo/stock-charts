@@ -2425,9 +2425,9 @@ public static class Metadata
                 ]
             },
 
-            // Pivots (Williams Fractal)
+            // Pivots
             new IndicatorListing {
-                Name = "Pivots (Williams Fractal)",
+                Name = "Pivots",
                 Uiid = "PIVOTS",
                 LegendTemplate = "PIVOTS([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/PIVOTS/",
