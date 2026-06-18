@@ -51,6 +51,9 @@ export class ChartService implements OnDestroy {
   /** Whether the initial chart load is in progress. */
   loading = signal(true);
 
+  /** Whether the API is unavailable (backend services not running). */
+  apiError = signal(false);
+
   /** Read-only proxy to ChartManager selections (used by templates). */
   get selections(): readonly IndicatorSelection[] {
     return this.chartManager.selections;
@@ -170,6 +173,14 @@ export class ChartService implements OnDestroy {
   loadCharts(): void {
     this.api.getQuotes().subscribe({
       next: (allQuotes: Quote[]) => {
+        // Check if we're using backup data due to API unavailability
+        if (this.api.isBackupActive) {
+          console.error("Backend API is unavailable");
+          this.apiError.set(true);
+          this.loading.set(false);
+          return;
+        }
+
         const canvas = document.getElementById("chartOverlay") as HTMLCanvasElement;
         const ctx = canvas?.getContext("2d");
         if (!ctx) {
@@ -184,6 +195,14 @@ export class ChartService implements OnDestroy {
 
         this.api.getListings().subscribe({
           next: (listings: IndicatorListing[]) => {
+            // Check again after listings load (defensive)
+            if (this.api.isBackupActive) {
+              console.error("Backend API is unavailable");
+              this.apiError.set(true);
+              this.loading.set(false);
+              return;
+            }
+
             this.listings = listings;
             this.loadSelections();
           },

@@ -28,6 +28,7 @@ interface ChartServicePrivate {
   window: WindowService;
   destroy$: Subject<void>;
   loading: { set: (v: unknown) => void; update: (fn: (v: unknown) => unknown) => void };
+  apiError: { set: (v: boolean) => void; update: (fn: (v: boolean) => boolean) => void };
   chartManager: ChartManager;
   cacheSelections: () => void;
   loadDefaultSelections: () => void;
@@ -272,6 +273,7 @@ describe("ChartService Smoke Tests", () => {
     priv.window = mockWindowService;
     priv.destroy$ = new Subject<void>();
     priv.loading = { set: vi.fn(), update: vi.fn() };
+    priv.apiError = { set: vi.fn(), update: vi.fn() };
 
     // Initialize ChartManager (mirrors constructor logic)
     priv.chartManager = new ChartManager({
@@ -562,5 +564,63 @@ describe("ChartService Smoke Tests", () => {
 
     warnSpy.mockRestore();
     addSpy.mockRestore();
+  });
+
+  /**
+   * Test 8: API Error Handling
+   * Verifies that apiError signal is set when API is unavailable
+   */
+  it("should set apiError signal when API service enters backup mode", () => {
+    const priv = privateOf(service);
+
+    // Mock API service with backup active
+    const mockApiWithBackup = {
+      ...mockApiService,
+      isBackupActive: true
+    } as unknown as ApiService;
+    priv.api = mockApiWithBackup;
+
+    // Mock loading signal
+    const loadingSpy = { set: vi.fn(), update: vi.fn() };
+    const apiErrorSpy = { set: vi.fn(), update: vi.fn() };
+    priv.loading = loadingSpy;
+    priv.apiError = apiErrorSpy;
+
+    // Act: Load charts when API is in backup mode
+    service.loadCharts();
+
+    // Assert: apiError signal is set to true
+    expect(apiErrorSpy.set).toHaveBeenCalledWith(true);
+    expect(loadingSpy.set).toHaveBeenCalledWith(false);
+  });
+
+  it("should initialize charts normally when API is available", () => {
+    const sampleQuotes = generateSampleQuotes(100);
+    const priv = privateOf(service);
+
+    // Mock API service WITHOUT backup active
+    const mockApiLive = {
+      ...mockApiService,
+      isBackupActive: false,
+      getQuotes: vi.fn(() => of(sampleQuotes)),
+      getListings: vi.fn(() => of([generateSampleIndicatorListing()]))
+    } as unknown as ApiService;
+    priv.api = mockApiLive;
+
+    // Mock loading and apiError signals
+    const loadingSpy = { set: vi.fn(), update: vi.fn() };
+    const apiErrorSpy = { set: vi.fn(), update: vi.fn() };
+    priv.loading = loadingSpy;
+    priv.apiError = apiErrorSpy;
+
+    // Mock loadSelections to avoid localStorage side effects
+    priv.loadSelections = vi.fn();
+
+    // Act: Load charts when API is live
+    service.loadCharts();
+
+    // Assert: apiError signal is NOT set to true
+    expect(apiErrorSpy.set).not.toHaveBeenCalledWith(true);
+    // loading.set(false) will be called in the complete callback
   });
 });

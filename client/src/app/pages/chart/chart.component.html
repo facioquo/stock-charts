@@ -10,9 +10,39 @@
   </div>
 }
 
+<!-- API unavailable error -->
+@if (cht.apiError()) {
+  <div role="alert" aria-live="assertive" class="api-error-container">
+    <div class="api-error-content">
+      <mat-icon class="api-error-icon">cloud_off</mat-icon>
+      <h2>Backend API Unavailable</h2>
+      <p>The Stock Indicators API is not currently accessible. Please ensure the backend services are running:</p>
+      <ul class="api-error-list">
+        <li>Azure Functions (port 7071)</li>
+        <li>Web API (port 5001)</li>
+        <li>Azurite Storage Emulator</li>
+      </ul>
+      <p class="api-error-help">
+        Run
+        <code>pnpm start</code>
+        for the frontend and start the backend services from the
+        <strong>Run: Full development stack</strong>
+        VS Code task.
+      </p>
+      <p class="api-error-docs">
+        See the
+        <a href="https://github.com/facioquo/stock-charts#commands" target="_blank" rel="noopener noreferrer">
+          README
+        </a>
+        for setup instructions.
+      </p>
+    </div>
+  </div>
+}
+
 <!-- SETTINGS -->
 <div class="button-container">
-  @if (!cht.loading()) {
+  @if (!cht.loading() && !cht.apiError()) {
     <button
       mat-fab
       color="accent"
@@ -26,9 +56,9 @@
 </div>
 
 <!-- CHART (MAIN OVERLAY) -->
-<div id="chart-overlay" class="chart-overlay-container" [hidden]="cht.loading()">
+<div id="chart-overlay" class="chart-overlay-container" [hidden]="cht.loading() || cht.apiError()">
   <canvas id="chartOverlay"></canvas>
 </div>
 
 <!-- CHART (OSCILLATORS) -->
-<div id="oscillators-zone" [hidden]="cht.loading()"></div>
+<div id="oscillators-zone" [hidden]="cht.loading() || cht.apiError()"></div>
