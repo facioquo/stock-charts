@@ -93,6 +93,27 @@ function makeSegmentedListing(dataName: string): IndicatorListing {
   });
 }
 
+/** Listing with one slope-segmented result (e.g. STDEV channels). */
+function makeSlopeSegmentedListing(dataName: string): IndicatorListing {
+  return makeListing({
+    results: [
+      {
+        displayName: dataName,
+        tooltipTemplate: "",
+        dataName,
+        dataType: "number",
+        lineType: "solid",
+        segmented: true,
+        segmentMode: "slope",
+        stack: "",
+        lineWidth: 2,
+        defaultColor: "#FF0000",
+        order: 0
+      }
+    ]
+  });
+}
+
 // ---------------------------------------------------------------------------
 // processQuoteData
 // ---------------------------------------------------------------------------
@@ -501,6 +522,30 @@ describe("buildDataPoints", () => {
     expect(ys[0]).toBe(10);
     expect(Number.isNaN(ys[1])).toBe(true);
     expect(Number.isNaN(ys[2])).toBe(true);
+  });
+
+  it("breaks slope-segmented lines only when slope changes", () => {
+    // Two linear windows: +1 slope then +2 slope.
+    const data: IndicatorDataRow[] = [
+      makeRow("2024-01-01", { upperChannel: 10 }),
+      makeRow("2024-01-02", { upperChannel: 11 }),
+      makeRow("2024-01-03", { upperChannel: 12 }),
+      makeRow("2024-01-04", { upperChannel: 14 }),
+      makeRow("2024-01-05", { upperChannel: 16 })
+    ];
+
+    const { dataPoints } = buildDataPoints(
+      data,
+      makeResult({ dataName: "upperChannel" }),
+      makeSlopeSegmentedListing("upperChannel")
+    );
+    const ys = dataPoints.map(p => p.y);
+
+    expect(ys[0]).toBe(10);
+    expect(ys[1]).toBe(11);
+    expect(ys[2]).toBe(12);
+    expect(Number.isNaN(ys[3])).toBe(true); // slope changed at new segment start
+    expect(ys[4]).toBe(16);
   });
 });
 

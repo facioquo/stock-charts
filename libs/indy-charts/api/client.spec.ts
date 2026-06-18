@@ -279,6 +279,112 @@ describe("createApiClient", () => {
       await expect(client.getListings()).rejects.toThrow("DNS lookup failed");
       expect(onError).toHaveBeenCalledWith("Error fetching listings", expect.any(Error));
     });
+
+    it("normalizes pivot points metadata for segmented level rendering", async () => {
+      const listings = [
+        makeListing({
+          uiid: "PIVOT-POINTS",
+          results: [
+            {
+              displayName: "R1",
+              tooltipTemplate: "R1",
+              dataName: "r1",
+              dataType: "number",
+              lineType: "solid",
+              stack: "",
+              lineWidth: 2,
+              defaultColor: "#000000"
+            }
+          ]
+        })
+      ];
+      mockFetchOk(listings);
+
+      const [pivot] = await client.getListings();
+      const [r1] = pivot.results;
+
+      expect(r1.lineType).toBe("dash");
+      expect(r1.lineWidth).toBe(1);
+      expect(r1.segmented).toBe(true);
+      expect(r1.segmentMode).toBe("step");
+      expect(r1.defaultColor).toBe("#DD2C00");
+    });
+
+    it("normalizes standard deviation channels metadata for slope segmentation", async () => {
+      const listings = [
+        makeListing({
+          uiid: "STDEV-CH",
+          results: [
+            {
+              displayName: "Centerline",
+              tooltipTemplate: "Centerline",
+              dataName: "centerline",
+              dataType: "number",
+              lineType: "solid",
+              stack: "",
+              lineWidth: 2,
+              defaultColor: "#000000"
+            }
+          ]
+        })
+      ];
+      mockFetchOk(listings);
+
+      const [stdev] = await client.getListings();
+      const [center] = stdev.results;
+
+      expect(center.lineType).toBe("dash");
+      expect(center.segmented).toBe(true);
+      expect(center.segmentMode).toBe("slope");
+      expect(center.defaultColor).toBe("#EF6C00");
+    });
+
+    it("normalizes Bollinger and rolling pivots line styles", async () => {
+      const listings = [
+        makeListing({
+          uiid: "BB",
+          results: [
+            {
+              displayName: "Centerline",
+              tooltipTemplate: "Centerline",
+              dataName: "sma",
+              dataType: "number",
+              lineType: "solid",
+              stack: "",
+              lineWidth: 2,
+              defaultColor: "#000000"
+            }
+          ]
+        }),
+        makeListing({
+          uiid: "ROLLING-PIVOTS",
+          results: [
+            {
+              displayName: "R2",
+              tooltipTemplate: "R2",
+              dataName: "r2",
+              dataType: "number",
+              lineType: "solid",
+              stack: "",
+              lineWidth: 2,
+              defaultColor: "#000000"
+            }
+          ]
+        })
+      ];
+      mockFetchOk(listings);
+
+      const [bb, rolling] = await client.getListings();
+
+      expect(bb.results[0].lineType).toBe("dash");
+      expect(bb.results[0].lineWidth).toBe(1);
+      expect(bb.results[0].defaultColor).toBe("#EF6C00");
+
+      expect(rolling.results[0].lineType).toBe("dash");
+      expect(rolling.results[0].lineWidth).toBe(1);
+      expect(rolling.results[0].segmented).toBe(false);
+      expect(rolling.results[0].defaultColor).toBe("#DD2C00");
+    });
   });
 
   // -----------------------------------------------------------------------

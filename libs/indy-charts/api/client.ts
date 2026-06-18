@@ -2,9 +2,19 @@ import {
   type IndicatorDataRow,
   type IndicatorListing,
   type IndicatorParam,
+  type IndicatorResultConfig,
   type IndicatorSelection,
   type Quote
 } from "../config/types";
+
+const STYLE_COLORS = {
+  ORANGE: "#EF6C00",
+  RED: "#DD2C00",
+  GREEN: "#2E7D32",
+  BLUE: "#1E88E5",
+  DARK_GRAY: "#616161CC",
+  DARK_GRAY_TRANSPARENT: "#61616110"
+} as const;
 
 /**
  * Configuration for {@link createApiClient}.
@@ -143,6 +153,82 @@ function endpointUrl(baseUrl: string, endpoint: string): string {
   return new URL(endpoint, baseUrl).toString();
 }
 
+function normalizeListings(listings: IndicatorListing[]): IndicatorListing[] {
+  return listings.map(listing => {
+    const uiid = listing.uiid.toUpperCase();
+    const normalizedResults = listing.results.map(result => normalizeResult(uiid, result));
+    return {
+      ...listing,
+      results: normalizedResults
+    };
+  });
+}
+
+function normalizeResult(uiid: string, result: IndicatorResultConfig): IndicatorResultConfig {
+  const dataName = result.dataName.toLowerCase();
+
+  if (uiid === "PIVOT-POINTS") {
+    return {
+      ...result,
+      lineType: dataName === "pp" ? "solid" : "dash",
+      lineWidth: 1,
+      segmented: true,
+      segmentMode: "step",
+      defaultColor:
+        dataName === "pp"
+          ? STYLE_COLORS.DARK_GRAY
+          : dataName.startsWith("r")
+            ? STYLE_COLORS.RED
+            : STYLE_COLORS.GREEN
+    };
+  }
+
+  if (uiid === "STDEV-CH") {
+    return {
+      ...result,
+      lineType: dataName === "centerline" ? "dash" : "solid",
+      lineWidth: 1,
+      segmented: true,
+      segmentMode: "slope",
+      defaultColor: STYLE_COLORS.ORANGE,
+      fill:
+        dataName === "upperchannel"
+          ? {
+              target: "+2",
+              colorAbove: STYLE_COLORS.DARK_GRAY_TRANSPARENT,
+              colorBelow: STYLE_COLORS.DARK_GRAY_TRANSPARENT
+            }
+          : result.fill
+    };
+  }
+
+  if (uiid === "BB") {
+    return {
+      ...result,
+      lineType: dataName === "sma" ? "dash" : "solid",
+      lineWidth: 1,
+      defaultColor: STYLE_COLORS.ORANGE
+    };
+  }
+
+  if (uiid === "ROLLING-PIVOTS") {
+    return {
+      ...result,
+      lineType: dataName === "pp" ? "solid" : "dash",
+      lineWidth: 1,
+      segmented: false,
+      defaultColor:
+        dataName === "pp"
+          ? STYLE_COLORS.BLUE
+          : dataName.startsWith("r")
+            ? STYLE_COLORS.RED
+            : STYLE_COLORS.GREEN
+    };
+  }
+
+  return result;
+}
+
 /**
  * Factory that creates a ready-to-use {@link ApiClient}.
  *
@@ -191,7 +277,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         const data = (await response.json()) as IndicatorListing[];
-        return data;
+        return normalizeListings(data);
       } catch (error) {
         onError?.("Error fetching listings", error);
         throw error;

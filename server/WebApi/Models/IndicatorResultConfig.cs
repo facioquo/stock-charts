@@ -21,6 +21,15 @@ public record IndicatorResultConfig
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool Segmented { get; init; }
 
+    /// <summary>
+    /// Segmentation strategy for segmented series.
+    /// "step" breaks level-step transitions (pivot levels);
+    /// "slope" breaks slope transitions (regression/channel sections).
+    /// Omitted when null.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? SegmentMode { get; init; }
+
     public string? Stack { get; set; }
     public float LineWidth { get; set; } = 2;
     public required string DefaultColor { get; init; }

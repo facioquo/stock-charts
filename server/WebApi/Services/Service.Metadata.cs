@@ -2360,6 +2360,7 @@ public static class Metadata
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
+                        SegmentMode = "step",
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
@@ -2370,6 +2371,7 @@ public static class Metadata
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
+                        SegmentMode = "step",
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
@@ -2380,6 +2382,7 @@ public static class Metadata
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
+                        SegmentMode = "step",
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
@@ -2390,6 +2393,7 @@ public static class Metadata
                         LineType = "solid",
                         LineWidth = 1,
                         Segmented = true,
+                        SegmentMode = "step",
                         DefaultColor = ChartColors.DarkGray
                     },
                     new() {
@@ -2400,6 +2404,7 @@ public static class Metadata
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
+                        SegmentMode = "step",
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
@@ -2410,6 +2415,7 @@ public static class Metadata
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
+                        SegmentMode = "step",
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
@@ -2420,6 +2426,7 @@ public static class Metadata
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
+                        SegmentMode = "step",
                         DefaultColor = ChartColors.StandardGreen
                     }
                 ]
@@ -3196,6 +3203,8 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
+                        Segmented = true,
+                        SegmentMode = "slope",
                         DefaultColor = ChartColors.StandardOrange,
                         Fill = new ChartFill {
                             Target = "+2",
@@ -3210,6 +3219,8 @@ public static class Metadata
                         DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
+                        Segmented = true,
+                        SegmentMode = "slope",
                         DefaultColor = ChartColors.StandardOrange
                     },
                     new() {
@@ -3219,6 +3230,8 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
+                        Segmented = true,
+                        SegmentMode = "slope",
                         DefaultColor = ChartColors.StandardOrange
                     }
                 ]
