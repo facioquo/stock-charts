@@ -48,7 +48,11 @@ const client = createApiClient({ baseUrl: "https://api.example.com" });
 const quotes = await client.getQuotes();
 
 const canvas = document.getElementById("overlay-chart") as HTMLCanvasElement;
-const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true });
+const chart = new OverlayChart(canvas, {
+  isDarkTheme: false,
+  showTooltips: true,
+  showRightAxisLabels: true // Optional: set to false to hide right-axis tick labels
+});
 chart.render(quotes.slice(-250));
 ```
 

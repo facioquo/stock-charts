@@ -37,7 +37,11 @@ if (!(canvas instanceof HTMLCanvasElement)) {
   throw new Error("Chart canvas not found");
 }
 
-const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true });
+const chart = new OverlayChart(canvas, {
+  isDarkTheme: false,
+  showTooltips: true,
+  showRightAxisLabels: true // Optional: set to false to hide right-axis tick labels
+});
 chart.render(quotes.slice(-250));
 
 // In your component's unmount / cleanup hook:
@@ -74,7 +78,13 @@ if (!(priceCanvas instanceof HTMLCanvasElement)) {
   throw new Error("Price chart canvas not found");
 }
 
-const manager = new ChartManager({ settings: { isDarkTheme: false, showTooltips: true } });
+const manager = new ChartManager({
+  settings: {
+    isDarkTheme: false,
+    showTooltips: true,
+    showRightAxisLabels: true // Optional: set to false to hide right-axis tick labels
+  }
+});
 manager.initializeOverlay(priceCanvas, quotes, 250);
 
 // Overlay indicator (EMA) renders on the price canvas.

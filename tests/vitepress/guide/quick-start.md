@@ -43,7 +43,11 @@ import { ChartManager } from "@facioquo/indy-charts";
 
 const quotes = await api.getQuotes();
 const manager = new ChartManager({
-  settings: { isDarkTheme: false, showTooltips: true }
+  settings: {
+    isDarkTheme: false,
+    showTooltips: true,
+    showRightAxisLabels: true // Optional: set to false to hide right-axis tick labels
+  }
 });
 
 const overlayCanvas = document.getElementById("overlay-chart") as HTMLCanvasElement;
