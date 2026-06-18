@@ -198,6 +198,16 @@
       "problemMatcher": "$msCompile"
     },
     // ===================================
+    // GENERATE
+    // ===================================
+    {
+      "label": "Generate: Backup indicators",
+      "detail": "Generate backup-indicators.json from Web API /indicators endpoint (builds backend and starts Web API first)",
+      "type": "shell",
+      "command": "node scripts/generate-backup-indicators.js --apiBase=https://localhost:5001",
+      "dependsOn": "Run: Backend services"
+    },
+    // ===================================
     // LINT & TEST
     // ===================================
     {
@@ -438,10 +448,18 @@
       "detail": "Start all Backend .NET services and Website dev server",
       "dependsOn": [
         "Stop: All services",
+        "Run: Backend services",
+        "Run: Website dev server"
+      ],
+      "dependsOrder": "sequence"
+    },
+    {
+      "label": "Run: Backend services",
+      "detail": "Start all Backend .NET services dev server",
+      "dependsOn": [
         "Run: Azure Storage",
         "Run: Azure Functions",
-        "Run: Web API",
-        "Run: Website dev server"
+        "Run: Web API"
       ],
       "dependsOrder": "sequence"
     },

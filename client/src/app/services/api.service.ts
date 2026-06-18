@@ -32,6 +32,11 @@ export class ApiService {
    */
   private backupActive = false;
 
+  /** Check if the API has fallen back to bundled backup data. */
+  get isBackupActive(): boolean {
+    return this.backupActive;
+  }
+
   /** Lazily-built timestamp-aligned rows for backup-mode `getSelectionData`. */
   private _backupRows: Array<{ timestamp: string; candle: unknown }> | undefined;
 

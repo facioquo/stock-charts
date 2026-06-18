@@ -28,6 +28,7 @@ interface ChartServicePrivate {
   window: WindowService;
   destroy$: Subject<void>;
   loading: { set: (v: unknown) => void; update: (fn: (v: unknown) => unknown) => void };
+  apiError: { set: (v: boolean) => void; update: (fn: (v: boolean) => boolean) => void };
   chartManager: ChartManager;
   cacheSelections: () => void;
   loadDefaultSelections: () => void;
@@ -272,6 +273,7 @@ describe("ChartService Smoke Tests", () => {
     priv.window = mockWindowService;
     priv.destroy$ = new Subject<void>();
     priv.loading = { set: vi.fn(), update: vi.fn() };
+    priv.apiError = { set: vi.fn(), update: vi.fn() };
 
     // Initialize ChartManager (mirrors constructor logic)
     priv.chartManager = new ChartManager({
@@ -542,6 +544,25 @@ describe("ChartService Smoke Tests", () => {
     }
   );
 
+  it("should not call loadDefaultSelections when empty array is cached (user removed all)", () => {
+    localStorage.setItem("selections", JSON.stringify([]));
+
+    const addSpy = vi.spyOn(service, "addSelectionWithoutScroll").mockImplementation(() => {});
+    const loadDefaultsSpy = vi
+      .spyOn(privateOf(service), "loadDefaultSelections")
+      .mockImplementation(() => {});
+
+    // Ensure these spies are always restored even if assertions fail
+    spiesToRestore.push(addSpy, loadDefaultsSpy);
+
+    privateOf(service).loadSelections();
+
+    // Should not add any selections (empty array)
+    expect(addSpy).not.toHaveBeenCalled();
+    // Should not load defaults (empty array is a valid user choice)
+    expect(loadDefaultsSpy).not.toHaveBeenCalled();
+  });
+
   it("should skip unavailable default indicators during startup hydration", () => {
     const listing = {
       ...generateSampleIndicatorListing(),
@@ -562,5 +583,79 @@ describe("ChartService Smoke Tests", () => {
 
     warnSpy.mockRestore();
     addSpy.mockRestore();
+  });
+
+  /**
+   * Test 8: Environment-Aware API Error Handling
+   */
+  it("should set apiError in production when API service enters backup mode", async () => {
+    // Mock production environment
+    const envModule = await import("../../environments/environment");
+    const originalProduction = envModule.env.production;
+    Object.defineProperty(envModule.env, "production", {
+      value: true,
+      writable: true,
+      configurable: true
+    });
+
+    try {
+      const priv = privateOf(service);
+      priv.apiError = { set: vi.fn(), update: vi.fn() };
+
+      // Mock API service to simulate backup mode
+      const mockApi = priv.api as unknown as {
+        getQuotes: () => ReturnType<ApiService["getQuotes"]>;
+        isBackupActive: boolean;
+      };
+      mockApi.isBackupActive = true;
+
+      service.loadCharts();
+
+      expect(priv.apiError.set).toHaveBeenCalledWith(true);
+    } finally {
+      // Restore original environment
+      Object.defineProperty(envModule.env, "production", {
+        value: originalProduction,
+        writable: true,
+        configurable: true
+      });
+    }
+  });
+
+  it("should not set apiError in development when API service enters backup mode", async () => {
+    // Mock development environment
+    const envModule = await import("../../environments/environment");
+    const originalProduction = envModule.env.production;
+    Object.defineProperty(envModule.env, "production", {
+      value: false,
+      writable: true,
+      configurable: true
+    });
+
+    try {
+      const priv = privateOf(service);
+      priv.apiError = { set: vi.fn(), update: vi.fn() };
+
+      // Mock API service to simulate backup mode
+      const mockApi = priv.api as unknown as {
+        getQuotes: () => ReturnType<ApiService["getQuotes"]>;
+        getListings: () => ReturnType<ApiService["getListings"]>;
+        isBackupActive: boolean;
+      };
+      mockApi.isBackupActive = true;
+
+      // In development, backup mode should work normally
+      service.loadCharts();
+
+      // apiError should NOT be set in development
+      expect(priv.apiError.set).not.toHaveBeenCalledWith(true);
+    } finally {
+      // Restore original environment
+      Object.defineProperty(envModule.env, "production", {
+        value: originalProduction,
+        writable: true,
+        configurable: true
+      });
+    }
   });
 });

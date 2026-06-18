@@ -13,6 +13,7 @@ import {
   type Quote
 } from "@facioquo/indy-charts";
 
+import { env } from "../../environments/environment";
 import { ApiService } from "./api.service";
 import { UserService } from "./user.service";
 import { UtilityService } from "./utility.service";
@@ -50,6 +51,9 @@ export class ChartService implements OnDestroy {
 
   /** Whether the initial chart load is in progress. */
   loading = signal(true);
+
+  /** Whether the API is unavailable (backend services not running). Only set in production. */
+  apiError = signal(false);
 
   /** Read-only proxy to ChartManager selections (used by templates). */
   get selections(): readonly IndicatorSelection[] {
@@ -170,6 +174,15 @@ export class ChartService implements OnDestroy {
   loadCharts(): void {
     this.api.getQuotes().subscribe({
       next: (allQuotes: Quote[]) => {
+        // In production, treat backup mode as an error and show error screen.
+        // In development/test, allow backup mode to work (needed for E2E tests).
+        if (env.production && this.api.isBackupActive) {
+          console.error("Backend API is unavailable in production");
+          this.apiError.set(true);
+          this.loading.set(false);
+          return;
+        }
+
         const canvas = document.getElementById("chartOverlay") as HTMLCanvasElement;
         const ctx = canvas?.getContext("2d");
         if (!ctx) {
@@ -184,6 +197,14 @@ export class ChartService implements OnDestroy {
 
         this.api.getListings().subscribe({
           next: (listings: IndicatorListing[]) => {
+            // Check again after listings load (defensive check in production)
+            if (env.production && this.api.isBackupActive) {
+              console.error("Backend API is unavailable in production");
+              this.apiError.set(true);
+              this.loading.set(false);
+              return;
+            }
+
             this.listings = listings;
             this.loadSelections();
           },
@@ -286,12 +307,14 @@ export class ChartService implements OnDestroy {
 
     try {
       const cached = JSON.parse(raw) as IndicatorSelection[] | null;
-      if (cached?.length) {
+      // Respect explicitly-stored empty arrays (user removed all indicators).
+      // Only fall through to defaults if localStorage has never been written.
+      if (Array.isArray(cached)) {
         // addSelectionWithoutScroll is asynchronous (HTTP-backed), so selections are
         // not yet registered by the time the forEach returns. Checking the count
         // immediately after would always see zero new entries and incorrectly fall
         // through to loadDefaultSelections(), doubling every indicator on every reload.
-        // Simply return here — if cached selections exist, trust them.
+        // Simply return here — if cached is a valid array (even empty), trust it.
         cached.forEach(selection => this.addSelectionWithoutScroll(selection));
         return;
       }

@@ -563,4 +563,82 @@ describe("ApiService", () => {
     expect(indicatorNames).toContain("MACD");
     expect(indicatorNames).toContain("BB");
   });
+
+  it("should expose backup status via isBackupActive getter", () => {
+    expect(service.isBackupActive).toBe(false);
+
+    service.getQuotes().subscribe(() => {
+      expect(service.isBackupActive).toBe(false);
+    });
+
+    const req = httpMock.expectOne(`${env.api}/quotes`);
+    req.flush([
+      {
+        timestamp: "2024-01-01T00:00:00.000Z",
+        open: 100,
+        high: 105,
+        low: 99,
+        close: 103,
+        volume: 1000000
+      }
+    ]);
+  });
+
+  it("should set isBackupActive to true when quotes API fails", () => {
+    expect(service.isBackupActive).toBe(false);
+
+    service.getQuotes().subscribe(() => {
+      expect(service.isBackupActive).toBe(true);
+    });
+
+    const req = httpMock.expectOne(`${env.api}/quotes`);
+    req.error(new ProgressEvent("Network error"), {
+      status: 0,
+      statusText: "Network Error"
+    });
+  });
+
+  it("should set isBackupActive to true when listings API fails", () => {
+    expect(service.isBackupActive).toBe(false);
+
+    service.getListings().subscribe(() => {
+      expect(service.isBackupActive).toBe(true);
+    });
+
+    const req = httpMock.expectOne(`${env.api}/indicators`);
+    req.error(new ProgressEvent("Network error"), {
+      status: 0,
+      statusText: "Network Error"
+    });
+  });
+
+  it("should clear isBackupActive after successful quotes response", () => {
+    // First, trigger backup mode
+    service.getQuotes().subscribe(() => {
+      expect(service.isBackupActive).toBe(true);
+    });
+
+    const req1 = httpMock.expectOne(`${env.api}/quotes`);
+    req1.error(new ProgressEvent("Network error"), {
+      status: 0,
+      statusText: "Network Error"
+    });
+
+    // Then, verify it clears on success
+    service.getQuotes().subscribe(() => {
+      expect(service.isBackupActive).toBe(false);
+    });
+
+    const req2 = httpMock.expectOne(`${env.api}/quotes`);
+    req2.flush([
+      {
+        timestamp: "2024-01-01T00:00:00.000Z",
+        open: 100,
+        high: 105,
+        low: 99,
+        close: 103,
+        volume: 1000000
+      }
+    ]);
+  });
 });
