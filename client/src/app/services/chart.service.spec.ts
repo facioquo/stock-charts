@@ -544,6 +544,25 @@ describe("ChartService Smoke Tests", () => {
     }
   );
 
+  it("should not call loadDefaultSelections when empty array is cached (user removed all)", () => {
+    localStorage.setItem("selections", JSON.stringify([]));
+
+    const addSpy = vi.spyOn(service, "addSelectionWithoutScroll").mockImplementation(() => {});
+    const loadDefaultsSpy = vi
+      .spyOn(privateOf(service), "loadDefaultSelections")
+      .mockImplementation(() => {});
+
+    // Ensure these spies are always restored even if assertions fail
+    spiesToRestore.push(addSpy, loadDefaultsSpy);
+
+    privateOf(service).loadSelections();
+
+    // Should not add any selections (empty array)
+    expect(addSpy).not.toHaveBeenCalled();
+    // Should not load defaults (empty array is a valid user choice)
+    expect(loadDefaultsSpy).not.toHaveBeenCalled();
+  });
+
   it("should skip unavailable default indicators during startup hydration", () => {
     const listing = {
       ...generateSampleIndicatorListing(),
