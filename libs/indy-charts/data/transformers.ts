@@ -129,7 +129,8 @@ export function buildDataPoints(
         }
       } else {
         // break the line at each window boundary (where the level steps)
-        const isBoundary = previousLevel !== undefined && !nearlyEqual(yValue, previousLevel, SEGMENT_EPSILON);
+        const isBoundary =
+          previousLevel !== undefined && !nearlyEqual(yValue, previousLevel, SEGMENT_EPSILON);
         previousLevel = yValue;
         if (isBoundary) {
           yValue = NaN;

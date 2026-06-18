@@ -41,7 +41,13 @@ const listing = listings.find(l => l.uiid === "RSI")!;
 const selection = createDefaultSelection(listing, { lookbackPeriods: 14 });
 const rows = loadStaticIndicatorData(await api.getSelectionData(selection, listing));
 
-const manager = new ChartManager({ settings: { isDarkTheme: false, showTooltips: true } });
+const manager = new ChartManager({
+  settings: {
+    isDarkTheme: false,
+    showTooltips: true,
+    showRightAxisLabels: false // Cleaner look for standalone oscillators
+  }
+});
 
 // Standalone oscillator: skip initializeOverlay, render straight into the oscillator canvas.
 const canvas = document.getElementById("rsi-chart") as HTMLCanvasElement;
@@ -97,7 +103,13 @@ const rows = loadStaticIndicatorData(await api.getSelectionData(selection, listi
 const priceCanvas = document.getElementById("price-chart") as HTMLCanvasElement;
 const rsiCanvas = document.getElementById("rsi-chart") as HTMLCanvasElement;
 
-const manager = new ChartManager({ settings: { isDarkTheme: false, showTooltips: true } });
+const manager = new ChartManager({
+  settings: {
+    isDarkTheme: false,
+    showTooltips: true,
+    showRightAxisLabels: true // Show axis labels when paired with price chart
+  }
+});
 manager.initializeOverlay(priceCanvas, quotes, 250);
 manager.processSelectionData(selection, listing, rows);
 manager.displaySelection(selection, listing);
@@ -147,7 +159,13 @@ const pctb = createDefaultSelection(pctbListing, { lookbackPeriods: 20, standard
 const priceCanvas = document.getElementById("price-chart") as HTMLCanvasElement;
 const pctbCanvas = document.getElementById("pctb-chart") as HTMLCanvasElement;
 
-const manager = new ChartManager({ settings: { isDarkTheme: false, showTooltips: true } });
+const manager = new ChartManager({
+  settings: {
+    isDarkTheme: false,
+    showTooltips: true,
+    showRightAxisLabels: true // Show axis labels for aligned multi-panel charts
+  }
+});
 
 // One manager drives both panels so they share the windowed x-axis.
 manager.initializeOverlay(priceCanvas, quotes, 250);
@@ -191,6 +209,7 @@ const selection = createDefaultSelection(listing, { lookbackPeriods: 21 });
 - Oscillators render **standalone by default**. Add `:with-overlay="true"` (or call `initializeOverlay` in plain TS) to pair with the price chart.
 - The Vue version requires the indicator to be registered in `setupIndyChartsForVue`. The plain version looks up the listing from `getListings()` at runtime.
 - Charts automatically respect your site's dark/light theme preference.
+- **Right-axis labels**: control whether mirrored tick labels render on the right side of charts via the `showRightAxisLabels` setting (defaults to `true`). Set to `false` for a cleaner look in standalone oscillators or documentation examples. Gridlines remain visible regardless of this setting.
 
 ## Next steps
 
