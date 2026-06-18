@@ -28,6 +28,7 @@ export interface IndyChartsVueDefaults {
   barCount?: number;
   quoteCount?: number;
   showTooltips?: boolean;
+  showRightAxisLabels?: boolean;
 }
 
 export interface IndyChartsVueThemeOptions {
@@ -91,6 +92,7 @@ export function chartSettingsFromOptions(
   return {
     isDarkTheme,
     showTooltips: options.defaults?.showTooltips ?? true,
+    showRightAxisLabels: options.defaults?.showRightAxisLabels ?? false,
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- intentional: treats empty string as absent (consistent with getThemeColors falsy check)
     background: background || themeBg
   };

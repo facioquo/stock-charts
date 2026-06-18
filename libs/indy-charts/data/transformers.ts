@@ -11,6 +11,7 @@ import {
 
 const CANDLE_HIGH_MULTIPLIER = 1.01;
 const CANDLE_LOW_MULTIPLIER = 0.99;
+const SEGMENT_EPSILON = 1e-8;
 
 const CATEGORIES = {
   CANDLESTICK_PATTERN: "candlestick-pattern"
@@ -70,7 +71,9 @@ export function buildDataPoints(
   // changes every point, every value after the first would be NaN'd away, so do
   // not set `segmented` on continuous indicators (EMA, rolling pivots, etc.).
   const segmented = resultConfig?.segmented === true;
+  const segmentMode = resultConfig?.segmentMode ?? "step";
   let previousLevel: number | undefined;
+  let previousSlope: number | undefined;
 
   data.forEach(row => {
     const rawValue: unknown = row[result.dataName];
@@ -103,12 +106,34 @@ export function buildDataPoints(
 
     if (typeof yValue !== "number") {
       yValue = NaN;
+      previousLevel = undefined;
+      previousSlope = undefined;
     } else if (segmented) {
-      // break the line at each window boundary (where the level steps)
-      const isBoundary = previousLevel !== undefined && yValue !== previousLevel;
-      previousLevel = yValue;
-      if (isBoundary) {
-        yValue = NaN;
+      if (segmentMode === "slope") {
+        // Break segmented sloped channels where slope changes between windows.
+        // The boundary point is replaced with NaN so Chart.js starts a new
+        // segment without drawing a connecting transition.
+        const currentLevel = yValue;
+        if (previousLevel !== undefined) {
+          const slope = currentLevel - previousLevel;
+          const isBoundary =
+            previousSlope !== undefined && !nearlyEqual(slope, previousSlope, SEGMENT_EPSILON);
+          previousSlope = slope;
+          previousLevel = currentLevel;
+          if (isBoundary) {
+            yValue = NaN;
+          }
+        } else {
+          previousLevel = currentLevel;
+          previousSlope = undefined;
+        }
+      } else {
+        // break the line at each window boundary (where the level steps)
+        const isBoundary = previousLevel !== undefined && !nearlyEqual(yValue, previousLevel, SEGMENT_EPSILON);
+        previousLevel = yValue;
+        if (isBoundary) {
+          yValue = NaN;
+        }
       }
     }
     if (row.timestamp == null) {
@@ -124,6 +149,11 @@ export function buildDataPoints(
   });
 
   return { dataPoints, pointColor, pointRotation, hasConditionalColor };
+}
+
+function nearlyEqual(a: number, b: number, epsilon: number): boolean {
+  const scale = Math.max(1, Math.abs(a), Math.abs(b));
+  return Math.abs(a - b) <= epsilon * scale;
 }
 
 /**
