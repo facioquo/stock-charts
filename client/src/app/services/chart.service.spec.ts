@@ -586,60 +586,76 @@ describe("ChartService Smoke Tests", () => {
   });
 
   /**
-   * Test 8: API Error Handling
-   * Verifies that apiError signal is set when API is unavailable
+   * Test 8: Environment-Aware API Error Handling
    */
-  it("should set apiError signal when API service enters backup mode", () => {
-    const priv = privateOf(service);
+  it("should set apiError in production when API service enters backup mode", async () => {
+    // Mock production environment
+    const envModule = await import("../../environments/environment");
+    const originalProduction = envModule.env.production;
+    Object.defineProperty(envModule.env, "production", {
+      value: true,
+      writable: true,
+      configurable: true
+    });
 
-    // Mock API service with backup active
-    const mockApiWithBackup = {
-      ...mockApiService,
-      isBackupActive: true
-    } as unknown as ApiService;
-    priv.api = mockApiWithBackup;
+    try {
+      const priv = privateOf(service);
+      priv.apiError = { set: vi.fn(), update: vi.fn() };
 
-    // Mock loading signal
-    const loadingSpy = { set: vi.fn(), update: vi.fn() };
-    const apiErrorSpy = { set: vi.fn(), update: vi.fn() };
-    priv.loading = loadingSpy;
-    priv.apiError = apiErrorSpy;
+      // Mock API service to simulate backup mode
+      const mockApi = priv.api as unknown as {
+        getQuotes: () => ReturnType<ApiService["getQuotes"]>;
+        isBackupActive: boolean;
+      };
+      mockApi.isBackupActive = true;
 
-    // Act: Load charts when API is in backup mode
-    service.loadCharts();
+      service.loadCharts();
 
-    // Assert: apiError signal is set to true
-    expect(apiErrorSpy.set).toHaveBeenCalledWith(true);
-    expect(loadingSpy.set).toHaveBeenCalledWith(false);
+      expect(priv.apiError.set).toHaveBeenCalledWith(true);
+    } finally {
+      // Restore original environment
+      Object.defineProperty(envModule.env, "production", {
+        value: originalProduction,
+        writable: true,
+        configurable: true
+      });
+    }
   });
 
-  it("should initialize charts normally when API is available", () => {
-    const sampleQuotes = generateSampleQuotes(100);
-    const priv = privateOf(service);
+  it("should not set apiError in development when API service enters backup mode", async () => {
+    // Mock development environment
+    const envModule = await import("../../environments/environment");
+    const originalProduction = envModule.env.production;
+    Object.defineProperty(envModule.env, "production", {
+      value: false,
+      writable: true,
+      configurable: true
+    });
 
-    // Mock API service WITHOUT backup active
-    const mockApiLive = {
-      ...mockApiService,
-      isBackupActive: false,
-      getQuotes: vi.fn(() => of(sampleQuotes)),
-      getListings: vi.fn(() => of([generateSampleIndicatorListing()]))
-    } as unknown as ApiService;
-    priv.api = mockApiLive;
+    try {
+      const priv = privateOf(service);
+      priv.apiError = { set: vi.fn(), update: vi.fn() };
 
-    // Mock loading and apiError signals
-    const loadingSpy = { set: vi.fn(), update: vi.fn() };
-    const apiErrorSpy = { set: vi.fn(), update: vi.fn() };
-    priv.loading = loadingSpy;
-    priv.apiError = apiErrorSpy;
+      // Mock API service to simulate backup mode
+      const mockApi = priv.api as unknown as {
+        getQuotes: () => ReturnType<ApiService["getQuotes"]>;
+        getListings: () => ReturnType<ApiService["getListings"]>;
+        isBackupActive: boolean;
+      };
+      mockApi.isBackupActive = true;
 
-    // Mock loadSelections to avoid localStorage side effects
-    priv.loadSelections = vi.fn();
+      // In development, backup mode should work normally
+      service.loadCharts();
 
-    // Act: Load charts when API is live
-    service.loadCharts();
-
-    // Assert: apiError signal is NOT set to true
-    expect(apiErrorSpy.set).not.toHaveBeenCalledWith(true);
-    // loading.set(false) will be called in the complete callback
+      // apiError should NOT be set in development
+      expect(priv.apiError.set).not.toHaveBeenCalledWith(true);
+    } finally {
+      // Restore original environment
+      Object.defineProperty(envModule.env, "production", {
+        value: originalProduction,
+        writable: true,
+        configurable: true
+      });
+    }
   });
 });

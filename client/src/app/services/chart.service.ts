@@ -13,6 +13,7 @@ import {
   type Quote
 } from "@facioquo/indy-charts";
 
+import { env } from "../../environments/environment";
 import { ApiService } from "./api.service";
 import { UserService } from "./user.service";
 import { UtilityService } from "./utility.service";
@@ -51,7 +52,7 @@ export class ChartService implements OnDestroy {
   /** Whether the initial chart load is in progress. */
   loading = signal(true);
 
-  /** Whether the API is unavailable (backend services not running). */
+  /** Whether the API is unavailable (backend services not running). Only set in production. */
   apiError = signal(false);
 
   /** Read-only proxy to ChartManager selections (used by templates). */
@@ -173,9 +174,10 @@ export class ChartService implements OnDestroy {
   loadCharts(): void {
     this.api.getQuotes().subscribe({
       next: (allQuotes: Quote[]) => {
-        // Check if we're using backup data due to API unavailability
-        if (this.api.isBackupActive) {
-          console.error("Backend API is unavailable");
+        // In production, treat backup mode as an error and show error screen.
+        // In development/test, allow backup mode to work (needed for E2E tests).
+        if (env.production && this.api.isBackupActive) {
+          console.error("Backend API is unavailable in production");
           this.apiError.set(true);
           this.loading.set(false);
           return;
@@ -195,9 +197,9 @@ export class ChartService implements OnDestroy {
 
         this.api.getListings().subscribe({
           next: (listings: IndicatorListing[]) => {
-            // Check if listings fell back to backup data (API unavailable)
-            if (this.api.isBackupActive) {
-              console.error("Backend API is unavailable");
+            // Check again after listings load (defensive check in production)
+            if (env.production && this.api.isBackupActive) {
+              console.error("Backend API is unavailable in production");
               this.apiError.set(true);
               this.loading.set(false);
               return;

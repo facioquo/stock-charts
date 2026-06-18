@@ -10,7 +10,7 @@
   </div>
 }
 
-<!-- API unavailable error -->
+<!-- API unavailable error (production only) -->
 @if (cht.apiError()) {
   <div role="alert" aria-live="assertive" class="api-error-container">
     <div class="api-error-content">
@@ -71,9 +71,9 @@
 </div>
 
 <!-- CHART (MAIN OVERLAY) -->
-<div id="chart-overlay" class="chart-overlay-container" [hidden]="cht.loading() || cht.apiError()">
+<div id="chart-overlay" class="chart-overlay-container" [hidden]="cht.loading()">
   <canvas id="chartOverlay"></canvas>
 </div>
 
 <!-- CHART (OSCILLATORS) -->
-<div id="oscillators-zone" [hidden]="cht.loading() || cht.apiError()"></div>
+<div id="oscillators-zone" [hidden]="cht.loading()"></div>
