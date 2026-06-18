@@ -195,7 +195,7 @@ export class ChartService implements OnDestroy {
 
         this.api.getListings().subscribe({
           next: (listings: IndicatorListing[]) => {
-            // Check again after listings load (defensive)
+            // Check if listings fell back to backup data (API unavailable)
             if (this.api.isBackupActive) {
               console.error("Backend API is unavailable");
               this.apiError.set(true);
