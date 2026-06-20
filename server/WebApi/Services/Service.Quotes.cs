@@ -1,4 +1,6 @@
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace WebApi.Services;
 
@@ -10,10 +12,14 @@ public interface IQuoteService
 
 public partial class QuoteService(
     ILogger<QuoteService> logger,
-    IStorage storage) : IQuoteService
+    IStorage storage,
+    IMemoryCache cache,
+    IOptions<CacheSettings> cacheSettings) : IQuoteService
 {
     private readonly ILogger<QuoteService> _logger = logger;
     private readonly IStorage _storage = storage;
+    private readonly IMemoryCache _cache = cache;
+    private readonly TimeSpan _cacheDuration = cacheSettings.Value.Duration;
 
     /// <summary>
     /// Get default quotes
@@ -23,7 +29,9 @@ public partial class QuoteService(
         => await Get("QQQ", ct);
 
     /// <summary>
-    /// Get quotes for a specific symbol.
+    /// Get quotes for a specific symbol, served from an in-memory cache so the
+    /// shared quote blob is downloaded at most once per symbol per cache window
+    /// regardless of how many indicator endpoints request it.
     /// </summary>
     /// <param name="symbol">"SPY" or "QQQ" only, for now</param>
     /// <param name="ct">Cancellation token</param>
@@ -37,6 +45,23 @@ public partial class QuoteService(
             throw new ArgumentException("symbol must be \"SPY\" or \"QQQ\".", nameof(symbol));
         }
 
+        string cacheKey = $"quotes:{symbol}";
+
+        if (_cache.TryGetValue(cacheKey, out IReadOnlyList<Quote>? cached) && cached is not null)
+        {
+            return cached;
+        }
+
+        // A cancellation here propagates without caching; any other failure
+        // falls back to backup quotes, which are cached like a real result so a
+        // transient storage outage does not stampede the blob on every request.
+        IReadOnlyList<Quote> quotes = await LoadQuotesAsync(symbol, ct);
+        _cache.Set(cacheKey, quotes, _cacheDuration);
+        return quotes;
+    }
+
+    private async Task<IReadOnlyList<Quote>> LoadQuotesAsync(string symbol, CancellationToken ct)
+    {
         string blobName = $"{symbol}-DAILY.json";
         try
         {
@@ -56,7 +81,7 @@ public partial class QuoteService(
         }
     }
 
-    private async Task<IEnumerable<Quote>?> TryGetBlobQuotesAsync(string blobName, CancellationToken ct)
+    private async Task<IReadOnlyList<Quote>?> TryGetBlobQuotesAsync(string blobName, CancellationToken ct)
     {
         BlobClient blob = _storage.GetBlobClient(blobName);
 
@@ -83,7 +108,7 @@ public partial class QuoteService(
             return null;
         }
 
-        return quotes.OrderBy(x => x.Timestamp);
+        return quotes.OrderBy(x => x.Timestamp).ToList();
     }
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Blob {BlobName} not found, using backup data")]

@@ -1,13 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.Extensions.Options;
 using WebApi.Services;
 
 namespace WebApi.Controllers;
 
 [ApiController]
 [Route("")]
-public class Main(IQuoteService quoteService) : ControllerBase
+[OutputCache(PolicyName = OutputCachePolicies.IndicatorData)]
+public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSettings) : ControllerBase
 {
     private readonly IQuoteService quoteFeed = quoteService;
+    private readonly TimeSpan cacheDuration = cacheSettings.Value.Duration;
 
     // GLOBALS
     private const int limitLast = 120;
@@ -20,13 +24,14 @@ public class Main(IQuoteService quoteService) : ControllerBase
     public async Task<IActionResult> GetQuotes()
     {
         IEnumerable<Quote> quotes = await quoteFeed.Get(HttpContext.RequestAborted);
+        SetClientCache();
         return Ok(quotes.TakeLast(limitLast));
     }
 
     [HttpGet("indicators")]
     public IActionResult GetIndicatorCatalog()
     {
-        Response.Headers.CacheControl = "public, max-age=3600"; // 1 hour TTL
+        SetClientCache();
         Response.Headers.ETag = "YYYY.MM.DD"; // replaced in build deployment
         Response.Headers.LastModified = DateTime.UtcNow.ToString("R");
 
@@ -39,6 +44,7 @@ public class Main(IQuoteService quoteService) : ControllerBase
         {
             IReadOnlyList<Quote> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
             IEnumerable<T> results = indicatorFunc(quotes).TakeLast(limitLast);
+            SetClientCache();
             return Ok(results);
         }
         catch (ArgumentOutOfRangeException rex)
@@ -46,6 +52,12 @@ public class Main(IQuoteService quoteService) : ControllerBase
             return BadRequest(rex.Message);
         }
     }
+
+    // Emit a shared-cache directive so browsers and CDN/edge caches (e.g.
+    // Cloudflare in front of the doc site) can serve repeat requests without
+    // reaching the origin. Mirrors the server-side output-cache lifetime.
+    private void SetClientCache()
+        => Response.Headers.CacheControl = $"public, max-age={(int)cacheDuration.TotalSeconds}";
 
     //////////////////////////////////////////
     // INDICATORS (sorted alphabetically)
@@ -98,6 +110,7 @@ public class Main(IQuoteService quoteService) : ControllerBase
             IReadOnlyList<Quote> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
             IReadOnlyList<Quote> market = (await quoteFeed.Get("SPY", HttpContext.RequestAborted)).ToList();
             IEnumerable<BetaResult> results = quotes.ToBeta(market, lookbackPeriods, type).TakeLast(limitLast);
+            SetClientCache();
             return Ok(results);
         }
         catch (ArgumentOutOfRangeException rex)
