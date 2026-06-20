@@ -29,7 +29,11 @@ const quotes: Quote[] = loadStaticQuotes([
 ]);
 
 const canvas = document.getElementById("my-canvas") as HTMLCanvasElement;
-const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: false });
+const chart = new OverlayChart(canvas, {
+  isDarkTheme: false,
+  showTooltips: false,
+  showRightAxisLabels: true // Optional: set to false to hide right-axis tick labels
+});
 chart.render(quotes);
 
 // Push an EMA(20) line onto the existing chart.
@@ -155,6 +159,7 @@ function renderChart() {
   overlayChart = new OverlayChart(canvasEl.value, {
     isDarkTheme: isDark(),
     showTooltips: false,
+    showRightAxisLabels: false, // Cleaner look for documentation examples
     background: isDark() ? "#1b1b1f80" : "#ffffff80"
   });
   overlayChart.render(quotes);

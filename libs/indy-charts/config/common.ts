@@ -51,7 +51,7 @@ export function baseChartOptions(settings: ChartSettings): ChartOptions {
         position: "right",
         beginAtZero: false,
         ticks: {
-          display: true,
+          display: settings.showRightAxisLabels ?? true,
           mirror: true,
           color: getThemeColors(settings).text,
           font: {

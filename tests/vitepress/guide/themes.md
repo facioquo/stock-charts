@@ -17,7 +17,7 @@ By default, charts automatically detect your site's theme:
 
 Colors are applied consistently to:
 
-- Axis labels and values
+- Axis labels and values (controlled by `showRightAxisLabels` setting)
 - Annotation backgrounds (legend labels)
 - Grid lines
 - Chart grid colors
@@ -29,13 +29,17 @@ When you need the same palette outside of a chart (custom legends, side panels, 
 ```typescript
 import { getThemeColors } from "@facioquo/indy-charts";
 
-const colors = getThemeColors({ isDarkTheme: true, showTooltips: false });
+const colors = getThemeColors({
+  isDarkTheme: true,
+  showTooltips: false,
+  showRightAxisLabels: true
+});
 // colors.text       === "#808080"
 // colors.background === "#12131680"
 // colors.grid       === "#2E2E2E"
 ```
 
-`showTooltips` is required by `ChartSettings` but is not used by `getThemeColors`. Override the background by setting `settings.background` — the returned `colors.background` will reflect it.
+`showTooltips` and `showRightAxisLabels` are required by `ChartSettings` but are not used by `getThemeColors`. Override the background by setting `settings.background` — the returned `colors.background` will reflect it.
 
 ```typescript
 interface ThemeColors {

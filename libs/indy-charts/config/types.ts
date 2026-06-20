@@ -59,6 +59,11 @@ export interface IndicatorDataRow {
 export interface ChartSettings {
   isDarkTheme: boolean;
   showTooltips: boolean;
+  /**
+   * Whether to render mirrored right-axis tick labels.
+   * Gridlines still render when disabled.
+   */
+  showRightAxisLabels?: boolean;
   /** Optional override for annotation and axis-label backdrop background color. */
   background?: string;
 }
@@ -101,6 +106,12 @@ export interface IndicatorResultConfig {
    * (false) for ordinary continuous series.
    */
   segmented?: boolean;
+  /**
+   * Segmentation strategy when `segmented` is enabled.
+   * - `step` (default): break when the level changes between adjacent points.
+   * - `slope`: break when the per-point slope changes between adjacent segments.
+   */
+  segmentMode?: "step" | "slope";
   stack: string;
   lineWidth: number | null;
   defaultColor: string;

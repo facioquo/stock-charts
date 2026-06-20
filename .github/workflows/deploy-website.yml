@@ -143,6 +143,8 @@ jobs:
 
       - name: Build site
         run: pnpm --filter @stock-charts/client run build.prod
+        env:
+          BACKUP_INDICATORS_API_BASE: https://stock-charts-api.azurewebsites.net
 
       - name: Save artifacts
         uses: actions/upload-artifact@v7

@@ -43,7 +43,11 @@ import { ChartManager } from "@facioquo/indy-charts";
 
 const quotes = await api.getQuotes();
 const manager = new ChartManager({
-  settings: { isDarkTheme: false, showTooltips: true }
+  settings: {
+    isDarkTheme: false,
+    showTooltips: true,
+    showRightAxisLabels: true // Optional: set to false to hide right-axis tick labels
+  }
 });
 
 const overlayCanvas = document.getElementById("overlay-chart") as HTMLCanvasElement;
@@ -51,6 +55,13 @@ manager.initializeOverlay(overlayCanvas, quotes, 250);
 ```
 
 `250` is the visible-bar count. The chart fits the latest 250 quotes into the canvas; older history stays available for window resizing via `manager.setBarCount(n)`.
+
+### Chart settings explained
+
+- **`isDarkTheme`**: applies dark or light color palette
+- **`showTooltips`**: enables/disables hover tooltips
+- **`showRightAxisLabels`**: controls right-axis tick labels (defaults to `true`). Set to `false` for cleaner standalone charts or documentation examples. Gridlines remain visible regardless.
+- **`background`** (optional): overrides annotation and axis-label backdrop color
 
 ## Step 4: Add an overlay indicator (EMA)
 

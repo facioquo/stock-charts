@@ -37,7 +37,11 @@ if (!(canvas instanceof HTMLCanvasElement)) {
   throw new Error("Chart canvas not found");
 }
 
-const chart = new OverlayChart(canvas, { isDarkTheme: false, showTooltips: true });
+const chart = new OverlayChart(canvas, {
+  isDarkTheme: false,
+  showTooltips: true,
+  showRightAxisLabels: true // Optional: set to false to hide right-axis tick labels
+});
 chart.render(quotes.slice(-250));
 
 // In your component's unmount / cleanup hook:
@@ -52,6 +56,15 @@ datasets, full quote/dataset history on `ChartManager`) **and** tears down
 the underlying Chart.js instance. Always call the wrapper's `destroy()` —
 never reach into `chart.chart?.destroy()`, which only tears down Chart.js
 and leaks the wrapper's cached state.
+
+### Chart settings
+
+All chart classes accept a `ChartSettings` object:
+
+- **`isDarkTheme`**: applies dark or light color palette
+- **`showTooltips`**: enables/disables hover tooltips
+- **`showRightAxisLabels`** (optional, defaults to `true`): controls right-axis tick labels. Set to `false` for cleaner standalone charts. Gridlines remain visible regardless.
+- **`background`** (optional): overrides annotation and axis-label backdrop color
 
 For indicators, the responsive viewport, and oscillator subcharts, use `ChartManager`:
 
@@ -74,7 +87,13 @@ if (!(priceCanvas instanceof HTMLCanvasElement)) {
   throw new Error("Price chart canvas not found");
 }
 
-const manager = new ChartManager({ settings: { isDarkTheme: false, showTooltips: true } });
+const manager = new ChartManager({
+  settings: {
+    isDarkTheme: false,
+    showTooltips: true,
+    showRightAxisLabels: true // Optional: set to false to hide right-axis tick labels
+  }
+});
 manager.initializeOverlay(priceCanvas, quotes, 250);
 
 // Overlay indicator (EMA) renders on the price canvas.

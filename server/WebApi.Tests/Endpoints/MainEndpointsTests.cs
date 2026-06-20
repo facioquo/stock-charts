@@ -535,7 +535,10 @@ public class MainEndpointsTests
         // assert the count first so Assert.All cannot pass vacuously on an
         // empty result set (7 levels: R3-R1, PP, S1-S3).
         Assert.Equal(7, listing.Results.Count);
-        Assert.All(listing.Results, r => Assert.True(r.Segmented));
+        Assert.All(listing.Results, r => {
+            Assert.True(r.Segmented);
+            Assert.Equal("step", r.SegmentMode);
+        });
     }
 
     [Fact]
@@ -551,6 +554,21 @@ public class MainEndpointsTests
         // empty result set (7 levels: R3-R1, PP, S1-S3).
         Assert.Equal(7, listing.Results.Count);
         Assert.All(listing.Results, r => Assert.False(r.Segmented));
+    }
+
+    [Fact]
+    public void StandardDeviationChannelsListing_MarksAllResultsSlopeSegmented()
+    {
+        Models.IndicatorListing listing = Metadata
+            .IndicatorListing("https://localhost")
+            .Single(l => l.Uiid == "STDEV-CH");
+
+        // upper, centerline, lower
+        Assert.Equal(3, listing.Results.Count);
+        Assert.All(listing.Results, r => {
+            Assert.True(r.Segmented);
+            Assert.Equal("slope", r.SegmentMode);
+        });
     }
 
     /// <summary>

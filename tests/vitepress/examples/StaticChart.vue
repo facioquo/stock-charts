@@ -71,6 +71,7 @@ function renderChart(): void {
   overlayChart = new OverlayChart(canvasEl.value, {
     isDarkTheme: isDark(),
     showTooltips: false,
+    showRightAxisLabels: false, // Cleaner look for documentation examples
     background: isDark() ? "#1b1b1f80" : "#ffffff80"
   });
   overlayChart.render(quotes);
