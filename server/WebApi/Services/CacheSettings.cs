@@ -33,9 +33,9 @@ public sealed class CacheSettings
 public static class OutputCachePolicies
 {
     /// <summary>
-    /// Server-side cache policy for computed indicator responses. Keyed on the
-    /// request path and full query string (so distinct indicator parameters map
-    /// to distinct entries) and varied by <c>Origin</c> for CORS correctness.
+    /// Server-side cache policy for computed indicator responses. Varies by
+    /// query string (each parameter set is a distinct entry) and by
+    /// <c>Origin</c> for CORS correctness.
     /// </summary>
     public const string IndicatorData = "IndicatorData";
 }

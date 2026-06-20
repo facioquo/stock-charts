@@ -66,12 +66,13 @@ configuration.GetSection(CacheSettings.SectionName).Bind(cacheSettings);
 // does not re-download the shared quote blob for every other indicator.
 services.AddMemoryCache();
 
-// Server-side output cache for computed indicator responses. Keyed on the
-// request path and full query string by default; varied by Origin so cached
-// responses carry the correct CORS headers per allowed origin.
+// Server-side output cache for computed indicator responses. Varies by the
+// full query string (so each parameter set is a distinct entry) and by Origin
+// (so cached responses keep the correct per-origin CORS headers).
 services.AddOutputCache(options =>
     options.AddPolicy(OutputCachePolicies.IndicatorData, policy => policy
         .Expire(cacheSettings.Duration)
+        .SetVaryByQuery("*")
         .SetVaryByHeader("Origin")));
 
 // Add Azure dependencies
