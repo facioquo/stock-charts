@@ -37,5 +37,10 @@ public static class OutputCachePolicies
     /// query string (each parameter set is a distinct entry) and by
     /// <c>Origin</c> for CORS correctness.
     /// </summary>
-    public static readonly string IndicatorData = "IndicatorData";
+    /// <remarks>
+    /// Must remain <c>const</c>: it is used as the <c>PolicyName</c> argument of
+    /// <c>[OutputCache]</c> on the controller, and attribute arguments require a
+    /// compile-time constant (a <c>static readonly</c> field triggers CS0182).
+    /// </remarks>
+    public const string IndicatorData = "IndicatorData";
 }
