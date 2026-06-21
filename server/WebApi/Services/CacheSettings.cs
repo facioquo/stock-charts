@@ -30,7 +30,7 @@ public sealed class CacheSettings
 /// Named <see cref="Microsoft.AspNetCore.OutputCaching.OutputCacheAttribute"/>
 /// policies registered in startup configuration.
 /// </summary>
-public static class OutputCachePolicies
+internal static class OutputCachePolicies
 {
     /// <summary>
     /// Server-side cache policy for computed indicator responses. Varies by
@@ -38,9 +38,11 @@ public static class OutputCachePolicies
     /// <c>Origin</c> for CORS correctness.
     /// </summary>
     /// <remarks>
-    /// Must remain <c>const</c>: it is used as the <c>PolicyName</c> argument of
-    /// <c>[OutputCache]</c> on the controller, and attribute arguments require a
-    /// compile-time constant (a <c>static readonly</c> field triggers CS0182).
+    /// <c>const</c> (not <c>static readonly</c>) because it is the
+    /// <c>PolicyName</c> argument of <c>[OutputCache]</c> on the controller, and
+    /// attribute arguments must be compile-time constants (CS0182 otherwise).
+    /// Kept <c>internal</c> so it is not a public constant, avoiding the
+    /// cross-assembly inlining concern that flags public <c>const</c> fields.
     /// </remarks>
-    public const string IndicatorData = "IndicatorData";
+    internal const string IndicatorData = "IndicatorData";
 }
