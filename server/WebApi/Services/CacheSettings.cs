@@ -10,7 +10,7 @@ namespace WebApi.Services;
 public sealed class CacheSettings
 {
     /// <summary>Configuration section name.</summary>
-    public const string SectionName = "Caching";
+    public static readonly string SectionName = "Caching";
 
     /// <summary>
     /// Lifetime, in minutes, applied to cached indicator responses, the
@@ -37,5 +37,5 @@ public static class OutputCachePolicies
     /// query string (each parameter set is a distinct entry) and by
     /// <c>Origin</c> for CORS correctness.
     /// </summary>
-    public const string IndicatorData = "IndicatorData";
+    public static readonly string IndicatorData = "IndicatorData";
 }
