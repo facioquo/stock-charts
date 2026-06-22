@@ -1,96 +1,83 @@
 /*
- * Global styles for the React demo. Self-contained dark/light theming (no
- * Angular Material SCSS dependency). Full visual-fidelity port of the original
- * SCSS theme partials lands in the stacked styling slice.
+ * Global styles for the React demo. Faithful, self-contained port of the
+ * Angular `client/src/styles/` theme partials plus the page-level styles from
+ * `app.component.scss`, `chart.component.scss`, and `404.component.scss`. The
+ * Angular originals derive colour from Angular Material's SCSS; the React app
+ * intentionally carries no Material dependency, so the theme is expressed as
+ * CSS custom properties (`--bg`, `--surface`, `--text`, …) toggled by the
+ * `.dark-theme` / `.light-theme` body class (see `services/userPrefs.ts`).
  */
+
+@use "theme-dark"; // default theme
+@use "theme-light";
+@use "base-elements";
 
 :root {
   --toolbar-height: 56px;
   --accent: #ff9800;
 }
 
-.dark-theme {
-  --bg: #121316;
-  --surface: #1e1f24;
-  --text: #e3e3e6;
-  --text-muted: #9aa0a6;
-  --link: #8ab4f8;
-  --border: #2c2d33;
-}
-
-.light-theme {
-  --bg: #fafafa;
-  --surface: #fff;
-  --text: #1f1f1f;
-  --text-muted: #5f6368;
-  --link: #1a73e8;
-  --border: #e0e0e0;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-
-body {
-  background-color: var(--bg);
-  color: var(--text);
-  font-family: Rubik, Roboto, Arial, sans-serif;
-}
-
-a {
-  color: var(--link);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-.noselect {
-  user-select: none;
-}
-
-.no-wrap {
-  white-space: nowrap;
-}
-
-/* HEADER / TOOLBAR */
+/* HEADER / TOOLBAR — faithful port of `.main-toolbar` in app.component.scss */
 .main-toolbar {
-  display: flex;
-  align-items: center;
-  height: var(--toolbar-height);
-  padding: 0 16px;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--border);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+  line-height: normal;
+  background-color: transparent;
 }
 
+/* headings (ordered by ascending specificity to satisfy
+   stylelint `no-descending-specificity`) */
 .main-toolbar h1 {
-  font-size: 1.1rem;
-  font-weight: 500;
+  font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
+  font-size: 0.9em;
+  font-weight: 600;
+  line-height: 1;
   margin: 0;
-}
-
-.main-toolbar h1 small {
-  font-size: 0.7rem;
-  opacity: 0.7;
+  color: var(--brand-h1);
 }
 
 .main-toolbar h2 {
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
+  font-size: 0.6em;
+  font-weight: normal;
+  line-height: 0.9;
+  letter-spacing: 0.55px;
+  padding-left: 1px;
   margin: 0;
-  color: var(--text-muted);
+  color: var(--toolbar-h2);
+}
+
+.main-toolbar h1 small {
+  font-size: 0.7em;
+  opacity: 0.7;
+}
+
+.main-toolbar h1 a,
+.main-toolbar h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.main-toolbar h1 a {
+  padding-top: 0.5rem;
+}
+
+.main-toolbar h2 a {
+  padding-bottom: 0.9rem;
+}
+
+.main-toolbar h1 a:hover {
+  color: var(--brand-h1-hover);
+}
+
+.main-toolbar h2 a:hover {
+  color: var(--toolbar-h2-hover);
 }
 
 #main-content {
   position: relative;
   display: block;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 24px 16px;
 }
 
 /* LOADING */
@@ -111,23 +98,34 @@ a:hover {
 
 .chart-loading-label {
   margin-top: 5px;
-  color: #777;
+  color: var(--text-muted);
 }
 
-/* CHART CONTAINERS */
+/* CHART CONTAINERS — faithful port of chart.component.scss, including the
+   landscape / full-screen breakpoints. Width is managed by `main`. */
 .chart-overlay-container {
   aspect-ratio: 2.5;
 }
 
+/* tablet-lg */
 @media (width <= 880px) {
   .chart-overlay-container {
     aspect-ratio: 2;
   }
 }
 
+/* mobile */
 @media (width <= 600px) {
   .chart-overlay-container {
     aspect-ratio: 5/4;
+  }
+}
+
+/* landscape, full screen */
+@media (height <= 400px) and (orientation: landscape) {
+  .chart-overlay-container {
+    aspect-ratio: unset;
+    height: 100vh;
   }
 }
 
@@ -136,9 +134,34 @@ a:hover {
   margin-top: 8px;
 }
 
+/* tablet-lg */
 @media (width <= 880px) {
   .chart-oscillator-container {
     aspect-ratio: 8;
+  }
+}
+
+/* tablet-lg, landscape */
+@media (width <= 880px) and (orientation: landscape) {
+  .chart-oscillator-container {
+    aspect-ratio: unset;
+    height: 25vh;
+  }
+}
+
+/* mobile, landscape */
+@media (height <= 600px) and (orientation: landscape) {
+  .chart-oscillator-container {
+    aspect-ratio: unset;
+    height: 33.33vh;
+  }
+}
+
+/* mobile */
+@media (height <= 400px) {
+  .chart-oscillator-container {
+    aspect-ratio: unset;
+    height: 50vh;
   }
 }
 
@@ -175,9 +198,17 @@ a:hover {
   border-radius: 4px;
 }
 
-/* 404 */
+/* 404 — faithful port of 404.component.scss */
 .container {
-  max-width: 640px;
-  margin: 64px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.container p,
+.container h1,
+.container h2 {
   text-align: center;
 }

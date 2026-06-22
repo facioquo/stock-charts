@@ -1,0 +1,33 @@
+/*
+ * Light theme. Faithful port of `client/src/styles/theme-light.scss`. Mirrors
+ * the Angular Material light theme: azure primary, neutral greys, with toolbar
+ * and link-hover colours drawn from the M3 azure neutral tones (see the dark
+ * partial for the tone reference table).
+ */
+
+.light-theme {
+  /* surfaces */
+  --bg: #fafafa;
+  --surface: #fff;
+  --border: #e0e0e0;
+
+  /* text */
+  --text: #1f1f1f;
+  --text-muted: #5f6368;
+
+  /* links: azure accent, hover fades to neutral-30 */
+  --link: #1a73e8;
+  --link-hover: #46474a;
+
+  /* brand heading: neutral-40 → neutral-10 on hover */
+  --brand-h1: #5e5e62;
+  --brand-h1-hover: #1a1c1e;
+
+  /* secondary toolbar heading: neutral-50 → neutral-20 on hover */
+  --toolbar-h2: #76777a;
+  --toolbar-h2-hover: #2f3033;
+
+  /* scrollbar: shared neutral tones (neutral-40 / neutral-30) */
+  --scrollbar: #5e5e62;
+  --scrollbar-hover: #46474a;
+}
