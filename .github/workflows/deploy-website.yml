@@ -8,6 +8,9 @@ concurrency:
 
 permissions:
   contents: write
+  # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
+  # Packages (react-ui + tokens consumed by the web/ workspace — FAC-2121).
+  packages: read
 
 env:
   NODE_VERSION: 24
@@ -123,9 +126,13 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+          registry-url: https://npm.pkg.github.com
+          scope: "@facioquo"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Replace cache markers
         uses: jacobtomlinson/gha-find-replace@v3
