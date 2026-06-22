@@ -12,14 +12,12 @@ standard (ADR-0001).
 
 ## What is here
 
-| Layer                               | File(s)                                                                           |
-| ----------------------------------- | --------------------------------------------------------------------------------- |
-| Entry / routing                     | `src/main.tsx`, `src/router.tsx`                                                  |
-| App shell + pages                   | `src/components/App.tsx`, `src/pages/ChartPage.tsx`, `src/pages/NotFound.tsx`     |
-| API client (fetch, backup fallback) | `src/api/apiClient.ts`                                                            |
-| Chart orchestration                 | `src/charting/chartController.ts`, `src/charting/useChart.ts`                     |
-| Ported services                     | `src/services/userPrefs.ts`, `src/services/windowSize.ts`, `src/services/meta.ts` |
-| Config / types                      | `src/config/env.ts`, `src/types/chart.types.ts`                                   |
+- **Entry / routing** — `src/main.tsx`, `src/router.tsx`
+- **App shell + pages** — `src/components/App.tsx`, `src/pages/ChartPage.tsx`, `src/pages/NotFound.tsx`
+- **API client (fetch, backup fallback)** — `src/api/apiClient.ts`
+- **Chart orchestration** — `src/charting/chartController.ts`, `src/charting/useChart.ts`
+- **Ported services** — `src/services/userPrefs.ts`, `src/services/windowSize.ts`, `src/services/meta.ts`
+- **Config / types** — `src/config/env.ts`, `src/types/chart.types.ts`
 
 The framework-agnostic `@facioquo/indy-charts` `ChartManager` and the .NET
 backend are reused unchanged.
