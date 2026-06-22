@@ -86,9 +86,11 @@ test.describe("Stock Charts React Web", () => {
     const themeToggle = page.getByRole("checkbox", { name: "Dark theme" });
     const wasDark = await themeToggle.isChecked();
 
-    // The input is part of a custom switch; force the click so a covering label
-    // doesn't intercept it. A real click still toggles the checkbox + fires onChange.
-    await themeToggle.click({ force: true });
+    // The real checkbox is visually hidden inside a custom switch, so it can't be
+    // clicked directly. Click the visible label that wraps it — the label-for-input
+    // relationship still toggles the checkbox and fires React's onChange.
+    const themeSwitch = page.locator("label.switch", { has: themeToggle });
+    await themeSwitch.click();
 
     const expectedClass = wasDark ? "light-theme" : "dark-theme";
     await expect(page.locator("body")).toHaveClass(new RegExp(expectedClass));
