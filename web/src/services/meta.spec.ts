@@ -47,16 +47,20 @@ describe("meta", () => {
   });
 
   describe("pushMetaTags", () => {
-    let originalHead: string;
+    let preexistingMeta: Element[];
     let originalTitle: string;
 
     beforeEach(() => {
-      originalHead = document.head.innerHTML;
+      // Snapshot meta nodes (not innerHTML) so afterEach can remove only the
+      // tags a test adds, leaving any jsdom defaults intact.
+      preexistingMeta = Array.from(document.head.querySelectorAll("meta"));
       originalTitle = document.title;
     });
 
     afterEach(() => {
-      document.head.innerHTML = originalHead;
+      document.head.querySelectorAll("meta").forEach(node => {
+        if (!preexistingMeta.includes(node)) node.remove();
+      });
       document.title = originalTitle;
     });
 
