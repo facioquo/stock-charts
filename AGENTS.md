@@ -209,6 +209,7 @@ Client-side project dependencies are strictly in this direction only: client →
 - **ASP.NET Core Web API**: REST endpoints for chart data
 - **Skender.Stock.Indicators**: NuGet library used in `server/WebApi/Services/` to compute every indicator the API serves
 - **Directory.Packages.props**: Centralized NuGet version management
+- **Caching**: Layered, built-in (no extra packages), so doc-site traffic doesn't redundantly recompute indicators. Server-side output cache (`AddOutputCache`/`UseOutputCache`) caches each computed indicator response keyed by path + query string and varied by `Origin`; an in-memory quote cache (`IMemoryCache` in `QuoteService`) downloads the shared quote blob at most once per symbol per window; and `Cache-Control: public, max-age=...` headers let browsers/CDN serve repeats. Lifetime is one knob, `Caching:DurationMinutes`, in `CacheSettings`.
 
 ### Financial charts integration
 

@@ -57,6 +57,24 @@ services.Configure<GzipCompressionProviderOptions>(
 // Add logging
 services.AddLogging();
 
+// Caching configuration (shared by output cache, quote cache, and client headers)
+services.Configure<CacheSettings>(configuration.GetSection(CacheSettings.SectionName));
+CacheSettings cacheSettings = new();
+configuration.GetSection(CacheSettings.SectionName).Bind(cacheSettings);
+
+// In-memory cache for quote data, so an output-cache miss for one indicator
+// does not re-download the shared quote blob for every other indicator.
+services.AddMemoryCache();
+
+// Server-side output cache for computed indicator responses. Varies by the
+// full query string (so each parameter set is a distinct entry) and by Origin
+// (so cached responses keep the correct per-origin CORS headers).
+services.AddOutputCache(options =>
+    options.AddPolicy(OutputCachePolicies.IndicatorData, policy => policy
+        .Expire(cacheSettings.Duration)
+        .SetVaryByQuery("*")
+        .SetVaryByHeader("Origin")));
+
 // Add Azure dependencies
 services.AddAzureClients(builder => {
     builder.AddBlobServiceClient(configuration.GetValue<string>("Storage:ConnectionString")
@@ -84,7 +102,7 @@ else
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("CorsPolicy");
-app.UseResponseCaching();
+app.UseOutputCache();
 app.UseResponseCompression();
 
 // Controller endpoints

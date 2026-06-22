@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 using WebApi.Controllers;
 
@@ -17,7 +18,7 @@ public class MainEndpointsTests
     public MainEndpointsTests()
     {
         _quoteServiceMock = new Mock<IQuoteService>();
-        _controller = new Main(_quoteServiceMock.Object);
+        _controller = new Main(_quoteServiceMock.Object, Options.Create(new CacheSettings()));
     }
 
     [Fact]
