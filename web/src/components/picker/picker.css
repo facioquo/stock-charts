@@ -1,0 +1,412 @@
+/*
+ * Styles for the settings + indicator-picker dialogs (React port of the Angular
+ * Material picker). Co-located with the components and imported from ChartPage
+ * so it stays decoupled from the global theme stylesheet. Uses the same CSS
+ * custom properties (--bg, --surface, --text, etc.) defined by the global theme.
+ */
+
+/* SETTINGS FAB */
+.fab-container {
+  position: absolute;
+  top: -56px;
+  right: 8px;
+  height: 100%;
+}
+
+.fab {
+  position: sticky;
+  top: 8px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  opacity: 0.6;
+  background-color: var(--accent);
+  color: #1f1f1f;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 5px rgb(0 0 0 / 30%);
+}
+
+.fab:hover {
+  opacity: 0.9;
+}
+
+/* MODAL / DIALOG */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5vh 16px;
+  background-color: rgb(0 0 0 / 50%);
+  overflow-y: auto;
+}
+
+.modal-panel {
+  width: 100%;
+  max-width: 420px;
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 40%);
+  outline: none;
+}
+
+.dialog-toolbar {
+  display: flex;
+  align-items: center;
+  padding: 12px 8px 12px 16px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+}
+
+.dialog-title {
+  text-align: center;
+  font-size: 1.3em;
+  font-weight: 400;
+  margin: 0;
+  padding: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.filler {
+  flex: 1 1 auto;
+}
+
+.dialog-body {
+  padding: 16px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.dialog-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dialog-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  padding: 8px 16px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.dialog-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 16px 16px;
+}
+
+.dialog-error .error {
+  color: #d32f2f;
+  font-weight: 500;
+}
+
+/* TOGGLES */
+.general-settings {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.general-settings li {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.toggle-label {
+  font-size: large;
+  flex: 1 1 auto;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch .slider {
+  position: absolute;
+  inset: 0;
+  background-color: var(--border);
+  border-radius: 24px;
+  transition: background-color 0.15s;
+}
+
+.switch .slider::before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  top: 3px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: transform 0.15s;
+}
+
+.switch input:checked + .slider {
+  background-color: var(--accent);
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+/* SECTION HEADERS + LISTS */
+.dialog-section-header {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin-top: 16px;
+  background-color: var(--bg);
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.dialog-section-header.column {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.help-link {
+  font-size: 0.7em;
+  font-weight: 400;
+}
+
+.selection-list,
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.selection-list label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  cursor: pointer;
+}
+
+.nav-list button {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 4px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.nav-list button:hover {
+  background-color: var(--bg);
+}
+
+.nav-subtitle {
+  font-size: 0.75em;
+  color: var(--text-muted);
+}
+
+.action-button-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 8px 24px 0;
+}
+
+/* PARAM + STYLE FORMS */
+.param-container {
+  margin: 1rem auto 0;
+  max-width: 220px;
+}
+
+.param-input {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.param-input input {
+  text-align: center;
+}
+
+.style-container {
+  margin: 1rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.style-container h3 {
+  font-size: 1em;
+  font-weight: 400;
+  margin: 0 0 8px;
+}
+
+.style-input {
+  display: inline-flex;
+  flex-direction: column;
+  margin: 0 1rem 0.5rem 0;
+}
+
+.field-label {
+  font-size: 0.75em;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.field-error {
+  color: #d32f2f;
+  font-size: 0.75em;
+  margin: 2px 0 0;
+}
+
+.modal-panel input,
+.modal-panel select {
+  background-color: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font: inherit;
+}
+
+.modal-panel input:disabled,
+.modal-panel select:disabled {
+  opacity: 0.5;
+}
+
+.line-sample {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* COLOR PICKER */
+.color-field {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+}
+
+.color-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color-hex-input {
+  width: 100px;
+}
+
+.color-hex-input.invalid {
+  border-color: #d32f2f;
+}
+
+.color-toggle {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.swatch-grid {
+  position: absolute;
+  z-index: 1100;
+  top: 100%;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  padding: 8px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
+}
+
+.swatch {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.swatch[aria-selected="true"] {
+  outline: 2px solid var(--text);
+}
+
+/* BUTTONS */
+.icon-button {
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  padding: 4px;
+}
+
+.btn-text,
+.btn-raised {
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-text {
+  background: none;
+  color: var(--link);
+}
+
+.btn-raised {
+  color: #fff;
+}
+
+.btn-primary {
+  background-color: #1565c0;
+}
+
+.btn-warn {
+  background-color: #c62828;
+}
+
+.btn-raised:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
