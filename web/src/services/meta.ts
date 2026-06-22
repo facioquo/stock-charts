@@ -11,6 +11,22 @@ export interface MetaTag {
   content?: string;
 }
 
+function metaSelector(tag: MetaTag): string | undefined {
+  if (tag.id !== undefined) return `meta[id='${tag.id}']`;
+  if (tag.property !== undefined) return `meta[property='${tag.property}']`;
+  if (tag.name !== undefined) return `meta[name='${tag.name}']`;
+  return undefined;
+}
+
+function createMetaElement(tag: MetaTag): HTMLMetaElement {
+  const element = document.createElement("meta");
+  if (tag.id) element.setAttribute("id", tag.id);
+  if (tag.property) element.setAttribute("property", tag.property);
+  if (tag.name) element.setAttribute("name", tag.name);
+  document.head.appendChild(element);
+  return element;
+}
+
 export function pushMetaTags(tags: MetaTag[]): void {
   if (typeof document === "undefined") return;
 
@@ -19,24 +35,11 @@ export function pushMetaTags(tags: MetaTag[]): void {
       document.title = tag.content;
     }
 
-    const selector =
-      tag.id !== undefined
-        ? `meta[id='${tag.id}']`
-        : tag.property !== undefined
-          ? `meta[property='${tag.property}']`
-          : tag.name !== undefined
-            ? `meta[name='${tag.name}']`
-            : undefined;
+    const selector = metaSelector(tag);
     if (!selector) return;
 
-    let element = document.head.querySelector<HTMLMetaElement>(selector);
-    if (!element) {
-      element = document.createElement("meta");
-      if (tag.id) element.setAttribute("id", tag.id);
-      if (tag.property) element.setAttribute("property", tag.property);
-      if (tag.name) element.setAttribute("name", tag.name);
-      document.head.appendChild(element);
-    }
+    const element =
+      document.head.querySelector<HTMLMetaElement>(selector) ?? createMetaElement(tag);
     if (tag.content !== undefined) element.setAttribute("content", tag.content);
   });
 }

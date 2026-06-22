@@ -5,7 +5,7 @@ import { RouterProvider } from "react-router-dom";
 import { setupIndyCharts } from "@facioquo/indy-charts";
 
 import { router } from "./router";
-import "./styles/styles.css";
+import "./styles/styles.scss";
 
 // Register financial chart types + indicator chart setup once at startup.
 setupIndyCharts();
