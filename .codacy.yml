@@ -2,3 +2,4 @@
 exclude_paths:
   - ".claude/**"
   - "tests/vitepress/.vitepress/theme/custom.css"
+  - "web/**/*.scss"

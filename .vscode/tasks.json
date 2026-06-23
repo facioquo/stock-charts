@@ -174,6 +174,16 @@
       "dependsOrder": "sequence"
     },
     {
+      "label": "Build: Website (React foundation)",
+      "detail": "Build the React migration-foundation app (web/): tsc --noEmit && vite build",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/web run build",
+      "group": "build",
+      "problemMatcher": "$tsc",
+      "dependsOn": "Build: Libraries",
+      "dependsOrder": "sequence"
+    },
+    {
       "label": "Build: Backend .NET (non-incremental)",
       "detail": "Build .NET solution",
       "type": "shell",
@@ -258,6 +268,22 @@
       "detail": "Auto-fix Angular, library, and VitePress code with ESLint and format with Prettier",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client run lint:fix && pnpm run format:web && pnpm run lint:css:fix",
+      "group": "none",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Lint: Website (React) (check)",
+      "detail": "Check React migration-foundation app (web/) formatting with Prettier",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/web run format:check",
+      "group": "test",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Lint: Website (React) (fix)",
+      "detail": "Auto-format React migration-foundation app (web/) with Prettier",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/web run format",
       "group": "none",
       "problemMatcher": "$tsc"
     },
@@ -350,6 +376,14 @@
       "detail": "Run Angular unit tests",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/client run test",
+      "group": "test",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Test: Website (React)",
+      "detail": "Run Vitest unit tests for the React migration-foundation app (web/)",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/web run test",
       "group": "test",
       "problemMatcher": "$tsc"
     },
@@ -545,6 +579,25 @@
           "activeOnStart": true,
           "beginsPattern": "^.*Compiling",
           "endsPattern": "^.*Application bundle generation complete"
+        }
+      }
+    },
+    {
+      "label": "Run: Website (React) dev server",
+      "detail": "Start the React migration-foundation app (web/) Vite dev server with HMR",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/web run dev",
+      "isBackground": true,
+      "group": "none",
+      "problemMatcher": {
+        "owner": "website-react",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*VITE v",
+          "endsPattern": "^.*Local:\\s+http://"
         }
       }
     },

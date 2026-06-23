@@ -192,6 +192,47 @@ jobs:
       - name: Build production site
         run: pnpm --filter @stock-charts/client run build.prod
 
+  test-web:
+    # React migration foundation app (web/). Runs alongside the Angular client
+    # job; client/ stays the deployed app until the React port reaches parity.
+    needs: [test-libraries]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build libraries
+        # web/ consumes @facioquo/indy-charts via workspace:* and imports from
+        # its dist/, so libs must be built before the web build/test steps.
+        run: |
+          pnpm --filter @facioquo/chartjs-chart-financial run build
+          pnpm --filter @facioquo/indy-charts run build
+
+      - name: Check web formatting
+        run: pnpm --filter @stock-charts/web run format:check
+
+      - name: Run web unit tests with coverage
+        run: pnpm --filter @stock-charts/web run test:coverage
+
+      - name: Build web app
+        run: pnpm --filter @stock-charts/web run build
+
   test-e2e:
     runs-on: ubuntu-latest
     needs: [test-libraries, test-website]
@@ -238,7 +279,7 @@ jobs:
 
   lint-and-test:
     runs-on: ubuntu-slim
-    needs: [test-backend, test-libraries, test-website, test-e2e]
+    needs: [test-backend, test-libraries, test-website, test-web, test-e2e]
     if: always()
     steps:
       - name: Verify required jobs succeeded

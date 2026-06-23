@@ -1,0 +1,183 @@
+/*
+ * Global styles for the React demo. Self-contained dark/light theming (no
+ * Angular Material SCSS dependency). Full visual-fidelity port of the original
+ * SCSS theme partials lands in the stacked styling slice.
+ */
+
+:root {
+  --toolbar-height: 56px;
+  --accent: #ff9800;
+}
+
+.dark-theme {
+  --bg: #121316;
+  --surface: #1e1f24;
+  --text: #e3e3e6;
+  --text-muted: #9aa0a6;
+  --link: #8ab4f8;
+  --border: #2c2d33;
+}
+
+.light-theme {
+  --bg: #fafafa;
+  --surface: #fff;
+  --text: #1f1f1f;
+  --text-muted: #5f6368;
+  --link: #1a73e8;
+  --border: #e0e0e0;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: Rubik, Roboto, Arial, sans-serif;
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.noselect {
+  user-select: none;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+/* HEADER / TOOLBAR */
+.main-toolbar {
+  display: flex;
+  align-items: center;
+  height: var(--toolbar-height);
+  padding: 0 16px;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.main-toolbar h1 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.main-toolbar h1 small {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+.main-toolbar h2 {
+  font-size: 0.75rem;
+  font-weight: 400;
+  margin: 0;
+  color: var(--text-muted);
+}
+
+#main-content {
+  position: relative;
+  display: block;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+/* LOADING */
+.chart-loading {
+  font-family: Rubik, Roboto, Arial, sans-serif;
+  font-size: 10px;
+  text-align: center;
+}
+
+.chart-loading-spinner {
+  margin: 0;
+  padding-top: 175px;
+}
+
+.chart-loading-spinner img {
+  opacity: 0.5;
+}
+
+.chart-loading-label {
+  margin-top: 5px;
+  color: #777;
+}
+
+/* CHART CONTAINERS */
+.chart-overlay-container {
+  aspect-ratio: 2.5;
+}
+
+@media (width <= 880px) {
+  .chart-overlay-container {
+    aspect-ratio: 2;
+  }
+}
+
+@media (width <= 600px) {
+  .chart-overlay-container {
+    aspect-ratio: 5/4;
+  }
+}
+
+.chart-oscillator-container {
+  aspect-ratio: 10;
+  margin-top: 8px;
+}
+
+@media (width <= 880px) {
+  .chart-oscillator-container {
+    aspect-ratio: 8;
+  }
+}
+
+/* API ERROR */
+.api-error-container {
+  display: flex;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+.api-error-content {
+  max-width: 480px;
+  text-align: center;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.api-error-icon {
+  font-size: 48px;
+  color: var(--text-muted);
+}
+
+.api-error-list {
+  display: inline-block;
+  text-align: left;
+  color: var(--text-muted);
+}
+
+.api-error-help code {
+  background-color: var(--bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* 404 */
+.container {
+  max-width: 640px;
+  margin: 64px auto;
+  text-align: center;
+}
