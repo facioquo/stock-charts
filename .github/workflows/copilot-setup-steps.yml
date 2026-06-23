@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: read
+  packages: read
 
 env:
   NODE_VERSION: 24
@@ -50,10 +51,14 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+          registry-url: https://npm.pkg.github.com
+          scope: "@facioquo"
         continue-on-error: true
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
       - name: Environment summary
