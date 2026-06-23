@@ -104,6 +104,45 @@ function ParamsPanel({ params, onUpdate }: ParamsPanelProps): React.JSX.Element 
   );
 }
 
+interface SelectOption {
+  value: string | number;
+  name: string;
+}
+
+interface LabeledSelectProps {
+  id: string;
+  label: string;
+  value: string | number;
+  disabled?: boolean;
+  options: readonly SelectOption[];
+  onChange: (rawValue: string) => void;
+}
+
+/** A labelled `<select>` populated from `{ value, name }` options. */
+function LabeledSelect({
+  id,
+  label,
+  value,
+  disabled = false,
+  options,
+  onChange
+}: LabeledSelectProps): React.JSX.Element {
+  return (
+    <div className="style-input">
+      <label className="field-label" htmlFor={id}>
+        {label}
+      </label>
+      <select id={id} value={value} disabled={disabled} onChange={e => onChange(e.target.value)}>
+        {options.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.name}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 interface StyleRowProps {
   result: IndicatorSelection["results"][number];
   index: number;
@@ -118,40 +157,22 @@ function StyleRow({ result, index, onUpdate }: StyleRowProps): React.JSX.Element
     <div className="style-container">
       <h3>{result.displayName}</h3>
 
-      <div className="style-input">
-        <label className="field-label" htmlFor={`linetype-${index}`}>
-          Line type
-        </label>
-        <select
-          id={`linetype-${index}`}
-          value={result.lineType}
-          onChange={event => onUpdate(index, { lineType: event.target.value })}
-        >
-          {lineTypes.map(type => (
-            <option key={type.value} value={type.value}>
-              {type.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      <LabeledSelect
+        id={`linetype-${index}`}
+        label="Line type"
+        value={result.lineType}
+        options={lineTypes}
+        onChange={value => onUpdate(index, { lineType: value })}
+      />
 
-      <div className="style-input">
-        <label className="field-label" htmlFor={`linewidth-${index}`}>
-          Line width
-        </label>
-        <select
-          id={`linewidth-${index}`}
-          value={result.lineWidth}
-          disabled={widthDisabled}
-          onChange={event => onUpdate(index, { lineWidth: Number(event.target.value) })}
-        >
-          {lineWidths.map(width => (
-            <option key={width.value} value={width.value}>
-              {width.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      <LabeledSelect
+        id={`linewidth-${index}`}
+        label="Line width"
+        value={result.lineWidth}
+        disabled={widthDisabled}
+        options={lineWidths}
+        onChange={value => onUpdate(index, { lineWidth: Number(value) })}
+      />
 
       <ColorSwatchPicker
         value={result.color}
