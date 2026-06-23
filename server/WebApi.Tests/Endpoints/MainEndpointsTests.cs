@@ -62,6 +62,34 @@ public class MainEndpointsTests
     }
 
     [Fact]
+    public async Task GetQuotes_SetsPublicCacheWithVaryOrigin()
+    {
+        // Arrange
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new Quote(DateTime.UtcNow, 100m, 102m, 99m, 101m, 1_000_000)]);
+
+        DefaultHttpContext httpContext = new();
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = httpContext
+        };
+
+        // Act
+        await _controller.GetQuotes();
+
+        // Assert — these responses are cached `public` AND carry a per-origin
+        // Access-Control-Allow-Origin, so they MUST advertise `Vary: Origin`.
+        // Without it a shared/browser cache serves one origin's cached copy (ACAO
+        // included) to a sibling same-site origin, breaking CORS for the whole
+        // max-age window (regression guard for #517).
+        Assert.Contains("Origin", httpContext.Response.Headers.Vary.ToString(), StringComparison.OrdinalIgnoreCase);
+
+        string cacheControl = httpContext.Response.Headers.CacheControl.ToString();
+        Assert.Contains("public", cacheControl, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("max-age", cacheControl, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void GetIndicatorCatalog_ReturnsOkResultWithMetadata()
     {
         // Arrange
