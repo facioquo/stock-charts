@@ -149,14 +149,10 @@ interface StyleRowProps {
   onUpdate: (index: number, patch: ResultPatch) => void;
 }
 
-/** Line-type / width / color controls for a single indicator result series. */
-function StyleRow({ result, index, onUpdate }: StyleRowProps): React.JSX.Element {
-  const widthDisabled = !userSpecifiedWidth(result.lineType);
-  const colorDisabled = result.lineType === "none";
+/** Line-type and line-width selects for a result series. */
+function StyleSelects({ result, index, onUpdate }: StyleRowProps): React.JSX.Element {
   return (
-    <div className="style-container">
-      <h3>{result.displayName}</h3>
-
+    <>
       <LabeledSelect
         id={`linetype-${index}`}
         label="Line type"
@@ -164,23 +160,30 @@ function StyleRow({ result, index, onUpdate }: StyleRowProps): React.JSX.Element
         options={lineTypes}
         onChange={value => onUpdate(index, { lineType: value })}
       />
-
       <LabeledSelect
         id={`linewidth-${index}`}
         label="Line width"
         value={result.lineWidth}
-        disabled={widthDisabled}
+        disabled={!userSpecifiedWidth(result.lineType)}
         options={lineWidths}
         onChange={value => onUpdate(index, { lineWidth: Number(value) })}
       />
+    </>
+  );
+}
 
+/** Line-type / width / color controls for a single indicator result series. */
+function StyleRow({ result, index, onUpdate }: StyleRowProps): React.JSX.Element {
+  return (
+    <div className="style-container">
+      <h3>{result.displayName}</h3>
+      <StyleSelects result={result} index={index} onUpdate={onUpdate} />
       <ColorSwatchPicker
         value={result.color}
         presetColors={presetColors}
-        disabled={colorDisabled}
+        disabled={result.lineType === "none"}
         onChange={hex => onUpdate(index, { color: hex })}
       />
-
       <div className="line-sample" style={getLineSample(result)} aria-hidden="true" />
     </div>
   );
