@@ -5,7 +5,7 @@ import { getChartController, useChartState } from "../charting/useChart";
 import { SettingsDialog } from "../components/picker/SettingsDialog";
 import { PickConfigDialog } from "../components/picker/PickConfigDialog";
 import type { IndicatorListing } from "../types/chart.types";
-import "../components/picker/picker.css";
+import "../components/picker/picker.scss";
 
 /**
  * Main chart page. Ports `ChartComponent`: bootstraps the overlay chart,
