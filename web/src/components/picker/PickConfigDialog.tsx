@@ -172,12 +172,10 @@ function StyleSelects({ result, index, onUpdate }: StyleRowProps): React.JSX.Ele
   );
 }
 
-/** Line-type / width / color controls for a single indicator result series. */
-function StyleRow({ result, index, onUpdate }: StyleRowProps): React.JSX.Element {
+/** Color picker plus the rendered line-style preview for a result series. */
+function StyleColor({ result, index, onUpdate }: StyleRowProps): React.JSX.Element {
   return (
-    <div className="style-container">
-      <h3>{result.displayName}</h3>
-      <StyleSelects result={result} index={index} onUpdate={onUpdate} />
+    <>
       <ColorSwatchPicker
         value={result.color}
         presetColors={presetColors}
@@ -185,6 +183,17 @@ function StyleRow({ result, index, onUpdate }: StyleRowProps): React.JSX.Element
         onChange={hex => onUpdate(index, { color: hex })}
       />
       <div className="line-sample" style={getLineSample(result)} aria-hidden="true" />
+    </>
+  );
+}
+
+/** Line-type / width / color controls for a single indicator result series. */
+function StyleRow({ result, index, onUpdate }: StyleRowProps): React.JSX.Element {
+  return (
+    <div className="style-container">
+      <h3>{result.displayName}</h3>
+      <StyleSelects result={result} index={index} onUpdate={onUpdate} />
+      <StyleColor result={result} index={index} onUpdate={onUpdate} />
     </div>
   );
 }
