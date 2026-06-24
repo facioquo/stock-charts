@@ -1,10 +1,10 @@
 # Stock Charts
 
-Full-stack financial charting application showcasing the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package. Angular frontend with Chart.js visualization and .NET backend with Azure Functions.
+Full-stack financial charting application showcasing the [FacioQuo.Stock.Indicators](https://www.nuget.org/packages/FacioQuo.Stock.Indicators) NuGet package. Angular frontend with Chart.js visualization and .NET backend with Azure Functions.
 
 ## Primary directive
 
-Enable developers to quickly evaluate and understand the Skender.Stock.Indicators library capabilities through interactive financial charting demonstrations, accelerating their decision-making about library adoption and reducing integration learning time.
+Enable developers to quickly evaluate and understand the FacioQuo.Stock.Indicators library capabilities through interactive financial charting demonstrations, accelerating their decision-making about library adoption and reducing integration learning time.
 
 ## Secondary directives
 
@@ -207,7 +207,7 @@ Client-side project dependencies are strictly in this direction only: client →
 - **C# / .NET 10**: Latest language features, record types for DTOs
 - **Azure Functions**: Isolated worker model for data processing
 - **ASP.NET Core Web API**: REST endpoints for chart data
-- **Skender.Stock.Indicators**: NuGet library used in `server/WebApi/Services/` to compute every indicator the API serves
+- **FacioQuo.Stock.Indicators**: NuGet library used in `server/WebApi/Services/` to compute every indicator the API serves
 - **Directory.Packages.props**: Centralized NuGet version management
 - **Caching**: Layered, built-in (no extra packages), so doc-site traffic doesn't redundantly recompute indicators. Server-side output cache (`AddOutputCache`/`UseOutputCache`) caches each computed indicator response keyed by path + query string and varied by `Origin`; an in-memory quote cache (`IMemoryCache` in `QuoteService`) downloads the shared quote blob at most once per symbol per window; and `Cache-Control: public, max-age=...` headers let browsers/CDN serve repeats. Lifetime is one knob, `Caching:DurationMinutes`, in `CacheSettings`.
 
@@ -301,7 +301,7 @@ Typical lifecycle:
 
 When working on this codebase:
 
-- **Purpose**: This is a demonstration/showcase project for Skender.Stock.Indicators library
+- **Purpose**: This is a demonstration/showcase project for FacioQuo.Stock.Indicators library
 - **Workspace commands**: Run from root, use `pnpm --filter` for workspace-specific operations
 - **Solution structure**: Use `Charts.sln` for all .NET operations
 - **Type safety**: Prioritize TypeScript strict mode, Angular signals, C# nullable reference types

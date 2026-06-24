@@ -10,7 +10,7 @@ import {
   type IndicatorDataRow,
   type IndicatorListing,
   type IndicatorSelection,
-  type Quote
+  type Bar
 } from "@facioquo/indy-charts";
 
 import { env } from "../../environments/environment";
@@ -173,7 +173,7 @@ export class ChartService implements OnDestroy {
   /** Bootstrap the overlay chart and load cached / default indicators. */
   loadCharts(): void {
     this.api.getQuotes().subscribe({
-      next: (allQuotes: Quote[]) => {
+      next: (allQuotes: Bar[]) => {
         // In production, treat backup mode as an error and show error screen.
         // In development/test, allow backup mode to work (needed for E2E tests).
         if (env.production && this.api.isBackupActive) {

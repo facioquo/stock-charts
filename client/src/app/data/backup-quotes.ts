@@ -1,4 +1,4 @@
-import type { Quote } from "@facioquo/indy-charts";
+import type { Bar } from "@facioquo/indy-charts";
 
 /**
  * Simple seeded random number generator for deterministic quote generation
@@ -21,9 +21,9 @@ class SeededRandom {
  * Generate realistic backup quotes for QQQ (Invesco QQQ Trust)
  * Creates exactly 1000 business days of historical data from 2016-2019
  */
-function generateBackupQuotes(seed: number = 12345): Quote[] {
+function generateBackupQuotes(seed: number = 12345): Bar[] {
   const random = new SeededRandom(seed);
-  const quotes: Quote[] = [];
+  const quotes: Bar[] = [];
   const startDate = new Date("2016-01-04"); // Start on a Monday
   let currentPrice = 200.0; // Starting price for QQQ in early 2016
 
@@ -61,7 +61,7 @@ function generateBackupQuotes(seed: number = 12345): Quote[] {
  * Data represents QQQ (Invesco QQQ Trust) daily prices with realistic OHLCV data.
  * Dataset contains exactly 1000 data points covering 2016-2019.
  */
-export const CLIENT_BACKUP_QUOTES: Quote[] = generateBackupQuotes();
+export const CLIENT_BACKUP_QUOTES: Bar[] = generateBackupQuotes();
 
 /**
  * Generate a single day's quote with realistic OHLCV data
@@ -71,7 +71,7 @@ function generateDailyQuote(
   previousClose: number,
   dayIndex: number,
   random: SeededRandom
-): Quote {
+): Bar {
   // Create upward trend over time with periodic corrections
   const trendFactor = 1 + dayIndex * 0.0003; // Gradual upward trend
   const basePrice = previousClose * trendFactor;
@@ -150,6 +150,6 @@ export function getClientBackupQuotesCount(): number {
 /**
  * Get a subset of client backup quotes (for testing purposes)
  */
-export function getClientBackupQuotesSubset(count: number): Quote[] {
+export function getClientBackupQuotesSubset(count: number): Bar[] {
   return CLIENT_BACKUP_QUOTES.slice(-count);
 }

@@ -1,6 +1,6 @@
 # Stock Indicators for .NET demo
 
-A demo showcasing the [Skender.Stock.Indicators](https://www.nuget.org/packages/FacioQuo.Stock.Indicators) NuGet package with an Angular frontend, Chart.js charting, and a .NET Web API backend for financial indicators. See the [library documentation](https://dotnet.stockindicators.dev) for more examples, guides, and available indicators.
+A demo showcasing the [FacioQuo.Stock.Indicators](https://www.nuget.org/packages/FacioQuo.Stock.Indicators) NuGet package with an Angular frontend, Chart.js charting, and a .NET Web API backend for financial indicators. See the [library documentation](https://dotnet.stockindicators.dev) for more examples, guides, and available indicators.
 
 **Live demo:** [charts.StockIndicators.dev](https://charts.stockindicators.dev/)
 

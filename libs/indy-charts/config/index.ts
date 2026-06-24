@@ -12,7 +12,7 @@ export type {
   IndicatorResult,
   IndicatorResultConfig,
   IndicatorSelection,
-  Quote
+  Bar
 } from "./types";
 
 export type { ThemeColors } from "./theme-colors";

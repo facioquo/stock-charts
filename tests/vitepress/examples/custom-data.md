@@ -12,7 +12,7 @@ Render a candlestick + volume chart **and** a technical indicator overlay direct
   <StaticChart />
 </ClientOnly>
 
-The chart above plots OHLC + volume from a hard-coded `Quote[]` array (ISO string timestamps normalized to `Date` via `loadStaticQuotes`), with an EMA(20) line computed locally. Everything below ships in the page bundle — no network calls.
+The chart above plots OHLC + volume from a hard-coded `Bar[]` array (ISO string timestamps normalized to `Date` via `loadStaticQuotes`), with an EMA(20) line computed locally. Everything below ships in the page bundle — no network calls.
 
 ## How it works
 
@@ -20,10 +20,10 @@ The chart above plots OHLC + volume from a hard-coded `Quote[]` array (ISO strin
 
 ```typescript
 import { OverlayChart, loadStaticQuotes } from "@facioquo/indy-charts";
-import type { Quote } from "@facioquo/indy-charts";
+import type { Bar } from "@facioquo/indy-charts";
 
-// Quote.timestamp accepts ISO strings or Date instances.
-const quotes: Quote[] = loadStaticQuotes([
+// Bar.timestamp accepts ISO strings or Date instances.
+const quotes: Bar[] = loadStaticQuotes([
   { timestamp: "2025-01-02", open: 180.00, high: 182.50, low: 179.20, close: 181.80, volume: 38500000 },
   // ... more bars
 ]);
@@ -72,7 +72,7 @@ Then wrap the result into a Chart.js line dataset on the price y-axis:
 ```typescript
 import type { ChartDataset, ScatterDataPoint } from "chart.js";
 
-function buildEmaDataset(quotes: Quote[], period: number): ChartDataset<"line", ScatterDataPoint[]> {
+function buildEmaDataset(quotes: Bar[], period: number): ChartDataset<"line", ScatterDataPoint[]> {
   const ema = computeEma(quotes.map(q => q.close), period);
   return {
     type: "line",
@@ -101,12 +101,12 @@ import {
   OverlayChart,
   loadStaticQuotes,
   setupIndyCharts,
-  type Quote
+  type Bar
 } from "@facioquo/indy-charts";
 import type { ChartDataset, ScatterDataPoint } from "chart.js";
 
-// Quote.timestamp accepts ISO strings or Date instances.
-const quotes: Quote[] = loadStaticQuotes([
+// Bar.timestamp accepts ISO strings or Date instances.
+const quotes: Bar[] = loadStaticQuotes([
   { timestamp: "2025-01-02", open: 180.00, high: 182.50, low: 179.20, close: 181.80, volume: 38500000 },
   // ... more bars
 ]);
@@ -191,8 +191,8 @@ onBeforeUnmount(() => {
 
 ## Key points
 
-- **`Quote`**: single OHLCV bar — `timestamp` accepts an ISO string or `Date` instance, the rest are numeric. Type your fixture arrays as `Quote[]`.
-- **`loadStaticQuotes`**: normalizes `Quote.timestamp` to a `Date` (no-op when already a Date)
+- **`Bar`**: single OHLCV bar — `timestamp` accepts an ISO string or `Date` instance, the rest are numeric. Type your fixture arrays as `Bar[]`.
+- **`loadStaticQuotes`**: normalizes `Bar.timestamp` to a `Date` (no-op when already a Date)
 - **`OverlayChart`**: renders candlestick and volume directly onto a `<canvas>` element
 - **Custom indicators**: push your own `ChartDataset` onto `chart.data.datasets` after `render()`, then call `chart.update("none")`. Any Chart.js dataset shape works — line, dot, bar, etc.
 - **Theme sync**: re-create the chart on `document.documentElement` class changes to follow the page's dark / light mode automatically

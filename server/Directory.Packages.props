@@ -28,7 +28,7 @@
       improvements not available in the v2 stable line. Risk mitigated by integration tests in
       WebApi.Tests. Plan to upgrade to the stable v3 release once published.
     -->
-    <PackageVersion Include="Skender.Stock.Indicators" Version="3.0.0-preview.3.1" />
+    <PackageVersion Include="FacioQuo.Stock.Indicators" Version="3.0.0" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>

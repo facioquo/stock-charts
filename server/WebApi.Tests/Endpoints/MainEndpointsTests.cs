@@ -36,10 +36,10 @@ public class MainEndpointsTests
     public async Task GetQuotes_WithValidData_ReturnsOkResult()
     {
         // Arrange
-        Quote[] sampleQuotes = new[]
+        Bar[] sampleQuotes = new[]
         {
-            new Quote(DateTime.UtcNow, 100m, 102m, 99m, 101m, 1000000),
-            new Quote(DateTime.UtcNow.AddDays(-1), 99m, 101m, 98m, 100m, 900000)
+            new Bar(DateTime.UtcNow, 100m, 102m, 99m, 101m, 1000000),
+            new Bar(DateTime.UtcNow.AddDays(-1), 99m, 101m, 98m, 100m, 900000)
         };
 
         _quoteServiceMock
@@ -67,7 +67,7 @@ public class MainEndpointsTests
         // Arrange
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
-            .ReturnsAsync([new Quote(DateTime.UtcNow, 100m, 102m, 99m, 101m, 1_000_000)]);
+            .ReturnsAsync([new Bar(DateTime.UtcNow, 100m, 102m, 99m, 101m, 1_000_000)]);
 
         DefaultHttpContext httpContext = new();
         _controller.ControllerContext = new ControllerContext {
@@ -115,7 +115,7 @@ public class MainEndpointsTests
     public async Task GetAdl_WithValidQuotes_ReturnsOkResult()
     {
         // Arrange
-        List<Quote> sampleQuotes = GenerateSampleQuotes(50);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(50);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -136,7 +136,7 @@ public class MainEndpointsTests
     public async Task GetAdx_WithValidParameters_ReturnsOkResult()
     {
         // Arrange
-        List<Quote> sampleQuotes = GenerateSampleQuotes(50);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(50);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -157,7 +157,7 @@ public class MainEndpointsTests
     public async Task GetRsi_WithValidParameters_ReturnsOkResult()
     {
         // Arrange
-        List<Quote> sampleQuotes = GenerateSampleQuotes(50);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(50);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -178,7 +178,7 @@ public class MainEndpointsTests
     public async Task GetMacd_WithValidParameters_ReturnsOkResult()
     {
         // Arrange
-        List<Quote> sampleQuotes = GenerateSampleQuotes(50);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(50);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -199,7 +199,7 @@ public class MainEndpointsTests
     public async Task GetBollingerBands_WithValidParameters_ReturnsOkResult()
     {
         // Arrange
-        List<Quote> sampleQuotes = GenerateSampleQuotes(50);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(50);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -220,7 +220,7 @@ public class MainEndpointsTests
     public async Task GetSma_WithValidParameters_ReturnsOkResult()
     {
         // Arrange
-        List<Quote> sampleQuotes = GenerateSampleQuotes(50);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(50);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -241,7 +241,7 @@ public class MainEndpointsTests
     public async Task GetVwap_WithValidQuotes_ReturnsOkResult()
     {
         // Arrange — generate enough quotes so TakeLast(limitLast) has a first element
-        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -273,7 +273,7 @@ public class MainEndpointsTests
     public async Task GetVwap_WithFewerThanLimitLastQuotes_ReturnsOkResult()
     {
         // Arrange — fewer quotes than the limitLast window; all should be visible
-        List<Quote> sampleQuotes = GenerateSampleQuotes(50);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(50);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -323,7 +323,7 @@ public class MainEndpointsTests
     {
         // Arrange — HL2 = (high + low) / 2. With the sample generator
         // (high = base + 2, low = base - 2) the median collapses to base.
-        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -348,7 +348,7 @@ public class MainEndpointsTests
     public async Task GetHlc3_ComputesTypicalPrice_ReturnsOkResult()
     {
         // Arrange — HLC3 = (high + low + close) / 3.
-        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -372,7 +372,7 @@ public class MainEndpointsTests
     public async Task GetOc2_ComputesOpenCloseAverage_ReturnsOkResult()
     {
         // Arrange — OC2 = (open + close) / 2.
-        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -396,7 +396,7 @@ public class MainEndpointsTests
     public async Task GetOhl3_ComputesOpenHighLowAverage_ReturnsOkResult()
     {
         // Arrange — OHL3 = (open + high + low) / 3.
-        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -420,7 +420,7 @@ public class MainEndpointsTests
     public async Task GetOhlc4_ComputesAveragePrice_ReturnsOkResult()
     {
         // Arrange — OHLC4 = (open + high + low + close) / 4.
-        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -445,7 +445,7 @@ public class MainEndpointsTests
     {
         // Arrange — Gator derives from the Alligator, which needs ~121 periods
         // of warmup, so generate well beyond that.
-        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -468,7 +468,7 @@ public class MainEndpointsTests
     public async Task GetPivotPoints_WithValidQuotes_ReturnsOkResult()
     {
         // Arrange — monthly pivot points need at least two windows of warmup.
-        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -490,7 +490,7 @@ public class MainEndpointsTests
     public async Task GetPivots_WithValidParameters_ReturnsOkResult()
     {
         // Arrange
-        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -512,7 +512,7 @@ public class MainEndpointsTests
     public async Task GetPivots_WithInvalidParameters_ReturnsBadRequest()
     {
         // Arrange
-        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -533,7 +533,7 @@ public class MainEndpointsTests
     public async Task GetRollingPivots_WithValidParameters_ReturnsOkResult()
     {
         // Arrange
-        List<Quote> sampleQuotes = GenerateSampleQuotes(150);
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
         _quoteServiceMock
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(sampleQuotes);
@@ -602,9 +602,9 @@ public class MainEndpointsTests
     /// <summary>
     /// Helper to generate sample quote data for tests.
     /// </summary>
-    private static List<Quote> GenerateSampleQuotes(int count)
+    private static List<Bar> GenerateSampleQuotes(int count)
     {
-        List<Quote> quotes = new();
+        List<Bar> quotes = new();
         DateTime startDate = DateTime.UtcNow.AddDays(-count);
 
         for (int i = 0; i < count; i++)
@@ -612,7 +612,7 @@ public class MainEndpointsTests
             DateTime date = startDate.AddDays(i);
             decimal basePrice = 100m + (i * 0.5m);
 
-            quotes.Add(new Quote(
+            quotes.Add(new Bar(
                 date,
                 basePrice,
                 basePrice + 2m,

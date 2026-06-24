@@ -2571,7 +2571,7 @@ public static class Metadata
                 ]
             },
 
-            // Quote transform: Median Price (HL2)
+            // Bar transform: Median Price (HL2)
             new IndicatorListing {
                 Name = "Median Price (HL2)",
                 Uiid = "HL2",
@@ -2591,7 +2591,7 @@ public static class Metadata
                 ]
             },
 
-            // Quote transform: Typical Price (HLC3)
+            // Bar transform: Typical Price (HLC3)
             new IndicatorListing {
                 Name = "Typical Price (HLC3)",
                 Uiid = "HLC3",
@@ -2611,7 +2611,7 @@ public static class Metadata
                 ]
             },
 
-            // Quote transform: Open-Close Average (OC2)
+            // Bar transform: Open-Close Average (OC2)
             new IndicatorListing {
                 Name = "Open-Close Average (OC2)",
                 Uiid = "OC2",
@@ -2631,7 +2631,7 @@ public static class Metadata
                 ]
             },
 
-            // Quote transform: Open-High-Low Average (OHL3)
+            // Bar transform: Open-High-Low Average (OHL3)
             new IndicatorListing {
                 Name = "Open-High-Low Average (OHL3)",
                 Uiid = "OHL3",
@@ -2651,7 +2651,7 @@ public static class Metadata
                 ]
             },
 
-            // Quote transform: Average Price (OHLC4)
+            // Bar transform: Average Price (OHLC4)
             new IndicatorListing {
                 Name = "Average Price (OHLC4)",
                 Uiid = "OHLC4",

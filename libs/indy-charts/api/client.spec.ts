@@ -144,7 +144,7 @@ describe("createApiClient", () => {
   // -----------------------------------------------------------------------
 
   describe("getQuotes", () => {
-    it("returns Quote[] with Date objects from raw ISO strings", async () => {
+    it("returns Bar[] with Date objects from raw ISO strings", async () => {
       const apiQuotes: ApiQuote[] = [
         createQuote("2024-01-01T00:00:00Z"),
         createQuote("2024-01-02T00:00:00Z")

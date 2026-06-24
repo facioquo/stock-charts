@@ -8,7 +8,7 @@ import {
   type IndicatorListing,
   type IndicatorParam,
   type IndicatorSelection,
-  type Quote
+  type Bar
 } from "@facioquo/indy-charts";
 
 @Injectable({ providedIn: "root" })
@@ -40,7 +40,7 @@ export class ApiService {
   /** Lazily-built timestamp-aligned rows for backup-mode `getSelectionData`. */
   private _backupRows: Array<{ timestamp: string; candle: unknown }> | undefined;
 
-  getQuotes(): Observable<Quote[]> {
+  getQuotes(): Observable<Bar[]> {
     type ApiQuote = {
       timestamp: string;
       open: number;
@@ -191,8 +191,8 @@ export class ApiService {
       close: number;
       volume: number;
     }>
-  ): Quote[] {
-    // Normalize API quote format to Quote[] ensuring timestamp is a valid Date instance.
+  ): Bar[] {
+    // Normalize API quote format to Bar[] ensuring timestamp is a valid Date instance.
     return raw.map((q, index) => ({
       timestamp: this.parseTimestamp(q.timestamp, index),
       open: q.open,

@@ -4,7 +4,7 @@ import {
   type IndicatorParam,
   type IndicatorResultConfig,
   type IndicatorSelection,
-  type Quote
+  type Bar
 } from "../config/types";
 
 const STYLE_COLORS = {
@@ -62,10 +62,10 @@ export interface ApiClient {
   /**
    * Fetches the raw OHLCV quote history from `GET /quotes`.
    *
-   * @returns Resolved array of {@link Quote} objects sorted chronologically.
+   * @returns Resolved array of {@link Bar} objects sorted chronologically.
    * @throws  Re-throws any network or HTTP error (after calling `onError`).
    */
-  getQuotes(): Promise<Quote[]>;
+  getQuotes(): Promise<Bar[]>;
 
   /**
    * Fetches all available indicator listings from `GET /indicators`.
@@ -94,7 +94,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function normalizeQuotes(quotes: unknown[]): Quote[] {
+function normalizeQuotes(quotes: unknown[]): Bar[] {
   function asFiniteNumber(value: unknown, field: string, index: number): number {
     if (typeof value !== "number" || !Number.isFinite(value)) {
       throw new Error(
@@ -253,7 +253,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
   const baseUrl = config.baseUrl.endsWith("/") ? config.baseUrl : `${config.baseUrl}/`;
 
   return {
-    async getQuotes(): Promise<Quote[]> {
+    async getQuotes(): Promise<Bar[]> {
       try {
         const response = await fetch(endpointUrl(baseUrl, endpoints?.quotes ?? "quotes"));
         if (!response.ok) {

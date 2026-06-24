@@ -6,7 +6,7 @@ import {
   type IndicatorDataRow,
   type IndicatorListing,
   type IndicatorResult,
-  type Quote
+  type Bar
 } from "../config/types";
 
 const CANDLE_HIGH_MULTIPLIER = 1.01;
@@ -17,14 +17,14 @@ const CATEGORIES = {
   CANDLESTICK_PATTERN: "candlestick-pattern"
 } as const;
 
-export function processQuoteData(quotes: Quote[]): {
+export function processQuoteData(quotes: Bar[]): {
   priceData: FinancialDataPoint[];
   volumeAxisSize: number;
 } {
   const priceData: FinancialDataPoint[] = [];
   let sumVol = 0;
 
-  quotes.forEach((q: Quote) => {
+  quotes.forEach((q: Bar) => {
     priceData.push({
       x: new Date(q.timestamp).valueOf(),
       o: q.open,
@@ -201,7 +201,7 @@ export function addExtraBars(dataPoints: ScatterDataPoint[], extraBars: number):
 
 export function getCandlePointConfiguration(
   match: number,
-  candle: Quote
+  candle: Bar
 ): { yValue: number; color: string; rotation: number } {
   switch (match) {
     case -100:

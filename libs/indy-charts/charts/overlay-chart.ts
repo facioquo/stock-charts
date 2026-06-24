@@ -17,7 +17,7 @@ import {
   type ChartSettings,
   type IndicatorResult,
   type IndicatorSelection,
-  type Quote
+  type Bar
 } from "../config/types";
 
 const CHART_TYPES = {
@@ -49,7 +49,7 @@ export class OverlayChart {
    * Initialize the overlay chart with quote data.
    * Returns the full-resolution datasets for use in dynamic slicing.
    */
-  render(quotes: Quote[], extraBars: number = 6): ChartDataset[] {
+  render(quotes: Bar[], extraBars: number = 6): ChartDataset[] {
     const palette = getFinancialPalette(this.settings.isDarkTheme ? "dark" : "light");
     applyFinancialElementTheme(palette);
 
@@ -92,7 +92,7 @@ export class OverlayChart {
    * Use when the chart was initialized with a sliced view but the full
    * dataset is needed so setBarCount() can re-slice across the entire history.
    */
-  buildFullDatasets(allQuotes: Quote[], extraBars: number = 6): ChartDataset[] {
+  buildFullDatasets(allQuotes: Bar[], extraBars: number = 6): ChartDataset[] {
     const palette = getFinancialPalette(this.settings.isDarkTheme ? "dark" : "light");
     const { priceData } = processQuoteData(allQuotes);
     const datasets: ChartDataset[] = [

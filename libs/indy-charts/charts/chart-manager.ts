@@ -9,7 +9,7 @@ import {
   type IndicatorResult,
   type IndicatorResultConfig,
   type IndicatorSelection,
-  type Quote
+  type Bar
 } from "../config/types";
 
 import { baseDataset } from "../config/datasets";
@@ -41,7 +41,7 @@ export class ChartManager {
   private _overlayChart: OverlayChart | undefined;
   private _oscillators = new Map<string, OscillatorChart>();
   private _selections: IndicatorSelection[] = [];
-  private _allQuotes: Quote[] = [];
+  private _allQuotes: Bar[] = [];
   private _allProcessedDatasets = new Map<string, ChartDataset[]>();
   private _currentBarCount = 250;
   private _settings: ChartSettings;
@@ -68,7 +68,7 @@ export class ChartManager {
   }
 
   /** Read-only view of the full quote dataset. */
-  get allQuotes(): ReadonlyArray<Quote> {
+  get allQuotes(): ReadonlyArray<Bar> {
     return this._allQuotes;
   }
 
@@ -90,7 +90,7 @@ export class ChartManager {
    */
   initializeOverlay(
     ctx: CanvasRenderingContext2D | HTMLCanvasElement,
-    allQuotes: Quote[],
+    allQuotes: Bar[],
     barCount: number
   ): void {
     this._allQuotes = allQuotes;
