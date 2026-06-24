@@ -2,10 +2,10 @@ using System.Text.Json;
 using Alpaca.Markets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using FacioQuo.Stock.Indicators;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using FacioQuo.Stock.Indicators;
 using WebApi.Services;
 
 namespace Functions;
