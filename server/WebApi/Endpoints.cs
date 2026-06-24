@@ -23,7 +23,7 @@ public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSetti
     [HttpGet("quotes")]
     public async Task<IActionResult> GetQuotes()
     {
-        IEnumerable<Quote> quotes = await quoteFeed.Get(HttpContext.RequestAborted);
+        IEnumerable<Bar> quotes = await quoteFeed.Get(HttpContext.RequestAborted);
         SetClientCache();
         return Ok(quotes.TakeLast(limitLast));
     }
@@ -38,11 +38,11 @@ public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSetti
         return Ok(Metadata.IndicatorListing($"{Request.Scheme}://{Request.Host}"));
     }
 
-    private async Task<IActionResult> Get<T>(Func<IReadOnlyList<Quote>, IEnumerable<T>> indicatorFunc)
+    private async Task<IActionResult> Get<T>(Func<IReadOnlyList<Bar>, IEnumerable<T>> indicatorFunc)
     {
         try
         {
-            IReadOnlyList<Quote> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
+            IReadOnlyList<Bar> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
             IEnumerable<T> results = indicatorFunc(quotes).TakeLast(limitLast);
             SetClientCache();
             return Ok(results);
@@ -56,8 +56,22 @@ public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSetti
     // Emit a shared-cache directive so browsers and CDN/edge caches (e.g.
     // Cloudflare in front of the doc site) can serve repeat requests without
     // reaching the origin. Mirrors the server-side output-cache lifetime.
+    //
+    // Vary: Origin is REQUIRED here. These responses carry a per-origin
+    // Access-Control-Allow-Origin (CORS). Without advertising the Origin vary, a
+    // shared HTTP cache keyed only by URL serves one origin's cached copy — ACAO
+    // included — to another origin, which then fails the browser CORS check. The
+    // doc site (dotnet.stockindicators.dev) and demo site
+    // (charts.stockindicators.dev) are sibling subdomains that share a browser
+    // cache partition, so a cross-site refresh would otherwise poison each
+    // other's cached quotes/indicators for the whole max-age window. The
+    // server-side OutputCache already varies by Origin; this mirrors that to the
+    // client. See facioquo/stock-charts#517.
     private void SetClientCache()
-        => Response.Headers.CacheControl = $"public, max-age={(int)cacheDuration.TotalSeconds}";
+    {
+        Response.Headers.CacheControl = $"public, max-age={(int)cacheDuration.TotalSeconds}";
+        Response.Headers.Append("Vary", "Origin");
+    }
 
     //////////////////////////////////////////
     // INDICATORS (sorted alphabetically)
@@ -107,8 +121,8 @@ public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSetti
     {
         try
         {
-            IReadOnlyList<Quote> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
-            IReadOnlyList<Quote> market = (await quoteFeed.Get("SPY", HttpContext.RequestAborted)).ToList();
+            IReadOnlyList<Bar> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
+            IReadOnlyList<Bar> market = (await quoteFeed.Get("SPY", HttpContext.RequestAborted)).ToList();
             IEnumerable<BetaResult> results = quotes.ToBeta(market, lookbackPeriods, type).TakeLast(limitLast);
             SetClientCache();
             return Ok(results);
@@ -281,7 +295,7 @@ public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSetti
 
     [HttpGet("PIVOT-POINTS")]
     public Task<IActionResult> GetPivotPoints()
-        => Get(quotes => quotes.ToPivotPoints(PeriodSize.Month));
+        => Get(quotes => quotes.ToPivotPoints(BarInterval.Month));
 
     [HttpGet("PIVOTS")]
     public Task<IActionResult> GetPivots(int leftSpan, int rightSpan, int maxTrendPeriods)

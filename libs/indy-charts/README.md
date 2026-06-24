@@ -7,7 +7,7 @@ Framework-agnostic financial charting library for [Chart.js](https://chartjs.org
 - **Price + volume overlay** — candlestick and volume on a single canvas
 - **Oscillator subcharts** — RSI, MACD, Stochastic, etc., standalone or paired with the price chart
 - **Technical indicators** — SMA, EMA, RSI, MACD, Bollinger Bands, and more (computed server-side via the stock-charts REST API; this library renders the results)
-- **Bring-your-own data** — feed `OverlayChart` a `Quote[]` directly with no API
+- **Bring-your-own data** — feed `OverlayChart` a `Bar[]` directly with no API
 - **Light + dark themes** — built-in palettes plus per-instance and site-wide background overrides
 - **Vue 3 adapter** — optional `<StockIndicatorChart>` component for Vue / VitePress sites
 - **Strict TypeScript** — ES2020 target, full type definitions, no `any` in the public surface
@@ -171,7 +171,7 @@ Use the global component from Markdown / templates. Each instance is self-contai
 | `ChartManager` | Lifecycle orchestrator for overlay + oscillator charts and viewport changes |
 | `OverlayChart`, `OscillatorChart` | Lower-level chart classes if you don't need `ChartManager` |
 | `createApiClient(config)` | Typed `fetch` client for `GET /quotes`, `GET /indicators`, indicator data |
-| `loadStaticQuotes`, `loadStaticIndicatorData` | Accept bring-your-own `Quote[]` / `IndicatorDataRow[]` (timestamps as string or Date) |
+| `loadStaticQuotes`, `loadStaticIndicatorData` | Accept bring-your-own `Bar[]` / `IndicatorDataRow[]` (timestamps as string or Date) |
 | `createDefaultSelection`, `applySelectionTokens`, `calculateOptimalBars` | Selection / viewport helpers |
 | `getThemeColors`, `baseOverlayConfig`, `baseOscillatorConfig` | Theme + config building blocks |
 | `setupIndyChartsForVue` (`/vue` subpath) | Vue 3 adapter that registers `<StockIndicatorChart>` globally |
@@ -186,4 +186,4 @@ Apache-2.0. The full license text is shipped in the `LICENSE` file alongside thi
 
 - [facioquo/stock-charts](https://github.com/facioquo/stock-charts) — reference website and REST API that pair with this library
 - [`@facioquo/chartjs-chart-financial`](https://github.com/facioquo/stock-charts/tree/main/libs/chartjs-financial) — Chart.js financial chart types (bundled inside this package; no separate install required)
-- [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) — .NET indicator computation library that powers the REST API
+- [FacioQuo.Stock.Indicators](https://www.nuget.org/packages/FacioQuo.Stock.Indicators) — .NET indicator computation library that powers the REST API

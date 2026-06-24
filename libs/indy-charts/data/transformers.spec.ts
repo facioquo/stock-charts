@@ -6,13 +6,13 @@ import {
   addExtraBars,
   getCandlePointConfiguration
 } from "./transformers";
-import type { IndicatorDataRow, IndicatorListing, IndicatorResult, Quote } from "../config/types";
+import type { IndicatorDataRow, IndicatorListing, IndicatorResult, Bar } from "../config/types";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeQuote(dateStr: string, close = 100, volume = 1000): Quote {
+function makeQuote(dateStr: string, close = 100, volume = 1000): Bar {
   return {
     timestamp: new Date(dateStr),
     open: close - 1,

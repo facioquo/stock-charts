@@ -1,13 +1,13 @@
 import { describe, it, expect } from "vitest";
 
-import { type IndicatorDataRow, type Quote } from "../config/types";
+import { type IndicatorDataRow, type Bar } from "../config/types";
 import { loadStaticQuotes, loadStaticIndicatorData } from "./static";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function createQuote(dateStr: string, close = 100): Quote {
+function createQuote(dateStr: string, close = 100): Bar {
   return {
     timestamp: dateStr,
     open: close - 1,
@@ -70,8 +70,8 @@ describe("loadStaticQuotes", () => {
     expect(result[2].close).toBe(70);
   });
 
-  it("accepts a Quote[] fixture with mixed string/Date timestamps", () => {
-    const fixture: Quote[] = [
+  it("accepts a Bar[] fixture with mixed string/Date timestamps", () => {
+    const fixture: Bar[] = [
       { timestamp: "2024-02-01T00:00:00Z", open: 1, high: 2, low: 0, close: 1.5, volume: 10 },
       {
         timestamp: new Date("2024-02-02T00:00:00Z"),

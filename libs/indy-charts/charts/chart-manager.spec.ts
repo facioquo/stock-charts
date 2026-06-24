@@ -10,7 +10,7 @@ import type {
   IndicatorDataRow,
   IndicatorListing,
   IndicatorSelection,
-  Quote
+  Bar
 } from "../config/types";
 
 /**
@@ -59,7 +59,7 @@ function createMockOverlay(): Partial<OverlayChart> {
       update: vi.fn(),
       destroy: vi.fn()
     } as unknown as Chart,
-    render: vi.fn().mockImplementation((quotes: Quote[]) => {
+    render: vi.fn().mockImplementation((quotes: Bar[]) => {
       // Return full-length datasets so slicing can be validated.
       const priceData = quotes.map(q => ({
         x: new Date(q.timestamp).valueOf(),
@@ -89,7 +89,7 @@ function createMockOverlay(): Partial<OverlayChart> {
     removeIndicatorDatasets: vi.fn(),
     updateLegends: vi.fn(),
     updateTheme: vi.fn(),
-    buildFullDatasets: vi.fn().mockImplementation((quotes: Quote[]) => {
+    buildFullDatasets: vi.fn().mockImplementation((quotes: Bar[]) => {
       const priceData = quotes.map(q => ({
         x: new Date(q.timestamp).valueOf(),
         o: q.open,
@@ -148,8 +148,8 @@ function createMockOscillator(): Partial<OscillatorChart> {
 // Fixtures
 // ---------------------------------------------------------------------------
 
-function makeQuotes(count: number): Quote[] {
-  const quotes: Quote[] = [];
+function makeQuotes(count: number): Bar[] {
+  const quotes: Bar[] = [];
   const start = new Date("2024-01-02");
 
   for (let i = 0; i < count; i++) {
@@ -272,7 +272,7 @@ function makeSelection(listing: IndicatorListing, ucid: string): IndicatorSelect
   } as IndicatorSelection;
 }
 
-function makeIndicatorData(quotes: Quote[]): IndicatorDataRow[] {
+function makeIndicatorData(quotes: Bar[]): IndicatorDataRow[] {
   return quotes.map((q, index) => ({
     timestamp: new Date(q.timestamp).toISOString(),
     candle: q,

@@ -49,13 +49,13 @@ public class RandomQuotesTests
     {
         // Arrange & Act & Assert - frequency too small (under 1 hour)
         ArgumentException smallFreqException = Assert.Throws<ArgumentException>(() =>
-            new RandomQuotes(periodSize: PeriodSize.ThirtyMinutes, includeWeekends: false));
+            new RandomQuotes(periodSize: BarInterval.ThirtyMinutes, includeWeekends: false));
         Assert.Equal("includeWeekends", smallFreqException.ParamName);
         Assert.Contains("Weekends can only be excluded for period sizes between OneHour and less than OneWeek", smallFreqException.Message);
 
         // Test frequency too large (week or more)
         ArgumentException largeFreqException = Assert.Throws<ArgumentException>(() =>
-            new RandomQuotes(periodSize: PeriodSize.Week, includeWeekends: false));
+            new RandomQuotes(periodSize: BarInterval.Week, includeWeekends: false));
         Assert.Equal("includeWeekends", largeFreqException.ParamName);
         Assert.Contains("Weekends can only be excluded for period sizes between OneHour and less than OneWeek", largeFreqException.Message);
     }
@@ -89,8 +89,8 @@ public class RandomQuotesTests
         const int requestedBars = 20;
 
         // Act
-        RandomQuotes quotesWithWeekends = new(bars: requestedBars, periodSize: PeriodSize.Day, includeWeekends: true);
-        RandomQuotes quotesWithoutWeekends = new(bars: requestedBars, periodSize: PeriodSize.Day, includeWeekends: false);
+        RandomQuotes quotesWithWeekends = new(bars: requestedBars, periodSize: BarInterval.Day, includeWeekends: true);
+        RandomQuotes quotesWithoutWeekends = new(bars: requestedBars, periodSize: BarInterval.Day, includeWeekends: false);
 
         // Assert
         Assert.Equal(requestedBars, quotesWithWeekends.Count);
@@ -107,17 +107,17 @@ public class RandomQuotesTests
     public void Constructor_ValidatesHourlyFrequencyForWeekendExclusion()
     {
         // Arrange & Act - OneHour should be valid for weekend exclusion
-        RandomQuotes quotes = new(bars: 5, periodSize: PeriodSize.OneHour, includeWeekends: false);
+        RandomQuotes quotes = new(bars: 5, periodSize: BarInterval.OneHour, includeWeekends: false);
 
         // Assert
         Assert.Equal(5, quotes.Count);
 
         // TwoHours should also be valid
-        RandomQuotes quotesTwo = new(bars: 5, periodSize: PeriodSize.TwoHours, includeWeekends: false);
+        RandomQuotes quotesTwo = new(bars: 5, periodSize: BarInterval.TwoHours, includeWeekends: false);
         Assert.Equal(5, quotesTwo.Count);
 
         // Day should also be valid
-        RandomQuotes quotesDaily = new(bars: 5, periodSize: PeriodSize.Day, includeWeekends: false);
+        RandomQuotes quotesDaily = new(bars: 5, periodSize: BarInterval.Day, includeWeekends: false);
         Assert.Equal(5, quotesDaily.Count);
     }
 }

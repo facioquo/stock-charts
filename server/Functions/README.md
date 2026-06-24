@@ -63,7 +63,7 @@ code .  # then "Reopen in Container"
 #### Behavior without credentials
 
 - Functions start successfully with a warning log
-- Quote updates are skipped
+- Bar updates are skipped
 - WebAPI automatically serves backup quote data
 - Full application functionality is available for demo purposes
 

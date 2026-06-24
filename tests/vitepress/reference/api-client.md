@@ -41,9 +41,9 @@ interface ApiClientConfig {
 
 The returned `ApiClient` exposes three methods. All return promises that reject (after `onError`) on network or HTTP failures.
 
-### `getQuotes(): Promise<Quote[]>`
+### `getQuotes(): Promise<Bar[]>`
 
-Fetches OHLCV history from `GET {baseUrl}/quotes` and normalizes the response into `Quote` objects (timestamps parsed to `Date`).
+Fetches OHLCV history from `GET {baseUrl}/quotes` and normalizes the response into `Bar` objects (timestamps parsed to `Date`).
 
 ```typescript
 const quotes = await client.getQuotes();
@@ -77,7 +77,7 @@ Wrap the result in `loadStaticIndicatorData()` to get a typed `IndicatorDataRow[
 After normalization, quote data conforms to:
 
 ```typescript
-interface Quote {
+interface Bar {
   timestamp: Date;
   open: number;
   high: number;

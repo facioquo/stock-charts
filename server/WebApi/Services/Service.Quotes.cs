@@ -6,8 +6,8 @@ namespace WebApi.Services;
 
 public interface IQuoteService
 {
-    Task<IEnumerable<Quote>> Get(CancellationToken ct);
-    Task<IEnumerable<Quote>> Get(string symbol, CancellationToken ct);
+    Task<IEnumerable<Bar>> Get(CancellationToken ct);
+    Task<IEnumerable<Bar>> Get(string symbol, CancellationToken ct);
 }
 
 public partial class QuoteService(
@@ -24,8 +24,8 @@ public partial class QuoteService(
     /// <summary>
     /// Get default quotes
     /// </summary>
-    /// <returns cref="Quote">List of default quotes</returns>
-    public async Task<IEnumerable<Quote>> Get(CancellationToken ct)
+    /// <returns cref="Bar">List of default quotes</returns>
+    public async Task<IEnumerable<Bar>> Get(CancellationToken ct)
         => await Get("QQQ", ct);
 
     /// <summary>
@@ -35,7 +35,7 @@ public partial class QuoteService(
     /// </summary>
     /// <param name="symbol">"SPY" or "QQQ" only, for now</param>
     /// <param name="ct">Cancellation token</param>
-    public async Task<IEnumerable<Quote>> Get(string symbol, CancellationToken ct)
+    public async Task<IEnumerable<Bar>> Get(string symbol, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(symbol);
 
@@ -47,7 +47,7 @@ public partial class QuoteService(
 
         string cacheKey = $"quotes:{symbol}";
 
-        if (_cache.TryGetValue(cacheKey, out IReadOnlyList<Quote>? cached) && cached is not null)
+        if (_cache.TryGetValue(cacheKey, out IReadOnlyList<Bar>? cached) && cached is not null)
         {
             return cached;
         }
@@ -55,12 +55,12 @@ public partial class QuoteService(
         // A cancellation here propagates without caching; any other failure
         // falls back to backup quotes, which are cached like a real result so a
         // transient storage outage does not stampede the blob on every request.
-        IReadOnlyList<Quote> quotes = await LoadQuotesAsync(symbol, ct);
+        IReadOnlyList<Bar> quotes = await LoadQuotesAsync(symbol, ct);
         _cache.Set(cacheKey, quotes, _cacheDuration);
         return quotes;
     }
 
-    private async Task<IReadOnlyList<Quote>> LoadQuotesAsync(string symbol, CancellationToken ct)
+    private async Task<IReadOnlyList<Bar>> LoadQuotesAsync(string symbol, CancellationToken ct)
     {
         string blobName = $"{symbol}-DAILY.json";
         try
@@ -81,7 +81,7 @@ public partial class QuoteService(
         }
     }
 
-    private async Task<IReadOnlyList<Quote>?> TryGetBlobQuotesAsync(string blobName, CancellationToken ct)
+    private async Task<IReadOnlyList<Bar>?> TryGetBlobQuotesAsync(string blobName, CancellationToken ct)
     {
         BlobClient blob = _storage.GetBlobClient(blobName);
 
@@ -100,7 +100,7 @@ public partial class QuoteService(
             return null;
         }
 
-        List<Quote>? quotes = await JsonSerializer.DeserializeAsync<List<Quote>>(stream, cancellationToken: ct);
+        List<Bar>? quotes = await JsonSerializer.DeserializeAsync<List<Bar>>(stream, cancellationToken: ct);
 
         if (quotes == null || quotes.Count == 0)
         {

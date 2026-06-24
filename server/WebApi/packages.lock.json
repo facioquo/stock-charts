@@ -22,13 +22,19 @@
       },
       "Azure.Storage.Blobs": {
         "type": "Direct",
-        "requested": "[12.29.0, )",
-        "resolved": "12.29.0",
-        "contentHash": "e82Racxat6NsLHD+6Nwf2GxglYdN9T20QHgAsaHB1FYgbJUZilmUR0H+IPCu6AJy8nNyvSONc/erF8vtsyHrRw==",
+        "requested": "[12.29.1, )",
+        "resolved": "12.29.1",
+        "contentHash": "pWh7xZBto8YcwiO853AB3uijTfVqs9PDte0Bu9/Zd8O9nwKiitWm0Jej1vsNkmYUzeG1552f8vJPjmtW30pBUQ==",
         "dependencies": {
           "Azure.Core": "1.55.0",
           "Azure.Storage.Common": "12.28.0"
         }
+      },
+      "FacioQuo.Stock.Indicators": {
+        "type": "Direct",
+        "requested": "[3.0.0, )",
+        "resolved": "3.0.0",
+        "contentHash": "eZp1asI9dHSqJo44W72DvdHbNpmsV5hltigb5usplWHfRt9gJlwheiPDQ8uc1ekECLK8dceWzWGuFSN+sW/MdQ=="
       },
       "Microsoft.Extensions.Azure": {
         "type": "Direct",
@@ -44,12 +50,6 @@
         "requested": "[4.15.0, )",
         "resolved": "4.15.0",
         "contentHash": "E8fu71Y+vzhniJKy1K13Rzwm8Vjcj7CDFBpflqncKUZfc3SzuF0kMBiyMmgXNPkjWTdE3Z+30HlGgYjHONZY/Q=="
-      },
-      "Skender.Stock.Indicators": {
-        "type": "Direct",
-        "requested": "[3.0.0-preview.3.1, )",
-        "resolved": "3.0.0-preview.3.1",
-        "contentHash": "oBzrKgtwRRGfJyotPufP1tpNUnNeUgyiv58aY9E/Z4qaKfLL0pOqPUtcS9/5z/mnmhtyRCe/BKPkRKTD4kHUKw=="
       },
       "Azure.Storage.Common": {
         "type": "Transitive",

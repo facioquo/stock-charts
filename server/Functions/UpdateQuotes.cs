@@ -2,10 +2,10 @@ using System.Text.Json;
 using Alpaca.Markets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using FacioQuo.Stock.Indicators;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Skender.Stock.Indicators;
 using WebApi.Services;
 
 namespace Functions;
@@ -174,15 +174,15 @@ public partial class Jobs
         DateTime into = DateTime.Now.Subtract(TimeSpan.FromMinutes(16));
         DateTime from = into.Subtract(TimeSpan.FromDays(800));
 
-        IPage<IBar> barSet = await alpacaDataClient.ListHistoricalBarsAsync(
+        IPage<Alpaca.Markets.IBar> barSet = await alpacaDataClient.ListHistoricalBarsAsync(
             new HistoricalBarsRequest(symbol, from, into, BarTimeFrame.Day), ct);
 
-        List<Quote> quotes = new(barSet.Items.Count);
+        List<Bar> quotes = new(barSet.Items.Count);
 
         // compose
-        foreach (IBar bar in barSet.Items)
+        foreach (Alpaca.Markets.IBar bar in barSet.Items)
         {
-            quotes.Add(new Quote(bar.TimeUtc, bar.Open, bar.High, bar.Low, bar.Close, bar.Volume));
+            quotes.Add(new Bar(bar.TimeUtc, bar.Open, bar.High, bar.Low, bar.Close, bar.Volume));
         }
 
         string json = JsonSerializer
@@ -194,7 +194,7 @@ public partial class Jobs
         LogBlobUpdated(blobName);
     }
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Alpaca API credentials not configured. Quote updates skipped - API will use backup data. Set ALPACA_KEY and ALPACA_SECRET environment variables or configure Azure Key Vault.")]
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Alpaca API credentials not configured. Bar updates skipped - API will use backup data. Set ALPACA_KEY and ALPACA_SECRET environment variables or configure Azure Key Vault.")]
     private partial void LogAlpacaCredentialsMissing();
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Skipping {Symbol}: {Reason}")]

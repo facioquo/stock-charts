@@ -2,7 +2,7 @@ import type {
   IndicatorListing,
   IndicatorParam,
   IndicatorSelection,
-  Quote
+  Bar
 } from "@facioquo/indy-charts";
 
 import { env } from "../config/env";
@@ -63,7 +63,7 @@ export class ApiClient {
     return this.backupActive;
   }
 
-  async getQuotes(): Promise<Quote[]> {
+  async getQuotes(): Promise<Bar[]> {
     try {
       const res = await this.getJson<ApiQuote[]>(`${env.api}/quotes`);
       const quotes = this.toQuotes(res);
@@ -177,7 +177,7 @@ export class ApiClient {
     );
   }
 
-  private toQuotes(raw: ApiQuote[]): Quote[] {
+  private toQuotes(raw: ApiQuote[]): Bar[] {
     return raw.map((q, index) => ({
       timestamp: this.parseTimestamp(q.timestamp, index),
       open: q.open,

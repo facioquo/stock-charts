@@ -3,13 +3,13 @@ namespace WebApi.Tests.Services;
 public class UtilitiesTests
 {
     [Theory]
-    [InlineData(PeriodSize.OneMinute, 1)]
-    [InlineData(PeriodSize.TwoMinutes, 2)]
-    [InlineData(PeriodSize.ThreeMinutes, 3)]
-    [InlineData(PeriodSize.FiveMinutes, 5)]
-    [InlineData(PeriodSize.FifteenMinutes, 15)]
-    [InlineData(PeriodSize.ThirtyMinutes, 30)]
-    public void ToTimeSpan_KnownMappings_ReturnsExpected(PeriodSize periodSize, int expectedMinutes)
+    [InlineData(BarInterval.OneMinute, 1)]
+    [InlineData(BarInterval.TwoMinutes, 2)]
+    [InlineData(BarInterval.ThreeMinutes, 3)]
+    [InlineData(BarInterval.FiveMinutes, 5)]
+    [InlineData(BarInterval.FifteenMinutes, 15)]
+    [InlineData(BarInterval.ThirtyMinutes, 30)]
+    public void ToTimeSpan_KnownMappings_ReturnsExpected(BarInterval periodSize, int expectedMinutes)
     {
         // Arrange & Act
         TimeSpan result = Utilities.ToTimeSpan(periodSize);
@@ -19,10 +19,10 @@ public class UtilitiesTests
     }
 
     [Theory]
-    [InlineData(PeriodSize.OneHour, 1)]
-    [InlineData(PeriodSize.TwoHours, 2)]
-    [InlineData(PeriodSize.FourHours, 4)]
-    public void ToTimeSpan_KnownHourMappings_ReturnsExpected(PeriodSize periodSize, int expectedHours)
+    [InlineData(BarInterval.OneHour, 1)]
+    [InlineData(BarInterval.TwoHours, 2)]
+    [InlineData(BarInterval.FourHours, 4)]
+    public void ToTimeSpan_KnownHourMappings_ReturnsExpected(BarInterval periodSize, int expectedHours)
     {
         // Arrange & Act
         TimeSpan result = Utilities.ToTimeSpan(periodSize);
@@ -32,9 +32,9 @@ public class UtilitiesTests
     }
 
     [Theory]
-    [InlineData(PeriodSize.Day, 1)]
-    [InlineData(PeriodSize.Week, 7)]
-    public void ToTimeSpan_KnownDayMappings_ReturnsExpected(PeriodSize periodSize, int expectedDays)
+    [InlineData(BarInterval.Day, 1)]
+    [InlineData(BarInterval.Week, 7)]
+    public void ToTimeSpan_KnownDayMappings_ReturnsExpected(BarInterval periodSize, int expectedDays)
     {
         // Arrange & Act
         TimeSpan result = Utilities.ToTimeSpan(periodSize);
@@ -47,12 +47,12 @@ public class UtilitiesTests
     public void ToTimeSpan_Unsupported_ThrowsArgumentOutOfRange()
     {
         // Arrange
-        const PeriodSize unsupportedPeriod = PeriodSize.Month;
+        const BarInterval unsupportedPeriod = BarInterval.Month;
 
         // Act & Assert
         ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(() => Utilities.ToTimeSpan(unsupportedPeriod));
         Assert.Equal("periodSize", exception.ParamName);
-        Assert.Contains("Unsupported PeriodSize value", exception.Message);
+        Assert.Contains("Unsupported BarInterval value", exception.Message);
         Assert.Contains("Month", exception.Message);
     }
 }

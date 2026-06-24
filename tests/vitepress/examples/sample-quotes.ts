@@ -1,11 +1,11 @@
-import type { Quote } from "@facioquo/indy-charts";
+import type { Bar } from "@facioquo/indy-charts";
 
 /**
  * Forty synthetic daily OHLCV bars (Jan 2 – Feb 28, 2025). The fixture uses
- * ISO string timestamps; `Quote.timestamp` is `Date | string`, and
+ * ISO string timestamps; `Bar.timestamp` is `Date | string`, and
  * `loadStaticQuotes` normalizes to `Date` instances on consumption.
  */
-export const SAMPLE_QUOTES: Quote[] = [
+export const SAMPLE_QUOTES: Bar[] = [
   { timestamp: "2025-01-02", open: 180.0, high: 182.5, low: 179.2, close: 181.8, volume: 38500000 },
   { timestamp: "2025-01-03", open: 181.8, high: 183.4, low: 180.5, close: 182.6, volume: 32100000 },
   { timestamp: "2025-01-06", open: 182.6, high: 184.2, low: 181.0, close: 183.4, volume: 29800000 },

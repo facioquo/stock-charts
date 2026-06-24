@@ -3,7 +3,7 @@
 Thanks for taking the time to contribute! We accept:
 
 - Bug reports and fixes
-- Demonstrations of other `Skender.Stock.Indicators` NuGet package features
+- Demonstrations of other `FacioQuo.Stock.Indicators` NuGet package features
 
 ## Reporting bugs
 
@@ -148,7 +148,7 @@ After merge to `main`, changes may be batched before deploying. Turnaround time 
 
 ## Contact us
 
-Contact us through the NuGet [Contact Owners](https://www.nuget.org/packages/Skender.Stock.Indicators) method, privately direct message [@daveskender](https://twitter.com/messages/compose?recipient_id=27475431) on Twitter, or [submit an Issue](https://github.com/facioquo/stock-charts/issues) with your question if it is publicly relevant.
+Contact us through the NuGet [Contact Owners](https://www.nuget.org/packages/FacioQuo.Stock.Indicators) method, privately direct message [@daveskender](https://twitter.com/messages/compose?recipient_id=27475431) on Twitter, or [submit an Issue](https://github.com/facioquo/stock-charts/issues) with your question if it is publicly relevant.
 
 Thanks,
 Dave Skender
