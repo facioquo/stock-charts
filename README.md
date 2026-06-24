@@ -1,14 +1,14 @@
 # Stock Indicators for .NET demo
 
-A demo showcasing the [Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators) NuGet package with an Angular frontend, Chart.js charting, and a .NET Web API backend for financial indicators. See the [library documentation](https://dotnet.stockindicators.dev) for more examples, guides, and available indicators.
+A demo showcasing the [Skender.Stock.Indicators](https://www.nuget.org/packages/FacioQuo.Stock.Indicators) NuGet package with an Angular frontend, Chart.js charting, and a .NET Web API backend for financial indicators. See the [library documentation](https://dotnet.stockindicators.dev) for more examples, guides, and available indicators.
 
 **Live demo:** [charts.StockIndicators.dev](https://charts.stockindicators.dev/)
 
-![Stock chart visualization](https://raw.githubusercontent.com/DaveSkender/Stock.Indicators/main/docs/examples.webp)
+![Stock chart visualization](https://raw.githubusercontent.com/facioquo/stock-indicators-dotnet/v2/docs/examples.webp)
 
 ## Author's note
 
-This repo and charting tool is primarily intended to demonstrate the [Stock Indicators for .NET](https://dotnet.stockindicators.dev) library. **It is not meant to be a fully featured charting system** and may not be an architectural model that works for your use case. If you need a mature charting tool, please explore all of your [charting and visualization options](https://github.com/DaveSkender/Stock.Indicators/discussions/430).
+This repo and charting tool is primarily intended to demonstrate the [Stock Indicators for .NET](https://dotnet.stockindicators.dev) library. **It is not meant to be a fully featured charting system** and may not be an architectural model that works for your use case. If you need a mature charting tool, please explore all of your [charting and visualization options](https://github.com/facioquo/stock-indicators-dotnet/discussions/430).
 
 ## Quick start
 
