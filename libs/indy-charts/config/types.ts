@@ -26,13 +26,13 @@ export type ExtendedChartDataset = IndicatorDataset & {
 
 /**
  * Single source of truth for an OHLCV bar, mirroring the
- * Skender.Stock.Indicators .NET `Quote` model. `timestamp` accepts either a
+ * FacioQuo.Stock.Indicators .NET `Bar` model. `timestamp` accepts either a
  * `Date` instance or an ISO 8601 string so the same type works for in-memory
  * data, JSON fixtures, and wire responses without a parallel "raw" type.
  * The library normalizes to `Date` at consumption sites that need date
  * arithmetic (see `data/transformers.ts`).
  */
-export interface Quote {
+export interface Bar {
   timestamp: Date | string;
   open: number;
   high: number;
@@ -50,7 +50,7 @@ export interface Quote {
  */
 export interface IndicatorDataRow {
   timestamp?: Date | string;
-  candle?: Quote;
+  candle?: Bar;
   [key: string]: unknown; // For dynamic indicator result values
 }
 

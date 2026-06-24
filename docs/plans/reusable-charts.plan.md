@@ -7,7 +7,7 @@ and publishing prep) are complete.
 ## Goal
 
 Enable developers evaluating the
-[Skender.Stock.Indicators](https://www.nuget.org/packages/Skender.Stock.Indicators)
+[FacioQuo.Stock.Indicators](https://www.nuget.org/packages/FacioQuo.Stock.Indicators)
 library to render interactive financial charts from any JavaScript framework
 by consuming the `@facioquo/indy-charts` package as a single dependency.
 

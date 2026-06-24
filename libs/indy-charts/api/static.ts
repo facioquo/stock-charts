@@ -1,12 +1,12 @@
-import { type Quote, type IndicatorDataRow } from "../config/types";
+import { type Bar, type IndicatorDataRow } from "../config/types";
 
 /**
  * Load static quote data synchronously (for VitePress SSG or build-time
- * rendering). Accepts `Quote[]` with either ISO string or `Date` timestamps
- * (per the `Quote.timestamp: Date | string` contract) and returns a new
+ * rendering). Accepts `Bar[]` with either ISO string or `Date` timestamps
+ * (per the `Bar.timestamp: Date | string` contract) and returns a new
  * array with timestamps normalized to `Date` instances.
  */
-export function loadStaticQuotes(quotes: Quote[]): Quote[] {
+export function loadStaticQuotes(quotes: Bar[]): Bar[] {
   return quotes.map((q, index) => ({
     timestamp: normalizeTimestamp(q.timestamp, index),
     open: q.open,

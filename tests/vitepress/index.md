@@ -37,7 +37,7 @@ features:
 
   - icon: 🔌
     title: Bring your own data
-    details: Use the bundled API client or hand the chart pre-loaded Quote[] — no API required.
+    details: Use the bundled API client or hand the chart pre-loaded Bar[] — no API required.
     link: /examples/custom-data
     linkText: Static data example
 

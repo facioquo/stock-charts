@@ -4,7 +4,7 @@
   "author": "facioquo",
   "license": "Apache-2.0",
   "type": "module",
-  "packageManager": "pnpm@11.7.0",
+  "packageManager": "pnpm@11.9.0",
   "engines": {
     "node": ">=24"
   },
@@ -60,8 +60,8 @@
   "devDependencies": {
     "azurite": "^3.35.0",
     "markdownlint-cli2": "^0.22.1",
-    "npm-check-updates": "^22.2.3",
-    "@playwright/test": "1.61.0",
+    "npm-check-updates": "^22.2.7",
+    "@playwright/test": "1.61.1",
     "postcss-scss": "^4.0.9",
     "prettier": "^3.8.4",
     "rimraf": "^6.1.3",

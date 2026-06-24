@@ -10,5 +10,5 @@ export type {
   IndicatorParam,
   IndicatorResult,
   IndicatorSelection,
-  Quote
+  Bar
 } from "@facioquo/indy-charts";

@@ -4,7 +4,7 @@ namespace WebApi.Services;
 /// Geometric Brownian Motion (GMB) is a random simulator of market movement.
 /// GBM can be used for testing indicators, validation and Monte Carlo simulations of strategies.
 /// </summary>
-public class RandomQuotes : List<Quote>
+public class RandomQuotes : List<Bar>
 {
     private readonly double _volatility;
     private readonly double _drift;
@@ -33,7 +33,7 @@ public class RandomQuotes : List<Quote>
         double volatility = 1.0, // NOSONAR
         double drift = 0.01, // NOSONAR
         double seed = 1000.0, // NOSONAR
-        PeriodSize periodSize = PeriodSize.OneMinute, // NOSONAR
+        BarInterval periodSize = BarInterval.OneMinute, // NOSONAR
         bool includeWeekends = true) // NOSONAR
     {
         TimeSpan frequency = periodSize.ToTimeSpan();
@@ -101,7 +101,7 @@ public class RandomQuotes : List<Quote>
 
         double volume = Price(_seed * 1000, _volatility * 2, drift: 0);
 
-        Quote quote = new(timestamp, (decimal)open, (decimal)high, (decimal)low, (decimal)close, (decimal)volume);
+        Bar quote = new(timestamp, (decimal)open, (decimal)high, (decimal)low, (decimal)close, (decimal)volume);
 
         Add(quote);
         _seed = close;

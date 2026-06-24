@@ -10,7 +10,7 @@ import { type UtilityService } from "./utility.service";
 import { type WindowService } from "./window.service";
 import type {
   IndicatorListing,
-  Quote,
+  Bar,
   IndicatorSelection,
   IndicatorDataRow
 } from "@facioquo/indy-charts";
@@ -93,8 +93,8 @@ function createCanvasContext(canvas: HTMLCanvasElement): CanvasRenderingContext2
 /**
  * Generate sample quote data for testing
  */
-function generateSampleQuotes(count: number): Quote[] {
-  const quotes: Quote[] = [];
+function generateSampleQuotes(count: number): Bar[] {
+  const quotes: Bar[] = [];
   const startTime = Date.UTC(2024, 0, 1);
 
   for (let i = 0; i < count; i++) {

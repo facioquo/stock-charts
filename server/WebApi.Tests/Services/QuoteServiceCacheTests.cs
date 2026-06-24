@@ -33,8 +33,8 @@ public class QuoteServiceCacheTests
             Options.Create(new CacheSettings()));
 
         // Act
-        IEnumerable<Quote> first = await service.Get("QQQ", CancellationToken.None);
-        IEnumerable<Quote> second = await service.Get("QQQ", CancellationToken.None);
+        IEnumerable<Bar> first = await service.Get("QQQ", CancellationToken.None);
+        IEnumerable<Bar> second = await service.Get("QQQ", CancellationToken.None);
 
         // Assert — both calls return the same cached instance, and storage was
         // consulted exactly once across the two requests.

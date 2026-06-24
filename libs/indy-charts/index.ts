@@ -54,7 +54,7 @@
  * for immediate responsive updates.
  *
  * **Type Safety**: All public APIs use strict TypeScript types. The library exports types
- * for Quote, IndicatorSelection, ChartSettings, etc. enabling type-safe application code.
+ * for Bar, IndicatorSelection, ChartSettings, etc. enabling type-safe application code.
  *
  * **Theme Management**: Themes are immutable and applied globally. Call `updateTheme()`
  * to propagate color/styling changes to all active charts. Per-instance background colors
@@ -85,7 +85,7 @@
  * ### API
  * - `createApiClient(config)` - Create a lightweight `fetch`-based `ApiClient`
  * - `ApiClient` - Interface exposing `getQuotes`, `getListings`, `getSelectionData`
- * - `loadStaticQuotes(quotes)` - Accept `Quote[]` (string or Date timestamps), return `Quote[]` with timestamps as Date
+ * - `loadStaticQuotes(quotes)` - Accept `Bar[]` (string or Date timestamps), return `Bar[]` with timestamps as Date
  * - `loadStaticIndicatorData(rows)` - Pass-through helper for `IndicatorDataRow[]`
  *
  * ## Performance Considerations
@@ -119,7 +119,7 @@ export type {
   IndicatorResult,
   IndicatorResultConfig,
   IndicatorSelection,
-  Quote,
+  Bar,
   ThemeColors
 } from "./config";
 

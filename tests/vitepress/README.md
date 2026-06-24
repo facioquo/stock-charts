@@ -65,7 +65,7 @@ tests/vitepress/
 │   ├── indicators.md             # Oscillators
 │   ├── custom-data.md            # No-API, bring-your-own quotes
 │   ├── StaticChart.vue           # Demo component for custom-data
-│   └── sample-quotes.ts          # Quote fixture for the static demo
+│   └── sample-quotes.ts          # Bar fixture for the static demo
 ├── reference/
 │   └── api-client.md             # ApiClient reference
 ├── index.md                      # Home page (hero + live demos)

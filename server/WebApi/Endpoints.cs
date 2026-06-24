@@ -23,7 +23,7 @@ public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSetti
     [HttpGet("quotes")]
     public async Task<IActionResult> GetQuotes()
     {
-        IEnumerable<Quote> quotes = await quoteFeed.Get(HttpContext.RequestAborted);
+        IEnumerable<Bar> quotes = await quoteFeed.Get(HttpContext.RequestAborted);
         SetClientCache();
         return Ok(quotes.TakeLast(limitLast));
     }
@@ -38,11 +38,11 @@ public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSetti
         return Ok(Metadata.IndicatorListing($"{Request.Scheme}://{Request.Host}"));
     }
 
-    private async Task<IActionResult> Get<T>(Func<IReadOnlyList<Quote>, IEnumerable<T>> indicatorFunc)
+    private async Task<IActionResult> Get<T>(Func<IReadOnlyList<Bar>, IEnumerable<T>> indicatorFunc)
     {
         try
         {
-            IReadOnlyList<Quote> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
+            IReadOnlyList<Bar> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
             IEnumerable<T> results = indicatorFunc(quotes).TakeLast(limitLast);
             SetClientCache();
             return Ok(results);
@@ -121,8 +121,8 @@ public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSetti
     {
         try
         {
-            IReadOnlyList<Quote> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
-            IReadOnlyList<Quote> market = (await quoteFeed.Get("SPY", HttpContext.RequestAborted)).ToList();
+            IReadOnlyList<Bar> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
+            IReadOnlyList<Bar> market = (await quoteFeed.Get("SPY", HttpContext.RequestAborted)).ToList();
             IEnumerable<BetaResult> results = quotes.ToBeta(market, lookbackPeriods, type).TakeLast(limitLast);
             SetClientCache();
             return Ok(results);
@@ -295,7 +295,7 @@ public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSetti
 
     [HttpGet("PIVOT-POINTS")]
     public Task<IActionResult> GetPivotPoints()
-        => Get(quotes => quotes.ToPivotPoints(PeriodSize.Month));
+        => Get(quotes => quotes.ToPivotPoints(BarInterval.Month));
 
     [HttpGet("PIVOTS")]
     public Task<IActionResult> GetPivots(int leftSpan, int rightSpan, int maxTrendPeriods)
