@@ -19,15 +19,29 @@ interface ApiQuote {
 }
 
 /** Error carrying an HTTP-ish status; `0` denotes a network/transport failure. */
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(
     message: string,
     readonly status: number,
-    readonly url: string
+    readonly url: string,
+    /** Raw response body text, when present (e.g. a validation message). */
+    readonly body?: string
   ) {
     super(message);
     this.name = "ApiError";
   }
+}
+
+/**
+ * Human-readable message for an API failure. Prefers the server-provided
+ * response body (e.g. an indicator parameter validation message) and falls back
+ * to the error message. Used by the indicator picker to surface validation
+ * errors returned by the .NET Web API.
+ */
+export function describeApiError(error: unknown): string {
+  if (error instanceof ApiError) return error.body ?? error.message;
+  if (error instanceof Error) return error.message;
+  return "Unexpected error";
 }
 
 /**
@@ -128,7 +142,14 @@ export class ApiClient {
       throw new ApiError(cause instanceof Error ? cause.message : "Network error", 0, url);
     }
     if (!response.ok) {
-      throw new ApiError(`Request failed: ${response.status}`, response.status, url);
+      let body: string | undefined;
+      try {
+        body = (await response.text())?.trim() || undefined;
+      } catch {
+        // Body may be unreadable (already consumed, or test stub without text()).
+        body = undefined;
+      }
+      throw new ApiError(`Request failed: ${response.status}`, response.status, url, body);
     }
     return (await response.json()) as T;
   }

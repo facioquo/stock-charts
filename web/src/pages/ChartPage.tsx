@@ -1,20 +1,41 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { env } from "../config/env";
 import { getChartController, useChartState } from "../charting/useChart";
+import { SettingsDialog } from "../components/picker/SettingsDialog";
+import { PickConfigDialog } from "../components/picker/PickConfigDialog";
+import type { IndicatorListing } from "../types/chart.types";
+import "../components/picker/picker.scss";
 
 /**
- * Main chart page. Ports `ChartComponent`: bootstraps the overlay chart and
- * renders loading / API-error states. The settings FAB + picker dialog land in
- * the stacked follow-up slice; default indicators render without them.
+ * Main chart page. Ports `ChartComponent`: bootstraps the overlay chart,
+ * renders loading / API-error states, and hosts the settings FAB plus the
+ * settings / indicator-picker dialogs.
  */
 export function ChartPage(): React.JSX.Element {
   const { loading, apiError } = useChartState();
   const isProduction = env.production;
+  const controller = getChartController();
+
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [pickListing, setPickListing] = useState<IndicatorListing | null>(null);
 
   useEffect(() => {
-    void getChartController().loadCharts();
-  }, []);
+    void controller.loadCharts();
+  }, [controller]);
+
+  // Mirror the Angular flow: choosing an indicator closes settings and opens
+  // the config dialog; closing the config dialog reopens settings (which then
+  // reflects any newly-added indicator).
+  const openIndicatorSettings = (listing: IndicatorListing): void => {
+    setSettingsOpen(false);
+    setPickListing(listing);
+  };
+
+  const closePickConfig = (): void => {
+    setPickListing(null);
+    setSettingsOpen(true);
+  };
 
   return (
     <>
@@ -74,6 +95,21 @@ export function ChartPage(): React.JSX.Element {
         </div>
       )}
 
+      {/* SETTINGS FAB */}
+      {!loading && !apiError && (
+        <div className="fab-container">
+          <button
+            type="button"
+            className="fab"
+            aria-label="edit settings"
+            title="change indicators and settings"
+            onClick={() => setSettingsOpen(true)}
+          >
+            <span className="material-icons">edit</span>
+          </button>
+        </div>
+      )}
+
       {/* CHART (MAIN OVERLAY) */}
       <div id="chart-overlay" className="chart-overlay-container" hidden={loading}>
         <canvas id="chartOverlay" />
@@ -81,6 +117,18 @@ export function ChartPage(): React.JSX.Element {
 
       {/* CHART (OSCILLATORS) */}
       <div id="oscillators-zone" hidden={loading} />
+
+      {/* DIALOGS */}
+      {settingsOpen && (
+        <SettingsDialog
+          controller={controller}
+          onClose={() => setSettingsOpen(false)}
+          onPickIndicator={openIndicatorSettings}
+        />
+      )}
+      {pickListing && (
+        <PickConfigDialog listing={pickListing} controller={controller} onClose={closePickConfig} />
+      )}
     </>
   );
 }
