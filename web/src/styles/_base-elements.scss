@@ -1,0 +1,107 @@
+/*
+ * Base, theme-agnostic element + utility styles. Faithful port of the Angular
+ * `client/src/styles/_base-elements.scss` (and the structural pieces of
+ * `app.component.scss`), translated off Angular Material onto plain CSS that
+ * reads the custom properties defined by the theme partials.
+ */
+
+/* LAYOUT */
+html,
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: Rubik, "Google Sans", Roboto, "Helvetica Neue", sans-serif;
+  font-size: 16px;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* app shell: header / main / footer share the centred column (was `main,
+   header, footer` in app.component.scss) */
+header,
+main,
+footer {
+  display: block;
+  position: relative;
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+main {
+  /* ensures a scrollbar without `overflow-y: scroll`, which would double up
+     when a dialog opens */
+  min-height: 100vh;
+}
+
+/* TYPOGRAPHY */
+h1,
+h2 {
+  font-weight: 600;
+}
+
+a {
+  color: var(--link);
+  text-decoration: underline;
+}
+
+a:visited {
+  color: var(--link);
+}
+
+a:hover {
+  color: var(--link-hover);
+}
+
+/* ALIGNMENT + UTILITIES */
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}
+
+.noselect {
+  cursor: default;
+  user-select: none;
+}
+
+.no-wrap {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filler {
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+/* COMMON CONTROLS */
+.error {
+  color: #b71c1c;
+}
+
+/* SCROLLBAR (faithful port of picker/_scrollbar-theme.scss; colours come from
+   the active theme's neutral tones). Only on wider viewports. */
+@media screen and (width >= 800px) {
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 3px var(--scrollbar);
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar);
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-hover);
+  }
+}
