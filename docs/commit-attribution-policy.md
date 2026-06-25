@@ -1,6 +1,6 @@
 # Commit attribution policy
 
-This repository enforces [`facioquo/management`:`LAWS.md` §9.1](https://github.com/facioquo/management/blob/main/LAWS.md) — **no co-authorship or tooling-attribution trailers** in commit messages or pull request descriptions.
+This repository enforces the organization's agent laws (`facioquo/management`:`LAWS.md`), [section 9.1](https://github.com/facioquo/management/blob/main/LAWS.md) — **no co-authorship or tooling-attribution trailers** in commit messages or pull request descriptions.
 
 ## What is barred
 

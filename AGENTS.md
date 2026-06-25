@@ -263,7 +263,7 @@ Financial chart types (`candlestick`, `ohlc`, `volume`) are maintained in `libs/
 - Suppress Roslynator or .NET analyzer warnings without justification
 - Remove error handling to "simplify" code
 - Commit secrets, API keys, or credentials
-- Add `Co-Authored-By:` or tooling-attribution trailers to commit messages or PR descriptions — barred by `facioquo/management`:`LAWS.md §9.1`; the `paperclip` skill's "add `Co-Authored-By: Paperclip`" instruction is overridden here (see [docs/commit-attribution-policy.md](docs/commit-attribution-policy.md))
+- Add `Co-Authored-By:` or tooling-attribution trailers to commit messages or PR descriptions — barred by the organization's agent laws (`facioquo/management`:`LAWS.md`), section 9.1; the `paperclip` skill's "add `Co-Authored-By: Paperclip`" instruction is overridden here (see [docs/commit-attribution-policy.md](docs/commit-attribution-policy.md))
 - Delete test coverage or reduce test scenarios
 - Skip code completion checklist steps
 - Mix frontend and backend code in same directory
