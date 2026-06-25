@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#
+# Optional local commit-msg hook — rejects commits whose message carries a
+# barred attribution trailer (LAWS.md §9.1) before it is ever committed, so the
+# CI guard (.github/workflows/commit-trailer-guard.yml) never has to fail.
+#
+# This is a TEMPLATE, not auto-installed (the repo intentionally ships no
+# managed git-hook framework). To enable it locally:
+#
+#   ln -sf ../../scripts/hooks/commit-msg .git/hooks/commit-msg
+#   # or:  cp scripts/hooks/commit-msg .git/hooks/commit-msg
+#   chmod +x .git/hooks/commit-msg
+#
+# Git passes the path to the prepared commit-message file as $1.
+
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+exec bash "${repo_root}/scripts/check-commit-trailers.sh" --file "$1" "commit message"

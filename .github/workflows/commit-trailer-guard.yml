@@ -1,0 +1,49 @@
+name: "Commit trailer guard"
+
+# Enforces LAWS.md §9.1 — no Co-Authored-By / tooling-attribution trailers in
+# commit messages or PR descriptions. Runs on every PR, including drafts, so
+# violations are caught automatically before they reach CTO review instead of
+# costing a manual review cycle + force-push fix each time. Lightweight: a
+# couple of GitHub API reads piped through scripts/check-commit-trailers.sh.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  no-attribution-trailers:
+    # ubuntu-latest guarantees the preinstalled `gh` CLI used by the steps below.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: scripts/check-commit-trailers.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Scan PR commit messages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          gh api --paginate "repos/${REPO}/pulls/${PR}/commits" \
+            --jq '.[].commit.message' \
+            | bash scripts/check-commit-trailers.sh "PR commit messages"
+
+      - name: Scan PR description
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          gh api "repos/${REPO}/pulls/${PR}" --jq '.body // ""' \
+            | bash scripts/check-commit-trailers.sh "PR description"
