@@ -1,6 +1,6 @@
 # Stock Indicators for .NET demo
 
-A demo showcasing the [FacioQuo.Stock.Indicators](https://www.nuget.org/packages/FacioQuo.Stock.Indicators) NuGet package with an Angular frontend, Chart.js charting, and a .NET Web API backend for financial indicators. See the [library documentation](https://dotnet.stockindicators.dev) for more examples, guides, and available indicators.
+A demo showcasing the [FacioQuo.Stock.Indicators](https://www.nuget.org/packages/FacioQuo.Stock.Indicators) NuGet package with a React frontend, Chart.js charting, and a .NET Web API backend for financial indicators. See the [library documentation](https://dotnet.stockindicators.dev) for more examples, guides, and available indicators.
 
 **Live demo:** [charts.StockIndicators.dev](https://charts.stockindicators.dev/)
 
@@ -22,7 +22,6 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
   - **Linux**: Corepack (`corepack enable && corepack prepare pnpm --activate`)
-- [Angular CLI](https://angular.dev/tools/cli) - Use the workspace CLI through `pnpm --filter @stock-charts/client exec ng`
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
@@ -47,7 +46,7 @@ pnpm install
 pnpm run azure:start  # Terminal 1: Storage emulator
 cd server/Functions && func start  # Terminal 2: Azure Functions
 cd server/WebApi && dotnet run  # Terminal 3: Web API
-pnpm start  # Terminal 4: Angular dev server
+pnpm start  # Terminal 4: React dev server (Vite)
 ```
 
 **Access:** Website at <http://localhost:4200>, Web API at <https://localhost:5001>, Functions at <http://localhost:7071>
@@ -56,7 +55,7 @@ pnpm start  # Terminal 4: Angular dev server
 
 Financial chart support (`candlestick`, `ohlc`, `volume`) is integrated as typed, modular Chart.js workspace packages under `libs/chartjs-financial` and `libs/indy-charts`.
 
-- Register once at startup with `setupIndyCharts()` (already called from `client/src/main.ts`).
+- Register once at startup with `setupIndyCharts()` (already called from `web/src/main.tsx`).
 - Use OHLC data points in `{ x, o, h, l, c }` shape where `x` is a timestamp.
 - Theme candle/volume colors via `getFinancialPalette()` + `applyFinancialElementTheme()`.
 - Use factories (`buildCandlestickDataset`, `buildVolumeDataset`, `buildFinancialChartOptions`) for consistent typed chart config.

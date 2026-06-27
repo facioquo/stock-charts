@@ -28,6 +28,17 @@
     <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico" />
     <link rel="manifest" href="/assets/manifest.json" />
 
+    <!-- Google Analytics — placeholder replaced at deploy time -->
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=__GaTag__"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "__GaTag__");
+    </script>
+
     <!-- fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

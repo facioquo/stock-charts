@@ -141,15 +141,16 @@ jobs:
           replace: "${{ needs.versioning.outputs.version }}"
           regex: false
 
-      - name: Update configs
-        shell: pwsh
-        working-directory: client/src
-        run: |
-          (Get-Content index.html).Replace("__GaTag__", "G-17DX6ZW6HP") | Set-Content index.html
-          Write-Host "... Done!"
+      - name: Inject Google Analytics tag
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__GaTag__"
+          replace: "G-17DX6ZW6HP"
+          regex: false
+          include: "web/index.html"
 
       - name: Build site
-        run: pnpm --filter @stock-charts/client run build.prod
+        run: pnpm --filter @stock-charts/web run build
         env:
           BACKUP_INDICATORS_API_BASE: https://stock-charts-api.azurewebsites.net
 
@@ -157,7 +158,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: web
-          path: client/dist/app/browser
+          path: web/dist/app
           include-hidden-files: true
 
   deploy:

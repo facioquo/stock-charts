@@ -24,7 +24,6 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
   - **Linux**: Corepack (`corepack enable && corepack prepare pnpm --activate`)
-- [Angular CLI](https://angular.dev/cli) - Installed globally during setup
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
 - [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
@@ -71,7 +70,7 @@ pnpm install
 # Ctrl+Shift+P → "Tasks: Run Task" → "Run: Full development stack"
 ```
 
-This starts all services: Azurite storage emulator, Azure Functions, Web API, and Angular dev server.
+This starts all services: Azurite storage emulator, Azure Functions, Web API, and React dev server.
 
 ### Start manually
 
@@ -87,7 +86,7 @@ cd server/Functions && func start
 # Terminal 3: Web API
 cd server/WebApi && dotnet run
 
-# Terminal 4: Angular dev server
+# Terminal 4: React dev server (Vite)
 pnpm start
 ```
 
@@ -101,7 +100,7 @@ The repository uses **pnpm workspaces**:
 stock-charts/          # Root
 ├── package.json       # Workspace config + shared scripts
 ├── pnpm-workspace.yaml # pnpm workspace definition
-├── client/            # Angular frontend
+├── web/               # React + Vite frontend
 └── server/            # .NET backend
 ```
 
@@ -112,7 +111,7 @@ Available pnpm scripts are in `package.json`. Key scripts:
 - `pnpm run format` — Format all code
 - `pnpm run test:all` — Run all tests
 
-Workspace-specific: `pnpm --filter @stock-charts/client run build`
+Workspace-specific: `pnpm --filter @stock-charts/web run build`
 
 ## Development workflow
 
