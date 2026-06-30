@@ -15,7 +15,7 @@ concurrency:
 permissions:
   contents: write
   # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
-  # Packages (react-ui + tokens consumed by the web/ workspace — FAC-2121).
+  # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
   packages: read
 
 env:
@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -117,7 +117,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -164,7 +164,7 @@ jobs:
       - name: Build site
         run: pnpm --filter @stock-charts/web run build
         env:
-          BACKUP_INDICATORS_API_BASE: https://stock-charts-api.azurewebsites.net
+          INDICATORS_API_BASE: https://stock-charts-api.azurewebsites.net
 
       - name: Save artifacts
         uses: actions/upload-artifact@v7
