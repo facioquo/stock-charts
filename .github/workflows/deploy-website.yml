@@ -156,6 +156,11 @@ jobs:
           regex: false
           include: "web/index.html"
 
+      - name: Build libraries
+        run: |
+          pnpm --filter @facioquo/chartjs-chart-financial run build
+          pnpm --filter @facioquo/indy-charts run build
+
       - name: Build site
         run: pnpm --filter @stock-charts/web run build
         env:
