@@ -140,89 +140,7 @@ jobs:
       - name: Run package consumption smoke test
         run: pnpm run smoke:package-consumption
 
-  test-website:
-    needs: [test-libraries]
-    runs-on: ubuntu-latest
-    # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
-    # Packages (react-ui + tokens consumed by the web/ workspace — FAC-2121).
-    permissions:
-      contents: read
-      packages: read
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-        with:
-          run_install: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-          registry-url: https://npm.pkg.github.com
-          scope: "@facioquo"
-
-      - name: Verify GitHub Packages auth
-        run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "Authorization: Bearer ${NODE_AUTH_TOKEN}" \
-            https://npm.pkg.github.com/@facioquo/react-ui)
-          echo "Registry auth check: HTTP ${STATUS}"
-          [ "$STATUS" = "200" ] || { echo "Expected 200, got ${STATUS}"; exit 1; }
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build libraries
-        # Client consumes @facioquo/indy-charts via workspace:* and imports from
-        # its dist/, so libs must be built before the Angular build/test steps.
-        run: |
-          pnpm --filter @facioquo/chartjs-chart-financial run build
-          pnpm --filter @facioquo/indy-charts run build
-
-      - name: Check web formatting
-        run: pnpm run format:web:check
-
-      - name: Lint client
-        run: pnpm --filter @stock-charts/client run lint
-
-      - name: Lint CSS
-        run: pnpm run lint:css
-
-      - name: Run client unit tests with coverage
-        run: pnpm --filter @stock-charts/client run test:coverage
-
-      - name: Upload frontend coverage to Codecov
-        if: always()
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./client/coverage/lcov.info
-          flags: frontend
-          name: frontend-coverage
-          fail_ci_if_error: false
-
-      - name: Upload frontend coverage artifacts
-        if: github.event_name == 'pull_request' && (success() || failure())
-        uses: actions/upload-artifact@v7
-        with:
-          name: frontend-coverage-report
-          path: client/coverage/
-
-      - name: Build production site
-        run: pnpm --filter @stock-charts/client run build.prod
-
   test-web:
-    # React migration foundation app (web/). Runs alongside the Angular client
-    # job; client/ stays the deployed app until the React port reaches parity.
     needs: [test-libraries]
     runs-on: ubuntu-latest
 
@@ -253,17 +171,36 @@ jobs:
           pnpm --filter @facioquo/indy-charts run build
 
       - name: Check web formatting
-        run: pnpm --filter @stock-charts/web run format:check
+        run: pnpm run format:web:check
+
+      - name: Lint CSS
+        run: pnpm run lint:css
 
       - name: Run web unit tests with coverage
         run: pnpm --filter @stock-charts/web run test:coverage
 
-      - name: Build web app
+      - name: Upload frontend coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./web/coverage/lcov.info
+          flags: frontend
+          name: frontend-coverage
+          fail_ci_if_error: false
+
+      - name: Upload frontend coverage artifacts
+        if: github.event_name == 'pull_request' && (success() || failure())
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-coverage-report
+          path: web/coverage/
+
+      - name: Build production site
         run: pnpm --filter @stock-charts/web run build
 
   test-e2e:
     runs-on: ubuntu-latest
-    needs: [test-libraries, test-website]
+    needs: [test-libraries, test-web]
     # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
     # Packages (react-ui + tokens consumed by the web/ workspace — FAC-2121).
     permissions:
@@ -294,7 +231,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build libraries
-        # Angular dev server (used by Playwright's webServer config) runs from
+        # React dev server (used by Playwright's webServer config) runs from
         # source but needs the consumed library dist/ output to exist.
         run: |
           pnpm --filter @facioquo/chartjs-chart-financial run build
@@ -316,7 +253,7 @@ jobs:
 
   lint-and-test:
     runs-on: ubuntu-slim
-    needs: [test-backend, test-libraries, test-website, test-web, test-e2e]
+    needs: [test-backend, test-libraries, test-web, test-e2e]
     if: always()
     steps:
       - name: Verify required jobs succeeded

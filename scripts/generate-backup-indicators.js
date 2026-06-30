@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 const DEFAULT_API_BASE = process.env.BACKUP_INDICATORS_API_BASE || "https://localhost:5001";
 const apiBase =
   process.argv.find(a => a.startsWith("--apiBase="))?.split("=")[1] || DEFAULT_API_BASE;
-const dataDir = path.resolve(__dirname, "../client/src/app/data");
+const dataDir = path.resolve(__dirname, "../web/src/data");
 const jsonPath = path.join(dataDir, "backup-indicators.json");
 
 // Allow local development against self-signed localhost certificates.
@@ -31,9 +31,9 @@ async function fetchListings() {
 }
 
 /** Strip server origin from endpoint URLs so backup listings use relative paths.
- * `buildApiUrl()` in the Angular client uses `new URL(endpoint, baseUrl)`, which
- * ignores `baseUrl` when `endpoint` is already an absolute URL — causing production
- * requests to hit localhost instead of the configured API origin.
+ * The web client's buildApiUrl() uses new URL(endpoint, baseUrl), which ignores
+ * baseUrl when endpoint is already absolute — causing production requests to hit
+ * localhost instead of the configured API origin.
  * Extracts pathname from any absolute URL; leaves relative paths unchanged.
  */
 function normalizeEndpoints(listings) {

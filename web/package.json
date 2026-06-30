@@ -1,6 +1,6 @@
 {
   "name": "@stock-charts/web",
-  "description": "React + Vite frontend for stock charts application (Angular migration)",
+  "description": "React + Vite frontend for stock charts application",
   "type": "module",
   "packageManager": "pnpm@11.9.0",
   "scripts": {
@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist coverage",
     "format": "prettier --write \"src/**/*.{ts,tsx,html,scss,css,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,html,scss,css,json}\""
   },
