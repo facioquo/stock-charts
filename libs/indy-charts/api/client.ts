@@ -23,6 +23,12 @@ function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Computes exponential back-off delay with ±25% jitter.
+ * @param retryIndex - Zero-based retry index (0 on first retry).
+ * @param baseDelayMs - Starting delay in milliseconds.
+ * @returns Delay in milliseconds: `baseDelayMs * 2^retryIndex + rand(0, 0.25 * baseDelayMs)`.
+ */
 function backoffMs(retryIndex: number, baseDelayMs: number): number {
   const exponential = baseDelayMs * Math.pow(2, retryIndex);
   const jitter = Math.floor(Math.random() * baseDelayMs * 0.25);
@@ -41,30 +47,20 @@ async function fetchWithRetry(
   maxAttempts: number,
   baseDelayMs: number
 ): Promise<Response> {
-  let lastNetworkError: unknown;
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    if (attempt > 0) {
-      await sleep(backoffMs(attempt - 1, baseDelayMs));
-    }
+  for (let attempt = 0; ; attempt++) {
+    const isLast = attempt >= maxAttempts - 1;
     try {
       const response = await fetch(url);
-      if (response.ok || !isTransientStatus(response.status)) {
+      if (response.ok || !isTransientStatus(response.status) || isLast) {
         return response;
       }
-      if (attempt === maxAttempts - 1) {
-        return response;
-      }
-      // transient HTTP error — retry
+      // transient HTTP error on a non-final attempt — retry
     } catch (networkError) {
-      lastNetworkError = networkError;
-      if (attempt === maxAttempts - 1) throw networkError;
-      // network error — retry
+      if (isLast) throw networkError;
+      // network error on a non-final attempt — retry
     }
+    await sleep(backoffMs(attempt, baseDelayMs));
   }
-  // Unreachable in normal flow; satisfies TypeScript's control-flow analysis.
-  throw lastNetworkError instanceof Error
-    ? lastNetworkError
-    : new Error("fetchWithRetry: exhausted attempts");
 }
 
 // ---------------------------------------------------------------------------
