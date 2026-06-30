@@ -1,9 +1,15 @@
 name: Deploy website
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "web/**"
+      - "server/**"
+      - ".github/workflows/deploy-website.yml"
 
 concurrency:
-  group: website-deployer
+  group: website-deployer-${{ github.event.pull_request.number || 'main' }}
   cancel-in-progress: true
 
 permissions:
@@ -141,15 +147,22 @@ jobs:
           replace: "${{ needs.versioning.outputs.version }}"
           regex: false
 
-      - name: Update configs
-        shell: pwsh
-        working-directory: client/src
+      - name: Inject Google Analytics tag
+        if: github.ref == 'refs/heads/main'
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "__GaTag__"
+          replace: "G-17DX6ZW6HP"
+          regex: false
+          include: "web/index.html"
+
+      - name: Build libraries
         run: |
-          (Get-Content index.html).Replace("__GaTag__", "G-17DX6ZW6HP") | Set-Content index.html
-          Write-Host "... Done!"
+          pnpm --filter @facioquo/chartjs-chart-financial run build
+          pnpm --filter @facioquo/indy-charts run build
 
       - name: Build site
-        run: pnpm --filter @stock-charts/client run build.prod
+        run: pnpm --filter @stock-charts/web run build
         env:
           BACKUP_INDICATORS_API_BASE: https://stock-charts-api.azurewebsites.net
 
@@ -157,7 +170,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: web
-          path: client/dist/app/browser
+          path: web/dist/app
           include-hidden-files: true
 
   deploy:
@@ -169,7 +182,7 @@ jobs:
       - build-website
 
     environment:
-      name: charts.stockindicators.dev
+      name: ${{ github.event_name == 'pull_request' && 'preview' || 'charts.stockindicators.dev' }}
       url: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
 
     steps:
@@ -218,7 +231,7 @@ jobs:
           wranglerVersion: "latest"
           command: >
             pages deploy artifacts/web
-            --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
+            --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME || 'stock-charts' }}
 
       - name: Tag and draft release note
         uses: ncipollo/release-action@v1

@@ -140,7 +140,7 @@ jobs:
       - name: Run package consumption smoke test
         run: pnpm run smoke:package-consumption
 
-  test-website:
+  test-web:
     needs: [test-libraries]
     runs-on: ubuntu-latest
     # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
@@ -179,12 +179,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build libraries
-        # Client consumes @facioquo/indy-charts via workspace:* and imports from
-        # its dist/, so libs must be built before the Angular build/test steps.
+        # web/ consumes @facioquo/indy-charts via workspace:* and imports from
+        # its dist/, so libs must be built before the web build/test steps.
         run: |
           pnpm --filter @facioquo/chartjs-chart-financial run build
           pnpm --filter @facioquo/indy-charts run build
@@ -192,20 +190,17 @@ jobs:
       - name: Check web formatting
         run: pnpm run format:web:check
 
-      - name: Lint client
-        run: pnpm --filter @stock-charts/client run lint
-
       - name: Lint CSS
         run: pnpm run lint:css
 
-      - name: Run client unit tests with coverage
-        run: pnpm --filter @stock-charts/client run test:coverage
+      - name: Run web unit tests with coverage
+        run: pnpm --filter @stock-charts/web run test:coverage
 
       - name: Upload frontend coverage to Codecov
         if: always()
         uses: codecov/codecov-action@v5
         with:
-          files: ./client/coverage/lcov.info
+          files: ./web/coverage/lcov.info
           flags: frontend
           name: frontend-coverage
           fail_ci_if_error: false
@@ -215,7 +210,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: frontend-coverage-report
-          path: client/coverage/
+          path: web/coverage/
 
       - name: Build production site
         run: pnpm --filter @stock-charts/client run build.prod
@@ -272,7 +267,7 @@ jobs:
 
   test-e2e:
     runs-on: ubuntu-latest
-    needs: [test-libraries, test-website]
+    needs: [test-libraries, test-web]
     # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
     # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
     permissions:
@@ -303,7 +298,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build libraries
-        # Angular dev server (used by Playwright's webServer config) runs from
+        # React dev server (used by Playwright's webServer config) runs from
         # source but needs the consumed library dist/ output to exist.
         run: |
           pnpm --filter @facioquo/chartjs-chart-financial run build
@@ -325,7 +320,7 @@ jobs:
 
   lint-and-test:
     runs-on: ubuntu-slim
-    needs: [test-backend, test-libraries, test-website, test-web, test-e2e]
+    needs: [test-backend, test-libraries, test-web, test-e2e]
     if: always()
     steps:
       - name: Verify required jobs succeeded
