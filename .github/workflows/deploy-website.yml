@@ -9,7 +9,7 @@ concurrency:
 permissions:
   contents: write
   # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
-  # Packages (react-ui + tokens consumed by the web/ workspace — FAC-2121).
+  # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
   packages: read
 
 env:
