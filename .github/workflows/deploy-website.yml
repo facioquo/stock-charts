@@ -232,6 +232,7 @@ jobs:
           command: >
             pages deploy artifacts/web
             --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME || 'stock-charts' }}
+            ${{ github.event_name == 'pull_request' && format('--branch=pr-{0}', github.event.pull_request.number) || '' }}
 
       - name: Tag and draft release note
         uses: ncipollo/release-action@v1
