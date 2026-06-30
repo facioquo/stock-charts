@@ -228,7 +228,12 @@ describe("StockIndicatorChart", () => {
     );
     const root = createTestElement("root");
     const app = renderer.createApp(StockIndicatorChart, { indicator: "rsi" });
-    app.provide(indyChartsVueOptionsKey, defaultOptions);
+    // Disable retries so the error surfaces immediately — retry behaviour is
+    // covered by the ApiClient unit tests in client.spec.ts.
+    app.provide(indyChartsVueOptionsKey, {
+      ...defaultOptions,
+      api: { ...defaultOptions.api, retry: false }
+    });
 
     app.mount(root);
 
