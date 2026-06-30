@@ -77,7 +77,8 @@ function mockFetchOk(body: unknown): void {
       ok: true,
       json: () => Promise.resolve(body),
       status: 200,
-      statusText: "OK"
+      statusText: "OK",
+      headers: { get: (_: string): string | null => null }
     })
   );
 }
@@ -89,7 +90,8 @@ function mockFetchError(status: number, statusText: string): void {
       ok: false,
       json: () => Promise.resolve({}),
       status,
-      statusText
+      statusText,
+      headers: { get: (_: string): string | null => null }
     })
   );
 }
@@ -101,6 +103,7 @@ function mockFetchNetworkError(message: string): void {
 interface MockResponse {
   status: number;
   body?: unknown;
+  retryAfter?: string;
 }
 
 /** Stubs fetch to return each response in sequence; last response is repeated. */
@@ -111,6 +114,10 @@ function mockFetchSequence(responses: MockResponse[]): ReturnType<typeof vi.fn> 
       ok: r.status >= 200 && r.status < 300,
       status: r.status,
       statusText: r.status >= 200 && r.status < 300 ? "OK" : "Error",
+      headers: {
+        get: (h: string): string | null =>
+          h === "Retry-After" && r.retryAfter ? r.retryAfter : null
+      },
       json: () => Promise.resolve(r.body ?? {})
     });
   });
@@ -119,6 +126,7 @@ function mockFetchSequence(responses: MockResponse[]): ReturnType<typeof vi.fn> 
     ok: last.status >= 200 && last.status < 300,
     status: last.status,
     statusText: last.status >= 200 && last.status < 300 ? "OK" : "Error",
+    headers: { get: (_: string): string | null => null },
     json: () => Promise.resolve(last.body ?? {})
   });
   vi.stubGlobal("fetch", fn);
@@ -658,6 +666,37 @@ describe("retry", () => {
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
+  it("clamps Infinity maxAttempts to default (3 attempts)", async () => {
+    const fn = mockFetchSequence([{ status: 500 }, { status: 500 }, { status: 500 }]);
+
+    const client = createApiClient({
+      baseUrl: BASE_URL,
+      retry: { maxAttempts: Infinity, baseDelayMs: 0 }
+    });
+    await expect(client.getQuotes()).rejects.toThrow("HTTP 500");
+
+    expect(fn).toHaveBeenCalledTimes(3);
+  });
+
+  it("uses Retry-After header delay on 429 instead of back-off", async () => {
+    vi.useFakeTimers();
+    const fn = mockFetchSequence([
+      { status: 429, retryAfter: "1" }, // 1 second
+      { status: 200, body: [] }
+    ]);
+
+    const client = createApiClient({
+      baseUrl: BASE_URL,
+      retry: { maxAttempts: 2, baseDelayMs: 9999 } // large backoff to prove it's NOT used
+    });
+    const promise = client.getQuotes();
+    await vi.advanceTimersByTimeAsync(1000);
+    await promise;
+
+    expect(fn).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
+
   it("retries getListings on transient errors", async () => {
     const listing = makeListing({ name: "SMA" });
     const fn = mockFetchSequence([{ status: 502 }, { status: 200, body: [listing] }]);
@@ -805,5 +844,53 @@ describe("staleCache", () => {
 
     await expect(client.getQuotes()).rejects.toThrow("Network down");
     expect(onStale).not.toHaveBeenCalled();
+  });
+
+  it("calls onError before returning stale data (not silently bypassed)", async () => {
+    const onError = vi.fn<[context: string, error: unknown], void>();
+    const onStale = vi.fn<[context: string], void>();
+    setupStorage();
+
+    const quotes = [
+      { timestamp: "2024-01-01T00:00:00Z", open: 1, high: 2, low: 0.5, close: 1.5, volume: 100 }
+    ];
+    mockFetchOk(quotes);
+    const client = createApiClient({
+      baseUrl: BASE_URL,
+      retry: false,
+      staleCache: true,
+      onError,
+      onStale
+    });
+    await client.getQuotes(); // populate cache
+
+    mockFetchNetworkError("Network down");
+    const staleResult = await client.getQuotes();
+
+    expect(staleResult).toHaveLength(1);
+    expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(Error));
+    expect(onStale).toHaveBeenCalledWith("quotes");
+  });
+
+  it("surfaces original fetch error when cached data fails normalization", async () => {
+    const onError = vi.fn<[context: string, error: unknown], void>();
+    const storage = setupStorage();
+
+    // Write malformed quote data directly into the cache to simulate corruption.
+    storage.setItem(
+      `indy-charts:stale:${BASE_URL}/quotes`,
+      JSON.stringify([{ invalid: true }])
+    );
+
+    mockFetchNetworkError("Network down");
+    const client = createApiClient({
+      baseUrl: BASE_URL,
+      retry: false,
+      staleCache: true,
+      onError
+    });
+
+    await expect(client.getQuotes()).rejects.toThrow("Network down");
+    expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(Error));
   });
 });

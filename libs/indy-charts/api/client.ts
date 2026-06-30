@@ -24,21 +24,37 @@ function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Computes exponential back-off delay with ±25% jitter.
+ * Computes exponential back-off delay with full jitter (AWS Architecture Blog recommendation).
  * @param retryIndex - Zero-based retry index (0 on first retry).
  * @param baseDelayMs - Starting delay in milliseconds.
- * @returns Delay in milliseconds: `baseDelayMs * 2^retryIndex + rand(0, 0.25 * baseDelayMs)`.
+ * @returns Delay in milliseconds: a random value in `[0, baseDelayMs × 2^retryIndex]`.
  */
 function backoffMs(retryIndex: number, baseDelayMs: number): number {
   const exponential = baseDelayMs * Math.pow(2, retryIndex);
-  const jitter = Math.floor(Math.random() * baseDelayMs * 0.25);
-  return exponential + jitter;
+  return Math.floor(Math.random() * exponential);
+}
+
+/**
+ * Parses the value of a `Retry-After` HTTP header into milliseconds.
+ * Accepts either a delay-in-seconds integer or an HTTP-date string.
+ * Returns `null` when the header value cannot be interpreted.
+ */
+function parseRetryAfterMs(header: string): number | null {
+  const seconds = Number(header.trim());
+  if (Number.isFinite(seconds) && seconds >= 0) return Math.ceil(seconds * 1000);
+  const date = new Date(header.trim());
+  if (!Number.isNaN(date.getTime())) {
+    const ms = date.getTime() - Date.now();
+    return ms > 0 ? ms : 0;
+  }
+  return null;
 }
 
 /**
  * Wraps `fetch` with exponential back-off retry for transient failures.
  *
  * - Retries on network errors (fetch rejection), `5xx`, and `429`.
+ * - Respects the `Retry-After` response header on `429`.
  * - Returns immediately on `2xx` and non-transient `4xx`.
  * - After `maxAttempts` attempts the last error/response is surfaced.
  */
@@ -49,17 +65,20 @@ async function fetchWithRetry(
 ): Promise<Response> {
   for (let attempt = 0; ; attempt++) {
     const isLast = attempt >= maxAttempts - 1;
+    let delayMs: number | null = null;
     try {
       const response = await fetch(url);
       if (response.ok || !isTransientStatus(response.status) || isLast) {
         return response;
       }
-      // transient HTTP error on a non-final attempt — retry
+      // transient HTTP error on a non-final attempt — honour Retry-After if present
+      const retryAfter = response.headers.get("Retry-After");
+      if (retryAfter !== null) delayMs = parseRetryAfterMs(retryAfter);
     } catch (networkError) {
       if (isLast) throw networkError;
       // network error on a non-final attempt — retry
     }
-    await sleep(backoffMs(attempt, baseDelayMs));
+    await sleep(delayMs ?? backoffMs(attempt, baseDelayMs));
   }
 }
 
@@ -118,7 +137,7 @@ export interface RetryConfig {
   maxAttempts?: number;
   /**
    * Base delay in milliseconds for exponential back-off.
-   * Actual delay for retry `n` ≈ `baseDelayMs × 2^(n−1)` plus a small random jitter.
+   * Actual delay for retry `n` ≈ random value in `[0, baseDelayMs × 2^(n−1)]` (full jitter).
    * Defaults to `500`.
    */
   baseDelayMs?: number;
@@ -152,8 +171,10 @@ export interface ApiClientConfig {
 
   /**
    * Optional error callback invoked whenever a fetch operation throws or
-   * receives a non-2xx response.  The error is **re-thrown** after the
-   * callback returns, so callers still need to handle it.
+   * receives a non-2xx response.  When `staleCache` is enabled and a cached
+   * value is available the error is **not** re-thrown (the promise resolves
+   * with stale data); otherwise the error is **re-thrown** after the callback
+   * returns, so callers still need to handle it.
    *
    * @param context - Human-readable description of the failed operation.
    * @param error   - The original caught value (usually an `Error` instance).
@@ -197,7 +218,8 @@ export interface ApiClient {
    * Fetches the raw OHLCV quote history from `GET /quotes`.
    *
    * @returns Resolved array of {@link Bar} objects sorted chronologically.
-   * @throws  Re-throws any network or HTTP error (after calling `onError`).
+   * @throws  Re-throws any network or HTTP error (after calling `onError`) unless
+   *          stale cached data is available.
    */
   getQuotes(): Promise<Bar[]>;
 
@@ -205,7 +227,8 @@ export interface ApiClient {
    * Fetches all available indicator listings from `GET /indicators`.
    *
    * @returns Resolved array of {@link IndicatorListing} descriptors.
-   * @throws  Re-throws any network or HTTP error (after calling `onError`).
+   * @throws  Re-throws any network or HTTP error (after calling `onError`) unless
+   *          stale cached data is available.
    */
   getListings(): Promise<IndicatorListing[]>;
 
@@ -216,7 +239,8 @@ export interface ApiClient {
    * @param selection - The user's current indicator parameter choices.
    * @param listing   - The indicator descriptor that provides the endpoint path.
    * @returns Resolved array of raw data rows for the indicator series.
-   * @throws  Re-throws any network or HTTP error (after calling `onError`).
+   * @throws  Re-throws any network or HTTP error (after calling `onError`) unless
+   *          stale cached data is available.
    */
   getSelectionData(
     selection: IndicatorSelection,
@@ -387,9 +411,14 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
   const baseUrl = config.baseUrl.endsWith("/") ? config.baseUrl : `${config.baseUrl}/`;
 
   const retryEnabled = config.retry !== false;
-  const maxAttempts = retryEnabled
+  const rawMaxAttempts = retryEnabled
     ? ((config.retry as RetryConfig | undefined)?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS)
     : 1;
+  // Guard against Infinity or non-positive values which would produce an infinite loop.
+  const maxAttempts =
+    retryEnabled && (!Number.isFinite(rawMaxAttempts) || rawMaxAttempts < 1)
+      ? DEFAULT_MAX_ATTEMPTS
+      : rawMaxAttempts;
   const baseDelayMs = retryEnabled
     ? ((config.retry as RetryConfig | undefined)?.baseDelayMs ?? DEFAULT_BASE_DELAY_MS)
     : 0;
@@ -413,8 +442,14 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (staleCache) {
           const cached = tryStaleCacheRead<unknown[]>(url);
           if (cached) {
-            onStale?.("quotes");
-            return normalizeQuotes(cached);
+            try {
+              const staleData = normalizeQuotes(cached);
+              onError?.("Error fetching quotes", error);
+              onStale?.("quotes");
+              return staleData;
+            } catch {
+              // Malformed cached data — fall through to surface original fetch error.
+            }
           }
         }
         onError?.("Error fetching quotes", error);
@@ -437,8 +472,14 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (staleCache) {
           const cached = tryStaleCacheRead<IndicatorListing[]>(url);
           if (cached) {
-            onStale?.("listings");
-            return normalizeListings(cached);
+            try {
+              const staleData = normalizeListings(cached);
+              onError?.("Error fetching listings", error);
+              onStale?.("listings");
+              return staleData;
+            } catch {
+              // Malformed cached data — fall through to surface original fetch error.
+            }
           }
         }
         onError?.("Error fetching listings", error);
@@ -475,6 +516,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         if (staleCache) {
           const cached = tryStaleCacheRead<IndicatorDataRow[]>(url);
           if (cached) {
+            onError?.("Error fetching selection data", error);
             onStale?.("selection data");
             return cached;
           }

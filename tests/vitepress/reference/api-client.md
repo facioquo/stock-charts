@@ -30,8 +30,10 @@ interface ApiClientConfig {
 
   /**
    * Called whenever a fetch operation throws or receives a non-2xx response.
-   * The error is re-thrown after the callback returns — callers must still
-   * handle the rejected promise.
+   * When staleCache is enabled and a cached value is available, the promise
+   * resolves with stale data after onError fires — it is not re-thrown.
+   * Otherwise the error is re-thrown after the callback returns — callers
+   * must still handle the rejected promise.
    */
   onError?: (context: string, error: unknown) => void;
 
@@ -103,7 +105,7 @@ const client = createApiClient({
 
 ## Methods
 
-The returned `ApiClient` exposes three methods. All return promises that reject (after `onError`) on network or HTTP failures.
+The returned `ApiClient` exposes three methods. All return promises that reject (after `onError`) on network or HTTP failures, unless `staleCache` is enabled and a prior successful response is cached — in that case `onError` still fires but the promise resolves with the stale data.
 
 ### `getQuotes(): Promise<Bar[]>`
 
@@ -171,7 +173,7 @@ try {
 }
 ```
 
-`onError` is **observational**, not recovery. The promise still rejects with the original error so callers can decide how to react.
+`onError` is **observational**, not recovery. Without `staleCache`, the promise still rejects with the original error so callers can decide how to react. With `staleCache` and a cache hit, `onError` fires but the promise resolves — the caller receives stale data and `onStale` is also called.
 
 ## Custom endpoint paths
 
