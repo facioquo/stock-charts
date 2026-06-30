@@ -33,9 +33,9 @@ export default defineConfig({
   webServer: [
     {
       // React (Vite) website. Build indy-charts first so the dev server can
-      // resolve @facioquo/indy-charts; BROWSER=none prevents auto-open.
+      // resolve @facioquo/indy-charts before Playwright connects.
       command:
-        "pnpm --filter @facioquo/indy-charts run build && BROWSER=none pnpm run serve",
+        "pnpm --filter @facioquo/indy-charts run build && pnpm run serve",
       url: "http://localhost:4200",
       cwd: workspaceRoot,
       reuseExistingServer: !process.env["CI"],

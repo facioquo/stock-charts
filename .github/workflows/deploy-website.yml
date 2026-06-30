@@ -9,7 +9,7 @@ on:
       - ".github/workflows/deploy-website.yml"
 
 concurrency:
-  group: website-deployer-${{ github.event.pull_request.number || 'main' }}
+  group: ${{ github.event_name == 'workflow_dispatch' && format('website-deployer-manual-{0}', github.run_id) || format('website-deployer-{0}', github.event.pull_request.number || 'main') }}
   cancel-in-progress: true
 
 permissions:

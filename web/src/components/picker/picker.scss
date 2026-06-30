@@ -215,13 +215,13 @@
 }
 
 .selection-list li:has(input:checked) {
+  background-color: rgb(26 115 232 / 12%); /* fallback: Chrome 105-110 lacks color-mix() */
   background-color: color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 .selection-list label {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
   padding: 10px 8px;
   cursor: pointer;
