@@ -22,6 +22,7 @@ permissions:
 jobs:
   test-backend:
     runs-on: ubuntu-latest
+
     permissions:
       # dorny/test-reporter writes a check run with the parsed .trx results.
       contents: read
@@ -95,6 +96,7 @@ jobs:
 
   test-libraries:
     runs-on: ubuntu-latest
+
     # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
     # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
     permissions:
@@ -211,56 +213,6 @@ jobs:
         with:
           name: frontend-coverage-report
           path: web/coverage/
-
-      - name: Build production site
-        run: pnpm --filter @stock-charts/client run build.prod
-
-  test-web:
-    # React migration foundation app (web/). Runs alongside the Angular client
-    # job; client/ stays the deployed app until the React port reaches parity.
-    needs: [test-libraries]
-    runs-on: ubuntu-latest
-    # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
-    # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
-    permissions:
-      contents: read
-      packages: read
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-        with:
-          run_install: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-          registry-url: https://npm.pkg.github.com
-          scope: "@facioquo"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build libraries
-        # web/ consumes @facioquo/indy-charts via workspace:* and imports from
-        # its dist/, so libs must be built before the web build/test steps.
-        run: |
-          pnpm --filter @facioquo/chartjs-chart-financial run build
-          pnpm --filter @facioquo/indy-charts run build
-
-      - name: Check web formatting
-        run: pnpm --filter @stock-charts/web run format:check
-
-      - name: Run web unit tests with coverage
-        run: pnpm --filter @stock-charts/web run test:coverage
 
       - name: Build web app
         run: pnpm --filter @stock-charts/web run build

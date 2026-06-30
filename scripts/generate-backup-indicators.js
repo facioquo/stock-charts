@@ -9,7 +9,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DEFAULT_API_BASE = process.env.BACKUP_INDICATORS_API_BASE || "https://localhost:5001";
+const DEFAULT_API_BASE = process.env.INDICATORS_API_BASE || "https://localhost:5001";
 const apiBase =
   process.argv.find(a => a.startsWith("--apiBase="))?.split("=")[1] || DEFAULT_API_BASE;
 const dataDir = path.resolve(__dirname, "../web/src/data");
