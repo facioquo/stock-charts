@@ -182,7 +182,7 @@ jobs:
       - build-website
 
     environment:
-      name: ${{ github.event_name == 'pull_request' && 'preview' || 'charts.stockindicators.dev' }}
+      name: charts.stockindicators.dev
       url: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
 
     steps:
