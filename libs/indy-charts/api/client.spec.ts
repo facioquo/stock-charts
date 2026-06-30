@@ -568,11 +568,7 @@ describe("retry", () => {
     const quotes = [
       { timestamp: "2024-01-01T00:00:00Z", open: 1, high: 2, low: 0.5, close: 1.5, volume: 100 }
     ];
-    const fn = mockFetchSequence([
-      { status: 503 },
-      { status: 503 },
-      { status: 200, body: quotes }
-    ]);
+    const fn = mockFetchSequence([{ status: 503 }, { status: 503 }, { status: 200, body: quotes }]);
 
     const client = createApiClient({ baseUrl: BASE_URL, retry: NO_DELAY_RETRY });
     const result = await client.getQuotes();
@@ -583,10 +579,7 @@ describe("retry", () => {
   });
 
   it("retries on 429 and succeeds on the second attempt", async () => {
-    const fn = mockFetchSequence([
-      { status: 429 },
-      { status: 200, body: [] }
-    ]);
+    const fn = mockFetchSequence([{ status: 429 }, { status: 200, body: [] }]);
 
     const client = createApiClient({ baseUrl: BASE_URL, retry: NO_DELAY_RETRY });
     await client.getQuotes();
@@ -620,11 +613,7 @@ describe("retry", () => {
   });
 
   it("throws after exhausting maxAttempts on persistent 5xx", async () => {
-    const fn = mockFetchSequence([
-      { status: 500 },
-      { status: 500 },
-      { status: 500 }
-    ]);
+    const fn = mockFetchSequence([{ status: 500 }, { status: 500 }, { status: 500 }]);
 
     const client = createApiClient({
       baseUrl: BASE_URL,
@@ -671,10 +660,7 @@ describe("retry", () => {
 
   it("retries getListings on transient errors", async () => {
     const listing = makeListing({ name: "SMA" });
-    const fn = mockFetchSequence([
-      { status: 502 },
-      { status: 200, body: [listing] }
-    ]);
+    const fn = mockFetchSequence([{ status: 502 }, { status: 200, body: [listing] }]);
 
     const client = createApiClient({ baseUrl: BASE_URL, retry: NO_DELAY_RETRY });
     const result = await client.getListings();
@@ -685,13 +671,13 @@ describe("retry", () => {
 
   it("retries getSelectionData on transient errors", async () => {
     const rows = [{ timestamp: "2024-01-01", sma: 50 }];
-    const fn = mockFetchSequence([
-      { status: 503 },
-      { status: 200, body: rows }
-    ]);
+    const fn = mockFetchSequence([{ status: 503 }, { status: 200, body: rows }]);
 
     const client = createApiClient({ baseUrl: BASE_URL, retry: NO_DELAY_RETRY });
-    const result = await client.getSelectionData(makeSelection([]), makeListing({ endpoint: "sma" }));
+    const result = await client.getSelectionData(
+      makeSelection([]),
+      makeListing({ endpoint: "sma" })
+    );
 
     expect(fn).toHaveBeenCalledTimes(2);
     expect(result).toEqual(rows);
