@@ -18,11 +18,11 @@
   top: 8px;
   width: 56px;
   height: 56px;
-  border-radius: 50%;
+  border-radius: 16px;
   border: none;
   cursor: pointer;
   opacity: 0.6;
-  background-color: var(--accent);
+  background-color: var(--primary);
   color: var(--primary);
   display: inline-flex;
   align-items: center;
@@ -175,7 +175,7 @@
 }
 
 .switch input:checked + .slider {
-  background-color: var(--accent);
+  background-color: var(--primary);
 }
 
 .switch input:checked + .slider::before {
