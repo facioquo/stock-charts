@@ -22,6 +22,9 @@
 
 /* HEADER / TOOLBAR — faithful port of `.main-toolbar` in app.component.scss */
 .main-toolbar {
+  display: flex;
+  align-items: center;
+  min-height: var(--toolbar-height);
   margin-left: auto;
   margin-right: auto;
   padding: 0;

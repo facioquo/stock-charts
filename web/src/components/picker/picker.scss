@@ -21,9 +21,9 @@
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  opacity: 0.8;
-  background-color: var(--primary-container);
-  color: var(--on-primary-container);
+  opacity: 0.6;
+  background-color: var(--accent);
+  color: var(--primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -31,7 +31,7 @@
 }
 
 .fab:hover {
-  opacity: 1;
+  opacity: 0.9;
 }
 
 /* MODAL / DIALOG */
@@ -107,7 +107,7 @@
 
 .dialog-tab.active {
   color: var(--text);
-  border-bottom-color: var(--primary);
+  border-bottom-color: var(--accent);
 }
 
 .dialog-actions {
@@ -175,7 +175,7 @@
 }
 
 .switch input:checked + .slider {
-  background-color: var(--primary);
+  background-color: var(--accent);
 }
 
 .switch input:checked + .slider::before {
@@ -199,7 +199,7 @@
 }
 
 .help-link {
-  font-size: 0.7em;
+  font-size: 0.6em;
   font-weight: 400;
 }
 
