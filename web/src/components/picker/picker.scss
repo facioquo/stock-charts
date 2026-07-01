@@ -199,7 +199,7 @@
 }
 
 .help-link {
-  font-size: 0.6em;
+  font-size: 0.7em;
   font-weight: 400;
 }
 
@@ -423,6 +423,7 @@
 }
 
 .btn-raised:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
+  background-color: none;
   cursor: not-allowed;
 }
