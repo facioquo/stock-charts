@@ -23,7 +23,7 @@
   cursor: pointer;
   opacity: 0.6;
   background-color: var(--primary-container);
-  color: var(--border);
+  color: var(--text);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -132,7 +132,7 @@
 .general-settings li {
   display: flex;
   align-items: center;
-  padding: 8px 0;
+  padding: 16px 0;
 }
 
 .toggle-label {
