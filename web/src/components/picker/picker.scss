@@ -22,8 +22,8 @@
   border: none;
   cursor: pointer;
   opacity: 0.6;
-  background-color: var(--primary);
-  color: var(--primary);
+  background-color: var(--primar-container);
+  color: var(--border);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -175,7 +175,7 @@
 }
 
 .switch input:checked + .slider {
-  background-color: var(--primary);
+  background-color: var(--primary-container);
 }
 
 .switch input:checked + .slider::before {
@@ -415,11 +415,11 @@
 }
 
 .btn-primary {
-  background-color: #1565c0;
+  background-color: var(--primary-container);
 }
 
 .btn-warn {
-  background-color: #c62828;
+  background-color: var(--alert);
 }
 
 .btn-raised:disabled {
