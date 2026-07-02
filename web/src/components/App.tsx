@@ -1,17 +1,11 @@
-import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 
-import { loadSettings } from "../services/userPrefs";
-
 /**
- * Root shell — header toolbar + routed outlet. Ports `AppComponent`, applying
- * saved user preferences (theme) on mount.
+ * Root shell — header toolbar + routed outlet. Ports `AppComponent`. Saved user
+ * preferences (theme/tooltips) are applied in `main.tsx` before the first render
+ * so the chart controller captures the persisted theme at construction.
  */
 export function App(): React.JSX.Element {
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
   return (
     <>
       <header>
