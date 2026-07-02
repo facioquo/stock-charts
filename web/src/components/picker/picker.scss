@@ -18,12 +18,12 @@
   top: 8px;
   width: 56px;
   height: 56px;
-  border-radius: 50%;
+  border-radius: 16px;
   border: none;
   cursor: pointer;
   opacity: 0.6;
-  background-color: var(--accent);
-  color: #1f1f1f;
+  background-color: var(--primary-container);
+  color: var(--text);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -61,8 +61,9 @@
 .dialog-toolbar {
   display: flex;
   align-items: center;
-  padding: 12px 8px 12px 16px;
+  padding: 12px 16px 12px 24px;
   border-bottom: 1px solid var(--border);
+  font-size: 1.25rem;
   font-weight: 500;
 }
 
@@ -131,7 +132,7 @@
 .general-settings li {
   display: flex;
   align-items: center;
-  padding: 8px 0;
+  padding: 8px;
 }
 
 .toggle-label {
@@ -174,7 +175,7 @@
 }
 
 .switch input:checked + .slider {
-  background-color: var(--accent);
+  background-color: var(--primary-container);
 }
 
 .switch input:checked + .slider::before {
@@ -209,11 +210,20 @@
   padding: 0;
 }
 
+.selection-list li {
+  border-radius: 4px;
+}
+
+.selection-list li:has(input:checked) {
+  background-color: rgb(26 115 232 / 12%); /* fallback: Chrome 105-110 lacks color-mix() */
+  background-color: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
 .selection-list label {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 4px;
+  padding: 10px 8px;
   cursor: pointer;
 }
 
@@ -226,13 +236,19 @@
   border: none;
   border-bottom: 1px solid var(--border);
   color: var(--text);
-  padding: 8px 4px;
+  padding: 12px 8px;
   cursor: pointer;
   font: inherit;
+  min-height: 48px;
+  justify-content: center;
 }
 
 .nav-list button:hover {
   background-color: var(--bg);
+}
+
+.nav-title {
+  font-size: 1rem;
 }
 
 .nav-subtitle {
@@ -399,14 +415,14 @@
 }
 
 .btn-primary {
-  background-color: #1565c0;
+  background-color: var(--primary-container);
 }
 
 .btn-warn {
-  background-color: #c62828;
+  background-color: var(--alert);
 }
 
 .btn-raised:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
 }

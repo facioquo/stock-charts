@@ -28,15 +28,18 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry"
   },
-  /* Start both servers automatically; reuseExistingServer allows a locally
-   * running server to be reused during development, while CI always starts fresh. */
+  /* Start servers automatically; reuseExistingServer allows a locally running
+   * server to be reused during development, while CI always starts fresh. */
   webServer: [
     {
-      command: "pnpm run serve",
+      // React (Vite) website. Build indy-charts first so the dev server can
+      // resolve @facioquo/indy-charts before Playwright connects.
+      command:
+        "pnpm --filter @facioquo/indy-charts run build && pnpm run serve",
       url: "http://localhost:4200",
       cwd: workspaceRoot,
       reuseExistingServer: !process.env["CI"],
-      timeout: 120_000
+      timeout: 180_000
     },
     {
       command:
@@ -45,35 +48,18 @@ export default defineConfig({
       cwd: workspaceRoot,
       reuseExistingServer: !process.env["CI"],
       timeout: 180_000
-    },
-    {
-      // React (Vite) migration app. Build the workspace chart library first so
-      // the dev server can resolve `@facioquo/indy-charts`, then serve in
-      // development mode (PROD=false) so the chart renders from bundled backup
-      // data without a backend. BROWSER=none stops Vite from auto-opening.
-      command:
-        "pnpm --filter @facioquo/indy-charts run build && BROWSER=none pnpm --filter @stock-charts/web exec vite --port 4280 --strictPort",
-      url: "http://localhost:4280",
-      cwd: workspaceRoot,
-      reuseExistingServer: !process.env["CI"],
-      timeout: 180_000
     }
   ],
   projects: [
     {
       name: "website",
-      testMatch: ["website.spec.ts", "seed.spec.ts"],
+      testMatch: ["react-web.spec.ts", "seed.spec.ts"],
       use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:4200" }
     },
     {
       name: "vitepress",
       testMatch: ["vitepress.spec.ts"],
       use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:4302" }
-    },
-    {
-      name: "react-web",
-      testMatch: ["react-web.spec.ts"],
-      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:4280" }
     }
   ]
 });

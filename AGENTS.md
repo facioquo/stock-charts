@@ -1,6 +1,6 @@
 # Stock Charts
 
-Full-stack financial charting application showcasing the [FacioQuo.Stock.Indicators](https://www.nuget.org/packages/FacioQuo.Stock.Indicators) NuGet package. Angular frontend with Chart.js visualization and .NET backend with Azure Functions.
+Full-stack financial charting application showcasing the [FacioQuo.Stock.Indicators](https://www.nuget.org/packages/FacioQuo.Stock.Indicators) NuGet package. React frontend with Chart.js visualization and .NET backend with Azure Functions.
 
 ## Primary directive
 
@@ -19,12 +19,14 @@ stock-charts/
 ├── package.json              # Root workspace config
 ├── pnpm-workspace.yaml       # pnpm workspace definition
 ├── Charts.sln                # .NET solution file
-├── client/                   # Angular frontend
+├── web/                      # React + Vite frontend
 │   ├── src/
-│   │   ├── app/              # Angular components and services
-│   │   ├── environments/     # Environment configs
+│   │   ├── charting/         # Chart controllers and canvas helpers
+│   │   ├── components/       # React components
+│   │   ├── services/         # Data fetching and state services
 │   │   └── styles/           # SCSS stylesheets
-│   ├── angular.json          # Angular config
+│   ├── index.html            # App shell
+│   ├── vite.config.ts        # Vite config
 │   ├── tsconfig.json         # TypeScript config
 │   └── package.json          # Frontend dependencies
 ├── libs/                     # Shared TypeScript libraries
@@ -38,7 +40,7 @@ stock-charts/
 │   ├── WebApi.Tests/         # xUnit tests for the Web API
 │   └── Directory.Packages.props  # Centralized NuGet versions
 ├── tests/
-│   ├── playwright/           # End-to-end tests against client + VitePress
+│   ├── playwright/           # End-to-end tests against web + VitePress
 │   └── vitepress/            # Docs site (Cloudflare Pages) + indy-charts integration host
 ├── docs/                     # Documentation
 ├── scripts/                  # Setup and utility scripts
@@ -56,7 +58,7 @@ stock-charts/
 pnpm install                   # Install all workspace dependencies
 
 # Development
-pnpm start                         # Start Angular dev server (http://localhost:4200)
+pnpm start                         # Start React dev server (http://localhost:4200)
 pnpm run azure:start               # Start Azurite storage emulator
 cd server/Functions && func start  # Start Azure Functions (http://localhost:7071)
 cd server/WebApi && dotnet run     # Start Web API (https://localhost:5001)
@@ -71,69 +73,67 @@ pnpm run format               # Format all code (Prettier for frontend, dotnet f
 pnpm run format:check         # Check formatting without changes
 pnpm run lint                 # Lint all workspaces (ESLint, Roslynator, markdownlint)
 pnpm run lint:fix             # Auto-fix linting issues
-pnpm --filter @stock-charts/client run lint --max-warnings=0  # Frontend with zero warnings enforcement
 
 # Testing
 pnpm run test                 # Run all tests (frontend + backend)
 pnpm run test:all             # Explicit all tests command
-pnpm --filter @stock-charts/client run test        # Frontend tests only
+pnpm --filter @stock-charts/web run test           # Frontend tests only
 pnpm run test:dotnet          # Backend tests only
 dotnet test Charts.sln        # .NET tests directly
 
 # Workspace-specific
-pnpm --filter @stock-charts/client run <command>   # Run command in client workspace
+pnpm --filter @stock-charts/web run <command>      # Run command in web workspace
 ```
 
 ## Code style
 
-### Frontend (TypeScript/Angular)
+### Frontend (TypeScript/React)
 
 **Good example:**
 
 ```typescript
-// ✅ Signals-based reactive state, strict types, standalone component
-import { Component, signal, computed } from "@angular/core";
+// ✅ Hooks-based state, strict types, explicit error handling
+import { useState, useEffect } from "react";
 
-@Component({
-  selector: "app-chart",
-  standalone: true,
-  templateUrl: "./chart.component.html"
-})
-export class ChartComponent {
-  readonly data = signal<OhlcData[]>([]);
-  readonly isLoading = signal(false);
-  readonly chartReady = computed(
-    () => this.data().length > 0 && !this.isLoading()
-  );
+interface ChartProps {
+  symbol: string;
+}
 
-  async loadData(symbol: string): Promise<void> {
-    if (!symbol) throw new Error("Symbol required");
-    this.isLoading.set(true);
-    try {
-      const response = await this.api.getQuotes(symbol);
-      this.data.set(response);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
+export function ChartComponent({ symbol }: ChartProps) {
+  const [data, setData] = useState<OhlcData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!symbol) return;
+    let cancelled = false;
+    setIsLoading(true);
+    api
+      .getQuotes(symbol)
+      .then(response => {
+        if (!cancelled) setData(response);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [symbol]);
+
+  return <canvas id="chartOverlay" />;
 }
 ```
 
 **Bad example:**
 
 ```typescript
-// ❌ No signals, vague names, no error handling, no types
-export class Chart {
-  data: any;
-  loading = false;
+// ❌ No types, vague names, no cleanup, no error handling
+export function Chart({ s }) {
+  const [data, setData] = useState();
 
-  load(s) {
-    this.loading = true;
-    this.api.get("/data/" + s).subscribe(r => {
-      this.data = r;
-      this.loading = false;
-    });
-  }
+  useEffect(() => {
+    api.get("/data/" + s).then(r => setData(r));
+  }, []);
 }
 ```
 
@@ -185,7 +185,8 @@ public class Service
 
 ## Technology conventions
 
-- **Angular v21**: signals, standalone components, native control flow
+- **React v19**: hooks-based state, functional components, strict mode
+- **Vite v7**: dev server and production bundler for the React frontend
 - **pnpm packages**: pnpm workspace dependency management
 - **NuGet**: centralized NuGet package management
 - **Markdown**: sentence case, AGENTS.md as canonical source
@@ -194,13 +195,13 @@ public class Service
 
 ### Frontend architecture
 
-- **Angular v21**: Standalone components, signals-based reactivity, modern control flow (`@if`, `@for`, `@switch`)
+- **React v19 + Vite v7**: Functional components, hooks-based state, HMR dev server
 - **TypeScript**: Strict mode enabled, comprehensive type safety
 - **Chart.js v4+**: Financial chart types in `libs/chartjs-financial/`; bundled into `@facioquo/indy-charts` dist
-- **Angular Material v21**: UI component library for consistent design
+- **React Router v7**: Client-side routing
 - **pnpm workspaces**: Unified dependency management across root and all workspace packages
 
-Client-side project dependencies are strictly in this direction only: client → indy-charts → chartjs-financial
+Client-side project dependencies are strictly in this direction only: web → indy-charts → chartjs-financial
 
 ### Backend architecture
 
@@ -216,7 +217,7 @@ Client-side project dependencies are strictly in this direction only: client →
 Financial chart types (`candlestick`, `ohlc`, `volume`) are maintained in `libs/chartjs-financial/` and bundled into `@facioquo/indy-charts`:
 
 - **Location**: `libs/chartjs-financial/`
-- **Registration**: `setupIndyCharts()` is called once from `client/src/main.ts` (or `setupIndyChartsForVue()` from the Vue/VitePress adapter). `registerFinancialCharts()` is a public export of `@facioquo/chartjs-chart-financial` but indy-charts callers do not invoke it directly — `setupIndyCharts` handles registration internally.
+- **Registration**: `setupIndyCharts()` is called once from `web/src/main.tsx` (or `setupIndyChartsForVue()` from the Vue/VitePress adapter). `registerFinancialCharts()` is a public export of `@facioquo/chartjs-chart-financial` but indy-charts callers do not invoke it directly — `setupIndyCharts` handles registration internally.
 - **Data shape**: OHLC points as `{ x: timestamp, o, h, l, c }`
 - **Theming**: `getFinancialPalette()` and `applyFinancialElementTheme()`
 - **Factories**: `buildCandlestickDataset()`, `buildVolumeDataset()`, `buildFinancialChartOptions()`
@@ -232,7 +233,7 @@ Financial chart types (`candlestick`, `ohlc`, `volume`) are maintained in `libs/
 - Lint with zero errors: `pnpm run lint` (fix before commit)
 - Build successfully: `pnpm run build` and `dotnet build Charts.sln`
 - Run and pass all tests: `pnpm run test:all`
-- Use TypeScript strict mode and Angular signals for reactive state
+- Use TypeScript strict mode and React hooks for reactive state
 - Implement async/await patterns for I/O operations
 - Write unit tests for business logic
 - Update documentation when changing project structure
@@ -245,7 +246,7 @@ Financial chart types (`candlestick`, `ohlc`, `volume`) are maintained in `libs/
 ### ⚠️ Ask first
 
 - Adding new npm or NuGet dependencies
-- Modifying workspace configuration (package.json, angular.json, Charts.sln)
+- Modifying workspace configuration (package.json, vite.config.ts, Charts.sln)
 - Changing CI/CD workflows (.github/workflows/)
 - Modifying build configurations (tsconfig.json, .csproj files)
 - Database schema changes or migrations
@@ -283,7 +284,7 @@ One-time setup:
 
 Typical lifecycle:
 
-1. **Develop**: Start all services (Azurite, Functions, WebApi, Angular dev server)
+1. **Develop**: Start all services (Azurite, Functions, WebApi, React dev server)
 2. **Iterate**: Make changes, run tests, check linting
 3. **Complete**: Execute full code completion checklist before commit
 4. **Commit**: Ensure all quality gates pass (format, lint, build, test)
@@ -292,7 +293,7 @@ Typical lifecycle:
 
 - **Tasks**: `Ctrl+Shift+P` → "Tasks: Run Task" for common operations
 - **Formatting**: Auto-format on save (Prettier for frontend, dotnet format for backend)
-- **Extensions**: ESLint, Prettier, C# Dev Kit, Angular Language Service, Azure Storage (for viewing data), Azure Functions (for debugging)
+- **Extensions**: ESLint, Prettier, C# Dev Kit, Azure Storage (for viewing data), Azure Functions (for debugging)
 - **Extension conflicts**: Do NOT install Azurite extension (azurite.azurite) - it conflicts with npm-based emulator (`pnpm run azure:start`). Use Azure Storage extension to view blob/queue/table data.
 - **Debugging**: Press F5 to attach debugger to running Azure Functions (start Functions task first). Configured launch profiles for frontend and backend.
 - **Problem panel**: Navigate errors and warnings efficiently
@@ -304,7 +305,7 @@ When working on this codebase:
 - **Purpose**: This is a demonstration/showcase project for FacioQuo.Stock.Indicators library
 - **Workspace commands**: Run from root, use `pnpm --filter` for workspace-specific operations
 - **Solution structure**: Use `Charts.sln` for all .NET operations
-- **Type safety**: Prioritize TypeScript strict mode, Angular signals, C# nullable reference types
+- **Type safety**: Prioritize TypeScript strict mode, React hooks, C# nullable reference types
 - **Financial accuracy**: Consider precision and performance for financial calculations
 - **Responsive design**: Ensure charts render correctly across device sizes
 - **Performance**: Optimize Chart.js rendering (disable animations for large datasets)

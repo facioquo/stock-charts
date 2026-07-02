@@ -69,12 +69,13 @@ function DisplayedIndicators({
         {selections.map(selection => (
           <li key={selection.ucid}>
             <label>
+              <span>{selection.label}</span>
+              <span className="filler" />
               <input
                 type="checkbox"
                 checked={checked.has(selection.ucid)}
                 onChange={() => onToggle(selection.ucid)}
               />
-              <span>{selection.label}</span>
             </label>
           </li>
         ))}

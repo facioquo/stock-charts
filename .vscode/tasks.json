@@ -82,28 +82,10 @@
       "command": "pnpm run deps:check"
     },
     {
-      "label": "Check: Angular packages (client)",
-      "detail": "Check for dependency updates using Angular CLI for the client website.",
-      "type": "shell",
-      "command": "pnpm --filter @stock-charts/client exec ng update"
-    },
-    {
-      "label": "Update: Angular packages (client)",
-      "detail": "Update Angular dependencies with migrations (captures current version, updates packages, runs migrations)",
-      "type": "shell",
-      "command": "cd client && OLD_NG=$(node -p \"require('./package.json').dependencies['@angular/core'].replace(/[~^]/, '')\") && npx npm-check-updates '@angular/*' angular-eslint typescript --upgrade && cd .. && pnpm install && cd client && ng update @angular/core --migrate-only --from=$OLD_NG --allow-dirty",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
       "label": "Update: Node packages",
       "detail": "Update dependencies in root and all workspace packages to latest versions",
       "type": "shell",
-      "command": "pnpm run deps:update && pnpm install",
-      "dependsOn": "Update: Angular packages (client)",
-      "dependsOrder": "sequence"
+      "command": "pnpm run deps:update && pnpm install"
     },
     {
       "label": "Update: NuGet packages",
@@ -119,7 +101,7 @@
     },
     {
       "label": "Update: All packages",
-      "detail": "Update all Node, Angular, and NuGet packages to latest compatible versions",
+      "detail": "Update all Node and NuGet packages to latest compatible versions",
       "dependsOn": ["Update: Node packages", "Update: NuGet packages"],
       "dependsOrder": "sequence"
     },
@@ -165,22 +147,12 @@
     },
     {
       "label": "Build: Website",
-      "detail": "Build Angular application",
-      "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run build",
-      "group": "build",
-      "problemMatcher": "$tsc",
-      "dependsOn": "Install: Packages (pnpm)",
-      "dependsOrder": "sequence"
-    },
-    {
-      "label": "Build: Website (React foundation)",
-      "detail": "Build the React migration-foundation app (web/): tsc --noEmit && vite build",
+      "detail": "Build React application (tsc + vite build)",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/web run build",
       "group": "build",
       "problemMatcher": "$tsc",
-      "dependsOn": "Build: Libraries",
+      "dependsOn": ["Install: Packages (pnpm)", "Build: Libraries"],
       "dependsOrder": "sequence"
     },
     {
@@ -257,33 +229,17 @@
     },
     {
       "label": "Lint: Website (check)",
-      "detail": "Check Angular, library, and VitePress code with ESLint and Prettier",
+      "detail": "Check web formatting and CSS with Prettier and stylelint",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run lint --max-warnings=0 && pnpm run format:web:check && pnpm run lint:css",
+      "command": "pnpm run format:web:check && pnpm run lint:css",
       "group": "test",
       "problemMatcher": "$eslint-stylish"
     },
     {
       "label": "Lint: Website (fix)",
-      "detail": "Auto-fix Angular, library, and VitePress code with ESLint and format with Prettier",
+      "detail": "Auto-format web code with Prettier and fix CSS with stylelint",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run lint:fix && pnpm run format:web && pnpm run lint:css:fix",
-      "group": "none",
-      "problemMatcher": "$tsc"
-    },
-    {
-      "label": "Lint: Website (React) (check)",
-      "detail": "Check React migration-foundation app (web/) formatting with Prettier",
-      "type": "shell",
-      "command": "pnpm --filter @stock-charts/web run format:check",
-      "group": "test",
-      "problemMatcher": "$tsc"
-    },
-    {
-      "label": "Lint: Website (React) (fix)",
-      "detail": "Auto-format React migration-foundation app (web/) with Prettier",
-      "type": "shell",
-      "command": "pnpm --filter @stock-charts/web run format",
+      "command": "pnpm run format:web && pnpm run lint:css:fix",
       "group": "none",
       "problemMatcher": "$tsc"
     },
@@ -373,15 +329,7 @@
     },
     {
       "label": "Test: Website",
-      "detail": "Run Angular unit tests",
-      "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run test",
-      "group": "test",
-      "problemMatcher": "$tsc"
-    },
-    {
-      "label": "Test: Website (React)",
-      "detail": "Run Vitest unit tests for the React migration-foundation app (web/)",
+      "detail": "Run Vitest unit tests for the React web app",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/web run test",
       "group": "test",
@@ -565,32 +513,13 @@
     },
     {
       "label": "Run: Website dev server",
-      "detail": "Start Angular development server (with HMR)",
-      "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run start",
-      "isBackground": true,
-      "group": "none",
-      "problemMatcher": {
-        "owner": "website",
-        "pattern": {
-          "regexp": "^$"
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "^.*Compiling",
-          "endsPattern": "^.*Application bundle generation complete"
-        }
-      }
-    },
-    {
-      "label": "Run: Website (React) dev server",
-      "detail": "Start the React migration-foundation app (web/) Vite dev server with HMR",
+      "detail": "Start React (Vite) development server with HMR",
       "type": "shell",
       "command": "pnpm --filter @stock-charts/web run dev",
       "isBackground": true,
       "group": "none",
       "problemMatcher": {
-        "owner": "website-react",
+        "owner": "website",
         "pattern": {
           "regexp": "^$"
         },
@@ -658,7 +587,7 @@
     },
     {
       "label": "Stop: Website dev server",
-      "detail": "Stop the Angular dev server (attempts to free default port 4200)",
+      "detail": "Stop the React (Vite) dev server (attempts to free default port 4200)",
       "type": "shell",
       "command": "npx",
       "args": ["kill-port", "4200"],
@@ -727,9 +656,9 @@
     },
     {
       "label": "Clean: Website",
-      "detail": "Clean Angular build outputs (dist, coverage)",
+      "detail": "Clean React build outputs (dist, coverage)",
       "type": "shell",
-      "command": "pnpm --filter @stock-charts/client run clean"
+      "command": "pnpm --filter @stock-charts/web run clean"
     },
     {
       "label": "Clean: Backend .NET",

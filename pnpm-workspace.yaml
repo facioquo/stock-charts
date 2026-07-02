@@ -1,7 +1,6 @@
 packages:
   - libs/chartjs-financial
   - libs/indy-charts
-  - client
   - web
   - tests/playwright
   - tests/vitepress
