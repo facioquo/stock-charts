@@ -90,8 +90,15 @@
   display: block;
 }
 
-/* LOADING */
+/* LOADING — centered overlay inside the reserved chart aspect-ratio box, so the
+   spinner occupies the space the chart will and nothing shifts once it renders. */
 .chart-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   font-family: Rubik, Roboto, Arial, sans-serif;
   font-size: 10px;
   text-align: center;
@@ -99,7 +106,6 @@
 
 .chart-loading-spinner {
   margin: 0;
-  padding-top: 175px;
 
   img {
     opacity: 0.5;
@@ -116,6 +122,7 @@
    container keeps its responsive variants nested so all breakpoints for one
    element live together. */
 .chart-overlay-container {
+  position: relative; /* positioning context for the loading overlay */
   aspect-ratio: 2.5;
 
   /* tablet-lg */
