@@ -13,7 +13,6 @@ overrides:
   "@hono/node-server": ">=1.19.10"
   express-rate-limit: ">=8.2.2"
   flatted: ">=3.4.2"
-  vite: "^7.3.3"
 
 allowBuilds:
   '@parcel/watcher': false
