@@ -56,26 +56,24 @@ function DisplayedIndicators({
   return (
     <section className="displayed-indicators">
       <div className="dialog-section-header">
-        <span>Displayed indicators</span>
-        <span className="filler" />
         <input
           type="checkbox"
           aria-label="select all displayed indicators"
           checked={checked.size > 0 && checked.size === selections.length}
           onChange={event => onSelectAll(event.target.checked)}
         />
+        <span>Displayed indicators</span>
       </div>
       <ul className="selection-list">
         {selections.map(selection => (
           <li key={selection.ucid}>
             <label>
-              <span>{selection.label}</span>
-              <span className="filler" />
               <input
                 type="checkbox"
                 checked={checked.has(selection.ucid)}
                 onChange={() => onToggle(selection.ucid)}
               />
+              <span>{selection.label}</span>
             </label>
           </li>
         ))}

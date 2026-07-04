@@ -191,6 +191,7 @@
 .dialog-section-header {
   display: flex;
   align-items: center;
+  gap: 8px;
   padding: 8px;
   margin-top: 16px;
   background-color: var(--bg);
@@ -200,6 +201,7 @@
   &.column {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0;
   }
 }
 
@@ -304,6 +306,7 @@
   font-size: 0.75em;
   color: var(--text-muted);
   margin-bottom: 2px;
+  text-align: left;
 }
 
 .field-error {
