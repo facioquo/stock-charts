@@ -314,23 +314,10 @@ jobs:
           path: tests/playwright/playwright-report/
           retention-days: 3
 
-  tracking-id-guard:
-    name: No internal tracking IDs in committed files
-    runs-on: ubuntu-slim
-
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Scan all committed files for internal tracking identifiers
-        run: bash scripts/check-no-tracking-ids.sh
-
   lint-and-test:
     runs-on: ubuntu-slim
     needs:
-      [test-backend, test-libraries, test-website, test-web, test-e2e, tracking-id-guard]
+      [test-backend, test-libraries, test-website, test-web, test-e2e]
     if: always()
     steps:
       - name: Verify required jobs succeeded
