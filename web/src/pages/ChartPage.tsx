@@ -39,17 +39,6 @@ export function ChartPage(): React.JSX.Element {
 
   return (
     <>
-      {loading && (
-        <div role="status" aria-live="polite">
-          <div className="chart-loading">
-            <p className="chart-loading-spinner">
-              <img src="/assets/candle-spinner.svg" alt="Loading data" height={30} />
-            </p>
-            <p className="chart-loading-label">Loading</p>
-          </div>
-        </div>
-      )}
-
       {apiError && (
         <div role="alert" aria-live="assertive" className="api-error-container">
           <div className="api-error-content">
@@ -110,9 +99,19 @@ export function ChartPage(): React.JSX.Element {
         </div>
       )}
 
-      {/* CHART (MAIN OVERLAY) */}
-      <div id="chart-overlay" className="chart-overlay-container" hidden={loading}>
+      {/* CHART (MAIN OVERLAY) — kept mounted while loading so its aspect-ratio
+          reserves the chart's space and the spinner overlays it in place,
+          avoiding the empty → spinner → chart layout shift on load. */}
+      <div id="chart-overlay" className="chart-overlay-container" hidden={apiError}>
         <canvas id="chartOverlay" />
+        {loading && (
+          <div className="chart-loading" role="status" aria-live="polite">
+            <p className="chart-loading-spinner">
+              <img src="/assets/candle-spinner.svg" alt="Loading data" height={30} />
+            </p>
+            <p className="chart-loading-label">Loading</p>
+          </div>
+        )}
       </div>
 
       {/* CHART (OSCILLATORS) */}

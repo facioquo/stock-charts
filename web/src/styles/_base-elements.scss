@@ -44,14 +44,14 @@ h2 {
 a {
   color: var(--link);
   text-decoration: underline;
-}
 
-a:visited {
-  color: var(--link);
-}
+  &:visited {
+    color: var(--link);
+  }
 
-a:hover {
-  color: var(--link-hover);
+  &:hover {
+    color: var(--link-hover);
+  }
 }
 
 /* ALIGNMENT + UTILITIES */
@@ -81,7 +81,7 @@ a:hover {
 
 /* COMMON CONTROLS */
 .error {
-  color: #b71c1c;
+  color: var(--error);
 }
 
 /* SCROLLBAR (faithful port of picker/_scrollbar-theme.scss; colours come from

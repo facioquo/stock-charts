@@ -3,6 +3,9 @@
  * Material picker). Co-located with the components and imported from ChartPage
  * so it stays decoupled from the global theme stylesheet. Uses the same CSS
  * custom properties (--bg, --surface, --text, etc.) defined by the global theme.
+ *
+ * Related selectors (descendants, pseudo-classes, state modifiers) are nested
+ * under their parent so each control reads as one cohesive unit.
  */
 
 /* SETTINGS FAB */
@@ -18,20 +21,20 @@
   top: 8px;
   width: 56px;
   height: 56px;
-  border-radius: 50%;
+  border-radius: 16px;
   border: none;
   cursor: pointer;
-  opacity: 0.8;
+  opacity: 0.6;
   background-color: var(--primary-container);
-  color: var(--on-primary-container);
+  color: var(--text);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 3px 5px rgb(0 0 0 / 30%);
-}
 
-.fab:hover {
-  opacity: 1;
+  &:hover {
+    opacity: 0.9;
+  }
 }
 
 /* MODAL / DIALOG */
@@ -61,7 +64,7 @@
 .dialog-toolbar {
   display: flex;
   align-items: center;
-  padding: 12px 8px 12px 16px;
+  padding: 12px 16px 12px 24px;
   border-bottom: 1px solid var(--border);
   font-size: 1.25rem;
   font-weight: 500;
@@ -103,11 +106,11 @@
   padding: 8px 16px;
   cursor: pointer;
   font: inherit;
-}
 
-.dialog-tab.active {
-  color: var(--text);
-  border-bottom-color: var(--primary);
+  &.active {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+  }
 }
 
 .dialog-actions {
@@ -117,9 +120,11 @@
   padding: 8px 16px 16px;
 }
 
-.dialog-error .error {
-  color: #d32f2f;
-  font-weight: 500;
+.dialog-error {
+  .error {
+    color: var(--error);
+    font-weight: 500;
+  }
 }
 
 /* TOGGLES */
@@ -127,12 +132,12 @@
   list-style: none;
   margin: 0;
   padding: 0;
-}
 
-.general-settings li {
-  display: flex;
-  align-items: center;
-  padding: 8px 0;
+  li {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+  }
 }
 
 .toggle-label {
@@ -145,57 +150,59 @@
   display: inline-block;
   width: 44px;
   height: 24px;
-}
 
-.switch input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
 
-.switch .slider {
-  position: absolute;
-  inset: 0;
-  background-color: var(--border);
-  border-radius: 24px;
-  transition: background-color 0.15s;
-}
+  .slider {
+    position: absolute;
+    inset: 0;
+    background-color: var(--border);
+    border-radius: 24px;
+    transition: background-color 0.15s;
 
-.switch .slider::before {
-  content: "";
-  position: absolute;
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  top: 3px;
-  background-color: #fff;
-  border-radius: 50%;
-  transition: transform 0.15s;
-}
+    &::before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      top: 3px;
+      background-color: var(--on-primary);
+      border-radius: 50%;
+      transition: transform 0.15s;
+    }
+  }
 
-.switch input:checked + .slider {
-  background-color: var(--primary);
-}
+  input:checked + .slider {
+    background-color: var(--primary-container);
 
-.switch input:checked + .slider::before {
-  transform: translateX(20px);
+    &::before {
+      transform: translateX(20px);
+    }
+  }
 }
 
 /* SECTION HEADERS + LISTS */
 .dialog-section-header {
   display: flex;
   align-items: center;
+  gap: 8px;
   padding: 8px;
   margin-top: 16px;
   background-color: var(--bg);
   border-radius: 4px;
   font-weight: 500;
-}
 
-.dialog-section-header.column {
-  flex-direction: column;
-  align-items: flex-start;
+  &.column {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
 }
 
 .help-link {
@@ -210,41 +217,40 @@
   padding: 0;
 }
 
-.selection-list li {
-  border-radius: 4px;
+.selection-list {
+  li {
+    border-radius: 4px;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 8px;
+    cursor: pointer;
+  }
 }
 
-.selection-list li:has(input:checked) {
-  background-color: rgb(26 115 232 / 12%); /* fallback: Chrome 105-110 lacks color-mix() */
-  background-color: color-mix(in srgb, var(--primary) 12%, transparent);
-}
+.nav-list {
+  button {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 8px;
+    cursor: pointer;
+    font: inherit;
+    min-height: 48px;
+    justify-content: center;
 
-.selection-list label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 8px;
-  cursor: pointer;
-}
-
-.nav-list button {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--border);
-  color: var(--text);
-  padding: 12px 8px;
-  cursor: pointer;
-  font: inherit;
-  min-height: 48px;
-  justify-content: center;
-}
-
-.nav-list button:hover {
-  background-color: var(--bg);
+    &:hover {
+      background-color: var(--bg);
+    }
+  }
 }
 
 .nav-title {
@@ -272,22 +278,22 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
-}
 
-.param-input input {
-  text-align: center;
+  input {
+    text-align: center;
+  }
 }
 
 .style-container {
   margin: 1rem 0;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
-}
 
-.style-container h3 {
-  font-size: 1em;
-  font-weight: 400;
-  margin: 0 0 8px;
+  h3 {
+    font-size: 1em;
+    font-weight: 400;
+    margin: 0 0 8px;
+  }
 }
 
 .style-input {
@@ -300,10 +306,11 @@
   font-size: 0.75em;
   color: var(--text-muted);
   margin-bottom: 2px;
+  text-align: left;
 }
 
 .field-error {
-  color: #d32f2f;
+  color: var(--error);
   font-size: 0.75em;
   margin: 2px 0 0;
 }
@@ -316,11 +323,10 @@
   border-radius: 4px;
   padding: 6px 8px;
   font: inherit;
-}
 
-.modal-panel input:disabled,
-.modal-panel select:disabled {
-  opacity: 0.5;
+  &:disabled {
+    opacity: 0.5;
+  }
 }
 
 .line-sample {
@@ -344,10 +350,10 @@
 
 .color-hex-input {
   width: 100px;
-}
 
-.color-hex-input.invalid {
-  border-color: #d32f2f;
+  &.invalid {
+    border-color: var(--error);
+  }
 }
 
 .color-toggle {
@@ -379,10 +385,10 @@
   border: 1px solid var(--border);
   border-radius: 3px;
   cursor: pointer;
-}
 
-.swatch[aria-selected="true"] {
-  outline: 2px solid var(--text);
+  &[aria-selected="true"] {
+    outline: 2px solid var(--text);
+  }
 }
 
 /* BUTTONS */
@@ -411,18 +417,18 @@
 }
 
 .btn-raised {
-  color: #fff;
+  color: var(--on-primary);
 }
 
 .btn-primary {
-  background-color: #1565c0;
+  background-color: var(--primary-container);
 }
 
 .btn-warn {
-  background-color: #c62828;
+  background-color: var(--alert);
 }
 
 .btn-raised:disabled {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: not-allowed;
 }

@@ -18,64 +18,71 @@
   --primary: #1565c0;
   --primary-container: #cce5ff;
   --on-primary-container: #001e2c;
+
+  /* theme-independent semantic tokens */
+  --on-primary: #fff; /* foreground on filled primary/warn surfaces + switch knob */
+  --error: #d32f2f; /* inline validation + error text */
+  --alert: #d32f2f; /* raised "warn" action buttons (Angular Material `color="warn"`) */
 }
 
 /* HEADER / TOOLBAR — faithful port of `.main-toolbar` in app.component.scss */
 .main-toolbar {
+  display: flex;
+  align-items: center;
+  min-height: var(--toolbar-height);
   margin-left: auto;
   margin-right: auto;
   padding: 0;
   line-height: normal;
   background-color: transparent;
-}
 
-/* headings (ordered by ascending specificity to satisfy
-   stylelint `no-descending-specificity`) */
-.main-toolbar h1 {
-  font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
-  font-size: 0.9em;
-  font-weight: 600;
-  line-height: 1;
-  margin: 0;
-  color: var(--brand-h1);
-}
+  h1,
+  h2 {
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+  }
 
-.main-toolbar h2 {
-  font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
-  font-size: 0.6em;
-  font-weight: normal;
-  line-height: 0.9;
-  letter-spacing: 0.55px;
-  padding-left: 1px;
-  margin: 0;
-  color: var(--toolbar-h2);
-}
+  h1 {
+    font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
+    font-size: 1.35em;
+    font-weight: 600;
+    line-height: 1;
+    margin: 0;
+    color: var(--brand-h1);
 
-.main-toolbar h1 small {
-  font-size: 0.7em;
-  opacity: 0.7;
-}
+    a {
+      padding-top: 0.5rem;
 
-.main-toolbar h1 a,
-.main-toolbar h2 a {
-  color: inherit;
-  text-decoration: none;
-}
+      &:hover {
+        color: var(--brand-h1-hover);
+      }
+    }
 
-.main-toolbar h1 a {
-  padding-top: 0.5rem;
-}
+    small {
+      font-size: 0.75em;
+    }
+  }
 
-.main-toolbar h2 a {
-  padding-bottom: 0.9rem;
-}
+  h2 {
+    font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
+    font-size: 0.9em;
+    font-weight: normal;
+    line-height: 0.9;
+    letter-spacing: 0.55px;
+    padding-left: 1px;
+    margin: 0;
+    color: var(--toolbar-h2);
 
-.main-toolbar h1 a:hover {
-  color: var(--brand-h1-hover);
-}
+    a {
+      padding-bottom: 0.9rem;
 
-.main-toolbar h2 a:hover {
-  color: var(--toolbar-h2-hover);
+      &:hover {
+        color: var(--toolbar-h2-hover);
+      }
+    }
+  }
 }
 
 #main-content {
@@ -83,8 +90,15 @@
   display: block;
 }
 
-/* LOADING */
+/* LOADING — centered overlay inside the reserved chart aspect-ratio box, so the
+   spinner occupies the space the chart will and nothing shifts once it renders. */
 .chart-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   font-family: Rubik, Roboto, Arial, sans-serif;
   font-size: 10px;
   text-align: center;
@@ -92,11 +106,10 @@
 
 .chart-loading-spinner {
   margin: 0;
-  padding-top: 175px;
-}
 
-.chart-loading-spinner img {
-  opacity: 0.5;
+  img {
+    opacity: 0.5;
+  }
 }
 
 .chart-loading-label {
@@ -105,28 +118,25 @@
 }
 
 /* CHART CONTAINERS — faithful port of chart.component.scss, including the
-   landscape / full-screen breakpoints. Width is managed by `main`. */
+   landscape / full-screen breakpoints. Width is managed by `main`. Each
+   container keeps its responsive variants nested so all breakpoints for one
+   element live together. */
 .chart-overlay-container {
+  position: relative; /* positioning context for the loading overlay */
   aspect-ratio: 2.5;
-}
 
-/* tablet-lg */
-@media (width <= 880px) {
-  .chart-overlay-container {
+  /* tablet-lg */
+  @media (width <= 880px) {
     aspect-ratio: 2;
   }
-}
 
-/* mobile */
-@media (width <= 600px) {
-  .chart-overlay-container {
+  /* mobile */
+  @media (width <= 600px) {
     aspect-ratio: 5/4;
   }
-}
 
-/* landscape, full screen */
-@media (height <= 400px) and (orientation: landscape) {
-  .chart-overlay-container {
+  /* landscape, full screen */
+  @media (height <= 400px) and (orientation: landscape) {
     aspect-ratio: unset;
     height: 100vh;
   }
@@ -135,34 +145,26 @@
 .chart-oscillator-container {
   aspect-ratio: 10;
   margin-top: 8px;
-}
 
-/* tablet-lg */
-@media (width <= 880px) {
-  .chart-oscillator-container {
+  /* tablet-lg */
+  @media (width <= 880px) {
     aspect-ratio: 8;
   }
-}
 
-/* tablet-lg, landscape */
-@media (width <= 880px) and (orientation: landscape) {
-  .chart-oscillator-container {
+  /* tablet-lg, landscape */
+  @media (width <= 880px) and (orientation: landscape) {
     aspect-ratio: unset;
     height: 25vh;
   }
-}
 
-/* mobile, landscape */
-@media (height <= 600px) and (orientation: landscape) {
-  .chart-oscillator-container {
+  /* mobile, landscape */
+  @media (height <= 600px) and (orientation: landscape) {
     aspect-ratio: unset;
     height: 33.33vh;
   }
-}
 
-/* mobile */
-@media (height <= 400px) {
-  .chart-oscillator-container {
+  /* mobile */
+  @media (height <= 400px) {
     aspect-ratio: unset;
     height: 50vh;
   }
@@ -195,10 +197,12 @@
   color: var(--text-muted);
 }
 
-.api-error-help code {
-  background-color: var(--bg);
-  padding: 2px 6px;
-  border-radius: 4px;
+.api-error-help {
+  code {
+    background-color: var(--bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
 }
 
 /* 404 — faithful port of 404.component.scss */
@@ -208,10 +212,10 @@
   justify-content: center;
   align-items: center;
   min-height: 60vh;
-}
 
-.container p,
-.container h1,
-.container h2 {
-  text-align: center;
+  p,
+  h1,
+  h2 {
+    text-align: center;
+  }
 }
