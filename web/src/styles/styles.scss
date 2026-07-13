@@ -20,9 +20,9 @@
   --on-primary-container: #001e2c;
 
   /* theme-independent semantic tokens */
-  --on-primary: #fff; /* foreground on filled primary/warn surfaces + switch knob */
+  --on-primary: #fff; /* foreground on filled primary surfaces + switch knob */
   --error: #d32f2f; /* inline validation + error text */
-  --alert: #d32f2f; /* raised "warn" action buttons (Angular Material `color="warn"`) */
+  --control-container: #004d73; /* settings/picker raised buttons + active switches — stays dark in both themes */
 }
 
 /* HEADER / TOOLBAR — faithful port of `.main-toolbar` in app.component.scss */

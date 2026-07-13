@@ -314,7 +314,12 @@ function DialogActions({
       <button type="button" className="btn-text" onClick={onClose}>
         CANCEL
       </button>
-      <button type="button" className="btn-raised btn-warn" disabled={disabled} onClick={onSubmit}>
+      <button
+        type="button"
+        className="btn-raised btn-primary"
+        disabled={disabled}
+        onClick={onSubmit}
+      >
         {closeLabel}
       </button>
     </div>

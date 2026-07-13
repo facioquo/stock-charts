@@ -179,7 +179,7 @@
   }
 
   input:checked + .slider {
-    background-color: var(--primary-container);
+    background-color: var(--control-container);
 
     &::before {
       transform: translateX(20px);
@@ -418,11 +418,7 @@
 }
 
 .btn-primary {
-  background-color: var(--primary-container);
-}
-
-.btn-warn {
-  background-color: var(--alert);
+  background-color: var(--control-container);
 }
 
 .btn-raised:disabled {
