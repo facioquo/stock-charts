@@ -5,6 +5,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import https from "node:https";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,15 +16,21 @@ const apiBase =
 const dataDir = path.resolve(__dirname, "../web/src/data");
 const jsonPath = path.join(dataDir, "backup-indicators.json");
 
-// Allow local development against self-signed localhost certificates.
-// This is intentionally limited to localhosts to avoid weakening TLS globally.
-if (apiBase.startsWith("https://localhost") || apiBase.startsWith("https://127.0.0.1")) {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+function isLocalhostApiBase(baseUrl) {
+  return baseUrl.startsWith("https://localhost") || baseUrl.startsWith("https://127.0.0.1");
 }
 
 async function fetchListings() {
   const url = `${apiBase.replace(/\/$/, "")}/indicators`;
-  const res = await fetch(url, { headers: { Accept: "application/json" } }).catch(e => {
+  const res = await fetch(url, {
+    headers: { Accept: "application/json" },
+    ...(isLocalhostApiBase(apiBase)
+      ? {
+          // Prevent the local self-signed cert warning while keeping the override scoped to this request.
+          agent: new https.Agent({ rejectUnauthorized: false })
+        }
+      : {})
+  }).catch(e => {
     throw new Error(e.message);
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -59,13 +66,11 @@ if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
       console.log("Snapshot refreshed from API:", jsonPath);
     } catch (err) {
       if (fs.existsSync(jsonPath)) {
-        console.warn("Fetch failed, keeping existing snapshot:", err.message);
-        // Keep existing JSON only. Wrapper removed.
+        console.warn("Using existing backup indicators snapshot because the API could not be reached.");
       } else {
         console.error("Fetch failed and no existing snapshot is present:", err.message);
         process.exit(1);
       }
-      console.log("Error:", err);
     }
   })();
 }

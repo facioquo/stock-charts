@@ -43,7 +43,7 @@ features:
 
   - icon: 📦
     title: TypeScript first
-    details: Strict types, ES2020 target, Canvas + fetch APIs only. Runs in every modern browser.
+    details: Strict types, ES2022 target, Canvas + fetch APIs only. Runs in every modern browser.
 
   - icon: ⚡
     title: 250+ bars, instant pan
@@ -131,4 +131,4 @@ export default {
 
 ## Under the hood
 
-Built on [Chart.js](https://chartjs.org). Runs anywhere ES2020 + Canvas + `fetch` are available — every browser shipped in the last few years. Source: [github.com/facioquo/stock-charts](https://github.com/facioquo/stock-charts).
+Built on [Chart.js](https://chartjs.org). Runs anywhere ES2022 + Canvas + `fetch` are available — every browser shipped in the last few years. Source: [github.com/facioquo/stock-charts](https://github.com/facioquo/stock-charts).
