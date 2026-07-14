@@ -70,7 +70,7 @@ interface RetryConfig {
 
 ### Automatic retry
 
-By default the client retries up to **3 times** with exponential back-off (starting at 500 ms) for transient failures: network errors, `5xx` responses, and `429`. Non-transient `4xx` errors (except `429`) are not retried.
+By default the client retries up to **3 times** with exponential back-off (starting at 500 ms) for transient failures: network errors, `5xx` responses, and `429`. Non-transient `4xx` errors (except `429`) are not retried. On `429`, a server-supplied `Retry-After` header is honoured in place of the computed back-off, clamped to a 30-second ceiling so a misconfigured origin cannot stall the client.
 
 ```typescript
 // Custom retry — more aggressive

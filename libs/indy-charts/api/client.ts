@@ -13,6 +13,11 @@ import {
 
 const DEFAULT_MAX_ATTEMPTS = 3;
 const DEFAULT_BASE_DELAY_MS = 500;
+/**
+ * Upper bound applied to a server-supplied `Retry-After` delay so a large or
+ * misconfigured header value cannot pin a browser tab for an extended period.
+ */
+const MAX_RETRY_AFTER_MS = 30_000;
 const STALE_CACHE_PREFIX = "indy-charts:stale:";
 
 function isTransientStatus(status: number): boolean {
@@ -71,9 +76,13 @@ async function fetchWithRetry(
       if (response.ok || !isTransientStatus(response.status) || isLast) {
         return response;
       }
-      // transient HTTP error on a non-final attempt — honour Retry-After if present
+      // transient HTTP error on a non-final attempt — honour Retry-After if present,
+      // clamped to a ceiling so a misconfigured origin can't stall the client.
       const retryAfter = response.headers.get("Retry-After");
-      if (retryAfter !== null) delayMs = parseRetryAfterMs(retryAfter);
+      if (retryAfter !== null) {
+        const parsed = parseRetryAfterMs(retryAfter);
+        delayMs = parsed !== null ? Math.min(parsed, MAX_RETRY_AFTER_MS) : null;
+      }
     } catch (networkError) {
       if (isLast) throw networkError;
       // network error on a non-final attempt — retry
@@ -515,7 +524,8 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
       } catch (error) {
         if (staleCache) {
           const cached = tryStaleCacheRead<IndicatorDataRow[]>(url);
-          if (cached) {
+          // Guard against a tampered or corrupted cache entry, mirroring the live path.
+          if (Array.isArray(cached)) {
             onError?.("Error fetching selection data", error);
             onStale?.("selection data");
             return cached;

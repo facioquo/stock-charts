@@ -697,6 +697,26 @@ describe("retry", () => {
     vi.useRealTimers();
   });
 
+  it("clamps an oversized Retry-After header to the 30s ceiling", async () => {
+    vi.useFakeTimers();
+    const fn = mockFetchSequence([
+      { status: 429, retryAfter: "999999" }, // ~11.5 days if honoured verbatim
+      { status: 200, body: [] }
+    ]);
+
+    const client = createApiClient({
+      baseUrl: BASE_URL,
+      retry: { maxAttempts: 2, baseDelayMs: 0 }
+    });
+    const promise = client.getQuotes();
+    // Advancing by the ceiling alone must be enough to release the second attempt.
+    await vi.advanceTimersByTimeAsync(30_000);
+    await promise;
+
+    expect(fn).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
+
   it("retries getListings on transient errors", async () => {
     const listing = makeListing({ name: "SMA" });
     const fn = mockFetchSequence([{ status: 502 }, { status: 200, body: [listing] }]);
@@ -870,6 +890,33 @@ describe("staleCache", () => {
     expect(staleResult).toHaveLength(1);
     expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(Error));
     expect(onStale).toHaveBeenCalledWith("quotes");
+  });
+
+  it("surfaces original fetch error when cached selection data is not an array", async () => {
+    const onError = vi.fn<[context: string, error: unknown], void>();
+    const onStale = vi.fn<[context: string], void>();
+    const storage = setupStorage();
+
+    // Write a tampered (non-array) cache entry to simulate corruption.
+    storage.setItem(
+      `indy-charts:stale:${BASE_URL}/sma`,
+      JSON.stringify({ notAnArray: true })
+    );
+
+    mockFetchNetworkError("Network down");
+    const client = createApiClient({
+      baseUrl: BASE_URL,
+      retry: false,
+      staleCache: true,
+      onError,
+      onStale
+    });
+
+    await expect(
+      client.getSelectionData(makeSelection([]), makeListing({ endpoint: "sma" }))
+    ).rejects.toThrow("Network down");
+    expect(onError).toHaveBeenCalledWith("Error fetching selection data", expect.any(Error));
+    expect(onStale).not.toHaveBeenCalled();
   });
 
   it("surfaces original fetch error when cached data fails normalization", async () => {
