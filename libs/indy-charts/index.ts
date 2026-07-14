@@ -97,7 +97,7 @@
  *
  * ## Browser Support
  *
- * Requires modern browser with ES2020+ support. Chart.js and chartjs-plugin-annotation
+ * Requires modern browser with ES2022+ support. Chart.js and chartjs-plugin-annotation
  * handle the heavy lifting across browsers.
  */
 

@@ -67,13 +67,13 @@
   "devDependencies": {
     "@facioquo/chartjs-chart-financial": "workspace:*",
     "@eslint/js": "^10.0.1",
-    "@vitest/eslint-plugin": "^1.6.20",
-    "eslint": "^10.5.0",
+    "@vitest/eslint-plugin": "1.6.23",
+    "eslint": "^10.7.0",
     "eslint-config-prettier": "^10.1.8",
     "jiti": "^2.7.0",
-    "typescript-eslint": "^8.62.0",
+    "typescript-eslint": "^8.64.0",
     "tsup": "^8.5.1",
-    "vitest": "^4.1.9",
-    "vue": "3.5.38"
+    "vitest": "^4.1.10",
+    "vue": "3.5.39"
   }
 }

@@ -43,7 +43,7 @@
   inset: 0;
   z-index: 1000;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   padding: 5vh 16px;
   background-color: rgb(0 0 0 / 50%);
@@ -52,7 +52,7 @@
 
 .modal-panel {
   width: 100%;
-  max-width: 420px;
+  max-width: 560px;
   background-color: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
@@ -64,7 +64,7 @@
 .dialog-toolbar {
   display: flex;
   align-items: center;
-  padding: 12px 16px 12px 24px;
+  padding: 12px 12px 12px 40px;
   border-bottom: 1px solid var(--border);
   font-size: 1.25rem;
   font-weight: 500;
@@ -86,7 +86,7 @@
 }
 
 .dialog-body {
-  padding: 16px;
+  padding: 32px;
   max-height: calc(100vh - 200px);
   overflow-y: auto;
 }
@@ -117,7 +117,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  padding: 8px 16px 16px;
+  padding: 0 32px 16px;
 }
 
 .dialog-error {
@@ -136,7 +136,7 @@
   li {
     display: flex;
     align-items: center;
-    padding: 8px;
+    padding: 8px 8px 8px 16px;
   }
 }
 
@@ -179,7 +179,7 @@
   }
 
   input:checked + .slider {
-    background-color: var(--primary-container);
+    background-color: var(--control-container);
 
     &::before {
       transform: translateX(20px);
@@ -191,22 +191,21 @@
 .dialog-section-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px;
+  padding: 10px 12px 10px 16px;
   margin-top: 16px;
   background-color: var(--bg);
   border-radius: 4px;
+  font-size: 1.2em;
   font-weight: 500;
 
   &.column {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0;
   }
 }
 
 .help-link {
-  font-size: 0.7em;
+  font-size: 0.6em;
   font-weight: 400;
 }
 
@@ -220,13 +219,17 @@
 .selection-list {
   li {
     border-radius: 4px;
+
+    &:hover {
+      background-color: var(--list-hover);
+    }
   }
 
   label {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 8px;
+    padding: 10px 12px 10px 16px;
     cursor: pointer;
   }
 }
@@ -241,14 +244,14 @@
     border: none;
     border-bottom: 1px solid var(--border);
     color: var(--text);
-    padding: 12px 8px;
+    padding: 12px 16px;
     cursor: pointer;
     font: inherit;
     min-height: 48px;
     justify-content: center;
 
     &:hover {
-      background-color: var(--bg);
+      background-color: var(--list-hover);
     }
   }
 }
@@ -286,27 +289,121 @@
 
 .style-container {
   margin: 1rem 0;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
+  padding-bottom: 2.5rem;
+  // border-bottom: 1px solid var(--border);
 
   h3 {
     font-size: 1em;
     font-weight: 400;
-    margin: 0 0 8px;
+    margin: 0 0 8px 8px;
   }
-}
 
-.style-input {
-  display: inline-flex;
-  flex-direction: column;
-  margin: 0 1rem 0.5rem 0;
+  @media screen and (width <=700px) {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 200px;
+  }
+
+  .style-input {
+    display: inline-flex;
+    flex-direction: column;
+    margin: 0 1rem 0.5rem 0;
+    width: 150px;
+
+    @media screen and (width <=700px) {
+      display: block;
+      width: 100%;
+
+      select {
+        width: 100%;
+      }
+    }
+  }
+
+  .line-sample {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  /* COLOR PICKER */
+  .color-field {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+    width: 150px;
+
+    @media screen and (width <=700px) {
+      display: block;
+      width: 100%;
+
+      .color-input-row {
+        input {
+          // width: 100%;
+        }
+      }
+    }
+
+    .color-input-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .color-hex-input {
+      width: 100px;
+
+      &.invalid {
+        border-color: var(--error);
+      }
+    }
+
+    .color-toggle {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .swatch-grid {
+      position: absolute;
+      z-index: 1100;
+      top: 100%;
+      left: 0;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      padding: 8px;
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
+    }
+
+    .swatch {
+      width: 24px;
+      height: 24px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      cursor: pointer;
+
+      &[aria-selected="true"] {
+        outline: 2px solid var(--text);
+      }
+    }
+  }
 }
 
 .field-label {
   font-size: 0.75em;
   color: var(--text-muted);
+  margin-left: 8px;
   margin-bottom: 2px;
-  text-align: left;
+
+  @media screen and (width <=700px) {
+    display: block;
+  }
 }
 
 .field-error {
@@ -329,66 +426,17 @@
   }
 }
 
-.line-sample {
-  width: 100%;
-  margin-top: 8px;
-}
-
-/* COLOR PICKER */
-.color-field {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  margin-bottom: 0.5rem;
-}
-
-.color-input-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.color-hex-input {
-  width: 100px;
-
-  &.invalid {
-    border-color: var(--error);
-  }
-}
-
-.color-toggle {
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
+.standard-checkbox {
+  width: 1rem;
+  height: 1rem;
+  min-width: 1rem;
+  min-height: 1rem;
+  padding: 0;
+  margin: 0;
   cursor: pointer;
-}
-
-.swatch-grid {
-  position: absolute;
-  z-index: 1100;
-  top: 100%;
-  left: 0;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 4px;
-  padding: 8px;
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
-}
-
-.swatch {
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  cursor: pointer;
-
-  &[aria-selected="true"] {
-    outline: 2px solid var(--text);
-  }
+  vertical-align: middle;
+  accent-color: transparent;
+  background-color: transparent;
 }
 
 /* BUTTONS */
@@ -421,11 +469,7 @@
 }
 
 .btn-primary {
-  background-color: var(--primary-container);
-}
-
-.btn-warn {
-  background-color: var(--alert);
+  background-color: var(--control-container);
 }
 
 .btn-raised:disabled {

@@ -19,18 +19,33 @@ interface ToggleRowProps {
   onChange: (value: boolean) => void;
 }
 
+function StandardCheckbox({
+  checked,
+  ariaLabel,
+  onChange
+}: {
+  checked: boolean;
+  ariaLabel: string;
+  onChange: (value: boolean) => void;
+}): React.JSX.Element {
+  return (
+    <input
+      type="checkbox"
+      aria-label={ariaLabel}
+      checked={checked}
+      onChange={event => onChange(event.target.checked)}
+      className="standard-checkbox"
+    />
+  );
+}
+
 /** A single labelled on/off switch used in the general-settings list. */
 function ToggleRow({ label, checked, onChange }: ToggleRowProps): React.JSX.Element {
   return (
     <li>
       <span className="toggle-label no-wrap">{label}</span>
       <label className="switch">
-        <input
-          type="checkbox"
-          aria-label={label}
-          checked={checked}
-          onChange={event => onChange(event.target.checked)}
-        />
+        <StandardCheckbox ariaLabel={label} checked={checked} onChange={onChange} />
         <span className="slider" />
       </label>
     </li>
@@ -56,11 +71,12 @@ function DisplayedIndicators({
   return (
     <section className="displayed-indicators">
       <div className="dialog-section-header">
-        <input
-          type="checkbox"
-          aria-label="select all displayed indicators"
+        <span>Displayed indicators</span>
+        <span className="filler" />
+        <StandardCheckbox
+          ariaLabel="select all displayed indicators"
           checked={checked.size > 0 && checked.size === selections.length}
-          onChange={event => onSelectAll(event.target.checked)}
+          onChange={onSelectAll}
         />
         <span>Displayed indicators</span>
       </div>
@@ -68,12 +84,13 @@ function DisplayedIndicators({
         {selections.map(selection => (
           <li key={selection.ucid}>
             <label>
-              <input
-                type="checkbox"
+              <span>{selection.label}</span>
+              <span className="filler" />
+              <StandardCheckbox
+                ariaLabel={`select ${selection.label}`}
                 checked={checked.has(selection.ucid)}
                 onChange={() => onToggle(selection.ucid)}
               />
-              <span>{selection.label}</span>
             </label>
           </li>
         ))}

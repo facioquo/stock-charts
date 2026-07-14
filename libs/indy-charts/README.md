@@ -10,7 +10,7 @@ Framework-agnostic financial charting library for [Chart.js](https://chartjs.org
 - **Bring-your-own data** — feed `OverlayChart` a `Bar[]` directly with no API
 - **Light + dark themes** — built-in palettes plus per-instance and site-wide background overrides
 - **Vue 3 adapter** — optional `<StockIndicatorChart>` component for Vue / VitePress sites
-- **Strict TypeScript** — ES2020 target, full type definitions, no `any` in the public surface
+- **Strict TypeScript** — ES2022 target, full type definitions, no `any` in the public surface
 
 ## Installation
 
