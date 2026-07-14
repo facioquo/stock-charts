@@ -14,10 +14,12 @@ import {
 const DEFAULT_MAX_ATTEMPTS = 3;
 const DEFAULT_BASE_DELAY_MS = 500;
 /**
- * Upper bound applied to a server-supplied `Retry-After` delay so a large or
- * misconfigured header value cannot pin a browser tab for an extended period.
+ * Upper bound applied to any retry delay — both the exponential back-off window
+ * and a server-supplied `Retry-After` value — so a high `maxAttempts`/`baseDelayMs`
+ * combination or a large/misconfigured header cannot pin a browser tab for an
+ * extended period.
  */
-const MAX_RETRY_AFTER_MS = 30_000;
+const MAX_RETRY_DELAY_MS = 30_000;
 const STALE_CACHE_PREFIX = "indy-charts:stale:";
 
 function isTransientStatus(status: number): boolean {
@@ -30,12 +32,14 @@ function sleep(ms: number): Promise<void> {
 
 /**
  * Computes exponential back-off delay with full jitter (AWS Architecture Blog recommendation).
+ * The exponential window is capped at {@link MAX_RETRY_DELAY_MS} so deep retry
+ * counts cannot produce an unbounded wait.
  * @param retryIndex - Zero-based retry index (0 on first retry).
  * @param baseDelayMs - Starting delay in milliseconds.
- * @returns Delay in milliseconds: a random value in `[0, baseDelayMs × 2^retryIndex]`.
+ * @returns Delay in milliseconds: a random value in `[0, min(baseDelayMs × 2^retryIndex, MAX_RETRY_DELAY_MS)]`.
  */
 function backoffMs(retryIndex: number, baseDelayMs: number): number {
-  const exponential = baseDelayMs * Math.pow(2, retryIndex);
+  const exponential = Math.min(baseDelayMs * Math.pow(2, retryIndex), MAX_RETRY_DELAY_MS);
   return Math.floor(Math.random() * exponential);
 }
 
@@ -47,6 +51,9 @@ function backoffMs(retryIndex: number, baseDelayMs: number): number {
 function parseRetryAfterMs(header: string): number | null {
   const seconds = Number(header.trim());
   if (Number.isFinite(seconds) && seconds >= 0) return Math.ceil(seconds * 1000);
+  // HTTP-date (RFC 9110 §10.2.3 IMF-fixdate) form. `Date` parsing of non-ISO
+  // formats is implementation-defined, but all major browser engines accept it;
+  // an unparseable value simply falls through to the exponential back-off path.
   const date = new Date(header.trim());
   if (!Number.isNaN(date.getTime())) {
     const ms = date.getTime() - Date.now();
@@ -81,7 +88,7 @@ async function fetchWithRetry(
       const retryAfter = response.headers.get("Retry-After");
       if (retryAfter !== null) {
         const parsed = parseRetryAfterMs(retryAfter);
-        delayMs = parsed !== null ? Math.min(parsed, MAX_RETRY_AFTER_MS) : null;
+        delayMs = parsed !== null ? Math.min(parsed, MAX_RETRY_DELAY_MS) : null;
       }
     } catch (networkError) {
       if (isLast) throw networkError;
@@ -146,7 +153,8 @@ export interface RetryConfig {
   maxAttempts?: number;
   /**
    * Base delay in milliseconds for exponential back-off.
-   * Actual delay for retry `n` ≈ random value in `[0, baseDelayMs × 2^(n−1)]` (full jitter).
+   * Actual delay for retry `n` ≈ random value in `[0, baseDelayMs × 2^(n−1)]` (full jitter),
+   * with the window capped at 30 seconds so deep retry counts stay bounded.
    * Defaults to `500`.
    */
   baseDelayMs?: number;
@@ -450,7 +458,8 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
       } catch (error) {
         if (staleCache) {
           const cached = tryStaleCacheRead<unknown[]>(url);
-          if (cached) {
+          // Guard against a tampered or corrupted cache entry before normalizing.
+          if (Array.isArray(cached)) {
             try {
               const staleData = normalizeQuotes(cached);
               onError?.("Error fetching quotes", error);
@@ -480,7 +489,8 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
       } catch (error) {
         if (staleCache) {
           const cached = tryStaleCacheRead<IndicatorListing[]>(url);
-          if (cached) {
+          // Guard against a tampered or corrupted cache entry before normalizing.
+          if (Array.isArray(cached)) {
             try {
               const staleData = normalizeListings(cached);
               onError?.("Error fetching listings", error);

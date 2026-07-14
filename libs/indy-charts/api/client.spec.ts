@@ -717,6 +717,47 @@ describe("retry", () => {
     vi.useRealTimers();
   });
 
+  it("caps the exponential back-off window at 30s for deep retries", async () => {
+    vi.useFakeTimers();
+    // Force jitter near the top of the window so the assertion is deterministic.
+    vi.spyOn(Math, "random").mockReturnValue(0.999);
+    const fn = mockFetchSequence([{ status: 500 }, { status: 200, body: [] }]);
+
+    // Uncapped, retryIndex 0 would wait ~9.99M ms; the ceiling must clamp it to ≤30s.
+    const client = createApiClient({
+      baseUrl: BASE_URL,
+      retry: { maxAttempts: 2, baseDelayMs: 10_000_000 }
+    });
+    const promise = client.getQuotes();
+    await vi.advanceTimersByTimeAsync(30_000);
+    await promise;
+
+    expect(fn).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
+
+  it("honours an HTTP-date Retry-After value on 429", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2024-01-01T00:00:00Z"));
+    // A large back-off would wait ~30s (capped); only the header delay is this short.
+    vi.spyOn(Math, "random").mockReturnValue(0.999);
+    const fn = mockFetchSequence([
+      { status: 429, retryAfter: "Mon, 01 Jan 2024 00:00:02 GMT" }, // 2s in the future
+      { status: 200, body: [] }
+    ]);
+
+    const client = createApiClient({
+      baseUrl: BASE_URL,
+      retry: { maxAttempts: 2, baseDelayMs: 10_000_000 }
+    });
+    const promise = client.getQuotes();
+    await vi.advanceTimersByTimeAsync(2000);
+    await promise;
+
+    expect(fn).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
+
   it("retries getListings on transient errors", async () => {
     const listing = makeListing({ name: "SMA" });
     const fn = mockFetchSequence([{ status: 502 }, { status: 200, body: [listing] }]);
@@ -898,10 +939,7 @@ describe("staleCache", () => {
     const storage = setupStorage();
 
     // Write a tampered (non-array) cache entry to simulate corruption.
-    storage.setItem(
-      `indy-charts:stale:${BASE_URL}/sma`,
-      JSON.stringify({ notAnArray: true })
-    );
+    storage.setItem(`indy-charts:stale:${BASE_URL}/sma`, JSON.stringify({ notAnArray: true }));
 
     mockFetchNetworkError("Network down");
     const client = createApiClient({
@@ -924,10 +962,7 @@ describe("staleCache", () => {
     const storage = setupStorage();
 
     // Write malformed quote data directly into the cache to simulate corruption.
-    storage.setItem(
-      `indy-charts:stale:${BASE_URL}/quotes`,
-      JSON.stringify([{ invalid: true }])
-    );
+    storage.setItem(`indy-charts:stale:${BASE_URL}/quotes`, JSON.stringify([{ invalid: true }]));
 
     mockFetchNetworkError("Network down");
     const client = createApiClient({

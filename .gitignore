@@ -120,6 +120,7 @@ logs/
 *.vspscc
 *.vssscc
 tmpclaude-*
+.claude/*.session
 
 # ========================================
 # LOGS & DIAGNOSTICS

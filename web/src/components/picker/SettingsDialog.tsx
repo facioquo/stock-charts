@@ -78,7 +78,6 @@ function DisplayedIndicators({
           checked={checked.size > 0 && checked.size === selections.length}
           onChange={onSelectAll}
         />
-        <span>Displayed indicators</span>
       </div>
       <ul className="selection-list">
         {selections.map(selection => (
