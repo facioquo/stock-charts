@@ -289,8 +289,8 @@
 
 .style-container {
   margin: 1rem 0;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
+  padding-bottom: 2.5rem;
+  // border-bottom: 1px solid var(--border);
 
   h3 {
     font-size: 1em;
@@ -308,7 +308,7 @@
     display: inline-flex;
     flex-direction: column;
     margin: 0 1rem 0.5rem 0;
-    width: 154px;
+    width: 150px;
 
     @media screen and (width <=700px) {
       display: block;
@@ -331,7 +331,7 @@
     display: inline-flex;
     flex-direction: column;
     margin-bottom: 0.5rem;
-    width: 154px;
+    width: 150px;
 
     @media screen and (width <=700px) {
       display: block;
@@ -339,7 +339,7 @@
 
       .color-input-row {
         input {
-          width: 100%;
+          // width: 100%;
         }
       }
     }
