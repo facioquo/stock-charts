@@ -9,7 +9,7 @@ on:
       - ".github/workflows/deploy-website.yml"
 
 concurrency:
-  group: ${{ github.event_name == 'workflow_dispatch' && format('website-deployer-manual-{0}', github.run_id) || format('website-deployer-{0}', github.event.pull_request.number || 'main') }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -182,7 +182,7 @@ jobs:
       - build-website
 
     environment:
-      name: ${{ github.event_name == 'pull_request' && 'preview' || 'charts.stockindicators.dev' }}
+      name: charts.stockindicators.dev
       url: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
 
     steps:
@@ -231,8 +231,7 @@ jobs:
           wranglerVersion: "latest"
           command: >
             pages deploy artifacts/web
-            --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME || 'stock-charts' }}
-            ${{ github.event_name == 'pull_request' && format('--branch=pr-{0}', github.event.pull_request.number) || '' }}
+            --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
 
       - name: Tag and draft release note
         uses: ncipollo/release-action@v1
