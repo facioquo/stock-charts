@@ -5,7 +5,6 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import https from "node:https";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,20 +15,10 @@ const apiBase =
 const dataDir = path.resolve(__dirname, "../web/src/data");
 const jsonPath = path.join(dataDir, "backup-indicators.json");
 
-function isLocalhostApiBase(baseUrl) {
-  return baseUrl.startsWith("https://localhost") || baseUrl.startsWith("https://127.0.0.1");
-}
-
 async function fetchListings() {
   const url = `${apiBase.replace(/\/$/, "")}/indicators`;
   const res = await fetch(url, {
-    headers: { Accept: "application/json" },
-    ...(isLocalhostApiBase(apiBase)
-      ? {
-          // Prevent the local self-signed cert warning while keeping the override scoped to this request.
-          agent: new https.Agent({ rejectUnauthorized: false })
-        }
-      : {})
+    headers: { Accept: "application/json" }
   }).catch(e => {
     throw new Error(e.message);
   });
