@@ -85,15 +85,6 @@ jobs:
           path: server/coverage/*.trx
           reporter: dotnet-trx
 
-      - name: Upload backend coverage artifacts
-        if: github.event_name == 'pull_request' && (success() || failure())
-        uses: actions/upload-artifact@v7
-        with:
-          name: backend-coverage-report
-          path: |
-            server/coverage/*.trx
-            server/coverage/lcov.info
-
   test-libraries:
     runs-on: ubuntu-latest
 
@@ -206,13 +197,6 @@ jobs:
           flags: frontend
           name: frontend-coverage
           fail_ci_if_error: false
-
-      - name: Upload frontend coverage artifacts
-        if: github.event_name == 'pull_request' && (success() || failure())
-        uses: actions/upload-artifact@v7
-        with:
-          name: frontend-coverage-report
-          path: web/coverage/
 
       - name: Build web app
         run: pnpm --filter @stock-charts/web run build
