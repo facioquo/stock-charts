@@ -17,6 +17,10 @@ permissions:
   # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
   # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
   packages: read
+  # `deployments`/`pull-requests` let wrangler-action record the Pages
+  # deployment and surface its preview URL on the PR.
+  deployments: write
+  pull-requests: write
 
 env:
   NODE_VERSION: 24
@@ -228,6 +232,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           wranglerVersion: "latest"
           command: >
             pages deploy artifacts/web
