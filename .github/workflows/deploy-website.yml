@@ -236,7 +236,7 @@ jobs:
           wranglerVersion: "latest"
           command: >
             pages deploy artifacts/web
-            --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }}
+            --project-name=stock-charts
 
       - name: Tag and draft release note
         uses: ncipollo/release-action@v1
