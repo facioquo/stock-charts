@@ -337,6 +337,14 @@ public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSetti
     public Task<IActionResult> GetSma(int lookbackPeriods)
         => Get(quotes => quotes.ToSma(lookbackPeriods));
 
+    // One endpoint backs the SMA-MAD / SMA-MSE / SMA-MAPE catalog entries. The
+    // metrics carry incompatible units (dollars, dollars², fraction), so each
+    // listing charts a single metric on its own pane instead of sharing a
+    // y-axis. See #475.
+    [HttpGet("SMA-ANALYSIS")]
+    public Task<IActionResult> GetSmaAnalysis(int lookbackPeriods)
+        => Get(quotes => quotes.ToSmaAnalysis(lookbackPeriods));
+
     [HttpGet("SMI")]
     public Task<IActionResult> GetSmi(int lookbackPeriods, int firstSmoothPeriods, int secondSmoothPeriods, int signalPeriods)
         => Get(quotes => quotes.ToSmi(lookbackPeriods, firstSmoothPeriods, secondSmoothPeriods, signalPeriods));

@@ -3043,6 +3043,101 @@ public static class Metadata
                 ]
             },
 
+            // SMA Analysis — one listing per error metric. MAD (dollars),
+            // MSE (dollars²), and MAPE (fraction) have incompatible units, so
+            // charting them together flattens the smaller series into
+            // unreadable lines (#475). All three share the SMA-ANALYSIS
+            // endpoint and select a single metric from its response.
+            new IndicatorListing {
+                Name = "SMA Error Analysis (MAD)",
+                Uiid = "SMA-MAD",
+                LegendTemplate = "SMA-MAD([P1])",
+                Endpoint = $"{baseUrl}/SMA-ANALYSIS/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 2,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Mean Absolute Deviation",
+                        TooltipTemplate = "SMA-MAD([P1])",
+                        DataName = "mad",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            new IndicatorListing {
+                Name = "SMA Error Analysis (MAPE)",
+                Uiid = "SMA-MAPE",
+                LegendTemplate = "SMA-MAPE([P1])",
+                Endpoint = $"{baseUrl}/SMA-ANALYSIS/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 2,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Mean Absolute Percentage Error",
+                        TooltipTemplate = "SMA-MAPE([P1])",
+                        DataName = "mape",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            new IndicatorListing {
+                Name = "SMA Error Analysis (MSE)",
+                Uiid = "SMA-MSE",
+                LegendTemplate = "SMA-MSE([P1])",
+                Endpoint = $"{baseUrl}/SMA-ANALYSIS/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 14,
+                        Minimum = 2,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Mean Squared Error",
+                        TooltipTemplate = "SMA-MSE([P1])",
+                        DataName = "mse",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
             // Slope
             new IndicatorListing {
                 Name = "Slope",

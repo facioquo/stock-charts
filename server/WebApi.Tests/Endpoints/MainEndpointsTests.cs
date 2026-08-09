@@ -552,6 +552,76 @@ public class MainEndpointsTests
     }
 
     [Fact]
+    public async Task GetSmaAnalysis_WithValidParameters_ReturnsOkResult()
+    {
+        // Arrange
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act
+        IActionResult result = await _controller.GetSmaAnalysis(14);
+
+        // Assert — the response carries all four metrics (sma, mad, mse, mape)
+        // for the visible window; the catalog splits them into per-metric
+        // listings client-side, so the endpoint itself stays whole.
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<SmaAnalysisResult> analysis = Assert.IsType<IEnumerable<SmaAnalysisResult>>(okResult.Value, exactMatch: false).ToList();
+        Assert.Equal(120, analysis.Count);
+        Assert.All(analysis, r => {
+            Assert.NotNull(r.Mad);
+            Assert.NotNull(r.Mse);
+            Assert.NotNull(r.Mape);
+        });
+    }
+
+    [Fact]
+    public async Task GetSmaAnalysis_WithInvalidParameters_ReturnsBadRequest()
+    {
+        // Arrange
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act — lookbackPeriods below the library minimum surfaces as 400 via
+        // the Get<T> helper, not a 500.
+        IActionResult result = await _controller.GetSmaAnalysis(0);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    [Theory]
+    [InlineData("SMA-MAD", "mad")]
+    [InlineData("SMA-MAPE", "mape")]
+    [InlineData("SMA-MSE", "mse")]
+    public void SmaAnalysisListings_ExposeOneMetricEach(string uiid, string dataName)
+    {
+        // The metrics have incompatible units (dollars, fraction, dollars²), so
+        // each listing must chart exactly one metric on its own pane (#475). A
+        // regression that recombines them would revive the unreadable shared
+        // y-axis this split exists to prevent.
+        Models.IndicatorListing listing = Metadata
+            .IndicatorListing("https://localhost")
+            .Single(l => l.Uiid == uiid);
+
+        Assert.Equal("oscillator", listing.ChartType);
+        Assert.EndsWith("/SMA-ANALYSIS/", listing.Endpoint, StringComparison.Ordinal);
+        Models.IndicatorResultConfig result = Assert.Single(listing.Results);
+        Assert.Equal(dataName, result.DataName);
+    }
+
+    [Fact]
     public void PivotPointsListing_MarksAllLevelsSegmented()
     {
         // monthly Pivot Points are piecewise-constant level lines: the client
