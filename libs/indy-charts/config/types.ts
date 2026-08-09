@@ -1,14 +1,24 @@
 import { type ChartDataset, type ScatterDataPoint } from "chart.js";
 
+import { type FinancialDataPoint } from "../types/financial.types";
+
 // CHARTS
 
 /**
- * Indicator datasets are line or bar series of `{ x, y }` points. Pinning the
- * data shape lets callers (e.g. createThresholdDataset) read `dataset.data` as
- * `ScatterDataPoint[]` without casts, and keeps the shape consistent with
- * `buildDataPoints` / `addExtraBars` output.
+ * A single indicator data point: `{ x, y }` for line/bar series, or
+ * `{ x, o, h, l, c }` for candle series (lineType "candle"). Both carry a
+ * numeric `x` epoch, which is all shared consumers (thresholds, extra-bar
+ * padding, window slicing) rely on.
  */
-export type IndicatorDataset = ChartDataset<"line" | "bar", ScatterDataPoint[]>;
+export type IndicatorPoint = ScatterDataPoint | FinancialDataPoint;
+
+/**
+ * Indicator datasets are line, bar, or candlestick series. Pinning the data
+ * shape lets callers (e.g. createThresholdDataset) read `dataset.data` as
+ * `IndicatorPoint[]` without casts, and keeps the shape consistent with
+ * `buildDataPoints` / `buildFinancialDataPoints` / `addExtraBars` output.
+ */
+export type IndicatorDataset = ChartDataset<"line" | "bar" | "candlestick", IndicatorPoint[]>;
 
 /**
  * Candlestick-pattern indicators set per-point style arrays

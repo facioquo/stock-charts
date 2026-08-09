@@ -13,7 +13,12 @@ import {
 } from "../config/types";
 
 import { baseDataset } from "../config/datasets";
-import { buildDataPoints, addExtraBars } from "../data/transformers";
+import {
+  buildDataPoints,
+  buildFinancialDataPoints,
+  addExtraBars,
+  addExtraFinancialBars
+} from "../data/transformers";
 import { OverlayChart } from "./overlay-chart";
 import { OscillatorChart } from "./oscillator-chart";
 
@@ -140,6 +145,19 @@ export class ChartManager {
       if (!resultConfig) return;
 
       const dataset = baseDataset(result, resultConfig);
+
+      // Candle series carry `{ x, o, h, l, c }` points read from the row's
+      // OHLC fields rather than a single `dataName` value, and take their
+      // up/down coloring from the themed candlestick element defaults — the
+      // per-point color machinery below does not apply.
+      if (result.lineType === "candle") {
+        const candlePoints = buildFinancialDataPoints(data, result);
+        addExtraFinancialBars(candlePoints, this.extraBars);
+        dataset.data = candlePoints;
+        result.dataset = dataset;
+        return;
+      }
+
       const { dataPoints, pointColor, pointRotation, hasConditionalColor } = buildDataPoints(
         data,
         result,

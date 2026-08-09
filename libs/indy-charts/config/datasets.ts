@@ -102,6 +102,21 @@ export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): Indic
       return ptDataset;
     }
 
+    case "candle": {
+      // OHLC series (e.g. Heikin-Ashi). Data is `{ x, o, h, l, c }` points
+      // built by `buildFinancialDataPoints`, not `{ x, y }`. Up/down/unchanged
+      // colors come from the globally themed candlestick element defaults
+      // (`applyFinancialElementTheme`), so no per-result color is applied.
+      const candleDataset: IndicatorDataset = {
+        label: r.label,
+        type: "candlestick",
+        data: [],
+        yAxisID: "y",
+        order: r.order
+      };
+      return candleDataset;
+    }
+
     case "none": {
       // hide instead of exclude 'none' lines,
       // otherwise, it breaks line offset fill

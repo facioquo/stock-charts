@@ -172,7 +172,54 @@ function resolveExpandingColor(row: IndicatorDataRow, dataName: string): string 
   return flag ? COLORS.GREEN : COLORS.RED;
 }
 
-export function addExtraBars(dataPoints: ScatterDataPoint[], extraBars: number): void {
+/**
+ * Build OHLC data points for a candle-rendered indicator result (lineType
+ * "candle", e.g. Heikin-Ashi). Unlike {@link buildDataPoints}, which extracts a
+ * single `y` value per row by `dataName`, this reads the fixed
+ * `open`/`high`/`low`/`close` fields the API emits for OHLC series. Rows keep
+ * 1:1 index alignment with quotes — non-numeric fields become NaN (drawn as a
+ * gap) rather than being dropped — because window slicing is index-based.
+ */
+export function buildFinancialDataPoints(
+  data: IndicatorDataRow[],
+  result: IndicatorResult
+): FinancialDataPoint[] {
+  return data.map(row => {
+    if (row.timestamp == null) {
+      throw new Error(`Indicator row missing 'timestamp' field for "${result.dataName}"`);
+    }
+    const x = new Date(row.timestamp).valueOf();
+    if (!Number.isFinite(x)) {
+      throw new Error(
+        `Indicator row has invalid timestamp for "${result.dataName}": ${String(row.timestamp)}`
+      );
+    }
+    return {
+      x,
+      o: numberOrNaN(row.open),
+      h: numberOrNaN(row.high),
+      l: numberOrNaN(row.low),
+      c: numberOrNaN(row.close)
+    };
+  });
+}
+
+function numberOrNaN(value: unknown): number {
+  return typeof value === "number" ? value : NaN;
+}
+
+/**
+ * Compute trailing x-axis timestamps continuing past the last data point.
+ * Advances one business day per bar, skipping Saturday (6) and Sunday (0), so
+ * extra bars align with expected trading sessions on daily charts. UTC methods
+ * keep the padded dates deterministic across client timezones — local-time
+ * arithmetic would shift the cadence near midnight UTC and let overlay vs
+ * oscillator x-axes drift apart on browsers in different zones.
+ */
+function extraBarTimestamps(
+  dataPoints: ReadonlyArray<{ x: number | null }>,
+  extraBars: number
+): number[] {
   const maxTime =
     dataPoints.length > 0
       ? Math.max(
@@ -186,17 +233,30 @@ export function addExtraBars(dataPoints: ScatterDataPoint[], extraBars: number):
   // Fall back to today when dataPoints is empty or every timestamp was invalid.
   const baseDate = maxTime > 0 ? new Date(maxTime) : new Date();
 
+  const timestamps: number[] = [];
   for (let i = 0; i < extraBars; i++) {
-    // Advance to the next business day, skipping Saturday (6) and Sunday (0),
-    // so extra bars align with expected trading sessions on daily charts.
-    // UTC methods keep the padded dates deterministic across client timezones —
-    // local-time arithmetic would shift the cadence near midnight UTC and let
-    // overlay vs oscillator x-axes drift apart on browsers in different zones.
     do {
       baseDate.setUTCDate(baseDate.getUTCDate() + 1);
     } while (baseDate.getUTCDay() === 0 || baseDate.getUTCDay() === 6);
-    dataPoints.push({ x: baseDate.valueOf(), y: NaN });
+    timestamps.push(baseDate.valueOf());
   }
+  return timestamps;
+}
+
+export function addExtraBars(dataPoints: ScatterDataPoint[], extraBars: number): void {
+  extraBarTimestamps(dataPoints, extraBars).forEach(x => dataPoints.push({ x, y: NaN }));
+}
+
+/**
+ * Candle-series counterpart of {@link addExtraBars}: pads with all-NaN OHLC
+ * points so candle datasets stay x-axis aligned with line/bar datasets that
+ * carry the same trailing padding. NaN geometry draws nothing and fails
+ * hit-testing, so the padding is invisible and untooltipped.
+ */
+export function addExtraFinancialBars(dataPoints: FinancialDataPoint[], extraBars: number): void {
+  extraBarTimestamps(dataPoints, extraBars).forEach(x =>
+    dataPoints.push({ x, o: NaN, h: NaN, l: NaN, c: NaN })
+  );
 }
 
 export function getCandlePointConfiguration(

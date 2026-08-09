@@ -422,6 +422,62 @@ describe("ChartManager", () => {
       expect(selection.results[0].dataset.data.length).toBeGreaterThan(0);
     });
 
+    it("builds OHLC candle datasets from row open/high/low/close fields", () => {
+      // Heikin-Ashi-style listing: one result rendered as candles. Points must
+      // carry { x, o, h, l, c } read from the row's fixed OHLC fields (not a
+      // single dataName value), stay 1:1 with rows plus trailing padding, and
+      // skip the per-point color arrays used by pattern/histogram series.
+      const listing = makeOscillatorListing({
+        uiid: "HEIKIN-ASHI",
+        category: "price-transform",
+        chartConfig: null,
+        parameters: [],
+        results: [
+          {
+            dataName: "close",
+            displayName: "Heikin-Ashi",
+            tooltipTemplate: "HA",
+            defaultColor: "#4169E1",
+            lineType: "candle",
+            lineWidth: 2,
+            dataType: "number",
+            stack: "",
+            order: 1
+          }
+        ]
+      });
+      const selection = makeSelection(listing, "ha-1");
+      const quotes = makeQuotes(5);
+      const data: IndicatorDataRow[] = quotes.map(q => ({
+        timestamp: new Date(q.timestamp).toISOString(),
+        open: q.open,
+        high: q.high,
+        low: q.low,
+        close: q.close
+      }));
+
+      mgr.processSelectionData(selection, listing, data);
+
+      const dataset = selection.results[0].dataset;
+      expect(dataset.type).toBe("candlestick");
+      // 5 rows + EXTRA_BARS (6) trailing padding
+      expect(dataset.data).toHaveLength(11);
+      expect(dataset.data[0]).toEqual({
+        x: new Date(quotes[0].timestamp).valueOf(),
+        o: quotes[0].open,
+        h: quotes[0].high,
+        l: quotes[0].low,
+        c: quotes[0].close
+      });
+      // trailing padding is invisible all-NaN OHLC
+      const padded = dataset.data[10] as { o: number; c: number };
+      expect(padded.o).toBeNaN();
+      expect(padded.c).toBeNaN();
+      // candle coloring comes from themed element defaults, not point arrays
+      expect(dataset.pointBackgroundColor).toBeUndefined();
+      expect(dataset.backgroundColor).toBeUndefined();
+    });
+
     it("colors histogram bars per the <dataName>IsExpanding flags", () => {
       // Gator-style oscillator: two bar histograms whose color encodes whether
       // each bar is expanding (green) or contracting (red), per the standard
