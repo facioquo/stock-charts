@@ -221,6 +221,10 @@ public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSetti
     public Task<IActionResult> GetGator()
         => Get(quotes => quotes.ToGator());
 
+    [HttpGet("HEIKIN-ASHI")]
+    public Task<IActionResult> GetHeikinAshi()
+        => Get(quotes => quotes.ToHeikinAshi());
+
     [HttpGet("HL2")]
     public Task<IActionResult> GetHl2()
         => Get(quotes => quotes.Use(CandlePart.HL2));
