@@ -50,6 +50,19 @@ describe("baseDataset", () => {
     expect(ds.stack).toBe("macd-hist");
   });
 
+  it("returns a candlestick dataset for lineType=candle without per-result color", () => {
+    const ds = baseDataset(
+      makeResult({ lineType: "candle", dataName: "close" }),
+      makeResultConfig({ lineType: "candle", dataName: "close" })
+    );
+    expect(ds.type).toBe("candlestick");
+    expect(ds.data).toEqual([]);
+    // up/down coloring comes from the themed candlestick element defaults;
+    // a static per-result color would override the up/down split.
+    expect(ds.borderColor).toBeUndefined();
+    expect(ds.backgroundColor).toBeUndefined();
+  });
+
   it("throws on an unsupported lineType", () => {
     expect(() =>
       baseDataset(makeResult({ lineType: "spline" }), makeResultConfig({ lineType: "spline" }))

@@ -13,7 +13,12 @@ import {
 } from "../config/types";
 
 import { baseDataset } from "../config/datasets";
-import { buildDataPoints, addExtraBars } from "../data/transformers";
+import {
+  buildDataPoints,
+  buildFinancialDataPoints,
+  addExtraBars,
+  addExtraFinancialBars
+} from "../data/transformers";
 import { OverlayChart } from "./overlay-chart";
 import { OscillatorChart } from "./oscillator-chart";
 
@@ -140,6 +145,19 @@ export class ChartManager {
       if (!resultConfig) return;
 
       const dataset = baseDataset(result, resultConfig);
+
+      // Candle series carry `{ x, o, h, l, c }` points read from the row's
+      // OHLC fields rather than a single `dataName` value, and take their
+      // up/down coloring from the themed candlestick element defaults — the
+      // per-point color machinery below does not apply.
+      if (result.lineType === "candle") {
+        const candlePoints = buildFinancialDataPoints(data, result);
+        addExtraFinancialBars(candlePoints, this.extraBars);
+        dataset.data = candlePoints;
+        result.dataset = dataset;
+        return;
+      }
+
       const { dataPoints, pointColor, pointRotation, hasConditionalColor } = buildDataPoints(
         data,
         result,
@@ -242,6 +260,23 @@ export class ChartManager {
 
     this._overlayChart.addIndicatorDatasets(selection.results);
     this._overlayChart.updateLegends(this._selections);
+    this.syncPriceCandleVisibility();
+  }
+
+  /**
+   * Hide the raw price candles while any candle-rendered overlay (e.g.
+   * Heikin-Ashi) is displayed, and restore them when the last one is removed.
+   * The transform *replaces* the price bars — both series sit at nearly the
+   * same prices, so drawing them together occludes each other. Volume is
+   * unaffected. Runs after every overlay add/remove, including the re-attach
+   * pass in `initializeOverlay`, so the state survives overlay re-creation.
+   */
+  private syncPriceCandleVisibility(): void {
+    if (!this._overlayChart) return;
+    const hasCandleOverlay = this._selections.some(
+      s => s.chartType === CHART_TYPES.OVERLAY && s.results.some(r => r.lineType === "candle")
+    );
+    this._overlayChart.setPriceVisibility(!hasCandleOverlay);
   }
 
   /**
@@ -327,6 +362,7 @@ export class ChartManager {
       if (this._overlayChart) {
         this._overlayChart.removeIndicatorDatasets(selection.results);
         this._overlayChart.updateLegends(this._selections);
+        this.syncPriceCandleVisibility();
         this._overlayChart.chart?.update();
       }
     } else {

@@ -123,6 +123,22 @@ export class OverlayChart {
     this._chart.update("none");
   }
 
+  /**
+   * Show or hide the main price candlestick dataset (index 0 — the same
+   * invariant `applySlicedData` relies on). Used when a candle-rendered
+   * overlay indicator (e.g. Heikin-Ashi) replaces the raw price candles:
+   * the transform sits at nearly the same prices, so drawing both just
+   * occludes the two series. Hidden datasets are excluded from y-scale
+   * bounds and tooltips, so the replacement series drives both.
+   */
+  setPriceVisibility(visible: boolean): void {
+    if (!this._chart) return;
+    const price = this._chart.data.datasets[0];
+    if (!price || price.type !== "candlestick") return;
+    price.hidden = !visible;
+    this._chart.update("none");
+  }
+
   updateLegends(overlaySelections: IndicatorSelection[]): void {
     if (!this._chart) return;
     if (!this._chart.scales["x"] || !this._chart.scales["y"]) return;

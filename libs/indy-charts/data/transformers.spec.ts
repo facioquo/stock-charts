@@ -3,7 +3,9 @@ import { type ScatterDataPoint } from "chart.js";
 import {
   processQuoteData,
   buildDataPoints,
+  buildFinancialDataPoints,
   addExtraBars,
+  addExtraFinancialBars,
   getCandlePointConfiguration
 } from "./transformers";
 import type { IndicatorDataRow, IndicatorListing, IndicatorResult, Bar } from "../config/types";
@@ -688,5 +690,93 @@ describe("getCandlePointConfiguration", () => {
     const config = getCandlePointConfiguration(100, q);
 
     expect(config.yValue).toBe(0.99 * 197);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildFinancialDataPoints
+// ---------------------------------------------------------------------------
+
+describe("buildFinancialDataPoints", () => {
+  const result = makeResult({ dataName: "close", lineType: "candle" });
+
+  it("maps rows to { x, o, h, l, c } points from fixed OHLC fields", () => {
+    const rows: IndicatorDataRow[] = [
+      { timestamp: "2024-01-02", open: 101, high: 104, low: 99, close: 103 }
+    ];
+
+    const points = buildFinancialDataPoints(rows, result);
+
+    expect(points).toEqual([
+      { x: new Date("2024-01-02").valueOf(), o: 101, h: 104, l: 99, c: 103 }
+    ]);
+  });
+
+  it("keeps 1:1 row alignment, mapping missing OHLC fields to NaN", () => {
+    // Window slicing is index-based, so warmup rows must become NaN
+    // placeholders (drawn as gaps) rather than being dropped.
+    const rows: IndicatorDataRow[] = [
+      { timestamp: "2024-01-02" },
+      { timestamp: "2024-01-03", open: 101, high: 104, low: 99, close: 103 }
+    ];
+
+    const points = buildFinancialDataPoints(rows, result);
+
+    expect(points).toHaveLength(2);
+    expect(points[0].o).toBeNaN();
+    expect(points[0].h).toBeNaN();
+    expect(points[0].l).toBeNaN();
+    expect(points[0].c).toBeNaN();
+    expect(points[1].c).toBe(103);
+  });
+
+  it("throws when a row is missing its timestamp", () => {
+    const rows: IndicatorDataRow[] = [{ open: 101, high: 104, low: 99, close: 103 }];
+
+    expect(() => buildFinancialDataPoints(rows, result)).toThrow(/missing 'timestamp'/);
+  });
+
+  it("throws when a row has an unparseable timestamp", () => {
+    const rows: IndicatorDataRow[] = [
+      { timestamp: "not-a-date", open: 101, high: 104, low: 99, close: 103 }
+    ];
+
+    expect(() => buildFinancialDataPoints(rows, result)).toThrow(/invalid timestamp/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// addExtraFinancialBars
+// ---------------------------------------------------------------------------
+
+describe("addExtraFinancialBars", () => {
+  it("pads with all-NaN OHLC points on future business days", () => {
+    const points = [{ x: new Date("2024-06-14T00:00:00Z").valueOf(), o: 1, h: 2, l: 0, c: 1 }]; // Friday
+
+    addExtraFinancialBars(points, 2);
+
+    expect(points).toHaveLength(3);
+    // Friday → Monday → Tuesday (weekend skipped)
+    expect(points[1].x).toBe(new Date("2024-06-17T00:00:00Z").valueOf());
+    expect(points[2].x).toBe(new Date("2024-06-18T00:00:00Z").valueOf());
+    [points[1], points[2]].forEach(p => {
+      expect(p.o).toBeNaN();
+      expect(p.h).toBeNaN();
+      expect(p.l).toBeNaN();
+      expect(p.c).toBeNaN();
+    });
+  });
+
+  it("produces the same padded x values as addExtraBars for shared axes", () => {
+    // Candle and line datasets on the same chart must stay x-aligned, so the
+    // two padding paths must walk identical business-day cadences.
+    const start = new Date("2024-06-13T00:00:00Z").valueOf();
+    const linePoints: ScatterDataPoint[] = [{ x: start, y: 5 }];
+    const candlePoints = [{ x: start, o: 1, h: 2, l: 0, c: 1 }];
+
+    addExtraBars(linePoints, 4);
+    addExtraFinancialBars(candlePoints, 4);
+
+    expect(candlePoints.map(p => p.x)).toEqual(linePoints.map(p => p.x));
   });
 });
