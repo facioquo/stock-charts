@@ -92,4 +92,15 @@ describe("cache-safe CORS handling", () => {
     );
     expect(first.get("vary")).toBe("Origin");
   });
+
+  it("never advertises credentialed CORS — the API is fully anonymous", () => {
+    // Regression guard: credentialed CORS gains nothing for a cookie-less,
+    // auth-less API and would widen what a compromised allowed origin could
+    // attempt against it.
+    const headers = new Headers();
+    applyCors(headers, "https://charts.stockindicators.dev");
+
+    expect(headers.get("access-control-allow-origin")).toBe("https://charts.stockindicators.dev");
+    expect(headers.get("access-control-allow-credentials")).toBeNull();
+  });
 });

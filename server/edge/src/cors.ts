@@ -105,5 +105,8 @@ export function applyCors(headers: Headers, allowedOrigin: string | null): void 
   }
 
   headers.set("access-control-allow-origin", allowedOrigin);
-  headers.set("access-control-allow-credentials", "true");
+  // Deliberately no access-control-allow-credentials: the API is fully
+  // anonymous, so credentialed CORS would only widen what a compromised
+  // allowed origin could attempt. The header stays in CORS_RESPONSE_HEADERS
+  // so stripCors still clears it from any upstream response.
 }

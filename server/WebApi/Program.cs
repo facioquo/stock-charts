@@ -30,9 +30,11 @@ if (allowedOrigins.Length > 0)
     services.AddCors(options => {
         options.AddPolicy("CorsPolicy",
         cors => {
+            // No AllowCredentials: the API is fully anonymous (no cookies or
+            // auth), so advertising credentialed CORS would only widen what a
+            // compromised allowed origin could attempt.
             cors.AllowAnyHeader();
             cors.AllowAnyMethod();
-            cors.AllowCredentials();
             cors.WithOrigins(allowedOrigins)
                 .SetIsOriginAllowedToAllowWildcardSubdomains();
         });
