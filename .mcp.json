@@ -1,10 +1,5 @@
 {
-  "servers": {
-    "angular-cli": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@angular/cli@latest", "mcp"]
-    },
+  "mcpServers": {
     "cloudflare": {
       "type": "stdio",
       "command": "npx",
@@ -32,13 +27,5 @@
       "command": "npx",
       "args": ["-y", "playwright", "run-test-mcp-server"]
     }
-  },
-  "inputs": [
-    {
-      "id": "codacy_account_token",
-      "type": "promptString",
-      "description": "Your personal Codacy Account API token (from app.codacy.com → Account). Required.",
-      "password": true
-    }
-  ]
+  }
 }
