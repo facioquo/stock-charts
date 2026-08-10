@@ -15,9 +15,13 @@ const { ApiContainer, QUOTES_HOST } = await import("./container");
 const outboundContext = { containerId: "test-container", className: "ApiContainer" };
 
 describe("ApiContainer.outboundByHost", () => {
-  const handler = ApiContainer.outboundByHost?.[QUOTES_HOST];
+  const handlers = ApiContainer.outboundByHost ?? {};
 
-  if (handler === undefined) {
+  // Read via Object.entries (rather than a computed `handlers[QUOTES_HOST]`
+  // lookup) and confirm the single registered host is the expected one.
+  const [registeredHost, handler] = Object.entries(handlers)[0] ?? [];
+
+  if (registeredHost !== QUOTES_HOST || handler === undefined) {
     throw new Error(`No outbound handler registered for ${QUOTES_HOST}`);
   }
 
