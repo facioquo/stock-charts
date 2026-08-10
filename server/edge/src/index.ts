@@ -6,6 +6,10 @@ import type { Env } from "./env";
 import { refreshQuotes } from "./quotes";
 
 export { ApiContainer };
+// wrangler ≥4.120 wires the container's proxy image through
+// `ctx.exports.ContainerProxy`; without this re-export the container fails to
+// start with "ctx.exports.ContainerProxy is undefined".
+export { ContainerProxy } from "@cloudflare/containers";
 
 /**
  * Every request routes to the same container instance. Indicator computation is
