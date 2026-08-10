@@ -47,7 +47,7 @@ direct dependencies of `@facioquo/indy-charts` and install automatically.
 
 Integrate `@facioquo/indy-charts` into the external VitePress documentation
 site, consuming **published** packages from GitHub Packages and calling the
-**deployed** API endpoint `https://stock-charts-api.stockindicators.workers.dev`.
+**deployed** API endpoint `https://charts-api.stockindicators.dev`.
 
 Task 5.1 is the gate for all others — packages must be published before the
 external repo can install them.
@@ -106,7 +106,7 @@ external repo can install them.
   - Call `setupIndyChartsForVue` from `@facioquo/indy-charts/vue` in the
     external VitePress theme.
   - Configure the site-level `api.baseUrl` default as
-    `https://stock-charts-api.stockindicators.workers.dev`.
+    `https://charts-api.stockindicators.dev`.
   - Use `<StockIndicatorChart indicator="..." />` from Markdown pages. Pass
     explicit `:config` overrides per-page if needed.
 
@@ -147,7 +147,7 @@ external repo can install them.
 - [ ] Task 5.8: End-to-end validation against the deployed API
   - Deploy the external site and open it in a browser.
   - Verify `StockIndicatorChart` fetches quotes from
-    `https://stock-charts-api.stockindicators.workers.dev/quotes` and renders an
+    `https://charts-api.stockindicators.dev/quotes` and renders an
     OHLC candlestick chart.
   - Verify `StockIndicatorChart` requests selection data and draws both overlay
     and oscillator examples.
@@ -186,7 +186,7 @@ import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 export default {
   enhanceApp({ app }) {
     setupIndyChartsForVue(app, {
-      api: { baseUrl: "https://stock-charts-api.stockindicators.workers.dev" },
+      api: { baseUrl: "https://charts-api.stockindicators.dev" },
       defaults: { barCount: 250, quoteCount: 250, showTooltips: true },
       indicators: {
         rsi: { uiid: "RSI", params: { lookbackPeriods: 14 }, results: ["rsi"] }
@@ -210,7 +210,7 @@ Then use the global component from Markdown:
 import { createApiClient } from "@facioquo/indy-charts";
 
 const client = createApiClient({
-  baseUrl: "https://stock-charts-api.stockindicators.workers.dev",
+  baseUrl: "https://charts-api.stockindicators.dev",
   onError: (context, error) => console.error(context, error)
 });
 

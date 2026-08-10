@@ -4,7 +4,13 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-08-01",
   "compatibility_flags": ["nodejs_compat"],
-  "workers_dev": true,
+  // Single canonical host: the custom domain below is the only public entry.
+  // The workers.dev alias stays off so the response cache (keyed by URL) and
+  // consumer configs never split across two hostnames.
+  "workers_dev": false,
+  // Custom domain on the stockindicators.dev zone (same account): deploy
+  // auto-creates the DNS record and certificate — no manual DNS step.
+  "routes": [{ "pattern": "charts-api.stockindicators.dev", "custom_domain": true }],
 
   "observability": {
     "enabled": true
@@ -64,7 +70,7 @@
     // Api__PublicBaseUrl (see src/container.ts) so the /indicators catalog
     // embeds externally-reachable URLs instead of the container's internal
     // http://localhost:8080 address.
-    "PUBLIC_BASE_URL": "https://stock-charts-api.stockindicators.workers.dev",
+    "PUBLIC_BASE_URL": "https://charts-api.stockindicators.dev",
     "QUOTE_SYMBOLS": "SPY,QQQ",
     "QUOTE_HISTORY_DAYS": "800"
   }
