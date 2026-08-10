@@ -93,7 +93,7 @@ curl -si localhost:8080/quotes | head -12       # 200, Cache-Control: public, ma
 # Live-data mode: point at any host serving {SYMBOL}-DAILY.json
 docker run --rm -p 127.0.0.1:8080:8080 \
   -e "Quotes__BaseUrl=http://your-quote-host/" \
-  -e "Api__PublicBaseUrl=https://stock-charts-api.example.workers.dev" \
+  -e "Api__PublicBaseUrl=https://charts-api.stockindicators.dev" \
   stock-charts-api
 ```
 
@@ -127,7 +127,7 @@ Containers require the **Workers Paid** plan ($5/month minimum).
 
 | Setting | Where | Notes |
 | :--- | :--- | :--- |
-| `PUBLIC_BASE_URL` | [wrangler.jsonc](wrangler.jsonc) | Set after the first deploy to the assigned `workers.dev` URL, so `/indicators` emits reachable absolute endpoint URLs |
+| `PUBLIC_BASE_URL` | [wrangler.jsonc](wrangler.jsonc) | The Worker's custom domain (`charts-api.stockindicators.dev`), so `/indicators` emits reachable absolute endpoint URLs. Must match the `routes` entry |
 | `ALLOWED_ORIGINS` | [wrangler.jsonc](wrangler.jsonc) | Production CORS allow list. Supports `*.` subdomain wildcards for preview deployments |
 | Production API URL | `web/src/config/env.ts`, `tests/vitepress/.vitepress/theme/index.ts`, `tests/playwright/vitepress.spec.ts` | Must match the deployed Worker hostname. CI's backup-indicator snapshot reads the `INDICATORS_API_BASE` repository variable, which overrides the workflow default |
 | `Caching:DurationMinutes` | `../WebApi/appsettings.json` | Drives the API's `max-age`, which is what the Worker cache honours |
@@ -135,15 +135,17 @@ Containers require the **Workers Paid** plan ($5/month minimum).
 ### First cutover
 
 1. Create the R2 bucket and set the Alpaca secrets (above).
-2. Deploy the Worker and container; note the assigned `workers.dev` hostname.
-3. Set `PUBLIC_BASE_URL` and the production API URL in the files listed above, then redeploy.
-4. Seed R2 by triggering the cron once (`wrangler dev --test-scheduled`, or wait for the schedule).
+2. Deploy the Worker and container. The `charts-api.stockindicators.dev` custom domain in
+   `routes` is provisioned automatically — the zone lives in the same account, so the DNS
+   record and certificate are created by the deploy (`workers_dev` is off; the custom domain
+   is the only public host).
+3. Seed R2 by triggering the cron once (`wrangler dev --test-scheduled`, or wait for the schedule).
    Until it runs, `/quotes` correctly serves the bundled 2018 backup dataset.
-5. Verify against the `workers.dev` URL before pointing the site at it:
+4. Verify against `https://charts-api.stockindicators.dev` before pointing the site at it:
    - a repeat request returns `x-edge-cache: HIT` and does not restart the container;
    - load the Pages site and the VitePress demo back to back in one browser and confirm neither
      poisons the other's cached `/quotes` (the failure mode in facioquo/stock-charts#517);
    - `wrangler tail` shows the cron firing and `SPY-DAILY.json` / `QQQ-DAILY.json` landing in R2;
    - the Containers dashboard shows the instance sleeping after ~10 minutes idle.
-6. Deploy the site, then leave the old origin running for about a week — already-loaded browser
+5. Deploy the site, then leave the old origin running for about a week — already-loaded browser
    bundles still point at it — before decommissioning.

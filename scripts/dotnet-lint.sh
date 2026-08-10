@@ -52,9 +52,13 @@ lint_check() {
   dotnet format --verify-no-changes --verbosity quiet || dotnet_exit_code=$?
 
   # Try roslynator if available, but don't fail the script if it's not
+  # CS8795 is excluded: Roslynator's analysis workspace does not execute
+  # source generators, so [LoggerMessage] partial methods look unimplemented
+  # to it. The real compile (dotnet build, CI) runs the generators and would
+  # catch a genuinely missing implementation.
   if roslynator_available; then
     log "Running Roslynator analysis..."
-    if dotnet tool run roslynator analyze; then
+    if dotnet tool run roslynator analyze --ignored-diagnostics CS8795; then
       log "Roslynator analysis completed"
     else
       roslynator_exit_code=$?
