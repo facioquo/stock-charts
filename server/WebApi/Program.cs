@@ -79,18 +79,21 @@ services.AddOutputCache(options =>
 // Public origin used to build absolute URLs in the indicator catalog
 services.Configure<ApiSettings>(configuration.GetSection(ApiSettings.SectionName));
 
-// Quote datasets are fetched over HTTP. In production the base address resolves
-// to an R2 bucket that the edge Worker exposes to this container through its
-// outbound handler, so no storage credentials are needed here. When the address
-// is unreachable (typical for local development), QuoteService falls back to its
-// bundled backup dataset.
-string quotesBaseUrl = configuration.GetValue<string>("Quotes:BaseUrl") is { Length: > 0 } configured
-    ? configured
-    : "http://quotes.r2/";
+// Quote datasets are fetched over HTTP from whatever host supplies them. In
+// production that is the edge Worker, which sets Quotes:BaseUrl to an internal
+// hostname it resolves through its R2 binding — see the envVars block in
+// server/edge/src/container.ts, the single source of truth for that address, so
+// no storage credentials are needed here. Leaving it unset (the norm for local
+// development) makes QuoteService serve its bundled backup dataset.
+string? quotesBaseUrl = configuration.GetValue<string>("Quotes:BaseUrl");
 
 services.AddHttpClient(HttpQuoteStore.HttpClientName, client => {
-    // Trailing slash is required: relative object names resolve against it.
-    client.BaseAddress = new Uri(quotesBaseUrl.TrimEnd('/') + '/');
+    if (!string.IsNullOrWhiteSpace(quotesBaseUrl))
+    {
+        // Trailing slash is required: relative object names resolve against it.
+        client.BaseAddress = new Uri(quotesBaseUrl.TrimEnd('/') + '/');
+    }
+
     client.Timeout = TimeSpan.FromSeconds(10);
 });
 

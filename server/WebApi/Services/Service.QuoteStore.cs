@@ -30,7 +30,11 @@ public sealed partial class HttpQuoteStore(
     ILogger<HttpQuoteStore> logger) : IQuoteStore
 {
     /// <summary>Named <see cref="HttpClient"/> registered in startup configuration.</summary>
-    public const string HttpClientName = "quotes";
+    /// <remarks>
+    /// <c>static readonly</c> rather than <c>const</c> so the value is resolved
+    /// at runtime instead of being inlined into consuming assemblies.
+    /// </remarks>
+    public static readonly string HttpClientName = "quotes";
 
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
     private readonly ILogger<HttpQuoteStore> _logger = logger;
@@ -41,6 +45,15 @@ public sealed partial class HttpQuoteStore(
 
         string objectName = $"{symbol}-DAILY.json";
         HttpClient client = _httpClientFactory.CreateClient(HttpClientName);
+
+        // No quote host configured — the norm for local development. Reported as
+        // "nothing published" so the caller serves its backup dataset, rather
+        // than throwing once per request.
+        if (client.BaseAddress is null)
+        {
+            LogNoQuoteHostConfigured();
+            return null;
+        }
 
         using HttpResponseMessage response
             = await client.GetAsync(objectName, HttpCompletionOption.ResponseHeadersRead, ct);
@@ -64,4 +77,7 @@ public sealed partial class HttpQuoteStore(
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Quote dataset {ObjectName} not found, using backup data")]
     private partial void LogQuotesNotFound(string objectName);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "No Quotes:BaseUrl configured, using backup data")]
+    private partial void LogNoQuoteHostConfigured();
 }

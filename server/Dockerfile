@@ -30,5 +30,9 @@ COPY --from=build /app ./
 # TLS terminates at the edge; the Worker reaches this container over plain HTTP.
 ENV ASPNETCORE_URLS=http://+:8080
 
+# Drop root. The .NET base images ship a non-root `app` user (UID 1654) for
+# exactly this; the API only ever reads from its own image.
+USER $APP_UID
+
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "WebApi.dll"]

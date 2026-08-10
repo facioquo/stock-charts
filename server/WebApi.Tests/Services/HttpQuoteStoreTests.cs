@@ -13,7 +13,9 @@ namespace WebApi.Tests.Services;
 /// </summary>
 public class HttpQuoteStoreTests
 {
-    private const string BaseAddress = "http://quotes.r2/";
+    // Stand-in host. The store's behaviour is scheme- and host-independent; the
+    // real address is supplied by the edge Worker at runtime.
+    private const string BaseAddress = "https://quotes.example/";
 
     /// <summary>Records the request it received and replays a canned response.</summary>
     private sealed class StubHandler(HttpStatusCode status, string? body = null) : HttpMessageHandler
@@ -24,6 +26,7 @@ public class HttpQuoteStoreTests
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             RequestedUri = request.RequestUri;
 
             HttpResponseMessage response = new(status);
@@ -60,7 +63,7 @@ public class HttpQuoteStoreTests
         await using Stream? stream = await store.OpenQuotesAsync("QQQ", CancellationToken.None);
 
         // Assert — the object name must match what the edge Worker writes to R2.
-        Assert.Equal(new Uri("http://quotes.r2/QQQ-DAILY.json"), handler.RequestedUri);
+        Assert.Equal(new Uri($"{BaseAddress}QQQ-DAILY.json"), handler.RequestedUri);
     }
 
     [Fact]
@@ -94,6 +97,30 @@ public class HttpQuoteStoreTests
 
         // Assert
         Assert.Null(stream);
+    }
+
+    [Fact]
+    public async Task OpenQuotesAsync_WithNoQuoteHostConfigured_ReturnsNull()
+    {
+        // Arrange — Quotes:BaseUrl unset leaves BaseAddress null, which is the
+        // normal local-development state. It must read as "nothing published"
+        // rather than throwing once per request.
+        using StubHandler handler = new(HttpStatusCode.OK, "[]");
+        HttpClient client = new(handler);
+
+        Mock<IHttpClientFactory> factoryMock = new();
+        factoryMock
+            .Setup(f => f.CreateClient(HttpQuoteStore.HttpClientName))
+            .Returns(client);
+
+        HttpQuoteStore store = new(factoryMock.Object, Mock.Of<ILogger<HttpQuoteStore>>());
+
+        // Act
+        await using Stream? stream = await store.OpenQuotesAsync("QQQ", CancellationToken.None);
+
+        // Assert — no request was attempted.
+        Assert.Null(stream);
+        Assert.Null(handler.RequestedUri);
     }
 
     [Fact]
