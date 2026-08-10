@@ -227,6 +227,7 @@ jobs:
     # be masked by a green Pages deployment.
     if: |
       always() &&
+      needs.versioning.result == 'success' &&
       needs.build-backend.result == 'success' &&
       needs.build-website.result == 'success' &&
       (needs.deploy-api.result == 'success' || needs.deploy-api.result == 'skipped')

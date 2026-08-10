@@ -87,16 +87,20 @@ services.Configure<ApiSettings>(configuration.GetSection(ApiSettings.SectionName
 // development) makes QuoteService serve its bundled backup dataset.
 string? quotesBaseUrl = configuration.GetValue<string>("Quotes:BaseUrl");
 
+// Validated eagerly at startup rather than inside the AddHttpClient configure
+// callback (which only runs lazily, on the first CreateClient call), so a
+// misconfigured value fails fast instead of surfacing on the first request.
+if (!string.IsNullOrWhiteSpace(quotesBaseUrl)
+    && (!Uri.TryCreate(quotesBaseUrl, UriKind.Absolute, out Uri? parsedQuotesBaseUrl)
+        || (parsedQuotesBaseUrl.Scheme != Uri.UriSchemeHttp && parsedQuotesBaseUrl.Scheme != Uri.UriSchemeHttps)))
+{
+    throw new InvalidOperationException(
+        $"Quotes:BaseUrl must be an absolute http or https URL. Got: '{quotesBaseUrl}'.");
+}
+
 services.AddHttpClient(HttpQuoteStore.HttpClientName, client => {
     if (!string.IsNullOrWhiteSpace(quotesBaseUrl))
     {
-        if (!Uri.TryCreate(quotesBaseUrl, UriKind.Absolute, out Uri? parsed)
-            || (parsed.Scheme != Uri.UriSchemeHttp && parsed.Scheme != Uri.UriSchemeHttps))
-        {
-            throw new InvalidOperationException(
-                $"Quotes:BaseUrl must be an absolute http or https URL. Got: '{quotesBaseUrl}'.");
-        }
-
         // Trailing slash is required: relative object names resolve against it.
         client.BaseAddress = new Uri(quotesBaseUrl.TrimEnd('/') + '/');
     }
