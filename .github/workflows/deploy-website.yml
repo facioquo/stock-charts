@@ -243,9 +243,26 @@ jobs:
           name: web
           path: artifacts/web
 
+      # This job has no `actions/checkout` step — it only downloads the built
+      # `web` artifact — so there is no .git directory for wrangler's branch
+      # auto-detection to read. Per Cloudflare's own fallback, a deploy that
+      # cannot resolve a branch is uploaded as a PRODUCTION deployment. Without
+      # an explicit --branch, every PR preview build was silently overwriting
+      # charts.stockindicators.dev instead of publishing a preview alias.
+      # DEPLOY_BRANCH is github.head_ref (the PR's source branch) for
+      # pull_request events, falling back to github.ref_name for
+      # workflow_dispatch. Only a branch matching the Pages project's
+      # configured production branch (main) is ever promoted to production.
+      #
+      # Set via env: (not interpolated straight into `command:`) because
+      # wrangler-action runs `command` through a shell — splicing a
+      # ${{ }} expression directly into it would let a crafted branch name
+      # inject shell commands with access to the secrets below.
       - name: Publish to Cloudflare Pages
         id: deploy
         uses: cloudflare/wrangler-action@v4
+        env:
+          DEPLOY_BRANCH: ${{ github.head_ref || github.ref_name }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -254,6 +271,7 @@ jobs:
           command: >
             pages deploy artifacts/web
             --project-name=stock-charts
+            --branch="$DEPLOY_BRANCH"
 
       - name: Tag and draft release note
         uses: ncipollo/release-action@v1
