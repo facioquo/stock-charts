@@ -8,6 +8,9 @@ export interface Env {
   /** Quote datasets written by the scheduled refresh. */
   QUOTES: R2Bucket;
 
+  /** Per-IP rate limiter guarding the cache-miss (container-waking) path. */
+  RATE_LIMITER: RateLimit;
+
   /** Comma-separated CORS allow list. Entries may use a `*.` subdomain wildcard. */
   ALLOWED_ORIGINS: string;
 

@@ -79,6 +79,23 @@ export default {
       return response;
     }
 
+    // Rate-limit only the cache-miss path: cached serves are effectively free,
+    // but every miss below wakes the billable container, and unique query
+    // strings can bypass the cache at will. Legitimate chart loads make ~10
+    // uncached requests; sustained cache-busting gets a 429 instead of
+    // compute time.
+    const clientIp = request.headers.get("cf-connecting-ip") ?? "unknown";
+    const { success: withinLimit } = await env.RATE_LIMITER.limit({ key: clientIp });
+
+    if (!withinLimit) {
+      const limited = new Response("Rate limit exceeded", {
+        status: 429,
+        headers: { "retry-after": "60" }
+      });
+      applyCors(limited.headers, allowedOrigin);
+      return limited;
+    }
+
     let upstream: Response;
 
     try {

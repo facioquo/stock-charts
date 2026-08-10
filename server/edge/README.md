@@ -29,6 +29,15 @@ another's cached copy (facioquo/stock-charts#517).
 
 Responses carry `x-edge-cache: HIT|MISS` so the behaviour is visible in browser devtools.
 
+## Rate limiting
+
+Cache **misses** are rate limited per client IP (120/minute via the Workers `ratelimits`
+binding); over-limit requests get a `429` with `Retry-After` instead of waking the container.
+Cache hits are never throttled — they cost nothing, while unique query strings could otherwise
+bypass the cache at will and keep the billable container awake. Counting is per-Cloudflare-location
+and eventually consistent: an abuse damper, not an accounting system. The Workers binding is used
+instead of a zone WAF rule because the zone's Free plan cannot scope rules to this hostname.
+
 ## Storage access
 
 The container holds no storage credentials. It fetches `http://quotes.r2/QQQ-DAILY.json`, and the

@@ -22,10 +22,13 @@ const worker = (await import("./index")).default;
 
 const ALLOWED_ORIGIN = "https://charts.stockindicators.dev";
 
-function makeEnv(): Env {
+function makeEnv(overrides?: { limitSuccess?: boolean }): Env {
   return {
     API: {},
     QUOTES: {},
+    RATE_LIMITER: {
+      limit: vi.fn().mockResolvedValue({ success: overrides?.limitSuccess ?? true })
+    },
     ALLOWED_ORIGINS: ALLOWED_ORIGIN,
     QUOTE_SYMBOLS: "SPY,QQQ",
     QUOTE_HISTORY_DAYS: "800"
@@ -73,6 +76,46 @@ describe("worker.fetch", () => {
 
     expect(response.status).toBe(405);
     expect(getContainerMock).not.toHaveBeenCalled();
+  });
+
+  it("returns 429 with CORS on a rate-limited cache miss, without waking the container", async () => {
+    const request = new Request("https://api.example/EMA?lookbackPeriods=99", {
+      headers: { Origin: ALLOWED_ORIGIN, "cf-connecting-ip": "203.0.113.7" }
+    });
+
+    const env = makeEnv({ limitSuccess: false });
+    const response = await worker.fetch(request, env, makeCtx());
+
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("60");
+    // CORS must still be applied so browsers surface the 429 rather than an
+    // opaque CORS failure.
+    expect(response.headers.get("access-control-allow-origin")).toBe(ALLOWED_ORIGIN);
+    expect(getContainerMock).not.toHaveBeenCalled();
+    expect((env.RATE_LIMITER.limit as ReturnType<typeof vi.fn>).mock.calls[0][0]).toEqual({
+      key: "203.0.113.7"
+    });
+  });
+
+  it("does not consult the rate limiter on a cache hit", async () => {
+    // Cached serves are effectively free — only the container-waking miss path
+    // is limited, so bursts of legitimate cached traffic are never throttled.
+    cacheMatch.mockResolvedValue(
+      new Response("cached body", {
+        status: 200,
+        headers: { "cache-control": "public, max-age=60" }
+      })
+    );
+
+    const env = makeEnv({ limitSuccess: false });
+    const response = await worker.fetch(
+      new Request("https://api.example/quotes", { headers: { Origin: ALLOWED_ORIGIN } }),
+      env,
+      makeCtx()
+    );
+
+    expect(response.status).toBe(200);
+    expect(env.RATE_LIMITER.limit).not.toHaveBeenCalled();
   });
 
   it("serves a cache hit with CORS re-applied and the HIT status", async () => {

@@ -46,6 +46,22 @@
     }
   ],
 
+  // Per-IP abuse damper for the cache-miss path only: cached serves cost
+  // nothing, but every miss wakes the billable container, and unique query
+  // strings bypass the cache at will. 120 misses/min is far above any real
+  // chart page (~10 on first load) and starves cache-busting scrapers.
+  // Counting is per-Cloudflare-location and eventually consistent — this is
+  // an abuse damper, not an accounting system. The Workers binding is used
+  // instead of a zone WAF rule because the zone's Free plan cannot scope
+  // rules to this hostname.
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 120, "period": 60 }
+    }
+  ],
+
   // Quote datasets written by the scheduled refresh and read back by the
   // container through the outbound handler in src/container.ts.
   "r2_buckets": [
