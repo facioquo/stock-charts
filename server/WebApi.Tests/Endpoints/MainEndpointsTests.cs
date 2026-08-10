@@ -582,16 +582,17 @@ public class MainEndpointsTests
     }
 
     [Fact]
-    public void HeikinAshiListing_RendersAsCandlePane()
+    public void HeikinAshiListing_RendersAsCandleOverlay()
     {
-        // The candle line type reads open/high/low/close from each row; the
-        // oscillator chart type gives the transform its own pane instead of
-        // occluding the raw price candles (#498).
+        // The candle line type reads open/high/low/close from each row. The
+        // overlay chart type puts the transform on the price chart, where the
+        // client hides the raw price candles while it is displayed — the
+        // transform replaces them rather than coexisting (#498).
         Models.IndicatorListing listing = Metadata
             .IndicatorListing("https://localhost")
             .Single(l => l.Uiid == "HEIKIN-ASHI");
 
-        Assert.Equal("oscillator", listing.ChartType);
+        Assert.Equal("overlay", listing.ChartType);
         Models.IndicatorResultConfig result = Assert.Single(listing.Results);
         Assert.Equal("candle", result.LineType);
         Assert.Equal("close", result.DataName);

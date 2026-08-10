@@ -1565,12 +1565,12 @@ public static class Metadata
                 LegendTemplate = "HEIKIN-ASHI",
                 Endpoint = $"{baseUrl}/HEIKIN-ASHI/",
                 Category = "price-transform",
-                // Rendered in its own pane rather than as a price overlay:
-                // Heikin-Ashi candles sit at nearly the same prices as the raw
-                // candles, so overlaying the two just occludes both. The
-                // side-by-side pane matches how charting platforms present the
-                // transform for comparison.
-                ChartType = "oscillator",
+                // Overlay that REPLACES the raw price candles: the client
+                // hides the main price dataset while a candle-rendered overlay
+                // is displayed (both series sit at nearly the same prices, so
+                // drawing them together occludes each other) and restores it
+                // when the selection is removed.
+                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "Heikin-Ashi",
