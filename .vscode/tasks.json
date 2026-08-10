@@ -179,6 +179,13 @@
       "group": "build",
       "problemMatcher": "$msCompile"
     },
+    {
+      "label": "Build: Validate container image (Docker)",
+      "detail": "Build the API container image from server/Dockerfile without pushing (requires Docker; mirrors the CI validation gate)",
+      "type": "shell",
+      "command": "docker build --platform linux/amd64 -f server/Dockerfile server/",
+      "group": "build"
+    },
     // ===================================
     // GENERATE
     // ===================================
@@ -198,6 +205,7 @@
       "dependsOn": [
         "Lint: Website (check)",
         "Lint: Indy-Charts (check)",
+        "Lint: Edge worker (check)",
         "Lint: Backend .NET (check)",
         "Lint: Markdown (check)",
         "Lint: Stylelint (check)"
@@ -220,6 +228,7 @@
       "dependsOn": [
         "Lint: Website (fix)",
         "Lint: Indy-Charts (fix)",
+        "Lint: Edge worker (fix)",
         "Lint: Backend .NET (fix)",
         "Lint: Stylelint (fix)"
       ],
@@ -258,6 +267,22 @@
       "command": "pnpm --filter @facioquo/indy-charts run lint:fix",
       "group": "none",
       "problemMatcher": "$eslint-stylish"
+    },
+    {
+      "label": "Lint: Edge worker (check)",
+      "detail": "Check edge worker formatting (Prettier) and types (tsc)",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/edge run format:check && pnpm --filter @stock-charts/edge run typecheck",
+      "group": "test",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Lint: Edge worker (fix)",
+      "detail": "Auto-format edge worker code with Prettier",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/edge run format",
+      "group": "none",
+      "problemMatcher": "$tsc"
     },
     {
       "label": "Lint: Backend .NET (check)",
@@ -309,10 +334,11 @@
     },
     {
       "label": "Test: All tests",
-      "detail": "Run all unit tests: Website, Libs, E2E, and Backend .NET",
+      "detail": "Run all unit tests: Website, Libs, Edge worker, E2E, and Backend .NET",
       "dependsOn": [
         "Test: Website",
         "Test: Libs",
+        "Test: Edge worker",
         "Test: Backend .NET",
         "Test: E2E (Playwright)"
       ],
@@ -325,6 +351,13 @@
       "detail": "Run Vitest unit tests for chartjs-financial and indy-charts libraries",
       "type": "shell",
       "command": "pnpm run test:libs",
+      "group": "test"
+    },
+    {
+      "label": "Test: Edge worker",
+      "detail": "Run Vitest unit tests for the Cloudflare Worker (server/edge)",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/edge run test",
       "group": "test"
     },
     {
