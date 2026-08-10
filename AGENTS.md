@@ -210,19 +210,23 @@ Client-side project dependencies are strictly in this direction only: web → in
 - **ASP.NET Core Web API**: REST endpoints for chart data, running as a Cloudflare Container built from `server/Dockerfile`
 - **FacioQuo.Stock.Indicators**: NuGet library used in `server/WebApi/Services/` to compute every indicator the API serves
 - **Cloudflare Worker** (`server/edge/`): the API's front door. Answers CORS preflight, serves cached responses, and forwards misses to the container. Also owns the `scheduled` cron that refreshes quote datasets from Alpaca into R2
-- **R2**: stores one daily-bar quote dataset per symbol, named `{SYMBOL}-DAILY.json`. The container holds no storage credentials. It fetches the dataset over plain HTTP from an internal hostname, and the Worker's `outboundByHost` handler resolves that through its R2 binding
+- **R2**: stores one quote dataset per symbol, keyed by symbol and bar interval. The container holds no storage credentials. It fetches datasets over plain HTTP from an internal hostname. The Worker's `outboundByHost` handler resolves that through its R2 binding
 - **Directory.Packages.props**: Centralized NuGet version management
 
 #### Caching
 
 Layered and built-in (no extra packages), so doc-site traffic doesn't redundantly recompute indicators:
 
-1. **Worker response cache** (`server/edge/src/index.ts`) — the outermost tier. It keeps the container asleep, and therefore unbilled. Entries are keyed by URL alone, with all CORS headers stripped before storage. The correct `Access-Control-Allow-Origin` is written per request on the way out. One entry therefore serves every allowed origin safely.
+1. **Worker response cache** (`server/edge/src/index.ts`) — the outermost tier. It keeps the container asleep, and therefore unbilled.
 2. **Server-side output cache** (`AddOutputCache`/`UseOutputCache`) — caches each computed indicator response keyed by path + query string, varied by `Origin`.
 3. **In-memory quote cache** (`IMemoryCache` in `QuoteService`) — fetches the shared quote dataset at most once per symbol per window.
 4. **`Cache-Control: public, max-age=...`** — lets browsers and the CDN serve repeats.
 
 Lifetime for tiers 2-4 is one knob, `Caching:DurationMinutes`, in `CacheSettings`.
+
+Worker cache entries are keyed by URL alone. All CORS headers are stripped before
+storage. The correct `Access-Control-Allow-Origin` is written per request on the
+way out. One entry therefore serves every allowed origin safely.
 
 #### Quote dataset contract
 
