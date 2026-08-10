@@ -41,7 +41,7 @@
   ],
   "scripts": {
     "prebuild": "pnpm --filter @facioquo/chartjs-chart-financial run build",
-    "build": "tsup",
+    "build": "tsdown",
     "prelint": "pnpm --filter @facioquo/chartjs-chart-financial run build",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -65,15 +65,15 @@
     }
   },
   "devDependencies": {
-    "@facioquo/chartjs-chart-financial": "workspace:*",
     "@eslint/js": "^10.0.1",
-    "@vitest/eslint-plugin": "1.6.23",
-    "eslint": "^10.7.0",
+    "@facioquo/chartjs-chart-financial": "workspace:*",
+    "@vitest/eslint-plugin": "1.6.26",
+    "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
     "jiti": "^2.7.0",
-    "typescript-eslint": "^8.64.0",
-    "tsup": "^8.5.1",
+    "tsdown": "^0.22.14",
+    "typescript-eslint": "^8.66.0",
     "vitest": "^4.1.10",
-    "vue": "3.5.39"
+    "vue": "3.5.41"
   }
 }
