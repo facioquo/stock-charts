@@ -243,7 +243,13 @@ function usePickConfig(
   const [closeLabel, setCloseLabel] = useState("ADD");
 
   const hasParams = selection.params.length > 0;
-  const showStyles = listing.category !== "candlestick-pattern";
+  // Style controls are hidden where they'd be no-ops: candlestick-pattern
+  // markers and candle-rendered results (e.g. Heikin-Ashi) both take their
+  // colors from fixed pattern/theme rules, not per-result settings. The
+  // length guard keeps listings with no results (vacuous `every`) styleable.
+  const candleOnly =
+    listing.results.length > 0 && listing.results.every(r => r.lineType === "candle");
+  const showStyles = listing.category !== "candlestick-pattern" && !candleOnly;
   const [tab, setTab] = useState<TabId>(hasParams ? "params" : "styles");
 
   const formValid = useMemo(() => isFormValid(selection, showStyles), [selection, showStyles]);

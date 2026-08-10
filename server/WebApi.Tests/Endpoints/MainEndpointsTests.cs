@@ -552,6 +552,53 @@ public class MainEndpointsTests
     }
 
     [Fact]
+    public async Task GetHeikinAshi_WithValidQuotes_ReturnsOkResult()
+    {
+        // Arrange
+        List<Bar> sampleQuotes = GenerateSampleQuotes(150);
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(sampleQuotes);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+
+        // Act
+        IActionResult result = await _controller.GetHeikinAshi();
+
+        // Assert — rows stay 1:1 with the visible quote window (the client's
+        // index-based window slicing depends on it), and every row carries the
+        // full OHLC set the candle renderer reads.
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<HeikinAshiResult> ha = Assert.IsType<IEnumerable<HeikinAshiResult>>(okResult.Value, exactMatch: false).ToList();
+        Assert.Equal(120, ha.Count);
+        Assert.All(ha, r => {
+            Assert.NotEqual(default, r.Open);
+            Assert.NotEqual(default, r.High);
+            Assert.NotEqual(default, r.Low);
+            Assert.NotEqual(default, r.Close);
+        });
+    }
+
+    [Fact]
+    public void HeikinAshiListing_RendersAsCandleOverlay()
+    {
+        // The candle line type reads open/high/low/close from each row. The
+        // overlay chart type puts the transform on the price chart, where the
+        // client hides the raw price candles while it is displayed — the
+        // transform replaces them rather than coexisting (#498).
+        Models.IndicatorListing listing = Metadata
+            .IndicatorListing("https://localhost")
+            .Single(l => l.Uiid == "HEIKIN-ASHI");
+
+        Assert.Equal("overlay", listing.ChartType);
+        Models.IndicatorResultConfig result = Assert.Single(listing.Results);
+        Assert.Equal("candle", result.LineType);
+        Assert.Equal("close", result.DataName);
+    }
+
+    [Fact]
     public async Task GetSmaAnalysis_WithValidParameters_ReturnsOkResult()
     {
         // Arrange

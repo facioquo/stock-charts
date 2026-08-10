@@ -128,4 +128,38 @@ describe("PickConfigDialog", () => {
     expect(screen.getByLabelText("Line type")).toBeInTheDocument();
     expect(screen.getByLabelText("Line width")).toBeInTheDocument();
   });
+
+  it("hides the styles tab for candle-only listings (e.g. Heikin-Ashi)", () => {
+    // Candle series take colors from the themed candlestick element defaults,
+    // so per-result style controls would be no-ops.
+    const candleListing: IndicatorListing = {
+      ...listing,
+      name: "Heikin-Ashi",
+      uiid: "HEIKIN-ASHI",
+      category: "price-transform",
+      results: [
+        {
+          displayName: "Heikin-Ashi",
+          tooltipTemplate: "HEIKIN-ASHI",
+          dataName: "close",
+          dataType: "number",
+          lineType: "candle",
+          stack: "",
+          lineWidth: 2,
+          defaultColor: "#1E88E5"
+        }
+      ]
+    };
+    const controller = makeController();
+    render(
+      <PickConfigDialog
+        listing={candleListing}
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+      />
+    );
+
+    expect(screen.queryByRole("tab", { name: "Styles" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "ADD" })).toBeEnabled();
+  });
 });

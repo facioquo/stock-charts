@@ -1558,6 +1558,33 @@ public static class Metadata
                 ]
             },
 
+            // Heikin-Ashi
+            new IndicatorListing {
+                Name = "Heikin-Ashi",
+                Uiid = "HEIKIN-ASHI",
+                LegendTemplate = "HEIKIN-ASHI",
+                Endpoint = $"{baseUrl}/HEIKIN-ASHI/",
+                Category = "price-transform",
+                // Overlay that REPLACES the raw price candles: the client
+                // hides the main price dataset while a candle-rendered overlay
+                // is displayed (both series sit at nearly the same prices, so
+                // drawing them together occludes each other) and restores it
+                // when the selection is removed.
+                ChartType = "overlay",
+                Results = [
+                    new() {
+                        DisplayName = "Heikin-Ashi",
+                        TooltipTemplate = "HEIKIN-ASHI",
+                        // LineType "candle" reads open/high/low/close from each
+                        // row; dataName anchors tooltips and result identity.
+                        DataName = "close",
+                        DataType = "number",
+                        LineType = "candle",
+                        DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
             // Hilbert Transform Instantaneous Trendline
             new IndicatorListing {
                 Name = "Hilbert Transform Instantaneous Trendline",
