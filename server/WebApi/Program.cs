@@ -2,7 +2,6 @@
 
 using System.IO.Compression;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.Extensions.Azure;
 using WebApi.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -13,8 +12,10 @@ IServiceCollection services = builder.Services;
 services.AddControllers();
 
 // Get CORS origins from appsettings (semicolon-separated list)
-// reminder: Website origins for production are in cloud host settings » API » CORS
-// Demo origins supplement Website (CF Pages VitePress demo; not overridden by cloud host settings)
+// reminder: in production the edge Worker owns CORS — it answers preflight
+// without waking this container and rewrites Access-Control-* on every response
+// (see server/edge/src/index.ts). This policy is what makes direct hosting and
+// local development (`dotnet run` against the Vite dev server) work.
 string? allowedOriginConfig = configuration.GetValue<string>("CorsOrigins:Website");
 string[] websiteOrigins = allowedOriginConfig?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? [];
 
@@ -75,16 +76,27 @@ services.AddOutputCache(options =>
         .SetVaryByQuery("*")
         .SetVaryByHeader("Origin")));
 
-// Add Azure dependencies
-services.AddAzureClients(builder => {
-    builder.AddBlobServiceClient(configuration.GetValue<string>("Storage:ConnectionString")
-        ?? "UseDevelopmentStorage=true");
+// Public origin used to build absolute URLs in the indicator catalog
+services.Configure<ApiSettings>(configuration.GetSection(ApiSettings.SectionName));
+
+// Quote datasets are fetched over HTTP. In production the base address resolves
+// to an R2 bucket that the edge Worker exposes to this container through its
+// outbound handler, so no storage credentials are needed here. When the address
+// is unreachable (typical for local development), QuoteService falls back to its
+// bundled backup dataset.
+string quotesBaseUrl = configuration.GetValue<string>("Quotes:BaseUrl") is { Length: > 0 } configured
+    ? configured
+    : "http://quotes.r2/";
+
+services.AddHttpClient(HttpQuoteStore.HttpClientName, client => {
+    // Trailing slash is required: relative object names resolve against it.
+    client.BaseAddress = new Uri(quotesBaseUrl.TrimEnd('/') + '/');
+    client.Timeout = TimeSpan.FromSeconds(10);
 });
 
 // Add application services
-services.AddSingleton<IStorage, Storage>();
+services.AddSingleton<IQuoteStore, HttpQuoteStore>();
 services.AddSingleton<IQuoteService, QuoteService>();
-services.AddHostedService<StartupServices>();
 
 // Build application
 WebApplication app = builder.Build();
@@ -94,12 +106,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
-else
-{
-    app.UseHsts();
-}
 
-app.UseHttpsRedirection();
+// No HTTPS redirection or HSTS here: TLS terminates at the edge and the
+// Worker-to-container hop is plain HTTP on the container port. Redirecting
+// would bounce every proxied request to an unreachable https://localhost.
 app.UseRouting();
 app.UseCors("CorsPolicy");
 app.UseOutputCache();

@@ -1,0 +1,25 @@
+{
+  "name": "@stock-charts/edge",
+  "description": "Cloudflare Worker fronting the indicator API container and refreshing quote datasets",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf .wrangler node_modules/.vite",
+    "format": "prettier --write \"src/**/*.ts\" wrangler.jsonc",
+    "format:check": "prettier --check \"src/**/*.ts\" wrangler.jsonc"
+  },
+  "devDependencies": {
+    "@cloudflare/containers": "^0.3.7",
+    "@cloudflare/workers-types": "^5.20260801.1",
+    "@types/node": "^26.1.2",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.10",
+    "wrangler": "^4.118.0"
+  }
+}

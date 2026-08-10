@@ -25,10 +25,8 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
   - **Windows**: winget (`winget install pnpm.pnpm`)
   - **Linux**: Corepack (`corepack enable && corepack prepare pnpm --activate`)
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
-- [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
-
-**Note:** Azure Functions Core Tools is essential for running the backend Azure Functions locally (`func start` command). It is not installed automatically with Node or .NET SDK.
+- [Docker](https://docs.docker.com/get-started/get-docker/) - _optional_, only to run the API in its deployment container via `pnpm run edge:dev`
 
 ### Installation
 
@@ -50,7 +48,6 @@ After installation, verify all tools:
 node --version    # Should be v24+
 pnpm --version    # Should be 11+
 dotnet --version  # Should be 10.0+
-func --version    # Should be 4.x
 ```
 
 ### Quick setup
@@ -70,27 +67,36 @@ pnpm install
 # Ctrl+Shift+P → "Tasks: Run Task" → "Run: Full development stack"
 ```
 
-This starts all services: Azurite storage emulator, Azure Functions, Web API, and React dev server.
+This starts the Web API and the React dev server.
 
 ### Start manually
 
-Open 4 terminals and run in order:
+Open 2 terminals and run in order:
 
 ```bash
-# Terminal 1: Storage emulator
-pnpm run azure:start
-
-# Terminal 2: Azure Functions
-cd server/Functions && func start
-
-# Terminal 3: Web API
+# Terminal 1: Web API
 cd server/WebApi && dotnet run
 
-# Terminal 4: React dev server (Vite)
+# Terminal 2: React dev server (Vite)
 pnpm start
 ```
 
-Access at: Website <http://localhost:4200>, Web API <https://localhost:5001>, Functions <http://localhost:7071>
+Access at: Website <http://localhost:4200>, Web API <https://localhost:5001>
+
+No storage emulator or cloud credentials are required. Without a reachable quote host the API
+falls back to a bundled backup dataset, so a fresh clone renders charts immediately.
+
+### Running the API as deployed
+
+In production the API runs as a container behind a Cloudflare Worker that owns caching and CORS.
+To reproduce that locally (requires Docker):
+
+```bash
+pnpm run edge:dev   # Worker + API container on http://localhost:8787
+```
+
+See [server/edge/README.md](../server/edge/README.md) for the full local workflow, the R2 dataset
+contract, and deployment steps.
 
 ### Project structure
 
@@ -101,7 +107,9 @@ stock-charts/          # Root
 ├── package.json       # Workspace config + shared scripts
 ├── pnpm-workspace.yaml # pnpm workspace definition
 ├── web/               # React + Vite frontend
-└── server/            # .NET backend
+└── server/            # Backend
+    ├── WebApi/        # .NET indicator API (runs as a container)
+    └── edge/          # Cloudflare Worker: caching/CORS front door + quote refresh cron
 ```
 
 Available pnpm scripts are in `package.json`. Key scripts:

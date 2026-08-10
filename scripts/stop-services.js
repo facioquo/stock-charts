@@ -6,7 +6,7 @@
  *   - Use: pnpm run stop:services
  *   - Or: Press Ctrl+C in the terminal running services (preferred)
  *
- * This script force-kills Azure Functions and .NET processes.
+ * This script force-kills .NET processes.
  * Node processes are NOT killed to avoid terminating this script itself.
  * For Node services, press Ctrl+C in their terminal for graceful shutdown.
  */
@@ -36,13 +36,11 @@ if (isWindows) {
   // Windows: Simple task kill with exact process names
   // Note: Skipping node.exe to avoid killing this script itself
   // Users should use Ctrl+C in terminals running Node services
-  tryKill("taskkill /F /IM func.exe", "Killed func.exe (Azure Functions)");
   tryKill("taskkill /F /IM dotnet.exe", "Killed dotnet.exe (.NET)");
 } else {
   // Unix/macOS: pkill with exact-name matching (-x flag)
   // Note: Skipping node to avoid killing this script itself
   // Users should use Ctrl+C in terminals running Node services
-  tryKill("pkill -TERM -x func", "Terminated func (Azure Functions)");
   tryKill("pkill -TERM -x dotnet", "Terminated dotnet (.NET)");
 }
 

@@ -1,13 +1,6 @@
 {
   "$schema": "vscode://schemas/settings/default",
   // ==============================
-  // AZURE
-  "azureFunctions.projectSubpath": "server/Functions",
-  "azureFunctions.deploySubpath": "server/Functions/bin/Release/net10.0/publish",
-  "azureFunctions.projectLanguage": "C#",
-  "azureFunctions.projectRuntime": "~4",
-  "azureFunctions.preDeployTask": "publish-functions",
-  // ==============================
   // GITHUB COPILOT
   "chat.customAgentInSubagent.enabled": true,
   "chat.mcp.assisted.nuget.enabled": true,

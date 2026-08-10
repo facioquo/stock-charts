@@ -2,7 +2,6 @@
   "extends": "stylelint-config-standard",
   "plugins": ["stylelint-scss"],
   "ignoreFiles": [
-    ".azurite/**",
     ".github/**",
     "node_modules/**",
     "**/node_modules/**",

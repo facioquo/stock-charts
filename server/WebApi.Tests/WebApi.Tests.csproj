@@ -21,4 +21,11 @@
   <ItemGroup>
     <ProjectReference Include="../WebApi/WebApi.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Shared with server/edge/src/quotes.spec.ts: both sides assert against
+         the same fixture so the R2 dataset contract cannot drift silently. -->
+    <Content Include="../quote-dataset.contract.json" Link="quote-dataset.contract.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

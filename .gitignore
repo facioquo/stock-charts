@@ -87,9 +87,9 @@ appsettings.local.json
 appsettings.Development.json
 
 # ========================================
-# AZURE & LOCAL DEVELOPMENT
+# LOCAL DEVELOPMENT
 # ========================================
-.azurite/
+.wrangler/
 # .claude/
 .claude/*.local.json
 .codex/

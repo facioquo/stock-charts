@@ -45,13 +45,13 @@ jobs:
             echo "| Version | ${{ steps.marker.outputs.version }} |"
           } >> $GITHUB_STEP_SUMMARY
 
+  # Verification gate only. The deployable artifact is the container image,
+  # which wrangler builds from server/Dockerfile in the deploy-api job.
   build-backend:
     name: Build backend
     runs-on: ubuntu-latest
     needs:
       - versioning
-    env:
-      url: https://charts.stockindicators.dev
 
     steps:
       - name: Checkout sources
@@ -80,38 +80,6 @@ jobs:
           --configuration Release
           --property:ContinuousIntegrationBuild=true
           -warnAsError
-
-      - name: Package Web API
-        if: github.ref == 'refs/heads/main'
-        working-directory: server
-        run: >
-          dotnet publish WebApi/WebApi.csproj
-          --configuration Release
-          --property:PublishDir="../artifacts/api"
-
-      - name: Package Functions
-        if: github.ref == 'refs/heads/main'
-        working-directory: server
-        run: >
-          dotnet publish Functions/Functions.csproj
-          --configuration Release
-          --property:PublishDir="../artifacts/fns"
-
-      - name: Save Web API
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v7
-        with:
-          name: api
-          path: "server/artifacts/api"
-          include-hidden-files: true
-
-      - name: Save Functions
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v7
-        with:
-          name: fns
-          path: "server/artifacts/fns"
-          include-hidden-files: true
 
   build-website:
     name: Build website
@@ -168,7 +136,7 @@ jobs:
       - name: Build site
         run: pnpm --filter @stock-charts/web run build
         env:
-          INDICATORS_API_BASE: https://stock-charts-api.azurewebsites.net
+          INDICATORS_API_BASE: ${{ vars.INDICATORS_API_BASE || 'https://stock-charts-api.stockindicators.workers.dev' }}
 
       - name: Save artifacts
         uses: actions/upload-artifact@v7
@@ -176,6 +144,60 @@ jobs:
           name: web
           path: web/dist/app
           include-hidden-files: true
+
+  # Builds the container image from server/Dockerfile and deploys it together
+  # with the Worker that fronts it and refreshes quote datasets.
+  deploy-api:
+    name: Deploy API
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - versioning
+      - build-backend
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+          registry-url: https://npm.pkg.github.com
+          scope: "@facioquo"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Must run before the image is built: the marker becomes the ETag the
+      # /indicators endpoint serves.
+      - name: Replace cache markers
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "YYYY.MM.DD"
+          replace: "${{ needs.versioning.outputs.version }}"
+          regex: false
+
+      # Runs the lockfile-pinned wrangler rather than wrangler-action's
+      # "latest", so the CLI that builds and pushes the container image matches
+      # the @cloudflare/containers version the Worker is type-checked against.
+      # Alpaca credentials are set once with `wrangler secret put`, never here.
+      - name: Deploy Worker and container
+        run: pnpm --filter @stock-charts/edge exec wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
   deploy:
     name: Deploy
@@ -190,41 +212,11 @@ jobs:
       url: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
 
     steps:
-      - name: Download Functions package
-        if: github.ref == 'refs/heads/main'
-        uses: actions/download-artifact@v8
-        with:
-          name: fns
-          path: artifacts/fns
-
-      - name: Download API package
-        if: github.ref == 'refs/heads/main'
-        uses: actions/download-artifact@v8
-        with:
-          name: api
-          path: artifacts/api
-
       - name: Download Web package
         uses: actions/download-artifact@v8
         with:
           name: web
           path: artifacts/web
-
-      - name: Deploy Functions
-        if: github.ref == 'refs/heads/main'
-        uses: Azure/functions-action@v1
-        with:
-          app-name: stock-charts-functions
-          package: artifacts/fns
-          publish-profile: ${{ secrets.PUBLISH_PROFILE_FNS }}
-
-      - name: Deploy API
-        if: github.ref == 'refs/heads/main'
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: stock-charts-api
-          package: artifacts/api
-          publish-profile: ${{ secrets.PUBLISH_PROFILE_API }}
 
       - name: Publish to Cloudflare Pages
         id: deploy

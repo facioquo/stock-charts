@@ -25,20 +25,9 @@ dotnet dev-certs https --trust 2>/dev/null || echo "  (dev-certs trust may requi
 echo "🧰 Installing .NET tools..."
 dotnet tool restore
 
-# Disable Angular auto-completion
-ng config -g cli.completion.prompted true
-
 # Install Node dependencies
 echo "📦 Installing Node dependencies..."
 pnpm install --frozen-lockfile --loglevel=error --config.confirmModulesPurge=false
-
-# Bootstrap local.settings.json if absent (safe — never overwrites existing file with credentials)
-SETTINGS_FILE="${REPO_ROOT}/server/Functions/local.settings.json"
-SETTINGS_EXAMPLE="${REPO_ROOT}/server/Functions/local.settings.example.json"
-if [ ! -f "${SETTINGS_FILE}" ]; then
-  cp "${SETTINGS_EXAMPLE}" "${SETTINGS_FILE}"
-  echo "📄 Created server/Functions/local.settings.json from example (fill in ALPACA_KEY and ALPACA_SECRET if needed)"
-fi
 
 # cleanup
 sudo apt-get autoremove --purge -y

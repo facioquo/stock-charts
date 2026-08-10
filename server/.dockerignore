@@ -1,0 +1,5 @@
+**/bin/
+**/obj/
+coverage/
+edge/
+WebApi.Tests/

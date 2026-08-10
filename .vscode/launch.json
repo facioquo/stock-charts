@@ -4,10 +4,26 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Attach to .NET Functions",
+      // Runs the indicator API directly on https://localhost:5001.
+      // With no reachable quote host it serves its bundled backup dataset.
+      "name": "Run: Web API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build: Backend .NET (incremental)",
+      "program": "${workspaceFolder}/server/WebApi/bin/Debug/net10.0/WebApi.dll",
+      "cwd": "${workspaceFolder}/server/WebApi",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      }
+    },
+    {
+      "name": "Attach to .NET process",
       "type": "coreclr",
       "request": "attach",
-      "processId": "${command:azureFunctions.pickProcess}",
       "justMyCode": false,
       "suppressJITOptimizations": true
     }

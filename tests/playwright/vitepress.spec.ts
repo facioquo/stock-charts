@@ -239,7 +239,7 @@ async function mockChartApi(page: Page): Promise<void> {
 
   // Intercept both the local dev server and the production API origin so the
   // mocks work whether the VitePress site was built in DEV or PROD mode.
-  for (const base of ["https://localhost:5001", "https://stock-charts-api.azurewebsites.net"]) {
+  for (const base of ["https://localhost:5001", "https://stock-charts-api.stockindicators.workers.dev"]) {
     await page.route(`${base}/quotes`, route =>
       route.fulfill({ json: mockQuotes, headers: { "access-control-allow-origin": "*" } })
     );

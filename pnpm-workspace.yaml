@@ -1,6 +1,7 @@
 packages:
   - libs/chartjs-financial
   - libs/indy-charts
+  - server/edge
   - web
   - tests/playwright
   - tests/vitepress
@@ -21,3 +22,5 @@ allowBuilds:
   msgpackr-extract: false
   unrs-resolver: false
   vue-demi: false
+  # wrangler's local runtime; its install script fetches the platform binary
+  workerd: true

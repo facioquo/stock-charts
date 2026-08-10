@@ -11,9 +11,14 @@ export interface EnvConfig {
   useChartLibrary?: boolean;
 }
 
-const defaultApi = import.meta.env.PROD
-  ? "https://stock-charts-api.azurewebsites.net"
-  : "https://localhost:5001";
+/**
+ * Production API origin: the Cloudflare Worker that fronts the indicator API
+ * container (see `server/edge`). Keep in sync with `PROD_API_URL` in
+ * `tests/vitepress/.vitepress/theme/index.ts`.
+ */
+const PROD_API_URL = "https://stock-charts-api.stockindicators.workers.dev";
+
+const defaultApi = import.meta.env.PROD ? PROD_API_URL : "https://localhost:5001";
 
 export const env: EnvConfig = {
   production: import.meta.env.PROD,

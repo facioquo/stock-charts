@@ -12,12 +12,12 @@ public interface IQuoteService
 
 public partial class QuoteService(
     ILogger<QuoteService> logger,
-    IStorage storage,
+    IQuoteStore store,
     IMemoryCache cache,
     IOptions<CacheSettings> cacheSettings) : IQuoteService
 {
     private readonly ILogger<QuoteService> _logger = logger;
-    private readonly IStorage _storage = storage;
+    private readonly IQuoteStore _store = store;
     private readonly IMemoryCache _cache = cache;
     private readonly TimeSpan _cacheDuration = cacheSettings.Value.Duration;
 
@@ -62,10 +62,9 @@ public partial class QuoteService(
 
     private async Task<IReadOnlyList<Bar>> LoadQuotesAsync(string symbol, CancellationToken ct)
     {
-        string blobName = $"{symbol}-DAILY.json";
         try
         {
-            return await TryGetBlobQuotesAsync(blobName, ct) ?? QuoteBackup.BackupQuotes;
+            return await TryGetStoredQuotesAsync(symbol, ct) ?? QuoteBackup.BackupQuotes;
         }
 
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
@@ -81,44 +80,28 @@ public partial class QuoteService(
         }
     }
 
-    private async Task<IReadOnlyList<Bar>?> TryGetBlobQuotesAsync(string blobName, CancellationToken ct)
+    private async Task<IReadOnlyList<Bar>?> TryGetStoredQuotesAsync(string symbol, CancellationToken ct)
     {
-        BlobClient blob = _storage.GetBlobClient(blobName);
+        await using Stream? stream = await _store.OpenQuotesAsync(symbol, ct);
 
-        if (!await blob.ExistsAsync(ct))
+        if (stream is null)
         {
-            LogBlobNotFound(blobName);
-            return null;
-        }
-
-        Response<BlobDownloadInfo> response = await blob.DownloadAsync(ct);
-        await using Stream? stream = response?.Value.Content;
-
-        if (stream == null)
-        {
-            LogDownloadStreamNull(blobName);
             return null;
         }
 
         List<Bar>? quotes = await JsonSerializer.DeserializeAsync<List<Bar>>(stream, cancellationToken: ct);
 
-        if (quotes == null || quotes.Count == 0)
+        if (quotes is null || quotes.Count == 0)
         {
-            LogNoQuotesFound(blobName);
+            LogNoQuotesFound(symbol);
             return null;
         }
 
         return quotes.OrderBy(x => x.Timestamp).ToList();
     }
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Blob {BlobName} not found, using backup data")]
-    private partial void LogBlobNotFound(string blobName);
-
-    [LoggerMessage(Level = LogLevel.Error, Message = "Download stream was null for {BlobName}")]
-    private partial void LogDownloadStreamNull(string blobName);
-
-    [LoggerMessage(Level = LogLevel.Warning, Message = "No quotes found in {BlobName}")]
-    private partial void LogNoQuotesFound(string blobName);
+    [LoggerMessage(Level = LogLevel.Warning, Message = "No quotes found in stored dataset for {Symbol}")]
+    private partial void LogNoQuotesFound(string symbol);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Failed to retrieve quotes for {Symbol}")]
     private partial void LogRetrieveQuotesFailed(Exception exception, string symbol);

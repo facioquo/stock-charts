@@ -18,7 +18,10 @@ public class MainEndpointsTests
     public MainEndpointsTests()
     {
         _quoteServiceMock = new Mock<IQuoteService>();
-        _controller = new Main(_quoteServiceMock.Object, Options.Create(new CacheSettings()));
+        _controller = new Main(
+            _quoteServiceMock.Object,
+            Options.Create(new CacheSettings()),
+            Options.Create(new ApiSettings()));
     }
 
     [Fact]
