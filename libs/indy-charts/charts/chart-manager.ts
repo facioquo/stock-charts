@@ -274,8 +274,7 @@ export class ChartManager {
   private syncPriceCandleVisibility(): void {
     if (!this._overlayChart) return;
     const hasCandleOverlay = this._selections.some(
-      s =>
-        s.chartType === CHART_TYPES.OVERLAY && s.results.some(r => r.lineType === "candle")
+      s => s.chartType === CHART_TYPES.OVERLAY && s.results.some(r => r.lineType === "candle")
     );
     this._overlayChart.setPriceVisibility(!hasCandleOverlay);
   }
