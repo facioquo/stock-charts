@@ -87,6 +87,7 @@ function createMockOverlay(): Partial<OverlayChart> {
     }),
     addIndicatorDatasets: vi.fn(),
     removeIndicatorDatasets: vi.fn(),
+    setPriceVisibility: vi.fn(),
     updateLegends: vi.fn(),
     updateTheme: vi.fn(),
     buildFullDatasets: vi.fn().mockImplementation((quotes: Bar[]) => {
@@ -427,7 +428,7 @@ describe("ChartManager", () => {
       // carry { x, o, h, l, c } read from the row's fixed OHLC fields (not a
       // single dataName value), stay 1:1 with rows plus trailing padding, and
       // skip the per-point color arrays used by pattern/histogram series.
-      const listing = makeOscillatorListing({
+      const listing = makeOverlayListing({
         uiid: "HEIKIN-ASHI",
         category: "price-transform",
         chartConfig: null,
@@ -567,6 +568,67 @@ describe("ChartManager", () => {
       const overlay = mgr.overlayChart as unknown as ReturnType<typeof createMockOverlay>;
       expect(overlay.addIndicatorDatasets).toHaveBeenCalled();
       expect(overlay.updateLegends).toHaveBeenCalled();
+    });
+
+    it("hides the price candles while a candle overlay is displayed and restores on removal", () => {
+      // Candle-rendered overlays (e.g. Heikin-Ashi) REPLACE the raw price
+      // candles: both sit at nearly the same prices, so drawing them together
+      // occludes each other. Volume is untouched.
+      const ctx = {} as CanvasRenderingContext2D;
+      mgr.initializeOverlay(ctx, makeQuotes(50), 25);
+      const overlay = mgr.overlayChart as unknown as ReturnType<typeof createMockOverlay>;
+
+      const listing = makeOverlayListing({
+        uiid: "HEIKIN-ASHI",
+        category: "price-transform",
+        parameters: [],
+        results: [
+          {
+            dataName: "close",
+            displayName: "Heikin-Ashi",
+            tooltipTemplate: "HA",
+            defaultColor: "#4169E1",
+            lineType: "candle",
+            lineWidth: 2,
+            dataType: "number",
+            stack: "",
+            order: 1
+          }
+        ]
+      });
+      const selection = makeSelection(listing, "ha-vis");
+      const quotes = makeQuotes(50);
+      mgr.processSelectionData(
+        selection,
+        listing,
+        quotes.map(q => ({
+          timestamp: new Date(q.timestamp).toISOString(),
+          open: q.open,
+          high: q.high,
+          low: q.low,
+          close: q.close
+        }))
+      );
+
+      mgr.displaySelection(selection, listing);
+      expect(overlay.setPriceVisibility).toHaveBeenLastCalledWith(false);
+
+      mgr.removeSelection("ha-vis");
+      expect(overlay.setPriceVisibility).toHaveBeenLastCalledWith(true);
+    });
+
+    it("keeps the price candles visible for ordinary line overlays", () => {
+      const ctx = {} as CanvasRenderingContext2D;
+      mgr.initializeOverlay(ctx, makeQuotes(50), 25);
+      const overlay = mgr.overlayChart as unknown as ReturnType<typeof createMockOverlay>;
+
+      const listing = makeOverlayListing();
+      const selection = makeSelection(listing, "sma-vis");
+      mgr.processSelectionData(selection, listing, makeIndicatorData(makeQuotes(50)));
+
+      mgr.displaySelection(selection, listing);
+
+      expect(overlay.setPriceVisibility).toHaveBeenLastCalledWith(true);
     });
 
     it("does not register the same ucid twice", () => {

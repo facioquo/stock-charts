@@ -260,6 +260,24 @@ export class ChartManager {
 
     this._overlayChart.addIndicatorDatasets(selection.results);
     this._overlayChart.updateLegends(this._selections);
+    this.syncPriceCandleVisibility();
+  }
+
+  /**
+   * Hide the raw price candles while any candle-rendered overlay (e.g.
+   * Heikin-Ashi) is displayed, and restore them when the last one is removed.
+   * The transform *replaces* the price bars — both series sit at nearly the
+   * same prices, so drawing them together occludes each other. Volume is
+   * unaffected. Runs after every overlay add/remove, including the re-attach
+   * pass in `initializeOverlay`, so the state survives overlay re-creation.
+   */
+  private syncPriceCandleVisibility(): void {
+    if (!this._overlayChart) return;
+    const hasCandleOverlay = this._selections.some(
+      s =>
+        s.chartType === CHART_TYPES.OVERLAY && s.results.some(r => r.lineType === "candle")
+    );
+    this._overlayChart.setPriceVisibility(!hasCandleOverlay);
   }
 
   /**
@@ -345,6 +363,7 @@ export class ChartManager {
       if (this._overlayChart) {
         this._overlayChart.removeIndicatorDatasets(selection.results);
         this._overlayChart.updateLegends(this._selections);
+        this.syncPriceCandleVisibility();
         this._overlayChart.chart?.update();
       }
     } else {
