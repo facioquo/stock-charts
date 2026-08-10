@@ -23,4 +23,4 @@ pnpm --filter @stock-charts/web build     # tsc --noEmit && vite build -> dist/a
 pnpm --filter @stock-charts/web test      # Vitest
 ```
 
-`VITE_API_URL` overrides the backend base URL (defaults: `https://localhost:5001` in dev, the Azure API in production).
+`VITE_API_URL` overrides the backend base URL (defaults: `https://localhost:5001` in dev, the Cloudflare Worker API in production).

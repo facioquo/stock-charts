@@ -6,7 +6,9 @@ import { setupIndyChartsForVue } from "@facioquo/indy-charts/vue";
 // @ts-expect-error - CSS file import for side effects
 import "./custom.css";
 
-const PROD_API_URL = "https://stock-charts-api.azurewebsites.net";
+// Cloudflare Worker fronting the indicator API container (see server/edge).
+// Keep in sync with PROD_API_URL in web/src/config/env.ts.
+const PROD_API_URL = "https://charts-api.stockindicators.dev";
 const LOCAL_API_URL = "https://localhost:5001";
 // VITE_API_URL is for local development only; production always uses the live API
 // (guards against CF Pages dashboard env var misconfiguration). Dev defaults to

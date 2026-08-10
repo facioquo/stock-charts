@@ -8,10 +8,16 @@ namespace WebApi.Controllers;
 [ApiController]
 [Route("")]
 [OutputCache(PolicyName = OutputCachePolicies.IndicatorData)]
-public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSettings) : ControllerBase
+public class Main(
+    IQuoteService quoteService,
+    IOptions<CacheSettings> cacheSettings,
+    IOptions<ApiSettings> apiSettings,
+    IHostEnvironment environment,
+    ILogger<Main> logger) : ControllerBase
 {
     private readonly IQuoteService quoteFeed = quoteService;
     private readonly TimeSpan cacheDuration = cacheSettings.Value.Duration;
+    private readonly string? publicBaseUrl = apiSettings.Value.PublicBaseUrl;
 
     // GLOBALS
     private const int limitLast = 120;
@@ -35,7 +41,29 @@ public class Main(IQuoteService quoteService, IOptions<CacheSettings> cacheSetti
         Response.Headers.ETag = "YYYY.MM.DD"; // replaced in build deployment
         Response.Headers.LastModified = DateTime.UtcNow.ToString("R");
 
-        return Ok(Metadata.IndicatorListing($"{Request.Scheme}://{Request.Host}"));
+        // Behind the edge Worker this container only sees its own internal
+        // address, so the public origin comes from configuration when set.
+        string baseUrl;
+
+        if (string.IsNullOrWhiteSpace(publicBaseUrl))
+        {
+            if (!environment.IsDevelopment())
+            {
+                logger.LogWarning(
+                    "Api:PublicBaseUrl is not configured; the indicator catalog is falling back to " +
+                    "the request-derived origin {Scheme}://{Host}, which may be unreachable behind the edge Worker.",
+                    Request.Scheme,
+                    Request.Host);
+            }
+
+            baseUrl = $"{Request.Scheme}://{Request.Host}";
+        }
+        else
+        {
+            baseUrl = publicBaseUrl.TrimEnd('/');
+        }
+
+        return Ok(Metadata.IndicatorListing(baseUrl));
     }
 
     private async Task<IActionResult> Get<T>(Func<IReadOnlyList<Bar>, IEnumerable<T>> indicatorFunc)

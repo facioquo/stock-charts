@@ -23,12 +23,10 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
   - **Windows**: winget (`winget install pnpm.pnpm`)
   - **Linux**: Corepack (`corepack enable && corepack prepare pnpm --activate`)
 - [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
-- [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (v4) - **Required for backend development**
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
+- [Docker](https://docs.docker.com/get-started/get-docker/) - _optional_, only to run the API in its deployment container via `pnpm run edge:dev`
 
 After installing the prerequisites above, run `pnpm install` from the repository root.
-
-**Note:** Azure Functions Core Tools is essential for running the backend Azure Functions locally (`func start` command) and must be [installed separately](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools) on Linux.
 
 ### Setup and run
 
@@ -43,13 +41,18 @@ pnpm install
 # Ctrl+Shift+P → "Tasks: Run Task" → "Run: Full development stack"
 
 # Option 2: Manual start in separate terminals
-pnpm run azure:start  # Terminal 1: Storage emulator
-cd server/Functions && func start  # Terminal 2: Azure Functions
-cd server/WebApi && dotnet run  # Terminal 3: Web API
-pnpm start  # Terminal 4: React dev server (Vite)
+cd server/WebApi && dotnet run  # Terminal 1: Web API
+pnpm start  # Terminal 2: React dev server (Vite)
 ```
 
-**Access:** Website at <http://localhost:4200>, Web API at <https://localhost:5001>, Functions at <http://localhost:7071>
+**Access:** Website at <http://localhost:4200>, Web API at <https://localhost:5001>
+
+No storage emulator or cloud credentials are needed: without a reachable quote host the API serves
+a bundled backup dataset, so charts render on a fresh clone.
+
+To exercise the API exactly as it is deployed — inside its container, behind the caching/CORS
+Worker — run `pnpm run edge:dev` (requires Docker) and point the site at <http://localhost:8787>
+with `VITE_API_URL`. See [server/edge/README.md](server/edge/README.md).
 
 ## Financial charts
 

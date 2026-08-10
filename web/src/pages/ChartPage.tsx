@@ -71,12 +71,11 @@ export function ChartPage(): React.JSX.Element {
                   services are running:
                 </p>
                 <ul className="api-error-list">
-                  <li>Azure Functions (port 7071)</li>
                   <li>Web API (port 5001)</li>
-                  <li>Azurite Storage Emulator</li>
                 </ul>
                 <p className="api-error-help">
-                  Run <code>pnpm dev</code> for the frontend and start the backend services.
+                  Run <code>pnpm start</code> for the frontend, and{" "}
+                  <code>cd server/WebApi &amp;&amp; dotnet run</code> for the backend.
                 </p>
               </>
             )}

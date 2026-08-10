@@ -1,6 +1,6 @@
 # Stock Charts
 
-Full-stack financial charting application showcasing the [FacioQuo.Stock.Indicators](https://www.nuget.org/packages/FacioQuo.Stock.Indicators) NuGet package. React frontend with Chart.js visualization and .NET backend with Azure Functions.
+Full-stack financial charting application showcasing the [FacioQuo.Stock.Indicators](https://www.nuget.org/packages/FacioQuo.Stock.Indicators) NuGet package. React frontend with Chart.js visualization and a .NET backend, both hosted on Cloudflare.
 
 ## Primary directive
 
@@ -32,12 +32,14 @@ stock-charts/
 ├── libs/                     # Shared TypeScript libraries
 │   ├── chartjs-financial/    # Chart.js financial chart types (candlestick, OHLC, volume)
 │   └── indy-charts/          # Reusable financial indicator charts library
-├── server/                   # .NET backend
-│   ├── Functions/            # Azure Functions
-│   ├── WebApi/               # REST API endpoints
+├── server/                   # Backend
+│   ├── WebApi/               # REST API endpoints (.NET)
 │   │   ├── Models/           # Data models
 │   │   └── Services/         # Business logic
 │   ├── WebApi.Tests/         # xUnit tests for the Web API
+│   ├── edge/                 # Cloudflare Worker: caching/CORS front door + quote refresh cron
+│   ├── Dockerfile            # Container image for the Web API
+│   ├── quote-dataset.contract.json  # Shared R2 dataset fixture (asserted from both languages)
 │   └── Directory.Packages.props  # Centralized NuGet versions
 ├── tests/
 │   ├── playwright/           # End-to-end tests against web + VitePress
@@ -59,9 +61,8 @@ pnpm install                   # Install all workspace dependencies
 
 # Development
 pnpm start                         # Start React dev server (http://localhost:4200)
-pnpm run azure:start               # Start Azurite storage emulator
-cd server/Functions && func start  # Start Azure Functions (http://localhost:7071)
 cd server/WebApi && dotnet run     # Start Web API (https://localhost:5001)
+pnpm run edge:dev                  # Start Worker + API container (http://localhost:8787, needs Docker)
 
 # Building
 pnpm run build                # Build all workspaces
@@ -206,11 +207,33 @@ Client-side project dependencies are strictly in this direction only: web → in
 ### Backend architecture
 
 - **C# / .NET 10**: Latest language features, record types for DTOs
-- **Azure Functions**: Isolated worker model for data processing
-- **ASP.NET Core Web API**: REST endpoints for chart data
+- **ASP.NET Core Web API**: REST endpoints for chart data, running as a Cloudflare Container built from `server/Dockerfile`
 - **FacioQuo.Stock.Indicators**: NuGet library used in `server/WebApi/Services/` to compute every indicator the API serves
+- **Cloudflare Worker** (`server/edge/`): the API's front door. Answers CORS preflight, serves cached responses, and forwards misses to the container. Also owns the `scheduled` cron that refreshes quote datasets from Alpaca into R2
+- **R2**: stores one quote dataset per symbol, keyed by symbol and bar interval. The container holds no storage credentials. It fetches datasets over plain HTTP from an internal hostname. The Worker's `outboundByHost` handler resolves that through its R2 binding
 - **Directory.Packages.props**: Centralized NuGet version management
-- **Caching**: Layered, built-in (no extra packages), so doc-site traffic doesn't redundantly recompute indicators. Server-side output cache (`AddOutputCache`/`UseOutputCache`) caches each computed indicator response keyed by path + query string and varied by `Origin`; an in-memory quote cache (`IMemoryCache` in `QuoteService`) downloads the shared quote blob at most once per symbol per window; and `Cache-Control: public, max-age=...` headers let browsers/CDN serve repeats. Lifetime is one knob, `Caching:DurationMinutes`, in `CacheSettings`.
+
+#### Caching
+
+Layered and built-in (no extra packages), so doc-site traffic doesn't redundantly recompute indicators:
+
+1. **Worker response cache** (`server/edge/src/index.ts`) — the outermost tier. It keeps the container asleep, and therefore unbilled.
+2. **Server-side output cache** (`AddOutputCache`/`UseOutputCache`) — caches each computed indicator response keyed by path + query string, varied by `Origin`.
+3. **In-memory quote cache** (`IMemoryCache` in `QuoteService`) — fetches the shared quote dataset at most once per symbol per window.
+4. **`Cache-Control: public, max-age=...`** — lets browsers and the CDN serve repeats.
+
+Lifetime for tiers 2-4 is one knob, `Caching:DurationMinutes`, in `CacheSettings`.
+
+Worker cache entries are keyed by URL alone. All CORS headers are stripped before
+storage. The correct `Access-Control-Allow-Origin` is written per request on the
+way out. One entry therefore serves every allowed origin safely.
+
+#### Quote dataset contract
+
+`server/edge/src/quotes.ts` writes **PascalCase** JSON. `QuoteService` deserializes with default,
+case-sensitive `JsonSerializerOptions`, so camelCase would silently produce default-valued bars.
+`server/quote-dataset.contract.json` is asserted from both sides — in `server/edge/src/quotes.spec.ts`
+and `server/WebApi.Tests/Services/QuoteDatasetContractTests.cs`.
 
 ### Financial charts integration
 
@@ -251,7 +274,8 @@ Financial chart types (`candlestick`, `ohlc`, `volume`) are maintained in `libs/
 - Modifying build configurations (tsconfig.json, .csproj files)
 - Database schema changes or migrations
 - Changing environment configurations
-- Adding new Azure Functions or API endpoints
+- Adding new API endpoints or Worker handlers
+- Changing Cloudflare deployment config (`server/edge/wrangler.jsonc`, `server/Dockerfile`)
 - Modifying Chart.js extension implementations
 - Changes to setup scripts that affect cross-platform compatibility
 
@@ -276,15 +300,14 @@ One-time setup:
 
 1. **Setup**: VS Code task "Setup: Dev environment"
 2. **Install**: Run `pnpm install` from root
-3. **Credentials** (optional): Configure Alpaca API credentials for real-time quote updates
-   - Copy `server/Functions/local.settings.example.json` to `local.settings.json` and fill in `ALPACA_KEY` and `ALPACA_SECRET`
-   - See [server/Functions/README.md](server/Functions/README.md) for details
+3. **Credentials** (optional): Alpaca API credentials drive the scheduled quote refresh
+   - Production: `wrangler secret put ALPACA_KEY` / `ALPACA_SECRET` (see [server/edge/README.md](server/edge/README.md))
    - Application works fully without credentials using backup quote data
    - No exceptions thrown when credentials are missing
 
 Typical lifecycle:
 
-1. **Develop**: Start all services (Azurite, Functions, WebApi, React dev server)
+1. **Develop**: Start the services you need (WebApi or the edge Worker, plus the React dev server)
 2. **Iterate**: Make changes, run tests, check linting
 3. **Complete**: Execute full code completion checklist before commit
 4. **Commit**: Ensure all quality gates pass (format, lint, build, test)
@@ -293,9 +316,8 @@ Typical lifecycle:
 
 - **Tasks**: `Ctrl+Shift+P` → "Tasks: Run Task" for common operations
 - **Formatting**: Auto-format on save (Prettier for frontend, dotnet format for backend)
-- **Extensions**: ESLint, Prettier, C# Dev Kit, Azure Storage (for viewing data), Azure Functions (for debugging)
-- **Extension conflicts**: Do NOT install Azurite extension (azurite.azurite) - it conflicts with npm-based emulator (`pnpm run azure:start`). Use Azure Storage extension to view blob/queue/table data.
-- **Debugging**: Press F5 to attach debugger to running Azure Functions (start Functions task first). Configured launch profiles for frontend and backend.
+- **Extensions**: ESLint, Prettier, C# Dev Kit, Containers (Docker tooling for `wrangler dev`)
+- **Debugging**: F5 launches the Web API directly on <https://localhost:5001>; "Attach to .NET process" attaches to an already-running host.
 - **Problem panel**: Navigate errors and warnings efficiently
 
 ## Context for AI assistance

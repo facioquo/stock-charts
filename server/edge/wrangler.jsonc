@@ -1,0 +1,97 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "stock-charts-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Single canonical host: the custom domain below is the only public entry.
+  // The workers.dev alias stays off so the response cache (keyed by URL) and
+  // consumer configs never split across two hostnames.
+  "workers_dev": false,
+  // Custom domain on the stockindicators.dev zone (same account): deploy
+  // auto-creates the DNS record and certificate — no manual DNS step.
+  "routes": [{ "pattern": "charts-api.stockindicators.dev", "custom_domain": true }],
+
+  "observability": {
+    "enabled": true
+  },
+
+  // The .NET indicator API. `basic` (1/4 vCPU, 1 GiB, 4 GB disk) is ample for
+  // ~800 daily bars, and a single instance keeps the API's in-memory quote
+  // cache hot while minimising billable memory-hours. The instance sleeps after
+  // 10 minutes idle; the Worker response cache below is what keeps it asleep.
+  "containers": [
+    {
+      "class_name": "ApiContainer",
+      "image": "../Dockerfile",
+      "image_build_context": "..",
+      "instance_type": "basic",
+      "max_instances": 1
+    }
+  ],
+
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "API",
+        "class_name": "ApiContainer"
+      }
+    ]
+  },
+
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["ApiContainer"]
+    }
+  ],
+
+  // Per-IP abuse damper for the cache-miss path only: cached serves cost
+  // nothing, but every miss wakes the billable container, and unique query
+  // strings bypass the cache at will. 120 misses/min is far above any real
+  // chart page (~10 on first load) and starves cache-busting scrapers.
+  // Counting is per-Cloudflare-location and eventually consistent — this is
+  // an abuse damper, not an accounting system. The Workers binding is used
+  // instead of a zone WAF rule because the zone's Free plan cannot scope
+  // rules to this hostname.
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 120, "period": 60 }
+    }
+  ],
+
+  // Quote datasets written by the scheduled refresh and read back by the
+  // container through the outbound handler in src/container.ts.
+  "r2_buckets": [
+    {
+      "binding": "QUOTES",
+      "bucket_name": "stock-charts-quotes"
+    }
+  ],
+
+  // Daily bars do not justify per-minute polling. UTC only: 13:00-23:59 UTC
+  // spans US extended market hours year-round (ET is UTC-5/-4).
+  "triggers": {
+    "crons": ["*/5 13-23 * * 1-5"]
+  },
+
+  "vars": {
+    // Origins allowed to call the API cross-site. The Worker answers preflight
+    // and rewrites Access-Control-* itself, so this is the production source of
+    // truth; server/WebApi/appsettings.json only covers direct/local hosting.
+    "ALLOWED_ORIGINS": "https://charts.stockindicators.dev,https://dotnet.stockindicators.dev,https://stock-charts.pages.dev,https://stock-charts-vitepress.pages.dev",
+    // The deployed Worker's own origin. Passed through to the container as
+    // Api__PublicBaseUrl (see src/container.ts) so the /indicators catalog
+    // embeds externally-reachable URLs instead of the container's internal
+    // http://localhost:8080 address.
+    "PUBLIC_BASE_URL": "https://charts-api.stockindicators.dev",
+    "QUOTE_SYMBOLS": "SPY,QQQ",
+    "QUOTE_HISTORY_DAYS": "800"
+  }
+
+  // Secrets (set once, never in CI):
+  //   pnpm --filter @stock-charts/edge exec wrangler secret put ALPACA_KEY
+  //   pnpm --filter @stock-charts/edge exec wrangler secret put ALPACA_SECRET
+}

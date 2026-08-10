@@ -18,7 +18,7 @@
     // ===================================
     {
       "label": "Setup: Dev environment (linux)",
-      "detail": "Install all development prerequisites (Node, .NET, Azure Functions Core Tools, pnpm)",
+      "detail": "Install all development prerequisites (Node, .NET, pnpm)",
       "type": "shell",
       "command": "bash .devcontainer/post-create.sh",
       "group": "none"
@@ -179,6 +179,13 @@
       "group": "build",
       "problemMatcher": "$msCompile"
     },
+    {
+      "label": "Build: Validate container image (Docker)",
+      "detail": "Build the API container image from server/Dockerfile without pushing (requires Docker; mirrors the CI validation gate)",
+      "type": "shell",
+      "command": "docker build --platform linux/amd64 -f server/Dockerfile server/",
+      "group": "build"
+    },
     // ===================================
     // GENERATE
     // ===================================
@@ -198,6 +205,7 @@
       "dependsOn": [
         "Lint: Website (check)",
         "Lint: Indy-Charts (check)",
+        "Lint: Edge worker (check)",
         "Lint: Backend .NET (check)",
         "Lint: Markdown (check)",
         "Lint: Stylelint (check)"
@@ -220,6 +228,7 @@
       "dependsOn": [
         "Lint: Website (fix)",
         "Lint: Indy-Charts (fix)",
+        "Lint: Edge worker (fix)",
         "Lint: Backend .NET (fix)",
         "Lint: Stylelint (fix)"
       ],
@@ -258,6 +267,22 @@
       "command": "pnpm --filter @facioquo/indy-charts run lint:fix",
       "group": "none",
       "problemMatcher": "$eslint-stylish"
+    },
+    {
+      "label": "Lint: Edge worker (check)",
+      "detail": "Check edge worker formatting (Prettier) and types (tsc)",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/edge run format:check && pnpm --filter @stock-charts/edge run typecheck",
+      "group": "test",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Lint: Edge worker (fix)",
+      "detail": "Auto-format edge worker code with Prettier",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/edge run format",
+      "group": "none",
+      "problemMatcher": "$tsc"
     },
     {
       "label": "Lint: Backend .NET (check)",
@@ -309,10 +334,11 @@
     },
     {
       "label": "Test: All tests",
-      "detail": "Run all unit tests: Website, Libs, E2E, and Backend .NET",
+      "detail": "Run all unit tests: Website, Libs, Edge worker, E2E, and Backend .NET",
       "dependsOn": [
         "Test: Website",
         "Test: Libs",
+        "Test: Edge worker",
         "Test: Backend .NET",
         "Test: E2E (Playwright)"
       ],
@@ -325,6 +351,13 @@
       "detail": "Run Vitest unit tests for chartjs-financial and indy-charts libraries",
       "type": "shell",
       "command": "pnpm run test:libs",
+      "group": "test"
+    },
+    {
+      "label": "Test: Edge worker",
+      "detail": "Run Vitest unit tests for the Cloudflare Worker (server/edge)",
+      "type": "shell",
+      "command": "pnpm --filter @stock-charts/edge run test",
       "group": "test"
     },
     {
@@ -427,7 +460,7 @@
     // ===================================
     {
       "label": "Run: Full development stack",
-      "detail": "Start all Backend .NET services and Website dev server",
+      "detail": "Start the Web API and Website dev server directly (without the edge Worker; use \"Run: Edge worker\" separately for the Cloudflare-fronted stack)",
       "dependsOn": [
         "Stop: All services",
         "Run: Backend services",
@@ -437,56 +470,32 @@
     },
     {
       "label": "Run: Backend services",
-      "detail": "Start all Backend .NET services dev server",
-      "dependsOn": [
-        "Run: Azure Storage",
-        "Run: Azure Functions",
-        "Run: Web API"
-      ],
+      "detail": "Start the Web API dev server",
+      "dependsOn": ["Run: Web API"],
       "dependsOrder": "sequence"
     },
     {
-      "label": "Run: Azure Storage",
-      "detail": "Start Azurite (Azure Storage Emulator)",
+      "label": "Run: Edge worker",
+      "detail": "Start the Cloudflare Worker and API container locally (requires Docker)",
       "type": "shell",
-      "command": "pnpm run azure:start",
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "azure-storage",
-        "pattern": {
-          "regexp": "^$"
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "^Azurite .* service is starting",
-          "endsPattern": "^Azurite .* successfully listening"
-        }
-      },
-      "presentation": {
-        "clear": true
-      }
-    },
-    {
-      "label": "Run: Azure Functions",
-      "detail": "Start Azure Functions host",
-      "type": "shell",
-      "command": "node scripts/start-functions.js",
-      "dependsOn": "Build: Backend .NET (incremental)",
-      "dependsOrder": "sequence",
+      "command": "pnpm run edge:dev",
       "isBackground": true,
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "problemMatcher": {
-        "owner": "azure-functions",
+        "owner": "wrangler",
         "pattern": {
           "regexp": "^$"
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "^.*Azure Functions",
-          "endsPattern": "^.*Worker process started"
+          "beginsPattern": ".*wrangler.*",
+          "endsPattern": ".*Ready on http.*"
         }
+      },
+      "presentation": {
+        "clear": true
       }
     },
     {
@@ -551,11 +560,9 @@
     },
     {
       "label": "Run: VitePress chart demo full stack",
-      "detail": "Start Azurite, Azure Functions, Web API, and VitePress demo site for daily dev validation",
+      "detail": "Start the Web API and VitePress demo site for daily dev validation",
       "dependsOn": [
         "Stop: VitePress chart demo full stack",
-        "Run: Azure Storage",
-        "Run: Azure Functions",
         "Run: Web API",
         "Run: VitePress chart demo dev server"
       ],
@@ -563,7 +570,7 @@
     },
     {
       "label": "Stop: Backend services",
-      "detail": "Stop backend services (Azure Functions + Web API)",
+      "detail": "Stop backend .NET services (Web API)",
       "type": "shell",
       "command": "pnpm",
       "args": ["run", "stop:services"],
@@ -574,11 +581,11 @@
       "group": "none"
     },
     {
-      "label": "Stop: Azurite",
-      "detail": "Stop Azurite storage emulator (cross-platform)",
+      "label": "Stop: Edge worker",
+      "detail": "Stop the local Worker dev server (frees default port 8787)",
       "type": "shell",
       "command": "npx",
-      "args": ["kill-port", "10000", "10001", "10002"],
+      "args": ["kill-port", "8787"],
       "presentation": {
         "clear": false,
         "reveal": "silent"
@@ -611,11 +618,10 @@
     },
     {
       "label": "Stop: VitePress chart demo full stack",
-      "detail": "Stop VitePress demo server plus backend services and Azurite",
+      "detail": "Stop the VitePress demo server plus backend services",
       "dependsOn": [
         "Stop: VitePress chart demo dev server",
-        "Stop: Backend services",
-        "Stop: Azurite"
+        "Stop: Backend services"
       ],
       "dependsOrder": "sequence",
       "group": "none",
@@ -628,7 +634,7 @@
       "label": "Stop: All services",
       "detail": "Gracefully stop all running Backend and Website services (cross-platform)",
       "dependsOn": [
-        "Stop: Azurite",
+        "Stop: Edge worker",
         "Stop: Backend services",
         "Stop: Website dev server",
         "Stop: VitePress chart demo dev server"
@@ -649,7 +655,7 @@
       "dependsOn": [
         "Clean: Backend .NET (hard reset)",
         "Clean: Website",
-        "Clean: Root and Azure storage"
+        "Clean: Root"
       ],
       "dependsOrder": "sequence",
       "group": "build"
@@ -676,16 +682,10 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Clean: Root and Azure storage",
-      "detail": "Clean Azurite and root level items, including npm packages",
+      "label": "Clean: Root",
+      "detail": "Clean root level items, including npm packages",
       "type": "shell",
       "command": "pnpm run clean"
-    },
-    {
-      "label": "Clean: Azure Storage Emulator data",
-      "detail": "Delete local Azurite data and state",
-      "type": "shell",
-      "command": "pnpm run azure:clean"
     },
     {
       "label": "Delete: Claude temporary files",

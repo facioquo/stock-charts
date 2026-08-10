@@ -2,7 +2,6 @@
 
 using System.IO.Compression;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.Extensions.Azure;
 using WebApi.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -13,8 +12,10 @@ IServiceCollection services = builder.Services;
 services.AddControllers();
 
 // Get CORS origins from appsettings (semicolon-separated list)
-// reminder: Website origins for production are in cloud host settings » API » CORS
-// Demo origins supplement Website (CF Pages VitePress demo; not overridden by cloud host settings)
+// reminder: in production the edge Worker owns CORS — it answers preflight
+// without waking this container and rewrites Access-Control-* on every response
+// (see server/edge/src/index.ts). This policy is what makes direct hosting and
+// local development (`dotnet run` against the Vite dev server) work.
 string? allowedOriginConfig = configuration.GetValue<string>("CorsOrigins:Website");
 string[] websiteOrigins = allowedOriginConfig?.Split(';', StringSplitOptions.RemoveEmptyEntries) ?? [];
 
@@ -29,9 +30,11 @@ if (allowedOrigins.Length > 0)
     services.AddCors(options => {
         options.AddPolicy("CorsPolicy",
         cors => {
+            // No AllowCredentials: the API is fully anonymous (no cookies or
+            // auth), so advertising credentialed CORS would only widen what a
+            // compromised allowed origin could attempt.
             cors.AllowAnyHeader();
             cors.AllowAnyMethod();
-            cors.AllowCredentials();
             cors.WithOrigins(allowedOrigins)
                 .SetIsOriginAllowedToAllowWildcardSubdomains();
         });
@@ -75,16 +78,41 @@ services.AddOutputCache(options =>
         .SetVaryByQuery("*")
         .SetVaryByHeader("Origin")));
 
-// Add Azure dependencies
-services.AddAzureClients(builder => {
-    builder.AddBlobServiceClient(configuration.GetValue<string>("Storage:ConnectionString")
-        ?? "UseDevelopmentStorage=true");
+// Public origin used to build absolute URLs in the indicator catalog
+services.Configure<ApiSettings>(configuration.GetSection(ApiSettings.SectionName));
+
+// Quote datasets are fetched over HTTP from whatever host supplies them. In
+// production that is the edge Worker, which sets Quotes:BaseUrl to an internal
+// hostname it resolves through its R2 binding — see the envVars block in
+// server/edge/src/container.ts, the single source of truth for that address, so
+// no storage credentials are needed here. Leaving it unset (the norm for local
+// development) makes QuoteService serve its bundled backup dataset.
+string? quotesBaseUrl = configuration.GetValue<string>("Quotes:BaseUrl");
+
+// Validated eagerly at startup rather than inside the AddHttpClient configure
+// callback (which only runs lazily, on the first CreateClient call), so a
+// misconfigured value fails fast instead of surfacing on the first request.
+if (!string.IsNullOrWhiteSpace(quotesBaseUrl)
+    && (!Uri.TryCreate(quotesBaseUrl, UriKind.Absolute, out Uri? parsedQuotesBaseUrl)
+        || (parsedQuotesBaseUrl.Scheme != Uri.UriSchemeHttp && parsedQuotesBaseUrl.Scheme != Uri.UriSchemeHttps)))
+{
+    throw new InvalidOperationException(
+        $"Quotes:BaseUrl must be an absolute http or https URL. Got: '{quotesBaseUrl}'.");
+}
+
+services.AddHttpClient(HttpQuoteStore.HttpClientName, client => {
+    if (!string.IsNullOrWhiteSpace(quotesBaseUrl))
+    {
+        // Trailing slash is required: relative object names resolve against it.
+        client.BaseAddress = new Uri(quotesBaseUrl.TrimEnd('/') + '/');
+    }
+
+    client.Timeout = TimeSpan.FromSeconds(10);
 });
 
 // Add application services
-services.AddSingleton<IStorage, Storage>();
+services.AddSingleton<IQuoteStore, HttpQuoteStore>();
 services.AddSingleton<IQuoteService, QuoteService>();
-services.AddHostedService<StartupServices>();
 
 // Build application
 WebApplication app = builder.Build();
@@ -94,12 +122,10 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
-else
-{
-    app.UseHsts();
-}
 
-app.UseHttpsRedirection();
+// No HTTPS redirection or HSTS here: TLS terminates at the edge and the
+// Worker-to-container hop is plain HTTP on the container port. Redirecting
+// would bounce every proxied request to an unreachable https://localhost.
 app.UseRouting();
 app.UseCors("CorsPolicy");
 app.UseOutputCache();

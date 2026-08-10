@@ -2,7 +2,7 @@
   // globs to lint
   "globs": ["**/*.md"],
   "gitignore": true,
-  "ignores": [".azurite/**", ".github/**/*.md", "node_modules/**", "**/node_modules/**"],
+  "ignores": [".github/**/*.md", "node_modules/**", "**/node_modules/**"],
   "config": {
     "default": true,
     "MD003": { "style": "atx" },

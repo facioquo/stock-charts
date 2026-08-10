@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using WebApi.Controllers;
@@ -18,7 +20,12 @@ public class MainEndpointsTests
     public MainEndpointsTests()
     {
         _quoteServiceMock = new Mock<IQuoteService>();
-        _controller = new Main(_quoteServiceMock.Object, Options.Create(new CacheSettings()));
+        _controller = new Main(
+            _quoteServiceMock.Object,
+            Options.Create(new CacheSettings()),
+            Options.Create(new ApiSettings()),
+            Mock.Of<IHostEnvironment>(e => e.EnvironmentName == Environments.Development),
+            Mock.Of<ILogger<Main>>());
     }
 
     [Fact]
@@ -109,6 +116,38 @@ public class MainEndpointsTests
         Assert.IsType<OkObjectResult>(result);
         OkObjectResult okResult = (OkObjectResult)result;
         Assert.NotNull(okResult.Value);
+    }
+
+    [Fact]
+    public void GetIndicatorCatalog_WithPublicBaseUrlConfigured_UsesConfiguredOriginNotRequestHost()
+    {
+        // Arrange — behind the edge Worker the container only sees its own
+        // internal request host, so a configured PublicBaseUrl must win over
+        // whatever host the request arrived on.
+        Main controller = new(
+            _quoteServiceMock.Object,
+            Options.Create(new CacheSettings()),
+            Options.Create(new ApiSettings { PublicBaseUrl = "https://charts.stockindicators.dev/" }),
+            Mock.Of<IHostEnvironment>(e => e.EnvironmentName == Environments.Development),
+            Mock.Of<ILogger<Main>>());
+
+        DefaultHttpContext httpContext = new();
+        HttpRequest request = httpContext.Request;
+        request.Scheme = "http";
+        request.Host = new HostString("internal-container-host:8080");
+
+        controller.ControllerContext = new ControllerContext {
+            HttpContext = httpContext
+        };
+
+        // Act
+        IActionResult result = controller.GetIndicatorCatalog();
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        List<Models.IndicatorListing> listings = Assert.IsType<IEnumerable<Models.IndicatorListing>>(okResult.Value, exactMatch: false).ToList();
+        Assert.NotEmpty(listings);
+        Assert.All(listings, l => Assert.StartsWith("https://charts.stockindicators.dev/", l.Endpoint, StringComparison.Ordinal));
     }
 
     [Fact]
