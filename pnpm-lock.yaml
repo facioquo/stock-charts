@@ -117,10 +117,11 @@ importers:
         version: 3.5.41(typescript@6.0.3)
 
   server/edge:
-    devDependencies:
+    dependencies:
       '@cloudflare/containers':
         specifier: ^0.3.7
         version: 0.3.7
+    devDependencies:
       '@cloudflare/workers-types':
         specifier: ^5.20260810.1
         version: 5.20260810.1

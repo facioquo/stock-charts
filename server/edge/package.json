@@ -14,8 +14,10 @@
     "format": "prettier --write \"src/**/*.ts\" wrangler.jsonc",
     "format:check": "prettier --check \"src/**/*.ts\" wrangler.jsonc"
   },
+  "dependencies": {
+    "@cloudflare/containers": "^0.3.7"
+  },
   "devDependencies": {
-    "@cloudflare/containers": "^0.3.7",
     "@cloudflare/workers-types": "^5.20260810.1",
     "@types/node": "^26.2.0",
     "typescript": "~6.0.3",

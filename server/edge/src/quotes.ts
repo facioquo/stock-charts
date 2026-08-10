@@ -148,7 +148,7 @@ export async function refreshQuotes(env: Env): Promise<void> {
 
   const barsBySymbol = await fetchBars(env, symbols, from, into);
 
-  await Promise.all(
+  const results = await Promise.allSettled(
     symbols.map(async symbol => {
       const bars = barsBySymbol[symbol];
 
@@ -164,4 +164,21 @@ export async function refreshQuotes(env: Env): Promise<void> {
       console.log(`Updated dataset: ${key} (${bars.length} bars)`);
     })
   );
+
+  // One symbol's R2 write failing must not prevent the others from being
+  // published. Every rejection is logged individually before the failure is
+  // reported to the caller, so a failed cron invocation still reflects that
+  // at least one symbol did not update.
+  const failedSymbols: string[] = [];
+
+  results.forEach((result, index) => {
+    if (result.status === "rejected") {
+      failedSymbols.push(symbols[index]);
+      console.error(`Failed to update dataset for ${symbols[index]}:`, result.reason);
+    }
+  });
+
+  if (failedSymbols.length > 0) {
+    throw new Error(`Failed to refresh dataset(s) for: ${failedSymbols.join(", ")}`);
+  }
 }

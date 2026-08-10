@@ -18,11 +18,6 @@
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    // tsup's declaration build hardcodes `baseUrl: compilerOptions.baseUrl || "."`
-    // when it hands options to rollup-plugin-dts, and TypeScript 6 errors on the
-    // deprecated option (TS5101). Nothing here sets baseUrl, so this only
-    // silences tsup's injected value. Remove once tsup drops it.
-    "ignoreDeprecations": "6.0",
     "types": []
   },
   "include": ["**/*.ts"],

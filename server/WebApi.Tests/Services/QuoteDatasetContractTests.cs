@@ -22,14 +22,15 @@ namespace WebApi.Tests.Services;
 /// </remarks>
 public class QuoteDatasetContractTests
 {
-    private static string ContractJson()
-        => File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "quote-dataset.contract.json"));
+    private static Task<string> ContractJsonAsync(CancellationToken cancellationToken)
+        => File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "quote-dataset.contract.json"), cancellationToken);
 
     [Fact]
-    public void ContractFixture_DeserializesIntoFullyPopulatedBars()
+    public async Task ContractFixture_DeserializesIntoFullyPopulatedBars()
     {
         // Act
-        List<Bar>? bars = JsonSerializer.Deserialize<List<Bar>>(ContractJson());
+        string json = await ContractJsonAsync(TestContext.Current.CancellationToken);
+        List<Bar>? bars = JsonSerializer.Deserialize<List<Bar>>(json);
 
         // Assert — every field materializes; none fall back to a default.
         Assert.NotNull(bars);
@@ -48,10 +49,12 @@ public class QuoteDatasetContractTests
     public async Task QuoteService_ReadsContractFixtureFromStore()
     {
         // Arrange — the store hands back exactly the bytes the Worker writes.
+        string json = await ContractJsonAsync(TestContext.Current.CancellationToken);
+
         Mock<IQuoteStore> storeMock = new();
         storeMock
             .Setup(s => s.OpenQuotesAsync("QQQ", It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => new MemoryStream(Encoding.UTF8.GetBytes(ContractJson())));
+            .ReturnsAsync(() => new MemoryStream(Encoding.UTF8.GetBytes(json)));
 
         using MemoryCache cache = new(new MemoryCacheOptions());
         QuoteService service = new(

@@ -81,6 +81,21 @@ jobs:
           --property:ContinuousIntegrationBuild=true
           -warnAsError
 
+  # Verification gate only — no push. Catches a broken server/Dockerfile on the
+  # PR that changes it, rather than at deploy-api's first real build on main.
+  validate-container:
+    name: Validate container image
+    runs-on: ubuntu-latest
+    needs:
+      - versioning
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v7
+
+      - name: Build container image (no push)
+        run: docker build --platform linux/amd64 -f server/Dockerfile server/
+
   build-website:
     name: Build website
     runs-on: ubuntu-latest
@@ -206,6 +221,15 @@ jobs:
       - versioning
       - build-backend
       - build-website
+      - deploy-api
+    # deploy-api only runs on main; it is 'skipped' for preview builds, which
+    # must still be allowed to publish. On main, a failed API deploy must NOT
+    # be masked by a green Pages deployment.
+    if: |
+      always() &&
+      needs.build-backend.result == 'success' &&
+      needs.build-website.result == 'success' &&
+      (needs.deploy-api.result == 'success' || needs.deploy-api.result == 'skipped')
 
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'charts.stockindicators.dev' || 'preview' }}

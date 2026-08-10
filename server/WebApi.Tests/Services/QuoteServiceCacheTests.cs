@@ -73,9 +73,14 @@ public class QuoteServiceCacheTests
         await service.Get("QQQ", CancellationToken.None);
         await service.Get("SPY", CancellationToken.None);
 
-        // Assert — two distinct symbols means two storage reads, not four.
+        // Assert — two distinct symbols means two storage reads, not four, and
+        // each read is for the symbol it was cached under (not e.g. both reads
+        // for the same symbol by coincidence of count).
         storeMock.Verify(
-            s => s.OpenQuotesAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
-            Times.Exactly(2));
+            s => s.OpenQuotesAsync("QQQ", It.IsAny<CancellationToken>()),
+            Times.Once);
+        storeMock.Verify(
+            s => s.OpenQuotesAsync("SPY", It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 }

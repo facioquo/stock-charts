@@ -150,4 +150,21 @@ public class HttpQuoteStoreTests
         await Assert.ThrowsAsync<ArgumentException>(
             () => store.OpenQuotesAsync(symbol, CancellationToken.None));
     }
+
+    [Fact]
+    public async Task OpenQuotesAsync_WithCancelledToken_Throws()
+    {
+        // Arrange — the stub handler's SendAsync checks the token itself
+        // (mirroring what the real HttpClient pipeline does), so this exercises
+        // the same cancellation path a genuine request timeout would take.
+        using StubHandler handler = new(HttpStatusCode.OK, "[]");
+        HttpQuoteStore store = CreateStore(handler);
+
+        using CancellationTokenSource cts = new();
+        await cts.CancelAsync();
+
+        // Act / Assert
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => store.OpenQuotesAsync("QQQ", cts.Token));
+    }
 }

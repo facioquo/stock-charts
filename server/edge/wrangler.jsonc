@@ -60,6 +60,11 @@
     // and rewrites Access-Control-* itself, so this is the production source of
     // truth; server/WebApi/appsettings.json only covers direct/local hosting.
     "ALLOWED_ORIGINS": "https://charts.stockindicators.dev,https://dotnet.stockindicators.dev,https://stock-charts.pages.dev,https://stock-charts-vitepress.pages.dev",
+    // The deployed Worker's own origin. Passed through to the container as
+    // Api__PublicBaseUrl (see src/container.ts) so the /indicators catalog
+    // embeds externally-reachable URLs instead of the container's internal
+    // http://localhost:8080 address.
+    "PUBLIC_BASE_URL": "https://stock-charts-api.stockindicators.workers.dev",
     "QUOTE_SYMBOLS": "SPY,QQQ",
     "QUOTE_HISTORY_DAYS": "800"
   }

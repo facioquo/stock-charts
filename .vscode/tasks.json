@@ -427,7 +427,7 @@
     // ===================================
     {
       "label": "Run: Full development stack",
-      "detail": "Start all Backend .NET services and Website dev server",
+      "detail": "Start the Web API and Website dev server directly (without the edge Worker; use \"Run: Edge worker\" separately for the Cloudflare-fronted stack)",
       "dependsOn": [
         "Stop: All services",
         "Run: Backend services",

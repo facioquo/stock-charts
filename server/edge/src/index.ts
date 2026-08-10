@@ -67,7 +67,9 @@ export default {
     const hit = await cache.match(cacheKey);
 
     if (hit !== undefined) {
-      const response = new Response(hit.body, hit);
+      // The cache entry was written from a GET response and always carries a
+      // body. A HEAD request must not echo it back.
+      const response = new Response(request.method === "HEAD" ? null : hit.body, hit);
       response.headers.set(CACHE_STATUS, "HIT");
       applyCors(response.headers, allowedOrigin);
       return response;

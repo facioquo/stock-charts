@@ -137,6 +137,12 @@ jobs:
     name: Test edge worker
     runs-on: ubuntu-latest
 
+    # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
+    # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
+    permissions:
+      contents: read
+      packages: read
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -152,9 +158,13 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+          registry-url: https://npm.pkg.github.com
+          scope: "@facioquo"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check edge worker formatting
         run: pnpm --filter @stock-charts/edge run format:check

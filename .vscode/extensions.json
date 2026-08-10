@@ -10,6 +10,7 @@
     "dotjoshjohnson.xml",
     "EditorConfig.EditorConfig",
     "esbenp.prettier-vscode",
+    "GitHub.copilot-chat",
     "GitHub.vscode-github-actions",
     "mikestead.dotenv",
     // Docker tooling: wrangler builds the API container image locally.

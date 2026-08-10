@@ -74,7 +74,7 @@ export function ChartPage(): React.JSX.Element {
                   <li>Web API (port 5001)</li>
                 </ul>
                 <p className="api-error-help">
-                  Run <code>pnpm dev</code> for the frontend, and{" "}
+                  Run <code>pnpm start</code> for the frontend, and{" "}
                   <code>cd server/WebApi &amp;&amp; dotnet run</code> for the backend.
                 </p>
               </>

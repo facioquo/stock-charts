@@ -11,7 +11,9 @@ namespace WebApi.Controllers;
 public class Main(
     IQuoteService quoteService,
     IOptions<CacheSettings> cacheSettings,
-    IOptions<ApiSettings> apiSettings) : ControllerBase
+    IOptions<ApiSettings> apiSettings,
+    IHostEnvironment environment,
+    ILogger<Main> logger) : ControllerBase
 {
     private readonly IQuoteService quoteFeed = quoteService;
     private readonly TimeSpan cacheDuration = cacheSettings.Value.Duration;
@@ -41,9 +43,25 @@ public class Main(
 
         // Behind the edge Worker this container only sees its own internal
         // address, so the public origin comes from configuration when set.
-        string baseUrl = string.IsNullOrWhiteSpace(publicBaseUrl)
-            ? $"{Request.Scheme}://{Request.Host}"
-            : publicBaseUrl.TrimEnd('/');
+        string baseUrl;
+
+        if (string.IsNullOrWhiteSpace(publicBaseUrl))
+        {
+            if (!environment.IsDevelopment())
+            {
+                logger.LogWarning(
+                    "Api:PublicBaseUrl is not configured; the indicator catalog is falling back to " +
+                    "the request-derived origin {Scheme}://{Host}, which may be unreachable behind the edge Worker.",
+                    Request.Scheme,
+                    Request.Host);
+            }
+
+            baseUrl = $"{Request.Scheme}://{Request.Host}";
+        }
+        else
+        {
+            baseUrl = publicBaseUrl.TrimEnd('/');
+        }
 
         return Ok(Metadata.IndicatorListing(baseUrl));
     }
