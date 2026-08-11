@@ -176,14 +176,17 @@ export class FinancialController extends BarController {
     // keep them x-aligned with line/bar series that carry the same trailing
     // padding (see indy-charts `addExtraFinancialBars`), and gaps in real data
     // parse the same way.
+    //
+    // Both ends must be finite for a bar to count. A half-damaged bar draws no
+    // high-low wick, so letting its good end stretch the axis would reserve
+    // room for something that never appears.
     for (const point of parsed) {
-      if (Number.isFinite(point.l)) {
-        min = Math.min(min, point.l);
+      if (!Number.isFinite(point.l) || !Number.isFinite(point.h)) {
+        continue;
       }
 
-      if (Number.isFinite(point.h)) {
-        max = Math.max(max, point.h);
-      }
+      min = Math.min(min, point.l);
+      max = Math.max(max, point.h);
     }
 
     // Nothing finite leaves min/max as EMPTY_RANGE, which is exactly right:

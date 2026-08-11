@@ -76,6 +76,19 @@ describe("FinancialController.getMinMax", () => {
     expect(minMax(parsed)).toEqual({ min: 99, max: 104 + 299 });
   });
 
+  it("ignores a bar with only one end non-finite", () => {
+    // `buildFinancialDataPoints` maps each OHLC field independently, so a row
+    // carrying a good low beside a null high produces a half-damaged bar. It
+    // draws no wick, so it must not stretch the axis from its good end either.
+    const parsed = [
+      bar(1, 100, 110, 95, 105),
+      { x: 2, o: 105, h: NaN, l: 1, c: 118 },
+      { x: 3, o: 105, h: 999, l: NaN, c: 118 }
+    ];
+
+    expect(minMax(parsed)).toEqual({ min: 95, max: 110 });
+  });
+
   it("ignores infinite lows and highs", () => {
     // Non-finite covers more than NaN: an infinity reaching the scale would
     // stretch the axis to nothing usable rather than merely blanking a bar.
