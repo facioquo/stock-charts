@@ -76,6 +76,14 @@ describe("FinancialController.getMinMax", () => {
     expect(minMax(parsed)).toEqual({ min: 99, max: 104 + 299 });
   });
 
+  it("ignores infinite lows and highs", () => {
+    // Non-finite covers more than NaN: an infinity reaching the scale would
+    // stretch the axis to nothing usable rather than merely blanking a bar.
+    const parsed = [bar(1, 100, 110, 95, 105), bar(2, 105, Infinity, -Infinity, 118)];
+
+    expect(minMax(parsed)).toEqual({ min: 95, max: 110 });
+  });
+
   it("claims no range when every bar is non-finite", () => {
     // An inverted range is a no-op in the Math.min/Math.max fold Chart.js runs
     // over the scale's datasets. A concrete 0-1 would read as real data on a
