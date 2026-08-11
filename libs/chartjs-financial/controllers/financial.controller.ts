@@ -155,9 +155,27 @@ export class FinancialController extends BarController {
     let min = Number.POSITIVE_INFINITY;
     let max = Number.NEGATIVE_INFINITY;
 
+    // Skip non-finite bars. A single NaN low or high would otherwise poison
+    // the whole reduction — `Math.min(x, NaN)` is NaN — leaving the value
+    // scale with no usable bounds, so Chart.js falls back to 0-1 and clamps
+    // every candle off-canvas. Callers legitimately pad OHLC series with
+    // all-NaN bars to keep them x-aligned with line/bar series that carry the
+    // same trailing padding (see indy-charts `addExtraFinancialBars`), and
+    // gaps in real data parse the same way.
     for (const point of parsed) {
-      min = Math.min(min, point.l);
-      max = Math.max(max, point.h);
+      if (Number.isFinite(point.l)) {
+        min = Math.min(min, point.l);
+      }
+
+      if (Number.isFinite(point.h)) {
+        max = Math.max(max, point.h);
+      }
+    }
+
+    // Every bar was non-finite; match the too-little-data branch above rather
+    // than handing the scale ±Infinity.
+    if (!Number.isFinite(min) || !Number.isFinite(max)) {
+      return { min: 0, max: 1 };
     }
 
     return { min, max };
