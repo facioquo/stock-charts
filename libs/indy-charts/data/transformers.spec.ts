@@ -730,6 +730,46 @@ describe("buildFinancialDataPoints", () => {
     expect(points[1].c).toBe(103);
   });
 
+  it("treats explicit null OHLC as a gap, the same as a missing field", () => {
+    // The .NET API emits null (not a missing key, and never NaN) for warmup and
+    // unavailable periods, so nulls arrive here in normal operation.
+    const rows: IndicatorDataRow[] = [
+      { timestamp: "2024-01-02", open: null, high: null, low: null, close: null },
+      { timestamp: "2024-01-03", open: 101, high: 104, low: 99, close: 103 }
+    ];
+
+    const points = buildFinancialDataPoints(rows, result);
+
+    expect(points).toHaveLength(2);
+    expect(points[0].l).toBeNaN();
+    expect(points[1].l).toBe(99);
+  });
+
+  it("keeps every slot when a single bar in a long series is unusable", () => {
+    // One bad bar leaves a hole in place; it must not drop the slot and shift
+    // every later bar left. Positions come from each row's own timestamp, so
+    // the surrounding bars stay exactly where they were.
+    const rows: IndicatorDataRow[] = Array.from({ length: 300 }, (_, i) => ({
+      timestamp: new Date(Date.UTC(2024, 0, 1) + i * 86_400_000).toISOString(),
+      open: 100 + i,
+      high: 104 + i,
+      low: 99 + i,
+      close: 103 + i
+    }));
+    const holed = rows[150];
+    rows[150] = { timestamp: holed.timestamp, open: null, high: null, low: null, close: null };
+
+    const points = buildFinancialDataPoints(rows, result);
+
+    expect(points).toHaveLength(300);
+    expect(points[150].l).toBeNaN();
+    expect(points.filter(p => Number.isNaN(p.l))).toHaveLength(1);
+    // Neighbours keep their own values, and every slot keeps its own x.
+    expect(points[149].l).toBe(99 + 149);
+    expect(points[151].l).toBe(99 + 151);
+    expect(points.map(p => p.x)).toEqual(rows.map(r => new Date(r.timestamp as string).valueOf()));
+  });
+
   it("throws when a row is missing its timestamp", () => {
     const rows: IndicatorDataRow[] = [{ open: 101, high: 104, low: 99, close: 103 }];
 

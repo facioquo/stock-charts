@@ -67,6 +67,15 @@ describe("FinancialController.getMinMax", () => {
     expect(minMax(parsed)).toEqual({ min: 95, max: 120 });
   });
 
+  it("scales a long series from its usable bars when one is unusable", () => {
+    // One bad bar out of 300 leaves a hole in place; the other 299 still
+    // define the range and still occupy their own slots.
+    const parsed = Array.from({ length: 300 }, (_, i) => bar(i, 100 + i, 104 + i, 99 + i, 103 + i));
+    parsed[150] = padding(150);
+
+    expect(minMax(parsed)).toEqual({ min: 99, max: 104 + 299 });
+  });
+
   it("claims no range when every bar is non-finite", () => {
     // An inverted range is a no-op in the Math.min/Math.max fold Chart.js runs
     // over the scale's datasets. A concrete 0-1 would read as real data on a
