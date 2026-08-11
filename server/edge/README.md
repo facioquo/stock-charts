@@ -126,9 +126,17 @@ pnpm --filter @stock-charts/edge exec wrangler secret put ALPACA_KEY
 pnpm --filter @stock-charts/edge exec wrangler secret put ALPACA_SECRET
 ```
 
-The `CLOUDFLARE_API_TOKEN` repository secret needs **Workers Scripts**, **Containers**, and **R2**
-edit permissions — broader than the Pages-only scope it previously required. `CLOUDFLARE_ACCOUNT_ID`
-is unchanged.
+The `CLOUDFLARE_API_TOKEN` repository secret needs these permissions (verified empirically on
+the first production deploy — each one gated a different step):
+
+- **Account** — Workers Scripts: Edit (script upload), Containers: Edit (container registration),
+  Cloudflare Pages: Edit (site deploy)
+- **Zone** (`stockindicators.dev`) — Workers Routes: Edit (the `charts-api` custom-domain route);
+  DNS: Edit is only needed if the custom-domain DNS record must be (re)provisioned
+
+R2 permissions are **not** required: the deploy only attaches the bucket binding as script
+metadata, and runtime access goes through the Worker's binding, never this token.
+`CLOUDFLARE_ACCOUNT_ID` is unchanged.
 
 Containers require the **Workers Paid** plan ($5/month minimum).
 
