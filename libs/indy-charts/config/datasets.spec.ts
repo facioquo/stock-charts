@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import type { ScatterDataPoint } from "chart.js";
 
+import { PRICE_DATASET_ORDER } from "@facioquo/chartjs-chart-financial";
+
 import { baseDataset, createThresholdDataset } from "./datasets";
 import type { ChartThreshold, IndicatorResult, IndicatorResultConfig } from "./types";
 
@@ -61,6 +63,19 @@ describe("baseDataset", () => {
     // a static per-result color would override the up/down split.
     expect(ds.borderColor).toBeUndefined();
     expect(ds.backgroundColor).toBeUndefined();
+  });
+
+  it("puts a candle overlay on the price layer, ignoring the listing order", () => {
+    // The series replaces the price candles, so it has to occupy their layer:
+    // anything drawn over or under the price series must land the same way
+    // over or under the replacement. The listing's own order (1 for
+    // Heikin-Ashi) would otherwise float it above every other overlay.
+    const ds = baseDataset(
+      makeResult({ lineType: "candle", dataName: "close", order: 1 }),
+      makeResultConfig({ lineType: "candle", dataName: "close" })
+    );
+    expect(ds.order).toBe(PRICE_DATASET_ORDER);
+    expect(ds.order).not.toBe(1);
   });
 
   it("throws on an unsupported lineType", () => {
