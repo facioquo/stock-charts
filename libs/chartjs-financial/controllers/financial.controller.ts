@@ -85,6 +85,21 @@ interface Ruler {
   ratio: number;
 }
 
+/**
+ * The "no data to contribute" range for {@link FinancialController.getMinMax}.
+ *
+ * Chart.js seeds `Scale.getMinMax` with these same values and folds every
+ * dataset in with `Math.min`/`Math.max`, so an inverted range is a no-op:
+ * sibling datasets keep their own bounds instead of being widened. Returning a
+ * concrete span here — 0-1, say — would instead be a claim that the series
+ * holds values in that range, which reads as real data on a price axis and
+ * drags any co-plotted series' floor down with it.
+ *
+ * When nothing at all is on the scale, Chart.js applies its own empty-scale
+ * default; that is the framework's call to make, not this controller's.
+ */
+const EMPTY_RANGE = { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY };
+
 export class FinancialController extends BarController {
   static overrides = {
     label: "",
@@ -144,22 +159,38 @@ export class FinancialController extends BarController {
     const parsed = controller._cachedMeta._parsed;
     const axis = controller._cachedMeta.iScale.axis;
 
-    if (parsed.length < 2) {
-      return { min: 0, max: 1 };
-    }
-
     if (scale === controller._cachedMeta.iScale) {
-      return { min: parsed[0][axis] ?? 0, max: parsed[parsed.length - 1][axis] ?? 0 };
+      // Fewer than two bars cannot describe a span, so claim no range at all.
+      return parsed.length < 2
+        ? EMPTY_RANGE
+        : { min: parsed[0][axis] ?? 0, max: parsed[parsed.length - 1][axis] ?? 0 };
     }
 
     let min = Number.POSITIVE_INFINITY;
     let max = Number.NEGATIVE_INFINITY;
 
+    // Skip non-finite bars. A single NaN low or high would otherwise poison
+    // the whole reduction — `Math.min(x, NaN)` is NaN — leaving the value
+    // scale with no usable bounds, so Chart.js clamped every candle
+    // off-canvas. Callers legitimately pad OHLC series with all-NaN bars to
+    // keep them x-aligned with line/bar series that carry the same trailing
+    // padding (see indy-charts `addExtraFinancialBars`), and gaps in real data
+    // parse the same way.
+    //
+    // Both ends must be finite for a bar to count. A half-damaged bar draws no
+    // high-low wick, so letting its good end stretch the axis would reserve
+    // room for something that never appears.
     for (const point of parsed) {
+      if (!Number.isFinite(point.l) || !Number.isFinite(point.h)) {
+        continue;
+      }
+
       min = Math.min(min, point.l);
       max = Math.max(max, point.h);
     }
 
+    // Nothing finite leaves min/max as EMPTY_RANGE, which is exactly right:
+    // damaged or absent bars are simply not drawn and contribute no bounds.
     return { min, max };
   }
 

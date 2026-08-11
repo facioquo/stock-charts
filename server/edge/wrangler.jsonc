@@ -81,7 +81,25 @@
     // Origins allowed to call the API cross-site. The Worker answers preflight
     // and rewrites Access-Control-* itself, so this is the production source of
     // truth; server/WebApi/appsettings.json only covers direct/local hosting.
-    "ALLOWED_ORIGINS": "https://charts.stockindicators.dev,https://dotnet.stockindicators.dev,https://stock-charts.pages.dev,https://stock-charts-vitepress.pages.dev",
+    //
+    // Three kinds of entry, in order below:
+    //   1. Production custom domains.
+    //   2. Pages project default domains (`<project>.pages.dev`), which serve
+    //      the production branch. Cloudflare assigns these and may append a
+    //      suffix on name collision — hence `stock-indicators-dotnet-76p`.
+    //   3. `*.` wildcards for Cloudflare Pages preview deployments. Preview
+    //      hostnames are generated per branch and per deployment
+    //      (`<branch-slug>.<project>.pages.dev`, `<hash>.<project>.pages.dev`)
+    //      and change constantly, so they can only be matched by suffix — a
+    //      literal entry would be stale by the next push. The project apex is
+    //      the stable part. Without these, every chart on a PR preview fails
+    //      its fetch on CORS (facioquo/stock-indicators-dotnet#2183).
+    //
+    // The wildcard is deliberately anchored to each project rather than a
+    // blanket `https://*.pages.dev`, which would open the API to any site
+    // hosted on Cloudflare Pages. `resolveAllowedOrigin` never matches a `*.`
+    // entry against its own bare apex, so both forms are listed.
+    "ALLOWED_ORIGINS": "https://charts.stockindicators.dev,https://dotnet.stockindicators.dev,https://stock-charts.pages.dev,https://stock-charts-vitepress.pages.dev,https://stock-indicators-dotnet-76p.pages.dev,https://*.stock-charts.pages.dev,https://*.stock-charts-vitepress.pages.dev,https://*.stock-indicators-dotnet-76p.pages.dev",
     // The deployed Worker's own origin. Passed through to the container as
     // Api__PublicBaseUrl (see src/container.ts) so the /indicators catalog
     // embeds externally-reachable URLs instead of the container's internal
