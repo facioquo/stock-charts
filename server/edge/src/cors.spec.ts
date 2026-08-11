@@ -1,4 +1,6 @@
 import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
@@ -14,7 +16,10 @@ const ALLOW_LIST =
  * throws here, which is the intent.
  */
 function deployedAllowList(): string {
-  const config = readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8");
+  // Path built as a string: this package compiles against Workers types, where
+  // the global URL is not Node's and so is not a valid readFileSync argument.
+  const configPath = join(dirname(fileURLToPath(import.meta.url)), "..", "wrangler.jsonc");
+  const config = readFileSync(configPath, "utf8");
   const match = /"ALLOWED_ORIGINS":\s*"([^"]+)"/.exec(config);
 
   if (match === null) {
