@@ -1,5 +1,7 @@
 import { type ScatterDataPoint } from "chart.js";
 
+import { PRICE_DATASET_ORDER } from "@facioquo/chartjs-chart-financial";
+
 import {
   type ChartThreshold,
   type IndicatorDataset,
@@ -107,12 +109,18 @@ export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): Indic
       // built by `buildFinancialDataPoints`, not `{ x, y }`. Up/down/unchanged
       // colors come from the globally themed candlestick element defaults
       // (`applyFinancialElementTheme`), so no per-result color is applied.
+      //
+      // The series replaces the price candles rather than sitting over them
+      // (see ChartManager.syncPriceCandleVisibility), so it takes the price
+      // layer instead of the listing's own `order`. Otherwise every other
+      // overlay would stack against it differently than against the price
+      // candles it stands in for.
       const candleDataset: IndicatorDataset = {
         label: r.label,
         type: "candlestick",
         data: [],
         yAxisID: "y",
-        order: r.order
+        order: PRICE_DATASET_ORDER
       };
       return candleDataset;
     }

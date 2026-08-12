@@ -12,6 +12,18 @@ interface QuoteLike {
   volume: number;
 }
 
+/**
+ * Draw order of the price candles on the overlay chart, and of the volume bars
+ * just behind them. Chart.js draws highest `order` first, so these sit beneath
+ * the indicator series layered over them.
+ *
+ * Exported because a candle-rendered indicator that *replaces* the price series
+ * (e.g. Heikin-Ashi) has to claim the same layer, or every other overlay would
+ * stack against it differently than against the price candles it stands in for.
+ */
+export const PRICE_DATASET_ORDER = 75;
+const VOLUME_DATASET_ORDER = PRICE_DATASET_ORDER + 1;
+
 export function toFinancialDataPoint(quote: QuoteLike): FinancialDataPoint {
   return {
     x: new Date(quote.timestamp).valueOf(),
@@ -33,7 +45,7 @@ export function buildCandlestickDataset(
     data: priceData,
     yAxisID: "y",
     borderColor: borderColor as unknown as string,
-    order: 75
+    order: PRICE_DATASET_ORDER
   };
 }
 
@@ -81,6 +93,6 @@ export function buildVolumeDataset(
     yAxisID: "volumeAxis",
     backgroundColor: volumeColors,
     borderWidth: 0,
-    order: 76
+    order: VOLUME_DATASET_ORDER
   };
 }
