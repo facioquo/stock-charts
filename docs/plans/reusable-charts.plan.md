@@ -32,7 +32,7 @@ direct dependencies of `@facioquo/indy-charts` and install automatically.
 
 | Package | Workspace path | Description |
 | :--- | :--- | :--- |
-| `@facioquo/chartjs-chart-financial` | `libs/chartjs-financial/` | Chart.js financial plugin (candlestick, OHLC, volume) |
+| `@facioquo/chartjs-chart-financial` | `libs/chartjs-financial/` | Chart.js financial plugin (candlestick, OHLC, volume). Workspace-only — bundled into indy-charts, not published. |
 | `@facioquo/indy-charts` | `libs/indy-charts/` | High-level chart API, config, data transformers, API client |
 
 ### Consumers
@@ -60,6 +60,11 @@ external repo can install them.
     present on the registry.
   - Confirm both `@facioquo/chartjs-chart-financial` and `@facioquo/indy-charts`
     appear under the repository Packages page with the `latest` dist-tag.
+  - **Superseded:** `@facioquo/chartjs-chart-financial` is no longer published.
+    indy-charts bundles it (`alwaysBundle` in `tsdown.config.ts`) so consumers
+    install a single package, which is what the note above already required.
+    The package is now `private` and its publish workflow is removed; only
+    `publish-indy-charts.yml` remains.
 
 - [x] Task 5.2: Configure the external repository for GitHub Packages authentication
   - Create `.npmrc` at the repo root:
