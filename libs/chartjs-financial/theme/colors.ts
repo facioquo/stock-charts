@@ -9,7 +9,17 @@ export const COLORS = {
   CANDLE_UNCHANGED: "#616161",
   VOLUME_UP: "#1B5E2060",
   VOLUME_DOWN: "#B71C1C60",
-  VOLUME_UNCHANGED: "#61616160"
+  VOLUME_UNCHANGED: "#61616160",
+  // Dark-mode variants: lighter steps of the same green/red/grey families
+  // (Material 400-500 range) so marks clear WCAG contrast against the dark
+  // theme's #1e1f24 surface — the 900-range light-mode colors above drop to
+  // ~2:1 there and become hard to read.
+  DARK_CANDLE_UP: "#4CAF50",
+  DARK_CANDLE_DOWN: "#EF5350",
+  DARK_CANDLE_UNCHANGED: "#BDBDBD",
+  DARK_VOLUME_UP: "#4CAF5060",
+  DARK_VOLUME_DOWN: "#EF535060",
+  DARK_VOLUME_UNCHANGED: "#BDBDBD60"
 } as const;
 
 const LIGHT_PALETTE: FinancialPalette = {
@@ -30,24 +40,21 @@ const LIGHT_PALETTE: FinancialPalette = {
   }
 };
 
-// TODO: DARK_PALETTE currently uses the same colors as LIGHT_PALETTE.
-// Future work should define distinct dark-mode variants with appropriate contrast
-// adjustments for borders and volume colors to improve visibility in dark themes.
 const DARK_PALETTE: FinancialPalette = {
   candle: {
-    up: COLORS.CANDLE_UP,
-    down: COLORS.CANDLE_DOWN,
-    unchanged: COLORS.CANDLE_UNCHANGED
+    up: COLORS.DARK_CANDLE_UP,
+    down: COLORS.DARK_CANDLE_DOWN,
+    unchanged: COLORS.DARK_CANDLE_UNCHANGED
   },
   candleBorder: {
-    up: COLORS.CANDLE_UP,
-    down: COLORS.CANDLE_DOWN,
-    unchanged: COLORS.CANDLE_UNCHANGED
+    up: COLORS.DARK_CANDLE_UP,
+    down: COLORS.DARK_CANDLE_DOWN,
+    unchanged: COLORS.DARK_CANDLE_UNCHANGED
   },
   volume: {
-    up: COLORS.VOLUME_UP,
-    down: COLORS.VOLUME_DOWN,
-    unchanged: COLORS.VOLUME_UNCHANGED
+    up: COLORS.DARK_VOLUME_UP,
+    down: COLORS.DARK_VOLUME_DOWN,
+    unchanged: COLORS.DARK_VOLUME_UNCHANGED
   }
 };
 
