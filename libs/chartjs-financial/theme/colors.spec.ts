@@ -24,6 +24,13 @@ describe("financial colors", () => {
     expect(dark.volume.up).not.toBe(light.volume.up);
     expect(dark.volume.down).not.toBe(light.volume.down);
     expect(dark.volume.unchanged).not.toBe(light.volume.unchanged);
+
+    expect(dark.candle.up).toBe("#4CAF50");
+    expect(dark.candle.down).toBe("#EF5350");
+    expect(dark.candle.unchanged).toBe("#BDBDBD");
+    expect(getVolumeColor(10, 11, dark)).toBe(dark.volume.up);
+    expect(getVolumeColor(11, 10, dark)).toBe(dark.volume.down);
+    expect(getVolumeColor(10, 10, dark)).toBe(dark.volume.unchanged);
   });
 
   it("computes up/down/unchanged volume colors from open/close", () => {
