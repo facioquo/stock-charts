@@ -220,7 +220,7 @@ Client-side project dependencies are strictly in this direction only: web → in
 - `WebApi.Tests` is a self-hosting xUnit.net v3 executable
 - The project carries no VSTest packages and no `.runsettings` file
 - Name the project with `--project`
-- Place test application arguments after a `--` separator
+- Place test application arguments (`--coverlet`, `--report-xunit-trx`) after a `--` separator
 - Unrecognized tokens become test filters and silently match zero tests
 
 #### Caching
