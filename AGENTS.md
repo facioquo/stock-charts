@@ -212,7 +212,16 @@ Client-side project dependencies are strictly in this direction only: web → in
 - **Cloudflare Worker** (`server/edge/`): the API's front door. Answers CORS preflight, serves cached responses, and forwards misses to the container. Also owns the `scheduled` cron that refreshes quote datasets from Alpaca into R2
 - **R2**: stores one quote dataset per symbol, keyed by symbol and bar interval. The container holds no storage credentials. It fetches datasets over plain HTTP from an internal hostname. The Worker's `outboundByHost` handler resolves that through its R2 binding
 - **Directory.Packages.props**: Centralized NuGet version management
-- **Microsoft.Testing.Platform**: `global.json` opts `dotnet test` into the MTP runner. `WebApi.Tests` is a self-hosting xUnit.net v3 executable — no VSTest packages, and no `.runsettings`. Pass the project with `--project`, and put test-app arguments (`--coverlet`, `--report-xunit-trx`) after a `--` separator; anything `dotnet test` does not recognize becomes a test filter and silently matches zero tests
+
+#### Backend testing
+
+`global.json` opts `dotnet test` into the Microsoft Testing Platform (MTP) runner.
+
+- `WebApi.Tests` is a self-hosting xUnit.net v3 executable
+- The project carries no VSTest packages and no `.runsettings` file
+- Name the project with `--project`
+- Place test application arguments after a `--` separator
+- Unrecognized tokens become test filters and silently match zero tests
 
 #### Caching
 
