@@ -1,5 +1,6 @@
 {
   "name": "@stock-charts/web",
+  "private": true,
   "description": "React + Vite frontend for stock charts application",
   "type": "module",
   "scripts": {

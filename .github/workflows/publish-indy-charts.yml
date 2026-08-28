@@ -23,6 +23,7 @@ jobs:
   publish:
     name: "Publish indy-charts to GitHub Packages"
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: pkg.github.com
 
     steps:

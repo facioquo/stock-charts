@@ -1,0 +1,26 @@
+<Project>
+  <!--
+    Build settings shared by every project under server/. Package versions are
+    centralized separately in Directory.Packages.props, alongside this file.
+
+    Only genuinely shared settings belong here. Project-specific identity
+    (Title, UserSecretsId, IsTestProject, OutputType) stays in the .csproj that
+    owns it.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- net10.0 already defaults to C# 14; stating it makes the org pin visible
+         and keeps a future SDK from moving the language out from under us. -->
+    <LangVersion>14.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <!-- Analyzers run on every build and in the IDE, so a finding surfaces while
+       the code is being written rather than in CI. -->
+  <PropertyGroup>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+  </PropertyGroup>
+</Project>

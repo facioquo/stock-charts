@@ -1,5 +1,6 @@
 {
   "name": "stock-charts",
+  "private": true,
   "description": "Full-stack financial charting application with React frontend and .NET backend",
   "author": "facioquo",
   "license": "Apache-2.0",
