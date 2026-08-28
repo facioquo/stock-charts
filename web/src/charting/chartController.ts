@@ -8,7 +8,7 @@ import {
   type IndicatorSelection
 } from "@facioquo/indy-charts";
 
-import { apiClient, ApiClient } from "../api/apiClient";
+import { apiClient, type ApiClient } from "../api/apiClient";
 import { env } from "../config/env";
 import { getSettings } from "../services/userPrefs";
 import { scrollToEnd, scrollToStart } from "../services/meta";

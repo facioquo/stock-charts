@@ -6,10 +6,10 @@ import { ApiClient } from "./apiClient";
 import backupQuotes from "../data/backup-quotes.json";
 
 const okResponse = (body: unknown): Response =>
-  ({ ok: true, status: 200, json: async () => body }) as unknown as Response;
+  ({ ok: true, status: 200, json: () => Promise.resolve(body) }) as unknown as Response;
 
 const errorResponse = (status: number): Response =>
-  ({ ok: false, status, json: async () => [] }) as unknown as Response;
+  ({ ok: false, status, json: () => Promise.resolve([]) }) as unknown as Response;
 
 afterEach(() => {
   vi.restoreAllMocks();

@@ -75,7 +75,7 @@ export class ApiClient {
         "Backend API unavailable, using client-side backup quotes",
         this.errorInfo(error)
       );
-      return this.toQuotes(backupQuotes as ApiQuote[]);
+      return this.toQuotes(backupQuotes);
     }
   }
 

@@ -91,7 +91,7 @@ function makeListing(uiid: string, chartType: "overlay" | "oscillator"): Indicat
     chartConfig: null,
     parameters: [],
     results: []
-  } as unknown as IndicatorListing;
+  };
 }
 
 function makeSelection(uiid: string, chartType: "overlay" | "oscillator"): IndicatorSelection {
@@ -102,7 +102,7 @@ function makeSelection(uiid: string, chartType: "overlay" | "oscillator"): Indic
     chartType,
     params: [],
     results: []
-  } as unknown as IndicatorSelection;
+  };
 }
 
 describe("ChartController", () => {
