@@ -16,7 +16,11 @@ Enable developers to quickly evaluate and understand the FacioQuo.Stock.Indicato
 
 Agents working in this repository **MUST** have the `facioquo-management` plugin installed and apply its `org-rules` skill. The plugin carries the organization's canonical laws, SOPs, and standards, and is read from the installed copy.
 
-**HARD STOP:** if `facioquo-management` is not installed, or its canon cannot be read, stop and surface the blocker — do not proceed on assumption or a remembered summary.
+**Stop immediately** when `facioquo-management` is not installed, or when its canon cannot be read.
+
+- Surface the blocker rather than working around it
+- Do not proceed on an assumption
+- Do not proceed on a remembered summary of the rules
 
 **Repository-specific laws:** None.
 
@@ -48,7 +52,7 @@ stock-charts/
 │   ├── edge/                 # Cloudflare Worker: caching/CORS front door + quote refresh cron
 │   ├── Dockerfile            # Container image for the Web API
 │   ├── quote-dataset.contract.json  # Shared R2 dataset fixture (asserted from both languages)
-│   ├── Directory.Build.props     # Centralized MSBuild settings (TFM, analyzers)
+│   ├── Directory.Build.props     # Centralized MSBuild settings (framework, analyzers)
 │   └── Directory.Packages.props  # Centralized NuGet versions
 ├── tests/
 │   ├── playwright/           # End-to-end tests against web + VitePress
