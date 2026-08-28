@@ -7,20 +7,13 @@
     <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="coverlet.collector" Version="10.0.1" />
+    <PackageVersion Include="coverlet.MTP" Version="10.0.1" />
     <!-- FluentAssertions pinned to v7.x to avoid licensing changes in v8+ -->
     <PackageVersion Include="FluentAssertions" Version="7.2.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.11" />
     <PackageVersion Include="Moq" Version="4.20.72" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
-    <PackageVersion Include="Roslynator.Analyzers" Version="4.16.0" />
-    <!--
-      Preview release: required for the v3 API which includes breaking changes and performance
-      improvements not available in the v2 stable line. Risk mitigated by integration tests in
-      WebApi.Tests. Plan to upgrade to the stable v3 release once published.
-    -->
+    <PackageVersion Include="Roslynator.Analyzers" Version="5.0.0" />
     <PackageVersion Include="FacioQuo.Stock.Indicators" Version="3.0.0" />
-    <PackageVersion Include="xunit.v3" Version="3.2.2" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="xunit.v3" Version="4.0.0" />
   </ItemGroup>
 </Project>

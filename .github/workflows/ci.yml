@@ -50,21 +50,30 @@ jobs:
       - name: Verify .NET formatting
         run: dotnet format Charts.sln --verify-no-changes
 
+      # Microsoft.Testing.Platform runner (opted in via global.json): the project
+      # goes to `--project`, and everything after `--` is passed to the test
+      # application (coverlet.MTP and the xUnit TRX reporter). Any token
+      # `dotnet test` does not recognize is forwarded to the test application as
+      # a filter, which silently matches zero tests -- hence no bare
+      # `-warnAsError` here. The "Build .NET solution" step above already
+      # enforces warnings-as-errors over these same projects and configuration.
       - name: Run backend tests with coverage
         run: |
           dotnet tool restore
-          dotnet test Charts.sln \
-            --collect:"XPlat Code Coverage" \
-            --results-directory:./server/coverage \
-            --logger:trx \
+          dotnet test --project server/WebApi.Tests/WebApi.Tests.csproj \
             --configuration Release \
+            --results-directory ./server/coverage \
             --property:ContinuousIntegrationBuild=true \
-            -warnAsError
+            -- \
+            --coverlet \
+            --coverlet-output-format cobertura \
+            --report-xunit-trx \
+            --report-xunit-trx-filename backend.trx
 
       - name: Convert coverage to lcov format
         run: |
           dotnet tool run reportgenerator \
-            -reports:"server/coverage/**/coverage.cobertura.xml" \
+            -reports:"server/coverage/coverage.cobertura*.xml" \
             -targetdir:"server/coverage" \
             -reporttypes:"lcov"
 

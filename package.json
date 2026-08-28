@@ -4,7 +4,7 @@
   "author": "facioquo",
   "license": "Apache-2.0",
   "type": "module",
-  "packageManager": "pnpm@11.21.0",
+  "packageManager": "pnpm@11.24.0",
   "engines": {
     "node": ">=24"
   },
@@ -16,7 +16,7 @@
     "postinstall": "node scripts/setup-playwright-mcp.cjs",
     "clean": "rm -rf node_modules .codacy && pnpm -r run clean",
     "deps:check": "ncu --deep --peer",
-    "deps:update": "ncu --deep --peer --upgrade",
+    "deps:update": "ncu --deep --peer --target semver --upgrade",
     "prebuild": "node scripts/generate-backup-indicators.js",
     "build": "pnpm -r run build",
     "prebuild:prod": "node scripts/generate-backup-indicators.js",
@@ -29,7 +29,7 @@
     "test:coverage": "pnpm --filter @stock-charts/web run test:coverage",
     "test:libs": "pnpm --filter @facioquo/chartjs-chart-financial --filter @facioquo/indy-charts run test",
     "pretest:dotnet": "dotnet tool restore && rm -rf server/coverage",
-    "test:dotnet": "dotnet test Charts.sln --settings .runsettings --collect:\"XPlat Code Coverage\" --results-directory ./server/coverage --logger trx && (dotnet tool run reportgenerator -reports:server/coverage/**/coverage.cobertura.xml -targetdir:server/coverage -reporttypes:\"lcov;TextSummary\" 2>&1 | grep -v 'LoggerMessage.g.cs' || true) && echo && cat server/coverage/Summary.txt",
+    "test:dotnet": "dotnet test --project server/WebApi.Tests/WebApi.Tests.csproj --results-directory ./server/coverage -- --coverlet --coverlet-output-format cobertura --report-xunit-trx --report-xunit-trx-filename backend.trx && (dotnet tool run reportgenerator -reports:server/coverage/coverage.cobertura*.xml -targetdir:server/coverage -reporttypes:\"lcov;TextSummary\" 2>&1 | grep -v 'LoggerMessage.g.cs' || true) && echo && cat server/coverage/Summary.txt",
     "test:all": "pnpm --filter @stock-charts/web run test:coverage && pnpm run test:libs && pnpm run test:dotnet && pnpm run test:e2e",
     "smoke:package-consumption": "node scripts/smoke-indy-charts-vitepress-consumer.js",
     "lint": "bash scripts/website-lint.sh check && pnpm run lint:dotnet && pnpm run lint:md",
@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "markdownlint-cli2": "^0.23.2",
-    "npm-check-updates": "^23.0.2",
+    "npm-check-updates": "^23.1.0",
     "@playwright/test": "1.62.1",
     "postcss-scss": "^4.0.9",
     "prettier": "^3.9.6",

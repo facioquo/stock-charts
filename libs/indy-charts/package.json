@@ -68,12 +68,12 @@
     "@eslint/js": "^10.0.1",
     "@facioquo/chartjs-chart-financial": "workspace:*",
     "@vitest/eslint-plugin": "1.6.27",
-    "eslint": "^10.8.1",
+    "eslint": "^10.9.1",
     "eslint-config-prettier": "^10.1.8",
     "jiti": "^2.7.0",
     "tsdown": "^0.22.14",
-    "typescript-eslint": "^8.66.0",
-    "vitest": "^4.1.10",
-    "vue": "3.5.41"
+    "typescript-eslint": "^8.68.0",
+    "vitest": "^4.1.11",
+    "vue": "3.5.42"
   }
 }

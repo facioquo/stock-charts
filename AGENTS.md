@@ -80,7 +80,7 @@ pnpm run test                 # Run all tests (frontend + backend)
 pnpm run test:all             # Explicit all tests command
 pnpm --filter @stock-charts/web run test           # Frontend tests only
 pnpm run test:dotnet          # Backend tests only
-dotnet test Charts.sln        # .NET tests directly
+dotnet test --project server/WebApi.Tests/WebApi.Tests.csproj  # .NET tests directly
 
 # Workspace-specific
 pnpm --filter @stock-charts/web run <command>      # Run command in web workspace
@@ -212,6 +212,7 @@ Client-side project dependencies are strictly in this direction only: web → in
 - **Cloudflare Worker** (`server/edge/`): the API's front door. Answers CORS preflight, serves cached responses, and forwards misses to the container. Also owns the `scheduled` cron that refreshes quote datasets from Alpaca into R2
 - **R2**: stores one quote dataset per symbol, keyed by symbol and bar interval. The container holds no storage credentials. It fetches datasets over plain HTTP from an internal hostname. The Worker's `outboundByHost` handler resolves that through its R2 binding
 - **Directory.Packages.props**: Centralized NuGet version management
+- **Microsoft.Testing.Platform**: `global.json` opts `dotnet test` into the MTP runner. `WebApi.Tests` is a self-hosting xUnit.net v3 executable — no VSTest packages, and no `.runsettings`. Pass the project with `--project`, and put test-app arguments (`--coverlet`, `--report-xunit-trx`) after a `--` separator; anything `dotnet test` does not recognize becomes a test filter and silently matches zero tests
 
 #### Caching
 
