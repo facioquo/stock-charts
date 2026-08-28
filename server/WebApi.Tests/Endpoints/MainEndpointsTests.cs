@@ -63,8 +63,7 @@ public class MainEndpointsTests
         IActionResult result = await _controller.GetQuotes();
 
         // Assert
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult okResult = (OkObjectResult)result;
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
         Assert.NotNull(okResult.Value);
     }
 
@@ -113,8 +112,7 @@ public class MainEndpointsTests
         IActionResult result = _controller.GetIndicatorCatalog();
 
         // Assert
-        Assert.IsType<OkObjectResult>(result);
-        OkObjectResult okResult = (OkObjectResult)result;
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
         Assert.NotNull(okResult.Value);
     }
 

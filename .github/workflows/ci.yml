@@ -53,10 +53,13 @@ jobs:
       - name: Run backend tests with coverage
         run: |
           dotnet tool restore
-          dotnet test Charts.sln \
-            --collect:"XPlat Code Coverage" \
+          dotnet test server/WebApi.Tests/WebApi.Tests.csproj \
             --results-directory:./server/coverage \
-            --logger:trx \
+            --coverlet \
+            --coverlet-output-format:cobertura \
+            --coverlet-output-format:lcov \
+            --report-xunit-trx \
+            --report-xunit-trx-filename:backend.trx \
             --configuration Release \
             --property:ContinuousIntegrationBuild=true \
             -warnAsError
@@ -64,7 +67,7 @@ jobs:
       - name: Convert coverage to lcov format
         run: |
           dotnet tool run reportgenerator \
-            -reports:"server/coverage/**/coverage.cobertura.xml" \
+              -reports:"server/coverage/coverage.cobertura*.xml" \
             -targetdir:"server/coverage" \
             -reporttypes:"lcov"
 

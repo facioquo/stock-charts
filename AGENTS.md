@@ -80,7 +80,7 @@ pnpm run test                 # Run all tests (frontend + backend)
 pnpm run test:all             # Explicit all tests command
 pnpm --filter @stock-charts/web run test           # Frontend tests only
 pnpm run test:dotnet          # Backend tests only
-dotnet test Charts.sln        # .NET tests directly
+dotnet test server/WebApi.Tests/WebApi.Tests.csproj  # .NET tests directly
 
 # Workspace-specific
 pnpm --filter @stock-charts/web run <command>      # Run command in web workspace
