@@ -12,6 +12,14 @@ Enable developers to quickly evaluate and understand the FacioQuo.Stock.Indicato
 2. Ensure seamless first-run experience for developers on all platforms through automated setup and clear documentation (not as important as #1)
 3. Maintain visual quality and performance that reflects real-world production requirements so developers can trust the library's capabilities (not as important as #2)
 
+## Org rules
+
+Agents working in this repository **MUST** have the `facioquo-management` plugin installed and apply its `org-rules` skill. The plugin carries the organization's canonical laws, SOPs, and standards, and is read from the installed copy.
+
+**HARD STOP:** if `facioquo-management` is not installed, or its canon cannot be read, stop and surface the blocker — do not proceed on assumption or a remembered summary.
+
+**Repository-specific laws:** None.
+
 ## Repository structure
 
 ```text
@@ -40,6 +48,7 @@ stock-charts/
 │   ├── edge/                 # Cloudflare Worker: caching/CORS front door + quote refresh cron
 │   ├── Dockerfile            # Container image for the Web API
 │   ├── quote-dataset.contract.json  # Shared R2 dataset fixture (asserted from both languages)
+│   ├── Directory.Build.props     # Centralized MSBuild settings (TFM, analyzers)
 │   └── Directory.Packages.props  # Centralized NuGet versions
 ├── tests/
 │   ├── playwright/           # End-to-end tests against web + VitePress
@@ -212,6 +221,7 @@ Client-side project dependencies are strictly in this direction only: web → in
 - **Cloudflare Worker** (`server/edge/`): the API's front door. Answers CORS preflight, serves cached responses, and forwards misses to the container. Also owns the `scheduled` cron that refreshes quote datasets from Alpaca into R2
 - **R2**: stores one quote dataset per symbol, keyed by symbol and bar interval. The container holds no storage credentials. It fetches datasets over plain HTTP from an internal hostname. The Worker's `outboundByHost` handler resolves that through its R2 binding
 - **Directory.Packages.props**: Centralized NuGet version management
+- **Directory.Build.props**: Centralized MSBuild settings — target framework, language version, and analyzer switches, so no `.csproj` restates them
 - **Microsoft.Testing.Platform**: `global.json` opts `dotnet test` into the MTP runner. `WebApi.Tests` is a self-hosting xUnit.net v3 executable — no VSTest packages, and no `.runsettings`. Pass the project with `--project`, and put test-app arguments (`--coverlet`, `--report-xunit-trx`) after a `--` separator; anything `dotnet test` does not recognize becomes a test filter and silently matches zero tests
 
 #### Caching
