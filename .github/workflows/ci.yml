@@ -22,6 +22,7 @@ permissions:
 jobs:
   test-backend:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     permissions:
       # dorny/test-reporter writes a check run with the parsed .trx results.
@@ -96,6 +97,7 @@ jobs:
 
   test-libraries:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
     # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
@@ -136,6 +138,14 @@ jobs:
           pnpm --filter '@facioquo/chartjs-chart-financial' run lint --max-warnings=0
           pnpm --filter '@facioquo/indy-charts' run lint --max-warnings=0
 
+      # The VitePress host and the Node build scripts have ESLint configs but no
+      # other job that runs them; they ride here because this job has the built
+      # libraries the VitePress host imports.
+      - name: Lint VitePress host and root scripts
+        run: |
+          pnpm --filter @stock-charts/vitepress-example run lint --max-warnings=0
+          pnpm run lint:scripts --max-warnings=0
+
       - name: Run library unit tests
         run: pnpm run test:libs
 
@@ -145,6 +155,7 @@ jobs:
   test-edge:
     name: Test edge worker
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
     # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
@@ -178,6 +189,9 @@ jobs:
       - name: Check edge worker formatting
         run: pnpm --filter @stock-charts/edge run format:check
 
+      - name: Lint edge worker
+        run: pnpm --filter @stock-charts/edge run lint --max-warnings=0
+
       - name: Typecheck edge worker
         run: pnpm --filter @stock-charts/edge run typecheck
 
@@ -187,6 +201,7 @@ jobs:
   test-web:
     needs: [test-libraries]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
     # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
     permissions:
@@ -234,6 +249,9 @@ jobs:
       - name: Check web formatting
         run: pnpm run format:web:check
 
+      - name: Lint web app
+        run: pnpm --filter @stock-charts/web run lint --max-warnings=0
+
       - name: Lint CSS
         run: pnpm run lint:css
 
@@ -254,6 +272,7 @@ jobs:
 
   test-e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: [test-libraries, test-web]
     # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
     # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
@@ -307,6 +326,7 @@ jobs:
 
   lint-and-test:
     runs-on: ubuntu-slim
+    timeout-minutes: 5
     needs: [test-backend, test-edge, test-libraries, test-web, test-e2e]
     if: always()
     steps:

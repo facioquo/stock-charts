@@ -1,5 +1,6 @@
 {
   "name": "stock-charts",
+  "private": true,
   "description": "Full-stack financial charting application with React frontend and .NET backend",
   "author": "facioquo",
   "license": "Apache-2.0",
@@ -53,12 +54,17 @@
     "dev": "pnpm --filter @stock-charts/web run dev",
     "edge:dev": "pnpm --filter @stock-charts/edge run dev",
     "edge:deploy": "pnpm --filter @stock-charts/edge run deploy",
-    "stop:services": "node scripts/stop-services.js"
+    "stop:services": "node scripts/stop-services.js",
+    "lint:scripts": "eslint .",
+    "lint:scripts:fix": "eslint . --fix"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.62.1",
+    "eslint": "^10.9.1",
+    "globals": "^16.5.0",
     "markdownlint-cli2": "^0.23.2",
     "npm-check-updates": "^23.1.0",
-    "@playwright/test": "1.62.1",
     "postcss-scss": "^4.0.9",
     "prettier": "^3.9.6",
     "stylelint": "^17.14.1",

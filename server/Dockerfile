@@ -9,8 +9,10 @@
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Restore first so the layer caches across source-only changes.
-COPY Directory.Packages.props ./
+# Restore first so the layer caches across source-only changes. Both Directory.*
+# props files are evaluated during restore, so they precede it: Build.props
+# carries TargetFramework and the analyzer settings, Packages.props the versions.
+COPY Directory.Build.props Directory.Packages.props ./
 COPY WebApi/WebApi.csproj WebApi/packages.lock.json WebApi/
 RUN dotnet restore WebApi/WebApi.csproj --locked-mode
 

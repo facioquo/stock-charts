@@ -29,6 +29,7 @@ jobs:
   versioning:
     name: Define version
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       version: ${{ steps.marker.outputs.version }}
 
@@ -50,6 +51,7 @@ jobs:
   build-backend:
     name: Build backend
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs:
       - versioning
 
@@ -86,6 +88,7 @@ jobs:
   validate-container:
     name: Validate container image
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs:
       - versioning
 
@@ -99,6 +102,7 @@ jobs:
   build-website:
     name: Build website
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs:
       - versioning
 
@@ -165,6 +169,7 @@ jobs:
   deploy-api:
     name: Deploy API
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     if: github.ref == 'refs/heads/main'
     needs:
       - versioning
@@ -217,6 +222,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs:
       - versioning
       - build-backend
