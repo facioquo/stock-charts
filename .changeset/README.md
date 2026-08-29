@@ -35,7 +35,13 @@ changeset rather than getting one of its own.
 1. Pull requests merge to `main` carrying their changeset files.
 2. The release workflow opens (or updates) a **Version Packages** pull request
    that consumes them, bumps the version, and writes `CHANGELOG.md`.
-3. Merging that pull request publishes to GitHub Packages.
+3. Its CI starts in an approval-required state, because a workflow opened it.
+   Press **Approve and run** on that pull request's Actions tab so the required
+   `lint-and-test` check reports.
+4. Merging that pull request publishes to GitHub Packages.
+
+Step 3 is expected, not a fault: GitHub holds CI for pull requests opened by a
+workflow. If the check never appears at all, close and reopen the pull request.
 
 Do not hand-edit a merged changeset file or the generated Version Packages pull
 request — add another changeset and let the workflow regenerate it.

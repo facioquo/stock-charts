@@ -78,6 +78,22 @@ jobs:
           pnpm --filter @facioquo/indy-charts run build
           pnpm --filter @facioquo/indy-charts run test
 
+      # Releasing needs one manual step, by design.
+      #
+      # This action opens the Version Packages pull request using GITHUB_TOKEN.
+      # GitHub deliberately starts CI for a pull request opened that way in an
+      # approval-required state, so `lint-and-test` — the branch ruleset's
+      # required check — waits until someone with write access presses
+      # "Approve and run" on the pull request's Actions tab. It then runs
+      # normally and the pull request becomes mergeable.
+      #
+      # A personal access token or GitHub App token would remove that click, at
+      # the cost of a standing credential that can push to main. The click is
+      # cheaper: the same person merges the release pull request anyway, so this
+      # adds nothing to the flow that was not already manual.
+      #
+      # If the check never appears at all, close and reopen the pull request —
+      # a human-triggered reopen starts CI without the approval gate.
       - name: Open the version pull request, or publish
         uses: changesets/action@v1
         with:
