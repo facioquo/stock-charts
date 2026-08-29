@@ -22,6 +22,7 @@ permissions:
 jobs:
   test-backend:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     permissions:
       # dorny/test-reporter writes a check run with the parsed .trx results.
@@ -96,6 +97,7 @@ jobs:
 
   test-libraries:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
     # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
@@ -153,6 +155,7 @@ jobs:
   test-edge:
     name: Test edge worker
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
     # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
@@ -198,6 +201,7 @@ jobs:
   test-web:
     needs: [test-libraries]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
     # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
     permissions:
@@ -268,6 +272,7 @@ jobs:
 
   test-e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: [test-libraries, test-web]
     # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
     # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
@@ -321,6 +326,7 @@ jobs:
 
   lint-and-test:
     runs-on: ubuntu-slim
+    timeout-minutes: 5
     needs: [test-backend, test-edge, test-libraries, test-web, test-e2e]
     if: always()
     steps:
