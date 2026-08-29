@@ -753,9 +753,6 @@ public class MainEndpointsTests
         });
     }
 
-    /// <summary>
-    /// Helper to generate sample quote data for tests.
-    /// </summary>
     // Benchmark-comparison endpoints (BETA, CORRELATION, PRS) read a second
     // series for the market benchmark. These tests pin that behaviour, because
     // when the benchmark resolves to the same bars as the evaluated security
@@ -860,6 +857,9 @@ public class MainEndpointsTests
         return quotes;
     }
 
+    /// <summary>
+    /// Helper to generate sample quote data for tests.
+    /// </summary>
     private static List<Bar> GenerateSampleQuotes(int count)
         => GenerateSampleQuotes(count, DateTime.UtcNow.AddDays(-count));
 

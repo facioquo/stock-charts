@@ -1008,61 +1008,6 @@ public static class Metadata
                 ]
             },
 
-            // Correlation Coefficient
-            // Charted against the SPY benchmark the API fixes for comparison
-            // indicators; the caller does not choose it, so there is no symbol
-            // parameter. Correlation (-1 to 1) and R² (0 to 1) are both
-            // dimensionless, so they share one y-axis without misleading.
-            new IndicatorListing {
-                Name = "Correlation Coefficient (vs SPY)",
-                Uiid = "CORRELATION",
-                LegendTemplate = "CORRELATION([P1])",
-                Endpoint = $"{baseUrl}/CORRELATION/",
-                Category = "price-characteristic",
-                ChartType = "oscillator",
-                ChartConfig = new ChartConfig {
-                    Thresholds =
-                    [
-                        // Zero is the meaningful reference: above is positive
-                        // correlation with the benchmark, below is negative.
-                        new() {
-                            Value = 0,
-                            Color = ChartColors.ThresholdGrayTransparent,
-                            Style = "dash"
-                        }
-                    ]
-                },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 250
-                    }
-                ],
-                Results = [
-                    new() {
-                        DisplayName = "Correlation",
-                        TooltipTemplate = "Correlation",
-                        DataName = "correlation",
-                        DataType = "number",
-                        LineType = "solid",
-                        DefaultColor = ChartColors.StandardBlue
-                    },
-                    new() {
-                        DisplayName = "R²",
-                        TooltipTemplate = "R-Squared",
-                        DataName = "rSquared",
-                        DataType = "number",
-                        LineType = "dash",
-                        DefaultColor = ChartColors.StandardGreen
-                    }
-                ]
-            },
-
             // ConnorsRSI
             new IndicatorListing {
                 Name = "ConnorsRSI (CRSI)",
@@ -1134,6 +1079,61 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
+                    }
+                ]
+            },
+
+            // Correlation Coefficient
+            // Charted against the SPY benchmark the API fixes for comparison
+            // indicators; the caller does not choose it, so there is no symbol
+            // parameter. Correlation (-1 to 1) and R² (0 to 1) are both
+            // dimensionless, so they share one y-axis without misleading.
+            new IndicatorListing {
+                Name = "Correlation Coefficient (vs SPY)",
+                Uiid = "CORRELATION",
+                LegendTemplate = "CORRELATION([P1])",
+                Endpoint = $"{baseUrl}/CORRELATION/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        // Zero is the meaningful reference: above is positive
+                        // correlation with the benchmark, below is negative.
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Correlation",
+                        TooltipTemplate = "Correlation",
+                        DataName = "correlation",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "R²",
+                        TooltipTemplate = "R-Squared",
+                        DataName = "rSquared",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardGreen
                     }
                 ]
             },
