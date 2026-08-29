@@ -10,7 +10,7 @@ import { ChartController, type ChartState } from "./chartController";
 let instance: ChartController | undefined;
 
 export function getChartController(): ChartController {
-  if (!instance) instance = new ChartController();
+  instance ??= new ChartController();
   return instance;
 }
 

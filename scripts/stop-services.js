@@ -26,7 +26,7 @@ function tryKill(cmd, description) {
   try {
     execSync(cmd, { stdio: "ignore" });
     console.log(`✅ ${description}`);
-  } catch (error) {
+  } catch {
     // Silently ignore errors (expected if service isn't running)
     console.log(`ℹ️  ${description} (no running processes)`);
   }

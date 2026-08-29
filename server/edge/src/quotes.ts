@@ -101,7 +101,7 @@ async function fetchBars(
       throw new Error(`Alpaca responded ${response.status}: ${await response.text()}`);
     }
 
-    const payload = (await response.json()) as AlpacaBarsResponse;
+    const payload = await response.json<AlpacaBarsResponse>();
 
     for (const [symbol, bars] of Object.entries(payload.bars ?? {})) {
       collected[symbol] = [...(collected[symbol] ?? []), ...bars];
