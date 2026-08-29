@@ -56,9 +56,13 @@
     "edge:deploy": "pnpm --filter @stock-charts/edge run deploy",
     "stop:services": "node scripts/stop-services.js",
     "lint:scripts": "eslint .",
-    "lint:scripts:fix": "eslint . --fix"
+    "lint:scripts:fix": "eslint . --fix",
+    "changeset": "changeset",
+    "changeset:status": "changeset status --since=origin/main",
+    "changeset:version": "changeset version"
   },
   "devDependencies": {
+    "@changesets/cli": "^3.0.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "1.62.1",
     "eslint": "^10.9.1",
