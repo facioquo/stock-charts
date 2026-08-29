@@ -1008,6 +1008,61 @@ public static class Metadata
                 ]
             },
 
+            // Correlation Coefficient
+            // Charted against the SPY benchmark the API fixes for comparison
+            // indicators; the caller does not choose it, so there is no symbol
+            // parameter. Correlation (-1 to 1) and R² (0 to 1) are both
+            // dimensionless, so they share one y-axis without misleading.
+            new IndicatorListing {
+                Name = "Correlation Coefficient (vs SPY)",
+                Uiid = "CORRELATION",
+                LegendTemplate = "CORRELATION([P1])",
+                Endpoint = $"{baseUrl}/CORRELATION/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        // Zero is the meaningful reference: above is positive
+                        // correlation with the benchmark, below is negative.
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Correlation",
+                        TooltipTemplate = "Correlation",
+                        DataName = "correlation",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "R²",
+                        TooltipTemplate = "R-Squared",
+                        DataName = "rSquared",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardGreen
+                    }
+                ]
+            },
+
             // ConnorsRSI
             new IndicatorListing {
                 Name = "ConnorsRSI (CRSI)",
@@ -2594,6 +2649,32 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
+                    }
+                ]
+            },
+
+            // Price Relative Strength (PRS)
+            // Charts the raw eval/benchmark price ratio only. PrsPercent is
+            // omitted deliberately: it is a percentage and would need its own
+            // y-axis, the same mixed-unit problem that split SMA analysis into
+            // per-metric listings. No threshold line either — PRS is an
+            // unnormalized ratio, so no fixed value marks equal performance.
+            new IndicatorListing {
+                Name = "Price Relative Strength (vs SPY)",
+                Uiid = "PRS",
+                LegendTemplate = "PRS",
+                Endpoint = $"{baseUrl}/PRS/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                Parameters = [],
+                Results = [
+                    new() {
+                        DisplayName = "PRS",
+                        TooltipTemplate = "PRS",
+                        DataName = "prs",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },

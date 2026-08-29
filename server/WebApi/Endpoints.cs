@@ -22,6 +22,11 @@ public class Main(
     // GLOBALS
     private const int limitLast = 120;
 
+    // Market benchmark for indicators that compare one security against another
+    // (BETA, CORRELATION, PRS). SPY is one of the two symbols the scheduled
+    // quote refresh maintains, and the demo evaluates QQQ against it.
+    private const string benchmarkSymbol = "SPY";
+
     [HttpGet]
     public string Get()
         => "API is functioning nominally.";
@@ -72,6 +77,32 @@ public class Main(
         {
             IReadOnlyList<Bar> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
             IEnumerable<T> results = indicatorFunc(quotes).TakeLast(limitLast);
+            SetClientCache();
+            return Ok(results);
+        }
+        catch (ArgumentOutOfRangeException rex)
+        {
+            return BadRequest(rex.Message);
+        }
+    }
+
+    // Some indicators measure a security against a market benchmark and so need
+    // a second series. The benchmark is fixed rather than a request parameter:
+    // QuoteService serves only the symbols the scheduled refresh maintains, so
+    // an arbitrary caller-supplied symbol has no data behind it.
+    private async Task<IActionResult> GetVsBenchmark<T>(
+        Func<IReadOnlyList<Bar>, IReadOnlyList<Bar>, IEnumerable<T>> indicatorFunc)
+    {
+        try
+        {
+            // Fetched in sequence, not in parallel: both reads normally land in
+            // the in-memory quote cache, so the saving would be negligible and
+            // is not worth issuing concurrent requests against a shared cache.
+            IReadOnlyList<Bar> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
+            IReadOnlyList<Bar> benchmark
+                = (await quoteFeed.Get(benchmarkSymbol, HttpContext.RequestAborted)).ToList();
+
+            IEnumerable<T> results = indicatorFunc(quotes, benchmark).TakeLast(limitLast);
             SetClientCache();
             return Ok(results);
         }
@@ -145,21 +176,8 @@ public class Main(
         => Get(quotes => quotes.ToBollingerBands(lookbackPeriods, standardDeviations));
 
     [HttpGet("BETA")]
-    public async Task<IActionResult> GetBeta(int lookbackPeriods, BetaType type)
-    {
-        try
-        {
-            IReadOnlyList<Bar> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
-            IReadOnlyList<Bar> market = (await quoteFeed.Get("SPY", HttpContext.RequestAborted)).ToList();
-            IEnumerable<BetaResult> results = quotes.ToBeta(market, lookbackPeriods, type).TakeLast(limitLast);
-            SetClientCache();
-            return Ok(results);
-        }
-        catch (ArgumentOutOfRangeException rex)
-        {
-            return BadRequest(rex.Message);
-        }
-    }
+    public Task<IActionResult> GetBeta(int lookbackPeriods, BetaType type)
+        => GetVsBenchmark((quotes, market) => quotes.ToBeta(market, lookbackPeriods, type));
 
     [HttpGet("BOP")]
     public Task<IActionResult> GetBop(int smoothPeriods)
@@ -192,6 +210,10 @@ public class Main(
     [HttpGet("CMO")]
     public Task<IActionResult> GetCmo(int lookbackPeriods)
         => Get(quotes => quotes.ToCmo(lookbackPeriods));
+
+    [HttpGet("CORRELATION")]
+    public Task<IActionResult> GetCorrelation(int lookbackPeriods)
+        => GetVsBenchmark((quotes, market) => quotes.ToCorrelation(market, lookbackPeriods));
 
     [HttpGet("CRSI")]
     public Task<IActionResult> GetConnorsRsi(int rsiPeriods, int streakPeriods, int rankPeriods)
@@ -336,6 +358,12 @@ public class Main(
     [HttpGet("PMO")]
     public Task<IActionResult> GetPmo(int timePeriods, int smoothPeriods, int signalPeriods)
         => Get(quotes => quotes.ToPmo(timePeriods, smoothPeriods, signalPeriods));
+
+    // No lookbackPeriods parameter: it only drives PrsPercent, which this
+    // listing does not chart (see the catalog entry).
+    [HttpGet("PRS")]
+    public Task<IActionResult> GetPrs()
+        => GetVsBenchmark((quotes, market) => quotes.ToPrs(market));
 
     [HttpGet("PSAR")]
     public Task<IActionResult> GetParabolicSar(double accelerationStep, double maxAccelerationFactor)
