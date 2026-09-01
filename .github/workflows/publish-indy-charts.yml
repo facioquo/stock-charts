@@ -1,25 +1,9 @@
 name: "Publish @facioquo/indy-charts"
 
-# Releases are driven by Changesets, not by a hand-edited version field.
-#
-# A pull request that changes the package carries a `.changeset/*.md` file. On
-# merge this workflow opens (or updates) a "Version Packages" pull request that
-# consumes the pending changesets, bumps the version, and writes CHANGELOG.md.
-# Merging *that* pull request is what publishes, so a release only ever leaves
-# on a version someone explicitly merged.
-#
-# The path filter watches both halves of the loop, because either can move the
-# release forward:
-#
-#   - `.changeset/**` — a merged pull request adds a changeset, so the release
-#     pull request has to be opened or refreshed. Filtering on the package alone
-#     would miss this: the changeset arrives with a change to any part of the
-#     repository, or to none of it.
-#   - `libs/indy-charts/**` — the version commit rewrites package.json and
-#     CHANGELOG.md here, and merging it is what publishes.
-#
-# Every other push to main is genuinely nothing to do, and skipping those keeps
-# this off the critical path of unrelated work.
+# Changesets-driven releases; see .changeset/README.md for the full flow.
+# A merged changeset opens the "Version Packages" PR; merging that publishes.
+# Both paths trigger it: changesets arrive under .changeset/, and the version
+# commit lands under libs/indy-charts/.
 on:
   push:
     branches:
@@ -29,8 +13,8 @@ on:
       - "libs/indy-charts/**"
   workflow_dispatch: {}
 
-# Not cancel-in-progress: cancelling midway through a publish could leave the
-# registry and the repository disagreeing about what shipped.
+# Not cancel-in-progress: a cancelled publish could leave the registry and the
+# repository disagreeing about what shipped.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
@@ -49,8 +33,7 @@ jobs:
     environment: pkg.github.com
 
     permissions:
-      # `contents: write` lets the action push the version branch, and
-      # `pull-requests: write` lets it open the Version Packages pull request.
+      # write: push the version branch, open the Version Packages PR, publish.
       contents: write
       pull-requests: write
       packages: write
@@ -59,8 +42,7 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v7
         with:
-          # Changesets diffs against the base branch to find pending files.
-          fetch-depth: 0
+          fetch-depth: 0 # changesets diffs against the base branch
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -80,30 +62,16 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # indy-charts bundles chartjs-financial into its dist, so the dependency
-      # builds first; the tests then gate whatever the next step does.
+      # indy-charts bundles chartjs-financial into its dist, so that builds first.
       - name: Build and test the package
         run: |
           pnpm --filter @facioquo/chartjs-chart-financial run build
           pnpm --filter @facioquo/indy-charts run build
           pnpm --filter @facioquo/indy-charts run test
 
-      # Releasing needs one manual step, by design.
-      #
-      # This action opens the Version Packages pull request using GITHUB_TOKEN.
-      # GitHub deliberately starts CI for a pull request opened that way in an
-      # approval-required state, so `lint-and-test` — the branch ruleset's
-      # required check — waits until someone with write access presses
-      # "Approve and run" on the pull request's Actions tab. It then runs
-      # normally and the pull request becomes mergeable.
-      #
-      # A personal access token or GitHub App token would remove that click, at
-      # the cost of a standing credential that can push to main. The click is
-      # cheaper: the same person merges the release pull request anyway, so this
-      # adds nothing to the flow that was not already manual.
-      #
-      # If the check never appears at all, close and reopen the pull request —
-      # a human-triggered reopen starts CI without the approval gate.
+      # The Version Packages PR opens under GITHUB_TOKEN, so its CI waits for an
+      # "Approve and run" press before `lint-and-test` reports. See
+      # .changeset/README.md.
       - name: Open the version pull request, or publish
         uses: changesets/action@v1
         with:
