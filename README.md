@@ -49,8 +49,8 @@ pnpm start  # Terminal 2: React dev server (Vite)
 
 No storage emulator or cloud credentials are needed: without a reachable quote host the API serves
 a bundled backup dataset, so charts render on a fresh clone. That dataset covers the default symbol
-only, so the `/BETA`, `/CORRELATION`, and `/PRS` endpoints report 503 until a real quote host
-is configured — they need a second security to compare against.
+only, so the three endpoints that compare against a second security — beta, correlation, and price
+relative strength — report 503 until a real quote host is configured.
 
 To exercise the API exactly as it is deployed — inside its container, behind the caching/CORS
 Worker — run `pnpm run edge:dev` (requires Docker) and point the site at <http://localhost:8787>
