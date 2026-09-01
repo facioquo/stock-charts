@@ -1,34 +1,48 @@
 name: "Publish @facioquo/indy-charts"
 
+# Changesets-driven releases; see .changeset/README.md for the full flow.
+# A merged changeset opens the "Version Packages" PR; merging that publishes.
+# Both paths trigger it: changesets arrive under .changeset/, and the version
+# commit lands under libs/indy-charts/.
 on:
   push:
     branches:
       - main
     paths:
-      - 'libs/indy-charts/**'
+      - ".changeset/**"
+      - "libs/indy-charts/**"
   workflow_dispatch: {}
 
+# Not cancel-in-progress: a cancelled publish could leave the registry and the
+# repository disagreeing about what shipped.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   NODE_VERSION: 24
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
-  publish:
-    name: "Publish indy-charts to GitHub Packages"
+  release:
+    name: "Version or publish indy-charts"
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: pkg.github.com
 
+    permissions:
+      # write: push the version branch, open the Version Packages PR, publish.
+      contents: write
+      pull-requests: write
+      packages: write
+
     steps:
       - name: Checkout sources
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # changesets diffs against the base branch
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -48,34 +62,28 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build chartjs-financial dependency
-        run: pnpm --filter @facioquo/chartjs-chart-financial build
+      # indy-charts bundles chartjs-financial into its dist, so that builds first.
+      - name: Build and test the package
+        run: |
+          pnpm --filter @facioquo/chartjs-chart-financial run build
+          pnpm --filter @facioquo/indy-charts run build
+          pnpm --filter @facioquo/indy-charts run test
 
-      - name: Build package
-        working-directory: libs/indy-charts
-        run: pnpm run build
-
-      - name: Run package tests
-        working-directory: libs/indy-charts
-        run: pnpm run test
-
-      - name: Publish @facioquo/indy-charts
-        working-directory: libs/indy-charts
+      # v2 is required by @changesets/cli v3, and renames every input v1 used.
+      # The token goes to `github-token`; v2 dropped the GITHUB_TOKEN env var.
+      # npm auth comes from actions/setup-node's registry-url above, since v2
+      # no longer writes .npmrc from NPM_TOKEN.
+      #
+      # The Version Packages PR opens under GITHUB_TOKEN, so its CI waits for an
+      # "Approve and run" press before `lint-and-test` reports. See
+      # .changeset/README.md.
+      - name: Open the version pull request, or publish
+        uses: changesets/action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version-script: pnpm changeset version
+          publish-script: pnpm changeset publish
+          commit-message: "chore: Version packages"
+          pr-title: "chore: Version packages"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PACKAGE_VERSION=$(jq -r '.version' package.json)
-          PACKAGE_NAME=$(jq -r '.name' package.json)
-
-          if [[ "$PACKAGE_VERSION" == *-* ]]; then
-            NPM_TAG="next"
-          else
-            NPM_TAG="latest"
-          fi
-
-          if npm view "$PACKAGE_NAME@$PACKAGE_VERSION" > /dev/null 2>&1; then
-            echo "Version $PACKAGE_VERSION already published; skipping publish."
-          else
-            echo "Publishing $PACKAGE_NAME@$PACKAGE_VERSION with tag '$NPM_TAG'"
-            pnpm publish --no-git-checks --tag "$NPM_TAG"
-          fi

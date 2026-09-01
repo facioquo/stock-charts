@@ -18,6 +18,7 @@ Enable developers to quickly evaluate and understand the FacioQuo.Stock.Indicato
 stock-charts/
 ├── package.json              # Root workspace config
 ├── pnpm-workspace.yaml       # pnpm workspace definition
+├── .changeset/               # Pending release notes for @facioquo/indy-charts
 ├── Charts.sln                # .NET solution file
 ├── web/                      # React + Vite frontend
 │   ├── src/
@@ -82,6 +83,10 @@ pnpm run test:all             # Explicit all tests command
 pnpm --filter @stock-charts/web run test           # Frontend tests only
 pnpm run test:dotnet          # Backend tests only
 dotnet test --project server/WebApi.Tests/WebApi.Tests.csproj  # .NET tests directly
+
+# Releasing @facioquo/indy-charts (see .changeset/README.md)
+pnpm changeset                # Describe a consumer-visible change; commit with the PR
+pnpm run changeset:status     # Show what would be released
 
 # Workspace-specific
 pnpm --filter @stock-charts/web run <command>      # Run command in web workspace
