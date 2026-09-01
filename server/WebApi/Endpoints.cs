@@ -356,10 +356,9 @@ public class Main(
     public Task<IActionResult> GetPmo(int timePeriods, int smoothPeriods, int signalPeriods)
         => Get(quotes => quotes.ToPmo(timePeriods, smoothPeriods, signalPeriods));
 
-    // No lookbackPeriods: it only drives PrsPercent, which this listing omits.
     [HttpGet("PRS")]
-    public Task<IActionResult> GetPrs()
-        => GetVsBenchmark((quotes, market) => quotes.ToPrs(market));
+    public Task<IActionResult> GetPrs(int lookbackPeriods)
+        => GetVsBenchmark((quotes, market) => quotes.ToPrs(market, lookbackPeriods));
 
     [HttpGet("PSAR")]
     public Task<IActionResult> GetParabolicSar(double accelerationStep, double maxAccelerationFactor)

@@ -2651,22 +2651,43 @@ public static class Metadata
             },
 
             // Price Relative Strength (PRS)
-            // The raw eval/benchmark ratio only: PrsPercent is a percentage and
-            // would need its own y-axis. No threshold, because an unnormalized
-            // ratio has no fixed value marking equal performance.
+            // Charts prsPercent, not the raw prs ratio: percent change over the
+            // lookback is comparable across time, where the ratio's level
+            // depends on the two securities' absolute prices.
             new IndicatorListing {
                 Name = "Price Relative Strength (vs SPY)",
                 Uiid = "PRS",
-                LegendTemplate = "PRS",
+                LegendTemplate = "PRS([P1])",
                 Endpoint = $"{baseUrl}/PRS/",
                 Category = "price-characteristic",
                 ChartType = "oscillator",
-                Parameters = [],
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        // Above zero outperforms the benchmark over the lookback.
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
                 Results = [
                     new() {
-                        DisplayName = "PRS",
-                        TooltipTemplate = "PRS",
-                        DataName = "prs",
+                        DisplayName = "PRS %",
+                        TooltipTemplate = "PRS %",
+                        DataName = "prsPercent",
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue

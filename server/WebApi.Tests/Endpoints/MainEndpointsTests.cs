@@ -774,7 +774,7 @@ public class MainEndpointsTests
         // Act
         IActionResult result = indicator switch {
             "CORRELATION" => await _controller.GetCorrelation(20),
-            "PRS" => await _controller.GetPrs(),
+            "PRS" => await _controller.GetPrs(20),
             _ => await _controller.GetBeta(20, BetaType.Standard)
         };
 
@@ -813,6 +813,82 @@ public class MainEndpointsTests
         Assert.NotEmpty(correlations);
         Assert.All(correlations, c => Assert.InRange(c, -1d, 1d));
         Assert.Contains(correlations, c => Math.Abs(c - 1d) > 1e-9);
+    }
+
+    [Fact]
+    public async Task GetPrs_WithDistinctBenchmark_DoesNotReturnConstantZero()
+    {
+        // Arrange — a security identical to its benchmark has zero relative
+        // strength at every point, which is what a symbol-agnostic benchmark
+        // silently produces.
+        SetupBenchmarkQuotes(
+            GenerateSampleQuotes(60, BenchmarkStart),
+            GenerateDivergentQuotes(60, BenchmarkStart));
+
+        // Act
+        IActionResult result = await _controller.GetPrs(20);
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        IEnumerable<PrsResult> results
+            = Assert.IsType<IEnumerable<PrsResult>>(okResult.Value, exactMatch: false);
+
+        List<double> percents = results
+            .Where(r => r.PrsPercent is not null)
+            .Select(r => r.PrsPercent!.Value)
+            .ToList();
+
+        Assert.NotEmpty(percents);
+        Assert.Contains(percents, p => Math.Abs(p) > 1e-9);
+    }
+
+    [Fact]
+    public async Task GetBeta_WithDistinctBenchmark_DoesNotReturnConstantOne()
+    {
+        // Arrange — beta against itself is exactly 1.0 throughout.
+        SetupBenchmarkQuotes(
+            GenerateSampleQuotes(60, BenchmarkStart),
+            GenerateDivergentQuotes(60, BenchmarkStart));
+
+        // Act
+        IActionResult result = await _controller.GetBeta(20, BetaType.Standard);
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        IEnumerable<BetaResult> results
+            = Assert.IsType<IEnumerable<BetaResult>>(okResult.Value, exactMatch: false);
+
+        List<double> betas = results
+            .Where(r => r.Beta is not null)
+            .Select(r => r.Beta!.Value)
+            .ToList();
+
+        Assert.NotEmpty(betas);
+        Assert.Contains(betas, b => Math.Abs(b - 1d) > 1e-9);
+    }
+
+    // The shared helper translates the library's ArgumentOutOfRangeException
+    // (InvalidBarsException derives from it) into a 400 rather than a 500.
+    [Theory]
+    [InlineData("CORRELATION")]
+    [InlineData("PRS")]
+    [InlineData("BETA")]
+    public async Task BenchmarkIndicators_WithInvalidLookback_ReturnBadRequest(string indicator)
+    {
+        // Arrange
+        SetupBenchmarkQuotes(
+            GenerateSampleQuotes(60, BenchmarkStart),
+            GenerateDivergentQuotes(60, BenchmarkStart));
+
+        // Act
+        IActionResult result = indicator switch {
+            "CORRELATION" => await _controller.GetCorrelation(0),
+            "PRS" => await _controller.GetPrs(0),
+            _ => await _controller.GetBeta(0, BetaType.Standard)
+        };
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result);
     }
 
     // Wires the default feed and the "SPY" benchmark feed to separate datasets.
