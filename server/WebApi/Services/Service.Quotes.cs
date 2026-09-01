@@ -22,11 +22,17 @@ public partial class QuoteService(
     private readonly TimeSpan _cacheDuration = cacheSettings.Value.Duration;
 
     /// <summary>
+    /// Symbol the bundled failover dataset represents, and the one served when
+    /// no symbol is named.
+    /// </summary>
+    private const string defaultSymbol = "QQQ";
+
+    /// <summary>
     /// Get default quotes
     /// </summary>
     /// <returns cref="Bar">List of default quotes</returns>
     public async Task<IEnumerable<Bar>> Get(CancellationToken ct)
-        => await Get("QQQ", ct);
+        => await Get(defaultSymbol, ct);
 
     /// <summary>
     /// Get quotes for a specific symbol, served from an in-memory cache so the
@@ -64,7 +70,7 @@ public partial class QuoteService(
     {
         try
         {
-            return await TryGetStoredQuotesAsync(symbol, ct) ?? QuoteBackup.BackupQuotes;
+            return await TryGetStoredQuotesAsync(symbol, ct) ?? Failover(symbol);
         }
 
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
@@ -76,8 +82,26 @@ public partial class QuoteService(
         catch (Exception ex)
         {
             LogRetrieveQuotesFailed(ex, symbol);
+            return Failover(symbol);
+        }
+    }
+
+    // The bundled dataset is one security's history, so it stands in for the
+    // default symbol only. Serving it for a second symbol would present that
+    // history as another security's, and any indicator comparing the two would
+    // then be comparing a series against itself — a perfect correlation, a beta
+    // of exactly 1, and zero relative strength, none of it flagged as unreal.
+    // Returning nothing instead lets callers report the benchmark as
+    // unavailable, which is what it is.
+    private IReadOnlyList<Bar> Failover(string symbol)
+    {
+        if (symbol == defaultSymbol)
+        {
             return QuoteBackup.BackupQuotes;
         }
+
+        LogNoFailoverForSymbol(symbol);
+        return [];
     }
 
     private async Task<IReadOnlyList<Bar>?> TryGetStoredQuotesAsync(string symbol, CancellationToken ct)
@@ -102,6 +126,11 @@ public partial class QuoteService(
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "No quotes found in stored dataset for {Symbol}")]
     private partial void LogNoQuotesFound(string symbol);
+
+    [LoggerMessage(
+        Level = LogLevel.Warning,
+        Message = "No stored quotes for {Symbol} and no failover dataset for it; returning none")]
+    private partial void LogNoFailoverForSymbol(string symbol);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Failed to retrieve quotes for {Symbol}")]
     private partial void LogRetrieveQuotesFailed(Exception exception, string symbol);

@@ -867,6 +867,32 @@ public class MainEndpointsTests
         Assert.Contains(betas, b => Math.Abs(b - 1d) > 1e-9);
     }
 
+    // When storage is unreachable the benchmark symbol has no failover dataset,
+    // so these endpoints report the benchmark missing rather than computing a
+    // comparison against nothing.
+    [Theory]
+    [InlineData("CORRELATION")]
+    [InlineData("PRS")]
+    [InlineData("BETA")]
+    public async Task BenchmarkIndicators_WithNoBenchmarkQuotes_ReturnServiceUnavailable(
+        string indicator)
+    {
+        // Arrange
+        SetupBenchmarkQuotes(GenerateSampleQuotes(60, BenchmarkStart), []);
+
+        // Act
+        IActionResult result = indicator switch {
+            "CORRELATION" => await _controller.GetCorrelation(20),
+            "PRS" => await _controller.GetPrs(20),
+            _ => await _controller.GetBeta(20, BetaType.Standard)
+        };
+
+        // Assert — 503, because both chart clients treat 5xx as transient and
+        // fall back to their stale cache, where a 4xx surfaces as an error.
+        ObjectResult objectResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(StatusCodes.Status503ServiceUnavailable, objectResult.StatusCode);
+    }
+
     // The shared helper translates the library's ArgumentOutOfRangeException
     // (InvalidBarsException derives from it) into a 400 rather than a 500.
     [Theory]

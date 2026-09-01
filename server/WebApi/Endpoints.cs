@@ -95,9 +95,20 @@ public class Main(
         {
             // Sequential, not parallel: both reads normally hit the in-memory
             // quote cache, so concurrency would buy nothing.
-            IReadOnlyList<Bar> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
-            IReadOnlyList<Bar> benchmark
+            List<Bar> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
+            List<Bar> benchmark
                 = (await quoteFeed.Get(benchmarkSymbol, HttpContext.RequestAborted)).ToList();
+
+            // Without the benchmark there is no comparison to make. 503 rather
+            // than 400 because the data is missing, not the request malformed —
+            // and because both chart clients already treat 5xx as transient and
+            // degrade to their stale cache, where a 400 surfaces as an error.
+            if (benchmark.Count == 0)
+            {
+                return StatusCode(
+                    StatusCodes.Status503ServiceUnavailable,
+                    $"Quotes for the {benchmarkSymbol} benchmark are unavailable.");
+            }
 
             IEnumerable<T> results = indicatorFunc(quotes, benchmark).TakeLast(limitLast);
             SetClientCache();
