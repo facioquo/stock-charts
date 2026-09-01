@@ -1084,10 +1084,8 @@ public static class Metadata
             },
 
             // Correlation Coefficient
-            // Charted against the SPY benchmark the API fixes for comparison
-            // indicators; the caller does not choose it, so there is no symbol
-            // parameter. Correlation (-1 to 1) and R² (0 to 1) are both
-            // dimensionless, so they share one y-axis without misleading.
+            // Correlation (-1 to 1) and R² (0 to 1) are both dimensionless, so
+            // sharing one y-axis does not mislead.
             new IndicatorListing {
                 Name = "Correlation Coefficient (vs SPY)",
                 Uiid = "CORRELATION",
@@ -1098,8 +1096,7 @@ public static class Metadata
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
-                        // Zero is the meaningful reference: above is positive
-                        // correlation with the benchmark, below is negative.
+                        // Above zero tracks the benchmark, below inverts it.
                         new() {
                             Value = 0,
                             Color = ChartColors.ThresholdGrayTransparent,
@@ -2654,11 +2651,9 @@ public static class Metadata
             },
 
             // Price Relative Strength (PRS)
-            // Charts the raw eval/benchmark price ratio only. PrsPercent is
-            // omitted deliberately: it is a percentage and would need its own
-            // y-axis, the same mixed-unit problem that split SMA analysis into
-            // per-metric listings. No threshold line either — PRS is an
-            // unnormalized ratio, so no fixed value marks equal performance.
+            // The raw eval/benchmark ratio only: PrsPercent is a percentage and
+            // would need its own y-axis. No threshold, because an unnormalized
+            // ratio has no fixed value marking equal performance.
             new IndicatorListing {
                 Name = "Price Relative Strength (vs SPY)",
                 Uiid = "PRS",

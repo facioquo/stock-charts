@@ -22,9 +22,8 @@ public class Main(
     // GLOBALS
     private const int limitLast = 120;
 
-    // Market benchmark for indicators that compare one security against another
-    // (BETA, CORRELATION, PRS). SPY is one of the two symbols the scheduled
-    // quote refresh maintains, and the demo evaluates QQQ against it.
+    // Benchmark for BETA, CORRELATION, and PRS. The demo evaluates QQQ against
+    // SPY; both are symbols the scheduled quote refresh maintains.
     private const string benchmarkSymbol = "SPY";
 
     [HttpGet]
@@ -86,18 +85,16 @@ public class Main(
         }
     }
 
-    // Some indicators measure a security against a market benchmark and so need
-    // a second series. The benchmark is fixed rather than a request parameter:
-    // QuoteService serves only the symbols the scheduled refresh maintains, so
-    // an arbitrary caller-supplied symbol has no data behind it.
+    // Fixed benchmark rather than a request parameter: QuoteService serves only
+    // the symbols the scheduled refresh maintains, so a caller-supplied symbol
+    // would have no data behind it.
     private async Task<IActionResult> GetVsBenchmark<T>(
         Func<IReadOnlyList<Bar>, IReadOnlyList<Bar>, IEnumerable<T>> indicatorFunc)
     {
         try
         {
-            // Fetched in sequence, not in parallel: both reads normally land in
-            // the in-memory quote cache, so the saving would be negligible and
-            // is not worth issuing concurrent requests against a shared cache.
+            // Sequential, not parallel: both reads normally hit the in-memory
+            // quote cache, so concurrency would buy nothing.
             IReadOnlyList<Bar> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
             IReadOnlyList<Bar> benchmark
                 = (await quoteFeed.Get(benchmarkSymbol, HttpContext.RequestAborted)).ToList();
@@ -359,8 +356,7 @@ public class Main(
     public Task<IActionResult> GetPmo(int timePeriods, int smoothPeriods, int signalPeriods)
         => Get(quotes => quotes.ToPmo(timePeriods, smoothPeriods, signalPeriods));
 
-    // No lookbackPeriods parameter: it only drives PrsPercent, which this
-    // listing does not chart (see the catalog entry).
+    // No lookbackPeriods: it only drives PrsPercent, which this listing omits.
     [HttpGet("PRS")]
     public Task<IActionResult> GetPrs()
         => GetVsBenchmark((quotes, market) => quotes.ToPrs(market));
