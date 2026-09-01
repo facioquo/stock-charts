@@ -319,8 +319,9 @@ One-time setup:
 2. **Install**: Run `pnpm install` from root
 3. **Credentials** (optional): Alpaca API credentials drive the scheduled quote refresh
    - Production: `wrangler secret put ALPACA_KEY` / `ALPACA_SECRET` (see [server/edge/README.md](server/edge/README.md))
-   - Application works fully without credentials using backup quote data
+   - Charts render without credentials from the bundled backup dataset
    - No exceptions thrown when credentials are missing
+   - The backup covers the default symbol only, so the three endpoints that compare against a second security — beta, correlation, and price relative strength — return 503 until a real quote host is configured
 
 Typical lifecycle:
 
