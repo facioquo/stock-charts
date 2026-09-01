@@ -753,13 +753,195 @@ public class MainEndpointsTests
         });
     }
 
+    // Benchmark-comparison endpoints (BETA, CORRELATION, PRS) read a second
+    // series for the market benchmark. These tests pin that behaviour, because
+    // when the benchmark resolves to the same bars as the evaluated security
+    // the maths still succeeds — it just returns a degenerate constant, which
+    // no status code or exception reveals.
+
+    [Theory]
+    [InlineData("CORRELATION")]
+    [InlineData("PRS")]
+    [InlineData("BETA")]
+    public async Task BenchmarkIndicators_RequestTheBenchmarkSeries(string indicator)
+    {
+        // Arrange — both series share one start date; the indicators require
+        // timestamp-aligned inputs.
+        SetupBenchmarkQuotes(
+            GenerateSampleQuotes(60, BenchmarkStart),
+            GenerateSampleQuotes(60, BenchmarkStart));
+
+        // Act
+        IActionResult result = indicator switch {
+            "CORRELATION" => await _controller.GetCorrelation(20),
+            "PRS" => await _controller.GetPrs(20),
+            _ => await _controller.GetBeta(20, BetaType.Standard)
+        };
+
+        // Assert — the benchmark series is fetched by symbol, not inferred from
+        // the default feed.
+        Assert.IsType<OkObjectResult>(result);
+        _quoteServiceMock.Verify(
+            q => q.Get("SPY", It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task GetCorrelation_WithDistinctBenchmark_DoesNotReturnPerfectCorrelation()
+    {
+        // Arrange — two genuinely different price paths. Correlating a series
+        // with itself yields exactly 1.0 at every point; that is what a
+        // symbol-agnostic benchmark silently produces, so this asserts the two
+        // series stay distinct all the way into the calculation.
+        SetupBenchmarkQuotes(
+            GenerateSampleQuotes(60, BenchmarkStart),
+            GenerateDivergentQuotes(60, BenchmarkStart));
+
+        // Act
+        IActionResult result = await _controller.GetCorrelation(20);
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        IEnumerable<CorrResult> results
+            = Assert.IsType<IEnumerable<CorrResult>>(okResult.Value, exactMatch: false);
+
+        List<double> correlations = results
+            .Where(r => r.Correlation is not null)
+            .Select(r => r.Correlation!.Value)
+            .ToList();
+
+        Assert.NotEmpty(correlations);
+        Assert.All(correlations, c => Assert.InRange(c, -1d, 1d));
+        Assert.Contains(correlations, c => Math.Abs(c - 1d) > 1e-9);
+    }
+
+    [Fact]
+    public async Task GetPrs_WithDistinctBenchmark_DoesNotReturnConstantZero()
+    {
+        // Arrange — a security identical to its benchmark has zero relative
+        // strength at every point, which is what a symbol-agnostic benchmark
+        // silently produces.
+        SetupBenchmarkQuotes(
+            GenerateSampleQuotes(60, BenchmarkStart),
+            GenerateDivergentQuotes(60, BenchmarkStart));
+
+        // Act
+        IActionResult result = await _controller.GetPrs(20);
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        IEnumerable<PrsResult> results
+            = Assert.IsType<IEnumerable<PrsResult>>(okResult.Value, exactMatch: false);
+
+        List<double> percents = results
+            .Where(r => r.PrsPercent is not null)
+            .Select(r => r.PrsPercent!.Value)
+            .ToList();
+
+        Assert.NotEmpty(percents);
+        Assert.Contains(percents, p => Math.Abs(p) > 1e-9);
+    }
+
+    [Fact]
+    public async Task GetBeta_WithDistinctBenchmark_DoesNotReturnConstantOne()
+    {
+        // Arrange — beta against itself is exactly 1.0 throughout.
+        SetupBenchmarkQuotes(
+            GenerateSampleQuotes(60, BenchmarkStart),
+            GenerateDivergentQuotes(60, BenchmarkStart));
+
+        // Act
+        IActionResult result = await _controller.GetBeta(20, BetaType.Standard);
+
+        // Assert
+        OkObjectResult okResult = Assert.IsType<OkObjectResult>(result);
+        IEnumerable<BetaResult> results
+            = Assert.IsType<IEnumerable<BetaResult>>(okResult.Value, exactMatch: false);
+
+        List<double> betas = results
+            .Where(r => r.Beta is not null)
+            .Select(r => r.Beta!.Value)
+            .ToList();
+
+        Assert.NotEmpty(betas);
+        Assert.Contains(betas, b => Math.Abs(b - 1d) > 1e-9);
+    }
+
+    // The shared helper translates the library's ArgumentOutOfRangeException
+    // (InvalidBarsException derives from it) into a 400 rather than a 500.
+    [Theory]
+    [InlineData("CORRELATION")]
+    [InlineData("PRS")]
+    [InlineData("BETA")]
+    public async Task BenchmarkIndicators_WithInvalidLookback_ReturnBadRequest(string indicator)
+    {
+        // Arrange
+        SetupBenchmarkQuotes(
+            GenerateSampleQuotes(60, BenchmarkStart),
+            GenerateDivergentQuotes(60, BenchmarkStart));
+
+        // Act
+        IActionResult result = indicator switch {
+            "CORRELATION" => await _controller.GetCorrelation(0),
+            "PRS" => await _controller.GetPrs(0),
+            _ => await _controller.GetBeta(0, BetaType.Standard)
+        };
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    // Wires the default feed and the "SPY" benchmark feed to separate datasets.
+    private void SetupBenchmarkQuotes(IReadOnlyList<Bar> evaluated, IReadOnlyList<Bar> benchmark)
+    {
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(evaluated);
+
+        _quoteServiceMock
+            .Setup(q => q.Get("SPY", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(benchmark);
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext()
+        };
+    }
+
+    // Fixed so the evaluated and benchmark series carry identical timestamps;
+    // the comparison indicators reject misaligned inputs.
+    private static readonly DateTime BenchmarkStart = new(2024, 1, 2, 0, 0, 0, DateTimeKind.Utc);
+
+    // A price path that rises and falls against GenerateSampleQuotes' steady
+    // climb, so the two series are not perfectly correlated.
+    private static List<Bar> GenerateDivergentQuotes(int count, DateTime startDate)
+    {
+        List<Bar> quotes = new(count);
+
+        for (int i = 0; i < count; i++)
+        {
+            decimal basePrice = 100m + ((decimal)Math.Sin(i / 3d) * 8m);
+
+            quotes.Add(new Bar(
+                startDate.AddDays(i),
+                basePrice,
+                basePrice + 2m,
+                basePrice - 2m,
+                basePrice + 1m,
+                1000000 + (i * 10000)));
+        }
+
+        return quotes;
+    }
+
     /// <summary>
     /// Helper to generate sample quote data for tests.
     /// </summary>
     private static List<Bar> GenerateSampleQuotes(int count)
+        => GenerateSampleQuotes(count, DateTime.UtcNow.AddDays(-count));
+
+    private static List<Bar> GenerateSampleQuotes(int count, DateTime startDate)
     {
         List<Bar> quotes = new();
-        DateTime startDate = DateTime.UtcNow.AddDays(-count);
 
         for (int i = 0; i < count; i++)
         {

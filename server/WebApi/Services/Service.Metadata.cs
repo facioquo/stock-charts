@@ -1083,6 +1083,58 @@ public static class Metadata
                 ]
             },
 
+            // Correlation Coefficient
+            // Correlation (-1 to 1) and R² (0 to 1) are both dimensionless, so
+            // sharing one y-axis does not mislead.
+            new IndicatorListing {
+                Name = "Correlation Coefficient (vs SPY)",
+                Uiid = "CORRELATION",
+                LegendTemplate = "CORRELATION([P1])",
+                Endpoint = $"{baseUrl}/CORRELATION/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        // Above zero tracks the benchmark, below inverts it.
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "Correlation",
+                        TooltipTemplate = "Correlation",
+                        DataName = "correlation",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
+                    },
+                    new() {
+                        DisplayName = "R²",
+                        TooltipTemplate = "R-Squared",
+                        DataName = "rSquared",
+                        DataType = "number",
+                        LineType = "dash",
+                        DefaultColor = ChartColors.StandardGreen
+                    }
+                ]
+            },
+
             // Detrended Price Oscillator (DPO)
             new IndicatorListing {
                 Name = "Detrended Price Oscillator (DPO)",
@@ -2594,6 +2646,51 @@ public static class Metadata
                         DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
+                    }
+                ]
+            },
+
+            // Price Relative Strength (PRS)
+            // Charts prsPercent, not the raw prs ratio: percent change over the
+            // lookback is comparable across time, where the ratio's level
+            // depends on the two securities' absolute prices.
+            new IndicatorListing {
+                Name = "Price Relative Strength (vs SPY)",
+                Uiid = "PRS",
+                LegendTemplate = "PRS([P1])",
+                Endpoint = $"{baseUrl}/PRS/",
+                Category = "price-characteristic",
+                ChartType = "oscillator",
+                ChartConfig = new ChartConfig {
+                    Thresholds =
+                    [
+                        // Above zero outperforms the benchmark over the lookback.
+                        new() {
+                            Value = 0,
+                            Color = ChartColors.ThresholdGrayTransparent,
+                            Style = "dash"
+                        }
+                    ]
+                },
+                Parameters =
+                [
+                    new() {
+                        DisplayName = "Lookback Periods",
+                        ParamName = "lookbackPeriods",
+                        DataType = "int",
+                        DefaultValue = 20,
+                        Minimum = 1,
+                        Maximum = 250
+                    }
+                ],
+                Results = [
+                    new() {
+                        DisplayName = "PRS %",
+                        TooltipTemplate = "PRS %",
+                        DataName = "prsPercent",
+                        DataType = "number",
+                        LineType = "solid",
+                        DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
