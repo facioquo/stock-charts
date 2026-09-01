@@ -321,7 +321,7 @@ One-time setup:
    - Production: `wrangler secret put ALPACA_KEY` / `ALPACA_SECRET` (see [server/edge/README.md](server/edge/README.md))
    - Charts render without credentials from the bundled backup dataset
    - No exceptions thrown when credentials are missing
-   - The exception is the benchmark comparisons (`BETA`, `CORRELATION`, `PRS`), which need a second security and return 503 on the backup path — the backup covers the default symbol only
+   - The backup covers the default symbol only, so the three endpoints that compare against a second security — `/BETA`, `/CORRELATION`, and `/PRS` — return 503 until a real quote host is configured
 
 Typical lifecycle:
 
