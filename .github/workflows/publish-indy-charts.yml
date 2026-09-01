@@ -69,16 +69,21 @@ jobs:
           pnpm --filter @facioquo/indy-charts run build
           pnpm --filter @facioquo/indy-charts run test
 
+      # v2 is required by @changesets/cli v3, and renames every input v1 used.
+      # The token goes to `github-token`; v2 dropped the GITHUB_TOKEN env var.
+      # npm auth comes from actions/setup-node's registry-url above, since v2
+      # no longer writes .npmrc from NPM_TOKEN.
+      #
       # The Version Packages PR opens under GITHUB_TOKEN, so its CI waits for an
       # "Approve and run" press before `lint-and-test` reports. See
       # .changeset/README.md.
       - name: Open the version pull request, or publish
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
-          version: pnpm changeset version
-          publish: pnpm changeset publish
-          commit: "chore: Version packages"
-          title: "chore: Version packages"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version-script: pnpm changeset version
+          publish-script: pnpm changeset publish
+          commit-message: "chore: Version packages"
+          pr-title: "chore: Version packages"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
