@@ -45,3 +45,16 @@ workflow. If the check never appears at all, close and reopen the pull request.
 
 Do not hand-edit a merged changeset file or the generated Version Packages pull
 request — add another changeset and let the workflow regenerate it.
+
+## Prereleases
+
+The previous workflow inferred a `next` dist-tag from a hyphen in the version
+string. Changesets replaces that guess with an explicit mode:
+
+```bash
+pnpm changeset pre enter next   # subsequent releases publish under the `next` tag
+pnpm changeset pre exit         # back to `latest`
+```
+
+Commit the `.changeset/pre.json` the first command writes. Nothing is in
+prerelease mode today, so releases publish as `latest`.

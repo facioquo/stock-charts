@@ -58,8 +58,7 @@
     "lint:scripts": "eslint .",
     "lint:scripts:fix": "eslint . --fix",
     "changeset": "changeset",
-    "changeset:status": "changeset status --since=origin/main",
-    "changeset:version": "changeset version"
+    "changeset:status": "changeset status --since=origin/main"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.1",
