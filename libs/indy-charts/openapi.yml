@@ -1,0 +1,342 @@
+openapi: 3.1.0
+
+info:
+  title: indy-charts chart data API
+  version: "1.0.0"
+  summary: The HTTP interface @facioquo/indy-charts expects from a quote and indicator source.
+  license:
+    name: Apache-2.0
+    identifier: Apache-2.0
+  description: |
+    `@facioquo/indy-charts` can render charts from data you supply directly, with no HTTP
+    involved. This specification describes the alternative: the interface its built-in API
+    client calls when you point it at a server with `createApiClient({ baseUrl })`.
+
+    Implement these three operations and the library will drive your server. The reference
+    implementation is <https://charts-api.stockindicators.dev>.
+
+    ## The catalog drives everything
+
+    There is no fixed list of indicator routes. `GET /indicators` returns a catalog, each
+    entry carrying an `endpoint` and the `parameters` it accepts, and the client builds its
+    indicator requests from that. Adding an indicator is a catalog change, not a
+    specification change — which is why this document describes one templated indicator
+    operation rather than enumerating the reference server's 96 routes.
+
+    ## Field naming
+
+    Responses are camelCase. Timestamps are ISO 8601 strings; the client also accepts a
+    `Date` when data is supplied in-process rather than over HTTP.
+
+servers:
+  - url: https://charts-api.stockindicators.dev
+    description: Reference implementation.
+
+# No authentication. The client sends no credentials, so an implementation that
+# requires them will not work with it unaltered.
+security: []
+
+tags:
+  - name: quotes
+    description: Raw OHLCV price history.
+  - name: catalog
+    description: Which indicators exist and how to call them.
+  - name: indicators
+    description: Computed indicator series.
+
+paths:
+  /quotes:
+    get:
+      tags: [quotes]
+      operationId: getQuotes
+      summary: Price history for the charted security
+      description: |
+        Returns the OHLCV bars the price chart renders, oldest first. The client calls this
+        once per chart load via `ApiClient.getQuotes()`.
+      responses:
+        "200":
+          description: Bars in chronological order.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Bar" }
+        "503":
+          $ref: "#/components/responses/Unavailable"
+
+  /indicators:
+    get:
+      tags: [catalog]
+      operationId: getIndicatorCatalog
+      summary: Catalog of available indicators
+      description: |
+        Returns every indicator this server can compute, with the endpoint to call, the
+        parameters it accepts, and how each result series should be drawn. The client calls
+        this once via `ApiClient.getListings()` and builds its indicator picker from it.
+
+        `endpoint` is an absolute URL. A server behind a proxy must emit its public origin
+        here, not the address it sees the request arrive on.
+      responses:
+        "200":
+          description: Indicator listings.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/IndicatorListing" }
+        "503":
+          $ref: "#/components/responses/Unavailable"
+
+  /{indicator}:
+    get:
+      tags: [indicators]
+      operationId: getIndicatorData
+      summary: Computed series for one indicator
+      description: |
+        Returns the computed rows for a single indicator. The path comes from the catalog
+        entry's `endpoint`, and the query parameters from that entry's `parameters` — the
+        client sends each `paramName` with the user's chosen value, so a server receives
+        exactly the parameters it advertised.
+
+        Each row carries a `timestamp` plus one field per `dataName` in the listing's
+        `results`. A field may be `null` where the indicator has no value for that bar,
+        which is normal during an indicator's warm-up period.
+      parameters:
+        - name: indicator
+          in: path
+          required: true
+          description: The `endpoint` path segment from a catalog entry, such as `RSI` or `BB`.
+          schema: { type: string }
+          example: BB
+        - name: lookbackPeriods
+          in: query
+          required: false
+          description: |
+            Illustrative only. The real parameters are whatever the catalog entry declares;
+            each is sent by its `paramName`. `BB` sends `lookbackPeriods` and
+            `standardDeviations`, `DOJI` sends `maxPriceChangePercent`, and an indicator
+            with an empty `parameters` array is called with no query string at all.
+          schema: { type: integer }
+          example: 20
+      responses:
+        "200":
+          description: Computed rows in chronological order.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/IndicatorDataRow" }
+        "400":
+          description: A parameter fell outside the range the catalog declared.
+        "503":
+          $ref: "#/components/responses/Unavailable"
+
+components:
+  responses:
+    Unavailable:
+      description: |
+        The source data is temporarily unavailable. The client treats any 5xx as transient:
+        it retries with exponential back-off and honours `Retry-After`, then falls back to
+        its last good cached response. A 4xx is not retried, so use 503 rather than 4xx for
+        a condition a retry could resolve.
+
+  schemas:
+    Bar:
+      type: object
+      description: One OHLCV price bar.
+      required: [timestamp, open, high, low, close, volume]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Bar open time, ISO 8601.
+          example: "2026-09-02T04:00:00Z"
+        open: { type: number, example: 706.82 }
+        high: { type: number, example: 709.77 }
+        low: { type: number, example: 705.185 }
+        close: { type: number, example: 709.32 }
+        volume: { type: number, example: 375937 }
+        date:
+          type: string
+          format: date-time
+          deprecated: true
+          description: |
+            Legacy alias for `timestamp` emitted by the reference server. The client ignores
+            it; a new implementation should omit it.
+
+    IndicatorListing:
+      type: object
+      description: One indicator in the catalog — how to call it, and how to draw it.
+      required:
+        [name, uiid, legendTemplate, endpoint, category, chartType, order, parameters, results]
+      properties:
+        name:
+          type: string
+          description: Display name for the picker.
+          example: Bollinger Bands®
+        uiid:
+          type: string
+          description: Stable identifier, unique within the catalog.
+          example: BB
+        legendTemplate:
+          type: string
+          description: Legend label; `[P1]`, `[P2]`… are replaced by parameter values in order.
+          example: BB([P1],[P2])
+        endpoint:
+          type: string
+          format: uri
+          description: Absolute URL this indicator is fetched from.
+          example: https://charts-api.stockindicators.dev/BB/
+        category:
+          type: string
+          description: |
+            Grouping for the picker. `candlestick-pattern` is behavioural: rows in that
+            category carry `candle`, and the client renders point markers from it.
+          example: price-channel
+        chartType:
+          type: string
+          description: |
+            `overlay` draws on the price chart; `oscillator` draws in its own pane below.
+          enum: [overlay, oscillator]
+        order:
+          type: number
+          description: Z-order. Lower draws on top.
+          example: 1
+        chartConfig:
+          oneOf:
+            - $ref: "#/components/schemas/ChartConfig"
+            - type: "null"
+          description: Axis bounds and threshold lines; null when the defaults suffice.
+        parameters:
+          type: array
+          items: { $ref: "#/components/schemas/IndicatorParamConfig" }
+          description: User-adjustable inputs. Empty when the indicator takes none.
+        results:
+          type: array
+          items: { $ref: "#/components/schemas/IndicatorResultConfig" }
+          description: One entry per series the indicator returns.
+
+    IndicatorParamConfig:
+      type: object
+      description: One user-adjustable input, and the bounds the picker enforces.
+      required: [displayName, paramName, dataType, defaultValue, minimum, maximum]
+      properties:
+        displayName: { type: string, example: Lookback Periods }
+        paramName:
+          type: string
+          description: Query-string name the client sends this value as.
+          example: lookbackPeriods
+        dataType: { type: string, example: int }
+        defaultValue: { type: number, example: 20 }
+        minimum: { type: number, example: 2 }
+        maximum: { type: number, example: 250 }
+
+    IndicatorResultConfig:
+      type: object
+      description: One series within an indicator, and how to draw it.
+      required: [displayName, tooltipTemplate, dataName, dataType, lineType, stack, defaultColor]
+      properties:
+        displayName: { type: string, example: Upper Band }
+        tooltipTemplate: { type: string, example: Upper Band }
+        dataName:
+          type: string
+          description: Key this series appears under in each data row.
+          example: upperBand
+        dataType: { type: string, example: number }
+        lineType:
+          type: string
+          description: |
+            `solid`, `dash`, `dots`, `bar`, `pointer`, or `candle`. `candle` renders OHLC
+            results as candlesticks in their own pane.
+          example: solid
+        stack:
+          type: string
+          description: Stack group for bar series; empty when unstacked.
+        lineWidth:
+          oneOf: [{ type: number }, { type: "null" }]
+        defaultColor:
+          type: string
+          description: CSS colour applied when the user has not overridden it.
+          example: "#B58AB5"
+        fill:
+          oneOf:
+            - $ref: "#/components/schemas/ChartFill"
+            - type: "null"
+        segmented:
+          type: boolean
+          description: |
+            Draw as flat segments that step at boundaries, rather than a continuous line —
+            for level series such as monthly pivot points.
+        segmentMode:
+          type: string
+          enum: [step, slope]
+          description: Where to break segments when `segmented` is set. Defaults to `step`.
+
+    ChartConfig:
+      type: object
+      description: Axis bounds and threshold lines for an indicator's pane.
+      required: [minimumYAxis, maximumYAxis, thresholds]
+      properties:
+        minimumYAxis:
+          oneOf: [{ type: number }, { type: "null" }]
+        maximumYAxis:
+          oneOf: [{ type: number }, { type: "null" }]
+        thresholds:
+          type: array
+          items: { $ref: "#/components/schemas/ChartThreshold" }
+
+    ChartThreshold:
+      type: object
+      description: A horizontal reference line, such as RSI's 70 and 30.
+      required: [value, color, style]
+      properties:
+        value: { type: number, example: 70 }
+        color: { type: string, example: "#DDDDDD50" }
+        style: { type: string, example: dash }
+        fill:
+          oneOf:
+            - $ref: "#/components/schemas/ChartFill"
+            - type: "null"
+
+    ChartFill:
+      type: object
+      description: Shading relative to another series or a threshold.
+      required: [target, colorAbove, colorBelow]
+      properties:
+        target:
+          type: string
+          description: Dataset index or threshold identifier to fill against.
+        colorAbove: { type: string }
+        colorBelow: { type: string }
+
+    IndicatorDataRow:
+      type: object
+      description: |
+        One computed row. Beyond `timestamp`, the keys are the `dataName` values from the
+        listing's `results` — so the shape varies per indicator and cannot be enumerated
+        here. A value is `null` where the indicator has not warmed up.
+      required: [timestamp]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-09-02T04:00:00Z"
+        candle:
+          allOf:
+            - $ref: "#/components/schemas/Bar"
+          description: |
+            Present on `candlestick-pattern` rows only. Carries the bar's OHLCV plus its
+            shape metrics (`size`, `body`, `upperWick`, `lowerWick`, the matching `*Pct`
+            ratios, `isBullish`, `isBearish`), which the client uses to place and rotate the
+            pattern marker.
+      additionalProperties:
+        description: One indicator series value, keyed by its `dataName`.
+        oneOf: [{ type: number }, { type: string }, { type: boolean }, { type: "null" }]
+      example:
+        timestamp: "2026-09-02T04:00:00Z"
+        sma: 717.55775
+        upperBand: 732.3101882645718
+        lowerBand: 702.8053117354283
+        percentB: 0.22080039067904103
+        zScore: -1.1167984372838382
+        width: 0.041118469599336814

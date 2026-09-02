@@ -178,6 +178,25 @@ Use the global component from Markdown / templates. Each instance is self-contai
 
 Full TypeScript definitions ship with the package — no `@types/` install required.
 
+## Serving your own data
+
+The API is optional — `loadStaticQuotes` and `loadStaticIndicatorData` accept your own `Bar[]` and `IndicatorDataRow[]` with no HTTP involved. Point `createApiClient({ baseUrl })` at a server instead and it expects a specific interface, described in **`openapi.yml`**, which ships in this package:
+
+```bash
+# from a consuming project
+npx @redocly/cli preview-docs node_modules/@facioquo/indy-charts/openapi.yml
+```
+
+Three operations, and the catalog drives the rest:
+
+| Operation | Returns | Called by |
+| --- | --- | --- |
+| `GET /quotes` | `Bar[]` — OHLCV, oldest first | `getQuotes()` |
+| `GET /indicators` | `IndicatorListing[]` — what exists, how to call and draw it | `getListings()` |
+| `GET /{endpoint}` | `IndicatorDataRow[]` — one row per bar | `getSelectionData()` |
+
+There is no fixed list of indicator routes: each catalog entry carries the `endpoint` to call and the `parameters` it accepts, so adding an indicator is a catalog change rather than an interface change. Return 503 rather than a 4xx for anything a retry could resolve — the client retries 5xx with back-off and falls back to its last good response, but treats 4xx as final.
+
 ## License
 
 Apache-2.0. The full license text is shipped in the `LICENSE` file alongside this README.

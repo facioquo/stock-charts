@@ -37,6 +37,7 @@
   },
   "files": [
     "dist",
+    "openapi.yml",
     "README.md"
   ],
   "scripts": {
