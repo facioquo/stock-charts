@@ -1,7 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    // Test-only. `openapi.spec.ts` reads the spec off disk to assert it against
+    // the types; the build tsconfig keeps `types: []` so none of this reaches
+    // the shipped library.
+    "types": ["node"]
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]

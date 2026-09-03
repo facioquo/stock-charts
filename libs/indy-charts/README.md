@@ -193,9 +193,9 @@ Three operations, and the catalog drives the rest:
 | --- | --- | --- |
 | `GET /quotes` | `Bar[]` — OHLCV, oldest first | `getQuotes()` |
 | `GET /indicators` | `IndicatorListing[]` — what exists, how to call and draw it | `getListings()` |
-| `GET /{endpoint}` | `IndicatorDataRow[]` — one row per bar | `getSelectionData()` |
+| `GET /{indicatorPath}` | `IndicatorDataRow[]` — one row per bar | `getSelectionData()` |
 
-There is no fixed list of indicator routes: each catalog entry carries the `endpoint` to call and the `parameters` it accepts, so adding an indicator is a catalog change rather than an interface change. Return 503 rather than a 4xx for anything a retry could resolve — the client retries 5xx with back-off and falls back to its last good response, but treats 4xx as final.
+There is no fixed list of indicator routes: each catalog entry carries the `endpoint` to call and the `parameters` it accepts, so adding an indicator is a catalog change rather than an interface change. `endpoint` is resolved with `new URL(endpoint, baseUrl)`, so it may be absolute (as the reference server emits) or relative to your `baseUrl`. Return 503 rather than a 4xx for anything a retry could resolve — the client retries 5xx with back-off and falls back to its last good response, but treats 4xx as final.
 
 ## License
 

@@ -49,7 +49,8 @@
     "format": "prettier --write \"**/*.{ts,json}\"",
     "format:check": "prettier --check \"**/*.{ts,json}\"",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "lint:openapi": "redocly lint openapi.yml"
   },
   "dependencies": {
     "chartjs-adapter-date-fns": "^3.0.0",
@@ -68,6 +69,8 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@facioquo/chartjs-chart-financial": "workspace:*",
+    "@redocly/cli": "^2.51.1",
+    "@types/node": "^26.4.0",
     "@vitest/eslint-plugin": "1.6.27",
     "eslint": "^10.9.1",
     "eslint-config-prettier": "^10.1.8",
@@ -75,6 +78,7 @@
     "tsdown": "^0.22.14",
     "typescript-eslint": "^8.68.0",
     "vitest": "^4.1.11",
-    "vue": "3.5.42"
+    "vue": "3.5.42",
+    "yaml": "^2.9.0"
   }
 }

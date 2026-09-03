@@ -74,8 +74,10 @@ paths:
         parameters it accepts, and how each result series should be drawn. The client calls
         this once via `ApiClient.getListings()` and builds its indicator picker from it.
 
-        `endpoint` is an absolute URL. A server behind a proxy must emit its public origin
-        here, not the address it sees the request arrive on.
+        Each entry's `endpoint` is resolved with `new URL(endpoint, baseUrl)`, so it may be
+        either an absolute URL or a path relative to the configured `baseUrl`. The reference
+        server emits absolute URLs; a server behind a proxy that does so must emit its
+        public origin, not the address it sees the request arrive on.
       responses:
         "200":
           description: Indicator listings.
@@ -87,27 +89,42 @@ paths:
         "503":
           $ref: "#/components/responses/Unavailable"
 
-  /{indicator}:
+  /{indicatorPath}:
     get:
       tags: [indicators]
       operationId: getIndicatorData
       summary: Computed series for one indicator
       description: |
-        Returns the computed rows for a single indicator. The path comes from the catalog
-        entry's `endpoint`, and the query parameters from that entry's `parameters` — the
-        client sends each `paramName` with the user's chosen value, so a server receives
-        exactly the parameters it advertised.
+        Returns the computed rows for a single indicator.
+
+        **This path is a modelling device, not a literal route.** OpenAPI cannot express
+        "whatever URL a previous response named", so this operation stands in for the URL
+        the client actually requests, which it derives as
+        `new URL(listing.endpoint, baseUrl)`. When `endpoint` is absolute — as it is on the
+        reference server — that URL is fetched directly and `baseUrl` is not consulted at
+        all, so nothing is ever appended to `servers.url` here. When `endpoint` is relative,
+        it resolves against `baseUrl` and the result does sit under `servers.url`.
+
+        Both forms work. What a server must guarantee is that the URL `endpoint` resolves to
+        answers this operation.
+
+        Query parameters come from the catalog entry's `parameters`: the client sends each
+        `paramName` with the user's chosen value, so a server receives exactly the parameters
+        it advertised, and nothing else.
 
         Each row carries a `timestamp` plus one field per `dataName` in the listing's
         `results`. A field may be `null` where the indicator has no value for that bar,
         which is normal during an indicator's warm-up period.
       parameters:
-        - name: indicator
+        - name: indicatorPath
           in: path
           required: true
-          description: The `endpoint` path segment from a catalog entry, such as `RSI` or `BB`.
+          description: |
+            Stands in for the path of the URL `listing.endpoint` resolves to. On the
+            reference server, `endpoint` is `https://charts-api.stockindicators.dev/BB/` and
+            this path is therefore `BB/`.
           schema: { type: string }
-          example: BB
+          example: BB/
         - name: lookbackPeriods
           in: query
           required: false
@@ -184,9 +201,15 @@ components:
           example: BB([P1],[P2])
         endpoint:
           type: string
-          format: uri
-          description: Absolute URL this indicator is fetched from.
-          example: https://charts-api.stockindicators.dev/BB/
+          format: uri-reference
+          description: |
+            Where this indicator is fetched from, resolved as
+            `new URL(endpoint, baseUrl)`. An absolute URL is fetched as given and ignores
+            `baseUrl`; a relative reference such as `BB/` resolves against it. The reference
+            server emits absolute URLs.
+          examples:
+            - https://charts-api.stockindicators.dev/BB/
+            - BB/
         category:
           type: string
           description: |
@@ -309,6 +332,43 @@ components:
         colorAbove: { type: string }
         colorBelow: { type: string }
 
+    CandlestickShape:
+      type: object
+      description: |
+        Proportions of a single candle, sent alongside its OHLCV on
+        `candlestick-pattern` rows. The `*Pct` ratios are the corresponding measure divided
+        by `size`, so they sum to 1.
+      required:
+        [size, body, upperWick, lowerWick, bodyPct, upperWickPct, lowerWickPct, isBullish, isBearish]
+      properties:
+        size:
+          type: number
+          description: High minus low.
+          example: 4.585
+        body:
+          type: number
+          description: Absolute difference between open and close.
+          example: 2.5
+        upperWick:
+          type: number
+          description: High minus the higher of open and close.
+          example: 0.45
+        lowerWick:
+          type: number
+          description: The lower of open and close, minus low.
+          example: 1.635
+        bodyPct: { type: number, example: 0.5452562704471101 }
+        upperWickPct: { type: number, example: 0.09814612868047982 }
+        lowerWickPct: { type: number, example: 0.35659760087241005 }
+        isBullish:
+          type: boolean
+          description: Close is above open.
+          example: true
+        isBearish:
+          type: boolean
+          description: Close is below open.
+          example: false
+
     IndicatorDataRow:
       type: object
       description: |
@@ -324,11 +384,10 @@ components:
         candle:
           allOf:
             - $ref: "#/components/schemas/Bar"
+            - $ref: "#/components/schemas/CandlestickShape"
           description: |
-            Present on `candlestick-pattern` rows only. Carries the bar's OHLCV plus its
-            shape metrics (`size`, `body`, `upperWick`, `lowerWick`, the matching `*Pct`
-            ratios, `isBullish`, `isBearish`), which the client uses to place and rotate the
-            pattern marker.
+            Present on `candlestick-pattern` rows only. The bar's OHLCV plus its shape
+            metrics, which the client uses to place and rotate the pattern marker.
       additionalProperties:
         description: One indicator series value, keyed by its `dataName`.
         oneOf: [{ type: number }, { type: string }, { type: boolean }, { type: "null" }]
