@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
  * `server/quote-dataset.contract.json` is asserted from both the Worker and the
  * .NET test suite.
  *
- * `openapi.yml` is the interface consumers implement, and it is prose plus
+ * `backing-api.yml` is the interface consumers implement, and it is prose plus
  * schemas — nothing about it fails to compile when it drifts from the types it
  * claims to describe. These tests fail instead.
  *
@@ -18,7 +18,7 @@ import { describe, expect, it } from "vitest";
  */
 
 const here = fileURLToPath(new URL(".", import.meta.url));
-const spec = parse(readFileSync(`${here}openapi.yml`, "utf8")) as OpenApiDocument;
+const spec = parse(readFileSync(`${here}backing-api.yml`, "utf8")) as OpenApiDocument;
 const manifest = JSON.parse(readFileSync(`${here}package.json`, "utf8")) as {
   files: string[];
 };
@@ -37,15 +37,21 @@ interface OpenApiDocument {
 const schemas = spec.components.schemas;
 const propertiesOf = (name: string): string[] => Object.keys(schemas[name].properties ?? {});
 
-describe("openapi.yml ships with the package", () => {
+describe("backing-api.yml ships with the package", () => {
   it("is listed in the published files", () => {
     // A rename here silently stops shipping the spec: the package still builds,
     // publishes, and installs, and consumers simply find nothing.
-    expect(manifest.files).toContain("openapi.yml");
+    expect(manifest.files).toContain("backing-api.yml");
+  });
+
+  it("ships the agent guide alongside it", () => {
+    // `llms.md` is authored here and copied to `dist/llms.txt` by the build;
+    // agents look for the `.txt` name under the installed package.
+    expect(manifest.files).toContain("llms.md");
   });
 });
 
-describe("openapi.yml documents the operations the client calls", () => {
+describe("backing-api.yml documents the operations the client calls", () => {
   it("covers exactly the three ApiClient methods", () => {
     const operations = Object.values(spec.paths)
       .flatMap(methods => Object.values(methods))
@@ -68,6 +74,12 @@ describe("schemas agree with the exported TypeScript types", () => {
   // make someone decide whether the published contract changes too.
   it("Bar carries the OHLCV fields the client requires", () => {
     expect(schemas.Bar.required).toEqual(["timestamp", "open", "high", "low", "close", "volume"]);
+  });
+
+  it("IndicatorListing requires every field the exported type requires", () => {
+    // Every property on the TypeScript interface is required; `chartConfig` is
+    // nullable in value, not optional in presence.
+    expect(schemas.IndicatorListing.required).toEqual(propertiesOf("IndicatorListing"));
   });
 
   it("IndicatorListing declares every field the picker reads", () => {

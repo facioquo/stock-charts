@@ -21,7 +21,10 @@ info:
     entry carrying an `endpoint` and the `parameters` it accepts, and the client builds its
     indicator requests from that. Adding an indicator is a catalog change, not a
     specification change — which is why this document describes one templated indicator
-    operation rather than enumerating the reference server's 96 routes.
+    operation rather than enumerating a particular server's routes.
+
+    Entries do not map one-to-one onto endpoints: several may share an endpoint and differ
+    only in which `results` they chart.
 
     ## Field naming
 
@@ -185,7 +188,18 @@ components:
       type: object
       description: One indicator in the catalog — how to call it, and how to draw it.
       required:
-        [name, uiid, legendTemplate, endpoint, category, chartType, order, parameters, results]
+        [
+          name,
+          uiid,
+          legendTemplate,
+          endpoint,
+          category,
+          chartType,
+          order,
+          chartConfig,
+          parameters,
+          results
+        ]
       properties:
         name:
           type: string
@@ -276,7 +290,7 @@ components:
           type: string
           description: Stack group for bar series; empty when unstacked.
         lineWidth:
-          oneOf: [{ type: number }, { type: "null" }]
+          type: [number, "null"]
         defaultColor:
           type: string
           description: CSS colour applied when the user has not overridden it.
@@ -301,9 +315,9 @@ components:
       required: [minimumYAxis, maximumYAxis, thresholds]
       properties:
         minimumYAxis:
-          oneOf: [{ type: number }, { type: "null" }]
+          type: [number, "null"]
         maximumYAxis:
-          oneOf: [{ type: number }, { type: "null" }]
+          type: [number, "null"]
         thresholds:
           type: array
           items: { $ref: "#/components/schemas/ChartThreshold" }
@@ -390,7 +404,7 @@ components:
             metrics, which the client uses to place and rotate the pattern marker.
       additionalProperties:
         description: One indicator series value, keyed by its `dataName`.
-        oneOf: [{ type: number }, { type: string }, { type: boolean }, { type: "null" }]
+        type: [number, string, boolean, "null"]
       example:
         timestamp: "2026-09-02T04:00:00Z"
         sma: 717.55775

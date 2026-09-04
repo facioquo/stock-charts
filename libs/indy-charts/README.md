@@ -180,12 +180,14 @@ Full TypeScript definitions ship with the package — no `@types/` install requi
 
 ## Serving your own data
 
-The API is optional — `loadStaticQuotes` and `loadStaticIndicatorData` accept your own `Bar[]` and `IndicatorDataRow[]` with no HTTP involved. Point `createApiClient({ baseUrl })` at a server instead and it expects a specific interface, described in **`openapi.yml`**, which ships in this package:
+The API is optional — `loadStaticQuotes` and `loadStaticIndicatorData` accept your own `Bar[]` and `IndicatorDataRow[]` with no HTTP involved. Point `createApiClient({ baseUrl })` at a server instead and it expects a specific interface, described in **`backing-api.yml`**, which ships in this package:
 
 ```bash
 # from a consuming project
-npx @redocly/cli preview-docs node_modules/@facioquo/indy-charts/openapi.yml
+npx @redocly/cli preview-docs node_modules/@facioquo/indy-charts/backing-api.yml
 ```
+
+`dist/llms.txt` covers the same ground for coding agents, alongside the charting API.
 
 Three operations, and the catalog drives the rest:
 

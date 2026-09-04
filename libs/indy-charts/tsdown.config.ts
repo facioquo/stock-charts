@@ -25,5 +25,10 @@ export default defineConfig({
   clean: true,
   onSuccess: async () => {
     await copyFile(resolve("README.md"), resolve("dist/README.md"));
+
+    // Authored as `llms.md` so markdownlint covers it, shipped under the
+    // conventional `llms.txt` name agents look for.
+    await copyFile(resolve("llms.md"), resolve("dist/llms.txt"));
+    await copyFile(resolve("backing-api.yml"), resolve("dist/backing-api.yml"));
   }
 });

@@ -37,7 +37,8 @@
   },
   "files": [
     "dist",
-    "openapi.yml",
+    "backing-api.yml",
+    "llms.md",
     "README.md"
   ],
   "scripts": {
@@ -50,7 +51,7 @@
     "format:check": "prettier --check \"**/*.{ts,json}\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "lint:openapi": "redocly lint openapi.yml"
+    "lint:openapi": "redocly lint backing-api.yml"
   },
   "dependencies": {
     "chartjs-adapter-date-fns": "^3.0.0",
