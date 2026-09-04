@@ -33,6 +33,8 @@ stock-charts/
 ├── libs/                     # Shared TypeScript libraries
 │   ├── chartjs-financial/    # Chart.js financial chart types (candlestick, OHLC, volume)
 │   └── indy-charts/          # Reusable financial indicator charts library
+│       ├── backing-api.yml   # Published HTTP contract for a self-hosted data source
+│       └── llms.md           # Agent guide; built to dist/llms.txt
 ├── server/                   # Backend
 │   ├── WebApi/               # REST API endpoints (.NET)
 │   │   ├── Models/           # Data models
@@ -252,6 +254,22 @@ case-sensitive `JsonSerializerOptions`, so camelCase would silently produce defa
 `server/quote-dataset.contract.json` is asserted from both sides — in `server/edge/src/quotes.spec.ts`
 and `server/WebApi.Tests/Services/QuoteDatasetContractTests.cs`.
 
+#### Published interface contract
+
+`libs/indy-charts/backing-api.yml` specifies the HTTP interface `createApiClient` expects, for consumers hosting their own data source. It ships in the package, so it is a public contract rather than internal documentation.
+
+A change to what `server/WebApi` returns — a field on `Bar`, a field on `IndicatorListing`, a status code the client acts on — changes that contract. Update `backing-api.yml` in the same pull request, and add a changeset, since the package's consumers see it.
+
+It does not enumerate indicator routes. Each catalog entry carries the `endpoint` and `parameters` it accepts, so adding an indicator is a catalog change and leaves the contract alone.
+
+`libs/indy-charts/backing-api.spec.ts` asserts the specification against the exported types and the published `files`; `pnpm --filter @facioquo/indy-charts run lint:openapi` checks it structurally in CI. Neither catches drift from the live server, so verify a wire-shape change against a real response.
+
+#### Agent guide
+
+`libs/indy-charts/llms.md` is the pattern book for the package, covering both the charting API and hosting the backing API. The build copies it to `dist/llms.txt`, the name agents look for under an installed package; author the markdown, never the built file.
+
+Keep it a guide to what a caller does, not an export listing — the types already carry the API surface.
+
 ### Financial charts integration
 
 Financial chart types (`candlestick`, `ohlc`, `volume`) are maintained in `libs/chartjs-financial/` and bundled into `@facioquo/indy-charts`:
@@ -292,6 +310,7 @@ Financial chart types (`candlestick`, `ohlc`, `volume`) are maintained in `libs/
 - Database schema changes or migrations
 - Changing environment configurations
 - Adding new API endpoints or Worker handlers
+- Breaking `libs/indy-charts/backing-api.yml` — removing a field, narrowing a type, or changing a status code the client acts on, each of which breaks a consumer's own data source
 - Changing Cloudflare deployment config (`server/edge/wrangler.jsonc`, `server/Dockerfile`)
 - Modifying Chart.js extension implementations
 - Changes to setup scripts that affect cross-platform compatibility
