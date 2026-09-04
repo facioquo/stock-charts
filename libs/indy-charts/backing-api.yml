@@ -22,9 +22,12 @@ info:
     ## Field naming
 
     Responses are camelCase. Timestamps are ISO 8601 strings; the client also accepts a `Date` when data is supplied in-process rather than over HTTP.
+# Matches the value the specification already defaults to when `servers` is
+# absent. It is not the resolution root: the client builds request URLs with
+# `new URL(endpoint, baseUrl)` in application code, never from this field.
 servers:
   - url: /
-    description: Your own deployment — whatever origin you pass as the client's `baseUrl`.
+    description: Placeholder. The origin is whatever you pass as the client's `baseUrl`.
 
 # No authentication. The client sends no credentials, so an implementation that
 # requires them will not work with it unaltered.
@@ -85,7 +88,7 @@ paths:
       description: |
         Returns the computed rows for a single indicator.
 
-        **This path is a modelling device, not a literal route.** OpenAPI cannot express "whatever URL a previous response named", so this operation stands in for the URL the client actually requests, which it derives as `new URL(listing.endpoint, baseUrl)`. When `endpoint` is absolute, that URL is fetched directly and `baseUrl` is not consulted at all, so nothing is ever appended to `servers.url` here. When `endpoint` is relative, it resolves against `baseUrl` and the result does sit under `servers.url`.
+        **This path is a modelling device, not a literal route.** OpenAPI cannot express "whatever URL a previous response named", so this operation stands in for the URL the client actually requests, which it derives as `new URL(listing.endpoint, baseUrl)`. When `endpoint` is absolute, that URL is fetched directly and `baseUrl` is not consulted at all, so nothing is ever appended to `servers.url` here. When `endpoint` is relative, it resolves against `baseUrl`.
 
         Both forms work. What a server must guarantee is that the URL `endpoint` resolves to answers this operation.
 
@@ -124,7 +127,7 @@ components:
   responses:
     Unavailable:
       description: |
-        The source data is temporarily unavailable. The client treats any 5xx as transient: it retries with exponential back-off and honours `Retry-After`, then falls back to its last good cached response. A 4xx is not retried, so use 503 rather than 4xx for a condition a retry could resolve.
+        The source data is temporarily unavailable. The client retries any 5xx, and 429, with exponential back-off, honours `Retry-After`, then falls back to its last good cached response. Every other 4xx is final and surfaces to the caller, so use 503 for a condition a retry could resolve and 429 to ask for a slower one.
   schemas:
     Bar:
       type: object
@@ -307,6 +310,8 @@ components:
       type: object
       description: |
         Proportions of a single candle, sent alongside its OHLCV on `candlestick-pattern` rows. The `*Pct` ratios are the corresponding measure divided by `size`, so they sum to 1.
+
+        Documented from observed responses. The library's own `IndicatorDataRow.candle` is typed `Bar`, which these fields extend rather than contradict — a consumer reading the type alone would not know they arrive.
       required:
         [size, body, upperWick, lowerWick, bodyPct, upperWickPct, lowerWickPct, isBullish, isBearish]
       properties:

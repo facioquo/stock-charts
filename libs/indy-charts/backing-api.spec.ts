@@ -5,16 +5,20 @@ import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 
 /**
- * Two-sided assertion for the published interface contract, mirroring how
- * `server/quote-dataset.contract.json` is asserted from both the Worker and the
- * .NET test suite.
+ * Pins the published contract against the things that can silently stop
+ * matching it: the package manifest, and the document's own internal
+ * consistency.
  *
- * `backing-api.yml` is the interface consumers implement, and it is prose plus
- * schemas — nothing about it fails to compile when it drifts from the types it
- * claims to describe. These tests fail instead.
+ * What this does NOT cover, deliberately and worth knowing before trusting it:
+ * the exported TypeScript types. Nothing here imports `./config`, so renaming a
+ * field on `Bar` or `IndicatorListing` leaves every test below green. Types are
+ * erased at runtime, and a compile-time check would need spec files to be
+ * typechecked, which they are not — `tsconfig.json` excludes them and `eslint`
+ * does not surface type errors. The literal field lists are therefore a
+ * regression pin maintained by hand, not a derivation.
  *
- * Structural validity is `pnpm run lint:openapi` (Redocly); this file covers the
- * agreement between the document, the package manifest, and the TypeScript types.
+ * Nor does anything compare against a running server. Structural validity is
+ * `pnpm run lint:openapi`.
  */
 
 const here = fileURLToPath(new URL(".", import.meta.url));
@@ -47,9 +51,9 @@ describe("backing-api.yml ships with the package", () => {
     expect(spec.info.version).toBe(manifest.version);
   });
 
-  it("ships the agent guide", () => {
-    // `llms.md` is authored here and copied to `dist/llms.txt` by the build;
-    // agents look for the `.txt` name under the installed package.
+  it("lists the agent guide among the packed files", () => {
+    // Does not prove the build emitted `dist/llms.txt`; that copy step is
+    // unguarded.
     expect(manifest.files).toContain("llms.md");
   });
 });
@@ -72,16 +76,18 @@ describe("backing-api.yml documents the operations the client calls", () => {
   });
 });
 
-describe("schemas agree with the exported TypeScript types", () => {
-  // Kept literal rather than derived: a type change should fail here loudly and
-  // make someone decide whether the published contract changes too.
+describe("schema shapes are pinned against accidental edits", () => {
+  // Literal rather than derived. These catch a careless edit to the document;
+  // they cannot catch the TypeScript type moving underneath it.
   it("Bar carries the OHLCV fields the client requires", () => {
     expect(schemas.Bar.required).toEqual(["timestamp", "open", "high", "low", "close", "volume"]);
   });
 
-  it("IndicatorListing requires every field the exported type requires", () => {
-    // Every property on the TypeScript interface is required; `chartConfig` is
-    // nullable in value, not optional in presence.
+  it("IndicatorListing marks every declared property required", () => {
+    // Every property of the exported interface is required, `chartConfig`
+    // included — it is nullable in value, not optional in presence. Both sides
+    // of this comparison come from the document, so it catches a property added
+    // without a matching `required` entry, nothing more.
     expect(schemas.IndicatorListing.required).toEqual(propertiesOf("IndicatorListing"));
   });
 

@@ -140,7 +140,7 @@ jobs:
 
       # The published interface contract. Structural validity is checked here;
       # its agreement with the types and the packed files is asserted in
-      # libs/indy-charts/openapi.spec.ts, which runs with the library tests.
+      # libs/indy-charts/backing-api.spec.ts, which runs with the library tests.
       - name: Lint the indy-charts OpenAPI spec
         run: pnpm --filter '@facioquo/indy-charts' run lint:openapi
 

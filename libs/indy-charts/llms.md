@@ -129,9 +129,9 @@ Behind a proxy, emit your public origin. A server that echoes the address it saw
 
 ### Status codes the client acts on
 
-Return **503**, not a 4xx, for anything a retry could fix. The client retries 5xx with exponential back-off, honours `Retry-After`, and falls back to its last good response. A 4xx is final and surfaces to the user.
+Return **503** for anything a retry could fix, and **429** to ask for a slower one. The client retries both with exponential back-off, honours `Retry-After`, and falls back to its last good response. Every other 4xx is final and surfaces to the user.
 
-That distinction is the one thing most worth getting right when implementing this interface: a source that is briefly unavailable and says so with a 4xx turns a recoverable gap into a broken chart.
+That distinction is the one thing most worth getting right when implementing this interface: a source that is briefly unavailable and reports it as, say, a 404 turns a recoverable gap into a broken chart.
 
 ### Serving your own
 
