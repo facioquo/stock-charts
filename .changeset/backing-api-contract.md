@@ -2,7 +2,7 @@
 "@facioquo/indy-charts": minor
 ---
 
-Ship `backing-api.yml` and `llms.txt`: the HTTP contract a self-hosted data source implements, and a guide to both halves of the package.
+Ship `dist/backing-api.yml` and `dist/llms.txt`: the HTTP contract a self-hosted data source implements, and a guide to both halves of the package.
 
 The API has always been optional — supply your own `Bar[]` and `IndicatorDataRow[]` and nothing makes a request. But pointing `createApiClient({ baseUrl })` at a server means meeting a specific shape, and that shape was discoverable only by reading the client's source.
 
@@ -11,6 +11,6 @@ The API has always been optional — supply your own `Bar[]` and `IndicatorDataR
 `llms.txt` covers using the charts and hosting the backing API in one place, for coding agents working against the package.
 
 ```bash
-npx @redocly/cli preview-docs node_modules/@facioquo/indy-charts/backing-api.yml
+npx @redocly/cli preview-docs node_modules/@facioquo/indy-charts/dist/backing-api.yml
 cat node_modules/@facioquo/indy-charts/dist/llms.txt
 ```

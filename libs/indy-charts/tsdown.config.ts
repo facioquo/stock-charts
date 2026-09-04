@@ -35,9 +35,13 @@ export default defineConfig({
       version: string;
     };
     const contract = await readFile(resolve("backing-api.yml"), "utf8");
-    await writeFile(
-      resolve("dist/backing-api.yml"),
-      contract.replace(/^ {2}version: ".*"$/m, `  version: "${version}"`)
-    );
+    const versioned = contract.replace(/^ {2}version: ".*"$/m, `  version: "${version}"`);
+
+    // A silent no-op here would ship a contract stating the wrong release.
+    if (!versioned.includes(`  version: "${version}"`)) {
+      throw new Error(`backing-api.yml: could not set info.version to ${version}`);
+    }
+
+    await writeFile(resolve("dist/backing-api.yml"), versioned);
   }
 });

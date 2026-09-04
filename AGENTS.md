@@ -258,11 +258,17 @@ and `server/WebApi.Tests/Services/QuoteDatasetContractTests.cs`.
 
 `libs/indy-charts/backing-api.yml` specifies the HTTP interface `createApiClient` expects, for consumers hosting their own data source. It ships in the package, so it is a public contract rather than internal documentation.
 
-A change to what `server/WebApi` returns changes that contract: a field on `Bar`, a field on `IndicatorListing`, or a status code the client acts on. Update `backing-api.yml` in the same pull request. Add a changeset too, because the package's consumers see it.
+These change the contract. Update `backing-api.yml` in the same pull request, and add a changeset:
 
-It does not enumerate indicator routes. Each catalog entry carries the `endpoint` and `parameters` it accepts, so adding an indicator is a catalog change and leaves the contract alone.
+- A field added to or removed from `IndicatorListing`
+- A status code the client acts on
+- A FacioQuo.Stock.Indicators version bump that moves `Bar`, which is defined upstream rather than here
 
-`libs/indy-charts/backing-api.spec.ts` asserts the specification against the exported types and the published `files`. `pnpm --filter @facioquo/indy-charts run lint:openapi` checks it structurally in CI. Neither compares against a live server, so verify a wire-shape change against a real response.
+Adding an indicator does not. Each catalog entry carries the `endpoint` and `parameters` it accepts, so the contract stays put.
+
+Two guards run in CI. `backing-api.spec.ts` asserts the document against the exported types and the published `files`; `lint:openapi` checks it structurally.
+
+Neither compares against a live server. Verify a wire-shape change against a real response.
 
 #### Agent guide
 
