@@ -112,7 +112,7 @@ Optional. Skip this whole section if you supply your own data.
 Preview the contract:
 
 ```bash
-npx @redocly/cli preview-docs node_modules/@facioquo/indy-charts/dist/backing-api.yml
+npx @redocly/cli build-docs node_modules/@facioquo/indy-charts/dist/backing-api.yml
 ```
 
 ### The catalog is the interface

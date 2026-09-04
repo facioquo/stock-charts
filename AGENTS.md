@@ -274,7 +274,9 @@ Neither compares against a live server. Verify a wire-shape change against a rea
 
 `libs/indy-charts/llms.md` is the pattern book for the package, covering the charting API and hosting the backing API. The build copies it to `dist/llms.txt`, the name agents look for under an installed package. Author the markdown; the built file is generated.
 
-It reads as a guide to what a caller does. The types already carry the API surface, so an export listing there earns nothing.
+It leads with the mistake a caller makes rather than the API surface, and states the footguns types cannot: the teardown contract, which status codes the client retries, where a chart renders.
+
+`info.version` in the contract is a placeholder; the build overwrites it from `package.json`. Do not wire it to a test that compares the two, or every release pull request fails.
 
 ### Financial charts integration
 

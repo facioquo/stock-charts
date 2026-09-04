@@ -11,6 +11,6 @@ The API has always been optional — supply your own `Bar[]` and `IndicatorDataR
 `llms.txt` covers using the charts and hosting the backing API in one place, for coding agents working against the package.
 
 ```bash
-npx @redocly/cli preview-docs node_modules/@facioquo/indy-charts/dist/backing-api.yml
+npx @redocly/cli build-docs node_modules/@facioquo/indy-charts/dist/backing-api.yml
 cat node_modules/@facioquo/indy-charts/dist/llms.txt
 ```

@@ -2,7 +2,8 @@ openapi: 3.1.0
 
 info:
   title: indy-charts chart data API
-  # Kept equal to the package version; the build injects it into the shipped copy.
+  # Placeholder. The build overwrites this from package.json, so the shipped
+  # copy states its release; this value is not maintained by hand.
   version: "0.9.2"
   summary: The HTTP interface @facioquo/indy-charts expects from a quote and indicator source.
   license:
@@ -128,6 +129,8 @@ components:
     Unavailable:
       description: |
         The source data is temporarily unavailable. The client retries any 5xx, and 429, with exponential back-off, honours `Retry-After`, then falls back to its last good cached response. Every other 4xx is final and surfaces to the caller, so use 503 for a condition a retry could resolve and 429 to ask for a slower one.
+
+        This is guidance for your implementation rather than observed behaviour of any particular server: a source that falls back to bundled data when its upstream fails will answer 200 here instead.
   schemas:
     Bar:
       type: object
