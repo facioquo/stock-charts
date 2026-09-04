@@ -1,4 +1,4 @@
-import { copyFile } from "fs/promises";
+import { copyFile, readFile, writeFile } from "fs/promises";
 import { resolve } from "path";
 
 import { defineConfig } from "tsdown";
@@ -29,6 +29,15 @@ export default defineConfig({
     // Authored as `llms.md` so markdownlint covers it, shipped under the
     // conventional `llms.txt` name agents look for.
     await copyFile(resolve("llms.md"), resolve("dist/llms.txt"));
-    await copyFile(resolve("backing-api.yml"), resolve("dist/backing-api.yml"));
+    // info.version tracks the package version, so the shipped contract always
+    // states the release it belongs to without anyone editing two files.
+    const { version } = JSON.parse(await readFile(resolve("package.json"), "utf8")) as {
+      version: string;
+    };
+    const contract = await readFile(resolve("backing-api.yml"), "utf8");
+    await writeFile(
+      resolve("dist/backing-api.yml"),
+      contract.replace(/^ {2}version: ".*"$/m, `  version: "${version}"`)
+    );
   }
 });

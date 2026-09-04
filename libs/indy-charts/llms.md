@@ -112,7 +112,7 @@ Optional. Skip this whole section if you supply your own data.
 Preview the contract:
 
 ```bash
-npx @redocly/cli preview-docs node_modules/@facioquo/indy-charts/backing-api.yml
+npx @redocly/cli preview-docs node_modules/@facioquo/indy-charts/dist/backing-api.yml
 ```
 
 ### The catalog is the interface
@@ -135,7 +135,7 @@ That distinction is the one thing most worth getting right when implementing thi
 
 ### Serving your own
 
-Any server answering those three operations works. The reference implementation is <https://charts-api.stockindicators.dev>; `backing-api.yml` is what it conforms to, and what yours should.
+Any server answering those three operations works. A reference implementation of the .NET side lives in <https://github.com/facioquo/stock-charts>; `backing-api.yml` is what yours conforms to.
 
 Responses are camelCase, timestamps ISO 8601. Each indicator row carries a `timestamp` plus one field per `dataName` the listing declares, `null` where the indicator has not warmed up.
 

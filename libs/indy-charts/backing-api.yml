@@ -2,38 +2,29 @@ openapi: 3.1.0
 
 info:
   title: indy-charts chart data API
-  version: "1.0.0"
+  # Kept equal to the package version; the build injects it into the shipped copy.
+  version: "0.9.2"
   summary: The HTTP interface @facioquo/indy-charts expects from a quote and indicator source.
   license:
     name: Apache-2.0
     identifier: Apache-2.0
   description: |
-    `@facioquo/indy-charts` can render charts from data you supply directly, with no HTTP
-    involved. This specification describes the alternative: the interface its built-in API
-    client calls when you point it at a server with `createApiClient({ baseUrl })`.
+    `@facioquo/indy-charts` can render charts from data you supply directly, with no HTTP involved. This specification describes the alternative: the interface its built-in API client calls when you point it at a server with `createApiClient({ baseUrl })`.
 
-    Implement these three operations and the library will drive your server. The reference
-    implementation is <https://charts-api.stockindicators.dev>.
+    Implement these three operations and the library will drive your server. A reference implementation of the .NET side lives in <https://github.com/facioquo/stock-charts>.
 
     ## The catalog drives everything
 
-    There is no fixed list of indicator routes. `GET /indicators` returns a catalog, each
-    entry carrying an `endpoint` and the `parameters` it accepts, and the client builds its
-    indicator requests from that. Adding an indicator is a catalog change, not a
-    specification change — which is why this document describes one templated indicator
-    operation rather than enumerating a particular server's routes.
+    There is no fixed list of indicator routes. `GET /indicators` returns a catalog, each entry carrying an `endpoint` and the `parameters` it accepts, and the client builds its indicator requests from that. Adding an indicator is a catalog change, not a specification change — which is why this document describes one templated indicator operation rather than enumerating a particular server's routes.
 
-    Entries do not map one-to-one onto endpoints: several may share an endpoint and differ
-    only in which `results` they chart.
+    Entries do not map one-to-one onto endpoints: several may share an endpoint and differ only in which `results` they chart.
 
     ## Field naming
 
-    Responses are camelCase. Timestamps are ISO 8601 strings; the client also accepts a
-    `Date` when data is supplied in-process rather than over HTTP.
-
+    Responses are camelCase. Timestamps are ISO 8601 strings; the client also accepts a `Date` when data is supplied in-process rather than over HTTP.
 servers:
-  - url: https://charts-api.stockindicators.dev
-    description: Reference implementation.
+  - url: /
+    description: Your own deployment — whatever origin you pass as the client's `baseUrl`.
 
 # No authentication. The client sends no credentials, so an implementation that
 # requires them will not work with it unaltered.
@@ -54,8 +45,7 @@ paths:
       operationId: getQuotes
       summary: Price history for the charted security
       description: |
-        Returns the OHLCV bars the price chart renders, oldest first. The client calls this
-        once per chart load via `ApiClient.getQuotes()`.
+        Returns the OHLCV bars the price chart renders, oldest first. The client calls this once per chart load via `ApiClient.getQuotes()`.
       responses:
         "200":
           description: Bars in chronological order.
@@ -73,14 +63,9 @@ paths:
       operationId: getIndicatorCatalog
       summary: Catalog of available indicators
       description: |
-        Returns every indicator this server can compute, with the endpoint to call, the
-        parameters it accepts, and how each result series should be drawn. The client calls
-        this once via `ApiClient.getListings()` and builds its indicator picker from it.
+        Returns every indicator this server can compute, with the endpoint to call, the parameters it accepts, and how each result series should be drawn. The client calls this once via `ApiClient.getListings()` and builds its indicator picker from it.
 
-        Each entry's `endpoint` is resolved with `new URL(endpoint, baseUrl)`, so it may be
-        either an absolute URL or a path relative to the configured `baseUrl`. The reference
-        server emits absolute URLs; a server behind a proxy that does so must emit its
-        public origin, not the address it sees the request arrive on.
+        Each entry's `endpoint` is resolved with `new URL(endpoint, baseUrl)`, so it may be either an absolute URL or a path relative to the configured `baseUrl`. A server behind a proxy that emits absolute URLs must emit its public origin, not the address it sees the request arrive on.
       responses:
         "200":
           description: Indicator listings.
@@ -100,42 +85,26 @@ paths:
       description: |
         Returns the computed rows for a single indicator.
 
-        **This path is a modelling device, not a literal route.** OpenAPI cannot express
-        "whatever URL a previous response named", so this operation stands in for the URL
-        the client actually requests, which it derives as
-        `new URL(listing.endpoint, baseUrl)`. When `endpoint` is absolute — as it is on the
-        reference server — that URL is fetched directly and `baseUrl` is not consulted at
-        all, so nothing is ever appended to `servers.url` here. When `endpoint` is relative,
-        it resolves against `baseUrl` and the result does sit under `servers.url`.
+        **This path is a modelling device, not a literal route.** OpenAPI cannot express "whatever URL a previous response named", so this operation stands in for the URL the client actually requests, which it derives as `new URL(listing.endpoint, baseUrl)`. When `endpoint` is absolute, that URL is fetched directly and `baseUrl` is not consulted at all, so nothing is ever appended to `servers.url` here. When `endpoint` is relative, it resolves against `baseUrl` and the result does sit under `servers.url`.
 
-        Both forms work. What a server must guarantee is that the URL `endpoint` resolves to
-        answers this operation.
+        Both forms work. What a server must guarantee is that the URL `endpoint` resolves to answers this operation.
 
-        Query parameters come from the catalog entry's `parameters`: the client sends each
-        `paramName` with the user's chosen value, so a server receives exactly the parameters
-        it advertised, and nothing else.
+        Query parameters come from the catalog entry's `parameters`: the client sends each `paramName` with the user's chosen value, so a server receives exactly the parameters it advertised, and nothing else.
 
-        Each row carries a `timestamp` plus one field per `dataName` in the listing's
-        `results`. A field may be `null` where the indicator has no value for that bar,
-        which is normal during an indicator's warm-up period.
+        Each row carries a `timestamp` plus one field per `dataName` in the listing's `results`. A field may be `null` where the indicator has no value for that bar, which is normal during an indicator's warm-up period.
       parameters:
         - name: indicatorPath
           in: path
           required: true
           description: |
-            Stands in for the path of the URL `listing.endpoint` resolves to. On the
-            reference server, `endpoint` is `https://charts-api.stockindicators.dev/BB/` and
-            this path is therefore `BB/`.
+            Stands in for the path of the URL `listing.endpoint` resolves to. Where `endpoint` is `https://data.example.com/BB/`, this path is `BB/`.
           schema: { type: string }
           example: BB/
         - name: lookbackPeriods
           in: query
           required: false
           description: |
-            Illustrative only. The real parameters are whatever the catalog entry declares;
-            each is sent by its `paramName`. `BB` sends `lookbackPeriods` and
-            `standardDeviations`, `DOJI` sends `maxPriceChangePercent`, and an indicator
-            with an empty `parameters` array is called with no query string at all.
+            Illustrative only. The real parameters are whatever the catalog entry declares; each is sent by its `paramName`. `BB` sends `lookbackPeriods` and `standardDeviations`, `DOJI` sends `maxPriceChangePercent`, and an indicator with an empty `parameters` array is called with no query string at all.
           schema: { type: integer }
           example: 20
       responses:
@@ -155,11 +124,7 @@ components:
   responses:
     Unavailable:
       description: |
-        The source data is temporarily unavailable. The client treats any 5xx as transient:
-        it retries with exponential back-off and honours `Retry-After`, then falls back to
-        its last good cached response. A 4xx is not retried, so use 503 rather than 4xx for
-        a condition a retry could resolve.
-
+        The source data is temporarily unavailable. The client treats any 5xx as transient: it retries with exponential back-off and honours `Retry-After`, then falls back to its last good cached response. A 4xx is not retried, so use 503 rather than 4xx for a condition a retry could resolve.
   schemas:
     Bar:
       type: object
@@ -181,9 +146,7 @@ components:
           format: date-time
           deprecated: true
           description: |
-            Legacy alias for `timestamp` emitted by the reference server. The client ignores
-            it; a new implementation should omit it.
-
+            Legacy alias for `timestamp` some sources emit. The client ignores it; a new implementation should omit it.
     IndicatorListing:
       type: object
       description: One indicator in the catalog — how to call it, and how to draw it.
@@ -217,18 +180,14 @@ components:
           type: string
           format: uri-reference
           description: |
-            Where this indicator is fetched from, resolved as
-            `new URL(endpoint, baseUrl)`. An absolute URL is fetched as given and ignores
-            `baseUrl`; a relative reference such as `BB/` resolves against it. The reference
-            server emits absolute URLs.
+            Where this indicator is fetched from, resolved as `new URL(endpoint, baseUrl)`. An absolute URL is fetched as given and ignores `baseUrl`; a relative reference such as `BB/` resolves against it.
           examples:
-            - https://charts-api.stockindicators.dev/BB/
+            - https://data.example.com/BB/
             - BB/
         category:
           type: string
           description: |
-            Grouping for the picker. `candlestick-pattern` is behavioural: rows in that
-            category carry `candle`, and the client renders point markers from it.
+            Grouping for the picker. `candlestick-pattern` is behavioural: rows in that category carry `candle`, and the client renders point markers from it.
           example: price-channel
         chartType:
           type: string
@@ -283,8 +242,7 @@ components:
         lineType:
           type: string
           description: |
-            `solid`, `dash`, `dots`, `bar`, `pointer`, or `candle`. `candle` renders OHLC
-            results as candlesticks in their own pane.
+            `solid`, `dash`, `dots`, `bar`, `pointer`, or `candle`. `candle` renders OHLC results as candlesticks in their own pane.
           example: solid
         stack:
           type: string
@@ -302,8 +260,7 @@ components:
         segmented:
           type: boolean
           description: |
-            Draw as flat segments that step at boundaries, rather than a continuous line —
-            for level series such as monthly pivot points.
+            Draw as flat segments that step at boundaries, rather than a continuous line — for level series such as monthly pivot points.
         segmentMode:
           type: string
           enum: [step, slope]
@@ -349,9 +306,7 @@ components:
     CandlestickShape:
       type: object
       description: |
-        Proportions of a single candle, sent alongside its OHLCV on
-        `candlestick-pattern` rows. The `*Pct` ratios are the corresponding measure divided
-        by `size`, so they sum to 1.
+        Proportions of a single candle, sent alongside its OHLCV on `candlestick-pattern` rows. The `*Pct` ratios are the corresponding measure divided by `size`, so they sum to 1.
       required:
         [size, body, upperWick, lowerWick, bodyPct, upperWickPct, lowerWickPct, isBullish, isBearish]
       properties:
@@ -386,9 +341,7 @@ components:
     IndicatorDataRow:
       type: object
       description: |
-        One computed row. Beyond `timestamp`, the keys are the `dataName` values from the
-        listing's `results` — so the shape varies per indicator and cannot be enumerated
-        here. A value is `null` where the indicator has not warmed up.
+        One computed row. Beyond `timestamp`, the keys are the `dataName` values from the listing's `results` — so the shape varies per indicator and cannot be enumerated here. A value is `null` where the indicator has not warmed up.
       required: [timestamp]
       properties:
         timestamp:
@@ -400,8 +353,7 @@ components:
             - $ref: "#/components/schemas/Bar"
             - $ref: "#/components/schemas/CandlestickShape"
           description: |
-            Present on `candlestick-pattern` rows only. The bar's OHLCV plus its shape
-            metrics, which the client uses to place and rotate the pattern marker.
+            Present on `candlestick-pattern` rows only. The bar's OHLCV plus its shape metrics, which the client uses to place and rotate the pattern marker.
       additionalProperties:
         description: One indicator series value, keyed by its `dataName`.
         type: [number, string, boolean, "null"]

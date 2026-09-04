@@ -37,7 +37,6 @@
   },
   "files": [
     "dist",
-    "backing-api.yml",
     "llms.md",
     "README.md"
   ],

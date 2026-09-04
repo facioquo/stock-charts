@@ -258,17 +258,17 @@ and `server/WebApi.Tests/Services/QuoteDatasetContractTests.cs`.
 
 `libs/indy-charts/backing-api.yml` specifies the HTTP interface `createApiClient` expects, for consumers hosting their own data source. It ships in the package, so it is a public contract rather than internal documentation.
 
-A change to what `server/WebApi` returns — a field on `Bar`, a field on `IndicatorListing`, a status code the client acts on — changes that contract. Update `backing-api.yml` in the same pull request, and add a changeset, since the package's consumers see it.
+A change to what `server/WebApi` returns changes that contract: a field on `Bar`, a field on `IndicatorListing`, or a status code the client acts on. Update `backing-api.yml` in the same pull request. Add a changeset too, because the package's consumers see it.
 
 It does not enumerate indicator routes. Each catalog entry carries the `endpoint` and `parameters` it accepts, so adding an indicator is a catalog change and leaves the contract alone.
 
-`libs/indy-charts/backing-api.spec.ts` asserts the specification against the exported types and the published `files`; `pnpm --filter @facioquo/indy-charts run lint:openapi` checks it structurally in CI. Neither catches drift from the live server, so verify a wire-shape change against a real response.
+`libs/indy-charts/backing-api.spec.ts` asserts the specification against the exported types and the published `files`. `pnpm --filter @facioquo/indy-charts run lint:openapi` checks it structurally in CI. Neither compares against a live server, so verify a wire-shape change against a real response.
 
 #### Agent guide
 
-`libs/indy-charts/llms.md` is the pattern book for the package, covering both the charting API and hosting the backing API. The build copies it to `dist/llms.txt`, the name agents look for under an installed package; author the markdown, never the built file.
+`libs/indy-charts/llms.md` is the pattern book for the package, covering the charting API and hosting the backing API. The build copies it to `dist/llms.txt`, the name agents look for under an installed package. Author the markdown; the built file is generated.
 
-Keep it a guide to what a caller does, not an export listing — the types already carry the API surface.
+It reads as a guide to what a caller does. The types already carry the API surface, so an export listing there earns nothing.
 
 ### Financial charts integration
 

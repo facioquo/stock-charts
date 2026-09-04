@@ -184,7 +184,7 @@ The API is optional — `loadStaticQuotes` and `loadStaticIndicatorData` accept 
 
 ```bash
 # from a consuming project
-npx @redocly/cli preview-docs node_modules/@facioquo/indy-charts/backing-api.yml
+npx @redocly/cli preview-docs node_modules/@facioquo/indy-charts/dist/backing-api.yml
 ```
 
 `dist/llms.txt` covers the same ground for coding agents, alongside the charting API.

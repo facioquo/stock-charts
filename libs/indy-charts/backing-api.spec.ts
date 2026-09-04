@@ -21,6 +21,7 @@ const here = fileURLToPath(new URL(".", import.meta.url));
 const spec = parse(readFileSync(`${here}backing-api.yml`, "utf8")) as OpenApiDocument;
 const manifest = JSON.parse(readFileSync(`${here}package.json`, "utf8")) as {
   files: string[];
+  version: string;
 };
 
 interface SchemaObject {
@@ -30,6 +31,7 @@ interface SchemaObject {
 }
 
 interface OpenApiDocument {
+  info: { version: string };
   paths: Record<string, Record<string, { operationId?: string }>>;
   components: { schemas: Record<string, SchemaObject> };
 }
@@ -38,13 +40,14 @@ const schemas = spec.components.schemas;
 const propertiesOf = (name: string): string[] => Object.keys(schemas[name].properties ?? {});
 
 describe("backing-api.yml ships with the package", () => {
-  it("is listed in the published files", () => {
-    // A rename here silently stops shipping the spec: the package still builds,
-    // publishes, and installs, and consumers simply find nothing.
-    expect(manifest.files).toContain("backing-api.yml");
+  it("states the version of the package it belongs to", () => {
+    // The build injects this into the shipped copy, so a stale value here is
+    // only visible to someone reading the source — which is where an
+    // implementer starts.
+    expect(spec.info.version).toBe(manifest.version);
   });
 
-  it("ships the agent guide alongside it", () => {
+  it("ships the agent guide", () => {
     // `llms.md` is authored here and copied to `dist/llms.txt` by the build;
     // agents look for the `.txt` name under the installed package.
     expect(manifest.files).toContain("llms.md");
