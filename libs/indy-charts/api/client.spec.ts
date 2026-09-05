@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import type { Mock } from "vitest";
 import { createApiClient } from "./client";
 import type { ApiClient, RetryConfig } from "./client";
 import type { IndicatorListing, IndicatorParam, IndicatorSelection } from "../config/types";
@@ -163,10 +164,10 @@ const NO_DELAY_RETRY: RetryConfig = { maxAttempts: 3, baseDelayMs: 0 };
 
 describe("createApiClient", () => {
   let client: ApiClient;
-  let onError: ReturnType<typeof vi.fn<[context: string, error: unknown], void>>;
+  let onError: Mock<(context: string, error: unknown) => void>;
 
   beforeEach(() => {
-    onError = vi.fn<[context: string, error: unknown], void>();
+    onError = vi.fn<(context: string, error: unknown) => void>();
     // Disable retries by default so error-handling tests remain fast.
     // Retry-specific behaviour is covered in the "retry" describe block below.
     client = createApiClient({
@@ -801,7 +802,7 @@ describe("staleCache", () => {
   }
 
   it("stores successful quotes in sessionStorage and returns them on failure", async () => {
-    const onStale = vi.fn<[context: string], void>();
+    const onStale = vi.fn<(context: string) => void>();
     setupStorage();
 
     const quotes = [
@@ -823,7 +824,7 @@ describe("staleCache", () => {
   });
 
   it("stores successful listings in sessionStorage and returns them on failure", async () => {
-    const onStale = vi.fn<[context: string], void>();
+    const onStale = vi.fn<(context: string) => void>();
     setupStorage();
 
     const listings = [makeListing({ name: "SMA" })];
@@ -841,7 +842,7 @@ describe("staleCache", () => {
   });
 
   it("stores successful selection data in sessionStorage and returns it on failure", async () => {
-    const onStale = vi.fn<[context: string], void>();
+    const onStale = vi.fn<(context: string) => void>();
     setupStorage();
 
     const rows = [{ timestamp: "2024-01-01", sma: 42.0 }];
@@ -861,7 +862,7 @@ describe("staleCache", () => {
   });
 
   it("throws and calls onError when staleCache is off (no fallback)", async () => {
-    const onError = vi.fn<[context: string, error: unknown], void>();
+    const onError = vi.fn<(context: string, error: unknown) => void>();
     setupStorage();
 
     const quotes = [
@@ -883,7 +884,7 @@ describe("staleCache", () => {
   });
 
   it("does not call onStale on a successful fetch even when cache is populated", async () => {
-    const onStale = vi.fn<[context: string], void>();
+    const onStale = vi.fn<(context: string) => void>();
     setupStorage();
 
     mockFetchOk([]);
@@ -896,7 +897,7 @@ describe("staleCache", () => {
   });
 
   it("gracefully handles unavailable sessionStorage (e.g. SSR)", async () => {
-    const onStale = vi.fn<[context: string], void>();
+    const onStale = vi.fn<(context: string) => void>();
     // Simulate no sessionStorage (server-side rendering / Node)
     vi.stubGlobal("sessionStorage", undefined);
 
@@ -908,8 +909,8 @@ describe("staleCache", () => {
   });
 
   it("calls onError before returning stale data (not silently bypassed)", async () => {
-    const onError = vi.fn<[context: string, error: unknown], void>();
-    const onStale = vi.fn<[context: string], void>();
+    const onError = vi.fn<(context: string, error: unknown) => void>();
+    const onStale = vi.fn<(context: string) => void>();
     setupStorage();
 
     const quotes = [
@@ -934,8 +935,8 @@ describe("staleCache", () => {
   });
 
   it("surfaces original fetch error when cached selection data is not an array", async () => {
-    const onError = vi.fn<[context: string, error: unknown], void>();
-    const onStale = vi.fn<[context: string], void>();
+    const onError = vi.fn<(context: string, error: unknown) => void>();
+    const onStale = vi.fn<(context: string) => void>();
     const storage = setupStorage();
 
     // Write a tampered (non-array) cache entry to simulate corruption.
@@ -958,7 +959,7 @@ describe("staleCache", () => {
   });
 
   it("surfaces original fetch error when cached data fails normalization", async () => {
-    const onError = vi.fn<[context: string, error: unknown], void>();
+    const onError = vi.fn<(context: string, error: unknown) => void>();
     const storage = setupStorage();
 
     // Write malformed quote data directly into the cache to simulate corruption.
