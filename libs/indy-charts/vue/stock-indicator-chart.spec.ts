@@ -109,6 +109,12 @@ const renderer = createRenderer<TestNode, TestElement>({
     return createTestText(text);
   },
   setText(node, text) {
+    // The renderer signature types this as any host node, but Vue only calls it
+    // on nodes from createText. Narrowing keeps the assignment honest; an
+    // element reaching here would mean that contract changed.
+    if (node.kind !== "text") {
+      throw new Error(`setText called on a ${node.kind} node`);
+    }
     node.text = text;
   },
   setElementText(element, text) {
