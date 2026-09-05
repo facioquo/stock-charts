@@ -4,22 +4,71 @@ import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 
+import type { Bar, IndicatorListing, IndicatorParamConfig } from "./config";
+
 /**
- * Pins the published contract against the things that can silently stop
- * matching it: the package manifest, and the document's own internal
- * consistency.
+ * Pins the published contract against the three things that can silently stop
+ * matching it: the exported TypeScript types, the package manifest, and the
+ * document's own internal consistency.
  *
- * What this does NOT cover, deliberately and worth knowing before trusting it:
- * the exported TypeScript types. Nothing here imports `./config`, so renaming a
- * field on `Bar` or `IndicatorListing` leaves every test below green. Types are
- * erased at runtime, and a compile-time check would need spec files to be
- * typechecked, which they are not — `tsconfig.json` excludes them and `eslint`
- * does not surface type errors. The literal field lists are therefore a
- * regression pin maintained by hand, not a derivation.
+ * The field lists below run the check in both directions. `fieldsOf` binds each
+ * list to its exported interface at compile time, so adding or renaming a field
+ * on `Bar`, `IndicatorListing`, or `IndicatorParamConfig` fails `pnpm run
+ * typecheck`. The assertions then compare the same list against the document,
+ * so a type change that skips `backing-api.yml` fails here. Neither half alone
+ * is enough — the compile-time bind needs spec files inside the typecheck
+ * config, which is why they are.
  *
- * Nor does anything compare against a running server. Structural validity is
+ * `CandlestickShape` has no TypeScript counterpart; it is wire-only, so its list
+ * stays a hand-maintained regression pin.
+ *
+ * Nothing here compares against a running server. Structural validity is
  * `pnpm run lint:openapi`.
  */
+
+/**
+ * Bind a literal field list to an exported interface. A name that is not a key
+ * fails on `K`; a key the list omits turns the expected type into a marker tuple
+ * naming the absentee, so the error says which field went unrecorded.
+ */
+function fieldsOf<T>() {
+  return <K extends readonly (keyof T & string)[]>(
+    keys: [Exclude<keyof T, K[number]>] extends [never]
+      ? K
+      : ["contract is missing a field", Exclude<keyof T, K[number]>]
+  ): readonly string[] => keys as readonly string[];
+}
+
+const BAR_FIELDS = fieldsOf<Bar>()([
+  "timestamp",
+  "open",
+  "high",
+  "low",
+  "close",
+  "volume"
+] as const);
+
+const LISTING_FIELDS = fieldsOf<IndicatorListing>()([
+  "name",
+  "uiid",
+  "legendTemplate",
+  "endpoint",
+  "category",
+  "chartType",
+  "order",
+  "chartConfig",
+  "parameters",
+  "results"
+] as const);
+
+const PARAM_FIELDS = fieldsOf<IndicatorParamConfig>()([
+  "displayName",
+  "paramName",
+  "dataType",
+  "defaultValue",
+  "minimum",
+  "maximum"
+] as const);
 
 const here = fileURLToPath(new URL(".", import.meta.url));
 const spec = parse(readFileSync(`${here}backing-api.yml`, "utf8")) as OpenApiDocument;
@@ -78,11 +127,9 @@ describe("backing-api.yml documents the operations the client calls", () => {
   });
 });
 
-describe("schema shapes are pinned against accidental edits", () => {
-  // Literal rather than derived. These catch a careless edit to the document;
-  // they cannot catch the TypeScript type moving underneath it.
+describe("schema shapes match the exported types", () => {
   it("Bar carries the OHLCV fields the client requires", () => {
-    expect(schemas.Bar.required).toEqual(["timestamp", "open", "high", "low", "close", "volume"]);
+    expect(schemas.Bar.required).toEqual(BAR_FIELDS);
   });
 
   it("IndicatorListing marks every declared property required", () => {
@@ -94,29 +141,11 @@ describe("schema shapes are pinned against accidental edits", () => {
   });
 
   it("IndicatorListing declares every field the picker reads", () => {
-    expect(propertiesOf("IndicatorListing")).toEqual([
-      "name",
-      "uiid",
-      "legendTemplate",
-      "endpoint",
-      "category",
-      "chartType",
-      "order",
-      "chartConfig",
-      "parameters",
-      "results"
-    ]);
+    expect(propertiesOf("IndicatorListing")).toEqual(LISTING_FIELDS);
   });
 
   it("IndicatorParamConfig declares what the client sends as query parameters", () => {
-    expect(propertiesOf("IndicatorParamConfig")).toEqual([
-      "displayName",
-      "paramName",
-      "dataType",
-      "defaultValue",
-      "minimum",
-      "maximum"
-    ]);
+    expect(propertiesOf("IndicatorParamConfig")).toEqual(PARAM_FIELDS);
   });
 
   it("chartType admits only the two panes the library renders", () => {
@@ -126,8 +155,8 @@ describe("schema shapes are pinned against accidental edits", () => {
   });
 
   it("CandlestickShape declares the metrics the candle description promises", () => {
-    // The description listed these before the schema did, so a schema-driven
-    // consumer saw none of them.
+    // Wire-only, so this list has no type to bind to. The description listed
+    // these before the schema did, so a schema-driven consumer saw none of them.
     expect(schemas.CandlestickShape.required).toEqual([
       "size",
       "body",
