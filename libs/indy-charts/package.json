@@ -48,6 +48,7 @@
     "test:watch": "vitest",
     "format": "prettier --write \"**/*.{ts,json}\"",
     "format:check": "prettier --check \"**/*.{ts,json}\"",
+    "typecheck": "tsc --noEmit -p tsconfig.eslint.json",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:openapi": "redocly lint backing-api.yml"

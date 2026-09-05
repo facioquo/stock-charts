@@ -2,8 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
-    // Test- and config-only. `eslint.config.ts` reads `import.meta.dirname`; the
-    // build tsconfig keeps `types: []` so none of this reaches the shipped library.
+    // Spec- and config-only. `eslint.config.ts` reads `import.meta.dirname`; the
+    // build tsconfig keeps `types: []` so none of this reaches the shipped
+    // library. `pnpm run typecheck` uses this config rather than the build one,
+    // because the build config excludes spec files.
     "types": ["node"]
   },
   "include": ["**/*.ts"],
