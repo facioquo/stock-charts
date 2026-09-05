@@ -78,6 +78,7 @@ pnpm run format               # Format all code (Prettier for frontend, dotnet f
 pnpm run format:check         # Check formatting without changes
 pnpm run lint                 # Lint all workspaces (ESLint, Roslynator, markdownlint)
 pnpm run lint:fix             # Auto-fix linting issues
+pnpm run typecheck            # Typecheck every TypeScript workspace, spec files included
 
 # Testing
 pnpm run test                 # Run all tests (frontend + backend)
@@ -298,6 +299,7 @@ Financial chart types (`candlestick`, `ohlc`, `volume`) are maintained in `libs/
 - Format all code: `pnpm run format` (zero warnings required)
 - Lint with zero errors: `pnpm run lint` (fix before commit)
 - Build successfully: `pnpm run build` and `dotnet build Charts.sln`
+- Typecheck with zero errors: `pnpm run typecheck`
 - Run and pass all tests: `pnpm run test:all`
 - Use TypeScript strict mode and React hooks for reactive state
 - Implement async/await patterns for I/O operations

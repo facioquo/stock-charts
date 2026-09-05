@@ -33,6 +33,7 @@
     "test:dotnet": "dotnet test --project server/WebApi.Tests/WebApi.Tests.csproj --results-directory ./server/coverage -- --coverlet --coverlet-output-format cobertura --report-xunit-trx --report-xunit-trx-filename backend.trx && (dotnet tool run reportgenerator -reports:server/coverage/coverage.cobertura*.xml -targetdir:server/coverage -reporttypes:\"lcov;TextSummary\" 2>&1 | grep -v 'LoggerMessage.g.cs' || true) && echo && cat server/coverage/Summary.txt",
     "test:all": "pnpm --filter @stock-charts/web run test:coverage && pnpm run test:libs && pnpm run test:dotnet && pnpm run test:e2e",
     "smoke:package-consumption": "node scripts/smoke-indy-charts-vitepress-consumer.js",
+    "typecheck": "pnpm --filter @facioquo/chartjs-chart-financial --filter @facioquo/indy-charts --filter @stock-charts/web --filter @stock-charts/edge run typecheck",
     "lint": "bash scripts/website-lint.sh check && pnpm run lint:dotnet && pnpm run lint:md",
     "lint:fix": "bash scripts/website-lint.sh fix && pnpm run lint:dotnet:fix && pnpm run lint:md:fix",
     "lint:dotnet": "bash scripts/dotnet-lint.sh check",

@@ -138,6 +138,13 @@ jobs:
           pnpm --filter '@facioquo/chartjs-chart-financial' run lint --max-warnings=0
           pnpm --filter '@facioquo/indy-charts' run lint --max-warnings=0
 
+      # Spec files sit outside the build tsconfig, so `build` alone never checks
+      # them. This runs the config that includes them.
+      - name: Typecheck libraries
+        run: |
+          pnpm --filter '@facioquo/chartjs-chart-financial' run typecheck
+          pnpm --filter '@facioquo/indy-charts' run typecheck
+
       # The published interface contract. Structural validity is checked here;
       # its agreement with the types and the packed files is asserted in
       # libs/indy-charts/backing-api.spec.ts, which runs with the library tests.
@@ -257,6 +264,9 @@ jobs:
 
       - name: Lint web app
         run: pnpm --filter @stock-charts/web run lint --max-warnings=0
+
+      - name: Typecheck web app
+        run: pnpm --filter @stock-charts/web run typecheck
 
       - name: Lint CSS
         run: pnpm run lint:css
