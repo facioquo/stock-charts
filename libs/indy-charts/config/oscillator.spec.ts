@@ -7,19 +7,20 @@ import { type ChartSettings } from "./types";
 
 const settings: ChartSettings = { isDarkTheme: false, showTooltips: true };
 
-type TickCallback = (
-  value: string | number,
-  index: number,
-  ticks: Tick[]
-) => string | number | null;
-
-function yTickCallback(): TickCallback {
+// Return type inferred rather than restated: Chart.js declares a wider callback
+// return than it looks (string[] and number[] included), and a hand-written
+// alias silently drifts from it.
+function yTickCallback() {
   const options = baseOscillatorOptions(settings);
   const y = options.scales?.["y"];
-  const callback = y && "ticks" in y ? y.ticks.callback : undefined;
-  if (typeof callback !== "function") {
+  const raw = y && "ticks" in y ? y.ticks?.callback : undefined;
+  if (typeof raw !== "function") {
     throw new Error("y-axis tick callback is not configured");
   }
+  // Chart.js declares the callback with `this: Scale`; the oscillator assigns an
+  // arrow function, so there is no receiver. Widening it away here beats
+  // fabricating a Scale at all thirteen call sites.
+  const callback: OmitThisParameter<typeof raw> = raw;
   return callback;
 }
 

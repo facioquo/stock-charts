@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import config from "./eslint.config.ts";
+import config from "./eslint.config";
 
 describe("eslint.config", () => {
   it("exports a valid non-empty flat config array", () => {

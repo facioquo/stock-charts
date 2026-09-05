@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Chart, ChartDataset } from "chart.js";
 
 import { ChartManager } from "./chart-manager";
+import { createDefaultSelection } from "../helpers/create-default-selection";
 import type { OverlayChart } from "./overlay-chart";
 import type { OscillatorChart } from "./oscillator-chart";
 import type {
@@ -27,15 +28,15 @@ type MockChartShape = Pick<Chart, "data" | "options" | "scales" | "update" | "de
 // ---------------------------------------------------------------------------
 
 vi.mock("./overlay-chart", () => {
-  const MockOverlayChart = vi.fn(function mockOverlayChart() {
-    return Object.assign(this as object, createMockOverlay());
+  const MockOverlayChart = vi.fn(function mockOverlayChart(this: object) {
+    return Object.assign(this, createMockOverlay());
   });
   return { OverlayChart: MockOverlayChart };
 });
 
 vi.mock("./oscillator-chart", () => {
-  const MockOscillatorChart = vi.fn(function mockOscillatorChart() {
-    return Object.assign(this as object, createMockOscillator());
+  const MockOscillatorChart = vi.fn(function mockOscillatorChart(this: object) {
+    return Object.assign(this, createMockOscillator());
   });
   return { OscillatorChart: MockOscillatorChart };
 });
@@ -249,28 +250,10 @@ function makeOscillatorListing(overrides?: Partial<IndicatorListing>): Indicator
 }
 
 function makeSelection(listing: IndicatorListing, ucid: string): IndicatorSelection {
-  return {
-    ucid,
-    uiid: listing.uiid,
-    label: listing.legendTemplate,
-    chartType: listing.chartType,
-    params: (listing.parameters ?? []).map(p => ({
-      paramName: p.paramName,
-      displayName: p.displayName,
-      minimum: p.minimum,
-      maximum: p.maximum,
-      value: p.defaultValue
-    })),
-    results: listing.results.map(r => ({
-      label: r.displayName,
-      dataName: r.dataName,
-      color: r.defaultColor,
-      lineType: r.lineType,
-      lineWidth: r.lineWidth,
-      order: r.order,
-      dataset: { type: "line" as const, data: [], label: r.displayName }
-    }))
-  } as IndicatorSelection;
+  // Delegates to the production mapper so the fixture cannot drift from the
+  // defaults it applies (result `displayName`, the lineWidth and order
+  // fallbacks). Only the generated id is replaced, so assertions can name it.
+  return { ...createDefaultSelection(listing), ucid };
 }
 
 function makeIndicatorData(quotes: Bar[]): IndicatorDataRow[] {
@@ -475,7 +458,7 @@ describe("ChartManager", () => {
       expect(padded.o).toBeNaN();
       expect(padded.c).toBeNaN();
       // candle coloring comes from themed element defaults, not point arrays
-      expect(dataset.pointBackgroundColor).toBeUndefined();
+      expect(dataset).not.toHaveProperty("pointBackgroundColor");
       expect(dataset.backgroundColor).toBeUndefined();
     });
 

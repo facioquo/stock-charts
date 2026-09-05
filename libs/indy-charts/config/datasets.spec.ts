@@ -5,7 +5,21 @@ import type { ScatterDataPoint } from "chart.js";
 import { PRICE_DATASET_ORDER } from "@facioquo/chartjs-chart-financial";
 
 import { baseDataset, createThresholdDataset } from "./datasets";
-import type { ChartThreshold, IndicatorResult, IndicatorResultConfig } from "./types";
+import type {
+  ChartThreshold,
+  IndicatorDataset,
+  IndicatorResult,
+  IndicatorResultConfig
+} from "./types";
+
+// `IndicatorDataset` is a union over the three chart types; `borderDash` belongs
+// to the line member alone.
+function asLine(ds: IndicatorDataset) {
+  if (ds.type !== "line") {
+    throw new Error(`expected a line dataset, got ${ds.type}`);
+  }
+  return ds;
+}
 
 function makeResult(overrides?: Partial<IndicatorResult>): IndicatorResult {
   return {
@@ -111,7 +125,7 @@ describe("createThresholdDataset", () => {
       { x: 3000, y: 80 }
     ]);
     expect(ds.borderColor).toBe("#FF0000");
-    expect(ds.borderDash).toEqual([5, 2]);
+    expect(asLine(ds).borderDash).toEqual([5, 2]);
   });
 
   it("returns an empty data array when the source dataset is empty", () => {
@@ -125,7 +139,7 @@ describe("createThresholdDataset", () => {
     );
 
     expect(ds.data).toEqual([]);
-    expect(ds.borderDash).toEqual([]);
+    expect(asLine(ds).borderDash).toEqual([]);
   });
 
   it("offsets the order by index so multiple thresholds stack predictably", () => {
