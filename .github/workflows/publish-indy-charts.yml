@@ -73,10 +73,6 @@ jobs:
       # The token goes to `github-token`; v2 dropped the GITHUB_TOKEN env var.
       # npm auth comes from actions/setup-node's registry-url above, since v2
       # no longer writes .npmrc from NPM_TOKEN.
-      #
-      # The Version Packages PR opens under GITHUB_TOKEN, so its CI waits for an
-      # "Approve and run" press before `gate` reports. See
-      # .changeset/README.md.
       - name: Open the version pull request, or publish
         uses: changesets/action@v2
         with:
