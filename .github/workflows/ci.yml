@@ -340,7 +340,7 @@ jobs:
           path: tests/playwright/playwright-report/
           retention-days: 3
 
-  lint-and-test:
+  gate:
     runs-on: ubuntu-slim
     timeout-minutes: 5
     needs: [test-backend, test-edge, test-libraries, test-web, test-e2e]
