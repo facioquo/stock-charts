@@ -170,7 +170,8 @@ Use the global component from Markdown / templates. Each instance is self-contai
 | `setupIndyCharts()` | Register Chart.js controllers + financial chart types (call once at startup) |
 | `ChartManager` | Lifecycle orchestrator for overlay + oscillator charts and viewport changes |
 | `OverlayChart`, `OscillatorChart` | Lower-level chart classes if you don't need `ChartManager` |
-| `createApiClient(config)` | Typed `fetch` client for `GET /quotes`, `GET /indicators`, indicator data |
+| `createApiClient(config)` | Typed `fetch` client for `GET /quotes`, `GET /indicators`, indicator data; quote and listing responses are shared per URL across clients |
+| `clearApiClientCache()` | Drop those shared responses so the next call refetches |
 | `loadStaticQuotes`, `loadStaticIndicatorData` | Accept bring-your-own `Bar[]` / `IndicatorDataRow[]` (timestamps as string or Date) |
 | `createDefaultSelection`, `applySelectionTokens`, `calculateOptimalBars` | Selection / viewport helpers |
 | `getThemeColors`, `baseOverlayConfig`, `baseOscillatorConfig` | Theme + config building blocks |

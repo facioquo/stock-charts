@@ -7,11 +7,13 @@ import {
   onMounted,
   onUnmounted,
   ref,
+  shallowRef,
   watch,
-  type PropType
+  type PropType,
+  type VNode
 } from "vue";
 
-import { createApiClient, loadStaticIndicatorData } from "../api";
+import { createApiClient, loadStaticIndicatorData, peekCachedListings } from "../api";
 import { ChartManager } from "../charts";
 import type { IndicatorDataRow, IndicatorListing, IndicatorSelection } from "../config";
 import { applySelectionTokens, createDefaultSelection } from "../helpers";
@@ -30,6 +32,34 @@ const OSCILLATOR_CHART_TYPE = "oscillator";
 const DATA_UNAVAILABLE_ERROR_MESSAGE =
   "Chart data is currently unavailable. Check the API service and try again.";
 const MISSING_SETUP_ERROR_MESSAGE = "setupIndyChartsForVue() has not been called.";
+const LOADING_MESSAGE = "Loading chart data...";
+const EMPTY_MESSAGE = "No chart data is available.";
+
+/**
+ * Positions the status message over the reserved chart frames so it never
+ * takes flow space. Inline because the package ships no stylesheet and this
+ * positioning is what keeps the layout stable; visual styling stays with the
+ * consumer's `.indy-demo__status` rules.
+ */
+const STATUS_LAYER_STYLE = {
+  position: "absolute",
+  inset: "0",
+  zIndex: "1",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "12px",
+  boxSizing: "border-box",
+  textAlign: "center"
+} as const;
+
+type PaneKind = "overlay" | "oscillator";
+
+/** The chart frames to reserve before data has loaded. */
+interface FramePlan {
+  overlay: boolean;
+  oscillators: number;
+}
 
 /** A single indicator resolved to a chart config, ready for data loading. */
 interface ResolvedIndicator {
@@ -44,6 +74,8 @@ interface PreparedIndicator {
   listing: IndicatorListing;
   chartRows: IndicatorDataRow[];
   isOscillator: boolean;
+  /** Human-readable indicator name used for the canvas accessible name. */
+  title: string;
 }
 
 /** Describes one oscillator canvas pane to render in the template. */
@@ -51,6 +83,8 @@ interface OscillatorPane {
   /** Stable key (the selection ucid) used for the canvas ref map and v-for key. */
   key: string;
   testId: string;
+  /** Accessible name for the pane's canvas. */
+  label: string;
 }
 
 function findListing(listings: IndicatorListing[], uiid: string): IndicatorListing | undefined {
@@ -86,6 +120,14 @@ function isAuthorFacingError(error: unknown): error is Error {
     error.message.startsWith("Indicator listing not found for uiid") ||
     error.message.endsWith("chart canvas is not available.")
   );
+}
+
+function paneKind(listing: IndicatorListing): PaneKind {
+  return listing.chartType === OSCILLATOR_CHART_TYPE ? "oscillator" : "overlay";
+}
+
+function overlayLabel(titles: string[]): string {
+  return titles.length > 0 ? `${titles.join(" and ")} chart over price bars` : "Price bars chart";
 }
 
 function normalizeWindowSize(value: number, total: number): number {
@@ -139,7 +181,14 @@ export const StockIndicatorChart = defineComponent({
     const errorMessage = ref(DATA_UNAVAILABLE_ERROR_MESSAGE);
     const errorKind = ref<"author" | "data">("data");
     const overlayVisible = ref(false);
+    const overlayCanvasLabel = ref(overlayLabel([]));
     const oscillatorPanes = ref<OscillatorPane[]>([]);
+    /**
+     * Listings known for this API, used only to size the reserved frames.
+     * Unset for the first (server or hydrating) render so it matches static
+     * HTML, then filled from the shared cache on mount.
+     */
+    const knownListings = shallowRef<IndicatorListing[] | undefined>(undefined);
     const overlayCanvas = ref<HTMLCanvasElement | null>(null);
     const oscillatorCanvases = new Map<string, HTMLCanvasElement>();
     const rootId = computed(() => {
@@ -237,6 +286,36 @@ export const StockIndicatorChart = defineComponent({
     }
 
     /**
+     * Decide which frames to reserve before data arrives, from (in order) the
+     * known listings, each config's `chartType` hint, and the props: an
+     * unknown primary is an oscillator when `withOverlay` is set (the prop only
+     * matters for oscillators), otherwise an overlay. An unknown companion
+     * reserves nothing, since its pane type cannot be inferred.
+     */
+    function planFrames(): FramePlan {
+      let indicators: ResolvedIndicator[];
+      try {
+        indicators = resolvedIndicators();
+      } catch {
+        return { overlay: true, oscillators: 0 };
+      }
+
+      const listings = knownListings.value;
+      const kinds = indicators.map((indicator, index): PaneKind | undefined => {
+        const uiid = indicator.config.uiid;
+        const listing = listings && uiid ? findListing(listings, uiid) : undefined;
+        if (listing) return paneKind(listing);
+        if (indicator.config.chartType) return indicator.config.chartType;
+        if (index === 0) return props.withOverlay ? "oscillator" : "overlay";
+        return undefined;
+      });
+
+      const oscillators = kinds.filter(kind => kind === "oscillator").length;
+      const overlay = props.withOverlay || kinds.includes("overlay") || oscillators === 0;
+      return { overlay, oscillators };
+    }
+
+    /**
      * Build a selection for one indicator, applying any requested results
      * filter and replacing label tokens. Returns the populated selection.
      */
@@ -283,7 +362,13 @@ export const StockIndicatorChart = defineComponent({
         }
 
         const client = createApiClient(options.api);
-        const [quotes, listings] = await Promise.all([client.getQuotes(), client.getListings()]);
+        // Publish listings as soon as they arrive so the reserved frames are
+        // corrected before quotes and selection data finish loading.
+        const listingsRequest = client.getListings().then(result => {
+          if (!disposed && token === loadToken) knownListings.value = result;
+          return result;
+        });
+        const [quotes, listings] = await Promise.all([client.getQuotes(), listingsRequest]);
         if (disposed || token !== loadToken) return;
 
         const quoteCount = normalizeWindowSize(
@@ -329,7 +414,8 @@ export const StockIndicatorChart = defineComponent({
               selection,
               listing,
               chartRows,
-              isOscillator: listing.chartType === OSCILLATOR_CHART_TYPE
+              isOscillator: paneKind(listing) === "oscillator",
+              title: indicator.config.title ?? listing.name
             };
           })
         );
@@ -346,12 +432,14 @@ export const StockIndicatorChart = defineComponent({
         const needsOverlay = overlays.length > 0 || props.withOverlay === true;
 
         overlayVisible.value = needsOverlay;
+        overlayCanvasLabel.value = overlayLabel(overlays.map(item => item.title));
         oscillatorPanes.value = oscillators.map((item, index) => ({
           key: item.selection.ucid,
           testId:
             index === 0
               ? `${testIdPrefix.value}-oscillator-canvas`
-              : `${testIdPrefix.value}-oscillator-canvas-${index}`
+              : `${testIdPrefix.value}-oscillator-canvas-${index}`,
+          label: `${item.title} chart`
         }));
 
         phase.value = "ready";
@@ -408,6 +496,9 @@ export const StockIndicatorChart = defineComponent({
     }
 
     onMounted(() => {
+      if (options) {
+        knownListings.value = peekCachedListings(options.api);
+      }
       if (
         typeof document !== "undefined" &&
         typeof MutationObserver !== "undefined" &&
@@ -458,8 +549,139 @@ export const StockIndicatorChart = defineComponent({
       }
     );
 
-    return () =>
-      h(
+    function renderStatus(): VNode | null {
+      const prefix = testIdPrefix.value;
+      switch (phase.value) {
+        case "idle":
+        case "loading":
+          return h(
+            "div",
+            {
+              class: "indy-demo__status indy-demo__status--loading",
+              role: "status",
+              "data-testid": `${prefix}-loading`
+            },
+            LOADING_MESSAGE
+          );
+        case "empty":
+          return h(
+            "div",
+            {
+              class: "indy-demo__status indy-demo__status--error",
+              role: "status",
+              "data-testid": `${prefix}-empty`
+            },
+            EMPTY_MESSAGE
+          );
+        case "error":
+          return h(
+            "div",
+            {
+              class: "indy-demo__status indy-demo__status--error",
+              role: "status",
+              "data-testid": `${prefix}-error`,
+              "data-error-kind": errorKind.value
+            },
+            [
+              h("span", errorMessage.value),
+              h("div", { class: "indy-demo__status-actions" }, [
+                h(
+                  "button",
+                  {
+                    type: "button",
+                    class: "indy-demo__retry",
+                    onClick: () => void loadChart()
+                  },
+                  "Retry"
+                )
+              ])
+            ]
+          );
+        case "ready":
+          return null;
+      }
+    }
+
+    /** Sized frames holding the live canvases, once data is ready. */
+    function renderChartFrames(): VNode[] {
+      const frames: VNode[] = [];
+      if (overlayVisible.value) {
+        frames.push(
+          h(
+            "div",
+            { key: "overlay", class: "indy-demo__canvas-wrap indy-demo__canvas-wrap--overlay" },
+            [
+              h("canvas", {
+                ref: overlayCanvas,
+                class: "indy-demo__canvas",
+                role: "img",
+                "aria-label": overlayCanvasLabel.value,
+                "data-testid": `${testIdPrefix.value}-overlay-canvas`
+              })
+            ]
+          )
+        );
+      }
+      for (const pane of oscillatorPanes.value) {
+        frames.push(
+          h(
+            "div",
+            {
+              key: pane.key,
+              class: "indy-demo__canvas-wrap indy-demo__canvas-wrap--oscillator"
+            },
+            [
+              h("canvas", {
+                ref: (el: unknown) => setOscillatorCanvas(pane.key, el),
+                class: "indy-demo__canvas",
+                role: "img",
+                "aria-label": pane.label,
+                "data-testid": pane.testId
+              })
+            ]
+          )
+        );
+      }
+      return frames;
+    }
+
+    /** Empty sized frames reserved before data arrives (no canvases yet). */
+    function renderPlaceholderFrames(): VNode[] {
+      const plan = planFrames();
+      const prefix = testIdPrefix.value;
+      const frames: VNode[] = [];
+      if (plan.overlay) {
+        frames.push(
+          h("div", {
+            key: "overlay",
+            class:
+              "indy-demo__canvas-wrap indy-demo__canvas-wrap--overlay indy-demo__canvas-wrap--placeholder",
+            "aria-hidden": "true",
+            "data-testid": `${prefix}-overlay-frame`
+          })
+        );
+      }
+      for (let index = 0; index < plan.oscillators; index++) {
+        frames.push(
+          h("div", {
+            key: `oscillator-placeholder-${index}`,
+            class:
+              "indy-demo__canvas-wrap indy-demo__canvas-wrap--oscillator indy-demo__canvas-wrap--placeholder",
+            "aria-hidden": "true",
+            "data-testid": `${prefix}-oscillator-frame`
+          })
+        );
+      }
+      return frames;
+    }
+
+    // The frame stack renders on every pass — including the server and first
+    // client render — so the chart's height is reserved before any data
+    // arrives. Status messages overlay the frames instead of taking flow space.
+    return () => {
+      const status = renderStatus();
+      const frames = phase.value === "ready" ? renderChartFrames() : renderPlaceholderFrames();
+      return h(
         "section",
         {
           id: rootId.value,
@@ -467,95 +689,26 @@ export const StockIndicatorChart = defineComponent({
           "data-testid": `${testIdPrefix.value}-root`
         },
         [
-          phase.value === "loading"
-            ? [
-                h(
-                  "div",
-                  {
-                    class: "indy-demo__status indy-demo__status--loading",
-                    "data-testid": `${testIdPrefix.value}-loading`
-                  },
-                  "Loading chart data..."
-                ),
-                h(
-                  "div",
-                  {
-                    class: "indy-demo__stack indy-demo__stack--loading",
-                    "data-testid": `${testIdPrefix.value}-loading-layout`
-                  },
-                  [
-                    h("div", {
-                      class:
-                        "indy-demo__canvas-wrap indy-demo__canvas-wrap--overlay indy-demo__canvas-wrap--placeholder"
-                    })
-                  ]
-                )
-              ]
-            : null,
-          phase.value === "empty"
-            ? h(
-                "div",
-                {
-                  class: "indy-demo__status indy-demo__status--error",
-                  "data-testid": `${testIdPrefix.value}-empty`
-                },
-                "No chart data is available."
-              )
-            : null,
-          phase.value === "error"
-            ? h(
-                "div",
-                {
-                  class: "indy-demo__status indy-demo__status--error",
-                  "data-testid": `${testIdPrefix.value}-error`,
-                  "data-error-kind": errorKind.value
-                },
-                [
-                  h("span", errorMessage.value),
-                  h("div", { class: "indy-demo__status-actions" }, [
-                    h(
-                      "button",
-                      {
-                        type: "button",
-                        class: "indy-demo__retry",
-                        onClick: () => void loadChart()
-                      },
-                      "Retry"
-                    )
-                  ])
-                ]
-              )
-            : null,
-          phase.value === "ready"
-            ? h("div", { class: "indy-demo__stack" }, [
-                overlayVisible.value
-                  ? h("div", { class: "indy-demo__canvas-wrap indy-demo__canvas-wrap--overlay" }, [
-                      h("canvas", {
-                        ref: overlayCanvas,
-                        class: "indy-demo__canvas",
-                        "data-testid": `${testIdPrefix.value}-overlay-canvas`
-                      })
-                    ])
-                  : null,
-                ...oscillatorPanes.value.map(pane =>
-                  h(
+          h(
+            "div",
+            {
+              class: "indy-demo__stack",
+              style: { position: "relative" },
+              "data-testid": `${testIdPrefix.value}-layout`
+            },
+            [
+              ...frames,
+              status
+                ? h(
                     "div",
-                    {
-                      key: pane.key,
-                      class: "indy-demo__canvas-wrap indy-demo__canvas-wrap--oscillator"
-                    },
-                    [
-                      h("canvas", {
-                        ref: (el: unknown) => setOscillatorCanvas(pane.key, el),
-                        class: "indy-demo__canvas",
-                        "data-testid": pane.testId
-                      })
-                    ]
+                    { key: "status", class: "indy-demo__status-layer", style: STATUS_LAYER_STYLE },
+                    [status]
                   )
-                )
-              ])
-            : null
+                : null
+            ]
+          )
         ]
       );
+    };
   }
 });

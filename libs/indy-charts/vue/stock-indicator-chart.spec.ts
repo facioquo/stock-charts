@@ -1,6 +1,7 @@
 import { createRenderer, nextTick } from "vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { clearApiClientCache, createApiClient } from "../api";
 import { getThemeColors } from "../config";
 import { indyChartsVueOptionsKey } from "./context";
 import { StockIndicatorChart } from "./stock-indicator-chart";
@@ -174,6 +175,7 @@ const defaultOptions: IndyChartsVueOptions = {
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  clearApiClientCache();
 });
 
 describe("StockIndicatorChart", () => {
@@ -187,13 +189,25 @@ describe("StockIndicatorChart", () => {
     app.provide(indyChartsVueOptionsKey, defaultOptions);
 
     app.mount(root);
+
+    // Synchronously on mount — before any tick or data — the sized frame and
+    // its overlaid status are already in place.
+    const layout = findByTestId(root, "stock-indicator-chart-rsi-layout");
+    expect(layout).toBeDefined();
+    expect(findByTestId(root, "stock-indicator-chart-rsi-overlay-frame")).toBeDefined();
+    expect(findByTestId(root, "stock-indicator-chart-rsi-loading")).toBeDefined();
+
     await nextTick();
 
     const loading = findByTestId(root, "stock-indicator-chart-rsi-loading");
-    const layout = findByTestId(root, "stock-indicator-chart-rsi-loading-layout");
-
     expect(loading).toBeDefined();
-    expect(layout).toBeDefined();
+    expect(loading?.props["role"]).toBe("status");
+    // The status sits inside the frame stack on an absolutely positioned layer,
+    // so it takes no flow space.
+    const layer = loading?.parent;
+    expect(layer?.parent).toBe(layout);
+    expect(layer?.props["style"]).toMatchObject({ position: "absolute", inset: "0" });
+    expect(layout?.props["style"]).toMatchObject({ position: "relative" });
 
     app.unmount();
   });
@@ -605,5 +619,178 @@ describe("getThemeColors", () => {
   it("returns the light theme default background when isDarkTheme is false", () => {
     const colors = getThemeColors({ isDarkTheme: false, showTooltips: true });
     expect(colors.background).toBe("#FAF9FD90");
+  });
+});
+
+function countByTestId(node: TestNode, testId: string): number {
+  if (node.kind !== "element") return 0;
+  const self = node.props["data-testid"] === testId ? 1 : 0;
+  return node.children.reduce((sum, child) => sum + countByTestId(child, testId), self);
+}
+
+function pendingFetch() {
+  return vi.fn(() => new Promise<Response>(() => undefined));
+}
+
+describe("StockIndicatorChart layout reservation", () => {
+  it("reserves price and oscillator frames for withOverlay before listings load", () => {
+    vi.stubGlobal("fetch", pendingFetch());
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, { indicator: "rsi", withOverlay: true });
+    app.provide(indyChartsVueOptionsKey, defaultOptions);
+
+    app.mount(root);
+
+    expect(countByTestId(root, "stock-indicator-chart-rsi-overlay-frame")).toBe(1);
+    expect(countByTestId(root, "stock-indicator-chart-rsi-oscillator-frame")).toBe(1);
+    // Placeholder frames carry no canvases until data is ready.
+    expect(findByTestId(root, "stock-indicator-chart-rsi-overlay-canvas")).toBeUndefined();
+
+    app.unmount();
+  });
+
+  it("honors chartType hints for the primary and companions", () => {
+    vi.stubGlobal("fetch", pendingFetch());
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, {
+      indicator: "macd",
+      with: ["rsi", "unknown"],
+      id: "hinted"
+    });
+    app.provide(indyChartsVueOptionsKey, {
+      api: { baseUrl: "https://localhost:5001" },
+      indicators: {
+        macd: { uiid: "MACD", chartType: "oscillator" },
+        rsi: { uiid: "RSI", chartType: "oscillator" }
+      }
+    });
+
+    app.mount(root);
+
+    // Two hinted oscillators; the unknown companion reserves nothing, and no
+    // price frame is reserved because nothing asks for one.
+    expect(countByTestId(root, "stock-indicator-chart-hinted-oscillator-frame")).toBe(2);
+    expect(findByTestId(root, "stock-indicator-chart-hinted-overlay-frame")).toBeUndefined();
+
+    app.unmount();
+  });
+
+  it("sizes frames from listings already in the shared cache", async () => {
+    vi.stubGlobal("fetch", bollingerFetch());
+    await createApiClient({ baseUrl: "https://localhost:5001" }).getListings();
+    vi.stubGlobal("fetch", pendingFetch());
+
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, {
+      indicator: "bb",
+      with: "bbPctB",
+      id: "cached"
+    });
+    app.provide(indyChartsVueOptionsKey, bollingerOptions);
+    app.mount(root);
+    await nextTick();
+
+    expect(countByTestId(root, "stock-indicator-chart-cached-overlay-frame")).toBe(1);
+    expect(countByTestId(root, "stock-indicator-chart-cached-oscillator-frame")).toBe(1);
+
+    app.unmount();
+  });
+
+  it("keeps the frames while showing an error", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => Promise.reject(new Error("offline")))
+    );
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, { indicator: "rsi", withOverlay: true });
+    app.provide(indyChartsVueOptionsKey, {
+      ...defaultOptions,
+      api: { ...defaultOptions.api, retry: false }
+    });
+    app.mount(root);
+
+    await vi.waitFor(() => {
+      const error = findByTestId(root, "stock-indicator-chart-rsi-error");
+      expect(error?.props["role"]).toBe("status");
+    });
+    expect(findByTestId(root, "stock-indicator-chart-rsi-overlay-frame")).toBeDefined();
+    expect(findByTestId(root, "stock-indicator-chart-rsi-oscillator-frame")).toBeDefined();
+
+    app.unmount();
+  });
+
+  it("renders the frames during server-side rendering", async () => {
+    const { createSSRApp } = await import("vue");
+    const { renderToString } = await import("vue/server-renderer");
+    const app = createSSRApp(StockIndicatorChart, { indicator: "rsi", withOverlay: true });
+    app.provide(indyChartsVueOptionsKey, defaultOptions);
+
+    const html = await renderToString(app);
+
+    expect(html).toContain("indy-demo__canvas-wrap--overlay");
+    expect(html).toContain("indy-demo__canvas-wrap--oscillator");
+    expect(html).toContain('role="status"');
+  });
+});
+
+describe("StockIndicatorChart data sharing and accessibility", () => {
+  it("fetches quotes and listings once for concurrently mounted charts", async () => {
+    managerSpies.instances.length = 0;
+    const fetchMock = bollingerFetch();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const roots = [createTestElement("root"), createTestElement("root")];
+    const apps = [
+      renderer.createApp(StockIndicatorChart, { indicator: "bb", id: "one" }),
+      renderer.createApp(StockIndicatorChart, { indicator: "bbPctB", id: "two" })
+    ];
+    apps.forEach((app, index) => {
+      app.provide(indyChartsVueOptionsKey, bollingerOptions);
+      app.mount(roots[index]);
+    });
+
+    await vi.waitFor(() => {
+      expect(findByTestId(roots[0], "stock-indicator-chart-one-overlay-canvas")).toBeDefined();
+      expect(findByTestId(roots[1], "stock-indicator-chart-two-oscillator-canvas")).toBeDefined();
+    });
+
+    const urls = fetchMock.mock.calls.map(([input]) => requestUrl(input));
+    expect(urls.filter(url => url.endsWith("/indicators"))).toHaveLength(1);
+    expect(urls.filter(url => url.endsWith("/quotes"))).toHaveLength(1);
+
+    apps.forEach(app => app.unmount());
+  });
+
+  it("names each canvas from the indicator title", async () => {
+    managerSpies.instances.length = 0;
+    vi.stubGlobal("fetch", bollingerFetch());
+
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, {
+      indicator: "bb",
+      with: "bbPctB",
+      id: "named"
+    });
+    app.provide(indyChartsVueOptionsKey, {
+      ...bollingerOptions,
+      indicators: { ...bollingerOptions.indicators, bb: { uiid: "BB", title: "Bollinger Bands®" } }
+    });
+    app.mount(root);
+
+    await vi.waitFor(() => {
+      expect(findByTestId(root, "stock-indicator-chart-named-oscillator-canvas")).toBeDefined();
+    });
+
+    const overlay = findByTestId(root, "stock-indicator-chart-named-overlay-canvas");
+    const oscillator = findByTestId(root, "stock-indicator-chart-named-oscillator-canvas");
+    expect(overlay?.props["role"]).toBe("img");
+    // The registry title wins; the listing name is the fallback.
+    expect(overlay?.props["aria-label"]).toBe("Bollinger Bands® chart over price bars");
+    expect(oscillator?.props["role"]).toBe("img");
+    expect(oscillator?.props["aria-label"]).toBe("Bollinger Bands %B chart");
+    // No status remains once the chart is ready.
+    expect(findByTestId(root, "stock-indicator-chart-named-loading")).toBeUndefined();
+
+    app.unmount();
   });
 });

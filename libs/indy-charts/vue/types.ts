@@ -12,6 +12,13 @@ export interface StockIndicatorChartConfig {
   barCount?: number;
   quoteCount?: number;
   /**
+   * Layout hint for the indicator's pane type, used to reserve the right chart
+   * frames before the `/indicators` listings have loaded. The listing's own
+   * `chartType` always decides how the chart is drawn; this only avoids a
+   * layout shift on a first, uncached page view.
+   */
+  chartType?: "overlay" | "oscillator";
+  /**
    * Companion indicator name(s) to compose into the same chart. Overlay-type
    * companions render on the shared price panel; oscillator-type companions
    * render as aligned panes beneath it. The `with` prop takes precedence.

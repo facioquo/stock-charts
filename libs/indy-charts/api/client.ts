@@ -132,6 +132,112 @@ function tryStaleCacheWrite(url: string, data: unknown): void {
 }
 
 // ---------------------------------------------------------------------------
+// Shared response memo (module-level, per resolved URL)
+// ---------------------------------------------------------------------------
+
+/**
+ * One shared fetch of a catalog-style resource (quotes or listings).
+ * `body` is the parsed JSON of a successful (`2xx`) response.
+ */
+interface SharedResponse {
+  body: Promise<unknown>;
+  /** Whether a staleCache-enabled caller has already persisted this body. */
+  staleWritten: boolean;
+}
+
+/**
+ * Successful quote and listing responses are shared by every client created in
+ * this module, keyed by the fully resolved request URL. Concurrent callers join
+ * one in-flight request, and later callers reuse the settled body for the
+ * page's lifetime. A failed request is evicted so the next call refetches.
+ */
+const sharedResponses = new Map<string, SharedResponse>();
+
+/** Settled bodies from {@link sharedResponses}, readable synchronously. */
+const settledBodies = new Map<string, unknown>();
+
+function evictShared(url: string, entry: SharedResponse): void {
+  if (sharedResponses.get(url) === entry) {
+    sharedResponses.delete(url);
+    settledBodies.delete(url);
+  }
+}
+
+/**
+ * Returns the shared response for `url`, starting a fetch only when no request
+ * for that URL is in flight or settled. The first caller's retry policy applies
+ * to the shared request.
+ */
+function fetchShared(url: string, maxAttempts: number, baseDelayMs: number): SharedResponse {
+  const existing = sharedResponses.get(url);
+  if (existing) return existing;
+
+  const body = (async (): Promise<unknown> => {
+    const response = await fetchWithRetry(url, maxAttempts, baseDelayMs);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return (await response.json()) as unknown;
+  })();
+
+  const entry: SharedResponse = { body, staleWritten: false };
+  sharedResponses.set(url, entry);
+  body.then(
+    value => {
+      if (sharedResponses.get(url) === entry) settledBodies.set(url, value);
+    },
+    () => evictShared(url, entry)
+  );
+  return entry;
+}
+
+/**
+ * Clears the quote and listing responses shared across every
+ * {@link createApiClient} instance, so the next `getQuotes()` or
+ * `getListings()` call fetches again. The `sessionStorage` stale cache is
+ * left untouched.
+ */
+export function clearApiClientCache(): void {
+  sharedResponses.clear();
+  settledBodies.clear();
+}
+
+function normalizeBaseUrl(baseUrl: string): string {
+  return baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+}
+
+function listingsUrl(config: Pick<ApiClientConfig, "baseUrl" | "endpoints">): string {
+  return endpointUrl(
+    normalizeBaseUrl(config.baseUrl),
+    config.endpoints?.indicators ?? "indicators"
+  );
+}
+
+/**
+ * Synchronously returns indicator listings already known for this API without
+ * making a request: a settled shared response first, then (when `staleCache`
+ * is enabled) the last-good `sessionStorage` copy. Returns `undefined` when
+ * neither is available. Used to size chart layouts before data arrives.
+ */
+export function peekCachedListings(
+  config: Pick<ApiClientConfig, "baseUrl" | "endpoints" | "staleCache">
+): IndicatorListing[] | undefined {
+  const url = listingsUrl(config);
+  const candidates: unknown[] = [settledBodies.get(url)];
+  if (config.staleCache) candidates.push(tryStaleCacheRead<unknown>(url));
+
+  for (const candidate of candidates) {
+    if (!Array.isArray(candidate)) continue;
+    try {
+      return normalizeListings(candidate as IndicatorListing[]);
+    } catch {
+      // Malformed entry — try the next source.
+    }
+  }
+  return undefined;
+}
+
+// ---------------------------------------------------------------------------
 
 const STYLE_COLORS = {
   ORANGE: "#EF6C00",
@@ -237,6 +343,10 @@ export interface ApiClient {
    * @returns Resolved array of {@link Bar} objects sorted chronologically.
    * @throws  Re-throws any network or HTTP error (after calling `onError`) unless
    *          stale cached data is available.
+   *
+   * Successful responses are shared, per resolved URL, by every client this
+   * package creates: concurrent calls join one request and later calls reuse
+   * its body until {@link clearApiClientCache} is called.
    */
   getQuotes(): Promise<Bar[]>;
 
@@ -246,6 +356,10 @@ export interface ApiClient {
    * @returns Resolved array of {@link IndicatorListing} descriptors.
    * @throws  Re-throws any network or HTTP error (after calling `onError`) unless
    *          stale cached data is available.
+   *
+   * Successful responses are shared, per resolved URL, by every client this
+   * package creates: concurrent calls join one request and later calls reuse
+   * its body until {@link clearApiClientCache} is called.
    */
   getListings(): Promise<IndicatorListing[]>;
 
@@ -425,7 +539,7 @@ function normalizeResult(uiid: string, result: IndicatorResultConfig): Indicator
 export function createApiClient(config: ApiClientConfig): ApiClient {
   const { endpoints, onError, staleCache, onStale } = config;
   // Ensure baseUrl always ends with "/" so new URL(path, base) resolves correctly.
-  const baseUrl = config.baseUrl.endsWith("/") ? config.baseUrl : `${config.baseUrl}/`;
+  const baseUrl = normalizeBaseUrl(config.baseUrl);
 
   const retryEnabled = config.retry !== false;
   const rawMaxAttempts = retryEnabled
@@ -443,19 +557,21 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
   return {
     async getQuotes(): Promise<Bar[]> {
       const url = endpointUrl(baseUrl, endpoints?.quotes ?? "quotes");
+      const shared = fetchShared(url, maxAttempts, baseDelayMs);
       try {
-        const response = await fetchWithRetry(url, maxAttempts, baseDelayMs);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        const body = (await response.json()) as unknown;
+        const body = await shared.body;
         if (!Array.isArray(body)) {
           throw new Error("Invalid quotes response: expected an array");
         }
         const result = normalizeQuotes(body);
-        if (staleCache) tryStaleCacheWrite(url, body);
+        if (staleCache && !shared.staleWritten) {
+          tryStaleCacheWrite(url, body);
+          shared.staleWritten = true;
+        }
         return result;
       } catch (error) {
+        // Never keep a body that failed validation; the next call refetches.
+        evictShared(url, shared);
         if (staleCache) {
           const cached = tryStaleCacheRead<unknown[]>(url);
           // Guard against a tampered or corrupted cache entry before normalizing.
@@ -476,17 +592,19 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
     },
 
     async getListings(): Promise<IndicatorListing[]> {
-      const url = endpointUrl(baseUrl, endpoints?.indicators ?? "indicators");
+      const url = listingsUrl({ baseUrl, endpoints });
+      const shared = fetchShared(url, maxAttempts, baseDelayMs);
       try {
-        const response = await fetchWithRetry(url, maxAttempts, baseDelayMs);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        const data = (await response.json()) as IndicatorListing[];
+        const data = (await shared.body) as IndicatorListing[];
         const result = normalizeListings(data);
-        if (staleCache) tryStaleCacheWrite(url, data);
+        if (staleCache && !shared.staleWritten) {
+          tryStaleCacheWrite(url, data);
+          shared.staleWritten = true;
+        }
         return result;
       } catch (error) {
+        // Never keep a body that failed validation; the next call refetches.
+        evictShared(url, shared);
         if (staleCache) {
           const cached = tryStaleCacheRead<IndicatorListing[]>(url);
           // Guard against a tampered or corrupted cache entry before normalizing.

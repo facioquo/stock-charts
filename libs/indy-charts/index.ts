@@ -84,6 +84,7 @@
  *
  * ### API
  * - `createApiClient(config)` - Create a lightweight `fetch`-based `ApiClient`
+ * - `clearApiClientCache()` - Drop the quote and listing responses shared across clients
  * - `ApiClient` - Interface exposing `getQuotes`, `getListings`, `getSelectionData`
  * - `loadStaticQuotes(quotes)` - Accept `Bar[]` (string or Date timestamps), return `Bar[]` with timestamps as Date
  * - `loadStaticIndicatorData(rows)` - Pass-through helper for `IndicatorDataRow[]`
@@ -141,7 +142,12 @@ export { ChartManager, OverlayChart, OscillatorChart } from "./charts";
 export type { ChartManagerConfig } from "./charts";
 
 // API client
-export { createApiClient, loadStaticQuotes, loadStaticIndicatorData } from "./api";
+export {
+  clearApiClientCache,
+  createApiClient,
+  loadStaticQuotes,
+  loadStaticIndicatorData
+} from "./api";
 export type { ApiClient, ApiClientConfig, RetryConfig } from "./api";
 
 // Selection and sizing helpers
