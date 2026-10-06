@@ -94,14 +94,17 @@ export function ChartPage(): React.JSX.Element {
         </div>
       )}
 
-      {sharedView && (
-        <div role="status" className="shared-view-banner">
+      {/* The status region stays mounted so a screen reader announces its text when it fills. */}
+      <div className={sharedView ? "shared-view-banner" : undefined}>
+        {sharedView && (
           <span className="material-icons" aria-hidden="true">
             link
           </span>
-          <span className="banner-text">
-            Showing a shared chart. Your own indicators are saved and unchanged.
-          </span>
+        )}
+        <span role="status" className={sharedView ? "banner-text" : undefined}>
+          {sharedView ? "Showing a shared chart. Your own setup has not changed." : ""}
+        </span>
+        {sharedView && (
           <button
             type="button"
             className="btn-raised btn-primary"
@@ -111,8 +114,8 @@ export function ChartPage(): React.JSX.Element {
           >
             BACK TO MY INDICATORS
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* SETTINGS FAB */}
       {!loading && !apiError && (

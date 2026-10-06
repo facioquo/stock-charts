@@ -146,16 +146,15 @@ test.describe("Stock Charts React Web", () => {
     await shared.waitForLoadState("networkidle");
     await expect(shared.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
     await shared.getByRole("button", { name: "edit settings" }).click();
-    const oscillators = shared
-      .locator(".selection-list")
-      .nth(1)
-      .locator("li label");
+    const oscillators = shared.locator(".selection-list").nth(1).locator("li label");
     await expect(oscillators.first()).toHaveText(/^ADX/);
     expect(await shared.evaluate(() => localStorage.getItem("selections"))).toBeNull();
     await shared.keyboard.press("Escape");
 
     // The shared view says so, and one click returns to the visitor's own setup.
-    await expect(shared.getByText("Showing a shared chart")).toBeVisible();
+    await expect(
+      shared.getByRole("status").filter({ hasText: "Showing a shared chart" })
+    ).toBeVisible();
     await shared.getByRole("button", { name: "BACK TO MY INDICATORS" }).click();
     await expect(shared.getByText("Showing a shared chart")).toBeHidden({ timeout: 15_000 });
     expect(new URL(shared.url()).searchParams.has("c")).toBe(false);

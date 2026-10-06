@@ -668,6 +668,7 @@ describe("ChartController", () => {
     });
 
     afterEach(() => {
+      vi.unstubAllGlobals();
       vi.mocked(createDefaultSelection).mockReset();
       window.history.replaceState(null, "", "/");
     });
@@ -725,7 +726,6 @@ describe("ChartController", () => {
       expect(real.search).toBe("");
       expect(savedUiids()).toEqual(["A"]);
       expect(controller.getState().sharedView).toBe(false);
-      vi.unstubAllGlobals();
     });
 
     it("does not reload when no link is showing", async () => {
@@ -736,7 +736,6 @@ describe("ChartController", () => {
       controller.returnToSavedSetup();
 
       expect(reload).not.toHaveBeenCalled();
-      vi.unstubAllGlobals();
     });
 
     it("saves the linked list with the first change and drops the parameter", async () => {
@@ -779,6 +778,7 @@ describe("ChartController", () => {
       });
 
       expect(window.location.search).toBe("");
+      expect(controller.getState().sharedView).toBe(false);
     });
 
     it("falls back to the saved list when every linked indicator fails to load", async () => {
@@ -794,6 +794,7 @@ describe("ChartController", () => {
       });
       expect(savedUiids()).toEqual(["A"]);
       expect(window.location.search).toBe("");
+      expect(controller.getState().sharedView).toBe(false);
     });
 
     it("builds a link that restores the displayed indicators", async () => {
