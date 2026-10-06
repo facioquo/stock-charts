@@ -524,6 +524,69 @@ describe("ChartController", () => {
     ).toEqual(["A", "B"]);
   });
 
+  it("editing the only displayed indicator keeps a restore failure saved", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const getSelectionData = vi.fn((selection: { uiid: string }) =>
+      selection.uiid === "B" ? Promise.reject(new Error("500")) : Promise.resolve([{}])
+    ) as unknown as ApiClient["getSelectionData"];
+    const controller = await loadWithCache(
+      [makeSelection("A", "oscillator"), makeSelection("B", "oscillator")],
+      getSelectionData
+    );
+    await vi.waitFor(() => {
+      expect(controller.selections).toHaveLength(1);
+    });
+    const shown = controller.selections[0];
+    if (!shown) throw new Error("expected a displayed indicator");
+
+    await controller.updateSelection(shown.ucid, shown, makeListing("A", "oscillator"));
+
+    expect(
+      (JSON.parse(localStorage.getItem("selections") ?? "[]") as Array<{ uiid: string }>).map(
+        s => s.uiid
+      )
+    ).toEqual(["A", "B"]);
+  });
+
+  it("keeps a restore selection whose draw throws, in its saved place", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const getSelectionData = vi
+      .fn()
+      .mockResolvedValue([{}]) as unknown as ApiClient["getSelectionData"];
+    // Restoring A, B, SLOW: the second draw throws.
+    const controller = await (async () => {
+      const overlay = document.createElement("canvas");
+      overlay.id = "chartOverlay";
+      document.body.appendChild(overlay);
+      const zone = document.createElement("div");
+      zone.id = "oscillators-zone";
+      document.body.appendChild(zone);
+      localStorage.setItem(
+        "selections",
+        JSON.stringify(["A", "B", "SLOW"].map(uiid => makeSelection(uiid, "oscillator")))
+      );
+      const listings = ["A", "B", "SLOW"].map(uiid => makeListing(uiid, "oscillator"));
+      const instance = new ChartController(
+        makeApi({ getListings: vi.fn().mockResolvedValue(listings), getSelectionData })
+      );
+      manager(instance).processSelectionData.mockImplementationOnce(() => undefined);
+      manager(instance).processSelectionData.mockImplementationOnce(() => {
+        throw new Error("bad rows");
+      });
+      await instance.loadCharts();
+      return instance;
+    })();
+    await vi.waitFor(() => {
+      expect(controller.selections.map(s => s.uiid)).toEqual(["A", "SLOW"]);
+    });
+
+    expect(
+      (JSON.parse(localStorage.getItem("selections") ?? "[]") as Array<{ uiid: string }>).map(
+        s => s.uiid
+      )
+    ).toEqual(["A", "B", "SLOW"]);
+  });
+
   it("removing every displayed indicator also drops what could not be restored", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     const getSelectionData = vi.fn((selection: { uiid: string }) =>

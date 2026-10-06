@@ -150,7 +150,7 @@ export class ChartController {
 
     const order = this.selections.map(s => s.ucid);
     const before = document.getElementById(`${ucid}-container`)?.nextSibling ?? null;
-    this.deleteSelection(ucid);
+    this.removeDisplayed(ucid);
     this.showSelection(replacement, listing, data as IndicatorDataRow[], false, before);
     // Display appends; restore the original position (and overlay layering).
     this.chartManager.reorderSelections(order);
@@ -252,20 +252,24 @@ export class ChartController {
 
   /** Remove an indicator and clean up its chart / DOM container. */
   deleteSelection(ucid: string): void {
+    if (!this.removeDisplayed(ucid)) return;
+
+    // Removing every displayed indicator also clears what could not be restored.
+    if (!this.restoring && this.selections.length === 0) this.unrestored = [];
+    this.cacheSelections();
+  }
+
+  /** Removes the chart and its DOM container without touching the saved list. */
+  private removeDisplayed(ucid: string): boolean {
     const selection = this.selections.find(s => s.ucid === ucid);
-    if (!selection) return;
+    if (!selection) return false;
 
-    const isOscillator = selection.chartType === "oscillator";
     this.chartManager.removeSelection(ucid);
-
-    if (isOscillator) {
+    if (selection.chartType === "oscillator") {
       const container = document.getElementById(`${ucid}-container`);
       container?.parentNode?.removeChild(container);
     }
-
-    // Removing every displayed indicator also clears what could not be restored.
-    if (this.selections.length === 0) this.unrestored = [];
-    this.cacheSelections();
+    return true;
   }
 
   /** Propagate theme / tooltip changes to all charts. */
