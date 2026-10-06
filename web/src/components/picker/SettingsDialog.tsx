@@ -22,10 +22,14 @@ interface ToggleRowProps {
 }
 
 function StandardCheckbox({
+  id,
+  className,
   checked,
   ariaLabel,
   onChange
 }: {
+  id?: string;
+  className?: string;
   checked: boolean;
   ariaLabel: string;
   onChange: (value: boolean) => void;
@@ -33,10 +37,11 @@ function StandardCheckbox({
   return (
     <input
       type="checkbox"
+      id={id}
       aria-label={ariaLabel}
       checked={checked}
       onChange={event => onChange(event.target.checked)}
-      className="standard-checkbox"
+      className={className ? `standard-checkbox ${className}` : "standard-checkbox"}
     />
   );
 }
@@ -86,15 +91,7 @@ function DisplayedIndicators({
       <ul className="selection-list">
         {selections.map(selection => (
           <li key={selection.ucid}>
-            <label>
-              <span>{selection.label}</span>
-              <span className="filler" />
-              <StandardCheckbox
-                ariaLabel={`select ${selection.label}`}
-                checked={checked.has(selection.ucid)}
-                onChange={() => onToggle(selection.ucid)}
-              />
-            </label>
+            <label htmlFor={`select-${selection.ucid}`}>{selection.label}</label>
             <button
               type="button"
               className="icon-button"
@@ -106,6 +103,13 @@ function DisplayedIndicators({
             >
               <span className="material-icons">edit</span>
             </button>
+            <StandardCheckbox
+              id={`select-${selection.ucid}`}
+              className="selection-checkbox"
+              ariaLabel={`select ${selection.label}`}
+              checked={checked.has(selection.ucid)}
+              onChange={() => onToggle(selection.ucid)}
+            />
           </li>
         ))}
       </ul>

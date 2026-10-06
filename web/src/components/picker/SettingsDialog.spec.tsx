@@ -109,6 +109,28 @@ describe("SettingsDialog", () => {
     expect(onEditIndicator).toHaveBeenCalledWith(controller.selections[0]);
   });
 
+  it("checks a displayed indicator from its label, with the checkbox last in the row", () => {
+    const controller = makeController();
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    const label = screen.getByText("RSI (5)");
+    fireEvent.click(label);
+    const checkbox = screen.getByRole("checkbox", { name: "select RSI (5)" });
+    expect(checkbox).toBeChecked();
+    expect(label).toHaveAttribute("for", checkbox.id);
+    // The checkbox is a direct child of the row, after its label and edit button.
+    const row = checkbox.closest("li");
+    expect(checkbox.parentElement).toBe(row);
+    expect(row?.lastElementChild).toBe(checkbox);
+  });
+
   it("removes the checked displayed indicators", () => {
     const controller = makeController();
     render(
@@ -124,8 +146,7 @@ describe("SettingsDialog", () => {
     expect(removeButton).toBeDisabled();
 
     // check the first displayed indicator, then remove
-    const firstRow = screen.getByText("RSI (5)").closest("label") as HTMLElement;
-    fireEvent.click(firstRow.querySelector('input[type="checkbox"]') as HTMLElement);
+    fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
     expect(removeButton).toBeEnabled();
 
     fireEvent.click(removeButton);
