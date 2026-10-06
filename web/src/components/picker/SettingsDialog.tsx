@@ -1,4 +1,4 @@
-import { useId, useReducer, useState, type Dispatch } from "react";
+import { useEffect, useId, useReducer, useRef, useState, type Dispatch } from "react";
 
 import type { ChartController } from "../../charting/chartController";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
@@ -84,14 +84,15 @@ function SelectionGroup({
   onEdit,
   onMove
 }: SelectionGroupProps): React.JSX.Element | null {
+  const headingId = useId();
   if (selections.length === 0) return null;
   return (
     <>
       <div className="selection-group-header">
-        <span>{title}</span>
-        <span className="help-link">{hint}</span>
+        <h3 id={headingId}>{title}</h3>
+        <span className="selection-group-hint">{hint}</span>
       </div>
-      <ul className="selection-list">
+      <ul className="selection-list" aria-labelledby={headingId}>
         {selections.map((selection, index) => (
           <li key={selection.ucid}>
             <label htmlFor={`select-${selection.ucid}`}>{selection.label}</label>
@@ -99,6 +100,7 @@ function SelectionGroup({
               type="button"
               className="icon-button"
               aria-label={`move ${selection.label} up`}
+              data-move={`${selection.ucid}:-1`}
               title="move up"
               disabled={index === 0}
               onClick={() => onMove(selection.ucid, -1)}
@@ -109,6 +111,7 @@ function SelectionGroup({
               type="button"
               className="icon-button"
               aria-label={`move ${selection.label} down`}
+              data-move={`${selection.ucid}:1`}
               title="move down"
               disabled={index === selections.length - 1}
               onClick={() => onMove(selection.ucid, 1)}
@@ -165,7 +168,7 @@ function DisplayedIndicators({
       <SelectionGroup
         {...groupProps}
         title="Price chart overlays"
-        hint="later rows draw on top"
+        hint="earlier rows draw on top; bands stay behind lines"
         selections={selections.filter(s => s.chartType === "overlay")}
       />
       <SelectionGroup
@@ -302,8 +305,23 @@ function useSettingsControls(controller: ChartController): SettingsControls {
     forceUpdate();
   };
 
+  // A move re-renders the row (React moves the swapped node) or disables the
+  // pressed button at the end of its group; either drops focus to <body>.
+  const moved = useRef<{ ucid: string; offset: -1 | 1 } | null>(null);
+  useEffect(() => {
+    const target = moved.current;
+    if (!target) return;
+    moved.current = null;
+    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("button[data-move]"));
+    const find = (offset: number): HTMLButtonElement | undefined =>
+      buttons.find(button => button.dataset["move"] === `${target.ucid}:${offset}`);
+    const same = find(target.offset);
+    (same && !same.disabled ? same : find(-target.offset))?.focus();
+  });
+
   const moveSelection = (ucid: string, offset: -1 | 1): void => {
     controller.moveSelection(ucid, offset);
+    moved.current = { ucid, offset };
     forceUpdate();
   };
 

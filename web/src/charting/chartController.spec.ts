@@ -364,6 +364,47 @@ describe("ChartController", () => {
     expect(JSON.parse(localStorage.getItem("selections") ?? "[]")).toHaveLength(1);
   });
 
+  it("builds each restored chart once it and those before it settle", async () => {
+    const first = makeSelection("SLOW", "oscillator");
+    const stalled = makeSelection("FAST", "oscillator");
+    const getSelectionData = vi.fn((selection: IndicatorSelection) =>
+      selection.uiid === "SLOW" ? Promise.resolve([{}]) : new Promise<unknown[]>(() => undefined)
+    ) as unknown as ApiClient["getSelectionData"];
+
+    const controller = await loadWithCache([first, stalled], getSelectionData);
+
+    // The stalled request holds back only the charts after it.
+    await vi.waitFor(() => {
+      expect(controller.selections.map(s => s.ucid)).toEqual([first.ucid]);
+    });
+  });
+
+  it("saves an indicator added during restore together with the restored ones", async () => {
+    const restored = [makeSelection("SLOW", "oscillator"), makeSelection("FAST", "oscillator")];
+    const releases: Array<() => void> = [];
+    const getSelectionData = vi.fn(
+      () =>
+        new Promise<unknown[]>(resolve => {
+          releases.push(() => resolve([{}]));
+        })
+    ) as unknown as ApiClient["getSelectionData"];
+    const controller = await loadWithCache(restored, getSelectionData);
+    const saved = (): number =>
+      (JSON.parse(localStorage.getItem("selections") ?? "[]") as unknown[]).length;
+
+    // A user add lands while the restore is still waiting on its fetches.
+    const added = makeSelection("ADDED", "overlay");
+    const addedRequest = controller.addSelection(added, makeListing("ADDED", "overlay"));
+    releases.at(-1)?.();
+    await addedRequest;
+    expect(saved()).toBe(2);
+
+    releases.slice(0, 2).forEach(release => release());
+    await vi.waitFor(() => {
+      expect(saved()).toBe(3);
+    });
+  });
+
   describe("moveSelection", () => {
     async function withSelections(
       specs: Array<[string, "overlay" | "oscillator"]>
@@ -417,6 +458,41 @@ describe("ChartController", () => {
         ucid: string;
       }>;
       expect(cached.map(s => s.ucid)).toEqual(["ucid-Y", "ucid-X", "ucid-Z"]);
+    });
+
+    it("moves an oscillator's canvas up", async () => {
+      const controller = await withSelections([
+        ["X", "oscillator"],
+        ["Y", "oscillator"],
+        ["Z", "oscillator"]
+      ]);
+
+      controller.moveSelection("ucid-Z", -1);
+
+      const zone = document.getElementById("oscillators-zone");
+      expect(Array.from(zone?.children ?? []).map(c => c.id)).toEqual([
+        "ucid-X-container",
+        "ucid-Z-container",
+        "ucid-Y-container"
+      ]);
+    });
+
+    it("orders canvases by the model when one selection has no canvas", async () => {
+      const controller = await withSelections([
+        ["X", "oscillator"],
+        ["Y", "oscillator"],
+        ["Z", "oscillator"]
+      ]);
+      document.getElementById("ucid-Y-container")?.remove();
+
+      controller.moveSelection("ucid-Z", -1);
+
+      const zone = document.getElementById("oscillators-zone");
+      expect(Array.from(zone?.children ?? []).map(c => c.id)).toEqual([
+        "ucid-X-container",
+        "ucid-Z-container"
+      ]);
+      expect(controller.selections.map(s => s.uiid)).toEqual(["X", "Z", "Y"]);
     });
 
     it("does nothing at the end of a group or for an unknown ucid", async () => {

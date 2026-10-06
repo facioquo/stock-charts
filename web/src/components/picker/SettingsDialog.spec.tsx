@@ -52,7 +52,14 @@ function makeController(): FakeController {
       const i = selections.findIndex(s => s.ucid === ucid);
       if (i >= 0) selections.splice(i, 1);
     }),
-    moveSelection: vi.fn(),
+    moveSelection: vi.fn((ucid: string, offset: -1 | 1) => {
+      const from = selections.findIndex(s => s.ucid === ucid);
+      const to = selections.findIndex(
+        (s, i) => i !== from && i === from + offset && s.chartType === selections[from]?.chartType
+      );
+      if (from >= 0 && to >= 0)
+        [selections[from], selections[to]] = [selections[to], selections[from]];
+    }),
     onSettingsChange: vi.fn()
   };
 }
@@ -138,6 +145,28 @@ describe("SettingsDialog", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "move SMA (50) up" }));
     expect(controller.moveSelection).toHaveBeenCalledWith("u2", -1);
+  });
+
+  it("keeps keyboard focus on the moved row's button after a move", () => {
+    const controller = makeController();
+    controller.selections.push(makeSelection("u3", "ADX (14)"));
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    // A move that does not reach the end of the group keeps the same button.
+    fireEvent.click(screen.getByRole("button", { name: "move RSI (5) down" }));
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "move RSI (5) down" }));
+
+    // A move onto the end disables the pressed button; focus goes to the opposite one.
+    fireEvent.click(screen.getByRole("button", { name: "move RSI (5) down" }));
+    expect(screen.getByRole("button", { name: "move RSI (5) down" })).toBeDisabled();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "move RSI (5) up" }));
   });
 
   it("removes the checked displayed indicators", () => {

@@ -33,6 +33,8 @@ export class ChartController {
   private readonly chartManager: ChartManager;
   private readonly api: ApiClient;
   private unsubscribeResize: (() => void) | undefined;
+  /** True while startup selections are being restored, so a partial list is never saved. */
+  private restoring = false;
 
   /** Indicator catalog loaded from the API. */
   listings: IndicatorListing[] = [];
@@ -131,13 +133,15 @@ export class ChartController {
   }
 
   /**
-   * Show startup selections in list order. Fetches run concurrently, but the
-   * charts are built only after every fetch settles, so arrival order cannot
-   * change the stack. A selection that fails to load is skipped.
+   * Show startup selections in list order. Fetches run concurrently, and each
+   * chart is built as soon as it and every chart before it has settled, so
+   * arrival order cannot change the stack and one slow request holds back only
+   * the charts after it. A selection that fails to load is skipped.
    */
   private async showSelectionsInOrder(selections: readonly IndicatorSelection[]): Promise<void> {
-    const loaded = await Promise.all(
-      selections.map(async selection => {
+    this.restoring = true;
+    try {
+      const pending = selections.map(async selection => {
         const listing = this.listings.find(x => x.uiid === selection.uiid);
         if (!listing) return undefined;
         try {
@@ -147,21 +151,22 @@ export class ChartController {
           console.error("Error adding selection without scroll:", error);
           return undefined;
         }
-      })
-    );
+      });
 
-    let shown = false;
-    for (const item of loaded) {
-      if (!item) continue;
-      try {
-        this.showSelection(item.selection, item.listing, item.rows, false);
-        shown = true;
-      } catch (error) {
-        console.error("Error adding selection without scroll:", error);
+      for (const request of pending) {
+        const item = await request;
+        if (!item) continue;
+        try {
+          this.showSelection(item.selection, item.listing, item.rows, false);
+        } catch (error) {
+          console.error("Error adding selection without scroll:", error);
+        }
       }
+    } finally {
+      this.restoring = false;
     }
     // Never overwrite the saved list when nothing could be restored.
-    if (shown) this.cacheSelections();
+    if (this.selections.length > 0) this.cacheSelections();
   }
 
   /**
@@ -187,7 +192,7 @@ export class ChartController {
     });
     this.chartManager.reorderSelections(order);
 
-    if (moved.chartType === "oscillator") this.moveOscillatorDom(ucid, offset);
+    if (moved.chartType === "oscillator") this.syncOscillatorDom();
     this.cacheSelections();
   }
 
@@ -338,19 +343,19 @@ export class ChartController {
     if (scrollToMe) scrollToEnd(container.id);
   }
 
-  private moveOscillatorDom(ucid: string, offset: -1 | 1): void {
-    const container = document.getElementById(`${ucid}-container`);
-    if (!container) return;
-    if (offset < 0) {
-      const previous = container.previousElementSibling;
-      if (previous) container.parentNode?.insertBefore(container, previous);
-    } else {
-      const next = container.nextElementSibling;
-      if (next) container.parentNode?.insertBefore(next, container);
+  /** Re-append the oscillator canvases in model order. */
+  private syncOscillatorDom(): void {
+    const zone = document.getElementById("oscillators-zone");
+    if (!zone) return;
+    for (const selection of this.selections) {
+      if (selection.chartType !== "oscillator") continue;
+      const container = document.getElementById(`${selection.ucid}-container`);
+      if (container) zone.appendChild(container);
     }
   }
 
   private cacheSelections(): void {
+    if (this.restoring) return;
     try {
       const selections = this.selections.map(selection => ({
         ...selection,
