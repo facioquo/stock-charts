@@ -165,6 +165,7 @@ public partial class Main
 
         try
         {
+            // No indicator action takes a nullable today; unwrapped so one binds as MVC does.
             type = Nullable.GetUnderlyingType(type) ?? type;
 
             if (type.IsEnum)
@@ -178,7 +179,7 @@ public partial class Main
                 return true;
             }
 
-            value = Convert.ChangeType(text, Nullable.GetUnderlyingType(type) ?? type, CultureInfo.InvariantCulture);
+            value = Convert.ChangeType(text, type, CultureInfo.InvariantCulture);
             return true;
         }
         catch (Exception ex) when (ex is FormatException or OverflowException or InvalidCastException)

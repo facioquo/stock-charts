@@ -22,8 +22,8 @@ const INSTANCE = "api";
 const CACHE_STATUS = "x-edge-cache";
 
 /**
- * The most selections one batch request may carry. Keep in step with
- * `maxBatchSelections` in `server/WebApi/Endpoints.Batch.cs`.
+ * The most selections one batch request may carry. Asserted against
+ * `server/batch.contract.json`, which the API and both clients check too.
  */
 export const MAX_BATCH_SELECTIONS = 20;
 
@@ -119,7 +119,8 @@ export default {
     }
 
     const clientIp = request.headers.get("cf-connecting-ip") ?? "unknown";
-    // One binding call per selection: the Workers limiter has no weighted form.
+    // One binding call per selection: the Workers limiter has no weighted or peek
+    // form, so a batch that outruns the remaining tokens spends them and still gets a 429.
     let withinLimit = true;
 
     for (let spent = 0; withinLimit && spent < selections; spent++) {
