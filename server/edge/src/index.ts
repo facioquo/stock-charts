@@ -27,11 +27,20 @@ const CACHE_STATUS = "x-edge-cache";
  */
 const MAX_BATCH_SELECTIONS = 20;
 
-/** Selections a request asks the container to compute: one per `s` of a batch, else one. */
+/**
+ * Selections a request asks the container to compute: one per `s` query key,
+ * else one. Counted by key, whatever the path, and case-insensitively, because
+ * ASP.NET binds query keys without regard to case and decodes the path; no
+ * indicator route takes a parameter named `s`.
+ */
 function selectionCount(url: URL): number {
-  return url.pathname.replace(/\/+$/, "").toLowerCase().endsWith("/indicators/batch")
-    ? url.searchParams.getAll("s").length
-    : 1;
+  let count = 0;
+  for (const key of url.searchParams.keys()) {
+    if (key.toLowerCase() === "s") {
+      count++;
+    }
+  }
+  return Math.max(count, 1);
 }
 
 /**
@@ -110,9 +119,10 @@ export default {
     }
 
     const clientIp = request.headers.get("cf-connecting-ip") ?? "unknown";
+    // One binding call per selection: the Workers limiter has no weighted form.
     let withinLimit = true;
 
-    for (let spent = 0; withinLimit && spent < Math.max(selections, 1); spent++) {
+    for (let spent = 0; withinLimit && spent < selections; spent++) {
       withinLimit = (await env.RATE_LIMITER.limit({ key: clientIp })).success;
     }
 

@@ -282,6 +282,33 @@ describe("worker.fetch", () => {
       expect(getContainerMock).not.toHaveBeenCalled();
     });
 
+    it.each([
+      ["an upper-case key", "https://api.example/indicators/batch?"],
+      ["an encoded path", "https://api.example/indicators/%62atch?"]
+    ])("counts every selection of a batch sent with %s", async (name, prefix) => {
+      fetchMock.mockResolvedValue(new Response("[]", { status: 200 }));
+      const env = makeEnv();
+      const key = name === "an upper-case key" ? "S" : "s";
+
+      await worker.fetch(new Request(`${prefix}${key}=ADL&${key}=ADX&${key}=ATR`), env, makeCtx());
+
+      expect(env.RATE_LIMITER.limit).toHaveBeenCalledTimes(3);
+    });
+
+    it("refuses an over-cap batch written with upper-case keys", async () => {
+      const env = makeEnv();
+      const query = Array.from({ length: 21 }, () => "S=ADL").join("&");
+
+      const response = await worker.fetch(
+        new Request(`https://api.example/indicators/batch?${query}`),
+        env,
+        makeCtx()
+      );
+
+      expect(response.status).toBe(400);
+      expect(env.RATE_LIMITER.limit).not.toHaveBeenCalled();
+    });
+
     it("refuses a batch over the cap before spending tokens or waking the container", async () => {
       const env = makeEnv();
 
