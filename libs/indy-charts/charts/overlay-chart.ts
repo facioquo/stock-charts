@@ -125,8 +125,9 @@ export class OverlayChart {
 
   /**
    * Re-stack the given indicator datasets in the order supplied, after the
-   * price and volume datasets. Later datasets draw over earlier ones, so this
-   * sets the layering.
+   * price and volume datasets. Chart.js draws the lowest (`order`, index) last,
+   * on top, so among datasets with the same `order` earlier ones draw over
+   * later ones.
    */
   reorderIndicatorDatasets(results: IndicatorResult[]): void {
     if (!this._chart) return;

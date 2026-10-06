@@ -351,7 +351,8 @@ export class ChartManager {
    * Set the order of the registered selections. Listed ucids come first, in the
    * order given; unknown ucids are ignored and unlisted selections follow in
    * their existing order. For overlay selections the order is the layering
-   * (later draws over earlier). The caller orders oscillator canvases itself.
+   * (earlier draws over later, among results with the same `order`; bands carry a higher
+   * `order` than lines and stay behind them). The caller orders oscillator canvases itself.
    */
   reorderSelections(ucids: readonly string[]): void {
     const byUcid = new Map(this._selections.map(selection => [selection.ucid, selection]));
