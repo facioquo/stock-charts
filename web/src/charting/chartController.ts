@@ -62,8 +62,10 @@ export class ChartController {
   private unsubscribeResize: (() => void) | undefined;
   /** True while startup selections are being restored, so a partial list is never saved. */
   private restoring = false;
-  /** Restore fetches that timed out; they may be alive, so saves keep them. */
+  /** Restore fetches that timed out; they may be alive, so saves keep them for this session. */
   private unrestored: IndicatorSelection[] = [];
+  /** Saved order of the last restore, so kept selections return to their slot. */
+  private restoreOrder: string[] = [];
 
   /** Indicator catalog loaded from the API. */
   listings: IndicatorListing[] = [];
@@ -169,7 +171,7 @@ export class ChartController {
    */
   private async showSelectionsInOrder(selections: readonly IndicatorSelection[]): Promise<void> {
     this.restoring = true;
-    const timedOut = new Set<string>();
+    this.restoreOrder = selections.map(selection => selection.ucid);
     try {
       const pending = selections.map(async selection => {
         const listing = this.listings.find(x => x.uiid === selection.uiid);
@@ -181,10 +183,7 @@ export class ChartController {
           )) as IndicatorDataRow[];
           return { selection, listing, rows };
         } catch (error) {
-          if (error instanceof RestoreTimeoutError) {
-            timedOut.add(selection.ucid);
-            this.unrestored.push(selection);
-          }
+          if (error instanceof RestoreTimeoutError) this.unrestored.push(selection);
           console.error("Error adding selection without scroll:", error);
           return undefined;
         }
@@ -202,15 +201,8 @@ export class ChartController {
     } finally {
       this.restoring = false;
     }
-    const shown = new Map(this.selections.map(selection => [selection.ucid, selection]));
-    const merged = [
-      ...selections.flatMap(
-        selection => shown.get(selection.ucid) ?? (timedOut.has(selection.ucid) ? [selection] : [])
-      ),
-      ...this.selections.filter(selection => !selections.some(x => x.ucid === selection.ucid))
-    ];
     // Never overwrite the saved list when nothing could be restored.
-    if (merged.length > 0) this.persistSelections(merged);
+    if (this.selections.length > 0 || this.unrestored.length > 0) this.cacheSelections();
   }
 
   /**
@@ -403,10 +395,28 @@ export class ChartController {
     this.persistSelections(this.selections);
   }
 
+  /** Inserts each unrestored selection after its nearest saved predecessor that is present. */
+  private withUnrestored(list: readonly IndicatorSelection[]): IndicatorSelection[] {
+    const out = [...list];
+    for (const item of this.unrestored) {
+      if (out.some(x => x.ucid === item.ucid)) continue;
+      let at = 0;
+      for (let i = this.restoreOrder.indexOf(item.ucid) - 1; i >= 0; i--) {
+        const found = out.findIndex(x => x.ucid === this.restoreOrder.at(i));
+        if (found >= 0) {
+          at = found + 1;
+          break;
+        }
+      }
+      out.splice(at, 0, item);
+    }
+    return out;
+  }
+
   private persistSelections(list: readonly IndicatorSelection[]): void {
-    const kept = this.unrestored.filter(item => !list.some(x => x.ucid === item.ucid));
+    const ordered = this.withUnrestored(list);
     try {
-      const selections = [...list, ...kept].map(selection => ({
+      const selections = ordered.map(selection => ({
         ...selection,
         params: selection.params.map(param => ({ ...param })),
         results: selection.results.map(result => ({

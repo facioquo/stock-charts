@@ -316,7 +316,7 @@ describe("ChartController", () => {
     document.body.appendChild(zone);
 
     localStorage.setItem("selections", JSON.stringify(cached));
-    const listings = [makeListing("SLOW", "oscillator"), makeListing("FAST", "oscillator")];
+    const listings = ["SLOW", "FAST", "A", "B"].map(uiid => makeListing(uiid, "oscillator"));
     const controller = new ChartController(
       makeApi({ getListings: vi.fn().mockResolvedValue(listings), getSelectionData })
     );
@@ -465,6 +465,38 @@ describe("ChartController", () => {
       controller.moveSelection(first.ucid, 1);
 
       expect(savedUiids()).toContain("SLOW");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("saves a timed-out restore selection in its original slot after a user action", async () => {
+    vi.useFakeTimers();
+    try {
+      const getSelectionData = vi.fn((selection: { uiid: string }) =>
+        selection.uiid === "SLOW" ? new Promise<unknown[]>(() => undefined) : Promise.resolve([{}])
+      ) as unknown as ApiClient["getSelectionData"];
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      const savedUiids = (): string[] =>
+        (JSON.parse(localStorage.getItem("selections") ?? "[]") as Array<{ uiid: string }>).map(
+          s => s.uiid
+        );
+      const controller = await loadWithCache(
+        [
+          makeSelection("A", "oscillator"),
+          makeSelection("SLOW", "oscillator"),
+          makeSelection("B", "oscillator")
+        ],
+        getSelectionData
+      );
+      await vi.advanceTimersByTimeAsync(15_000);
+      expect(savedUiids()).toEqual(["A", "SLOW", "B"]);
+
+      await controller.addSelection(
+        makeSelection("C", "oscillator"),
+        makeListing("C", "oscillator")
+      );
+      expect(savedUiids()).toEqual(["A", "SLOW", "B", "C"]);
     } finally {
       vi.useRealTimers();
     }
