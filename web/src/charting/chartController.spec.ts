@@ -278,13 +278,30 @@ describe("ChartController", () => {
     expect(document.getElementById(`${selection.ucid}-container`)).not.toBeNull();
   });
 
-  it("rejects an update for a selection that is not displayed", async () => {
-    const controller = new ChartController(makeApi());
-    const selection = makeSelection("OSC", "oscillator");
+  it("removes the indicator when drawing the replacement fails, and saving again adds it back", async () => {
+    const zone = document.createElement("div");
+    zone.id = "oscillators-zone";
+    document.body.appendChild(zone);
 
-    await expect(
-      controller.updateSelection("missing", selection, makeListing("OSC", "oscillator"))
-    ).rejects.toThrow("not found");
+    const controller = new ChartController(
+      makeApi({ getSelectionData: vi.fn().mockResolvedValue([{}]) })
+    );
+    const listing = makeListing("OSC", "oscillator");
+    const selection = makeSelection("OSC", "oscillator");
+    await controller.addSelection(selection, listing, false);
+
+    manager(controller).processSelectionData.mockImplementationOnce(() => {
+      throw new Error("bad rows");
+    });
+    await expect(controller.updateSelection(selection.ucid, selection, listing)).rejects.toThrow(
+      "bad rows"
+    );
+    expect(controller.selections.some(s => s.ucid === selection.ucid)).toBe(false);
+
+    // The dialog's RETRY calls updateSelection again for the same ucid.
+    await controller.updateSelection(selection.ucid, selection, listing);
+    expect(controller.selections.filter(s => s.ucid === selection.ucid)).toHaveLength(1);
+    expect(document.getElementById(`${selection.ucid}-container`)).not.toBeNull();
   });
 
   it("propagates theme/tooltip settings to the chart manager", () => {

@@ -90,19 +90,16 @@ export class ChartController {
   }
 
   /**
-   * Replace a displayed indicator with an edited copy, keeping its `ucid` and,
-   * for an oscillator, its place in the stack. The new data is fetched before
-   * the old selection is touched, so a failed fetch leaves the chart unchanged.
+   * Replace a displayed indicator with an edited copy, keeping its `ucid` and
+   * its place in the stack. The new data is fetched before the old selection is
+   * touched, so a failed fetch leaves the chart unchanged. A failure while
+   * drawing the replacement removes the indicator; saving again adds it back.
    */
   async updateSelection(
     ucid: string,
     edited: IndicatorSelection,
     listing: IndicatorListing
   ): Promise<void> {
-    if (!this.selections.some(s => s.ucid === ucid)) {
-      throw new Error(`Indicator selection not found for ucid: ${ucid}`);
-    }
-
     // Labels were resolved from the old parameter values; restore the listing's
     // templates so applySelectionTokens fills in the edited ones.
     const replacement: IndicatorSelection = {
@@ -116,6 +113,12 @@ export class ChartController {
           result.label
       }))
     };
+    // Not displayed: an earlier save failed after removing it. Add it back.
+    if (!this.selections.some(s => s.ucid === ucid)) {
+      await this.addSelection(replacement, listing);
+      return;
+    }
+
     const data = await this.api.getSelectionData(replacement, listing);
 
     const order = this.selections.map(s => s.ucid);
