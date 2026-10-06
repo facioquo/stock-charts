@@ -61,9 +61,17 @@ function ToggleRow({ label, checked, onChange }: ToggleRowProps): React.JSX.Elem
 }
 
 type MoveButtonNode = HTMLButtonElement;
-type MoveButtonRef = (
-  ...target: [ucid: string, offset: -1 | 1]
-) => (node: MoveButtonNode | null) => void;
+/** Records a row's move button under `ucid:offset`, so focus can follow a move. */
+function makeMoveButtonRef(buttons: Map<string, MoveButtonNode>) {
+  return (ucid: string, offset: -1 | 1) =>
+    (node: MoveButtonNode | null): void => {
+      const key = `${ucid}:${offset}`;
+      if (node) buttons.set(key, node);
+      else buttons.delete(key);
+    };
+}
+
+type MoveButtonRef = ReturnType<typeof makeMoveButtonRef>;
 
 interface DisplayedIndicatorsProps {
   selections: readonly IndicatorSelection[];
@@ -325,11 +333,7 @@ function useSettingsControls(controller: ChartController): SettingsControls {
   // A move re-renders the row (React moves the swapped node) or disables the
   // pressed button at the end of its group; either drops focus to <body>.
   const moveButtons = useRef(new Map<string, MoveButtonNode>());
-  const moveButtonRef: MoveButtonRef = (ucid, offset) => node => {
-    const key = `${ucid}:${offset}`;
-    if (node) moveButtons.current.set(key, node);
-    else moveButtons.current.delete(key);
-  };
+  const moveButtonRef = makeMoveButtonRef(moveButtons.current);
 
   const moveSelection = (ucid: string, offset: -1 | 1): void => {
     controller.moveSelection(ucid, offset);
