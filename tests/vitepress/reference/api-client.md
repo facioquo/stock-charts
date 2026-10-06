@@ -101,7 +101,7 @@ const client = createApiClient({
 });
 ```
 
-Quote and listing responses are shared across every client (see [Methods](#methods)), and a settled response is reused, so the fallback applies only to a fetch that starts after a failed fetch or after `clearApiClientCache()`. It does not cover a later outage once a fetch has succeeded.
+Quote and listing responses are shared across every client (see [Methods](#methods)). A call answered from a settled response never reaches the fallback; a fetch that goes out still does, including the page's first fetch after a reload, a fetch after a failure, and one after `clearApiClientCache()`.
 
 `sessionStorage` is guarded: if it is unavailable (server-side rendering, private browsing, quota exceeded) the cache is silently skipped and the live-fetch error is surfaced normally.
 

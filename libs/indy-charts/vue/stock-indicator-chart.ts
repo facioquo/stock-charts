@@ -557,6 +557,7 @@ export const StockIndicatorChart = defineComponent({
           return h(
             "div",
             {
+              key: "loading",
               class: "indy-demo__status indy-demo__status--loading",
               role: "status",
               "data-testid": `${prefix}-loading`
@@ -567,6 +568,7 @@ export const StockIndicatorChart = defineComponent({
           return h(
             "div",
             {
+              key: "empty",
               class: "indy-demo__status indy-demo__status--error",
               role: "status",
               "data-testid": `${prefix}-empty`
@@ -577,6 +579,9 @@ export const StockIndicatorChart = defineComponent({
           return h(
             "div",
             {
+              // A distinct key mounts a fresh element, so the alert is inserted
+              // with its message rather than patched into the loading region.
+              key: "error",
               class: "indy-demo__status indy-demo__status--error",
               role: "alert",
               "data-testid": `${prefix}-error`,

@@ -159,7 +159,7 @@ Every client in the page shares quote and listing responses, keyed by URL. Sever
 
 - A settled response is not refreshed until you call `clearApiClientCache()`. A refresh button, an interval, or a Node or SSR process that calls `createApiClient` directly keeps the first body, so clear the cache before refetching.
 - The first caller's retry settings govern a request that later clients join. A client with `retry: false` or a different `maxAttempts` can get another client's policy.
-- `staleCache` serves only for a fetch that starts after a failed fetch or after `clearApiClientCache()`, not after any later failure.
+- A call answered from a settled response never reaches the `staleCache` fallback. A fetch that goes out, such as the page's first after a reload, one after a failure, or one after `clearApiClientCache()`, still serves the stale copy when it fails.
 
 ## What this package exports
 

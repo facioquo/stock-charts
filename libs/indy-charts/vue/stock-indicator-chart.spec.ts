@@ -740,11 +740,16 @@ describe("StockIndicatorChart layout reservation", () => {
       api: { ...defaultOptions.api, retry: false }
     });
     app.mount(root);
+    const loading = findByTestId(root, "stock-indicator-chart-rsi-loading");
+    expect(loading).toBeDefined();
 
     await vi.waitFor(() => {
       const error = findByTestId(root, "stock-indicator-chart-rsi-error");
       expect(error?.props["role"]).toBe("alert");
     });
+    // The alert mounts as a new element instead of patching the loading region.
+    expect(findByTestId(root, "stock-indicator-chart-rsi-error")).not.toBe(loading);
+    expect(loading?.parent).toBeNull();
     expect(findByTestId(root, "stock-indicator-chart-rsi-overlay-frame")).toBeDefined();
     expect(findByTestId(root, "stock-indicator-chart-rsi-oscillator-frame")).toBeDefined();
 
