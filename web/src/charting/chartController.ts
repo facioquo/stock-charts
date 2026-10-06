@@ -56,6 +56,7 @@ export class ChartController {
   private unsubscribeResize: (() => void) | undefined;
   /** True while startup selections are being restored, so a partial list is never saved. */
   private restoring = false;
+  private loadInFlight: Promise<void> | undefined;
   /** Restore fetches that failed or timed out. Saves keep them for this session so a transient failure does not delete a saved indicator, though they are not shown. */
   private unrestored: IndicatorSelection[] = [];
   /** Saved order of the last restore, so kept selections return to their slot. */
@@ -291,8 +292,19 @@ export class ChartController {
 
   //#region DATA OPERATIONS
 
-  /** Bootstrap the overlay chart and load cached / default indicators. */
-  async loadCharts(): Promise<void> {
+  /**
+   * Bootstrap the overlay chart and load cached / default indicators. A call
+   * made while another is running joins it, so a development remount (React
+   * strict mode runs effects twice) cannot restore every indicator twice.
+   */
+  loadCharts(): Promise<void> {
+    this.loadInFlight ??= this.bootstrapCharts().finally(() => {
+      this.loadInFlight = undefined;
+    });
+    return this.loadInFlight;
+  }
+
+  private async bootstrapCharts(): Promise<void> {
     try {
       const allQuotes = await this.api.getQuotes();
 

@@ -605,6 +605,32 @@ describe("ChartController", () => {
     expect(JSON.parse(localStorage.getItem("selections") ?? "null")).toEqual([]);
   });
 
+  it("joins a load already in flight instead of restoring every indicator twice", async () => {
+    const getSelectionData = vi
+      .fn()
+      .mockResolvedValue([{}]) as unknown as ApiClient["getSelectionData"];
+    const overlay = document.createElement("canvas");
+    overlay.id = "chartOverlay";
+    document.body.appendChild(overlay);
+    const zone = document.createElement("div");
+    zone.id = "oscillators-zone";
+    document.body.appendChild(zone);
+    const listings = ["A", "B"].map(uiid => makeListing(uiid, "oscillator"));
+    localStorage.setItem(
+      "selections",
+      JSON.stringify(["A", "B"].map(uiid => makeSelection(uiid, "oscillator")))
+    );
+    const getListings = vi.fn().mockResolvedValue(listings);
+    const controller = new ChartController(makeApi({ getListings, getSelectionData }));
+
+    await Promise.all([controller.loadCharts(), controller.loadCharts()]);
+
+    await vi.waitFor(() => {
+      expect(controller.selections).toHaveLength(2);
+    });
+    expect(getListings).toHaveBeenCalledTimes(1);
+  });
+
   describe("moveSelection", () => {
     async function withSelections(
       specs: Array<[string, "overlay" | "oscillator"]>
