@@ -13,7 +13,7 @@ import "../components/picker/picker.scss";
  * settings / indicator-picker dialogs.
  */
 export function ChartPage(): React.JSX.Element {
-  const { loading, apiError } = useChartState();
+  const { loading, apiError, sharedView } = useChartState();
   const isProduction = env.production;
   const controller = getChartController();
 
@@ -91,6 +91,24 @@ export function ChartPage(): React.JSX.Element {
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {sharedView && (
+        <div role="status" className="shared-view-banner">
+          <span className="material-icons" aria-hidden="true">
+            link
+          </span>
+          <span className="banner-text">
+            Showing a shared chart. Your own indicators are saved and unchanged.
+          </span>
+          <button
+            type="button"
+            className="btn-raised btn-primary"
+            onClick={() => controller.returnToSavedSetup()}
+          >
+            BACK TO MY INDICATORS
+          </button>
         </div>
       )}
 

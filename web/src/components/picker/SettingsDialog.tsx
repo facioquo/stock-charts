@@ -204,12 +204,25 @@ function DisplayedIndicators({
       <div className="dialog-section-header">
         <span>Displayed indicators</span>
         <span className="filler" />
+        <button
+          type="button"
+          className="icon-button"
+          aria-label="copy share link"
+          title="copy a link that restores these indicators"
+          onClick={copyLink}
+        >
+          <span className="material-icons">share</span>
+        </button>
         <StandardCheckbox
+          className="selection-checkbox"
           ariaLabel="select all displayed indicators"
           checked={checked.size > 0 && checked.size === selections.length}
           onChange={onSelectAll}
         />
       </div>
+      <span role="status" className="copy-link-status">
+        {copyStatus}
+      </span>
       <SelectionGroup
         {...groupProps}
         title="Price chart overlays"
@@ -232,17 +245,6 @@ function DisplayedIndicators({
         >
           REMOVE SELECTED
         </button>
-        <button
-          type="button"
-          className="btn-raised"
-          title="copy a link that restores these indicators"
-          onClick={copyLink}
-        >
-          COPY LINK
-        </button>
-        <span role="status" className="copy-link-status">
-          {copyStatus}
-        </span>
       </div>
     </section>
   );

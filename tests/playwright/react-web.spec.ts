@@ -136,7 +136,7 @@ test.describe("Stock Charts React Web", () => {
 
     await page.getByRole("button", { name: "edit settings" }).click();
     await page.getByRole("button", { name: /^move ADX.* up$/ }).click();
-    await page.getByRole("button", { name: "COPY LINK" }).click();
+    await page.getByRole("button", { name: "copy share link" }).click();
     await expect(page.getByRole("status").filter({ hasText: "Link copied" })).toBeVisible();
     const link = await page.evaluate(() => navigator.clipboard.readText());
 
@@ -149,9 +149,19 @@ test.describe("Stock Charts React Web", () => {
     const oscillators = shared
       .locator(".selection-list")
       .nth(1)
-      .locator("li label span:first-child");
+      .locator("li label");
     await expect(oscillators.first()).toHaveText(/^ADX/);
     expect(await shared.evaluate(() => localStorage.getItem("selections"))).toBeNull();
+    await shared.keyboard.press("Escape");
+
+    // The shared view says so, and one click returns to the visitor's own setup.
+    await expect(shared.getByText("Showing a shared chart")).toBeVisible();
+    await shared.getByRole("button", { name: "BACK TO MY INDICATORS" }).click();
+    await expect(shared.getByText("Showing a shared chart")).toBeHidden({ timeout: 15_000 });
+    expect(new URL(shared.url()).searchParams.has("c")).toBe(false);
+    await expect(shared.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+    await shared.getByRole("button", { name: "edit settings" }).click();
+    await expect(oscillators.first()).toHaveText(/^RSI/);
     await fresh.close();
 
     expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);

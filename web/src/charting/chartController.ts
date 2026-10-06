@@ -39,6 +39,8 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 export interface ChartState {
   loading: boolean;
   apiError: boolean;
+  /** Showing a share link's indicators, not yet the user's saved ones. */
+  sharedView: boolean;
 }
 
 /**
@@ -70,7 +72,7 @@ export class ChartController {
   /** Indicator catalog loaded from the API. */
   listings: IndicatorListing[] = [];
 
-  private state: ChartState = { loading: true, apiError: false };
+  private state: ChartState = { loading: true, apiError: false, sharedView: false };
   private readonly listeners = new Set<() => void>();
 
   constructor(api: ApiClient = apiClient) {
@@ -495,6 +497,7 @@ export class ChartController {
       return false;
     }
     this.linkActive = true;
+    this.setState({ sharedView: true });
     void this.showSelectionsInOrder(shared).then(() => {
       // A link whose indicators all fail to load must not leave an empty chart.
       if (!this.linkActive || this.selections.length > 0) return;
@@ -507,6 +510,7 @@ export class ChartController {
 
   private dropShareParam(): void {
     this.linkActive = false;
+    this.setState({ sharedView: false });
     try {
       const url = new URL(window.location.href);
       url.searchParams.delete(SHARE_PARAM);
@@ -514,6 +518,13 @@ export class ChartController {
     } catch {
       // History may be unavailable.
     }
+  }
+
+  /** Leaves a share link's view for the saved setup, which the link never replaced. */
+  returnToSavedSetup(): void {
+    if (!this.linkActive) return;
+    this.dropShareParam();
+    window.location.reload();
   }
 
   /** A link that restores the current selections on any browser. */

@@ -267,7 +267,7 @@ describe("SettingsDialog", () => {
       Object.assign(navigator, { clipboard: { writeText } });
       renderDialog(makeController());
 
-      fireEvent.click(screen.getByRole("button", { name: "COPY LINK" }));
+      fireEvent.click(screen.getByRole("button", { name: "copy share link" }));
 
       expect(writeText).toHaveBeenCalledWith("https://charts.example/?c=1.abc");
       await waitFor(() => {
@@ -281,7 +281,7 @@ describe("SettingsDialog", () => {
       });
       renderDialog(makeController());
 
-      fireEvent.click(screen.getByRole("button", { name: "COPY LINK" }));
+      fireEvent.click(screen.getByRole("button", { name: "copy share link" }));
 
       await waitFor(() => {
         expect(screen.getByRole("status")).toHaveTextContent("Copy failed");
@@ -292,7 +292,7 @@ describe("SettingsDialog", () => {
       Object.assign(navigator, { clipboard: undefined });
       renderDialog(makeController());
 
-      fireEvent.click(screen.getByRole("button", { name: "COPY LINK" }));
+      fireEvent.click(screen.getByRole("button", { name: "copy share link" }));
 
       expect(screen.getByRole("status")).toHaveTextContent("Copy failed");
     });
@@ -302,7 +302,7 @@ describe("SettingsDialog", () => {
       controller.selections.length = 0;
       renderDialog(controller);
 
-      expect(screen.queryByRole("button", { name: "COPY LINK" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "copy share link" })).not.toBeInTheDocument();
     });
   });
 });

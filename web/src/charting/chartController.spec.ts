@@ -130,7 +130,11 @@ describe("ChartController", () => {
 
   it("starts in the loading state and notifies subscribers when state changes", async () => {
     const controller = new ChartController(makeApi());
-    expect(controller.getState()).toEqual({ loading: true, apiError: false });
+    expect(controller.getState()).toEqual({
+      loading: true,
+      apiError: false,
+      sharedView: false
+    });
 
     const listener = vi.fn();
     const unsubscribe = controller.subscribe(listener);
@@ -676,6 +680,63 @@ describe("ChartController", () => {
       });
 
       expect(savedUiids()).toEqual(["A"]);
+    });
+
+    it("flags a shared view until the first change saves the linked list", async () => {
+      linkTo("FAST", "B");
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
+      expect(controller.getState().sharedView).toBe(true);
+      await vi.waitFor(() => {
+        expect(controller.selections).toHaveLength(2);
+      });
+
+      await controller.addSelection(
+        makeSelection("SLOW", "oscillator"),
+        makeListing("SLOW", "oscillator")
+      );
+
+      expect(controller.getState().sharedView).toBe(false);
+    });
+
+    it("is not a shared view without a link", async () => {
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
+
+      expect(controller.getState().sharedView).toBe(false);
+    });
+
+    it("returns to the saved setup by dropping the link and reloading", async () => {
+      const reload = vi.fn();
+      const real = window.location;
+      linkTo("FAST", "B");
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
+      await vi.waitFor(() => {
+        expect(controller.selections).toHaveLength(2);
+      });
+      vi.stubGlobal("location", {
+        get href() {
+          return real.href;
+        },
+        reload
+      });
+
+      controller.returnToSavedSetup();
+
+      expect(reload).toHaveBeenCalledTimes(1);
+      expect(real.search).toBe("");
+      expect(savedUiids()).toEqual(["A"]);
+      expect(controller.getState().sharedView).toBe(false);
+      vi.unstubAllGlobals();
+    });
+
+    it("does not reload when no link is showing", async () => {
+      const reload = vi.fn();
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
+      vi.stubGlobal("location", { href: "http://localhost/", reload });
+
+      controller.returnToSavedSetup();
+
+      expect(reload).not.toHaveBeenCalled();
+      vi.unstubAllGlobals();
     });
 
     it("saves the linked list with the first change and drops the parameter", async () => {
