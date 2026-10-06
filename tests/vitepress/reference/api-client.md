@@ -56,6 +56,18 @@ interface ApiClientConfig {
    * @param context - e.g. "quotes", "listings", "selection data"
    */
   onStale?: (context: string) => void;
+
+  /**
+   * Static snapshot served by your own site, read when the live request and the
+   * stale cache both fail. Produce the files with createOfflineSnapshot().
+   */
+  offlineFallback?: { baseUrl: string };
+
+  /**
+   * Called when snapshot data is served because the live request failed.
+   * @param context - e.g. "quotes", "listings", "selection data"
+   */
+  onOffline?: (context: string) => void;
 }
 
 interface RetryConfig {
@@ -104,6 +116,46 @@ const client = createApiClient({
 Quote and listing responses are shared across every client (see [Methods](#methods)). A call answered from a settled response never reaches the fallback; a fetch that goes out still does, including the page's first fetch after a reload, a fetch after a failure, and one after `clearApiClientCache()`.
 
 `sessionStorage` is guarded: if it is unavailable (server-side rendering, private browsing, quota exceeded) the cache is silently skipped and the live-fetch error is surfaced normally.
+
+### Offline snapshot fallback
+
+The stale cache is per tab and empty for a first-time visitor, so it cannot cover an origin that is gone for good. `offlineFallback` reads a snapshot shipped with your own site instead. The order is the live request (with retry), then `staleCache`, then the snapshot, then the original error. `onOffline` fires when snapshot data is served.
+
+Build the snapshot at build time, while the API is reachable. `createOfflineSnapshot` returns the files at the paths the fallback reads, so the two cannot drift:
+
+```typescript
+import { writeFile, mkdir } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { createOfflineSnapshot } from "@facioquo/indy-charts";
+
+const files = await createOfflineSnapshot({ baseUrl: "https://api.example.com" });
+for (const { path, data } of files) {
+  const target = join("public/chart-api", path);
+  await mkdir(dirname(target), { recursive: true });
+  await writeFile(target, JSON.stringify(data));
+}
+```
+
+```typescript
+const client = createApiClient({
+  baseUrl: "https://api.example.com",
+  offlineFallback: { baseUrl: "/chart-api" },
+  onOffline: context => console.warn(`Serving ${context} from the offline snapshot`)
+});
+```
+
+By default the snapshot holds the quotes, the indicator listings, and one data file per catalog indicator at its default parameters. Pass `{ selections }` to also capture parameters a page uses that differ from the defaults. A request with other parameters has no file and fails as it would without a snapshot.
+
+Each request maps to one file under the snapshot root. The API base path is dropped, so the layout does not depend on where the API is mounted:
+
+| Request | File |
+| --- | --- |
+| `GET /quotes` | `quotes.json` |
+| `GET /indicators` | `indicators.json` |
+| `GET /SMA/` | `SMA.json` |
+| `GET /SMA/?lookbackPeriods=20` | `SMA/lookbackPeriods=20.json` |
+
+Parameters are sorted by name and percent-encoded. A missing or unreachable snapshot file is ignored, so the fallback is safe during server-side rendering.
 
 ## Methods
 

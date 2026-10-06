@@ -161,6 +161,8 @@ Every client in the page shares quote and listing responses, keyed by URL. Sever
 - The first caller's retry settings govern a request that later clients join. A client with `retry: false` or a different `maxAttempts` can get another client's policy.
 - A call answered from a settled response never reaches the `staleCache` fallback. A fetch that goes out, such as the page's first after a reload, one after a failure, or one after `clearApiClientCache()`, still serves the stale copy when it fails.
 
+For an origin that is gone, ship a snapshot with your site. `createOfflineSnapshot(config)` runs at build time against the live API and returns `{ path, data }` files; write each to `path` under a folder you serve, then point `offlineFallback: { baseUrl }` at it. The client falls back to it after the live request and `staleCache`, and calls `onOffline` when it does. The snapshot holds every catalog indicator at its default parameters, so a request with other parameters has no file. Pass `selections` to capture those. A missing file is ignored, which keeps server-side rendering safe. Never hand-write the paths: `offlineSnapshotPath` is the only mapping, and the generator and the fallback both use it.
+
 ## What this package exports
 
 | Export | Purpose |
@@ -171,6 +173,7 @@ Every client in the page shares quote and listing responses, keyed by URL. Sever
 | `OverlayChart`, `OscillatorChart` | Single-canvas classes |
 | `createApiClient(config)` | Client for the three backing-API operations |
 | `clearApiClientCache()` | Drop the quote and listing responses shared across clients |
+| `createOfflineSnapshot`, `offlineSnapshotPath` | Build the snapshot files `offlineFallback` reads, and map a request to its file |
 | `loadStaticQuotes`, `loadStaticIndicatorData` | Bring-your-own `Bar[]` / `IndicatorDataRow[]` |
 | `createDefaultSelection`, `applySelectionTokens`, `calculateOptimalBars` | Selection and viewport helpers |
 | `getThemeColors`, `baseOverlayConfig`, `baseOscillatorConfig` | Theme and config building blocks |

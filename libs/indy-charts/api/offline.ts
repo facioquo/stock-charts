@@ -1,0 +1,52 @@
+/**
+ * Static-snapshot path mapping shared by the client's offline fallback and the
+ * snapshot generator, so the files a producer writes are the files a consumer
+ * reads.
+ */
+
+/**
+ * Maps a resolved API request URL to its snapshot file path, relative to the
+ * snapshot root.
+ *
+ * - The API base path is stripped, so a snapshot does not depend on where the
+ *   API is mounted.
+ * - No query: `<path>.json`, e.g. `quotes.json`, `SMA.json`.
+ * - Query: `<path>/<query>.json`, with parameters sorted by name and
+ *   percent-encoded, e.g. `SMA/lookbackPeriods=20.json`.
+ */
+export function offlineSnapshotPath(apiBaseUrl: string, requestUrl: string): string {
+  const base = new URL(apiBaseUrl);
+  const url = new URL(requestUrl);
+  const basePath = base.pathname.endsWith("/") ? base.pathname : `${base.pathname}/`;
+  const relative = url.pathname.startsWith(basePath)
+    ? url.pathname.slice(basePath.length)
+    : url.pathname;
+  const path = relative.replace(/^\/+|\/+$/g, "");
+
+  const query = [...url.searchParams.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([name, value]) => `${encodeURIComponent(name)}=${encodeURIComponent(value)}`)
+    .join("&");
+
+  return query ? `${path}/${query}.json` : `${path}.json`;
+}
+
+/**
+ * Fetches the snapshot file for a request URL and returns its parsed JSON, or
+ * `undefined` when the file is missing or cannot be fetched or parsed (for
+ * example during server-side rendering, where a relative URL does not resolve).
+ */
+export async function fetchOfflineSnapshot(
+  snapshotBaseUrl: string,
+  apiBaseUrl: string,
+  requestUrl: string
+): Promise<unknown> {
+  const root = snapshotBaseUrl.replace(/\/+$/, "");
+  try {
+    const response = await fetch(`${root}/${offlineSnapshotPath(apiBaseUrl, requestUrl)}`);
+    if (!response.ok) return undefined;
+    return (await response.json()) as unknown;
+  } catch {
+    return undefined;
+  }
+}

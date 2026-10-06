@@ -6,6 +6,7 @@ import {
   type IndicatorSelection,
   type Bar
 } from "../config/types";
+import { fetchOfflineSnapshot } from "./offline";
 
 // ---------------------------------------------------------------------------
 // Retry helpers
@@ -210,13 +211,6 @@ function normalizeBaseUrl(baseUrl: string): string {
   return baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
 }
 
-function listingsUrl(config: Pick<ApiClientConfig, "baseUrl" | "endpoints">): string {
-  return endpointUrl(
-    normalizeBaseUrl(config.baseUrl),
-    config.endpoints?.indicators ?? "indicators"
-  );
-}
-
 /**
  * Synchronously returns indicator listings already known for this API without
  * making a request: a settled shared response first, then (when `staleCache`
@@ -226,7 +220,7 @@ function listingsUrl(config: Pick<ApiClientConfig, "baseUrl" | "endpoints">): st
 export function peekCachedListings(
   config: Pick<ApiClientConfig, "baseUrl" | "endpoints" | "staleCache">
 ): IndicatorListing[] | undefined {
-  const url = listingsUrl(config);
+  const url = listingsRequestUrl(config);
   const candidates: unknown[] = [settledBodies.get(url)];
   if (config.staleCache) candidates.push(tryStaleCacheRead<unknown>(url));
 
@@ -333,6 +327,30 @@ export interface ApiClientConfig {
    *                  (e.g. `"quotes"`, `"listings"`, `"selection data"`).
    */
   onStale?: (context: string) => void;
+
+  /**
+   * Static snapshot served by the consumer's own site. When a live request and
+   * the {@link staleCache} both come up empty, the client reads the matching
+   * file under `baseUrl` instead, so charts still render when the API is gone
+   * for good. Produce the files with {@link createOfflineSnapshot}.
+   *
+   * Resolution order: live request (with retry), then `staleCache`, then this
+   * snapshot, then the original error. A missing or unreachable snapshot file
+   * is ignored, so the fallback is safe during server-side rendering.
+   */
+  offlineFallback?: {
+    /** Root URL of the snapshot files, e.g. `"/data/chart-api"`. */
+    baseUrl: string;
+  };
+
+  /**
+   * Called when snapshot data is returned because the live request failed.
+   * Distinct from {@link onStale}, which reports the per-tab `sessionStorage` copy.
+   *
+   * @param context - Human-readable description of the operation served from
+   *                  the snapshot (e.g. `"quotes"`, `"listings"`, `"selection data"`).
+   */
+  onOffline?: (context: string) => void;
 }
 
 /**
@@ -446,6 +464,33 @@ function endpointUrl(baseUrl: string, endpoint: string): string {
   return new URL(endpoint, baseUrl).toString();
 }
 
+type UrlConfig = Pick<ApiClientConfig, "baseUrl" | "endpoints">;
+
+/** Resolved `GET /quotes` URL for a client config. Shared with the snapshot generator. */
+export function quotesRequestUrl(config: UrlConfig): string {
+  return endpointUrl(normalizeBaseUrl(config.baseUrl), config.endpoints?.quotes ?? "quotes");
+}
+
+/** Resolved `GET /indicators` URL for a client config. Shared with the snapshot generator. */
+export function listingsRequestUrl(config: UrlConfig): string {
+  return endpointUrl(normalizeBaseUrl(config.baseUrl), config.endpoints?.indicators ?? "indicators");
+}
+
+/** Resolved indicator data URL, with the selection's parameters as the query. */
+export function selectionRequestUrl(
+  config: UrlConfig,
+  selection: IndicatorSelection,
+  listing: IndicatorListing
+): string {
+  const url = new URL(listing.endpoint, normalizeBaseUrl(config.baseUrl));
+  selection.params.forEach((p: IndicatorParam) => {
+    if (p.value != null) {
+      url.searchParams.set(p.paramName, String(p.value));
+    }
+  });
+  return url.toString();
+}
+
 function normalizeListings(listings: IndicatorListing[]): IndicatorListing[] {
   return listings.map(listing => {
     const uiid = listing.uiid.toUpperCase();
@@ -541,7 +586,7 @@ function normalizeResult(uiid: string, result: IndicatorResultConfig): Indicator
  * ```
  */
 export function createApiClient(config: ApiClientConfig): ApiClient {
-  const { endpoints, onError, staleCache, onStale } = config;
+  const { onError, staleCache, onStale, offlineFallback, onOffline } = config;
   // Ensure baseUrl always ends with "/" so new URL(path, base) resolves correctly.
   const baseUrl = normalizeBaseUrl(config.baseUrl);
 
@@ -558,9 +603,21 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
     ? ((config.retry as RetryConfig | undefined)?.baseDelayMs ?? DEFAULT_BASE_DELAY_MS)
     : 0;
 
+  /** Reads the snapshot copy of `url`, validated by `parse`; `undefined` when unavailable. */
+  async function readOffline<T>(url: string, parse: (body: unknown) => T): Promise<T | undefined> {
+    if (!offlineFallback) return undefined;
+    const body = await fetchOfflineSnapshot(offlineFallback.baseUrl, baseUrl, url);
+    if (body === undefined) return undefined;
+    try {
+      return parse(body);
+    } catch {
+      return undefined;
+    }
+  }
+
   return {
     async getQuotes(): Promise<Bar[]> {
-      const url = endpointUrl(baseUrl, endpoints?.quotes ?? "quotes");
+      const url = quotesRequestUrl(config);
       const shared = fetchShared(url, maxAttempts, baseDelayMs);
       try {
         const body = await shared.body;
@@ -590,13 +647,22 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
             }
           }
         }
+        const snapshot = await readOffline(url, body => {
+          if (!Array.isArray(body)) throw new Error("expected an array");
+          return normalizeQuotes(body);
+        });
+        if (snapshot) {
+          onError?.("Error fetching quotes", error);
+          onOffline?.("quotes");
+          return snapshot;
+        }
         onError?.("Error fetching quotes", error);
         throw error;
       }
     },
 
     async getListings(): Promise<IndicatorListing[]> {
-      const url = listingsUrl({ baseUrl, endpoints });
+      const url = listingsRequestUrl(config);
       const shared = fetchShared(url, maxAttempts, baseDelayMs);
       try {
         const data = (await shared.body) as IndicatorListing[];
@@ -623,6 +689,15 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
             }
           }
         }
+        const snapshot = await readOffline(url, body => {
+          if (!Array.isArray(body)) throw new Error("expected an array");
+          return normalizeListings(body as IndicatorListing[]);
+        });
+        if (snapshot) {
+          onError?.("Error fetching listings", error);
+          onOffline?.("listings");
+          return snapshot;
+        }
         onError?.("Error fetching listings", error);
         throw error;
       }
@@ -632,14 +707,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
       selection: IndicatorSelection,
       listing: IndicatorListing
     ): Promise<IndicatorDataRow[]> {
-      const selectionEndpoint = new URL(listing.endpoint, baseUrl);
-      selection.params.forEach((p: IndicatorParam) => {
-        if (p.value != null) {
-          selectionEndpoint.searchParams.set(p.paramName, String(p.value));
-        }
-      });
-
-      const url = selectionEndpoint.toString();
+      const url = selectionRequestUrl(config, selection, listing);
 
       try {
         const response = await fetchWithRetry(url, maxAttempts, baseDelayMs);
@@ -662,6 +730,15 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
             onStale?.("selection data");
             return cached;
           }
+        }
+        const snapshot = await readOffline(url, body => {
+          if (!Array.isArray(body)) throw new Error("expected an array");
+          return body as IndicatorDataRow[];
+        });
+        if (snapshot) {
+          onError?.("Error fetching selection data", error);
+          onOffline?.("selection data");
+          return snapshot;
         }
         onError?.("Error fetching selection data", error);
         throw error;
