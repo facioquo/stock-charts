@@ -119,7 +119,7 @@ Quote and listing responses are shared across every client (see [Methods](#metho
 
 ### Offline snapshot fallback
 
-The stale cache is per tab and empty for a first-time visitor, so it cannot cover an origin that is gone for good. `offlineFallback` reads a snapshot shipped with your own site instead. The order is the live request (with retry), then `staleCache`, then the snapshot, then the original error. `onOffline` fires when snapshot data is served.
+The stale cache is per tab and empty for a first-time visitor, so it cannot cover an origin that is gone for good. `offlineFallback` reads a snapshot shipped with your own site instead. The order is the live request (with retry), then `staleCache`, then the snapshot, then the original error. `onOffline` fires when snapshot data is served, and `onError` still fires for the failed live request. Each call waits out the live retries before the snapshot is read and the snapshot is not remembered, so pair `offlineFallback` with `retry: false` or a low `maxAttempts` for an origin that is gone. Snapshot files match the package version that wrote them; regenerate them when upgrading.
 
 Build the snapshot at build time, while the API is reachable. `createOfflineSnapshot` returns the files at the paths the fallback reads, so the two cannot drift:
 

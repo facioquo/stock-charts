@@ -30,8 +30,10 @@ export interface OfflineSnapshotOptions {
  * reads, at the paths it reads them from. Write each `data` as JSON to
  * `path` under the snapshot root and serve that root from the consumer's site.
  *
- * Runs at build time against a reachable API. `config.offlineFallback` is
- * ignored here so a snapshot is never built from another snapshot.
+ * Runs at build time against a reachable API. `offlineFallback` and
+ * `staleCache` are ignored here, so a snapshot is built only from live
+ * responses, never from another snapshot or a stale copy. Regenerate snapshots
+ * when upgrading the package: the file layout is not a stable contract.
  */
 export async function createOfflineSnapshot(
   config: ApiClientConfig,
@@ -39,7 +41,6 @@ export async function createOfflineSnapshot(
 ): Promise<OfflineSnapshotFile[]> {
   const liveConfig = { ...config };
   delete liveConfig.offlineFallback;
-  delete liveConfig.onOffline;
   // A stale copy would otherwise be baked into the snapshot.
   delete liveConfig.staleCache;
   const client = createApiClient(liveConfig);

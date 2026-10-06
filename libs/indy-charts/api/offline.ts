@@ -5,6 +5,19 @@
  */
 
 /**
+ * Escapes a query name or value for use in a file name. `encodeURIComponent`
+ * alone writes `%XX`, which a static host decodes before it looks for the file,
+ * so the escape character here is `~`. `~` and `*` (not a legal file name
+ * character on Windows) are escaped first, which keeps the mapping unambiguous.
+ */
+function fileSafe(value: string): string {
+  return encodeURIComponent(value)
+    .replaceAll("~", "~7E")
+    .replaceAll("*", "~2A")
+    .replaceAll("%", "~");
+}
+
+/**
  * Maps a resolved API request URL to its snapshot file path, relative to the
  * snapshot root.
  *
@@ -12,7 +25,7 @@
  *   API is mounted.
  * - No query: `<path>.json`, e.g. `quotes.json`, `SMA.json`.
  * - Query: `<path>/<query>.json`, with parameters sorted by name and
- *   percent-encoded, e.g. `SMA/lookbackPeriods=20.json`.
+ *   escaped with {@link fileSafe}, e.g. `SMA/lookbackPeriods=20.json`.
  */
 export function offlineSnapshotPath(apiBaseUrl: string, requestUrl: string): string {
   const base = new URL(apiBaseUrl);
@@ -25,7 +38,7 @@ export function offlineSnapshotPath(apiBaseUrl: string, requestUrl: string): str
 
   const query = [...url.searchParams.entries()]
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-    .map(([name, value]) => `${encodeURIComponent(name)}=${encodeURIComponent(value)}`)
+    .map(([name, value]) => `${fileSafe(name)}=${fileSafe(value)}`)
     .join("&");
 
   return query ? `${path}/${query}.json` : `${path}.json`;

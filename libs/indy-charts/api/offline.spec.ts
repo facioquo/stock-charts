@@ -58,6 +58,26 @@ function serve(routes: Record<string, unknown>): void {
   );
 }
 
+/** Stubs `sessionStorage` for the stale cache, seeded with `{ [requestUrl]: body }`. */
+function stubSession(seed: Record<string, unknown> = {}): void {
+  const store = new Map(
+    Object.entries(seed).map(([url, body]) => [`indy-charts:stale:${url}`, JSON.stringify(body)])
+  );
+  vi.stubGlobal("sessionStorage", {
+    getItem: (key: string) => store.get(key) ?? null,
+    setItem: (key: string, value: string) => void store.set(key, value)
+  });
+}
+
+const smaSelection = {
+  ucid: "u",
+  uiid: "SMA",
+  label: "SMA",
+  chartType: "overlay" as const,
+  params: [{ paramName: "lookbackPeriods", displayName: "L", minimum: 1, maximum: 9, value: 20 }],
+  results: []
+};
+
 afterEach(() => {
   clearApiClientCache();
   vi.unstubAllGlobals();
@@ -79,6 +99,16 @@ describe("offlineSnapshotPath", () => {
     );
   });
 
+  it("writes no percent signs or asterisks, and keeps distinct values distinct", () => {
+    const paths = ["1e+21", "a b", "a,b", "a/b", "50%", "~", "%7E", "*", "a~7Eb", "+", "~2B"].map(
+      value => offlineSnapshotPath(API, `${API}/SMA/?k=${encodeURIComponent(value)}`)
+    );
+
+    expect(paths.every(path => !/[%*]/.test(path))).toBe(true);
+    expect(new Set(paths).size).toBe(paths.length);
+    expect(paths[0]).toBe("SMA/k=1e~2B21.json");
+  });
+
   it("does not depend on where the API is mounted", () => {
     expect(offlineSnapshotPath("https://host.example/v1/", "https://host.example/v1/SMA/")).toBe(
       "SMA.json"
@@ -95,13 +125,16 @@ describe("offlineFallback", () => {
     });
     const onOffline = vi.fn<(context: string) => void>();
     const onStale = vi.fn();
+    const onError = vi.fn();
+    stubSession();
     const client = createApiClient({
       baseUrl: API,
       retry: false,
+      staleCache: true,
       offlineFallback: { baseUrl: `${SNAPSHOT}/` },
       onOffline,
       onStale,
-      onError: vi.fn()
+      onError
     });
 
     expect((await client.getQuotes())[0]?.close).toBe(1.5);
@@ -122,6 +155,11 @@ describe("offlineFallback", () => {
       "quotes",
       "listings",
       "selection data"
+    ]);
+    expect(onError.mock.calls.map(([context]) => context)).toEqual([
+      "Error fetching quotes",
+      "Error fetching listings",
+      "Error fetching selection data"
     ]);
     expect(onStale).not.toHaveBeenCalled();
   });
@@ -170,6 +208,79 @@ describe("offlineFallback", () => {
     });
 
     await expect(client.getQuotes()).rejects.toThrow("unreachable");
+  });
+
+  const reads = [
+    {
+      name: "quotes",
+      live: `${API}/quotes`,
+      file: `${SNAPSHOT}/quotes.json`,
+      good: quotes,
+      run: (client: ReturnType<typeof createApiClient>) => client.getQuotes()
+    },
+    {
+      name: "listings",
+      live: `${API}/indicators`,
+      file: `${SNAPSHOT}/indicators.json`,
+      good: catalog,
+      run: (client: ReturnType<typeof createApiClient>) => client.getListings()
+    },
+    {
+      name: "selection data",
+      live: `${API}/SMA/?lookbackPeriods=20`,
+      file: `${SNAPSHOT}/SMA/lookbackPeriods=20.json`,
+      good: [{ timestamp: "x", sma: 1 }],
+      run: (client: ReturnType<typeof createApiClient>) =>
+        client.getSelectionData(smaSelection, catalog[0])
+    }
+  ];
+
+  describe.each(reads)("$name", ({ live, file, good, run }) => {
+    const make = (extra: Partial<Parameters<typeof createApiClient>[0]> = {}) => {
+      const onError = vi.fn();
+      const onOffline = vi.fn();
+      const onStale = vi.fn();
+      const client = createApiClient({
+        baseUrl: API,
+        retry: false,
+        staleCache: true,
+        offlineFallback: { baseUrl: SNAPSHOT },
+        onError,
+        onOffline,
+        onStale,
+        ...extra
+      });
+      return { client, onError, onOffline, onStale };
+    };
+
+    it("rethrows the live error when the snapshot file is missing", async () => {
+      serve({});
+      stubSession();
+      const { client, onError, onOffline } = make();
+
+      await expect(run(client)).rejects.toThrow("unreachable");
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onOffline).not.toHaveBeenCalled();
+    });
+
+    it("rethrows the live error when the snapshot body is malformed", async () => {
+      serve({ [file]: { notAnArray: true } });
+      stubSession();
+      const { client, onOffline } = make();
+
+      await expect(run(client)).rejects.toThrow("unreachable");
+      expect(onOffline).not.toHaveBeenCalled();
+    });
+
+    it("prefers the stale cache over the snapshot", async () => {
+      serve({ [file]: good });
+      stubSession({ [live]: good });
+      const { client, onStale, onOffline } = make();
+
+      await run(client);
+      expect(onStale).toHaveBeenCalledTimes(1);
+      expect(onOffline).not.toHaveBeenCalled();
+    });
   });
 
   it("falls back on an HTTP error status and reports the live error", async () => {
@@ -319,6 +430,74 @@ describe("createOfflineSnapshot", () => {
     });
     expect((await client.getQuotes())[0]?.close).toBe(1.5);
     expect((await client.getListings()).map(item => item.uiid)).toEqual(["OBV"]);
+  });
+
+  it("builds only from live responses, ignoring a shared fallback config", async () => {
+    // A shared config at build time: stale cache seeded, snapshot served, live API down.
+    serve({
+      [`${SNAPSHOT}/quotes.json`]: quotes,
+      [`${SNAPSHOT}/indicators.json`]: catalog
+    });
+    stubSession({ [`${API}/quotes`]: quotes, [`${API}/indicators`]: catalog });
+    const onOffline = vi.fn();
+    const onStale = vi.fn();
+
+    await expect(
+      createOfflineSnapshot(
+        {
+          baseUrl: API,
+          retry: false,
+          staleCache: true,
+          offlineFallback: { baseUrl: SNAPSHOT },
+          onOffline,
+          onStale
+        },
+        { selections: [] }
+      )
+    ).rejects.toThrow("unreachable");
+    expect(onOffline).not.toHaveBeenCalled();
+    expect(onStale).not.toHaveBeenCalled();
+  });
+
+  it("round-trips a parameter value that a host would decode", async () => {
+    const wide = listing("WIDE", `${API}/WIDE/`, 1e21);
+    serve({
+      [`${API}/quotes`]: quotes,
+      [`${API}/indicators`]: [wide],
+      [`${API}/WIDE/?lookbackPeriods=1e%2B21`]: [{ timestamp: "x", wide: 1 }]
+    });
+    const files = await createOfflineSnapshot({ baseUrl: API, retry: false });
+    clearApiClientCache();
+
+    // A static host decodes the request path before it looks for the file.
+    const onDisk = new Map(files.map(file => [file.path, file.data]));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL) => {
+        const url = String(input instanceof Request ? input.url : input);
+        const path = decodeURIComponent(url.replace(`${SNAPSHOT}/`, ""));
+        const data = onDisk.get(path);
+        return url.startsWith(SNAPSHOT) && data !== undefined
+          ? Promise.resolve({
+              ok: true,
+              status: 200,
+              json: () => Promise.resolve(data)
+            } as Response)
+          : Promise.reject(new TypeError(`unreachable: ${url}`));
+      })
+    );
+    const client = createApiClient({
+      baseUrl: API,
+      retry: false,
+      offlineFallback: { baseUrl: SNAPSHOT }
+    });
+    const selection = {
+      ...smaSelection,
+      uiid: "WIDE",
+      params: [{ ...smaSelection.params[0], maximum: 1e22, value: 1e21 }]
+    };
+
+    expect(await client.getSelectionData(selection, wide)).toHaveLength(1);
   });
 
   it("captures explicit selections and rejects one with no catalog listing", async () => {
