@@ -183,10 +183,15 @@ describe("SettingsDialog", () => {
       />
     );
 
-    fireEvent.click(screen.getByText("RSI (5)"));
+    const label = screen.getByText("RSI (5)");
+    fireEvent.click(label);
     const checkbox = screen.getByRole("checkbox", { name: "select RSI (5)" });
     expect(checkbox).toBeChecked();
-    expect(checkbox.parentElement?.lastElementChild).toBe(checkbox);
+    expect(label).toHaveAttribute("for", checkbox.id);
+    // The checkbox is a direct child of the row, after its label and buttons.
+    const row = checkbox.closest("li");
+    expect(checkbox.parentElement).toBe(row);
+    expect(row?.lastElementChild).toBe(checkbox);
   });
 
   it("removes the checked displayed indicators", () => {
