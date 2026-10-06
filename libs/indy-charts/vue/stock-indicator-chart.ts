@@ -578,7 +578,7 @@ export const StockIndicatorChart = defineComponent({
             "div",
             {
               class: "indy-demo__status indy-demo__status--error",
-              role: "status",
+              role: "alert",
               "data-testid": `${prefix}-error`,
               "data-error-kind": errorKind.value
             },

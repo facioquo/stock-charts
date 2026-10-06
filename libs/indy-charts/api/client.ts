@@ -150,6 +150,10 @@ interface SharedResponse {
  * this module, keyed by the fully resolved request URL. Concurrent callers join
  * one in-flight request, and later callers reuse the settled body for the
  * page's lifetime. A failed request is evicted so the next call refetches.
+ * Settled bodies are kept deliberately: sizing layouts from listings at mount
+ * needs a synchronous read, and `clearApiClientCache()` is the refresh path.
+ * The URL is the whole key because `fetchWithRetry` sends a bare `fetch(url)`;
+ * any header or fetch option added later must join it.
  */
 const sharedResponses = new Map<string, SharedResponse>();
 

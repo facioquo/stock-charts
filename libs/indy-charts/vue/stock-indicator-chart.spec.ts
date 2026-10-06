@@ -696,6 +696,38 @@ describe("StockIndicatorChart layout reservation", () => {
     app.unmount();
   });
 
+  it("corrects the reserved frames once listings arrive, before quotes finish", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL): Promise<Response> => {
+        const url = requestUrl(input);
+        if (url.endsWith("/indicators")) {
+          return Promise.resolve(responseJson(makeBollingerListings()));
+        }
+        return new Promise<Response>(() => undefined);
+      })
+    );
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, {
+      indicator: "bb",
+      with: "bbPctB",
+      id: "midload"
+    });
+    app.provide(indyChartsVueOptionsKey, bollingerOptions);
+    app.mount(root);
+
+    // No listings yet: both panes are assumed overlays.
+    expect(countByTestId(root, "stock-indicator-chart-midload-oscillator-frame")).toBe(0);
+
+    await vi.waitFor(() => {
+      expect(countByTestId(root, "stock-indicator-chart-midload-oscillator-frame")).toBe(1);
+    });
+    expect(countByTestId(root, "stock-indicator-chart-midload-overlay-frame")).toBe(1);
+    expect(findByTestId(root, "stock-indicator-chart-midload-overlay-canvas")).toBeUndefined();
+
+    app.unmount();
+  });
+
   it("keeps the frames while showing an error", async () => {
     vi.stubGlobal(
       "fetch",
@@ -711,7 +743,7 @@ describe("StockIndicatorChart layout reservation", () => {
 
     await vi.waitFor(() => {
       const error = findByTestId(root, "stock-indicator-chart-rsi-error");
-      expect(error?.props["role"]).toBe("status");
+      expect(error?.props["role"]).toBe("alert");
     });
     expect(findByTestId(root, "stock-indicator-chart-rsi-overlay-frame")).toBeDefined();
     expect(findByTestId(root, "stock-indicator-chart-rsi-oscillator-frame")).toBeDefined();

@@ -1077,6 +1077,77 @@ describe("shared responses", () => {
 
     expect(setItem).toHaveBeenCalledTimes(1);
   });
+
+  it("does not let a request cleared mid-flight repopulate the cache", async () => {
+    const resolvers: Array<() => void> = [];
+    const okResponse = (body: unknown): Response =>
+      ({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        headers: { get: (_: string): string | null => null },
+        json: () => Promise.resolve(body)
+      }) as unknown as Response;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation(
+        (): Promise<Response> =>
+          new Promise(resolve => {
+            resolvers.push(() => resolve(okResponse([makeListing({ uiid: "old" })])));
+          })
+      )
+    );
+    const client = createApiClient({ baseUrl: BASE_URL, retry: false });
+
+    const cleared = client.getListings();
+    clearApiClientCache();
+    const current = client.getListings();
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(2);
+
+    resolvers[0]?.();
+    await cleared;
+
+    // The cleared request settles while its replacement is still pending.
+    expect(peekCachedListings({ baseUrl: BASE_URL })).toBeUndefined();
+
+    resolvers[1]?.();
+    await current;
+    expect(peekCachedListings({ baseUrl: BASE_URL })).toBeDefined();
+  });
+
+  it("does not keep a listings body that fails validation", async () => {
+    mockFetchOk([{}]);
+    const client = createApiClient({ baseUrl: BASE_URL, retry: false });
+    await expect(client.getListings()).rejects.toThrow();
+    expect(peekCachedListings({ baseUrl: BASE_URL })).toBeUndefined();
+
+    mockFetchOk([makeListing()]);
+    await expect(client.getListings()).resolves.toHaveLength(1);
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
+  });
+
+  it("applies the first caller's retry settings to a shared request", async () => {
+    const fetchMock = mockFetchSequence([{ status: 503 }, { status: 200, body: [makeListing()] }]);
+    const noRetry = createApiClient({ baseUrl: BASE_URL, retry: false });
+    const withRetry = createApiClient({
+      baseUrl: BASE_URL,
+      retry: { maxAttempts: 3, baseDelayMs: 0 }
+    });
+
+    const results = await Promise.allSettled([noRetry.getListings(), withRetry.getListings()]);
+
+    expect(results.map(r => r.status)).toEqual(["rejected", "rejected"]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const retried = mockFetchSequence([{ status: 503 }, { status: 200, body: [makeListing()] }]);
+    const first = createApiClient({ baseUrl: BASE_URL, retry: { maxAttempts: 3, baseDelayMs: 0 } });
+    const second = createApiClient({ baseUrl: BASE_URL, retry: false });
+
+    const joined = await Promise.all([first.getListings(), second.getListings()]);
+
+    expect(joined.map(listings => listings.length)).toEqual([1, 1]);
+    expect(retried).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe("peekCachedListings", () => {
@@ -1110,5 +1181,23 @@ describe("peekCachedListings", () => {
     expect(peekCachedListings({ baseUrl: BASE_URL, staleCache: true })?.[0]?.chartType).toBe(
       "oscillator"
     );
+  });
+
+  it("falls through to the stale copy when a settled body fails normalization", async () => {
+    const storage = createMockStorage();
+    storage.setItem(
+      `indy-charts:stale:${BASE_URL}/indicators`,
+      JSON.stringify([makeListing({ uiid: "RSI", chartType: "oscillator" })])
+    );
+    vi.stubGlobal("sessionStorage", storage);
+    // Quote rows served from the listings URL settle fine for getQuotes but are not listings.
+    mockFetchOk([createQuote("2024-01-01T00:00:00Z")]);
+    await createApiClient({
+      baseUrl: BASE_URL,
+      retry: false,
+      endpoints: { quotes: "indicators" }
+    }).getQuotes();
+
+    expect(peekCachedListings({ baseUrl: BASE_URL, staleCache: true })?.[0]?.uiid).toBe("RSI");
   });
 });
