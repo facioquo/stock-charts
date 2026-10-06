@@ -304,6 +304,135 @@ describe("ChartController", () => {
     expect(document.getElementById(`${selection.ucid}-container`)).not.toBeNull();
   });
 
+  async function loadWithCache(
+    cached: IndicatorSelection[],
+    getSelectionData: ApiClient["getSelectionData"]
+  ): Promise<ChartController> {
+    const overlay = document.createElement("canvas");
+    overlay.id = "chartOverlay";
+    document.body.appendChild(overlay);
+    const zone = document.createElement("div");
+    zone.id = "oscillators-zone";
+    document.body.appendChild(zone);
+
+    localStorage.setItem("selections", JSON.stringify(cached));
+    const listings = [makeListing("SLOW", "oscillator"), makeListing("FAST", "oscillator")];
+    const controller = new ChartController(
+      makeApi({ getListings: vi.fn().mockResolvedValue(listings), getSelectionData })
+    );
+    await controller.loadCharts();
+    return controller;
+  }
+
+  it("builds restored indicators in list order whatever order their data arrives in", async () => {
+    const slow = makeSelection("SLOW", "oscillator");
+    const fast = makeSelection("FAST", "oscillator");
+    const getSelectionData = vi.fn(
+      (selection: IndicatorSelection) =>
+        new Promise<unknown[]>(resolve => {
+          setTimeout(() => resolve([{}]), selection.uiid === "SLOW" ? 30 : 0);
+        })
+    ) as unknown as ApiClient["getSelectionData"];
+
+    const controller = await loadWithCache([slow, fast], getSelectionData);
+
+    await vi.waitFor(() => {
+      expect(manager(controller).displaySelection).toHaveBeenCalledTimes(2);
+    });
+    expect(controller.selections.map(s => s.ucid)).toEqual([slow.ucid, fast.ucid]);
+    const zone = document.getElementById("oscillators-zone");
+    expect(Array.from(zone?.children ?? []).map(c => c.id)).toEqual([
+      `${slow.ucid}-container`,
+      `${fast.ucid}-container`
+    ]);
+  });
+
+  it("keeps the saved list when no restored indicator can load", async () => {
+    const saved = [makeSelection("SLOW", "oscillator")];
+    const getSelectionData = vi
+      .fn()
+      .mockRejectedValue(new Error("offline")) as unknown as ApiClient["getSelectionData"];
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const controller = await loadWithCache(saved, getSelectionData);
+
+    await vi.waitFor(() => {
+      expect(getSelectionData).toHaveBeenCalled();
+    });
+    await new Promise(resolve => setTimeout(resolve, 10));
+    expect(manager(controller).displaySelection).not.toHaveBeenCalled();
+    expect(JSON.parse(localStorage.getItem("selections") ?? "[]")).toHaveLength(1);
+  });
+
+  describe("moveSelection", () => {
+    async function withSelections(
+      specs: Array<[string, "overlay" | "oscillator"]>
+    ): Promise<ChartController> {
+      const zone = document.createElement("div");
+      zone.id = "oscillators-zone";
+      document.body.appendChild(zone);
+      const api = makeApi({ getSelectionData: vi.fn().mockResolvedValue([{}]) });
+      const controller = new ChartController(api);
+      for (const [uiid, chartType] of specs) {
+        await controller.addSelection(makeSelection(uiid, chartType), makeListing(uiid, chartType));
+      }
+      return controller;
+    }
+
+    it("swaps within the group and leaves the other group where it is", async () => {
+      const controller = await withSelections([
+        ["A", "overlay"],
+        ["X", "oscillator"],
+        ["B", "overlay"],
+        ["Y", "oscillator"]
+      ]);
+
+      controller.moveSelection("ucid-B", -1);
+
+      expect(controller.selections.map(s => s.uiid)).toEqual(["B", "X", "A", "Y"]);
+      expect(manager(controller).reorderSelections).toHaveBeenCalledWith([
+        "ucid-B",
+        "ucid-X",
+        "ucid-A",
+        "ucid-Y"
+      ]);
+    });
+
+    it("moves an oscillator's canvas with it and caches the new order", async () => {
+      const controller = await withSelections([
+        ["X", "oscillator"],
+        ["Y", "oscillator"],
+        ["Z", "oscillator"]
+      ]);
+
+      controller.moveSelection("ucid-X", 1);
+
+      const zone = document.getElementById("oscillators-zone");
+      expect(Array.from(zone?.children ?? []).map(c => c.id)).toEqual([
+        "ucid-Y-container",
+        "ucid-X-container",
+        "ucid-Z-container"
+      ]);
+      const cached = JSON.parse(localStorage.getItem("selections") ?? "[]") as Array<{
+        ucid: string;
+      }>;
+      expect(cached.map(s => s.ucid)).toEqual(["ucid-Y", "ucid-X", "ucid-Z"]);
+    });
+
+    it("does nothing at the end of a group or for an unknown ucid", async () => {
+      const controller = await withSelections([
+        ["A", "overlay"],
+        ["X", "oscillator"]
+      ]);
+
+      controller.moveSelection("ucid-A", -1);
+      controller.moveSelection("ucid-X", 1);
+      controller.moveSelection("missing", 1);
+
+      expect(manager(controller).reorderSelections).not.toHaveBeenCalled();
+    });
+  });
+
   it("propagates theme/tooltip settings to the chart manager", () => {
     const controller = new ChartController(makeApi());
 

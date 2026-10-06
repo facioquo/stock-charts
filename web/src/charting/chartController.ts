@@ -130,13 +130,65 @@ export class ChartController {
     this.cacheSelections();
   }
 
-  /** Add an indicator without scrolling; swallows errors (used during startup). */
-  addSelectionWithoutScroll(selection: IndicatorSelection): void {
-    const listing = this.listings.find(x => x.uiid === selection.uiid);
-    if (!listing) return;
-    void this.addSelection(selection, listing, false).catch((error: unknown) => {
-      console.error("Error adding selection without scroll:", error);
+  /**
+   * Show startup selections in list order. Fetches run concurrently, but the
+   * charts are built only after every fetch settles, so arrival order cannot
+   * change the stack. A selection that fails to load is skipped.
+   */
+  private async showSelectionsInOrder(selections: readonly IndicatorSelection[]): Promise<void> {
+    const loaded = await Promise.all(
+      selections.map(async selection => {
+        const listing = this.listings.find(x => x.uiid === selection.uiid);
+        if (!listing) return undefined;
+        try {
+          const rows = (await this.api.getSelectionData(selection, listing)) as IndicatorDataRow[];
+          return { selection, listing, rows };
+        } catch (error) {
+          console.error("Error adding selection without scroll:", error);
+          return undefined;
+        }
+      })
+    );
+
+    let shown = false;
+    for (const item of loaded) {
+      if (!item) continue;
+      try {
+        this.showSelection(item.selection, item.listing, item.rows, false);
+        shown = true;
+      } catch (error) {
+        console.error("Error adding selection without scroll:", error);
+      }
+    }
+    // Never overwrite the saved list when nothing could be restored.
+    if (shown) this.cacheSelections();
+  }
+
+  /**
+   * Move a displayed indicator one place up or down within its own group:
+   * overlays change layering, oscillators change chart order. A move at the end
+   * of the group does nothing.
+   */
+  moveSelection(ucid: string, offset: -1 | 1): void {
+    const moved = this.selections.find(s => s.ucid === ucid);
+    if (!moved) return;
+
+    const group = this.selections.filter(s => s.chartType === moved.chartType);
+    const from = group.indexOf(moved);
+    const to = from + offset;
+    if (to < 0 || to >= group.length) return;
+
+    // Swap within the group, leaving the other group's slots where they are.
+    [group[from], group[to]] = [group[to], group[from]];
+    const order = this.selections.map(s => s.ucid);
+    const slots = this.selections.flatMap((s, i) => (s.chartType === moved.chartType ? [i] : []));
+    slots.forEach((slot, i) => {
+      order[slot] = group[i].ucid;
     });
+    this.chartManager.reorderSelections(order);
+
+    if (moved.chartType === "oscillator") this.moveOscillatorDom(ucid, offset);
+    this.cacheSelections();
   }
 
   /** Create a default selection from the indicator catalog. */
@@ -286,6 +338,18 @@ export class ChartController {
     if (scrollToMe) scrollToEnd(container.id);
   }
 
+  private moveOscillatorDom(ucid: string, offset: -1 | 1): void {
+    const container = document.getElementById(`${ucid}-container`);
+    if (!container) return;
+    if (offset < 0) {
+      const previous = container.previousElementSibling;
+      if (previous) container.parentNode?.insertBefore(container, previous);
+    } else {
+      const next = container.nextElementSibling;
+      if (next) container.parentNode?.insertBefore(next, container);
+    }
+  }
+
   private cacheSelections(): void {
     try {
       const selections = this.selections.map(selection => ({
@@ -325,7 +389,7 @@ export class ChartController {
       const cached = JSON.parse(raw) as IndicatorSelection[] | null;
       // Respect explicitly-stored empty arrays (user removed all indicators).
       if (Array.isArray(cached)) {
-        cached.forEach(selection => this.addSelectionWithoutScroll(selection));
+        void this.showSelectionsInOrder(cached);
         return;
       }
     } catch {
@@ -346,17 +410,18 @@ export class ChartController {
       { uiid: "MARUBOZU" }
     ];
 
-    defaults.forEach(({ uiid, lookbackPeriods }) => {
+    const selections = defaults.flatMap(({ uiid, lookbackPeriods }) => {
       const selection = this.tryDefaultSelection(uiid);
-      if (!selection) return;
+      if (!selection) return [];
 
       const lookbackParam = selection.params.find(x => x.paramName === "lookbackPeriods");
       if (lookbackParam && lookbackPeriods !== undefined) {
         lookbackParam.value = lookbackPeriods;
       }
-
-      this.addSelectionWithoutScroll(selection);
+      return [selection];
     });
+
+    void this.showSelectionsInOrder(selections);
   }
 
   private tryDefaultSelection(uiid: string): IndicatorSelection | undefined {

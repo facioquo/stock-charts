@@ -36,6 +36,7 @@ interface FakeController {
   selections: IndicatorSelection[];
   listings: IndicatorListing[];
   deleteSelection: ReturnType<typeof vi.fn>;
+  moveSelection: ReturnType<typeof vi.fn>;
   onSettingsChange: ReturnType<typeof vi.fn>;
 }
 
@@ -51,6 +52,7 @@ function makeController(): FakeController {
       const i = selections.findIndex(s => s.ucid === ucid);
       if (i >= 0) selections.splice(i, 1);
     }),
+    moveSelection: vi.fn(),
     onSettingsChange: vi.fn()
   };
 }
@@ -109,8 +111,13 @@ describe("SettingsDialog", () => {
     expect(onEditIndicator).toHaveBeenCalledWith(controller.selections[0]);
   });
 
-  it("checks a displayed indicator from its label, with the checkbox last in the row", () => {
+  it("groups indicators by chart and reorders within a group", () => {
     const controller = makeController();
+    controller.selections.push({
+      ...makeSelection("u3", "EMA (20)"),
+      chartType: "overlay"
+    });
+    controller.selections.push(makeSelection("u4", "ADX (14)"));
     render(
       <SettingsDialog
         controller={controller as unknown as ChartController}
@@ -120,15 +127,17 @@ describe("SettingsDialog", () => {
       />
     );
 
-    const label = screen.getByText("RSI (5)");
-    fireEvent.click(label);
-    const checkbox = screen.getByRole("checkbox", { name: "select RSI (5)" });
-    expect(checkbox).toBeChecked();
-    expect(label).toHaveAttribute("for", checkbox.id);
-    // The checkbox is a direct child of the row, after its label and edit button.
-    const row = checkbox.closest("li");
-    expect(checkbox.parentElement).toBe(row);
-    expect(row?.lastElementChild).toBe(checkbox);
+    expect(screen.getByText("Price chart overlays")).toBeInTheDocument();
+    expect(screen.getByText("Oscillator charts")).toBeInTheDocument();
+
+    // Each group's first row cannot move up and its last cannot move down.
+    expect(screen.getByRole("button", { name: "move EMA (20) up" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "move EMA (20) down" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "move RSI (5) up" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "move ADX (14) down" })).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "move SMA (50) up" }));
+    expect(controller.moveSelection).toHaveBeenCalledWith("u2", -1);
   });
 
   it("removes the checked displayed indicators", () => {
@@ -146,7 +155,8 @@ describe("SettingsDialog", () => {
     expect(removeButton).toBeDisabled();
 
     // check the first displayed indicator, then remove
-    fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
+    const firstRow = screen.getByText("RSI (5)").closest("label") as HTMLElement;
+    fireEvent.click(firstRow.querySelector('input[type="checkbox"]') as HTMLElement);
     expect(removeButton).toBeEnabled();
 
     fireEvent.click(removeButton);

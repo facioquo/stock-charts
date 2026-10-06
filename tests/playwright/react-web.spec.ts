@@ -100,6 +100,30 @@ test.describe("Stock Charts React Web", () => {
     expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
   });
 
+  test("a reordered indicator keeps its place after a reload", async ({
+    page,
+    errorCollection
+  }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+
+    const oscillators = page.locator(".selection-list").nth(1).locator("li label span:first-child");
+    await page.getByRole("button", { name: "edit settings" }).click();
+    await expect(oscillators.first()).toHaveText(/^RSI/);
+
+    await page.getByRole("button", { name: /^move ADX.* up$/ }).click();
+    await expect(oscillators.first()).toHaveText(/^ADX/);
+
+    await page.reload();
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+    await page.getByRole("button", { name: "edit settings" }).click();
+    await expect(oscillators.first()).toHaveText(/^ADX/);
+
+    expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
+  });
+
   test("theme toggle flips the body theme class", async ({ page, errorCollection }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");

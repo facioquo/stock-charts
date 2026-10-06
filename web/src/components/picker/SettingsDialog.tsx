@@ -66,32 +66,55 @@ interface DisplayedIndicatorsProps {
   onSelectAll: (value: boolean) => void;
   onRemove: () => void;
   onEdit: Dispatch<IndicatorSelection>;
+  onMove: ChartController["moveSelection"];
 }
 
-/** List of currently-displayed indicators with edit and multi-select removal. */
-function DisplayedIndicators({
+interface SelectionGroupProps extends Omit<DisplayedIndicatorsProps, "onSelectAll" | "onRemove"> {
+  title: string;
+  hint: string;
+}
+
+/** One group of displayed indicators, with edit and reorder controls per row. */
+function SelectionGroup({
+  title,
+  hint,
   selections,
   checked,
   onToggle,
-  onSelectAll,
-  onRemove,
-  onEdit
-}: DisplayedIndicatorsProps): React.JSX.Element {
+  onEdit,
+  onMove
+}: SelectionGroupProps): React.JSX.Element | null {
+  if (selections.length === 0) return null;
   return (
-    <section className="displayed-indicators">
-      <div className="dialog-section-header">
-        <span>Displayed indicators</span>
-        <span className="filler" />
-        <StandardCheckbox
-          ariaLabel="select all displayed indicators"
-          checked={checked.size > 0 && checked.size === selections.length}
-          onChange={onSelectAll}
-        />
+    <>
+      <div className="selection-group-header">
+        <span>{title}</span>
+        <span className="help-link">{hint}</span>
       </div>
       <ul className="selection-list">
-        {selections.map(selection => (
+        {selections.map((selection, index) => (
           <li key={selection.ucid}>
             <label htmlFor={`select-${selection.ucid}`}>{selection.label}</label>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label={`move ${selection.label} up`}
+              title="move up"
+              disabled={index === 0}
+              onClick={() => onMove(selection.ucid, -1)}
+            >
+              <span className="material-icons">arrow_upward</span>
+            </button>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label={`move ${selection.label} down`}
+              title="move down"
+              disabled={index === selections.length - 1}
+              onClick={() => onMove(selection.ucid, 1)}
+            >
+              <span className="material-icons">arrow_downward</span>
+            </button>
             <button
               type="button"
               className="icon-button"
@@ -113,6 +136,44 @@ function DisplayedIndicators({
           </li>
         ))}
       </ul>
+    </>
+  );
+}
+
+/** Displayed indicators grouped by chart, with edit, reorder, and multi-select removal. */
+function DisplayedIndicators({
+  selections,
+  checked,
+  onToggle,
+  onSelectAll,
+  onRemove,
+  onEdit,
+  onMove
+}: DisplayedIndicatorsProps): React.JSX.Element {
+  const groupProps = { checked, onToggle, onEdit, onMove };
+  return (
+    <section className="displayed-indicators">
+      <div className="dialog-section-header">
+        <span>Displayed indicators</span>
+        <span className="filler" />
+        <StandardCheckbox
+          ariaLabel="select all displayed indicators"
+          checked={checked.size > 0 && checked.size === selections.length}
+          onChange={onSelectAll}
+        />
+      </div>
+      <SelectionGroup
+        {...groupProps}
+        title="Price chart overlays"
+        hint="later rows draw on top"
+        selections={selections.filter(s => s.chartType === "overlay")}
+      />
+      <SelectionGroup
+        {...groupProps}
+        title="Oscillator charts"
+        hint="top to bottom, below the price chart"
+        selections={selections.filter(s => s.chartType === "oscillator")}
+      />
       <div className="action-button-container">
         <button
           type="button"
@@ -199,6 +260,7 @@ interface SettingsControls {
   toggleChecked: (ucid: string) => void;
   selectAll: (value: boolean) => void;
   removeSelected: () => void;
+  moveSelection: ChartController["moveSelection"];
 }
 
 /** State + handlers backing the settings dialog (theme, tooltips, selection). */
@@ -240,6 +302,11 @@ function useSettingsControls(controller: ChartController): SettingsControls {
     forceUpdate();
   };
 
+  const moveSelection = (ucid: string, offset: -1 | 1): void => {
+    controller.moveSelection(ucid, offset);
+    forceUpdate();
+  };
+
   return {
     isDarkTheme,
     showTooltips,
@@ -248,7 +315,8 @@ function useSettingsControls(controller: ChartController): SettingsControls {
     onToggleTooltips,
     toggleChecked,
     selectAll,
-    removeSelected
+    removeSelected,
+    moveSelection
   };
 }
 
@@ -293,6 +361,7 @@ export function SettingsDialog({
             onSelectAll={controls.selectAll}
             onRemove={controls.removeSelected}
             onEdit={onEditIndicator}
+            onMove={controls.moveSelection}
           />
         )}
 
