@@ -101,11 +101,22 @@ const client = createApiClient({
 });
 ```
 
+Quote and listing responses are shared across every client (see [Methods](#methods)). A call answered from a settled response never reaches the fallback; a fetch that goes out still does, including the page's first fetch after a reload, a fetch after a failure, and one after `clearApiClientCache()`.
+
 `sessionStorage` is guarded: if it is unavailable (server-side rendering, private browsing, quota exceeded) the cache is silently skipped and the live-fetch error is surfaced normally.
 
 ## Methods
 
 The returned `ApiClient` exposes three methods. All return promises that reject (after `onError`) on network or HTTP failures, unless `staleCache` is enabled and a prior successful response is cached — in that case `onError` still fires but the promise resolves with the stale data.
+
+Successful `getQuotes()` and `getListings()` responses are shared, per resolved URL, by every client the package creates. Concurrent calls join one request, and later calls reuse the settled body for the page's lifetime. A failed request is not kept. Call `clearApiClientCache()` to force a refetch; do this before refreshing in a long-lived tab, an interval, or a Node or SSR process. The first caller's retry settings govern a shared request.
+
+```typescript
+import { clearApiClientCache } from "@facioquo/indy-charts";
+
+clearApiClientCache();
+const fresh = await client.getQuotes();
+```
 
 ### `getQuotes(): Promise<Bar[]>`
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Mock } from "vitest";
-import { createApiClient } from "./client";
+import { clearApiClientCache, createApiClient, peekCachedListings } from "./client";
 import type { ApiClient, RetryConfig } from "./client";
 import type { IndicatorListing, IndicatorParam, IndicatorSelection } from "../config/types";
 
@@ -9,6 +9,11 @@ import type { IndicatorListing, IndicatorParam, IndicatorSelection } from "../co
 // ---------------------------------------------------------------------------
 
 const BASE_URL = "https://api.example.com";
+
+// Quote and listing responses are shared module-wide; isolate every test.
+beforeEach(() => {
+  clearApiClientCache();
+});
 
 type ApiQuote = {
   timestamp: string;
@@ -815,6 +820,7 @@ describe("staleCache", () => {
     await client.getQuotes();
 
     // Second call: network failure → should serve from cache
+    clearApiClientCache(); // drop the shared response so the next call refetches
     mockFetchNetworkError("Network down");
     const staleResult = await client.getQuotes();
 
@@ -833,6 +839,7 @@ describe("staleCache", () => {
     const client = createApiClient({ baseUrl: BASE_URL, retry: false, staleCache: true, onStale });
     await client.getListings();
 
+    clearApiClientCache(); // drop the shared response so the next call refetches
     mockFetchNetworkError("Network down");
     const staleResult = await client.getListings();
 
@@ -878,6 +885,7 @@ describe("staleCache", () => {
     });
     await client.getQuotes(); // prime (no caching)
 
+    clearApiClientCache(); // drop the shared response so the next call refetches
     mockFetchNetworkError("Network down");
     await expect(client.getQuotes()).rejects.toThrow("Network down");
     expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(Error));
@@ -926,6 +934,7 @@ describe("staleCache", () => {
     });
     await client.getQuotes(); // populate cache
 
+    clearApiClientCache(); // drop the shared response so the next call refetches
     mockFetchNetworkError("Network down");
     const staleResult = await client.getQuotes();
 
@@ -975,5 +984,220 @@ describe("staleCache", () => {
 
     await expect(client.getQuotes()).rejects.toThrow("Network down");
     expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(Error));
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Shared responses across clients
+// ---------------------------------------------------------------------------
+
+describe("shared responses", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it("joins concurrent listings requests from separate clients into one fetch", async () => {
+    mockFetchOk([makeListing()]);
+    const first = createApiClient({ baseUrl: BASE_URL, retry: false });
+    const second = createApiClient({ baseUrl: `${BASE_URL}/`, retry: false });
+
+    const [a, b] = await Promise.all([first.getListings(), second.getListings()]);
+
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
+    expect(a).toEqual(b);
+    // Each caller gets its own normalized copy, so one cannot mutate another's.
+    expect(a).not.toBe(b);
+    expect(a[0]).not.toBe(b[0]);
+  });
+
+  it("reuses a settled response until the cache is cleared", async () => {
+    mockFetchOk([createQuote("2024-01-01T00:00:00Z")]);
+    const client = createApiClient({ baseUrl: BASE_URL, retry: false });
+
+    await client.getQuotes();
+    await createApiClient({ baseUrl: BASE_URL, retry: false }).getQuotes();
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
+
+    clearApiClientCache();
+    await client.getQuotes();
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps separate entries per resolved URL", async () => {
+    mockFetchOk([makeListing()]);
+
+    await createApiClient({ baseUrl: BASE_URL, retry: false }).getListings();
+    await createApiClient({ baseUrl: "https://other.example.com", retry: false }).getListings();
+    await createApiClient({
+      baseUrl: BASE_URL,
+      retry: false,
+      endpoints: { indicators: "catalog" }
+    }).getListings();
+
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(3);
+  });
+
+  it("does not keep a failed response, and reports it to every waiting client", async () => {
+    const firstOnError = vi.fn<(context: string, error: unknown) => void>();
+    const secondOnError = vi.fn<(context: string, error: unknown) => void>();
+    mockFetchError(404, "Not Found");
+    const first = createApiClient({ baseUrl: BASE_URL, retry: false, onError: firstOnError });
+    const second = createApiClient({ baseUrl: BASE_URL, retry: false, onError: secondOnError });
+
+    const results = await Promise.allSettled([first.getListings(), second.getListings()]);
+
+    expect(results.map(r => r.status)).toEqual(["rejected", "rejected"]);
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
+    expect(firstOnError).toHaveBeenCalledWith("Error fetching listings", expect.any(Error));
+    expect(secondOnError).toHaveBeenCalledWith("Error fetching listings", expect.any(Error));
+
+    mockFetchOk([makeListing()]);
+    await expect(first.getListings()).resolves.toHaveLength(1);
+  });
+
+  it("does not keep a response body that fails validation", async () => {
+    mockFetchOk({ notAnArray: true });
+    const client = createApiClient({ baseUrl: BASE_URL, retry: false });
+    await expect(client.getQuotes()).rejects.toThrow("expected an array");
+
+    mockFetchOk([createQuote("2024-01-01T00:00:00Z")]);
+    await expect(client.getQuotes()).resolves.toHaveLength(1);
+  });
+
+  it("writes the stale-cache copy once per shared response", async () => {
+    const storage = createMockStorage();
+    const setItem = vi.spyOn(storage, "setItem");
+    vi.stubGlobal("sessionStorage", storage);
+    mockFetchOk([makeListing()]);
+
+    const client = createApiClient({ baseUrl: BASE_URL, retry: false, staleCache: true });
+    await Promise.all([client.getListings(), client.getListings()]);
+    await client.getListings();
+
+    expect(setItem).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not let a request cleared mid-flight repopulate the cache", async () => {
+    const resolvers: Array<() => void> = [];
+    const okResponse = (body: unknown): Response =>
+      ({
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        headers: { get: (_: string): string | null => null },
+        json: () => Promise.resolve(body)
+      }) as unknown as Response;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation(
+        (): Promise<Response> =>
+          new Promise(resolve => {
+            resolvers.push(() => resolve(okResponse([makeListing({ uiid: "old" })])));
+          })
+      )
+    );
+    const client = createApiClient({ baseUrl: BASE_URL, retry: false });
+
+    const cleared = client.getListings();
+    clearApiClientCache();
+    const current = client.getListings();
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(2);
+
+    resolvers[0]?.();
+    await cleared;
+
+    // The cleared request settles while its replacement is still pending.
+    expect(peekCachedListings({ baseUrl: BASE_URL })).toBeUndefined();
+
+    resolvers[1]?.();
+    await current;
+    expect(peekCachedListings({ baseUrl: BASE_URL })).toBeDefined();
+  });
+
+  it("does not keep a listings body that fails validation", async () => {
+    mockFetchOk([{}]);
+    const client = createApiClient({ baseUrl: BASE_URL, retry: false });
+    await expect(client.getListings()).rejects.toThrow();
+    expect(peekCachedListings({ baseUrl: BASE_URL })).toBeUndefined();
+
+    mockFetchOk([makeListing()]);
+    await expect(client.getListings()).resolves.toHaveLength(1);
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
+  });
+
+  it("applies the first caller's retry settings to a shared request", async () => {
+    const fetchMock = mockFetchSequence([{ status: 503 }, { status: 200, body: [makeListing()] }]);
+    const noRetry = createApiClient({ baseUrl: BASE_URL, retry: false });
+    const withRetry = createApiClient({
+      baseUrl: BASE_URL,
+      retry: { maxAttempts: 3, baseDelayMs: 0 }
+    });
+
+    const results = await Promise.allSettled([noRetry.getListings(), withRetry.getListings()]);
+
+    expect(results.map(r => r.status)).toEqual(["rejected", "rejected"]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const retried = mockFetchSequence([{ status: 503 }, { status: 200, body: [makeListing()] }]);
+    const first = createApiClient({ baseUrl: BASE_URL, retry: { maxAttempts: 3, baseDelayMs: 0 } });
+    const second = createApiClient({ baseUrl: BASE_URL, retry: false });
+
+    const joined = await Promise.all([first.getListings(), second.getListings()]);
+
+    expect(joined.map(listings => listings.length)).toEqual([1, 1]);
+    expect(retried).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("peekCachedListings", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it("returns undefined before any listings are known", () => {
+    vi.stubGlobal("sessionStorage", createMockStorage());
+    expect(peekCachedListings({ baseUrl: BASE_URL, staleCache: true })).toBeUndefined();
+  });
+
+  it("returns normalized listings once a shared response has settled", async () => {
+    mockFetchOk([makeListing({ uiid: "bb", results: [] })]);
+    await createApiClient({ baseUrl: BASE_URL, retry: false }).getListings();
+
+    const peeked = peekCachedListings({ baseUrl: `${BASE_URL}/` });
+    expect(peeked?.map(listing => listing.uiid)).toEqual(["bb"]);
+  });
+
+  it("falls back to the stale cache only when staleCache is enabled", () => {
+    const storage = createMockStorage();
+    storage.setItem(
+      `indy-charts:stale:${BASE_URL}/indicators`,
+      JSON.stringify([makeListing({ uiid: "RSI", chartType: "oscillator" })])
+    );
+    vi.stubGlobal("sessionStorage", storage);
+
+    expect(peekCachedListings({ baseUrl: BASE_URL })).toBeUndefined();
+    expect(peekCachedListings({ baseUrl: BASE_URL, staleCache: true })?.[0]?.chartType).toBe(
+      "oscillator"
+    );
+  });
+
+  it("falls through to the stale copy when a settled body fails normalization", async () => {
+    const storage = createMockStorage();
+    storage.setItem(
+      `indy-charts:stale:${BASE_URL}/indicators`,
+      JSON.stringify([makeListing({ uiid: "RSI", chartType: "oscillator" })])
+    );
+    vi.stubGlobal("sessionStorage", storage);
+    // Quote rows served from the listings URL settle fine for getQuotes but are not listings.
+    mockFetchOk([createQuote("2024-01-01T00:00:00Z")]);
+    await createApiClient({
+      baseUrl: BASE_URL,
+      retry: false,
+      endpoints: { quotes: "indicators" }
+    }).getQuotes();
+
+    expect(peekCachedListings({ baseUrl: BASE_URL, staleCache: true })?.[0]?.uiid).toBe("RSI");
   });
 });

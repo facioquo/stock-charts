@@ -97,6 +97,8 @@ export default {
 
 `:with-overlay` tells **that one instance** to render a price chart above its oscillator. It does not pair the component with a sibling instance.
 
+The component renders its sized chart frames on mount, before any data arrives, and lays loading and error messages over them, so the page does not shift when the chart draws. Pane types come from the listings once `GET /indicators` has loaded. Before that, `:with-overlay` implies an oscillator and anything else is assumed to be an overlay. Add `chartType: "oscillator"` to a registry entry to make a first, uncached view exact. A registry `chartType` is a layout-only hint: the listing's `chartType` still decides how the chart is drawn.
+
 ## The backing API
 
 Optional. Skip this whole section if you supply your own data.
@@ -153,6 +155,12 @@ createApiClient({
 
 `staleCache` keeps the last good response per URL in `sessionStorage` and serves it when a fetch fails. It is per-tab and empty for a first-time visitor, so it covers a blip rather than an origin that is gone.
 
+Every client in the page shares quote and listing responses, keyed by URL. Several charts on one page make one `GET /quotes` and one `GET /indicators` between them, and later calls reuse the result. A failed request is not kept. Three consequences:
+
+- A settled response is not refreshed until you call `clearApiClientCache()`. A refresh button, an interval, or a Node or SSR process that calls `createApiClient` directly keeps the first body, so clear the cache before refetching.
+- The first caller's retry settings govern a request that later clients join. A client with `retry: false` or a different `maxAttempts` can get another client's policy.
+- A call answered from a settled response never reaches the `staleCache` fallback. A fetch that goes out, such as the page's first after a reload, one after a failure, or one after `clearApiClientCache()`, still serves the stale copy when it fails.
+
 ## What this package exports
 
 | Export | Purpose |
@@ -162,6 +170,7 @@ createApiClient({
 | `ChartManager` | Overlay + oscillators + viewport, with teardown |
 | `OverlayChart`, `OscillatorChart` | Single-canvas classes |
 | `createApiClient(config)` | Client for the three backing-API operations |
+| `clearApiClientCache()` | Drop the quote and listing responses shared across clients |
 | `loadStaticQuotes`, `loadStaticIndicatorData` | Bring-your-own `Bar[]` / `IndicatorDataRow[]` |
 | `createDefaultSelection`, `applySelectionTokens`, `calculateOptimalBars` | Selection and viewport helpers |
 | `getThemeColors`, `baseOverlayConfig`, `baseOscillatorConfig` | Theme and config building blocks |
