@@ -64,6 +64,8 @@ export class ChartController {
   private changedWhileRestoring = false;
   /** The page was opened from a share link whose selections are not saved yet. */
   private linkActive = false;
+  /** Set once the visitor leaves a share link, so a restore still in flight cannot save the link's list. */
+  private leavingLink = false;
   /** Restore fetches that failed or timed out. Saves keep them for this session so a transient failure does not delete a saved indicator, though they are not shown. */
   private unrestored: IndicatorSelection[] = [];
   /** Saved order of the last restore, so kept selections return to their slot. */
@@ -437,6 +439,7 @@ export class ChartController {
   }
 
   private cacheSelections(): void {
+    if (this.leavingLink) return;
     if (this.restoring) {
       this.changedWhileRestoring = true;
       return;
@@ -523,6 +526,7 @@ export class ChartController {
   /** Leaves a share link's view for the saved setup, which the link never replaced. */
   returnToSavedSetup(): void {
     if (!this.linkActive) return;
+    this.leavingLink = true;
     this.dropShareParam();
     window.location.reload();
   }

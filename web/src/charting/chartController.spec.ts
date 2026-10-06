@@ -728,6 +728,37 @@ describe("ChartController", () => {
       expect(controller.getState().sharedView).toBe(false);
     });
 
+    it("keeps the saved list when a linked restore settles after returning", async () => {
+      const settlers: Array<() => void> = [];
+      const slow = vi.fn(
+        () =>
+          new Promise<unknown[]>(resolve => {
+            settlers.push(() => {
+              resolve([{}]);
+            });
+          })
+      ) as unknown as ApiClient["getSelectionData"];
+      const real = window.location;
+      linkTo("FAST", "B");
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], slow);
+      vi.stubGlobal("location", {
+        get href() {
+          return real.href;
+        },
+        reload: vi.fn()
+      });
+
+      controller.returnToSavedSetup();
+      settlers.forEach(settle => {
+        settle();
+      });
+      await vi.waitFor(() => {
+        expect(controller.selections.length).toBeGreaterThan(0);
+      });
+
+      expect(savedUiids()).toEqual(["A"]);
+    });
+
     it("does not reload when no link is showing", async () => {
       const reload = vi.fn();
       const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
