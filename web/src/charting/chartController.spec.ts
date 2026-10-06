@@ -444,6 +444,32 @@ describe("ChartController", () => {
     }
   });
 
+  it("keeps a timed-out restore selection saved across later user actions", async () => {
+    vi.useFakeTimers();
+    try {
+      const getSelectionData = vi
+        .fn()
+        .mockReturnValueOnce(new Promise<unknown[]>(() => undefined))
+        .mockResolvedValue([{}]) as unknown as ApiClient["getSelectionData"];
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      const savedUiids = (): string[] =>
+        (JSON.parse(localStorage.getItem("selections") ?? "[]") as Array<{ uiid: string }>).map(
+          s => s.uiid
+        );
+      const controller = await loadWithCache([makeSelection("SLOW", "overlay")], getSelectionData);
+      await vi.advanceTimersByTimeAsync(15_000);
+
+      await controller.addSelection(makeSelection("A", "overlay"), makeListing("A", "overlay"));
+      await controller.addSelection(makeSelection("B", "overlay"), makeListing("B", "overlay"));
+      const [first] = controller.selections;
+      controller.moveSelection(first.ucid, 1);
+
+      expect(savedUiids()).toContain("SLOW");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   describe("moveSelection", () => {
     async function withSelections(
       specs: Array<[string, "overlay" | "oscillator"]>

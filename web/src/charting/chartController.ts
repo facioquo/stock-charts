@@ -62,6 +62,8 @@ export class ChartController {
   private unsubscribeResize: (() => void) | undefined;
   /** True while startup selections are being restored, so a partial list is never saved. */
   private restoring = false;
+  /** Restore fetches that timed out; they may be alive, so saves keep them. */
+  private unrestored: IndicatorSelection[] = [];
 
   /** Indicator catalog loaded from the API. */
   listings: IndicatorListing[] = [];
@@ -167,7 +169,6 @@ export class ChartController {
    */
   private async showSelectionsInOrder(selections: readonly IndicatorSelection[]): Promise<void> {
     this.restoring = true;
-    // A timed-out request may still succeed, so its selection stays saved.
     const timedOut = new Set<string>();
     try {
       const pending = selections.map(async selection => {
@@ -180,7 +181,10 @@ export class ChartController {
           )) as IndicatorDataRow[];
           return { selection, listing, rows };
         } catch (error) {
-          if (error instanceof RestoreTimeoutError) timedOut.add(selection.ucid);
+          if (error instanceof RestoreTimeoutError) {
+            timedOut.add(selection.ucid);
+            this.unrestored.push(selection);
+          }
           console.error("Error adding selection without scroll:", error);
           return undefined;
         }
@@ -400,8 +404,9 @@ export class ChartController {
   }
 
   private persistSelections(list: readonly IndicatorSelection[]): void {
+    const kept = this.unrestored.filter(item => !list.some(x => x.ucid === item.ucid));
     try {
-      const selections = list.map(selection => ({
+      const selections = [...list, ...kept].map(selection => ({
         ...selection,
         params: selection.params.map(param => ({ ...param })),
         results: selection.results.map(result => ({
