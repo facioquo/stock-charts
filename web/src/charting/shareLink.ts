@@ -52,8 +52,8 @@ export function encodeSelections(
     if (!listing) return [];
     const defaults = createDefaultSelection(listing);
     const params = selection.params.map((param): ParamPair => [param.paramName, param.value ?? 0]);
-    const styles = selection.results.flatMap((result, index): StylePair[] => {
-      const base = defaults.results.at(index);
+    const styles = selection.results.flatMap((result): StylePair[] => {
+      const base = defaults.results.find(x => x.dataName === result.dataName);
       return base &&
         base.color === result.color &&
         base.lineType === result.lineType &&

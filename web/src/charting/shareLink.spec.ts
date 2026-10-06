@@ -210,6 +210,28 @@ describe("share link encoding", () => {
     expect(decoded?.results.find(r => r.dataName === "one")?.color).not.toBe("#ff0000");
   });
 
+  it("compares a style with the default of the same result when the catalog reordered results", () => {
+    const colored: IndicatorListing = {
+      ...duo,
+      results: (duo.results ?? []).map((result, index) => ({
+        ...result,
+        defaultColor: index === 0 ? "#111111" : "#222222"
+      }))
+    };
+    const saved = createDefaultSelection(colored);
+    // Result "one" takes the color that result "two" has by default.
+    const one = saved.results.find(r => r.dataName === "one");
+    if (one) one.color = "#222222";
+    const reordered: IndicatorListing = {
+      ...colored,
+      results: [...(colored.results ?? [])].reverse()
+    };
+
+    const [decoded] = decodeSelections(encodeSelections([saved], [reordered]), [colored]);
+
+    expect(decoded?.results.find(r => r.dataName === "one")?.color).toBe("#222222");
+  });
+
   it("builds a URL on the current path carrying only the share parameter", () => {
     const url = new URL(
       buildShareUrl([createDefaultSelection(sma)], listings, {
