@@ -11,7 +11,7 @@ namespace WebApi.Controllers;
 public partial class Main
 {
     /// <summary>Most selections one batch may carry; asserted against <c>batch.contract.json</c>.</summary>
-    public const int MaxBatchSelections = 20;
+    public static readonly int MaxBatchSelections = 20;
 
     // Only routes the catalog advertises run in a batch, so a later non-indicator
     // GET on this controller is never reachable through it.
