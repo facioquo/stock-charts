@@ -772,6 +772,52 @@ describe("createApiClient", () => {
       expect(rows).toEqual([[{ one: 1 }], [{ two: 2 }]]);
       expect(fetchMock).toHaveBeenCalledTimes(3);
     });
+
+    it("falls back per selection, but keeps asking for the batch, after a network failure", async () => {
+      const fetchMock = vi.fn((url: string) =>
+        url.includes("/indicators/batch")
+          ? Promise.reject(new Error("offline"))
+          : Promise.resolve({
+              ok: true,
+              status: 200,
+              statusText: "OK",
+              headers: { get: () => null },
+              json: () => Promise.resolve([{ single: url }])
+            } as unknown as Response)
+      );
+      vi.stubGlobal("fetch", fetchMock);
+
+      const first = await Promise.all(client.getSelectionsData(requests));
+      await Promise.all(client.getSelectionsData(requests));
+
+      expect(first).toHaveLength(2);
+      expect(batchCalls()).toHaveLength(2);
+      const singles = fetchMock.mock.calls.filter(([url]) => !url.includes("/indicators/batch"));
+      expect(singles.map(([url]) => new URL(url).pathname)).toEqual([
+        "/SMA/",
+        "/RSI/",
+        "/SMA/",
+        "/RSI/"
+      ]);
+    });
+
+    it("serves a batched selection from the stale cache when its single request fails", async () => {
+      vi.stubGlobal("sessionStorage", createMockStorage());
+      const stale = createApiClient({ baseUrl: BASE_URL, retry: false, staleCache: true });
+      mockFetchOk([
+        { status: 200, data: [{ a: 1 }] },
+        { status: 200, data: [{ b: 2 }] }
+      ]);
+      await Promise.all(stale.getSelectionsData(requests));
+
+      mockFetchNetworkError("Network down");
+      const rows = await stale.getSelectionData(
+        makeSelection([makeParam("lookbackPeriods", 20)]),
+        makeListing({ endpoint: "SMA/" })
+      );
+
+      expect(rows).toEqual([{ a: 1 }]);
+    });
   });
 
   describe("onError callback", () => {

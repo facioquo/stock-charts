@@ -151,6 +151,21 @@ public class BatchEndpointTests
     }
 
     [Fact]
+    public async Task Batch_RejectsAnUndefinedEnumNumberAndAnOverflowingNumber()
+    {
+        _quoteService
+            .Setup(q => q.Get(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Quotes(120));
+
+        // "99" parses as an enum but names no member; the second overflows int.
+        IActionResult result = await Batch(
+            ["BETA?lookbackPeriods=14&type=99", "ADX?lookbackPeriods=99999999999", "ADL"]);
+
+        ObjectResult multi = Assert.IsType<ObjectResult>(result);
+        Assert.Equal([400, 400, 200], Statuses(Items(multi.Value)));
+    }
+
+    [Fact]
     public async Task Batch_AnItemThatThrowsDoesNotDiscardItsNeighbours()
     {
         // A jaw offset of int.MaxValue overflows inside the indicator.

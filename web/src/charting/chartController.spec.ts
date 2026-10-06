@@ -320,7 +320,8 @@ describe("ChartController", () => {
 
   async function loadWithCache(
     cached: IndicatorSelection[],
-    getSelectionData: ApiClient["getSelectionData"]
+    getSelectionData: ApiClient["getSelectionData"],
+    extra: Partial<ApiClient> = {}
   ): Promise<ChartController> {
     const overlay = document.createElement("canvas");
     overlay.id = "chartOverlay";
@@ -332,11 +333,44 @@ describe("ChartController", () => {
     localStorage.setItem("selections", JSON.stringify(cached));
     const listings = ["SLOW", "FAST", "A", "B"].map(uiid => makeListing(uiid, "oscillator"));
     const controller = new ChartController(
-      makeApi({ getListings: vi.fn().mockResolvedValue(listings), getSelectionData })
+      makeApi({ getListings: vi.fn().mockResolvedValue(listings), getSelectionData, ...extra })
     );
     await controller.loadCharts();
     return controller;
   }
+
+  it("restores through one batch call over the listed selections, in list order", async () => {
+    const unknown = makeSelection("GONE", "oscillator");
+    const slow = makeSelection("SLOW", "oscillator");
+    const fast = makeSelection("FAST", "oscillator");
+    const getSelectionsData = vi.fn(
+      (
+        requests: ReadonlyArray<{ selection: IndicatorSelection; listing: IndicatorListing }>
+      ): Array<Promise<unknown[]>> =>
+        requests.map(({ selection }) => Promise.resolve([{ from: selection.uiid }]))
+    );
+
+    const controller = await loadWithCache([unknown, slow, fast], vi.fn().mockResolvedValue([]), {
+      getSelectionsData
+    });
+
+    await vi.waitFor(() => {
+      expect(manager(controller).processSelectionData).toHaveBeenCalledTimes(2);
+    });
+    expect(getSelectionsData).toHaveBeenCalledTimes(1);
+    const asked = getSelectionsData.mock.calls[0]?.[0] ?? [];
+    expect(asked.map(request => request.selection.uiid)).toEqual(["SLOW", "FAST"]);
+    expect(
+      (
+        manager(controller).processSelectionData.mock.calls as Array<
+          [IndicatorSelection, unknown, unknown]
+        >
+      ).map(([selection, , rows]) => [selection.uiid, rows])
+    ).toEqual([
+      ["SLOW", [{ from: "SLOW" }]],
+      ["FAST", [{ from: "FAST" }]]
+    ]);
+  });
 
   it("builds restored indicators in list order whatever order their data arrives in", async () => {
     const slow = makeSelection("SLOW", "oscillator");

@@ -159,7 +159,7 @@ Parameters are sorted by name and percent-encoded. A missing or unreachable snap
 
 ## Methods
 
-The returned `ApiClient` exposes four methods. All return promises that reject (after `onError`) on network or HTTP failures, unless `staleCache` holds a prior response or `offlineFallback` has a snapshot file — in that case `onError` still fires but the promise resolves with that data.
+The returned `ApiClient` exposes four methods. Each promise they return rejects (after `onError`) on network or HTTP failures, unless `staleCache` holds a prior response or `offlineFallback` has a snapshot file — in that case `onError` still fires but the promise resolves with that data. `getSelectionsData` returns an array with one such promise per request, not a single promise.
 
 Successful `getQuotes()` and `getListings()` responses are shared, per resolved URL, by every client the package creates. Concurrent calls join one request, and later calls reuse the settled body for the page's lifetime. A failed request is not kept. Call `clearApiClientCache()` to force a refetch; do this before refreshing in a long-lived tab, an interval, or a Node or SSR process. The first caller's retry settings govern a shared request.
 

@@ -819,7 +819,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         const item = (await chunks.at(Math.floor(index / BATCH_SIZE)))?.at(index % BATCH_SIZE);
         if (item?.status === 200 && Array.isArray(item.data)) {
           const rows = item.data as IndicatorDataRow[];
-          if (staleCache) tryStaleCacheWrite(selectionUrl(baseUrl, selection, listing), rows);
+          if (staleCache) tryStaleCacheWrite(selectionRequestUrl(config, selection, listing), rows);
           return rows;
         }
         return client.getSelectionData(selection, listing);
