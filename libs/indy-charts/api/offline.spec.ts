@@ -125,7 +125,7 @@ describe("offlineFallback", () => {
     });
     const onOffline = vi.fn<(context: string) => void>();
     const onStale = vi.fn();
-    const onError = vi.fn();
+    const onError = vi.fn<(context: string, error: unknown) => void>();
     stubSession();
     const client = createApiClient({
       baseUrl: API,
