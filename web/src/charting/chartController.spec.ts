@@ -437,8 +437,8 @@ describe("ChartController", () => {
       expect(savedUiids()).toEqual(["SLOW"]);
 
       await vi.advanceTimersByTimeAsync(15_000);
-      // The stalled fetch was given up on, and the list saved with the user's add.
-      expect(savedUiids()).toEqual(["FAST"]);
+      // The stalled fetch was given up on, but its selection stays saved alongside the add.
+      expect(savedUiids()).toEqual(["SLOW", "FAST"]);
     } finally {
       vi.useRealTimers();
     }

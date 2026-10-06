@@ -17,10 +17,16 @@ import { calculateOptimalBars, subscribeResize } from "../services/windowSize";
 /** A restore fetch slower than this is skipped, so it cannot hold back saving user changes. */
 const RESTORE_TIMEOUT_MS = 15_000;
 
+class RestoreTimeoutError extends Error {
+  constructor(ms: number) {
+    super(`Timed out after ${ms} ms`);
+  }
+}
+
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const timer = setTimeout(() => {
-      reject(new Error(`Timed out after ${ms} ms`));
+      reject(new RestoreTimeoutError(ms));
     }, ms);
     promise.then(
       value => {
@@ -161,6 +167,8 @@ export class ChartController {
    */
   private async showSelectionsInOrder(selections: readonly IndicatorSelection[]): Promise<void> {
     this.restoring = true;
+    // A timed-out request may still succeed, so its selection stays saved.
+    const timedOut = new Set<string>();
     try {
       const pending = selections.map(async selection => {
         const listing = this.listings.find(x => x.uiid === selection.uiid);
@@ -172,6 +180,7 @@ export class ChartController {
           )) as IndicatorDataRow[];
           return { selection, listing, rows };
         } catch (error) {
+          if (error instanceof RestoreTimeoutError) timedOut.add(selection.ucid);
           console.error("Error adding selection without scroll:", error);
           return undefined;
         }
@@ -189,8 +198,15 @@ export class ChartController {
     } finally {
       this.restoring = false;
     }
+    const shown = new Map(this.selections.map(selection => [selection.ucid, selection]));
+    const merged = [
+      ...selections.flatMap(
+        selection => shown.get(selection.ucid) ?? (timedOut.has(selection.ucid) ? [selection] : [])
+      ),
+      ...this.selections.filter(selection => !selections.some(x => x.ucid === selection.ucid))
+    ];
     // Never overwrite the saved list when nothing could be restored.
-    if (this.selections.length > 0) this.cacheSelections();
+    if (merged.length > 0) this.persistSelections(merged);
   }
 
   /**
@@ -380,8 +396,12 @@ export class ChartController {
 
   private cacheSelections(): void {
     if (this.restoring) return;
+    this.persistSelections(this.selections);
+  }
+
+  private persistSelections(list: readonly IndicatorSelection[]): void {
     try {
-      const selections = this.selections.map(selection => ({
+      const selections = list.map(selection => ({
         ...selection,
         params: selection.params.map(param => ({ ...param })),
         results: selection.results.map(result => ({
