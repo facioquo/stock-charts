@@ -629,6 +629,10 @@ describe("ChartController", () => {
       expect(controller.selections).toHaveLength(2);
     });
     expect(getListings).toHaveBeenCalledTimes(1);
+
+    // The singleton controller is loaded again on every page mount.
+    await controller.loadCharts();
+    expect(getListings).toHaveBeenCalledTimes(2);
   });
 
   describe("moveSelection", () => {
