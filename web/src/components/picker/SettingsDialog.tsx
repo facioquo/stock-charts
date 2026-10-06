@@ -89,7 +89,9 @@ function SelectionGroup({
   return (
     <>
       <div className="selection-group-header">
-        <h3 id={headingId}>{title}</h3>
+        <span id={headingId} className="selection-group-title">
+          {title}
+        </span>
         <span className="selection-group-hint">{hint}</span>
       </div>
       <ul className="selection-list" aria-labelledby={headingId}>

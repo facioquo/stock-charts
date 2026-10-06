@@ -414,6 +414,36 @@ describe("ChartController", () => {
     });
   });
 
+  it("skips a restore fetch that never settles so later saves are not held", async () => {
+    vi.useFakeTimers();
+    try {
+      const stalled = makeSelection("SLOW", "oscillator");
+      const getSelectionData = vi
+        .fn()
+        .mockReturnValueOnce(new Promise<unknown[]>(() => undefined))
+        .mockResolvedValue([{}]) as unknown as ApiClient["getSelectionData"];
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      const savedUiids = (): string[] =>
+        (JSON.parse(localStorage.getItem("selections") ?? "[]") as Array<{ uiid: string }>).map(
+          s => s.uiid
+        );
+      const controller = await loadWithCache([stalled], getSelectionData);
+
+      await controller.addSelection(
+        makeSelection("FAST", "oscillator"),
+        makeListing("FAST", "oscillator")
+      );
+      // Still restoring: the saved list is untouched.
+      expect(savedUiids()).toEqual(["SLOW"]);
+
+      await vi.advanceTimersByTimeAsync(15_000);
+      // The stalled fetch was given up on, and the list saved with the user's add.
+      expect(savedUiids()).toEqual(["FAST"]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   describe("moveSelection", () => {
     async function withSelections(
       specs: Array<[string, "overlay" | "oscillator"]>
@@ -492,14 +522,14 @@ describe("ChartController", () => {
         ["Y", "oscillator"],
         ["Z", "oscillator"]
       ]);
-      document.getElementById("ucid-Y-container")?.remove();
+      document.getElementById("ucid-X-container")?.remove();
 
       controller.moveSelection("ucid-Z", -1);
 
       const zone = document.getElementById("oscillators-zone");
       expect(Array.from(zone?.children ?? []).map(c => c.id)).toEqual([
-        "ucid-X-container",
-        "ucid-Z-container"
+        "ucid-Z-container",
+        "ucid-Y-container"
       ]);
       expect(controller.selections.map(s => s.uiid)).toEqual(["X", "Z", "Y"]);
     });

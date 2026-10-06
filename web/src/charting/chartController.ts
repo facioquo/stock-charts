@@ -14,6 +14,27 @@ import { getSettings } from "../services/userPrefs";
 import { scrollToEnd, scrollToStart } from "../services/meta";
 import { calculateOptimalBars, subscribeResize } from "../services/windowSize";
 
+/** A restore fetch slower than this is skipped, so it cannot hold back saving user changes. */
+const RESTORE_TIMEOUT_MS = 15_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`Timed out after ${ms} ms`));
+    }, ms);
+    promise.then(
+      value => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error: unknown) => {
+        clearTimeout(timer);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      }
+    );
+  });
+}
+
 export interface ChartState {
   loading: boolean;
   apiError: boolean;
@@ -145,7 +166,10 @@ export class ChartController {
         const listing = this.listings.find(x => x.uiid === selection.uiid);
         if (!listing) return undefined;
         try {
-          const rows = (await this.api.getSelectionData(selection, listing)) as IndicatorDataRow[];
+          const rows = (await withTimeout(
+            this.api.getSelectionData(selection, listing),
+            RESTORE_TIMEOUT_MS
+          )) as IndicatorDataRow[];
           return { selection, listing, rows };
         } catch (error) {
           console.error("Error adding selection without scroll:", error);

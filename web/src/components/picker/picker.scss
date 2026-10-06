@@ -213,12 +213,10 @@
   display: flex;
   flex-direction: column;
   padding: 12px 16px 4px;
+}
 
-  h3 {
-    margin: 0;
-    font-size: inherit;
-    font-weight: 500;
-  }
+.selection-group-title {
+  font-weight: 500;
 }
 
 .selection-group-hint {
