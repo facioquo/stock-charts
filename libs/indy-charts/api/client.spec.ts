@@ -549,6 +549,104 @@ describe("createApiClient", () => {
   // onError callback behaviour
   // -----------------------------------------------------------------------
 
+  describe("getSelectionsData", () => {
+    const requests = [
+      {
+        selection: makeSelection([makeParam("lookbackPeriods", 20)]),
+        listing: makeListing({ endpoint: "SMA/" })
+      },
+      {
+        selection: makeSelection([makeParam("lookbackPeriods", 14)]),
+        listing: makeListing({ endpoint: "RSI/" })
+      }
+    ];
+    const batchCalls = (): string[] =>
+      vi
+        .mocked(fetch)
+        .mock.calls.map(([url]) => (typeof url === "string" ? url : ""))
+        .filter(url => url.includes("/indicators/batch"));
+
+    it("answers every selection from one batch request", async () => {
+      mockFetchOk([
+        { status: 200, data: [{ a: 1 }] },
+        { status: 200, data: [{ b: 2 }] }
+      ]);
+
+      const rows = await Promise.all(client.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }]]);
+      expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
+      const url = new URL(batchCalls()[0] ?? "");
+      expect(url.pathname).toBe("/indicators/batch");
+      expect(url.searchParams.getAll("s")).toEqual([
+        "SMA?lookbackPeriods=20",
+        "RSI?lookbackPeriods=14"
+      ]);
+    });
+
+    it("requests a selection alone when its batch item failed", async () => {
+      const fetchMock = mockFetchSequence([
+        {
+          status: 207,
+          body: [
+            { status: 200, data: [{ a: 1 }] },
+            { status: 400, error: "bad" }
+          ]
+        },
+        { status: 200, body: [{ b: 2 }] }
+      ]);
+
+      const rows = await Promise.all(client.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }]]);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(String(fetchMock.mock.calls[1]?.[0])).toContain("/RSI/?lookbackPeriods=14");
+    });
+
+    it("falls back to one request per selection on a 404, and does not ask again", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((url: string) =>
+          Promise.resolve({
+            ok: !url.includes("/indicators/batch"),
+            status: url.includes("/indicators/batch") ? 404 : 200,
+            statusText: "",
+            headers: { get: () => null },
+            json: () => Promise.resolve([{ ok: 1 }])
+          } as unknown as Response)
+        )
+      );
+
+      const first = await Promise.all(client.getSelectionsData(requests));
+      expect(first).toEqual([[{ ok: 1 }], [{ ok: 1 }]]);
+      expect(batchCalls()).toHaveLength(1);
+
+      await Promise.all(client.getSelectionsData(requests));
+      expect(batchCalls()).toHaveLength(1);
+    });
+
+    it("does not batch a single selection", async () => {
+      mockFetchOk([{ ok: 1 }]);
+
+      await Promise.all(client.getSelectionsData(requests.slice(0, 1)));
+
+      expect(batchCalls()).toHaveLength(0);
+    });
+
+    it("falls back when the batch answer has the wrong length", async () => {
+      const fetchMock = mockFetchSequence([
+        { status: 200, body: [{ status: 200, data: [] }] },
+        { status: 200, body: [{ one: 1 }] },
+        { status: 200, body: [{ two: 2 }] }
+      ]);
+
+      const rows = await Promise.all(client.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ one: 1 }], [{ two: 2 }]]);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+    });
+  });
+
   describe("onError callback", () => {
     it("works without onError callback (no error thrown)", async () => {
       mockFetchError(500, "Server Error");

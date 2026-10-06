@@ -206,6 +206,56 @@ describe("worker.fetch", () => {
     expect(cachePut).not.toHaveBeenCalled();
   });
 
+  describe("batch indicator requests", () => {
+    const batchUrl = (...selections: string[]): string =>
+      `https://api.example/indicators/batch?${selections
+        .map(selection => `s=${encodeURIComponent(selection)}`)
+        .join("&")}`;
+
+    it("caches a complete batch under its full URL, so each selection list is its own entry", async () => {
+      fetchMock.mockImplementation(() =>
+        Promise.resolve(
+          new Response("[]", { status: 200, headers: { "cache-control": "public, max-age=60" } })
+        )
+      );
+      const ctx = makeCtx();
+      const first = batchUrl("ADX?lookbackPeriods=14", "ADL");
+      const second = batchUrl("ADX?lookbackPeriods=20", "ADL");
+
+      await worker.fetch(new Request(first), makeEnv(), ctx);
+      await worker.fetch(new Request(second), makeEnv(), ctx);
+
+      const keys = cachePut.mock.calls.map(([key]) => (key as Request).url);
+      expect(keys).toEqual([first, second]);
+    });
+
+    it("serves a repeated batch from the cache without waking the container", async () => {
+      const url = batchUrl("ADX?lookbackPeriods=14");
+      cacheMatch.mockResolvedValue(new Response("[]", { status: 200 }));
+
+      const response = await worker.fetch(new Request(url), makeEnv(), makeCtx());
+
+      expect(response.headers.get("x-edge-cache")).toBe("HIT");
+      expect(getContainerMock).not.toHaveBeenCalled();
+    });
+
+    it("does not cache a partial (207) batch", async () => {
+      fetchMock.mockResolvedValue(
+        new Response("[]", { status: 207, headers: { "cache-control": "public, max-age=60" } })
+      );
+      const ctx = makeCtx();
+
+      const response = await worker.fetch(
+        new Request(batchUrl("ADX?lookbackPeriods=14", "NOPE")),
+        makeEnv(),
+        ctx
+      );
+
+      expect(response.status).toBe(207);
+      expect(cachePut).not.toHaveBeenCalled();
+    });
+  });
+
   it("returns a 502 with CORS headers when the container fetch rejects", async () => {
     fetchMock.mockRejectedValue(new Error("container unreachable"));
 

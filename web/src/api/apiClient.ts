@@ -32,6 +32,19 @@ export class ApiError extends Error {
   }
 }
 
+/** A selection and the catalog entry that defines how to request it. */
+export interface SelectionRequest {
+  selection: IndicatorSelection;
+  listing: IndicatorListing;
+}
+
+/** One entry of a `GET /indicators/batch` response. */
+interface BatchItem {
+  status: number;
+  data?: unknown;
+  error?: string;
+}
+
 /**
  * Human-readable message for an API failure. Prefers the server-provided
  * response body (e.g. an indicator parameter validation message) and falls back
@@ -56,6 +69,8 @@ export function describeApiError(error: unknown): string {
  */
 export class ApiClient {
   private backupActive = false;
+  /** Cleared when the backend answers the batch route with 404/405. */
+  private batchSupported = true;
   private cachedBackupRows: Array<{ timestamp: string; candle: unknown }> | undefined;
 
   /** Whether the API has fallen back to bundled backup data. */
@@ -131,7 +146,61 @@ export class ApiClient {
     }
   }
 
+  /**
+   * Rows for several selections from one `GET /indicators/batch` call, as one
+   * promise per request in request order. A selection the batch cannot answer
+   * (an older backend without the route, a failed item, or an unreadable
+   * response) is fetched on its own through {@link getSelectionData}, so the
+   * result matches calling that method per selection.
+   */
+  getSelectionsData(requests: readonly SelectionRequest[]): Array<Promise<unknown[]>> {
+    if (requests.length < 2 || this.backupActive || !this.batchSupported) {
+      return requests.map(({ selection, listing }) => this.getSelectionData(selection, listing));
+    }
+
+    const batch = this.fetchBatch(requests);
+    return requests.map(async ({ selection, listing }, index) => {
+      const item = (await batch)?.at(index);
+      if (item?.status === 200 && Array.isArray(item.data)) return item.data as unknown[];
+      return this.getSelectionData(selection, listing);
+    });
+  }
+
   // HELPERS
+
+  /** `undefined` when the batch could not be used; callers fall back per selection. */
+  private async fetchBatch(
+    requests: readonly SelectionRequest[]
+  ): Promise<BatchItem[] | undefined> {
+    const query = new URLSearchParams();
+    requests.forEach(({ selection, listing }) => {
+      const params = new URLSearchParams();
+      selection.params.forEach((p: IndicatorParam) => {
+        params.set(p.paramName, String(p.value));
+      });
+      const url = new URL(this.buildApiUrl(listing.endpoint, params));
+      const base = new URL(env.api.endsWith("/") ? env.api : `${env.api}/`);
+      const name = url.pathname.startsWith(base.pathname)
+        ? url.pathname.slice(base.pathname.length)
+        : url.pathname;
+      query.append("s", `${name.replace(/^\/+|\/+$/g, "")}${url.search}`);
+    });
+
+    try {
+      const batchUrl = new URL("indicators/batch", env.api.endsWith("/") ? env.api : `${env.api}/`);
+      batchUrl.search = query.toString();
+      const body = await this.getJson<unknown>(batchUrl.toString());
+      return Array.isArray(body) && body.length === requests.length
+        ? (body as BatchItem[])
+        : undefined;
+    } catch (error) {
+      // 404/405: the backend predates the route, so stop asking this session.
+      if (error instanceof ApiError && (error.status === 404 || error.status === 405)) {
+        this.batchSupported = false;
+      }
+      return undefined;
+    }
+  }
 
   private async getJson<T>(url: string): Promise<T> {
     let response: Response;

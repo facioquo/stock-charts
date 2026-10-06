@@ -76,11 +76,19 @@ function manager(controller: ChartController): MockManager {
 }
 
 function makeApi(overrides: Partial<ApiClient> = {}): ApiClient {
+  const getSelectionData = overrides.getSelectionData ?? vi.fn().mockResolvedValue([]);
   return {
     isBackupActive: false,
     getQuotes: vi.fn().mockResolvedValue([]),
     getListings: vi.fn().mockResolvedValue([]),
-    getSelectionData: vi.fn().mockResolvedValue([]),
+    getSelectionData,
+    // The real client batches; the double answers each request on its own.
+    getSelectionsData: (
+      requests: Array<{ selection: IndicatorSelection; listing: IndicatorListing }>
+    ): Array<Promise<unknown[]>> =>
+      requests.map(
+        ({ selection, listing }) => getSelectionData(selection, listing) as Promise<unknown[]>
+      ),
     ...overrides
   } as unknown as ApiClient;
 }

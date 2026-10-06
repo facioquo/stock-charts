@@ -201,6 +201,21 @@ const rows = loadStaticIndicatorData(rawRows);
 
 Wrap the result in `loadStaticIndicatorData()` to get a typed `IndicatorDataRow[]`.
 
+### `getSelectionsData(requests): Promise<unknown[]>[]`
+
+Fetches the rows for several selections with one `GET {baseUrl}/indicators/batch` request. Pass `{ selection, listing }` pairs; it returns one promise per pair, in order, so each chart can render as its own rows arrive.
+
+```typescript
+const rows = await Promise.all(
+  client.getSelectionsData([
+    { selection: emaSelection, listing: emaListing },
+    { selection: rsiSelection, listing: rsiListing }
+  ])
+);
+```
+
+The batch is optional for a server. On a `404` or `405` the client requests each selection on its own and does not ask for the batch again, and a selection whose batch item failed is requested alone. `endpoints.batch` overrides the route.
+
 ## Data shape
 
 After normalization, quote data conforms to:
@@ -247,7 +262,8 @@ const client = createApiClient({
   baseUrl: "https://api.example.com",
   endpoints: {
     quotes: "v2/market/quotes",
-    indicators: "v2/market/indicators"
+    indicators: "v2/market/indicators",
+    batch: "v2/market/indicators/batch"
   }
 });
 ```

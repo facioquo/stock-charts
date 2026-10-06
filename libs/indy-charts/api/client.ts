@@ -288,6 +288,8 @@ export interface ApiClientConfig {
   endpoints?: {
     quotes?: string;
     indicators?: string;
+    /** Defaults to `indicators/batch`. */
+    batch?: string;
   };
 
   /**
@@ -399,6 +401,20 @@ export interface ApiClient {
     selection: IndicatorSelection,
     listing: IndicatorListing
   ): Promise<IndicatorDataRow[]>;
+
+  /**
+   * Rows for several selections from one `GET indicators/batch` request, as one
+   * promise per request in request order. A selection the batch cannot answer
+   * (a server without the route, a failed item, or an unreadable response) is
+   * requested on its own through {@link getSelectionData}, so each promise
+   * settles as that method would. A server that answers `404` or `405` is not
+   * asked for the batch again.
+   *
+   * @param requests - Selections with the listings that define their endpoints.
+   */
+  getSelectionsData(
+    requests: ReadonlyArray<{ selection: IndicatorSelection; listing: IndicatorListing }>
+  ): Array<Promise<IndicatorDataRow[]>>;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -618,7 +634,36 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
     }
   }
 
-  return {
+  let batchSupported = true;
+
+  /** `undefined` when the batch could not be used; callers fall back per selection. */
+  async function fetchBatch(
+    requests: ReadonlyArray<{ selection: IndicatorSelection; listing: IndicatorListing }>
+  ): Promise<Array<{ status: number; data?: unknown }> | undefined> {
+    const base = new URL(baseUrl);
+    const url = new URL(config.endpoints?.batch ?? "indicators/batch", baseUrl);
+    for (const { selection, listing } of requests) {
+      const request = new URL(selectionRequestUrl(config, selection, listing));
+      const name = request.pathname.startsWith(base.pathname)
+        ? request.pathname.slice(base.pathname.length)
+        : request.pathname;
+      url.searchParams.append("s", `${name.replace(/^\/+|\/+$/g, "")}${request.search}`);
+    }
+
+    try {
+      const response = await fetchWithRetry(url.toString(), maxAttempts, baseDelayMs);
+      if (response.status === 404 || response.status === 405) batchSupported = false;
+      if (!response.ok) return undefined;
+      const body = (await response.json()) as unknown;
+      return Array.isArray(body) && body.length === requests.length
+        ? (body as Array<{ status: number; data?: unknown }>)
+        : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  const client: ApiClient = {
     async getQuotes(): Promise<Bar[]> {
       const url = quotesRequestUrl(config);
       const shared = fetchShared(url, maxAttempts, baseDelayMs);
@@ -746,6 +791,27 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         onError?.("Error fetching selection data", error);
         throw error;
       }
+    },
+
+    getSelectionsData(requests) {
+      if (requests.length < 2 || !batchSupported) {
+        return requests.map(({ selection, listing }) =>
+          client.getSelectionData(selection, listing)
+        );
+      }
+
+      const batch = fetchBatch(requests);
+      return requests.map(async ({ selection, listing }, index) => {
+        const item = (await batch)?.at(index);
+        if (item?.status === 200 && Array.isArray(item.data)) {
+          const rows = item.data as IndicatorDataRow[];
+          if (staleCache) tryStaleCacheWrite(selectionUrl(baseUrl, selection, listing), rows);
+          return rows;
+        }
+        return client.getSelectionData(selection, listing);
+      });
     }
   };
+
+  return client;
 }

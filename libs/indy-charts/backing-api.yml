@@ -12,7 +12,7 @@ info:
   description: |
     `@facioquo/indy-charts` can render charts from data you supply directly, with no HTTP involved. This specification describes the alternative: the interface its built-in API client calls when you point it at a server with `createApiClient({ baseUrl })`.
 
-    Implement these three operations and the library will drive your server. A reference implementation of the .NET side lives in <https://github.com/facioquo/stock-charts>.
+    Implement the first three operations and the library will drive your server. The fourth, the batch, is optional. A reference implementation of the .NET side lives in <https://github.com/facioquo/stock-charts>.
 
     ## The catalog drives everything
 
@@ -78,6 +78,45 @@ paths:
               schema:
                 type: array
                 items: { $ref: "#/components/schemas/IndicatorListing" }
+        "503":
+          $ref: "#/components/responses/Unavailable"
+
+  /indicators/batch:
+    get:
+      tags: [indicators]
+      operationId: getIndicatorBatch
+      summary: Computed series for several indicators in one call
+      description: |
+        **Optional.** `ApiClient.getSelectionsData()` sends this request so a page load needs one call for every indicator it shows. A server without the route loses nothing: on a `404` or `405` the client requests each indicator on its own, through `getIndicatorData`, and does not ask for the batch again.
+
+        Each `s` value names one indicator request: the path of the URL the catalog entry's `endpoint` resolves to (without the leading or trailing slash), then `?` and the query the single request would carry, for example `BB?lookbackPeriods=20&standardDeviations=2`. Percent-encode the value. The response lists one result per `s`, in request order, each carrying the status the single request would have answered and, on `200`, the same rows.
+
+        Respond `200` when every selection succeeded, and `207` when any did not, so a partial answer is never cached as the whole. A client takes only the `200` items from a `207` and requests the rest on their own. Servers may cap the number of selections; `400` is the answer to a request over the cap.
+      parameters:
+        - name: s
+          in: query
+          required: true
+          style: form
+          explode: true
+          description: One indicator request, repeated once per selection.
+          schema:
+            type: array
+            items: { type: string }
+            minItems: 1
+          example: ["BB?lookbackPeriods=20&standardDeviations=2", "ADX?lookbackPeriods=14"]
+      responses:
+        "200":
+          description: Every selection succeeded.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/IndicatorBatch" }
+        "207":
+          description: At least one selection failed; each item carries its own `status`.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/IndicatorBatch" }
+        "400":
+          description: No `s` values, or more than the server accepts.
         "503":
           $ref: "#/components/responses/Unavailable"
 
@@ -345,6 +384,25 @@ components:
           type: boolean
           description: Close is below open.
           example: false
+
+    IndicatorBatch:
+      type: array
+      description: One result per requested selection, in request order.
+      items:
+        type: object
+        required: [status]
+        properties:
+          status:
+            type: integer
+            description: The status the single indicator request would have answered.
+            example: 200
+          data:
+            type: array
+            description: Present when `status` is `200`.
+            items: { $ref: "#/components/schemas/IndicatorDataRow" }
+          error:
+            type: string
+            description: Present when the selection failed; why.
 
     IndicatorDataRow:
       type: object

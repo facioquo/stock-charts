@@ -178,14 +178,20 @@ export class ChartController {
     this.changedWhileRestoring = false;
     this.restoreOrder = selections.map(selection => selection.ucid);
     try {
-      const pending = selections.map(async selection => {
+      // One batch call for the whole restore; each selection still settles on its own.
+      const known = selections.flatMap(selection => {
         const listing = this.listings.find(x => x.uiid === selection.uiid);
-        if (!listing) return undefined;
+        return listing ? [{ selection, listing }] : [];
+      });
+      const requests = this.api.getSelectionsData(known);
+      const pending = selections.map(async selection => {
+        const index = known.findIndex(x => x.selection === selection);
+        if (index < 0) return undefined;
+        const listing = known.at(index)?.listing;
+        const request = requests.at(index);
+        if (!listing || !request) return undefined;
         try {
-          const rows = (await withTimeout(
-            this.api.getSelectionData(selection, listing),
-            RESTORE_TIMEOUT_MS
-          )) as IndicatorDataRow[];
+          const rows = (await withTimeout(request, RESTORE_TIMEOUT_MS)) as IndicatorDataRow[];
           return { selection, listing, rows };
         } catch (error) {
           this.unrestored.push(selection);

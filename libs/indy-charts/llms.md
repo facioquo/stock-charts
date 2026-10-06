@@ -110,6 +110,9 @@ Optional. Skip this whole section if you supply your own data.
 | `GET /quotes` | `Bar[]`, oldest first | `getQuotes()` |
 | `GET /indicators` | `IndicatorListing[]` | `getListings()` |
 | Each listing's `endpoint` | `IndicatorDataRow[]` | `getSelectionData()` |
+| `GET /indicators/batch` (optional) | One result per selection | `getSelectionsData()` |
+
+The batch lets a page load every chart's rows in one request. Without the route the client falls back to one request per indicator, so a server need not implement it. Callers restoring several indicators should call `getSelectionsData()` rather than `getSelectionData()` in a loop.
 
 Preview the contract:
 
