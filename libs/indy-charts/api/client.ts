@@ -364,7 +364,7 @@ export interface ApiClient {
    *
    * @returns Resolved array of {@link Bar} objects sorted chronologically.
    * @throws  Re-throws any network or HTTP error (after calling `onError`) unless
-   *          stale cached data is available.
+   *          stale cached data or an offline snapshot copy is available.
    *
    * Successful responses are shared, per resolved URL, by every client this
    * package creates: concurrent calls join one request and later calls reuse
@@ -377,7 +377,7 @@ export interface ApiClient {
    *
    * @returns Resolved array of {@link IndicatorListing} descriptors.
    * @throws  Re-throws any network or HTTP error (after calling `onError`) unless
-   *          stale cached data is available.
+   *          stale cached data or an offline snapshot copy is available.
    *
    * Successful responses are shared, per resolved URL, by every client this
    * package creates: concurrent calls join one request and later calls reuse
@@ -393,7 +393,7 @@ export interface ApiClient {
    * @param listing   - The indicator descriptor that provides the endpoint path.
    * @returns Resolved array of raw data rows for the indicator series.
    * @throws  Re-throws any network or HTTP error (after calling `onError`) unless
-   *          stale cached data is available.
+   *          stale cached data or an offline snapshot copy is available.
    */
   getSelectionData(
     selection: IndicatorSelection,
@@ -473,7 +473,10 @@ export function quotesRequestUrl(config: UrlConfig): string {
 
 /** Resolved `GET /indicators` URL for a client config. Shared with the snapshot generator. */
 export function listingsRequestUrl(config: UrlConfig): string {
-  return endpointUrl(normalizeBaseUrl(config.baseUrl), config.endpoints?.indicators ?? "indicators");
+  return endpointUrl(
+    normalizeBaseUrl(config.baseUrl),
+    config.endpoints?.indicators ?? "indicators"
+  );
 }
 
 /** Resolved indicator data URL, with the selection's parameters as the query. */

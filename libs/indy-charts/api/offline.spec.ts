@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { createApiClient } from "./client";
+import { clearApiClientCache, createApiClient } from "./client";
 import { offlineSnapshotPath } from "./offline";
 import { createOfflineSnapshot } from "./snapshot";
 import type { IndicatorListing } from "../config/types";
@@ -59,6 +59,7 @@ function serve(routes: Record<string, unknown>): void {
 }
 
 afterEach(() => {
+  clearApiClientCache();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -171,6 +172,65 @@ describe("offlineFallback", () => {
     await expect(client.getQuotes()).rejects.toThrow("unreachable");
   });
 
+  it("falls back on an HTTP error status and reports the live error", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL) => {
+        const url = String(input instanceof Request ? input.url : input);
+        const ok = url === `${SNAPSHOT}/quotes.json`;
+        return Promise.resolve({
+          ok,
+          status: ok ? 200 : 503,
+          statusText: ok ? "OK" : "Service Unavailable",
+          headers: { get: () => null },
+          json: () => Promise.resolve(quotes)
+        } as unknown as Response);
+      })
+    );
+    const onError = vi.fn();
+    const onOffline = vi.fn();
+    const client = createApiClient({
+      baseUrl: API,
+      retry: false,
+      offlineFallback: { baseUrl: SNAPSHOT },
+      onError,
+      onOffline
+    });
+
+    await expect(client.getQuotes()).resolves.toHaveLength(1);
+    expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(Error));
+    expect(onOffline).toHaveBeenCalledWith("quotes");
+  });
+
+  it("rethrows the live error when the snapshot answers 404", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL) => {
+        const url = String(input instanceof Request ? input.url : input);
+        const live = url.startsWith(API);
+        return live
+          ? Promise.reject(new TypeError("live down"))
+          : Promise.resolve({
+              ok: false,
+              status: 404,
+              statusText: "Not Found",
+              headers: { get: () => null },
+              json: () => Promise.resolve({})
+            } as unknown as Response);
+      })
+    );
+    const onError = vi.fn();
+    const client = createApiClient({
+      baseUrl: API,
+      retry: false,
+      offlineFallback: { baseUrl: SNAPSHOT },
+      onError
+    });
+
+    await expect(client.getQuotes()).rejects.toThrow("live down");
+    expect(onError).toHaveBeenCalledWith("Error fetching quotes", expect.any(TypeError));
+  });
+
   it("is inert while the live API answers", async () => {
     serve({ [`${API}/quotes`]: quotes, [`${SNAPSHOT}/quotes.json`]: [] });
     const onOffline = vi.fn();
@@ -205,6 +265,7 @@ describe("createOfflineSnapshot", () => {
     ]);
 
     // Run time: the origin is gone and only the snapshot is served.
+    clearApiClientCache();
     serve(Object.fromEntries(files.map(file => [`${SNAPSHOT}/${file.path}`, file.data])));
     const client = createApiClient({
       baseUrl: API,
@@ -232,6 +293,32 @@ describe("createOfflineSnapshot", () => {
       expect((await client.getSelectionData(selection, item)).length).toBeGreaterThan(0);
     }
     expect((await client.getQuotes())[0]?.close).toBe(1.5);
+  });
+
+  it("reads and writes snapshot files under custom endpoint paths", async () => {
+    const endpoints = { quotes: "v2/market/quotes", indicators: "v2/market/indicators" };
+    serve({
+      [`${API}/v2/market/quotes`]: quotes,
+      [`${API}/v2/market/indicators`]: [listing("OBV", `${API}/OBV/`)],
+      [`${API}/OBV/`]: [{ timestamp: "x", obv: 5 }]
+    });
+    const files = await createOfflineSnapshot({ baseUrl: API, endpoints, retry: false });
+    expect(files.map(file => file.path).sort()).toEqual([
+      "OBV.json",
+      "v2/market/indicators.json",
+      "v2/market/quotes.json"
+    ]);
+
+    clearApiClientCache();
+    serve(Object.fromEntries(files.map(file => [`${SNAPSHOT}/${file.path}`, file.data])));
+    const client = createApiClient({
+      baseUrl: API,
+      endpoints,
+      retry: false,
+      offlineFallback: { baseUrl: SNAPSHOT }
+    });
+    expect((await client.getQuotes())[0]?.close).toBe(1.5);
+    expect((await client.getListings()).map(item => item.uiid)).toEqual(["OBV"]);
   });
 
   it("captures explicit selections and rejects one with no catalog listing", async () => {

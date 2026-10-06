@@ -159,7 +159,7 @@ Parameters are sorted by name and percent-encoded. A missing or unreachable snap
 
 ## Methods
 
-The returned `ApiClient` exposes three methods. All return promises that reject (after `onError`) on network or HTTP failures, unless `staleCache` is enabled and a prior successful response is cached — in that case `onError` still fires but the promise resolves with the stale data.
+The returned `ApiClient` exposes three methods. All return promises that reject (after `onError`) on network or HTTP failures, unless `staleCache` holds a prior response or `offlineFallback` has a snapshot file — in that case `onError` still fires but the promise resolves with that data.
 
 Successful `getQuotes()` and `getListings()` responses are shared, per resolved URL, by every client the package creates. Concurrent calls join one request, and later calls reuse the settled body for the page's lifetime. A failed request is not kept. Call `clearApiClientCache()` to force a refetch; do this before refreshing in a long-lived tab, an interval, or a Node or SSR process. The first caller's retry settings govern a shared request.
 
@@ -236,7 +236,7 @@ try {
 }
 ```
 
-`onError` is **observational**, not recovery. Without `staleCache`, the promise still rejects with the original error so callers can decide how to react. With `staleCache` and a cache hit, `onError` fires but the promise resolves — the caller receives stale data and `onStale` is also called.
+`onError` is **observational**, not recovery. Without a fallback, the promise still rejects with the original error so callers can decide how to react. With `staleCache` and a cache hit, `onError` fires but the promise resolves — the caller receives stale data and `onStale` is also called. With `offlineFallback` and a snapshot file, it resolves the same way and `onOffline` is called.
 
 ## Custom endpoint paths
 

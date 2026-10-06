@@ -40,6 +40,8 @@ export async function createOfflineSnapshot(
   const liveConfig = { ...config };
   delete liveConfig.offlineFallback;
   delete liveConfig.onOffline;
+  // A stale copy would otherwise be baked into the snapshot.
+  delete liveConfig.staleCache;
   const client = createApiClient(liveConfig);
   const [quotes, listings] = await Promise.all([client.getQuotes(), client.getListings()]);
 
