@@ -209,11 +209,16 @@ export class ChartController {
     this.placeAddedDuringRestoreLast(selections);
     // Never overwrite the saved list when nothing could be restored.
     if (
-      (save || this.changedWhileRestoring) &&
+      (save || this.userChangedWhileRestoring()) &&
       (this.selections.length > 0 || this.unrestored.length > 0)
     ) {
       this.cacheSelections();
     }
+  }
+
+  /** Read through a method: the flag is set by other calls while the restore awaits. */
+  private userChangedWhileRestoring(): boolean {
+    return this.changedWhileRestoring;
   }
 
   /** An indicator added while restoring displays first; saved order puts it after the restored ones. */

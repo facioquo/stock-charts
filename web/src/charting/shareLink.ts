@@ -50,7 +50,7 @@ export function encodeSelections(
     const defaults = createDefaultSelection(listing);
     const values = selection.params.map(param => param.value ?? 0);
     const styles = selection.results.map((result, index): ResultStyle => {
-      const base = defaults.results[index];
+      const base = defaults.results.at(index);
       return base &&
         base.color === result.color &&
         base.lineType === result.lineType &&
@@ -76,18 +76,15 @@ function isStyle(value: unknown): value is [string, string, number] {
   );
 }
 
-function decodeEntry(
-  entry: unknown,
-  listings: readonly IndicatorListing[]
-): IndicatorSelection | undefined {
-  if (!Array.isArray(entry) || typeof entry[0] !== "string") return undefined;
+function decodeEntry(entry: unknown, listings: readonly IndicatorListing[]): IndicatorSelection[] {
+  if (!Array.isArray(entry) || typeof entry[0] !== "string") return [];
   const [uiid, values, styles] = entry as [string, unknown, unknown];
   const listing = listings.find(x => x.uiid === uiid);
-  if (!listing || !Array.isArray(values)) return undefined;
+  if (!listing || !Array.isArray(values)) return [];
 
   const overrides: Record<string, number> = {};
   for (const [index, config] of (listing.parameters ?? []).entries()) {
-    const value: unknown = values[index];
+    const value: unknown = values.at(index);
     if (typeof value !== "number" || !Number.isFinite(value)) continue;
     if (config.dataType === "int" && !Number.isInteger(value)) continue;
     if (value < config.minimum || value > config.maximum) continue;
@@ -97,12 +94,12 @@ function decodeEntry(
   const selection = createDefaultSelection(listing, overrides);
   if (Array.isArray(styles)) {
     for (const [index, style] of styles.entries()) {
-      const result = selection.results[index];
+      const result = selection.results.at(index);
       if (!result || !isStyle(style)) continue;
       [result.color, result.lineType, result.lineWidth] = style;
     }
   }
-  return selection;
+  return [selection];
 }
 
 /**
@@ -122,9 +119,7 @@ export function decodeSelections(
     const payload: unknown = JSON.parse(fromBase64Url(encoded.slice(dot + 1)));
     if (!Array.isArray(payload)) return [];
     const unique = [...new Set(payload.map(entry => JSON.stringify(entry)))];
-    return unique
-      .slice(0, MAX_ENTRIES)
-      .flatMap(entry => decodeEntry(JSON.parse(entry), listings) ?? []);
+    return unique.slice(0, MAX_ENTRIES).flatMap(entry => decodeEntry(JSON.parse(entry), listings));
   } catch {
     return [];
   }
