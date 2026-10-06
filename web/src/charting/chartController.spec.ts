@@ -680,6 +680,7 @@ describe("ChartController", () => {
 
     it("saves the linked list with the first change and drops the parameter", async () => {
       linkTo("FAST", "B");
+      const historyLength = window.history.length;
       const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
       await vi.waitFor(() => {
         expect(controller.selections).toHaveLength(2);
@@ -692,6 +693,7 @@ describe("ChartController", () => {
 
       expect(savedUiids()).toEqual(["FAST", "B", "SLOW"]);
       expect(new URLSearchParams(window.location.search).has(SHARE_PARAM)).toBe(false);
+      expect(window.history.length).toBe(historyLength);
     });
 
     it("keeps a change made while the link is still restoring", async () => {
@@ -707,12 +709,30 @@ describe("ChartController", () => {
       });
     });
 
-    it("falls back to the saved list when the link cannot be read", async () => {
+    it("drops an unreadable link and shows the saved list", async () => {
+      vi.spyOn(console, "warn").mockImplementation(() => undefined);
       window.history.replaceState(null, "", `/?${SHARE_PARAM}=9.garbage`);
       const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
       await vi.waitFor(() => {
         expect(controller.selections.map(s => s.uiid)).toEqual(["A"]);
       });
+
+      expect(window.location.search).toBe("");
+    });
+
+    it("falls back to the saved list when every linked indicator fails to load", async () => {
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      const getSelectionData = vi.fn((selection: { uiid: string }) =>
+        selection.uiid === "A" ? Promise.resolve([{}]) : Promise.reject(new Error("500"))
+      ) as unknown as ApiClient["getSelectionData"];
+      linkTo("FAST", "B");
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], getSelectionData);
+
+      await vi.waitFor(() => {
+        expect(controller.selections.map(s => s.uiid)).toEqual(["A"]);
+      });
+      expect(savedUiids()).toEqual(["A"]);
+      expect(window.location.search).toBe("");
     });
 
     it("builds a link that restores the displayed indicators", async () => {

@@ -486,9 +486,19 @@ export class ChartController {
     const encoded = new URLSearchParams(window.location.search).get(SHARE_PARAM);
     if (!encoded) return false;
     const shared = decodeSelections(encoded, this.listings);
-    if (shared.length === 0) return false;
+    if (shared.length === 0) {
+      console.warn("Ignoring an unreadable share link");
+      this.dropShareParam();
+      return false;
+    }
     this.linkActive = true;
-    void this.showSelectionsInOrder(shared, false);
+    void this.showSelectionsInOrder(shared, false).then(() => {
+      // A link whose indicators all fail to load must not leave an empty chart.
+      if (!this.linkActive || this.selections.length > 0) return;
+      this.dropShareParam();
+      this.unrestored = [];
+      this.loadSavedSelections();
+    });
     return true;
   }
 
@@ -510,6 +520,10 @@ export class ChartController {
 
   private loadSelections(): void {
     if (this.loadSharedSelections()) return;
+    this.loadSavedSelections();
+  }
+
+  private loadSavedSelections(): void {
     let raw: string | null = null;
     try {
       raw = localStorage.getItem("selections");

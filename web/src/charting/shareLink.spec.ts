@@ -55,7 +55,7 @@ describe("share link encoding", () => {
     if (result) {
       result.color = "#ff0000";
       result.lineType = "dash";
-      result.lineWidth = 4;
+      result.lineWidth = 3;
     }
     const second = createDefaultSelection(obv);
 
@@ -66,7 +66,7 @@ describe("share link encoding", () => {
     expect(decoded[0]?.results[0]).toMatchObject({
       color: "#ff0000",
       lineType: "dash",
-      lineWidth: 4
+      lineWidth: 3
     });
   });
 
@@ -97,6 +97,51 @@ describe("share link encoding", () => {
     expect(decoded).toHaveLength(1);
     expect(decoded[0]?.uiid).toBe("SMA");
     expect(decoded[0]?.params[0]?.value).toBe(20);
+  });
+
+  const payloadOf = (entries: unknown[]): string =>
+    `1.${btoa(JSON.stringify(entries)).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "")}`;
+
+  it("ignores a link over the length cap", () => {
+    const entries = Array.from({ length: 2000 }, () => ["SMA", [20], []]);
+    const encoded = payloadOf(entries);
+    expect(encoded.length).toBeGreaterThan(8192);
+    expect(decodeSelections(encoded, listings)).toEqual([]);
+  });
+
+  it("caps the number of indicators and drops repeated entries", () => {
+    const distinct = Array.from({ length: 120 }, (_, i) => ["SMA", [i + 1], []]);
+    expect(decodeSelections(payloadOf(distinct), listings)).toHaveLength(50);
+
+    const repeated = Array.from({ length: 20 }, () => ["SMA", [20], []]);
+    expect(decodeSelections(payloadOf(repeated), listings)).toHaveLength(1);
+  });
+
+  it("applies only styles the settings dialog could produce", () => {
+    const decoded = decodeSelections(
+      payloadOf([
+        ["SMA", [20], [["red", "dash", 2]]],
+        ["SMA", [21], [["#ff0000", "candle", 2]]],
+        ["SMA", [22], [["#ff0000", "dash", 1e9]]],
+        ["SMA", [23], [["#ff0000", "dots", 2]]]
+      ]),
+      listings
+    );
+
+    const base = createDefaultSelection(sma).results[0];
+    expect(decoded.map(s => s.results[0]?.color)).toEqual([
+      base?.color,
+      base?.color,
+      base?.color,
+      "#ff0000"
+    ]);
+    expect(decoded[1]?.results[0]?.lineType).toBe(base?.lineType);
+    expect(decoded[2]?.results[0]?.lineWidth).toBe(base?.lineWidth);
+  });
+
+  it("falls back to the default for a fractional integer parameter", () => {
+    const [decoded] = decodeSelections(payloadOf([["SMA", [2.5], []]]), listings);
+    expect(decoded?.params[0]?.value).toBe(20);
   });
 
   it("builds a URL on the current path carrying only the share parameter", () => {

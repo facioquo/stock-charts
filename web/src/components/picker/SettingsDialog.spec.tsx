@@ -288,6 +288,15 @@ describe("SettingsDialog", () => {
       });
     });
 
+    it("reports a failure when the clipboard is unavailable", () => {
+      Object.assign(navigator, { clipboard: undefined });
+      renderDialog(makeController());
+
+      fireEvent.click(screen.getByRole("button", { name: "COPY LINK" }));
+
+      expect(screen.getByRole("status")).toHaveTextContent("Copy failed");
+    });
+
     it("is not offered with nothing displayed", () => {
       const controller = makeController();
       controller.selections.length = 0;

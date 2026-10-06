@@ -185,14 +185,18 @@ function DisplayedIndicators({
 }: DisplayedIndicatorsProps): React.JSX.Element {
   const [copyStatus, setCopyStatus] = useState("");
   const copyLink = (): void => {
-    navigator.clipboard.writeText(shareUrl()).then(
-      () => {
+    setCopyStatus("");
+    const failed = (): void => {
+      setCopyStatus("Copy failed");
+    };
+    try {
+      // The clipboard is undefined outside a secure context, so this can throw synchronously.
+      navigator.clipboard.writeText(shareUrl()).then(() => {
         setCopyStatus("Link copied");
-      },
-      () => {
-        setCopyStatus("Copy failed");
-      }
-    );
+      }, failed);
+    } catch {
+      failed();
+    }
   };
   const groupProps = { checked, onToggle, onEdit, onMove, moveButtonRef };
   return (
@@ -236,7 +240,7 @@ function DisplayedIndicators({
         >
           COPY LINK
         </button>
-        <span role="status" aria-live="polite" className="copy-link-status">
+        <span role="status" className="copy-link-status">
           {copyStatus}
         </span>
       </div>

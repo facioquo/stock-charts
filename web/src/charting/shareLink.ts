@@ -1,9 +1,16 @@
 import { createDefaultSelection } from "@facioquo/indy-charts";
 
+import { isValidHexColor, lineTypes, lineWidths } from "../components/picker/indicatorStyles";
 import type { IndicatorListing, IndicatorSelection } from "../types/chart.types";
 
 /** Query parameter that carries the encoded selections. */
 export const SHARE_PARAM = "c";
+
+/** A link longer than this is ignored; real links are a few hundred characters. */
+const MAX_ENCODED_LENGTH = 8192;
+
+/** An upper bound on indicators in a link; each one costs the visitor an API request. */
+const MAX_ENTRIES = 50;
 
 /** Encoding version, the prefix before the first dot. Bump when the payload shape changes. */
 const VERSION = "1";
@@ -57,14 +64,15 @@ export function encodeSelections(
   return `${VERSION}.${toBase64Url(JSON.stringify(entries))}`;
 }
 
+/** A style is applied only if the settings dialog could have produced it. */
 function isStyle(value: unknown): value is [string, string, number] {
   return (
     Array.isArray(value) &&
     value.length === 3 &&
     typeof value[0] === "string" &&
-    typeof value[1] === "string" &&
-    typeof value[2] === "number" &&
-    Number.isFinite(value[2])
+    isValidHexColor(value[0]) &&
+    lineTypes.some(option => option.value === value[1]) &&
+    lineWidths.some(option => option.value === value[2])
   );
 }
 
@@ -81,6 +89,7 @@ function decodeEntry(
   for (const [index, config] of (listing.parameters ?? []).entries()) {
     const value: unknown = values[index];
     if (typeof value !== "number" || !Number.isFinite(value)) continue;
+    if (config.dataType === "int" && !Number.isInteger(value)) continue;
     if (value < config.minimum || value > config.maximum) continue;
     overrides[config.paramName] = value;
   }
@@ -99,18 +108,23 @@ function decodeEntry(
 /**
  * Decodes a share parameter into selections. Returns `[]` for an unknown
  * version or an unreadable payload, and skips entries whose indicator is not in
- * the catalog; an out-of-range parameter falls back to its default.
+ * the catalog; an out-of-range parameter or an unsupported style falls back to
+ * its default. Oversized links, repeated entries, and entries past a cap are dropped.
  */
 export function decodeSelections(
   encoded: string,
   listings: readonly IndicatorListing[]
 ): IndicatorSelection[] {
+  if (encoded.length > MAX_ENCODED_LENGTH) return [];
   const dot = encoded.indexOf(".");
   if (dot < 0 || encoded.slice(0, dot) !== VERSION) return [];
   try {
     const payload: unknown = JSON.parse(fromBase64Url(encoded.slice(dot + 1)));
     if (!Array.isArray(payload)) return [];
-    return payload.flatMap(entry => decodeEntry(entry, listings) ?? []);
+    const unique = [...new Set(payload.map(entry => JSON.stringify(entry)))];
+    return unique
+      .slice(0, MAX_ENTRIES)
+      .flatMap(entry => decodeEntry(JSON.parse(entry), listings) ?? []);
   } catch {
     return [];
   }
