@@ -105,7 +105,9 @@ export function ChartPage(): React.JSX.Element {
           <button
             type="button"
             className="btn-raised btn-primary"
-            onClick={() => controller.returnToSavedSetup()}
+            onClick={() => {
+              controller.returnToSavedSetup();
+            }}
           >
             BACK TO MY INDICATORS
           </button>
