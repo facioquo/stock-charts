@@ -24,10 +24,10 @@ const MAX_RETRY_DELAY_MS = 30_000;
 const STALE_CACHE_PREFIX = "indy-charts:stale:";
 
 /** Most selections per batch request; matches the API cap. */
-const BATCH_SIZE = 20;
+export const BATCH_SIZE = 20;
 
 /** Statuses meaning the server will not answer a batch request at this size, so asking again fails the same. */
-const BATCH_REFUSED: ReadonlySet<number> = new Set([400, 404, 405, 413, 414]);
+export const BATCH_REFUSED: ReadonlySet<number> = new Set([400, 404, 405, 413, 414]);
 
 function isTransientStatus(status: number): boolean {
   return status === 429 || (status >= 500 && status <= 599);
@@ -413,8 +413,10 @@ export interface ApiClient {
    * promise per request in request order. A selection the batch cannot answer
    * (a server without the route, a failed item, or an unreadable response) is
    * requested on its own through {@link getSelectionData}, so each promise
-   * settles as that method would. A server that answers `404` or `405` is not
-   * asked for the batch again.
+   * settles as that method would. At most 20 selections go in one request. A
+   * server that answers `404`, `405`, `400`, `413` or `414` is not asked for the
+   * batch again. On success every promise settles together, once the batch
+   * answers, so a chart cannot draw before its neighbours' rows arrive.
    *
    * @param requests - Selections with the listings that define their endpoints.
    */

@@ -1,0 +1,4 @@
+{
+  "maxSelections": 20,
+  "refusedStatuses": [400, 404, 405, 413, 414]
+}

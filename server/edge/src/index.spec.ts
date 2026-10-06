@@ -1,3 +1,7 @@
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Env } from "./env";
@@ -18,7 +22,7 @@ vi.mock("@cloudflare/containers", () => ({
   getContainer: getContainerMock
 }));
 
-const worker = (await import("./index")).default;
+const { default: worker, MAX_BATCH_SELECTIONS } = await import("./index");
 
 const ALLOWED_ORIGIN = "https://charts.stockindicators.dev";
 
@@ -239,6 +243,15 @@ describe("worker.fetch", () => {
       expect(getContainerMock).not.toHaveBeenCalled();
     });
 
+    it("spends no rate-limit tokens on a cache hit", async () => {
+      cacheMatch.mockResolvedValue(new Response("[]", { status: 200 }));
+      const env = makeEnv();
+
+      await worker.fetch(new Request(batchUrl("ADX?lookbackPeriods=14", "ADL")), env, makeCtx());
+
+      expect(env.RATE_LIMITER.limit).not.toHaveBeenCalled();
+    });
+
     it("does not cache a partial (207) batch", async () => {
       fetchMock.mockResolvedValue(
         new Response("[]", { status: 207, headers: { "cache-control": "public, max-age=60" } })
@@ -309,11 +322,58 @@ describe("worker.fetch", () => {
       expect(env.RATE_LIMITER.limit).not.toHaveBeenCalled();
     });
 
+    it("accepts a batch of exactly the cap and spends one token per selection", async () => {
+      fetchMock.mockResolvedValue(new Response("[]", { status: 200 }));
+      const env = makeEnv();
+
+      const response = await worker.fetch(
+        new Request(batchUrl(...Array.from({ length: MAX_BATCH_SELECTIONS }, () => "ADL"))),
+        env,
+        makeCtx()
+      );
+
+      expect(response.status).toBe(200);
+      expect(env.RATE_LIMITER.limit).toHaveBeenCalledTimes(MAX_BATCH_SELECTIONS);
+    });
+
+    it("charges a repeated selection once per key, though the container computes it once", async () => {
+      fetchMock.mockResolvedValue(new Response("[]", { status: 200 }));
+      const env = makeEnv();
+
+      await worker.fetch(new Request(batchUrl("ADL", "ADL", "ADL")), env, makeCtx());
+
+      expect(env.RATE_LIMITER.limit).toHaveBeenCalledTimes(3);
+    });
+
+    it("charges one token for indexed selection keys, which the API does not read", async () => {
+      fetchMock.mockResolvedValue(new Response("[]", { status: 400 }));
+      const env = makeEnv();
+
+      await worker.fetch(
+        new Request("https://api.example/indicators/batch?s[0]=ADL&s[1]=ADX"),
+        env,
+        makeCtx()
+      );
+
+      expect(env.RATE_LIMITER.limit).toHaveBeenCalledTimes(1);
+    });
+
+    it("keeps its cap in step with the shared batch contract", () => {
+      const contract = JSON.parse(
+        readFileSync(
+          resolve(dirname(fileURLToPath(import.meta.url)), "../../batch.contract.json"),
+          "utf8"
+        )
+      ) as { maxSelections: number };
+
+      expect(MAX_BATCH_SELECTIONS).toBe(contract.maxSelections);
+    });
+
     it("refuses a batch over the cap before spending tokens or waking the container", async () => {
       const env = makeEnv();
 
       const response = await worker.fetch(
-        new Request(batchUrl(...Array.from({ length: 21 }, () => "ADL"))),
+        new Request(batchUrl(...Array.from({ length: MAX_BATCH_SELECTIONS + 1 }, () => "ADL"))),
         env,
         makeCtx()
       );

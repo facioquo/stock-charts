@@ -58,10 +58,10 @@ export function describeApiError(error: unknown): string {
 }
 
 /** Most selections per batch request; matches the API's cap. */
-const BATCH_SIZE = 20;
+export const BATCH_SIZE = 20;
 
 /** Statuses meaning the backend will not answer a batch request, now or at this size. */
-const BATCH_REFUSED: ReadonlySet<number> = new Set([400, 404, 405, 413, 414]);
+export const BATCH_REFUSED: ReadonlySet<number> = new Set([400, 404, 405, 413, 414]);
 
 /**
  * Fetch-based port of the Angular `ApiService`. Talks to the .NET Web API and
@@ -153,8 +153,9 @@ export class ApiClient {
   }
 
   /**
-   * Rows for several selections from one `GET /indicators/batch` call, as one
-   * promise per request in request order. A selection the batch cannot answer
+   * Rows for several selections from one `GET /indicators/batch` call (at most
+   * 20 per call), as one promise per request in request order. On success every
+   * promise settles together, once the batch answers. A selection the batch cannot answer
    * (an older backend without the route, a failed item, or an unreadable
    * response) is fetched on its own through {@link getSelectionData}, so the
    * result matches calling that method per selection.

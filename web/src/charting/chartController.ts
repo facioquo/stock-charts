@@ -168,10 +168,15 @@ export class ChartController {
   }
 
   /**
-   * Show startup selections in list order. Fetches run concurrently, and each
-   * chart is built as soon as it and every chart before it has settled, so
-   * arrival order cannot change the stack and one slow request holds back only
-   * the charts after it. A selection that fails to load is not shown, but stays saved for this session.
+   * Show startup selections in list order. The rows come from one batch request
+   * where the backend has the route (each selection requests its own rows
+   * concurrently otherwise), and each chart is built as soon as it and every
+   * chart before it has settled, so arrival order cannot change the stack. With
+   * a batch every selection settles together once the batch answers, and a
+   * selection that falls back to its own request settles later; on the fallback
+   * path one slow request holds back only the charts after it. The restore
+   * timeout bounds the batch round trip plus any such fallback. A selection that
+   * fails to load is not shown, but stays saved for this session.
    */
   private async showSelectionsInOrder(selections: readonly IndicatorSelection[]): Promise<void> {
     this.restoring = true;

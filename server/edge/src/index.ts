@@ -25,7 +25,7 @@ const CACHE_STATUS = "x-edge-cache";
  * The most selections one batch request may carry. Keep in step with
  * `maxBatchSelections` in `server/WebApi/Endpoints.Batch.cs`.
  */
-const MAX_BATCH_SELECTIONS = 20;
+export const MAX_BATCH_SELECTIONS = 20;
 
 /**
  * Selections a request asks the container to compute: one per `s` query key,

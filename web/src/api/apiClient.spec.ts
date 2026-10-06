@@ -1,8 +1,12 @@
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { IndicatorListing, IndicatorSelection } from "@facioquo/indy-charts";
 
-import { ApiClient } from "./apiClient";
+import { ApiClient, BATCH_REFUSED, BATCH_SIZE } from "./apiClient";
 import backupQuotes from "../data/backup-quotes.json";
 
 const okResponse = (body: unknown): Response =>
@@ -166,25 +170,28 @@ describe("ApiClient", () => {
       expect(fetchMock).toHaveBeenCalledTimes(3);
     });
 
-    it("splits a long list into batch requests no larger than the API cap", async () => {
+    it("splits a long list into batch requests no larger than the API cap, keeping every row with its selection", async () => {
       const many = Array.from({ length: 25 }, (_, i) => request("ADX", i + 1));
-      const fetchMock = vi.fn((url: string) => {
-        const count = new URL(url).searchParams.getAll("s").length;
-        return Promise.resolve(
-          okResponse(Array.from({ length: count }, () => ({ status: 200, data: [{ ok: 1 }] })))
-        );
-      });
+      const fetchMock = vi.fn((url: string) =>
+        Promise.resolve(
+          okResponse(
+            new URL(url).searchParams.getAll("s").map(name => ({ status: 200, data: [{ name }] }))
+          )
+        )
+      );
       vi.stubGlobal("fetch", fetchMock);
 
       const rows = await Promise.all(new ApiClient().getSelectionsData(many));
 
-      expect(rows).toHaveLength(25);
+      expect(rows.map(row => (row as Array<{ name: string }>)[0]?.name)).toEqual(
+        many.map((_, i) => `ADX?lookbackPeriods=${i + 1}`)
+      );
       expect(
         fetchMock.mock.calls.map(([url]) => new URL(url).searchParams.getAll("s").length)
-      ).toEqual([20, 5]);
+      ).toEqual([BATCH_SIZE, 5]);
     });
 
-    it.each([400, 414])("stops asking for the batch after a %i", async status => {
+    it.each([...BATCH_REFUSED])("stops asking for the batch after a %i", async status => {
       const fetchMock = vi.fn((url: string) =>
         Promise.resolve(
           url.includes("/indicators/batch") ? errorResponse(status) : okResponse([{ ok: 1 }])
@@ -198,6 +205,34 @@ describe("ApiClient", () => {
       await Promise.all(api.getSelectionsData(requests));
 
       expect(fetchMock.mock.calls.some(([url]) => url.includes("/indicators/batch"))).toBe(false);
+    });
+
+    it.each([429, 503])("keeps asking for the batch after a transient %i", async status => {
+      const fetchMock = vi.fn((url: string) =>
+        Promise.resolve(
+          url.includes("/indicators/batch") ? errorResponse(status) : okResponse([{ ok: 1 }])
+        )
+      );
+      vi.stubGlobal("fetch", fetchMock);
+      const api = new ApiClient();
+
+      await Promise.all(api.getSelectionsData(requests));
+      fetchMock.mockClear();
+      await Promise.all(api.getSelectionsData(requests));
+
+      expect(fetchMock.mock.calls.some(([url]) => url.includes("/indicators/batch"))).toBe(true);
+    });
+
+    it("keeps its cap and refusal set in step with the shared batch contract", () => {
+      const contract = JSON.parse(
+        readFileSync(
+          resolve(dirname(fileURLToPath(import.meta.url)), "../../../server/batch.contract.json"),
+          "utf8"
+        )
+      ) as { maxSelections: number; refusedStatuses: number[] };
+
+      expect(BATCH_SIZE).toBe(contract.maxSelections);
+      expect([...BATCH_REFUSED].sort()).toEqual([...contract.refusedStatuses].sort());
     });
 
     it("falls back per selection, but keeps trying the batch, after a network failure", async () => {

@@ -203,7 +203,7 @@ Wrap the result in `loadStaticIndicatorData()` to get a typed `IndicatorDataRow[
 
 ### `getSelectionsData(requests): Promise<unknown[]>[]`
 
-Fetches the rows for several selections with one `GET {baseUrl}/indicators/batch` request. Pass `{ selection, listing }` pairs; it returns one promise per pair, in order, so each chart can render as its own rows arrive.
+Fetches the rows for several selections with one `GET {baseUrl}/indicators/batch` request. Pass `{ selection, listing }` pairs; it returns one promise per pair, in order. On success every promise settles together once the batch answers; only a selection that falls back to its own request settles later.
 
 ```typescript
 const rows = await Promise.all(

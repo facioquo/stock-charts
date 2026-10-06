@@ -114,6 +114,14 @@ Optional. Skip this whole section if you supply your own data.
 
 The batch lets a page load every chart's rows in one request. Without the route the client falls back to one request per indicator, so a server need not implement it. Callers restoring several indicators should call `getSelectionsData()` rather than `getSelectionData()` in a loop.
 
+Mistakes the types do not show:
+
+- `getSelectionsData()` returns an **array of promises**, one per request, not one promise. Use `await Promise.all(client.getSelectionsData(requests))`.
+- One request is not always one network call: fewer than 2 selections are not batched, and more than 20 are sent as several batch requests. A server must accept at least 20 `s` values.
+- The batch gets a single attempt; a failed or unreadable batch falls back to one retrying request per selection.
+- A `400`, `404`, `405`, `413` or `414` from the batch route stops the client asking for it again, so answer a malformed request on the route with a `207` item rather than a `400`. A `429` or `5xx` does not.
+- Answer `200` only when every selection succeeded, and `207` otherwise: a `207` is never cached, and the client takes only its `200` items.
+
 Preview the contract:
 
 ```bash

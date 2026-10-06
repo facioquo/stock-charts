@@ -4,17 +4,20 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
+using WebApi.Services;
 
 namespace WebApi.Controllers;
 
 public partial class Main
 {
-    // Keep in step with MAX_BATCH_SELECTIONS in server/edge/src/index.ts and the client chunk size.
-    private const int maxBatchSelections = 20;
+    /// <summary>Most selections one batch may carry; asserted against <c>batch.contract.json</c>.</summary>
+    public const int MaxBatchSelections = 20;
 
-    // Routes of this controller that are not indicator calculations.
-    private static readonly HashSet<string> nonIndicatorRoutes
-        = new(["", "quotes", "indicators", "indicators/batch"], StringComparer.OrdinalIgnoreCase);
+    // Only routes the catalog advertises run in a batch, so a later non-indicator
+    // GET on this controller is never reachable through it.
+    private static readonly Lazy<HashSet<string>> catalogRoutes = new(() => new(
+        Metadata.IndicatorListing(string.Empty).Select(listing => listing.Endpoint.Trim('/')),
+        StringComparer.OrdinalIgnoreCase));
 
     // Indicator actions by route name, so a batch runs exactly the code a single
     // request does, with no second copy of the 90-odd endpoints to keep in step.
@@ -30,16 +33,20 @@ public partial class Main
     /// otherwise 207, so a partial result is never cached as the answer.
     /// </remarks>
     [HttpGet("indicators/batch")]
-    public async Task<IActionResult> GetIndicatorBatch([FromQuery(Name = "s")] string[]? selections)
+    public async Task<IActionResult> GetIndicatorBatch()
     {
-        if (selections is null || selections.Length == 0)
+        // Read the key `s` alone (case-insensitively, like the edge Worker's
+        // count): indexed forms such as s[0] are not selections here.
+        string[] selections = [.. Request.Query["s"].OfType<string>()];
+
+        if (selections.Length == 0)
         {
             return BadRequest("Provide at least one selection as s=<indicator>?<parameters>.");
         }
 
-        if (selections.Length > maxBatchSelections)
+        if (selections.Length > MaxBatchSelections)
         {
-            return BadRequest($"At most {maxBatchSelections} selections per request.");
+            return BadRequest($"At most {MaxBatchSelections} selections per request.");
         }
 
         // Sequential: the quote feed is cached in memory, so concurrency would
@@ -158,6 +165,8 @@ public partial class Main
 
         try
         {
+            type = Nullable.GetUnderlyingType(type) ?? type;
+
             if (type.IsEnum)
             {
                 if (!Enum.TryParse(type, text, ignoreCase: true, out value) || !Enum.IsDefined(type, value))
@@ -169,7 +178,7 @@ public partial class Main
                 return true;
             }
 
-            value = Convert.ChangeType(text, type, CultureInfo.InvariantCulture);
+            value = Convert.ChangeType(text, Nullable.GetUnderlyingType(type) ?? type, CultureInfo.InvariantCulture);
             return true;
         }
         catch (Exception ex) when (ex is FormatException or OverflowException or InvalidCastException)
@@ -187,7 +196,7 @@ public partial class Main
             string? route = method.GetCustomAttribute<HttpGetAttribute>()?.Template;
 
             if (route is null
-                || nonIndicatorRoutes.Contains(route)
+                || !catalogRoutes.Value.Contains(route)
                 || method.ReturnType != typeof(Task<IActionResult>))
             {
                 continue;

@@ -1,6 +1,16 @@
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Mock } from "vitest";
-import { clearApiClientCache, createApiClient, peekCachedListings } from "./client";
+import {
+  BATCH_REFUSED,
+  BATCH_SIZE,
+  clearApiClientCache,
+  createApiClient,
+  peekCachedListings
+} from "./client";
 import type { ApiClient, RetryConfig } from "./client";
 import type { IndicatorListing, IndicatorParam, IndicatorSelection } from "../config/types";
 
@@ -625,34 +635,37 @@ describe("createApiClient", () => {
       expect(batchCalls()).toHaveLength(1);
     });
 
-    it("splits a long list into batch requests no larger than the server cap", async () => {
-      const many = Array.from({ length: 25 }, () => requests[0]).filter(r => r !== undefined);
+    it("splits a long list into batch requests no larger than the server cap, keeping every row with its selection", async () => {
+      const many = Array.from({ length: 25 }, (_, i) => ({
+        selection: makeSelection([makeParam("lookbackPeriods", i + 1)]),
+        listing: makeListing({ endpoint: "SMA/" })
+      }));
       vi.stubGlobal(
         "fetch",
         vi.fn((url: string) => {
-          const count = new URL(url).searchParams.getAll("s").length;
+          const asked = new URL(url).searchParams.getAll("s");
           return Promise.resolve({
             ok: true,
             status: 200,
             statusText: "",
             headers: { get: () => null },
-            json: () =>
-              Promise.resolve(
-                Array.from({ length: count }, () => ({ status: 200, data: [{ a: 1 }] }))
-              )
+            json: () => Promise.resolve(asked.map(name => ({ status: 200, data: [{ name }] })))
           } as unknown as Response);
         })
       );
 
       const rows = await Promise.all(client.getSelectionsData(many));
 
-      expect(rows).toHaveLength(25);
+      expect(rows.map(row => (row as Array<{ name: string }>)[0]?.name)).toEqual(
+        many.map((_, i) => `SMA?lookbackPeriods=${i + 1}`)
+      );
       expect(batchCalls().map(url => new URL(url).searchParams.getAll("s").length)).toEqual([
-        20, 5
+        BATCH_SIZE,
+        5
       ]);
     });
 
-    it.each([400, 414])("stops asking for the batch after a %i", async status => {
+    it.each([...BATCH_REFUSED])("stops asking for the batch after a %i", async status => {
       vi.stubGlobal(
         "fetch",
         vi.fn((url: string) =>
@@ -670,6 +683,56 @@ describe("createApiClient", () => {
       await Promise.all(client.getSelectionsData(requests));
 
       expect(batchCalls()).toHaveLength(1);
+    });
+
+    it.each([429, 503])("keeps asking for the batch after a transient %i", async status => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((url: string) =>
+          Promise.resolve({
+            ok: !url.includes("/indicators/batch"),
+            status: url.includes("/indicators/batch") ? status : 200,
+            statusText: "",
+            headers: { get: () => null },
+            json: () => Promise.resolve([{ ok: 1 }])
+          } as unknown as Response)
+        )
+      );
+
+      await Promise.all(client.getSelectionsData(requests));
+      await Promise.all(client.getSelectionsData(requests));
+
+      expect(batchCalls()).toHaveLength(2);
+    });
+
+    it("requests the batch at endpoints.batch when it is overridden", async () => {
+      const custom = createApiClient({
+        baseUrl: BASE_URL,
+        endpoints: { batch: "v2/batch" },
+        retry: false
+      });
+      mockFetchOk([
+        { status: 200, data: [{ a: 1 }] },
+        { status: 200, data: [{ b: 2 }] }
+      ]);
+
+      await Promise.all(custom.getSelectionsData(requests));
+
+      expect(new URL(String(vi.mocked(fetch).mock.calls[0]?.[0] as string)).pathname).toBe(
+        "/v2/batch"
+      );
+    });
+
+    it("keeps its cap and refusal set in step with the shared batch contract", () => {
+      const contract = JSON.parse(
+        readFileSync(
+          resolve(dirname(fileURLToPath(import.meta.url)), "../../../server/batch.contract.json"),
+          "utf8"
+        )
+      ) as { maxSelections: number; refusedStatuses: number[] };
+
+      expect(BATCH_SIZE).toBe(contract.maxSelections);
+      expect([...BATCH_REFUSED].sort()).toEqual([...contract.refusedStatuses].sort());
     });
 
     it("makes one attempt at the batch before falling back, even with retries on", async () => {

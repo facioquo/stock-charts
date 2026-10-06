@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using WebApi.Controllers;
+using WebApi.Services;
 
 namespace WebApi.Tests.Endpoints;
 
@@ -35,6 +36,14 @@ public class BatchEndpointTests
         };
     }
 
+    /// <summary>Runs the batch with each value as a repeated <c>s</c> query key, as the wire carries it.</summary>
+    private Task<IActionResult> Batch(string[]? selections)
+    {
+        _controller.Request.QueryString = QueryString.Create(
+            (selections ?? []).Select(value => new KeyValuePair<string, string?>("s", value)));
+        return _controller.GetIndicatorBatch();
+    }
+
     private static List<Bar> Quotes(int count)
         => [.. Enumerable.Range(0, count)
             .Select(i => new Bar(
@@ -53,7 +62,7 @@ public class BatchEndpointTests
     [Fact]
     public async Task Batch_ReturnsEverySelectionInRequestOrder()
     {
-        IActionResult result = await _controller.GetIndicatorBatch(
+        IActionResult result = await Batch(
             ["ADX?lookbackPeriods=14", "BB?lookbackPeriods=20&standardDeviations=2", "ADL"]);
 
         OkObjectResult ok = Assert.IsType<OkObjectResult>(result);
@@ -65,7 +74,7 @@ public class BatchEndpointTests
     {
         OkObjectResult single = Assert.IsType<OkObjectResult>(await _controller.GetAdx(14));
         OkObjectResult batch = Assert.IsType<OkObjectResult>(
-            await _controller.GetIndicatorBatch(["ADX?lookbackPeriods=14"]));
+            await Batch(["ADX?lookbackPeriods=14"]));
 
         object data = Property(Items(batch.Value).Single(), "Data")!;
 
@@ -75,7 +84,7 @@ public class BatchEndpointTests
     [Fact]
     public async Task Batch_MatchesRouteNamesAndParametersCaseInsensitively()
     {
-        IActionResult result = await _controller.GetIndicatorBatch(["adx?LOOKBACKPERIODS=14"]);
+        IActionResult result = await Batch(["adx?LOOKBACKPERIODS=14"]);
 
         Assert.IsType<OkObjectResult>(result);
     }
@@ -83,7 +92,7 @@ public class BatchEndpointTests
     [Fact]
     public async Task Batch_SetsSharedCacheHeadersWhenEverySelectionSucceeds()
     {
-        await _controller.GetIndicatorBatch(["ADX?lookbackPeriods=14", "ADL"]);
+        await Batch(["ADX?lookbackPeriods=14", "ADL"]);
 
         Assert.Contains("public", _controller.Response.Headers.CacheControl.ToString());
         Assert.Equal("Origin", _controller.Response.Headers.Vary.ToString());
@@ -92,7 +101,7 @@ public class BatchEndpointTests
     [Fact]
     public async Task Batch_ReportsEachFailureAndReturnsMultiStatusWithoutCaching()
     {
-        IActionResult result = await _controller.GetIndicatorBatch(
+        IActionResult result = await Batch(
             ["ADX?lookbackPeriods=14", "NOPE", "ADX", "ADX?lookbackPeriods=abc", "ADX?lookbackPeriods=0"]);
 
         ObjectResult multi = Assert.IsType<ObjectResult>(result);
@@ -104,8 +113,8 @@ public class BatchEndpointTests
     [Fact]
     public async Task Batch_RejectsAnEmptyRequest()
     {
-        Assert.IsType<BadRequestObjectResult>(await _controller.GetIndicatorBatch(null));
-        Assert.IsType<BadRequestObjectResult>(await _controller.GetIndicatorBatch([]));
+        Assert.IsType<BadRequestObjectResult>(await Batch(null));
+        Assert.IsType<BadRequestObjectResult>(await Batch([]));
     }
 
     [Fact]
@@ -113,14 +122,14 @@ public class BatchEndpointTests
     {
         string[] tooMany = [.. Enumerable.Repeat("ADL", 21)];
 
-        Assert.IsType<BadRequestObjectResult>(await _controller.GetIndicatorBatch(tooMany));
-        Assert.IsType<OkObjectResult>(await _controller.GetIndicatorBatch([.. tooMany.Take(20)]));
+        Assert.IsType<BadRequestObjectResult>(await Batch(tooMany));
+        Assert.IsType<OkObjectResult>(await Batch([.. tooMany.Take(20)]));
     }
 
     [Fact]
     public async Task Batch_DoesNotRunNonIndicatorRoutes()
     {
-        IActionResult result = await _controller.GetIndicatorBatch(
+        IActionResult result = await Batch(
             ["quotes", "indicators", "indicators/batch"]);
 
         ObjectResult multi = Assert.IsType<ObjectResult>(result);
@@ -134,7 +143,7 @@ public class BatchEndpointTests
             .Setup(q => q.Get(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Quotes(120));
 
-        IActionResult result = await _controller.GetIndicatorBatch(
+        IActionResult result = await Batch(
             ["BETA?lookbackPeriods=14&type=Up", "BETA?lookbackPeriods=14&type=Sideways", "BETA?lookbackPeriods=14&type=up"]);
 
         ObjectResult multi = Assert.IsType<ObjectResult>(result);
@@ -145,7 +154,7 @@ public class BatchEndpointTests
     public async Task Batch_AnItemThatThrowsDoesNotDiscardItsNeighbours()
     {
         // A jaw offset of int.MaxValue overflows inside the indicator.
-        IActionResult result = await _controller.GetIndicatorBatch(
+        IActionResult result = await Batch(
             ["ADL", "ALLIGATOR?jawPeriods=13&jawOffset=2147483647&teethPeriods=8&teethOffset=5&lipsPeriods=5&lipsOffset=3", "ADX?lookbackPeriods=14"]);
 
         ObjectResult multi = Assert.IsType<ObjectResult>(result);
@@ -158,7 +167,7 @@ public class BatchEndpointTests
     {
         OkObjectResult single = Assert.IsType<OkObjectResult>(await _controller.GetAdx(14));
         OkObjectResult batch = Assert.IsType<OkObjectResult>(
-            await _controller.GetIndicatorBatch(["ADX?lookbackPeriods=14&lookbackPeriods=20"]));
+            await Batch(["ADX?lookbackPeriods=14&lookbackPeriods=20"]));
 
         object data = Property(Items(batch.Value).Single(), "Data")!;
 
@@ -169,19 +178,89 @@ public class BatchEndpointTests
     public async Task Batch_BindsAMissingParameterToItsDefaultLikeASingleCall()
     {
         BadRequestObjectResult single = Assert.IsType<BadRequestObjectResult>(await _controller.GetAdx(0));
-        IActionResult result = await _controller.GetIndicatorBatch(["ADX"]);
+        IActionResult result = await Batch(["ADX"]);
 
         ObjectResult multi = Assert.IsType<ObjectResult>(result);
         Assert.Equal([single.StatusCode], Statuses(Items(multi.Value)));
     }
 
     [Fact]
-    public async Task Batch_ComputesIdenticalSelectionsOnce()
+    public async Task Batch_ComputesIdenticalSelectionsOnceAndAnswersEveryPosition()
     {
-        IActionResult result = await _controller.GetIndicatorBatch(
-            ["ADX?lookbackPeriods=14", "adx?LOOKBACKPERIODS=14", "ADX?lookbackPeriods=14"]);
+        OkObjectResult ok = Assert.IsType<OkObjectResult>(await Batch(
+            ["ADX?lookbackPeriods=14", "adx?LOOKBACKPERIODS=14", "ADL", "ADX?lookbackPeriods=14"]));
 
-        Assert.IsType<OkObjectResult>(result);
-        _quoteService.Verify(q => q.Get(It.IsAny<CancellationToken>()), Times.Once);
+        List<object> items = Items(ok.Value);
+        Assert.Equal(4, items.Count);
+        string rows(int i) => JsonSerializer.Serialize(Property(items[i], "Data"));
+        Assert.Equal(rows(0), rows(1));
+        Assert.Equal(rows(0), rows(3));
+        Assert.NotEqual(rows(0), rows(2));
+        _quoteService.Verify(q => q.Get(It.IsAny<CancellationToken>()), Times.Exactly(2));
+    }
+
+    [Fact]
+    public async Task Batch_SerializesTheDocumentedWireShape()
+    {
+        JsonSerializerOptions web = new(JsonSerializerDefaults.Web);
+        ObjectResult multi = Assert.IsType<ObjectResult>(await Batch(
+            ["ADL", "ALLIGATOR?jawPeriods=13&jawOffset=2147483647&teethPeriods=8&teethOffset=5&lipsPeriods=5&lipsOffset=3", "NOPE"]));
+
+        using JsonDocument json = JsonDocument.Parse(JsonSerializer.Serialize(multi.Value, web));
+        JsonElement[] items = [.. json.RootElement.EnumerateArray()];
+
+        Assert.Equal(200, items[0].GetProperty("status").GetInt32());
+        Assert.Equal(JsonValueKind.Array, items[0].GetProperty("data").ValueKind);
+        Assert.False(items[0].TryGetProperty("error", out _));
+
+        // A 500 names no exception detail.
+        Assert.Equal(500, items[1].GetProperty("status").GetInt32());
+        Assert.Equal("The indicator could not be calculated.", items[1].GetProperty("error").GetString());
+        Assert.False(items[1].TryGetProperty("data", out _));
+
+        Assert.Equal(404, items[2].GetProperty("status").GetInt32());
+    }
+
+    [Fact]
+    public async Task Batch_IgnoresIndexedSelectionKeys()
+    {
+        _controller.Request.QueryString = new QueryString("?s[0]=ADL&s[1]=ADX%3FlookbackPeriods%3D14");
+
+        Assert.IsType<BadRequestObjectResult>(await _controller.GetIndicatorBatch());
+    }
+
+    [Fact]
+    public async Task Batch_ReadsTheSelectionKeyCaseInsensitively()
+    {
+        _controller.Request.QueryString = new QueryString("?S=ADL&s=ADL");
+
+        OkObjectResult ok = Assert.IsType<OkObjectResult>(await _controller.GetIndicatorBatch());
+        Assert.Equal(2, Items(ok.Value).Count);
+    }
+
+    [Fact]
+    public void Batch_RunsExactlyTheCatalogsIndicatorRoutes()
+    {
+        string[] advertised = [.. Metadata.IndicatorListing(string.Empty)
+            .Select(listing => listing.Endpoint.Trim('/'))
+            .Distinct(StringComparer.OrdinalIgnoreCase)];
+
+        string[] actions = [.. typeof(Main).GetMethods()
+            .Where(m => m.DeclaringType == typeof(Main) && m.ReturnType == typeof(Task<IActionResult>))
+            .Select(m => m.GetCustomAttributes(typeof(HttpGetAttribute), false).Cast<HttpGetAttribute>().SingleOrDefault()?.Template)
+            .OfType<string>()
+            .Where(route => route is not ("" or "quotes" or "indicators" or "indicators/batch"))];
+
+        Assert.Empty(advertised.Except(actions, StringComparer.OrdinalIgnoreCase));
+        Assert.Empty(actions.Except(advertised, StringComparer.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Batch_CapMatchesTheSharedContract()
+    {
+        using JsonDocument contract = JsonDocument.Parse(
+            File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "batch.contract.json")));
+
+        Assert.Equal(Main.MaxBatchSelections, contract.RootElement.GetProperty("maxSelections").GetInt32());
     }
 }
