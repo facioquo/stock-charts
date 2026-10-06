@@ -83,9 +83,14 @@ interface DisplayedIndicatorsProps {
   onMove: ChartController["moveSelection"];
   /** Ref callback factory that records a row's move button so focus can follow a move. */
   moveButtonRef: MoveButtonRef;
+  /** Builds a link that restores the displayed indicators. */
+  shareUrl: () => string;
 }
 
-interface SelectionGroupProps extends Omit<DisplayedIndicatorsProps, "onSelectAll" | "onRemove"> {
+interface SelectionGroupProps extends Omit<
+  DisplayedIndicatorsProps,
+  "onSelectAll" | "onRemove" | "shareUrl"
+> {
   title: string;
   hint: string;
 }
@@ -175,8 +180,20 @@ function DisplayedIndicators({
   onRemove,
   onEdit,
   onMove,
-  moveButtonRef
+  moveButtonRef,
+  shareUrl
 }: DisplayedIndicatorsProps): React.JSX.Element {
+  const [copyStatus, setCopyStatus] = useState("");
+  const copyLink = (): void => {
+    navigator.clipboard.writeText(shareUrl()).then(
+      () => {
+        setCopyStatus("Link copied");
+      },
+      () => {
+        setCopyStatus("Copy failed");
+      }
+    );
+  };
   const groupProps = { checked, onToggle, onEdit, onMove, moveButtonRef };
   return (
     <section className="displayed-indicators">
@@ -211,6 +228,17 @@ function DisplayedIndicators({
         >
           REMOVE SELECTED
         </button>
+        <button
+          type="button"
+          className="btn-raised"
+          title="copy a link that restores these indicators"
+          onClick={copyLink}
+        >
+          COPY LINK
+        </button>
+        <span role="status" aria-live="polite" className="copy-link-status">
+          {copyStatus}
+        </span>
       </div>
     </section>
   );
@@ -399,6 +427,7 @@ export function SettingsDialog({
             onEdit={onEditIndicator}
             onMove={controls.moveSelection}
             moveButtonRef={controls.moveButtonRef}
+            shareUrl={() => controller.shareUrl()}
           />
         )}
 

@@ -124,6 +124,39 @@ test.describe("Stock Charts React Web", () => {
     expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
   });
 
+  test("a copied link restores the configuration in a fresh browser", async ({
+    page,
+    browser,
+    errorCollection
+  }) => {
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+
+    await page.getByRole("button", { name: "edit settings" }).click();
+    await page.getByRole("button", { name: /^move ADX.* up$/ }).click();
+    await page.getByRole("button", { name: "COPY LINK" }).click();
+    await expect(page.getByRole("status").filter({ hasText: "Link copied" })).toBeVisible();
+    const link = await page.evaluate(() => navigator.clipboard.readText());
+
+    const fresh = await browser.newContext();
+    const shared = await fresh.newPage();
+    await shared.goto(link);
+    await shared.waitForLoadState("networkidle");
+    await expect(shared.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+    await shared.getByRole("button", { name: "edit settings" }).click();
+    const oscillators = shared
+      .locator(".selection-list")
+      .nth(1)
+      .locator("li label span:first-child");
+    await expect(oscillators.first()).toHaveText(/^ADX/);
+    expect(await shared.evaluate(() => localStorage.getItem("selections"))).toBeNull();
+    await fresh.close();
+
+    expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
+  });
+
   test("theme toggle flips the body theme class", async ({ page, errorCollection }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
