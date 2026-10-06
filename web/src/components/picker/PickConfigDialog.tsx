@@ -235,8 +235,8 @@ interface PickConfigState {
 function usePickConfig(
   listing: IndicatorListing,
   controller: ChartController,
-  existing: IndicatorSelection | undefined,
-  onClose: () => void
+  onClose: () => void,
+  existing?: IndicatorSelection
 ): PickConfigState {
   // Edit a copy so cancelling leaves the displayed selection untouched.
   const [selection, setSelection] = useState<IndicatorSelection>(() =>
@@ -370,7 +370,7 @@ export function PickConfigDialog({
   onClose
 }: PickConfigDialogProps): React.JSX.Element {
   const titleId = useId();
-  const cfg = usePickConfig(listing, controller, selection, onClose);
+  const cfg = usePickConfig(listing, controller, onClose, selection);
 
   return (
     <Modal open onClose={onClose} labelledBy={titleId} className="pick-config-dialog">

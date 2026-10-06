@@ -1,4 +1,4 @@
-import { useId, useReducer, useState } from "react";
+import { useId, useReducer, useState, type Dispatch } from "react";
 
 import type { ChartController } from "../../charting/chartController";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
@@ -12,7 +12,7 @@ interface SettingsDialogProps {
   /** Open the indicator config dialog for the chosen listing. */
   onPickIndicator: (listing: IndicatorListing) => void;
   /** Open the config dialog to edit a displayed indicator in place. */
-  onEditIndicator: (selection: IndicatorSelection) => void;
+  onEditIndicator: Dispatch<IndicatorSelection>;
 }
 
 interface ToggleRowProps {
@@ -60,7 +60,7 @@ interface DisplayedIndicatorsProps {
   onToggle: (ucid: string) => void;
   onSelectAll: (value: boolean) => void;
   onRemove: () => void;
-  onEdit: (selection: IndicatorSelection) => void;
+  onEdit: Dispatch<IndicatorSelection>;
 }
 
 /** List of currently-displayed indicators with edit and multi-select removal. */
@@ -100,7 +100,9 @@ function DisplayedIndicators({
               className="icon-button"
               aria-label={`edit ${selection.label}`}
               title={`edit ${selection.label}`}
-              onClick={() => onEdit(selection)}
+              onClick={() => {
+                onEdit(selection);
+              }}
             >
               <span className="material-icons">edit</span>
             </button>

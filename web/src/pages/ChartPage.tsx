@@ -19,7 +19,7 @@ export function ChartPage(): React.JSX.Element {
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pickListing, setPickListing] = useState<IndicatorListing | null>(null);
-  const [editSelection, setEditSelection] = useState<IndicatorSelection | null>(null);
+  const [editUcid, setEditUcid] = useState<string | null>(null);
 
   useEffect(() => {
     void controller.loadCharts();
@@ -38,13 +38,13 @@ export function ChartPage(): React.JSX.Element {
     const listing = controller.listings.find(x => x.uiid === selection.uiid);
     if (!listing) return;
     setSettingsOpen(false);
-    setEditSelection(selection);
+    setEditUcid(selection.ucid);
     setPickListing(listing);
   };
 
   const closePickConfig = (): void => {
     setPickListing(null);
-    setEditSelection(null);
+    setEditUcid(null);
     setSettingsOpen(true);
   };
 
@@ -140,7 +140,7 @@ export function ChartPage(): React.JSX.Element {
         <PickConfigDialog
           listing={pickListing}
           controller={controller}
-          selection={editSelection ?? undefined}
+          selection={controller.selections.find(s => s.ucid === editUcid)}
           onClose={closePickConfig}
         />
       )}
