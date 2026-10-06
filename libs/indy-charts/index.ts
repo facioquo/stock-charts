@@ -86,6 +86,7 @@
  * - `createApiClient(config)` - Create a lightweight `fetch`-based `ApiClient`
  * - `clearApiClientCache()` - Drop the quote and listing responses shared across clients
  * - `ApiClient` - Interface exposing `getQuotes`, `getListings`, `getSelectionData`
+ * - `createOfflineSnapshot(config, options?)` - Build the snapshot files `offlineFallback` reads
  * - `loadStaticQuotes(quotes)` - Accept `Bar[]` (string or Date timestamps), return `Bar[]` with timestamps as Date
  * - `loadStaticIndicatorData(rows)` - Pass-through helper for `IndicatorDataRow[]`
  *
@@ -145,10 +146,17 @@ export type { ChartManagerConfig } from "./charts";
 export {
   clearApiClientCache,
   createApiClient,
+  createOfflineSnapshot,
   loadStaticQuotes,
   loadStaticIndicatorData
 } from "./api";
-export type { ApiClient, ApiClientConfig, RetryConfig } from "./api";
+export type {
+  ApiClient,
+  ApiClientConfig,
+  OfflineSnapshotFile,
+  OfflineSnapshotOptions,
+  RetryConfig
+} from "./api";
 
 // Selection and sizing helpers
 export { applySelectionTokens, calculateOptimalBars, createDefaultSelection } from "./helpers";

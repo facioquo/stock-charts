@@ -161,6 +161,14 @@ Every client in the page shares quote and listing responses, keyed by URL. Sever
 - The first caller's retry settings govern a request that later clients join. A client with `retry: false` or a different `maxAttempts` can get another client's policy.
 - A call answered from a settled response never reaches the `staleCache` fallback. A fetch that goes out, such as the page's first after a reload, one after a failure, or one after `clearApiClientCache()`, still serves the stale copy when it fails.
 
+For an origin that is gone, ship a snapshot with your site and point `offlineFallback: { baseUrl }` at it. Three things to know first:
+
+- `onError` still fires when the snapshot serves the data. Do not wire it to an error banner over a chart that rendered; use `onOffline` to learn the snapshot answered.
+- Each call waits out the live request's retries before the snapshot is read, and the snapshot is not remembered. For a dead origin, set `retry: false` or a low `maxAttempts` next to `offlineFallback`.
+- Snapshot files match the package version that wrote them. Regenerate them when upgrading.
+
+Build the files with `createOfflineSnapshot(config)` at build time against the live API. It returns `{ path, data }` files; write each `data` as JSON to `path` under a folder you serve. The client falls back to the snapshot after the live request and `staleCache`. The snapshot holds every catalog indicator at its default parameters, so a request with other parameters has no file; pass `selections` to capture those. A missing file is ignored, which keeps server-side rendering safe. Never hand-write the paths.
+
 ## What this package exports
 
 | Export | Purpose |
@@ -171,6 +179,7 @@ Every client in the page shares quote and listing responses, keyed by URL. Sever
 | `OverlayChart`, `OscillatorChart` | Single-canvas classes |
 | `createApiClient(config)` | Client for the three backing-API operations |
 | `clearApiClientCache()` | Drop the quote and listing responses shared across clients |
+| `createOfflineSnapshot(config, options)` | Build the snapshot files `offlineFallback` reads |
 | `loadStaticQuotes`, `loadStaticIndicatorData` | Bring-your-own `Bar[]` / `IndicatorDataRow[]` |
 | `createDefaultSelection`, `applySelectionTokens`, `calculateOptimalBars` | Selection and viewport helpers |
 | `getThemeColors`, `baseOverlayConfig`, `baseOscillatorConfig` | Theme and config building blocks |
