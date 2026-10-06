@@ -60,7 +60,10 @@ function ToggleRow({ label, checked, onChange }: ToggleRowProps): React.JSX.Elem
   );
 }
 
-type MoveButtonRef = (ucid: string, offset: -1 | 1) => (node: HTMLButtonElement | null) => void;
+type MoveButtonNode = HTMLButtonElement;
+type MoveButtonRef = (
+  ...target: [ucid: string, offset: -1 | 1]
+) => (node: MoveButtonNode | null) => void;
 
 interface DisplayedIndicatorsProps {
   selections: readonly IndicatorSelection[];
@@ -321,7 +324,7 @@ function useSettingsControls(controller: ChartController): SettingsControls {
 
   // A move re-renders the row (React moves the swapped node) or disables the
   // pressed button at the end of its group; either drops focus to <body>.
-  const moveButtons = useRef(new Map<string, HTMLButtonElement>());
+  const moveButtons = useRef(new Map<string, MoveButtonNode>());
   const moveButtonRef: MoveButtonRef = (ucid, offset) => node => {
     const key = `${ucid}:${offset}`;
     if (node) moveButtons.current.set(key, node);
