@@ -30,6 +30,9 @@ vi.mock("@facioquo/indy-charts", () => {
       if (!this.selections.some(s => s.ucid === sel.ucid)) this.selections.push(sel);
     });
     createOscillator = vi.fn();
+    reorderSelections = vi.fn((ucids: string[]) => {
+      this.selections.sort((a, b) => ucids.indexOf(a.ucid) - ucids.indexOf(b.ucid));
+    });
     removeSelection = vi.fn((ucid: string) => {
       const index = this.selections.findIndex(s => s.ucid === ucid);
       if (index >= 0) this.selections.splice(index, 1);
@@ -58,6 +61,7 @@ interface MockManager {
   displaySelection: MockFn;
   createOscillator: MockFn;
   removeSelection: MockFn;
+  reorderSelections: MockFn;
   updateTheme: MockFn;
   setBarCount: MockFn;
   resize: MockFn;
@@ -241,6 +245,11 @@ describe("ChartController", () => {
 
     const order = Array.from(zone.children).map(child => child.id);
     expect(order).toEqual([`${first.ucid}-container`, `${second.ucid}-container`]);
+    // The manager's list, and so the cached order, keeps the edited indicator first.
+    expect(controller.selections.map(s => s.ucid)).toEqual([first.ucid, second.ucid]);
+    expect(
+      JSON.parse(localStorage.getItem("selections") ?? "[]").map((s: { ucid: string }) => s.ucid)
+    ).toEqual([first.ucid, second.ucid]);
     expect(manager(controller).removeSelection).toHaveBeenCalledWith(first.ucid);
     expect(controller.selections.filter(s => s.ucid === first.ucid)).toHaveLength(1);
     // The resolved label is reset to the template so new parameter values apply.

@@ -118,9 +118,12 @@ export class ChartController {
     };
     const data = await this.api.getSelectionData(replacement, listing);
 
+    const order = this.selections.map(s => s.ucid);
     const before = document.getElementById(`${ucid}-container`)?.nextSibling ?? null;
     this.deleteSelection(ucid);
     this.showSelection(replacement, listing, data as IndicatorDataRow[], false, before);
+    // Display appends; restore the original position (and overlay layering).
+    this.chartManager.reorderSelections(order);
     this.cacheSelections();
   }
 

@@ -124,6 +124,20 @@ export class OverlayChart {
   }
 
   /**
+   * Re-stack the given indicator datasets in the order supplied, after the
+   * price and volume datasets. Later datasets draw over earlier ones, so this
+   * sets the layering.
+   */
+  reorderIndicatorDatasets(results: IndicatorResult[]): void {
+    if (!this._chart) return;
+    const datasets = this._chart.data.datasets;
+    const ordered = results.map(result => result.dataset);
+    const rest = datasets.filter(dataset => !ordered.some(moved => moved === dataset));
+    datasets.splice(0, datasets.length, ...rest, ...ordered);
+    this._chart.update("none");
+  }
+
+  /**
    * Show or hide the main price candlestick dataset (index 0 — the same
    * invariant `applySlicedData` relies on). Used when a candle-rendered
    * overlay indicator (e.g. Heikin-Ashi) replaces the raw price candles:
