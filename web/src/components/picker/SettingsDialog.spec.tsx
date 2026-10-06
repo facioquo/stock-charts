@@ -172,6 +172,23 @@ describe("SettingsDialog", () => {
     expect(document.activeElement).toBe(screen.getByRole("button", { name: "move RSI (5) up" }));
   });
 
+  it("checks a displayed indicator from its label, with the checkbox last in the row", () => {
+    const controller = makeController();
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByText("RSI (5)"));
+    const checkbox = screen.getByRole("checkbox", { name: "select RSI (5)" });
+    expect(checkbox).toBeChecked();
+    expect(checkbox.parentElement?.lastElementChild).toBe(checkbox);
+  });
+
   it("removes the checked displayed indicators", () => {
     const controller = makeController();
     render(
@@ -187,8 +204,7 @@ describe("SettingsDialog", () => {
     expect(removeButton).toBeDisabled();
 
     // check the first displayed indicator, then remove
-    const firstRow = screen.getByText("RSI (5)").closest("label") as HTMLElement;
-    fireEvent.click(firstRow.querySelector('input[type="checkbox"]') as HTMLElement);
+    fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
     expect(removeButton).toBeEnabled();
 
     fireEvent.click(removeButton);

@@ -110,7 +110,7 @@ test.describe("Stock Charts React Web", () => {
 
     const oscillators = page
       .getByRole("list", { name: "Oscillator charts" })
-      .locator("li label span:first-child");
+      .locator("li label");
     await page.getByRole("button", { name: "edit settings" }).click();
     await expect(oscillators.first()).toHaveText(/^RSI/);
 
