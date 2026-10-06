@@ -103,7 +103,9 @@ function SelectionGroup({
               data-move={`${selection.ucid}:-1`}
               title="move up"
               disabled={index === 0}
-              onClick={() => onMove(selection.ucid, -1)}
+              onClick={() => {
+                onMove(selection.ucid, -1);
+              }}
             >
               <span className="material-icons">arrow_upward</span>
             </button>
@@ -114,7 +116,9 @@ function SelectionGroup({
               data-move={`${selection.ucid}:1`}
               title="move down"
               disabled={index === selections.length - 1}
-              onClick={() => onMove(selection.ucid, 1)}
+              onClick={() => {
+                onMove(selection.ucid, 1);
+              }}
             >
               <span className="material-icons">arrow_downward</span>
             </button>

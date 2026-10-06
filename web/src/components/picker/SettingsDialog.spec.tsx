@@ -53,12 +53,15 @@ function makeController(): FakeController {
       if (i >= 0) selections.splice(i, 1);
     }),
     moveSelection: vi.fn((ucid: string, offset: -1 | 1) => {
-      const from = selections.findIndex(s => s.ucid === ucid);
-      const to = selections.findIndex(
-        (s, i) => i !== from && i === from + offset && s.chartType === selections[from]?.chartType
-      );
-      if (from >= 0 && to >= 0)
-        [selections[from], selections[to]] = [selections[to], selections[from]];
+      const moved = selections.find(s => s.ucid === ucid);
+      if (!moved) return;
+      const group = selections.filter(s => s.chartType === moved.chartType);
+      const target = group.at(group.indexOf(moved) + offset);
+      if (!target || group.indexOf(moved) + offset < 0) return;
+      const from = selections.indexOf(moved);
+      const to = selections.indexOf(target);
+      selections.splice(from, 1);
+      selections.splice(to, 0, moved);
     }),
     onSettingsChange: vi.fn()
   };

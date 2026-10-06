@@ -183,13 +183,13 @@ export class ChartController {
     const to = from + offset;
     if (to < 0 || to >= group.length) return;
 
-    // Swap within the group, leaving the other group's slots where they are.
-    [group[from], group[to]] = [group[to], group[from]];
-    const order = this.selections.map(s => s.ucid);
-    const slots = this.selections.flatMap((s, i) => (s.chartType === moved.chartType ? [i] : []));
-    slots.forEach((slot, i) => {
-      order[slot] = group[i].ucid;
-    });
+    // Move within the group, leaving the other group's slots where they are.
+    const reordered = group.filter(s => s !== moved);
+    reordered.splice(to, 0, moved);
+    let next = 0;
+    const order = this.selections.map(s =>
+      s.chartType === moved.chartType ? (reordered.at(next++)?.ucid ?? s.ucid) : s.ucid
+    );
     this.chartManager.reorderSelections(order);
 
     if (moved.chartType === "oscillator") this.syncOscillatorDom();

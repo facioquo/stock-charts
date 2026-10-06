@@ -330,7 +330,12 @@ describe("ChartController", () => {
     const getSelectionData = vi.fn(
       (selection: IndicatorSelection) =>
         new Promise<unknown[]>(resolve => {
-          setTimeout(() => resolve([{}]), selection.uiid === "SLOW" ? 30 : 0);
+          setTimeout(
+            () => {
+              resolve([{}]);
+            },
+            selection.uiid === "SLOW" ? 30 : 0
+          );
         })
     ) as unknown as ApiClient["getSelectionData"];
 
@@ -385,7 +390,9 @@ describe("ChartController", () => {
     const getSelectionData = vi.fn(
       () =>
         new Promise<unknown[]>(resolve => {
-          releases.push(() => resolve([{}]));
+          releases.push(() => {
+            resolve([{}]);
+          });
         })
     ) as unknown as ApiClient["getSelectionData"];
     const controller = await loadWithCache(restored, getSelectionData);
@@ -399,7 +406,9 @@ describe("ChartController", () => {
     await addedRequest;
     expect(saved()).toBe(2);
 
-    releases.slice(0, 2).forEach(release => release());
+    releases.slice(0, 2).forEach(release => {
+      release();
+    });
     await vi.waitFor(() => {
       expect(saved()).toBe(3);
     });
