@@ -224,6 +224,60 @@ describe("ChartController", () => {
     expect(controller.selections.some(s => s.ucid === selection.ucid)).toBe(false);
   });
 
+  it("replaces an oscillator in place, keeping its ucid and stack position", async () => {
+    const zone = document.createElement("div");
+    zone.id = "oscillators-zone";
+    document.body.appendChild(zone);
+
+    const api = makeApi({ getSelectionData: vi.fn().mockResolvedValue([{}]) });
+    const controller = new ChartController(api);
+    const listing = makeListing("OSC", "oscillator");
+    const first = makeSelection("OSC", "oscillator");
+    const second = { ...makeSelection("OSC", "oscillator"), ucid: "second" };
+    await controller.addSelection(first, listing, false);
+    await controller.addSelection(second, listing, false);
+
+    await controller.updateSelection(first.ucid, { ...first, label: "OSC(14)" }, listing);
+
+    const order = Array.from(zone.children).map(child => child.id);
+    expect(order).toEqual([`${first.ucid}-container`, `${second.ucid}-container`]);
+    expect(manager(controller).removeSelection).toHaveBeenCalledWith(first.ucid);
+    expect(controller.selections.filter(s => s.ucid === first.ucid)).toHaveLength(1);
+    // The resolved label is reset to the template so new parameter values apply.
+    expect(controller.selections.find(s => s.ucid === first.ucid)?.label).toBe(
+      listing.legendTemplate
+    );
+  });
+
+  it("leaves the chart unchanged when the edited data fails to load", async () => {
+    const zone = document.createElement("div");
+    zone.id = "oscillators-zone";
+    document.body.appendChild(zone);
+
+    const getSelectionData = vi.fn().mockResolvedValueOnce([{}]);
+    const controller = new ChartController(makeApi({ getSelectionData }));
+    const listing = makeListing("OSC", "oscillator");
+    const selection = makeSelection("OSC", "oscillator");
+    await controller.addSelection(selection, listing, false);
+
+    getSelectionData.mockRejectedValueOnce(new Error("bad params"));
+    await expect(controller.updateSelection(selection.ucid, selection, listing)).rejects.toThrow(
+      "bad params"
+    );
+
+    expect(manager(controller).removeSelection).not.toHaveBeenCalled();
+    expect(document.getElementById(`${selection.ucid}-container`)).not.toBeNull();
+  });
+
+  it("rejects an update for a selection that is not displayed", async () => {
+    const controller = new ChartController(makeApi());
+    const selection = makeSelection("OSC", "oscillator");
+
+    await expect(
+      controller.updateSelection("missing", selection, makeListing("OSC", "oscillator"))
+    ).rejects.toThrow("not found");
+  });
+
   it("propagates theme/tooltip settings to the chart manager", () => {
     const controller = new ChartController(makeApi());
 

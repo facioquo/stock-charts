@@ -75,6 +75,31 @@ test.describe("Stock Charts React Web", () => {
     expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
   });
 
+  test("a displayed indicator is edited in place", async ({ page, errorCollection }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+
+    await page.getByRole("button", { name: "edit settings" }).click();
+    const displayed = page.locator(".displayed-indicators .selection-list li");
+    await expect(displayed.first()).toBeVisible();
+    const before = await displayed.count();
+
+    await page.getByRole("button", { name: /^edit RSI/ }).click();
+    const lookback = page.getByLabel("Lookback Periods");
+    await expect(lookback).toHaveValue("5");
+    await lookback.fill("9");
+    await page.getByRole("button", { name: "SAVE" }).click();
+
+    // Saving reopens the settings list: same number of indicators, new parameter.
+    await expect(page.getByRole("button", { name: /^edit RSI.*9/ })).toBeVisible({
+      timeout: 15_000
+    });
+    await expect(displayed).toHaveCount(before);
+
+    expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
+  });
+
   test("theme toggle flips the body theme class", async ({ page, errorCollection }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");

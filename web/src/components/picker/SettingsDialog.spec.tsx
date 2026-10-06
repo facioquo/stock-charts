@@ -67,6 +67,7 @@ describe("SettingsDialog", () => {
         controller={controller as unknown as ChartController}
         onClose={vi.fn()}
         onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
       />
     );
 
@@ -84,11 +85,28 @@ describe("SettingsDialog", () => {
         controller={controller as unknown as ChartController}
         onClose={vi.fn()}
         onPickIndicator={onPickIndicator}
+        onEditIndicator={vi.fn()}
       />
     );
 
     fireEvent.click(screen.getByRole("button", { name: /Simple Moving Average/ }));
     expect(onPickIndicator).toHaveBeenCalledWith(controller.listings[1]);
+  });
+
+  it("opens the config dialog to edit a displayed indicator", () => {
+    const controller = makeController();
+    const onEditIndicator = vi.fn();
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={onEditIndicator}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "edit RSI (5)" }));
+    expect(onEditIndicator).toHaveBeenCalledWith(controller.selections[0]);
   });
 
   it("removes the checked displayed indicators", () => {
@@ -98,6 +116,7 @@ describe("SettingsDialog", () => {
         controller={controller as unknown as ChartController}
         onClose={vi.fn()}
         onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
       />
     );
 
@@ -121,6 +140,7 @@ describe("SettingsDialog", () => {
         controller={controller as unknown as ChartController}
         onClose={vi.fn()}
         onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
       />
     );
 
@@ -136,6 +156,7 @@ describe("SettingsDialog", () => {
         controller={controller as unknown as ChartController}
         onClose={onClose}
         onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
       />
     );
 

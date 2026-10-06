@@ -218,6 +218,8 @@
 
 .selection-list {
   li {
+    display: flex;
+    align-items: center;
     border-radius: 4px;
 
     &:hover {
@@ -227,6 +229,7 @@
 
   label {
     display: flex;
+    flex: 1;
     align-items: center;
     gap: 8px;
     padding: 10px 12px 10px 16px;

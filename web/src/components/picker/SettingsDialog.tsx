@@ -11,6 +11,8 @@ interface SettingsDialogProps {
   onClose: () => void;
   /** Open the indicator config dialog for the chosen listing. */
   onPickIndicator: (listing: IndicatorListing) => void;
+  /** Open the config dialog to edit a displayed indicator in place. */
+  onEditIndicator: (selection: IndicatorSelection) => void;
 }
 
 interface ToggleRowProps {
@@ -58,15 +60,17 @@ interface DisplayedIndicatorsProps {
   onToggle: (ucid: string) => void;
   onSelectAll: (value: boolean) => void;
   onRemove: () => void;
+  onEdit: (selection: IndicatorSelection) => void;
 }
 
-/** List of currently-displayed indicators with multi-select removal. */
+/** List of currently-displayed indicators with edit and multi-select removal. */
 function DisplayedIndicators({
   selections,
   checked,
   onToggle,
   onSelectAll,
-  onRemove
+  onRemove,
+  onEdit
 }: DisplayedIndicatorsProps): React.JSX.Element {
   return (
     <section className="displayed-indicators">
@@ -91,6 +95,15 @@ function DisplayedIndicators({
                 onChange={() => onToggle(selection.ucid)}
               />
             </label>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label={`edit ${selection.label}`}
+              title={`edit ${selection.label}`}
+              onClick={() => onEdit(selection)}
+            >
+              <span className="material-icons">edit</span>
+            </button>
           </li>
         ))}
       </ul>
@@ -241,7 +254,8 @@ function useSettingsControls(controller: ChartController): SettingsControls {
 export function SettingsDialog({
   controller,
   onClose,
-  onPickIndicator
+  onPickIndicator,
+  onEditIndicator
 }: SettingsDialogProps): React.JSX.Element {
   const titleId = useId();
   const controls = useSettingsControls(controller);
@@ -272,6 +286,7 @@ export function SettingsDialog({
             onToggle={controls.toggleChecked}
             onSelectAll={controls.selectAll}
             onRemove={controls.removeSelected}
+            onEdit={onEditIndicator}
           />
         )}
 

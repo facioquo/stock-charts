@@ -85,17 +85,42 @@ export class ChartController {
     scrollToMe = false
   ): Promise<void> {
     const data = await this.api.getSelectionData(selection, listing);
-    const rows = data as IndicatorDataRow[];
-    this.chartManager.processSelectionData(selection, listing, rows);
-    applySelectionTokens(selection);
-    this.chartManager.displaySelection(selection, listing);
+    this.showSelection(selection, listing, data as IndicatorDataRow[], scrollToMe);
+    this.cacheSelections();
+  }
 
-    if (listing.chartType === "oscillator") {
-      this.createOscillatorDom(selection, listing, scrollToMe);
-    } else if (scrollToMe) {
-      scrollToStart("chart-overlay");
+  /**
+   * Replace a displayed indicator with an edited copy, keeping its `ucid` and,
+   * for an oscillator, its place in the stack. The new data is fetched before
+   * the old selection is touched, so a failed fetch leaves the chart unchanged.
+   */
+  async updateSelection(
+    ucid: string,
+    edited: IndicatorSelection,
+    listing: IndicatorListing
+  ): Promise<void> {
+    if (!this.selections.some(s => s.ucid === ucid)) {
+      throw new Error(`Indicator selection not found for ucid: ${ucid}`);
     }
 
+    // Labels were resolved from the old parameter values; restore the listing's
+    // templates so applySelectionTokens fills in the edited ones.
+    const replacement: IndicatorSelection = {
+      ...edited,
+      ucid,
+      label: listing.legendTemplate,
+      results: edited.results.map(result => ({
+        ...result,
+        label:
+          listing.results?.find(config => config.dataName === result.dataName)?.tooltipTemplate ??
+          result.label
+      }))
+    };
+    const data = await this.api.getSelectionData(replacement, listing);
+
+    const before = document.getElementById(`${ucid}-container`)?.nextSibling ?? null;
+    this.deleteSelection(ucid);
+    this.showSelection(replacement, listing, data as IndicatorDataRow[], false, before);
     this.cacheSelections();
   }
 
@@ -199,10 +224,29 @@ export class ChartController {
 
   //#region PRIVATE HELPERS
 
+  private showSelection(
+    selection: IndicatorSelection,
+    listing: IndicatorListing,
+    rows: IndicatorDataRow[],
+    scrollToMe: boolean,
+    before: Node | null = null
+  ): void {
+    this.chartManager.processSelectionData(selection, listing, rows);
+    applySelectionTokens(selection);
+    this.chartManager.displaySelection(selection, listing);
+
+    if (listing.chartType === "oscillator") {
+      this.createOscillatorDom(selection, listing, scrollToMe, before);
+    } else if (scrollToMe) {
+      scrollToStart("chart-overlay");
+    }
+  }
+
   private createOscillatorDom(
     selection: IndicatorSelection,
     listing: IndicatorListing,
-    scrollToMe: boolean
+    scrollToMe: boolean,
+    before: Node | null = null
   ): void {
     const body = document.getElementById("oscillators-zone");
     if (!body) return;
@@ -218,7 +262,7 @@ export class ChartController {
     const canvas = document.createElement("canvas");
     canvas.id = selection.ucid;
     container.appendChild(canvas);
-    body.appendChild(container);
+    body.insertBefore(container, before);
 
     const ctx = canvas.getContext("2d");
     if (!ctx) {
