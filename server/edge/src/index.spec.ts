@@ -254,6 +254,47 @@ describe("worker.fetch", () => {
       expect(response.status).toBe(207);
       expect(cachePut).not.toHaveBeenCalled();
     });
+
+    it("spends one rate-limit token per selection on a cache miss", async () => {
+      fetchMock.mockResolvedValue(new Response("[]", { status: 200 }));
+      const env = makeEnv();
+
+      await worker.fetch(
+        new Request(batchUrl("ADX?lookbackPeriods=14", "ADL", "ATR?lookbackPeriods=14")),
+        env,
+        makeCtx()
+      );
+
+      expect(env.RATE_LIMITER.limit).toHaveBeenCalledTimes(3);
+    });
+
+    it("answers 429 as soon as the limiter refuses, without waking the container", async () => {
+      const env = makeEnv({ limitSuccess: false });
+
+      const response = await worker.fetch(
+        new Request(batchUrl("ADX?lookbackPeriods=14", "ADL")),
+        env,
+        makeCtx()
+      );
+
+      expect(response.status).toBe(429);
+      expect(env.RATE_LIMITER.limit).toHaveBeenCalledTimes(1);
+      expect(getContainerMock).not.toHaveBeenCalled();
+    });
+
+    it("refuses a batch over the cap before spending tokens or waking the container", async () => {
+      const env = makeEnv();
+
+      const response = await worker.fetch(
+        new Request(batchUrl(...Array.from({ length: 21 }, () => "ADL"))),
+        env,
+        makeCtx()
+      );
+
+      expect(response.status).toBe(400);
+      expect(env.RATE_LIMITER.limit).not.toHaveBeenCalled();
+      expect(getContainerMock).not.toHaveBeenCalled();
+    });
   });
 
   it("returns a 502 with CORS headers when the container fetch rejects", async () => {

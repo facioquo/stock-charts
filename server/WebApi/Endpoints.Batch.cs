@@ -9,7 +9,8 @@ namespace WebApi.Controllers;
 
 public partial class Main
 {
-    private const int maxBatchSelections = 50;
+    // Keep in step with MAX_BATCH_SELECTIONS in server/edge/src/index.ts and the client chunk size.
+    private const int maxBatchSelections = 20;
 
     // Routes of this controller that are not indicator calculations.
     private static readonly HashSet<string> nonIndicatorRoutes
@@ -43,11 +44,19 @@ public partial class Main
 
         // Sequential: the quote feed is cached in memory, so concurrency would
         // buy nothing and the actions share this response.
+        // Identical selections are computed once.
+        Dictionary<string, BatchItem> computed = new(StringComparer.OrdinalIgnoreCase);
         List<BatchItem> items = [];
 
         foreach (string selection in selections)
         {
-            items.Add(await RunSelection(selection));
+            if (!computed.TryGetValue(selection, out BatchItem? item))
+            {
+                item = await RunSelection(selection);
+                computed[selection] = item;
+            }
+
+            items.Add(item);
         }
 
         if (items.All(item => item.Status == StatusCodes.Status200OK))
@@ -84,7 +93,18 @@ public partial class Main
             return new BatchItem(StatusCodes.Status400BadRequest, null, error);
         }
 
-        IActionResult result = await (Task<IActionResult>)action.Invoke(this, arguments)!;
+        IActionResult result;
+
+        try
+        {
+            result = await (Task<IActionResult>)action.Invoke(this, arguments)!;
+        }
+        catch (Exception ex) when (Unwrap(ex) is not OperationCanceledException)
+        {
+            // One selection's failure must not discard its valid neighbours.
+            logger.LogError(Unwrap(ex), "Batch selection '{Selection}' failed", selection);
+            return new BatchItem(StatusCodes.Status500InternalServerError, null, "The indicator could not be calculated.");
+        }
 
         return result switch {
             OkObjectResult ok => new BatchItem(StatusCodes.Status200OK, ok.Value, null),
@@ -94,6 +114,9 @@ public partial class Main
             _ => new BatchItem(StatusCodes.Status500InternalServerError, null, "Unexpected result.")
         };
     }
+
+    private static Exception Unwrap(Exception ex)
+        => ex is TargetInvocationException { InnerException: { } inner } ? inner : ex;
 
     private static bool TryBind(
         MethodInfo action,
@@ -109,13 +132,17 @@ public partial class Main
         {
             ParameterInfo parameter = parameters[i];
 
+            // Same as MVC binding: a missing parameter takes its default, and a
+            // repeated one takes its first value.
             if (!query.TryGetValue(parameter.Name!, out StringValues value) || value.Count == 0)
             {
-                error = $"Missing parameter '{parameter.Name}'.";
-                return false;
+                arguments[i] = parameter.HasDefaultValue
+                    ? parameter.DefaultValue
+                    : parameter.ParameterType.IsValueType ? Activator.CreateInstance(parameter.ParameterType) : null;
+                continue;
             }
 
-            if (!TryConvert(value.ToString(), parameter.ParameterType, out arguments[i]))
+            if (!TryConvert(value[0] ?? string.Empty, parameter.ParameterType, out arguments[i]))
             {
                 error = $"Invalid value for parameter '{parameter.Name}'.";
                 return false;

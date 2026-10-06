@@ -16,10 +16,11 @@ namespace WebApi.Tests.Endpoints;
 public class BatchEndpointTests
 {
     private readonly Main _controller;
+    private readonly Mock<IQuoteService> _quoteService = new();
 
     public BatchEndpointTests()
     {
-        Mock<IQuoteService> quoteService = new();
+        Mock<IQuoteService> quoteService = _quoteService;
         quoteService
             .Setup(q => q.Get(It.IsAny<CancellationToken>()))
             .ReturnsAsync(Quotes(120));
@@ -110,10 +111,10 @@ public class BatchEndpointTests
     [Fact]
     public async Task Batch_RejectsMoreSelectionsThanTheCap()
     {
-        string[] tooMany = [.. Enumerable.Repeat("ADL", 51)];
+        string[] tooMany = [.. Enumerable.Repeat("ADL", 21)];
 
         Assert.IsType<BadRequestObjectResult>(await _controller.GetIndicatorBatch(tooMany));
-        Assert.IsType<OkObjectResult>(await _controller.GetIndicatorBatch([.. tooMany.Take(50)]));
+        Assert.IsType<OkObjectResult>(await _controller.GetIndicatorBatch([.. tooMany.Take(20)]));
     }
 
     [Fact]
@@ -129,15 +130,58 @@ public class BatchEndpointTests
     [Fact]
     public async Task Batch_BindsEnumParametersByName()
     {
+        _quoteService
+            .Setup(q => q.Get(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Quotes(120));
+
         IActionResult result = await _controller.GetIndicatorBatch(
             ["BETA?lookbackPeriods=14&type=Up", "BETA?lookbackPeriods=14&type=Sideways", "BETA?lookbackPeriods=14&type=up"]);
 
-        // A known name is accepted (whatever the benchmark feed returns); an
-        // unknown one is a 400 for that selection alone.
         ObjectResult multi = Assert.IsType<ObjectResult>(result);
-        List<object?> statuses = Statuses(Items(multi.Value));
-        Assert.NotEqual(400, statuses[0]);
-        Assert.Equal(400, statuses[1]);
-        Assert.NotEqual(400, statuses[2]);
+        Assert.Equal([200, 400, 200], Statuses(Items(multi.Value)));
+    }
+
+    [Fact]
+    public async Task Batch_AnItemThatThrowsDoesNotDiscardItsNeighbours()
+    {
+        // A jaw offset of int.MaxValue overflows inside the indicator.
+        IActionResult result = await _controller.GetIndicatorBatch(
+            ["ADL", "ALLIGATOR?jawPeriods=13&jawOffset=2147483647&teethPeriods=8&teethOffset=5&lipsPeriods=5&lipsOffset=3", "ADX?lookbackPeriods=14"]);
+
+        ObjectResult multi = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(StatusCodes.Status207MultiStatus, multi.StatusCode);
+        Assert.Equal([200, 500, 200], Statuses(Items(multi.Value)));
+    }
+
+    [Fact]
+    public async Task Batch_BindsARepeatedParameterToItsFirstValue()
+    {
+        OkObjectResult single = Assert.IsType<OkObjectResult>(await _controller.GetAdx(14));
+        OkObjectResult batch = Assert.IsType<OkObjectResult>(
+            await _controller.GetIndicatorBatch(["ADX?lookbackPeriods=14&lookbackPeriods=20"]));
+
+        object data = Property(Items(batch.Value).Single(), "Data")!;
+
+        Assert.Equal(JsonSerializer.Serialize(single.Value), JsonSerializer.Serialize(data));
+    }
+
+    [Fact]
+    public async Task Batch_BindsAMissingParameterToItsDefaultLikeASingleCall()
+    {
+        BadRequestObjectResult single = Assert.IsType<BadRequestObjectResult>(await _controller.GetAdx(0));
+        IActionResult result = await _controller.GetIndicatorBatch(["ADX"]);
+
+        ObjectResult multi = Assert.IsType<ObjectResult>(result);
+        Assert.Equal([single.StatusCode], Statuses(Items(multi.Value)));
+    }
+
+    [Fact]
+    public async Task Batch_ComputesIdenticalSelectionsOnce()
+    {
+        IActionResult result = await _controller.GetIndicatorBatch(
+            ["ADX?lookbackPeriods=14", "adx?LOOKBACKPERIODS=14", "ADX?lookbackPeriods=14"]);
+
+        Assert.IsType<OkObjectResult>(result);
+        _quoteService.Verify(q => q.Get(It.IsAny<CancellationToken>()), Times.Once);
     }
 }

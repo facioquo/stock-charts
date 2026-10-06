@@ -166,6 +166,40 @@ describe("ApiClient", () => {
       expect(fetchMock).toHaveBeenCalledTimes(3);
     });
 
+    it("splits a long list into batch requests no larger than the API cap", async () => {
+      const many = Array.from({ length: 25 }, (_, i) => request("ADX", i + 1));
+      const fetchMock = vi.fn((url: string) => {
+        const count = new URL(url).searchParams.getAll("s").length;
+        return Promise.resolve(
+          okResponse(Array.from({ length: count }, () => ({ status: 200, data: [{ ok: 1 }] })))
+        );
+      });
+      vi.stubGlobal("fetch", fetchMock);
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(many));
+
+      expect(rows).toHaveLength(25);
+      expect(
+        fetchMock.mock.calls.map(([url]) => new URL(url).searchParams.getAll("s").length)
+      ).toEqual([20, 5]);
+    });
+
+    it.each([400, 414])("stops asking for the batch after a %i", async status => {
+      const fetchMock = vi.fn((url: string) =>
+        Promise.resolve(
+          url.includes("/indicators/batch") ? errorResponse(status) : okResponse([{ ok: 1 }])
+        )
+      );
+      vi.stubGlobal("fetch", fetchMock);
+      const api = new ApiClient();
+
+      await Promise.all(api.getSelectionsData(requests));
+      fetchMock.mockClear();
+      await Promise.all(api.getSelectionsData(requests));
+
+      expect(fetchMock.mock.calls.some(([url]) => url.includes("/indicators/batch"))).toBe(false);
+    });
+
     it("falls back per selection, but keeps trying the batch, after a network failure", async () => {
       const fetchMock = vi.fn((url: string) =>
         url.includes("/indicators/batch")

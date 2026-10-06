@@ -159,7 +159,7 @@ Parameters are sorted by name and percent-encoded. A missing or unreachable snap
 
 ## Methods
 
-The returned `ApiClient` exposes three methods. All return promises that reject (after `onError`) on network or HTTP failures, unless `staleCache` holds a prior response or `offlineFallback` has a snapshot file — in that case `onError` still fires but the promise resolves with that data.
+The returned `ApiClient` exposes four methods. All return promises that reject (after `onError`) on network or HTTP failures, unless `staleCache` holds a prior response or `offlineFallback` has a snapshot file — in that case `onError` still fires but the promise resolves with that data.
 
 Successful `getQuotes()` and `getListings()` responses are shared, per resolved URL, by every client the package creates. Concurrent calls join one request, and later calls reuse the settled body for the page's lifetime. A failed request is not kept. Call `clearApiClientCache()` to force a refetch; do this before refreshing in a long-lived tab, an interval, or a Node or SSR process. The first caller's retry settings govern a shared request.
 
@@ -214,7 +214,7 @@ const rows = await Promise.all(
 );
 ```
 
-The batch is optional for a server. On a `404` or `405` the client requests each selection on its own and does not ask for the batch again, and a selection whose batch item failed is requested alone. `endpoints.batch` overrides the route.
+The batch is optional for a server. On a `404`, `405`, `400`, `413` or `414` the client requests each selection on its own and does not ask for the batch again. The batch gets one attempt, and a list over 20 is sent as several requests. A selection whose batch item failed is requested alone. `endpoints.batch` overrides the route.
 
 ## Data shape
 

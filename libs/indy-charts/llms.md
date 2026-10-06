@@ -103,7 +103,7 @@ The component renders its sized chart frames on mount, before any data arrives, 
 
 Optional. Skip this whole section if you supply your own data.
 
-`createApiClient({ baseUrl })` expects three operations, specified in `backing-api.yml`:
+`createApiClient({ baseUrl })` expects three operations, plus an optional fourth, specified in `backing-api.yml`:
 
 | Operation | Returns | Client method |
 | --- | --- | --- |
@@ -140,7 +140,7 @@ That distinction is the one thing most worth getting right when implementing thi
 
 ### Serving your own
 
-Any server answering those three operations works. A reference implementation of the .NET side lives in <https://github.com/facioquo/stock-charts>; `backing-api.yml` is what yours conforms to.
+Any server answering the three required operations works. A reference implementation of the .NET side lives in <https://github.com/facioquo/stock-charts>; `backing-api.yml` is what yours conforms to.
 
 Responses are camelCase, timestamps ISO 8601. Each indicator row carries a `timestamp` plus one field per `dataName` the listing declares, `null` where the indicator has not warmed up.
 
@@ -180,7 +180,7 @@ Build the files with `createOfflineSnapshot(config)` at build time against the l
 | `setupIndyChartsForVue(app, config)` | Vue adapter (`/vue` subpath), registers `<StockIndicatorChart>` |
 | `ChartManager` | Overlay + oscillators + viewport, with teardown |
 | `OverlayChart`, `OscillatorChart` | Single-canvas classes |
-| `createApiClient(config)` | Client for the three backing-API operations |
+| `createApiClient(config)` | Client for the backing-API operations |
 | `clearApiClientCache()` | Drop the quote and listing responses shared across clients |
 | `createOfflineSnapshot(config, options)` | Build the snapshot files `offlineFallback` reads |
 | `loadStaticQuotes`, `loadStaticIndicatorData` | Bring-your-own `Bar[]` / `IndicatorDataRow[]` |

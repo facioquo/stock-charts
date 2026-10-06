@@ -23,6 +23,12 @@ const DEFAULT_BASE_DELAY_MS = 500;
 const MAX_RETRY_DELAY_MS = 30_000;
 const STALE_CACHE_PREFIX = "indy-charts:stale:";
 
+/** Most selections per batch request; matches the API cap. */
+const BATCH_SIZE = 20;
+
+/** Statuses meaning the server will not answer a batch request at this size, so asking again fails the same. */
+const BATCH_REFUSED: ReadonlySet<number> = new Set([400, 404, 405, 413, 414]);
+
 function isTransientStatus(status: number): boolean {
   return status === 429 || (status >= 500 && status <= 599);
 }
@@ -651,8 +657,9 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
     }
 
     try {
-      const response = await fetchWithRetry(url.toString(), maxAttempts, baseDelayMs);
-      if (response.status === 404 || response.status === 405) batchSupported = false;
+      // One attempt: each selection has its own retrying request to fall back to.
+      const response = await fetchWithRetry(url.toString(), 1, baseDelayMs);
+      if (BATCH_REFUSED.has(response.status)) batchSupported = false;
       if (!response.ok) return undefined;
       const body = (await response.json()) as unknown;
       return Array.isArray(body) && body.length === requests.length
@@ -800,9 +807,14 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         );
       }
 
-      const batch = fetchBatch(requests);
+      // One request per chunk, so a list longer than the server's cap still batches.
+      const chunks: Array<Promise<Array<{ status: number; data?: unknown }> | undefined>> = [];
+      for (let start = 0; start < requests.length; start += BATCH_SIZE) {
+        chunks.push(fetchBatch(requests.slice(start, start + BATCH_SIZE)));
+      }
+
       return requests.map(async ({ selection, listing }, index) => {
-        const item = (await batch)?.at(index);
+        const item = (await chunks.at(Math.floor(index / BATCH_SIZE)))?.at(index % BATCH_SIZE);
         if (item?.status === 200 && Array.isArray(item.data)) {
           const rows = item.data as IndicatorDataRow[];
           if (staleCache) tryStaleCacheWrite(selectionUrl(baseUrl, selection, listing), rows);

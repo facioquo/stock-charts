@@ -22,6 +22,19 @@ const INSTANCE = "api";
 const CACHE_STATUS = "x-edge-cache";
 
 /**
+ * The most selections one batch request may carry. Keep in step with
+ * `maxBatchSelections` in `server/WebApi/Endpoints.Batch.cs`.
+ */
+const MAX_BATCH_SELECTIONS = 20;
+
+/** Selections a request asks the container to compute: one per `s` of a batch, else one. */
+function selectionCount(url: URL): number {
+  return url.pathname.replace(/\/+$/, "").toLowerCase().endsWith("/indicators/batch")
+    ? url.searchParams.getAll("s").length
+    : 1;
+}
+
+/**
  * Only responses the API explicitly marks as shared-cacheable are stored. The
  * API sets `Cache-Control: public, max-age=...` on quote and indicator
  * responses; anything else (errors, the health check) goes straight through.
@@ -84,8 +97,24 @@ export default {
     // strings can bypass the cache at will. Legitimate chart loads make ~10
     // uncached requests; sustained cache-busting gets a 429 instead of
     // compute time.
+    // A batch spends one token per selection, so it costs what the same
+    // selections cost as separate requests.
+    const selections = selectionCount(new URL(request.url));
+
+    if (selections > MAX_BATCH_SELECTIONS) {
+      const refused = new Response(`At most ${MAX_BATCH_SELECTIONS} selections per request.`, {
+        status: 400
+      });
+      applyCors(refused.headers, allowedOrigin);
+      return refused;
+    }
+
     const clientIp = request.headers.get("cf-connecting-ip") ?? "unknown";
-    const { success: withinLimit } = await env.RATE_LIMITER.limit({ key: clientIp });
+    let withinLimit = true;
+
+    for (let spent = 0; withinLimit && spent < Math.max(selections, 1); spent++) {
+      withinLimit = (await env.RATE_LIMITER.limit({ key: clientIp })).success;
+    }
 
     if (!withinLimit) {
       const limited = new Response("Rate limit exceeded", {

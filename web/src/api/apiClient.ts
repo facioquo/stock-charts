@@ -57,6 +57,12 @@ export function describeApiError(error: unknown): string {
   return "Unexpected error";
 }
 
+/** Most selections per batch request; matches the API's cap. */
+const BATCH_SIZE = 20;
+
+/** Statuses meaning the backend will not answer a batch request, now or at this size. */
+const BATCH_REFUSED: ReadonlySet<number> = new Set([400, 404, 405, 413, 414]);
+
 /**
  * Fetch-based port of the Angular `ApiService`. Talks to the .NET Web API and
  * falls back to bundled backup data when the backend is unavailable, preserving
@@ -69,7 +75,7 @@ export function describeApiError(error: unknown): string {
  */
 export class ApiClient {
   private backupActive = false;
-  /** Cleared when the backend answers the batch route with 404/405. */
+  /** Cleared when the backend refuses the batch route. */
   private batchSupported = true;
   private cachedBackupRows: Array<{ timestamp: string; candle: unknown }> | undefined;
 
@@ -158,9 +164,16 @@ export class ApiClient {
       return requests.map(({ selection, listing }) => this.getSelectionData(selection, listing));
     }
 
-    const batch = this.fetchBatch(requests);
+    // One request per chunk, so a list longer than the server's cap still batches.
+    const chunks: Array<Promise<BatchItem[] | undefined>> = [];
+    for (let start = 0; start < requests.length; start += BATCH_SIZE) {
+      const chunk = requests.slice(start, start + BATCH_SIZE);
+      chunks.push(this.fetchBatch(chunk));
+    }
+
     return requests.map(async ({ selection, listing }, index) => {
-      const item = (await batch)?.at(index);
+      const chunk = chunks.at(Math.floor(index / BATCH_SIZE));
+      const item = (await chunk)?.at(index % BATCH_SIZE);
       if (item?.status === 200 && Array.isArray(item.data)) return item.data as unknown[];
       return this.getSelectionData(selection, listing);
     });
@@ -194,8 +207,9 @@ export class ApiClient {
         ? (body as BatchItem[])
         : undefined;
     } catch (error) {
-      // 404/405: the backend predates the route, so stop asking this session.
-      if (error instanceof ApiError && (error.status === 404 || error.status === 405)) {
+      // 404/405: the backend predates the route. 400/413/414: it refuses a request this
+      // size. Either way a retry would fail the same, so stop asking this session.
+      if (error instanceof ApiError && BATCH_REFUSED.has(error.status)) {
         this.batchSupported = false;
       }
       return undefined;

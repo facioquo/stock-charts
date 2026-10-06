@@ -87,11 +87,11 @@ paths:
       operationId: getIndicatorBatch
       summary: Computed series for several indicators in one call
       description: |
-        **Optional.** `ApiClient.getSelectionsData()` sends this request so a page load needs one call for every indicator it shows. A server without the route loses nothing: on a `404` or `405` the client requests each indicator on its own, through `getIndicatorData`, and does not ask for the batch again.
+        **Optional.** `ApiClient.getSelectionsData()` sends this request so a page load needs one call for every indicator it shows. A server without the route loses nothing: on a `404`, `405`, `400`, `413` or `414` the client requests each indicator on its own, through `getIndicatorData`, and does not ask for the batch again. The client makes one attempt at the batch, and sends at most 20 `s` values per request.
 
-        Each `s` value names one indicator request: the path of the URL the catalog entry's `endpoint` resolves to (without the leading or trailing slash), then `?` and the query the single request would carry, for example `BB?lookbackPeriods=20&standardDeviations=2`. Percent-encode the value. The response lists one result per `s`, in request order, each carrying the status the single request would have answered and, on `200`, the same rows.
+        Each `s` value names one indicator request: the path of the URL the catalog entry's `endpoint` resolves to, relative to the API base and without the leading or trailing slash, then `?` and the query the single request would carry, for example `BB?lookbackPeriods=20&standardDeviations=2`. Percent-encode the value. The response lists one result per `s`, in request order, each carrying the status the single request would have answered and, on `200`, the same rows.
 
-        Respond `200` when every selection succeeded, and `207` when any did not, so a partial answer is never cached as the whole. A client takes only the `200` items from a `207` and requests the rest on their own. Servers may cap the number of selections; `400` is the answer to a request over the cap.
+        Respond `200` when every selection succeeded, and `207` when any did not, so a partial answer is never cached as the whole. A client takes only the `200` items from a `207` and requests the rest on their own. Servers may cap the number of selections; the reference server accepts 20 and answers `400` with a plain-text message to a request over the cap. A selection that fails on the server answers its own item (`500`) without affecting the others. A repeated parameter takes its first value, and a missing one its default, as in the single request.
       parameters:
         - name: s
           in: query

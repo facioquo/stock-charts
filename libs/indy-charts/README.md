@@ -190,13 +190,14 @@ npx @redocly/cli build-docs node_modules/@facioquo/indy-charts/dist/backing-api.
 
 `dist/llms.txt` covers the same ground for coding agents, alongside the charting API.
 
-Three operations, and the catalog drives the rest:
+Three required operations and one optional, and the catalog drives the rest:
 
 | Operation | Returns | Called by |
 | --- | --- | --- |
 | `GET /quotes` | `Bar[]` — OHLCV, oldest first | `getQuotes()` |
 | `GET /indicators` | `IndicatorListing[]` — what exists, how to call and draw it | `getListings()` |
 | `GET /{indicatorPath}` | `IndicatorDataRow[]` — one row per bar | `getSelectionData()` |
+| `GET /indicators/batch` (optional) | One result per selection | `getSelectionsData()` |
 
 There is no fixed list of indicator routes: each catalog entry carries the `endpoint` to call and the `parameters` it accepts, so adding an indicator is a catalog change rather than an interface change. `endpoint` is resolved with `new URL(endpoint, baseUrl)`, so it may be absolute (as the reference server emits) or relative to your `baseUrl`. Return 503 for anything a retry could resolve, and 429 to ask for a slower one — the client retries both with back-off and falls back to its last good response. Every other 4xx is final.
 

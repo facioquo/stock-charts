@@ -625,6 +625,70 @@ describe("createApiClient", () => {
       expect(batchCalls()).toHaveLength(1);
     });
 
+    it("splits a long list into batch requests no larger than the server cap", async () => {
+      const many = Array.from({ length: 25 }, () => requests[0]).filter(r => r !== undefined);
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((url: string) => {
+          const count = new URL(url).searchParams.getAll("s").length;
+          return Promise.resolve({
+            ok: true,
+            status: 200,
+            statusText: "",
+            headers: { get: () => null },
+            json: () =>
+              Promise.resolve(
+                Array.from({ length: count }, () => ({ status: 200, data: [{ a: 1 }] }))
+              )
+          } as unknown as Response);
+        })
+      );
+
+      const rows = await Promise.all(client.getSelectionsData(many));
+
+      expect(rows).toHaveLength(25);
+      expect(batchCalls().map(url => new URL(url).searchParams.getAll("s").length)).toEqual([
+        20, 5
+      ]);
+    });
+
+    it.each([400, 414])("stops asking for the batch after a %i", async status => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((url: string) =>
+          Promise.resolve({
+            ok: !url.includes("/indicators/batch"),
+            status: url.includes("/indicators/batch") ? status : 200,
+            statusText: "",
+            headers: { get: () => null },
+            json: () => Promise.resolve([{ ok: 1 }])
+          } as unknown as Response)
+        )
+      );
+
+      await Promise.all(client.getSelectionsData(requests));
+      await Promise.all(client.getSelectionsData(requests));
+
+      expect(batchCalls()).toHaveLength(1);
+    });
+
+    it("makes one attempt at the batch before falling back, even with retries on", async () => {
+      const retrying = createApiClient({
+        baseUrl: BASE_URL,
+        retry: { maxAttempts: 3, baseDelayMs: 1 }
+      });
+      const fetchMock = mockFetchSequence([
+        { status: 503, body: {} },
+        { status: 200, body: [{ one: 1 }] },
+        { status: 200, body: [{ two: 2 }] }
+      ]);
+
+      const rows = await Promise.all(retrying.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ one: 1 }], [{ two: 2 }]]);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+    });
+
     it("does not batch a single selection", async () => {
       mockFetchOk([{ ok: 1 }]);
 

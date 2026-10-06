@@ -85,7 +85,7 @@
  * ### API
  * - `createApiClient(config)` - Create a lightweight `fetch`-based `ApiClient`
  * - `clearApiClientCache()` - Drop the quote and listing responses shared across clients
- * - `ApiClient` - Interface exposing `getQuotes`, `getListings`, `getSelectionData`
+ * - `ApiClient` - Interface exposing `getQuotes`, `getListings`, `getSelectionData`, `getSelectionsData`
  * - `createOfflineSnapshot(config, options?)` - Build the snapshot files `offlineFallback` reads
  * - `loadStaticQuotes(quotes)` - Accept `Bar[]` (string or Date timestamps), return `Bar[]` with timestamps as Date
  * - `loadStaticIndicatorData(rows)` - Pass-through helper for `IndicatorDataRow[]`
