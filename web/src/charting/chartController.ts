@@ -17,16 +17,10 @@ import { calculateOptimalBars, subscribeResize } from "../services/windowSize";
 /** A restore fetch slower than this is skipped, so it cannot hold back saving user changes. */
 const RESTORE_TIMEOUT_MS = 15_000;
 
-class RestoreTimeoutError extends Error {
-  constructor(ms: number) {
-    super(`Timed out after ${ms} ms`);
-  }
-}
-
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const timer = setTimeout(() => {
-      reject(new RestoreTimeoutError(ms));
+      reject(new Error(`Timed out after ${ms} ms`));
     }, ms);
     promise.then(
       value => {
@@ -62,7 +56,7 @@ export class ChartController {
   private unsubscribeResize: (() => void) | undefined;
   /** True while startup selections are being restored, so a partial list is never saved. */
   private restoring = false;
-  /** Restore fetches that timed out; they may be alive, so saves keep them for this session. */
+  /** Restore fetches that failed or timed out. Saves keep them for this session so a transient failure does not delete a saved indicator, though they are not shown. */
   private unrestored: IndicatorSelection[] = [];
   /** Saved order of the last restore, so kept selections return to their slot. */
   private restoreOrder: string[] = [];
@@ -167,7 +161,7 @@ export class ChartController {
    * Show startup selections in list order. Fetches run concurrently, and each
    * chart is built as soon as it and every chart before it has settled, so
    * arrival order cannot change the stack and one slow request holds back only
-   * the charts after it. A selection that fails to load is skipped.
+   * the charts after it. A selection that fails to load is not shown, but stays saved for this session.
    */
   private async showSelectionsInOrder(selections: readonly IndicatorSelection[]): Promise<void> {
     this.restoring = true;
@@ -183,7 +177,7 @@ export class ChartController {
           )) as IndicatorDataRow[];
           return { selection, listing, rows };
         } catch (error) {
-          if (error instanceof RestoreTimeoutError) this.unrestored.push(selection);
+          this.unrestored.push(selection);
           console.error("Error adding selection without scroll:", error);
           return undefined;
         }
@@ -195,14 +189,29 @@ export class ChartController {
         try {
           this.showSelection(item.selection, item.listing, item.rows, false);
         } catch (error) {
+          this.unrestored.push(item.selection);
           console.error("Error adding selection without scroll:", error);
         }
       }
     } finally {
       this.restoring = false;
     }
+    this.placeAddedDuringRestoreLast(selections);
     // Never overwrite the saved list when nothing could be restored.
     if (this.selections.length > 0 || this.unrestored.length > 0) this.cacheSelections();
+  }
+
+  /** An indicator added while restoring displays first; saved order puts it after the restored ones. */
+  private placeAddedDuringRestoreLast(restored: readonly IndicatorSelection[]): void {
+    const restoredIds = new Set(restored.map(selection => selection.ucid));
+    const added = this.selections.filter(selection => !restoredIds.has(selection.ucid));
+    if (added.length === 0) return;
+    const order = [
+      ...this.selections.filter(selection => restoredIds.has(selection.ucid)),
+      ...added
+    ].map(selection => selection.ucid);
+    this.chartManager.reorderSelections(order);
+    this.syncOscillatorDom();
   }
 
   /**
@@ -254,6 +263,8 @@ export class ChartController {
       container?.parentNode?.removeChild(container);
     }
 
+    // Removing every displayed indicator also clears what could not be restored.
+    if (this.selections.length === 0) this.unrestored = [];
     this.cacheSelections();
   }
 

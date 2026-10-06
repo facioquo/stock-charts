@@ -1,4 +1,5 @@
-import { useEffect, useId, useReducer, useRef, useState, type Dispatch } from "react";
+import { useId, useReducer, useRef, useState, type Dispatch } from "react";
+import { flushSync } from "react-dom";
 
 import type { ChartController } from "../../charting/chartController";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
@@ -59,6 +60,8 @@ function ToggleRow({ label, checked, onChange }: ToggleRowProps): React.JSX.Elem
   );
 }
 
+type MoveButtonRef = (ucid: string, offset: -1 | 1) => (node: HTMLButtonElement | null) => void;
+
 interface DisplayedIndicatorsProps {
   selections: readonly IndicatorSelection[];
   checked: ReadonlySet<string>;
@@ -67,6 +70,8 @@ interface DisplayedIndicatorsProps {
   onRemove: () => void;
   onEdit: Dispatch<IndicatorSelection>;
   onMove: ChartController["moveSelection"];
+  /** Ref callback factory that records a row's move button so focus can follow a move. */
+  moveButtonRef: MoveButtonRef;
 }
 
 interface SelectionGroupProps extends Omit<DisplayedIndicatorsProps, "onSelectAll" | "onRemove"> {
@@ -82,7 +87,8 @@ function SelectionGroup({
   checked,
   onToggle,
   onEdit,
-  onMove
+  onMove,
+  moveButtonRef
 }: SelectionGroupProps): React.JSX.Element | null {
   const headingId = useId();
   if (selections.length === 0) return null;
@@ -102,7 +108,7 @@ function SelectionGroup({
               type="button"
               className="icon-button"
               aria-label={`move ${selection.label} up`}
-              data-move={`${selection.ucid}:-1`}
+              ref={moveButtonRef(selection.ucid, -1)}
               title="move up"
               disabled={index === 0}
               onClick={() => {
@@ -115,7 +121,7 @@ function SelectionGroup({
               type="button"
               className="icon-button"
               aria-label={`move ${selection.label} down`}
-              data-move={`${selection.ucid}:1`}
+              ref={moveButtonRef(selection.ucid, 1)}
               title="move down"
               disabled={index === selections.length - 1}
               onClick={() => {
@@ -157,9 +163,10 @@ function DisplayedIndicators({
   onSelectAll,
   onRemove,
   onEdit,
-  onMove
+  onMove,
+  moveButtonRef
 }: DisplayedIndicatorsProps): React.JSX.Element {
-  const groupProps = { checked, onToggle, onEdit, onMove };
+  const groupProps = { checked, onToggle, onEdit, onMove, moveButtonRef };
   return (
     <section className="displayed-indicators">
       <div className="dialog-section-header">
@@ -270,6 +277,7 @@ interface SettingsControls {
   selectAll: (value: boolean) => void;
   removeSelected: () => void;
   moveSelection: ChartController["moveSelection"];
+  moveButtonRef: MoveButtonRef;
 }
 
 /** State + handlers backing the settings dialog (theme, tooltips, selection). */
@@ -313,22 +321,18 @@ function useSettingsControls(controller: ChartController): SettingsControls {
 
   // A move re-renders the row (React moves the swapped node) or disables the
   // pressed button at the end of its group; either drops focus to <body>.
-  const moved = useRef<{ ucid: string; offset: -1 | 1 } | null>(null);
-  useEffect(() => {
-    const target = moved.current;
-    if (!target) return;
-    moved.current = null;
-    const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("button[data-move]"));
-    const find = (offset: number): HTMLButtonElement | undefined =>
-      buttons.find(button => button.dataset["move"] === `${target.ucid}:${offset}`);
-    const same = find(target.offset);
-    (same && !same.disabled ? same : find(-target.offset))?.focus();
-  });
+  const moveButtons = useRef(new Map<string, HTMLButtonElement>());
+  const moveButtonRef: MoveButtonRef = (ucid, offset) => node => {
+    const key = `${ucid}:${offset}`;
+    if (node) moveButtons.current.set(key, node);
+    else moveButtons.current.delete(key);
+  };
 
   const moveSelection = (ucid: string, offset: -1 | 1): void => {
     controller.moveSelection(ucid, offset);
-    moved.current = { ucid, offset };
-    forceUpdate();
+    flushSync(forceUpdate);
+    const same = moveButtons.current.get(`${ucid}:${offset}`);
+    (same && !same.disabled ? same : moveButtons.current.get(`${ucid}:${-offset}`))?.focus();
   };
 
   return {
@@ -340,7 +344,8 @@ function useSettingsControls(controller: ChartController): SettingsControls {
     toggleChecked,
     selectAll,
     removeSelected,
-    moveSelection
+    moveSelection,
+    moveButtonRef
   };
 }
 
@@ -386,6 +391,7 @@ export function SettingsDialog({
             onRemove={controls.removeSelected}
             onEdit={onEditIndicator}
             onMove={controls.moveSelection}
+            moveButtonRef={controls.moveButtonRef}
           />
         )}
 

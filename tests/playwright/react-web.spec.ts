@@ -108,7 +108,9 @@ test.describe("Stock Charts React Web", () => {
     await page.waitForLoadState("networkidle");
     await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
 
-    const oscillators = page.locator(".selection-list").nth(1).locator("li label span:first-child");
+    const oscillators = page
+      .getByRole("list", { name: "Oscillator charts" })
+      .locator("li label span:first-child");
     await page.getByRole("button", { name: "edit settings" }).click();
     await expect(oscillators.first()).toHaveText(/^RSI/);
 

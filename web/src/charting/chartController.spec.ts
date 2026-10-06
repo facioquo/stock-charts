@@ -396,21 +396,23 @@ describe("ChartController", () => {
         })
     ) as unknown as ApiClient["getSelectionData"];
     const controller = await loadWithCache(restored, getSelectionData);
-    const saved = (): number =>
-      (JSON.parse(localStorage.getItem("selections") ?? "[]") as unknown[]).length;
+    const saved = (): string[] =>
+      (JSON.parse(localStorage.getItem("selections") ?? "[]") as Array<{ uiid: string }>).map(
+        s => s.uiid
+      );
 
     // A user add lands while the restore is still waiting on its fetches.
     const added = makeSelection("ADDED", "overlay");
     const addedRequest = controller.addSelection(added, makeListing("ADDED", "overlay"));
     releases.at(-1)?.();
     await addedRequest;
-    expect(saved()).toBe(2);
+    expect(saved()).toEqual(["SLOW", "FAST"]);
 
     releases.slice(0, 2).forEach(release => {
       release();
     });
     await vi.waitFor(() => {
-      expect(saved()).toBe(3);
+      expect(saved()).toEqual(["SLOW", "FAST", "ADDED"]);
     });
   });
 
@@ -464,7 +466,7 @@ describe("ChartController", () => {
       const [first] = controller.selections;
       controller.moveSelection(first.ucid, 1);
 
-      expect(savedUiids()).toContain("SLOW");
+      expect(savedUiids()).toEqual(["SLOW", "B", "A"]);
     } finally {
       vi.useRealTimers();
     }
@@ -500,6 +502,44 @@ describe("ChartController", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it("keeps a restore selection whose fetch failed, so a transient error does not delete it", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const getSelectionData = vi.fn((selection: { uiid: string }) =>
+      selection.uiid === "B" ? Promise.reject(new Error("500")) : Promise.resolve([{}])
+    ) as unknown as ApiClient["getSelectionData"];
+    const controller = await loadWithCache(
+      [makeSelection("A", "oscillator"), makeSelection("B", "oscillator")],
+      getSelectionData
+    );
+    await vi.waitFor(() => {
+      expect(controller.selections.map(s => s.uiid)).toEqual(["A"]);
+    });
+
+    expect(
+      (JSON.parse(localStorage.getItem("selections") ?? "[]") as Array<{ uiid: string }>).map(
+        s => s.uiid
+      )
+    ).toEqual(["A", "B"]);
+  });
+
+  it("removing every displayed indicator also drops what could not be restored", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const getSelectionData = vi.fn((selection: { uiid: string }) =>
+      selection.uiid === "B" ? Promise.reject(new Error("500")) : Promise.resolve([{}])
+    ) as unknown as ApiClient["getSelectionData"];
+    const controller = await loadWithCache(
+      [makeSelection("A", "oscillator"), makeSelection("B", "oscillator")],
+      getSelectionData
+    );
+    await vi.waitFor(() => {
+      expect(controller.selections).toHaveLength(1);
+    });
+
+    controller.deleteSelection(controller.selections[0]?.ucid ?? "");
+
+    expect(JSON.parse(localStorage.getItem("selections") ?? "null")).toEqual([]);
   });
 
   describe("moveSelection", () => {
