@@ -1,6 +1,6 @@
 import { createDefaultSelection } from "@facioquo/indy-charts";
 
-import { isValidHexColor, lineTypes, lineWidths } from "../components/picker/indicatorStyles";
+import { isValidHexColor, lineTypes, lineWidths } from "./indicatorStyles";
 import type { IndicatorListing, IndicatorSelection } from "../types/chart.types";
 
 /** Query parameter that carries the encoded selections. */
@@ -17,12 +17,15 @@ const VERSION = "1";
 
 /**
  * Payload for version 1: one entry per selection, in display order.
- * `[uiid, paramValues, results]`, where `paramValues` follows the listing's
- * parameter order and each result is `[color, lineType, lineWidth]`, or `null`
- * where it matches the listing default.
+ * `[uiid, params, styles]`. Parameters are `[paramName, value]` pairs and
+ * styles `[dataName, color, lineType, lineWidth]`, only for results that differ
+ * from the listing default. Both are keyed by name rather than position, so a
+ * catalog that reorders or adds a parameter or result does not shift a shared
+ * link's values.
  */
-type ResultStyle = [string, string, number] | null;
-type Entry = [string, number[], ResultStyle[]];
+type ParamPair = [string, number];
+type StylePair = [string, string, string, number];
+type Entry = [string, ParamPair[], StylePair[]];
 
 function toBase64Url(text: string): string {
   const bytes = new TextEncoder().encode(text);
@@ -48,44 +51,54 @@ export function encodeSelections(
     const listing = listings.find(x => x.uiid === selection.uiid);
     if (!listing) return [];
     const defaults = createDefaultSelection(listing);
-    const values = selection.params.map(param => param.value ?? 0);
-    const styles = selection.results.map((result, index): ResultStyle => {
+    const params = selection.params.map((param): ParamPair => [param.paramName, param.value ?? 0]);
+    const styles = selection.results.flatMap((result, index): StylePair[] => {
       const base = defaults.results.at(index);
       return base &&
         base.color === result.color &&
         base.lineType === result.lineType &&
         base.lineWidth === result.lineWidth
-        ? null
-        : [result.color, result.lineType, result.lineWidth];
+        ? []
+        : [[result.dataName, result.color, result.lineType, result.lineWidth]];
     });
-    while (styles.length > 0 && styles.at(-1) === null) styles.pop();
-    return [[selection.uiid, values, styles]];
+    return [[selection.uiid, params, styles]];
   });
   return `${VERSION}.${toBase64Url(JSON.stringify(entries))}`;
 }
 
 /** A style is applied only if the settings dialog could have produced it. */
-function isStyle(value: unknown): value is [string, string, number] {
+function isStyle(value: unknown): value is StylePair {
   return (
     Array.isArray(value) &&
-    value.length === 3 &&
+    value.length === 4 &&
     typeof value[0] === "string" &&
-    isValidHexColor(value[0]) &&
-    lineTypes.some(option => option.value === value[1]) &&
-    lineWidths.some(option => option.value === value[2])
+    typeof value[1] === "string" &&
+    isValidHexColor(value[1]) &&
+    lineTypes.some(option => option.value === value[2]) &&
+    lineWidths.some(option => option.value === value[3])
+  );
+}
+
+function isParamPair(value: unknown): value is ParamPair {
+  return (
+    Array.isArray(value) &&
+    value.length === 2 &&
+    typeof value[0] === "string" &&
+    typeof value[1] === "number"
   );
 }
 
 function decodeEntry(entry: unknown, listings: readonly IndicatorListing[]): IndicatorSelection[] {
   if (!Array.isArray(entry) || typeof entry[0] !== "string") return [];
-  const [uiid, values, styles] = entry as [string, unknown, unknown];
+  const [uiid, pairs, styles] = entry as [string, unknown, unknown];
   const listing = listings.find(x => x.uiid === uiid);
-  if (!listing || !Array.isArray(values)) return [];
+  if (!listing || !Array.isArray(pairs)) return [];
 
+  const values = new Map(pairs.filter(isParamPair));
   const overrides: Record<string, number> = {};
-  for (const [index, config] of (listing.parameters ?? []).entries()) {
-    const value: unknown = values.at(index);
-    if (typeof value !== "number" || !Number.isFinite(value)) continue;
+  for (const config of listing.parameters ?? []) {
+    const value = values.get(config.paramName);
+    if (value === undefined || !Number.isFinite(value)) continue;
     if (config.dataType === "int" && !Number.isInteger(value)) continue;
     if (value < config.minimum || value > config.maximum) continue;
     overrides[config.paramName] = value;
@@ -93,10 +106,9 @@ function decodeEntry(entry: unknown, listings: readonly IndicatorListing[]): Ind
 
   const selection = createDefaultSelection(listing, overrides);
   if (Array.isArray(styles)) {
-    for (const [index, style] of styles.entries()) {
-      const result = selection.results.at(index);
-      if (!result || !isStyle(style)) continue;
-      [result.color, result.lineType, result.lineWidth] = style;
+    for (const style of styles.filter(isStyle)) {
+      const result = selection.results.find(x => x.dataName === style[0]);
+      if (result) [, result.color, result.lineType, result.lineWidth] = style;
     }
   }
   return [selection];

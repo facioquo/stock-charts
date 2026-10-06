@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 
-import { isValidHexColor } from "./indicatorStyles";
+import { isValidHexColor } from "../../charting/indicatorStyles";
 
 interface ColorSwatchPickerProps {
   value: string;

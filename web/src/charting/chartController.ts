@@ -169,10 +169,7 @@ export class ChartController {
    * arrival order cannot change the stack and one slow request holds back only
    * the charts after it. A selection that fails to load is not shown, but stays saved for this session.
    */
-  private async showSelectionsInOrder(
-    selections: readonly IndicatorSelection[],
-    save = true
-  ): Promise<void> {
+  private async showSelectionsInOrder(selections: readonly IndicatorSelection[]): Promise<void> {
     this.restoring = true;
     this.changedWhileRestoring = false;
     this.restoreOrder = selections.map(selection => selection.ucid);
@@ -207,9 +204,10 @@ export class ChartController {
       this.restoring = false;
     }
     this.placeAddedDuringRestoreLast(selections);
-    // Never overwrite the saved list when nothing could be restored.
+    // Never overwrite the saved list when nothing could be restored, and keep a
+    // shared link unsaved until the user changes something.
     if (
-      (save || this.userChangedWhileRestoring()) &&
+      (!this.linkActive || this.userChangedWhileRestoring()) &&
       (this.selections.length > 0 || this.unrestored.length > 0)
     ) {
       this.cacheSelections();
@@ -497,7 +495,7 @@ export class ChartController {
       return false;
     }
     this.linkActive = true;
-    void this.showSelectionsInOrder(shared, false).then(() => {
+    void this.showSelectionsInOrder(shared).then(() => {
       // A link whose indicators all fail to load must not leave an empty chart.
       if (!this.linkActive || this.selections.length > 0) return;
       this.dropShareParam();

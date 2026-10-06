@@ -46,6 +46,28 @@ const obv: IndicatorListing = {
   parameters: []
 };
 
+const bands: IndicatorListing = {
+  ...sma,
+  uiid: "BANDS",
+  parameters: ["a", "b"].map(paramName => ({
+    ...(sma.parameters?.[0] ?? {}),
+    paramName,
+    minimum: 1,
+    maximum: 10,
+    defaultValue: 5
+  }))
+};
+
+const duo: IndicatorListing = {
+  ...sma,
+  uiid: "DUO",
+  parameters: [],
+  results: ["one", "two"].map(dataName => ({
+    ...(sma.results?.[0] ?? {}),
+    dataName
+  }))
+};
+
 const listings = [sma, obv];
 
 describe("share link encoding", () => {
@@ -75,7 +97,7 @@ describe("share link encoding", () => {
     const payload: unknown = JSON.parse(
       atob(encoded.slice(2).replaceAll("-", "+").replaceAll("_", "/"))
     );
-    expect(payload).toEqual([["SMA", [20], []]]);
+    expect(payload).toEqual([["SMA", [["lookbackPeriods", 20]], []]]);
   });
 
   it("starts with the format version", () => {
@@ -91,7 +113,13 @@ describe("share link encoding", () => {
   });
 
   it("skips unknown indicators and falls back to the default for an out-of-range value", () => {
-    const payload = btoa(JSON.stringify([["NOPE", [1], []], ["SMA", [9999], []], "junk"]));
+    const payload = btoa(
+      JSON.stringify([
+        ["NOPE", [["lookbackPeriods", 1]], []],
+        ["SMA", [["lookbackPeriods", 9999]], []],
+        "junk"
+      ])
+    );
     const decoded = decodeSelections(`1.${payload}`, listings);
 
     expect(decoded).toHaveLength(1);
@@ -103,27 +131,31 @@ describe("share link encoding", () => {
     `1.${btoa(JSON.stringify(entries)).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "")}`;
 
   it("ignores a link over the length cap", () => {
-    const entries = Array.from({ length: 2000 }, () => ["SMA", [20], []]);
+    const entries = Array.from({ length: 2000 }, () => ["SMA", [["lookbackPeriods", 20]], []]);
     const encoded = payloadOf(entries);
     expect(encoded.length).toBeGreaterThan(8192);
     expect(decodeSelections(encoded, listings)).toEqual([]);
   });
 
   it("caps the number of indicators and drops repeated entries", () => {
-    const distinct = Array.from({ length: 120 }, (_, i) => ["SMA", [i + 1], []]);
+    const distinct = Array.from({ length: 120 }, (_, i) => [
+      "SMA",
+      [["lookbackPeriods", i + 1]],
+      []
+    ]);
     expect(decodeSelections(payloadOf(distinct), listings)).toHaveLength(50);
 
-    const repeated = Array.from({ length: 20 }, () => ["SMA", [20], []]);
+    const repeated = Array.from({ length: 20 }, () => ["SMA", [["lookbackPeriods", 20]], []]);
     expect(decodeSelections(payloadOf(repeated), listings)).toHaveLength(1);
   });
 
   it("applies only styles the settings dialog could produce", () => {
     const decoded = decodeSelections(
       payloadOf([
-        ["SMA", [20], [["red", "dash", 2]]],
-        ["SMA", [21], [["#ff0000", "candle", 2]]],
-        ["SMA", [22], [["#ff0000", "dash", 1e9]]],
-        ["SMA", [23], [["#ff0000", "dots", 2]]]
+        ["SMA", [["lookbackPeriods", 20]], [["sma", "red", "dash", 2]]],
+        ["SMA", [["lookbackPeriods", 21]], [["sma", "#ff0000", "candle", 2]]],
+        ["SMA", [["lookbackPeriods", 22]], [["sma", "#ff0000", "dash", 1e9]]],
+        ["SMA", [["lookbackPeriods", 23]], [["sma", "#ff0000", "dots", 2]]]
       ]),
       listings
     );
@@ -140,8 +172,42 @@ describe("share link encoding", () => {
   });
 
   it("falls back to the default for a fractional integer parameter", () => {
-    const [decoded] = decodeSelections(payloadOf([["SMA", [2.5], []]]), listings);
+    const [decoded] = decodeSelections(
+      payloadOf([["SMA", [["lookbackPeriods", 2.5]], []]]),
+      listings
+    );
     expect(decoded?.params[0]?.value).toBe(20);
+  });
+
+  it("binds values by name, so a catalog that reorders parameters does not shift them", () => {
+    const encoded = encodeSelections([createDefaultSelection(bands, { b: 7, a: 3 })], [bands]);
+    const reordered: IndicatorListing = {
+      ...bands,
+      parameters: [...(bands.parameters ?? [])].reverse()
+    };
+
+    const [decoded] = decodeSelections(encoded, [reordered]);
+
+    expect(Object.fromEntries(decoded?.params.map(p => [p.paramName, p.value]) ?? [])).toEqual({
+      a: 3,
+      b: 7
+    });
+  });
+
+  it("binds a style to its result by name, so a catalog that reorders results does not shift it", () => {
+    const selection = createDefaultSelection(duo);
+    const second = selection.results.find(r => r.dataName === "two");
+    if (second) second.color = "#ff0000";
+    const encoded = encodeSelections([selection], [duo]);
+    const reordered: IndicatorListing = {
+      ...duo,
+      results: [...(duo.results ?? [])].reverse()
+    };
+
+    const [decoded] = decodeSelections(encoded, [reordered]);
+
+    expect(decoded?.results.find(r => r.dataName === "two")?.color).toBe("#ff0000");
+    expect(decoded?.results.find(r => r.dataName === "one")?.color).not.toBe("#ff0000");
   });
 
   it("builds a URL on the current path carrying only the share parameter", () => {

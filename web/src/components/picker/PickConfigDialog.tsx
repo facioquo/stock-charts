@@ -12,7 +12,7 @@ import {
   lineWidths,
   presetColors,
   userSpecifiedWidth
-} from "./indicatorStyles";
+} from "../../charting/indicatorStyles";
 import { Modal } from "./Modal";
 
 interface PickConfigDialogProps {

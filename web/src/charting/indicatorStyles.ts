@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-import type { IndicatorResult } from "../../types/chart.types";
+import type { IndicatorResult } from "../types/chart.types";
 
 export interface LineWidthOption {
   name: string;
