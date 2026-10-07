@@ -594,6 +594,79 @@ describe("createApiClient", () => {
       ]);
     });
 
+    it("matches items to selections by the selection each echoes, whatever order they arrive in", async () => {
+      mockFetchOk([
+        { selection: "SMA?lookbackPeriods=20", status: 200, data: [{ sma: 1 }] },
+        { selection: "RSI?lookbackPeriods=14", status: 200, data: [{ rsi: 2 }] }
+      ]);
+      const reversed = [...requests].reverse();
+
+      const rows = await Promise.all(client.getSelectionsData(reversed));
+
+      expect(rows).toEqual([[{ rsi: 2 }], [{ sma: 1 }]]);
+      expect(batchCalls()).toHaveLength(1);
+    });
+
+    it("answers the same selection requested twice from its echoed items", async () => {
+      mockFetchOk([
+        { selection: "SMA?lookbackPeriods=20", status: 200, data: [{ sma: 1 }] },
+        { selection: "SMA?lookbackPeriods=20", status: 200, data: [{ sma: 1 }] }
+      ]);
+
+      const rows = await Promise.all(
+        client.getSelectionsData([requests[0] as never, requests[0] as never])
+      );
+
+      expect(rows).toEqual([[{ sma: 1 }], [{ sma: 1 }]]);
+    });
+
+    it("matches an echoed selection ignoring case", async () => {
+      mockFetchOk([
+        { selection: "rsi?lookbackperiods=14", status: 200, data: [{ rsi: 2 }] },
+        { selection: "sma?lookbackperiods=20", status: 200, data: [{ sma: 1 }] }
+      ]);
+
+      const rows = await Promise.all(client.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ sma: 1 }], [{ rsi: 2 }]]);
+    });
+
+    it("answers only the echoed items of a partly echoing batch", async () => {
+      const fetchMock = mockFetchSequence([
+        {
+          status: 200,
+          body: [
+            { status: 200, data: [{ x: 9 }] },
+            { selection: "RSI?lookbackPeriods=14", status: 200, data: [{ rsi: 2 }] }
+          ]
+        },
+        { status: 200, body: [{ sma: 1 }] }
+      ]);
+
+      const rows = await Promise.all(client.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ sma: 1 }], [{ rsi: 2 }]]);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    it("requests a selection alone when an echoed batch leaves it out", async () => {
+      const fetchMock = mockFetchSequence([
+        {
+          status: 200,
+          body: [
+            { selection: "SMA?lookbackPeriods=20", status: 200, data: [{ sma: 1 }] },
+            { selection: "MACD", status: 200, data: [{ macd: 3 }] }
+          ]
+        },
+        { status: 200, body: [{ rsi: 2 }] }
+      ]);
+
+      const rows = await Promise.all(client.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ sma: 1 }], [{ rsi: 2 }]]);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
     it("requests a selection alone when its batch item failed", async () => {
       const fetchMock = mockFetchSequence([
         {

@@ -40,6 +40,8 @@ export interface SelectionRequest {
 
 /** One entry of a `GET /indicators/batch` response. */
 interface BatchItem {
+  /** The `s` value this item answers; absent from servers that answer strictly in request order. */
+  selection?: string;
   status: number;
   data?: unknown;
   error?: string;
@@ -155,10 +157,12 @@ export class ApiClient {
   /**
    * Rows for several selections from one `GET /indicators/batch` call (at most
    * 20 per call), as one promise per request in request order. On success every
-   * promise settles together, once the batch answers. A selection the batch cannot answer
-   * (an older backend without the route, a failed item, or an unreadable
-   * response) is fetched on its own through {@link getSelectionData}, so the
-   * result matches calling that method per selection.
+   * promise settles together, once the batch answers. Items are matched to requests
+   * by the `selection` each echoes, so a reordered response cannot hand a chart
+   * another indicator's rows; a server that echoes nothing is read positionally.
+   * A selection the batch cannot answer (an older backend without the route, a
+   * failed item, or an unreadable response) is fetched on its own through
+   * {@link getSelectionData}, so the result matches calling that method per selection.
    */
   getSelectionsData(requests: readonly SelectionRequest[]): Array<Promise<unknown[]>> {
     if (requests.length < 2 || this.backupActive || !this.batchSupported) {
@@ -166,7 +170,7 @@ export class ApiClient {
     }
 
     // One request per chunk, so a list longer than the server's cap still batches.
-    const chunks: Array<Promise<BatchItem[] | undefined>> = [];
+    const chunks: Array<Promise<Array<BatchItem | undefined> | undefined>> = [];
     for (let start = 0; start < requests.length; start += BATCH_SIZE) {
       const chunk = requests.slice(start, start + BATCH_SIZE);
       chunks.push(this.fetchBatch(chunk));
@@ -182,31 +186,50 @@ export class ApiClient {
 
   // HELPERS
 
-  /** `undefined` when the batch could not be used; callers fall back per selection. */
+  /** The `s` value naming one request: its route relative to the API base, then its query. */
+  private selectionKey({ selection, listing }: SelectionRequest): string {
+    const params = new URLSearchParams();
+    selection.params.forEach((p: IndicatorParam) => {
+      params.set(p.paramName, String(p.value));
+    });
+    const url = new URL(this.buildApiUrl(listing.endpoint, params));
+    const base = new URL(env.api.endsWith("/") ? env.api : `${env.api}/`);
+    const name = url.pathname.startsWith(base.pathname)
+      ? url.pathname.slice(base.pathname.length)
+      : url.pathname;
+    return `${name.replace(/^\/+|\/+$/g, "")}${url.search}`;
+  }
+
+  /**
+   * One slot per request, in request order; `undefined` marks a request the batch
+   * did not answer, and an `undefined` result means the batch could not be used.
+   * Callers fall back per selection for either.
+   */
   private async fetchBatch(
     requests: readonly SelectionRequest[]
-  ): Promise<BatchItem[] | undefined> {
+  ): Promise<Array<BatchItem | undefined> | undefined> {
+    const keys = requests.map(request => this.selectionKey(request));
     const query = new URLSearchParams();
-    requests.forEach(({ selection, listing }) => {
-      const params = new URLSearchParams();
-      selection.params.forEach((p: IndicatorParam) => {
-        params.set(p.paramName, String(p.value));
-      });
-      const url = new URL(this.buildApiUrl(listing.endpoint, params));
-      const base = new URL(env.api.endsWith("/") ? env.api : `${env.api}/`);
-      const name = url.pathname.startsWith(base.pathname)
-        ? url.pathname.slice(base.pathname.length)
-        : url.pathname;
-      query.append("s", `${name.replace(/^\/+|\/+$/g, "")}${url.search}`);
+    keys.forEach(key => {
+      query.append("s", key);
     });
 
     try {
       const batchUrl = new URL("indicators/batch", env.api.endsWith("/") ? env.api : `${env.api}/`);
       batchUrl.search = query.toString();
       const body = await this.getJson<unknown>(batchUrl.toString());
-      return Array.isArray(body) && body.length === requests.length
-        ? (body as BatchItem[])
-        : undefined;
+      if (!Array.isArray(body) || body.length !== requests.length) return undefined;
+      const items = body as BatchItem[];
+      // Echoed selections win over position: the order a response arrives in is not
+      // guaranteed, the selection it answers is. A response that echoes nothing is
+      // read in request order; one that echoes only some items answers just those.
+      if (!items.some(item => typeof item.selection === "string")) return items;
+      const bySelection = new Map<string, BatchItem>();
+      items.forEach(item => {
+        const key = typeof item.selection === "string" ? item.selection.toLowerCase() : undefined;
+        if (key !== undefined && !bySelection.has(key)) bySelection.set(key, item);
+      });
+      return keys.map(key => bySelection.get(key.toLowerCase()));
     } catch (error) {
       // 404/405: the backend predates the route. 400/413/414: it refuses a request this
       // size. Either way a retry would fail the same, so stop asking this session.

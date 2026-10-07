@@ -129,6 +129,113 @@ describe("ApiClient", () => {
       ]);
     });
 
+    it("matches items to selections by the selection each echoes, whatever order they arrive in", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(
+          okResponse([
+            { selection: "ADX?lookbackPeriods=14", status: 200, data: [{ a: 1 }] },
+            { selection: "MACD?lookbackPeriods=12", status: 200, data: [{ c: 3 }] },
+            { selection: "RSI?lookbackPeriods=5", status: 200, data: [{ b: 2 }] }
+          ])
+        )
+      );
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }], [{ c: 3 }]]);
+    });
+
+    it("answers the same selection requested twice from its echoed items", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(
+          okResponse([
+            { selection: "ADX?lookbackPeriods=14", status: 200, data: [{ a: 1 }] },
+            { selection: "RSI?lookbackPeriods=5", status: 200, data: [{ b: 2 }] },
+            { selection: "ADX?lookbackPeriods=14", status: 200, data: [{ a: 1 }] }
+          ])
+        )
+      );
+      const twice = [request("ADX", 14), request("RSI", 5), request("ADX", 14)];
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(twice));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }], [{ a: 1 }]]);
+    });
+
+    it("answers only the echoed items of a partly echoing batch, and requests the rest alone", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          okResponse([
+            { status: 200, data: [{ x: 9 }] },
+            { selection: "ADX?lookbackPeriods=14", status: 200, data: [{ a: 1 }] },
+            { status: 200, data: [{ y: 8 }] }
+          ])
+        )
+        .mockResolvedValue(okResponse([{ ok: 1 }]));
+      vi.stubGlobal("fetch", fetchMock);
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ ok: 1 }], [{ ok: 1 }]]);
+    });
+
+    it("requests the right selection alone when a reordered batch fails one item", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          okResponse([
+            { selection: "RSI?lookbackPeriods=5", status: 400, error: "bad" },
+            { selection: "MACD?lookbackPeriods=12", status: 200, data: [{ c: 3 }] },
+            { selection: "ADX?lookbackPeriods=14", status: 200, data: [{ a: 1 }] }
+          ])
+        )
+        .mockResolvedValue(okResponse([{ alone: 1 }]));
+      vi.stubGlobal("fetch", fetchMock);
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ alone: 1 }], [{ c: 3 }]]);
+      expect(String(fetchMock.mock.calls[1]?.[0])).toContain("/RSI/");
+    });
+
+    it("matches an echoed selection ignoring case", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(
+          okResponse([
+            { selection: "rsi?lookbackperiods=5", status: 200, data: [{ b: 2 }] },
+            { selection: "adx?lookbackperiods=14", status: 200, data: [{ a: 1 }] },
+            { selection: "macd?lookbackperiods=12", status: 200, data: [{ c: 3 }] }
+          ])
+        )
+      );
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }], [{ c: 3 }]]);
+    });
+
+    it("asks for a selection alone when an echoed batch has no item for it", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          okResponse([
+            { selection: "ADX?lookbackPeriods=14", status: 200, data: [{ a: 1 }] },
+            { selection: "RSI?lookbackPeriods=5", status: 200, data: [{ b: 2 }] },
+            { selection: "ADL", status: 200, data: [{ z: 9 }] }
+          ])
+        )
+        .mockResolvedValue(okResponse([{ ok: 1 }]));
+      vi.stubGlobal("fetch", fetchMock);
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }], [{ ok: 1 }]]);
+    });
+
     it("asks for a selection alone when the batch leaves it out", async () => {
       const fetchMock = vi
         .fn()

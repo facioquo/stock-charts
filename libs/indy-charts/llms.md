@@ -118,6 +118,7 @@ Mistakes the types do not show:
 
 - `getSelectionsData()` returns an **array of promises**, one per request, not one promise. Use `await Promise.all(client.getSelectionsData(requests))`.
 - One request is not always one network call: fewer than 2 selections are not batched, and more than 20 are sent as several batch requests. A server must accept at least 20 `s` values.
+- Echo each `s` value as `selection` on its batch item. The client matches by it, so a cache or proxy that reorders repeated `s` values cannot misattribute rows; without it the client trusts request order.
 - The batch gets a single attempt; a failed or unreadable batch falls back to one retrying request per selection.
 - A `400`, `404`, `405`, `413` or `414` from the batch route stops the client asking for it again, so answer a selection you cannot run with its own `207` item rather than rejecting the request with a `400`. A `429` or `5xx` does not.
 - Answer `200` only when every selection succeeded, and `207` otherwise: a `207` is never cached, and the client takes only its `200` items.
