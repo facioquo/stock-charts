@@ -209,6 +209,20 @@
   font-weight: 400;
 }
 
+.selection-group-header {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px 4px;
+}
+
+.selection-group-title {
+  font-weight: 500;
+}
+
+.selection-group-hint {
+  font-size: 0.75rem;
+}
+
 .selection-list,
 .nav-list {
   list-style: none;

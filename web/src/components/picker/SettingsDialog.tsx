@@ -1,4 +1,5 @@
-import { useId, useReducer, useState, type Dispatch } from "react";
+import { useId, useReducer, useRef, useState, type Dispatch } from "react";
+import { flushSync } from "react-dom";
 
 import type { ChartController } from "../../charting/chartController";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
@@ -59,6 +60,19 @@ function ToggleRow({ label, checked, onChange }: ToggleRowProps): React.JSX.Elem
   );
 }
 
+type MoveButtonNode = HTMLButtonElement;
+/** Records a row's move button under `ucid:offset`, so focus can follow a move. */
+function makeMoveButtonRef(buttons: Map<string, MoveButtonNode>) {
+  return (ucid: string, offset: -1 | 1) =>
+    (node: MoveButtonNode | null): void => {
+      const key = `${ucid}:${offset}`;
+      if (node) buttons.set(key, node);
+      else buttons.delete(key);
+    };
+}
+
+type MoveButtonRef = ReturnType<typeof makeMoveButtonRef>;
+
 interface DisplayedIndicatorsProps {
   selections: readonly IndicatorSelection[];
   checked: ReadonlySet<string>;
@@ -66,32 +80,67 @@ interface DisplayedIndicatorsProps {
   onSelectAll: (value: boolean) => void;
   onRemove: () => void;
   onEdit: Dispatch<IndicatorSelection>;
+  onMove: ChartController["moveSelection"];
+  /** Ref callback factory that records a row's move button so focus can follow a move. */
+  moveButtonRef: MoveButtonRef;
 }
 
-/** List of currently-displayed indicators with edit and multi-select removal. */
-function DisplayedIndicators({
+interface SelectionGroupProps extends Omit<DisplayedIndicatorsProps, "onSelectAll" | "onRemove"> {
+  title: string;
+  hint: string;
+}
+
+/** One group of displayed indicators, with edit and reorder controls per row. */
+function SelectionGroup({
+  title,
+  hint,
   selections,
   checked,
   onToggle,
-  onSelectAll,
-  onRemove,
-  onEdit
-}: DisplayedIndicatorsProps): React.JSX.Element {
+  onEdit,
+  onMove,
+  moveButtonRef
+}: SelectionGroupProps): React.JSX.Element | null {
+  const headingId = useId();
+  if (selections.length === 0) return null;
   return (
-    <section className="displayed-indicators">
-      <div className="dialog-section-header">
-        <span>Displayed indicators</span>
-        <span className="filler" />
-        <StandardCheckbox
-          ariaLabel="select all displayed indicators"
-          checked={checked.size > 0 && checked.size === selections.length}
-          onChange={onSelectAll}
-        />
+    <>
+      <div className="selection-group-header">
+        <span id={headingId} className="selection-group-title">
+          {title}
+        </span>
+        <span className="selection-group-hint">{hint}</span>
       </div>
-      <ul className="selection-list">
-        {selections.map(selection => (
+      <ul className="selection-list" aria-labelledby={headingId}>
+        {selections.map((selection, index) => (
           <li key={selection.ucid}>
             <label htmlFor={`select-${selection.ucid}`}>{selection.label}</label>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label={`move ${selection.label} up`}
+              ref={moveButtonRef(selection.ucid, -1)}
+              title="move up"
+              disabled={index === 0}
+              onClick={() => {
+                onMove(selection.ucid, -1);
+              }}
+            >
+              <span className="material-icons">arrow_upward</span>
+            </button>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label={`move ${selection.label} down`}
+              ref={moveButtonRef(selection.ucid, 1)}
+              title="move down"
+              disabled={index === selections.length - 1}
+              onClick={() => {
+                onMove(selection.ucid, 1);
+              }}
+            >
+              <span className="material-icons">arrow_downward</span>
+            </button>
             <button
               type="button"
               className="icon-button"
@@ -113,6 +162,45 @@ function DisplayedIndicators({
           </li>
         ))}
       </ul>
+    </>
+  );
+}
+
+/** Displayed indicators grouped by chart, with edit, reorder, and multi-select removal. */
+function DisplayedIndicators({
+  selections,
+  checked,
+  onToggle,
+  onSelectAll,
+  onRemove,
+  onEdit,
+  onMove,
+  moveButtonRef
+}: DisplayedIndicatorsProps): React.JSX.Element {
+  const groupProps = { checked, onToggle, onEdit, onMove, moveButtonRef };
+  return (
+    <section className="displayed-indicators">
+      <div className="dialog-section-header">
+        <span>Displayed indicators</span>
+        <span className="filler" />
+        <StandardCheckbox
+          ariaLabel="select all displayed indicators"
+          checked={checked.size > 0 && checked.size === selections.length}
+          onChange={onSelectAll}
+        />
+      </div>
+      <SelectionGroup
+        {...groupProps}
+        title="Price chart overlays"
+        hint="earlier rows draw on top; bands stay behind lines"
+        selections={selections.filter(s => s.chartType === "overlay")}
+      />
+      <SelectionGroup
+        {...groupProps}
+        title="Oscillator charts"
+        hint="top to bottom, below the price chart"
+        selections={selections.filter(s => s.chartType === "oscillator")}
+      />
       <div className="action-button-container">
         <button
           type="button"
@@ -199,6 +287,8 @@ interface SettingsControls {
   toggleChecked: (ucid: string) => void;
   selectAll: (value: boolean) => void;
   removeSelected: () => void;
+  moveSelection: ChartController["moveSelection"];
+  moveButtonRef: MoveButtonRef;
 }
 
 /** State + handlers backing the settings dialog (theme, tooltips, selection). */
@@ -240,6 +330,18 @@ function useSettingsControls(controller: ChartController): SettingsControls {
     forceUpdate();
   };
 
+  // A move re-renders the row (React moves the swapped node) or disables the
+  // pressed button at the end of its group; either drops focus to <body>.
+  const moveButtons = useRef(new Map<string, MoveButtonNode>());
+  const moveButtonRef = makeMoveButtonRef(moveButtons.current);
+
+  const moveSelection = (ucid: string, offset: -1 | 1): void => {
+    controller.moveSelection(ucid, offset);
+    flushSync(forceUpdate);
+    const same = moveButtons.current.get(`${ucid}:${offset}`);
+    (same && !same.disabled ? same : moveButtons.current.get(`${ucid}:${-offset}`))?.focus();
+  };
+
   return {
     isDarkTheme,
     showTooltips,
@@ -248,7 +350,9 @@ function useSettingsControls(controller: ChartController): SettingsControls {
     onToggleTooltips,
     toggleChecked,
     selectAll,
-    removeSelected
+    removeSelected,
+    moveSelection,
+    moveButtonRef
   };
 }
 
@@ -293,6 +397,8 @@ export function SettingsDialog({
             onSelectAll={controls.selectAll}
             onRemove={controls.removeSelected}
             onEdit={onEditIndicator}
+            onMove={controls.moveSelection}
+            moveButtonRef={controls.moveButtonRef}
           />
         )}
 

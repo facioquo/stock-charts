@@ -14,6 +14,27 @@ import { getSettings } from "../services/userPrefs";
 import { scrollToEnd, scrollToStart } from "../services/meta";
 import { calculateOptimalBars, subscribeResize } from "../services/windowSize";
 
+/** A restore fetch slower than this is skipped, so it cannot hold back saving user changes. */
+const RESTORE_TIMEOUT_MS = 15_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`Timed out after ${ms} ms`));
+    }, ms);
+    promise.then(
+      value => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error: unknown) => {
+        clearTimeout(timer);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      }
+    );
+  });
+}
+
 export interface ChartState {
   loading: boolean;
   apiError: boolean;
@@ -33,6 +54,13 @@ export class ChartController {
   private readonly chartManager: ChartManager;
   private readonly api: ApiClient;
   private unsubscribeResize: (() => void) | undefined;
+  /** True while startup selections are being restored, so a partial list is never saved. */
+  private restoring = false;
+  private loadInFlight: Promise<void> | undefined;
+  /** Restore fetches that failed or timed out. Saves keep them for this session so a transient failure does not delete a saved indicator, though they are not shown. */
+  private unrestored: IndicatorSelection[] = [];
+  /** Saved order of the last restore, so kept selections return to their slot. */
+  private restoreOrder: string[] = [];
 
   /** Indicator catalog loaded from the API. */
   listings: IndicatorListing[] = [];
@@ -123,20 +151,95 @@ export class ChartController {
 
     const order = this.selections.map(s => s.ucid);
     const before = document.getElementById(`${ucid}-container`)?.nextSibling ?? null;
-    this.deleteSelection(ucid);
+    this.removeDisplayed(ucid);
     this.showSelection(replacement, listing, data as IndicatorDataRow[], false, before);
     // Display appends; restore the original position (and overlay layering).
     this.chartManager.reorderSelections(order);
     this.cacheSelections();
   }
 
-  /** Add an indicator without scrolling; swallows errors (used during startup). */
-  addSelectionWithoutScroll(selection: IndicatorSelection): void {
-    const listing = this.listings.find(x => x.uiid === selection.uiid);
-    if (!listing) return;
-    void this.addSelection(selection, listing, false).catch((error: unknown) => {
-      console.error("Error adding selection without scroll:", error);
-    });
+  /**
+   * Show startup selections in list order. Fetches run concurrently, and each
+   * chart is built as soon as it and every chart before it has settled, so
+   * arrival order cannot change the stack and one slow request holds back only
+   * the charts after it. A selection that fails to load is not shown, but stays saved for this session.
+   */
+  private async showSelectionsInOrder(selections: readonly IndicatorSelection[]): Promise<void> {
+    this.restoring = true;
+    this.restoreOrder = selections.map(selection => selection.ucid);
+    try {
+      const pending = selections.map(async selection => {
+        const listing = this.listings.find(x => x.uiid === selection.uiid);
+        if (!listing) return undefined;
+        try {
+          const rows = (await withTimeout(
+            this.api.getSelectionData(selection, listing),
+            RESTORE_TIMEOUT_MS
+          )) as IndicatorDataRow[];
+          return { selection, listing, rows };
+        } catch (error) {
+          this.unrestored.push(selection);
+          console.error("Error adding selection without scroll:", error);
+          return undefined;
+        }
+      });
+
+      for (const request of pending) {
+        const item = await request;
+        if (!item) continue;
+        try {
+          this.showSelection(item.selection, item.listing, item.rows, false);
+        } catch (error) {
+          this.unrestored.push(item.selection);
+          console.error("Error adding selection without scroll:", error);
+        }
+      }
+    } finally {
+      this.restoring = false;
+    }
+    this.placeAddedDuringRestoreLast(selections);
+    // Never overwrite the saved list when nothing could be restored.
+    if (this.selections.length > 0 || this.unrestored.length > 0) this.cacheSelections();
+  }
+
+  /** An indicator added while restoring displays first; saved order puts it after the restored ones. */
+  private placeAddedDuringRestoreLast(restored: readonly IndicatorSelection[]): void {
+    const restoredIds = new Set(restored.map(selection => selection.ucid));
+    const added = this.selections.filter(selection => !restoredIds.has(selection.ucid));
+    if (added.length === 0) return;
+    const order = [
+      ...this.selections.filter(selection => restoredIds.has(selection.ucid)),
+      ...added
+    ].map(selection => selection.ucid);
+    this.chartManager.reorderSelections(order);
+    this.syncOscillatorDom();
+  }
+
+  /**
+   * Move a displayed indicator one place up or down within its own group:
+   * overlays change layering, oscillators change chart order. A move at the end
+   * of the group does nothing.
+   */
+  moveSelection(ucid: string, offset: -1 | 1): void {
+    const moved = this.selections.find(s => s.ucid === ucid);
+    if (!moved) return;
+
+    const group = this.selections.filter(s => s.chartType === moved.chartType);
+    const from = group.indexOf(moved);
+    const to = from + offset;
+    if (to < 0 || to >= group.length) return;
+
+    // Move within the group, leaving the other group's slots where they are.
+    const reordered = group.filter(s => s !== moved);
+    reordered.splice(to, 0, moved);
+    let next = 0;
+    const order = this.selections.map(s =>
+      s.chartType === moved.chartType ? (reordered.at(next++)?.ucid ?? s.ucid) : s.ucid
+    );
+    this.chartManager.reorderSelections(order);
+
+    if (moved.chartType === "oscillator") this.syncOscillatorDom();
+    this.cacheSelections();
   }
 
   /** Create a default selection from the indicator catalog. */
@@ -150,18 +253,24 @@ export class ChartController {
 
   /** Remove an indicator and clean up its chart / DOM container. */
   deleteSelection(ucid: string): void {
+    if (!this.removeDisplayed(ucid)) return;
+
+    // Removing every displayed indicator also clears what could not be restored.
+    if (!this.restoring && this.selections.length === 0) this.unrestored = [];
+    this.cacheSelections();
+  }
+
+  /** Removes the chart and its DOM container without touching the saved list. */
+  private removeDisplayed(ucid: string): boolean {
     const selection = this.selections.find(s => s.ucid === ucid);
-    if (!selection) return;
+    if (!selection) return false;
 
-    const isOscillator = selection.chartType === "oscillator";
     this.chartManager.removeSelection(ucid);
-
-    if (isOscillator) {
+    if (selection.chartType === "oscillator") {
       const container = document.getElementById(`${ucid}-container`);
       container?.parentNode?.removeChild(container);
     }
-
-    this.cacheSelections();
+    return true;
   }
 
   /** Propagate theme / tooltip changes to all charts. */
@@ -183,8 +292,19 @@ export class ChartController {
 
   //#region DATA OPERATIONS
 
-  /** Bootstrap the overlay chart and load cached / default indicators. */
-  async loadCharts(): Promise<void> {
+  /**
+   * Bootstrap the overlay chart and load cached / default indicators. A call
+   * made while another is running joins it, so a development remount (React
+   * strict mode runs effects twice) cannot restore every indicator twice.
+   */
+  loadCharts(): Promise<void> {
+    this.loadInFlight ??= this.bootstrapCharts().finally(() => {
+      this.loadInFlight = undefined;
+    });
+    return this.loadInFlight;
+  }
+
+  private async bootstrapCharts(): Promise<void> {
     try {
       const allQuotes = await this.api.getQuotes();
 
@@ -286,9 +406,44 @@ export class ChartController {
     if (scrollToMe) scrollToEnd(container.id);
   }
 
+  /** Re-append the oscillator canvases in model order. */
+  private syncOscillatorDom(): void {
+    const zone = document.getElementById("oscillators-zone");
+    if (!zone) return;
+    for (const selection of this.selections) {
+      if (selection.chartType !== "oscillator") continue;
+      const container = document.getElementById(`${selection.ucid}-container`);
+      if (container) zone.appendChild(container);
+    }
+  }
+
   private cacheSelections(): void {
+    if (this.restoring) return;
+    this.persistSelections(this.selections);
+  }
+
+  /** Inserts each unrestored selection after its nearest saved predecessor that is present. */
+  private withUnrestored(list: readonly IndicatorSelection[]): IndicatorSelection[] {
+    const out = [...list];
+    for (const item of this.unrestored) {
+      if (out.some(x => x.ucid === item.ucid)) continue;
+      let at = 0;
+      for (let i = this.restoreOrder.indexOf(item.ucid) - 1; i >= 0; i--) {
+        const found = out.findIndex(x => x.ucid === this.restoreOrder.at(i));
+        if (found >= 0) {
+          at = found + 1;
+          break;
+        }
+      }
+      out.splice(at, 0, item);
+    }
+    return out;
+  }
+
+  private persistSelections(list: readonly IndicatorSelection[]): void {
+    const ordered = this.withUnrestored(list);
     try {
-      const selections = this.selections.map(selection => ({
+      const selections = ordered.map(selection => ({
         ...selection,
         params: selection.params.map(param => ({ ...param })),
         results: selection.results.map(result => ({
@@ -325,7 +480,7 @@ export class ChartController {
       const cached = JSON.parse(raw) as IndicatorSelection[] | null;
       // Respect explicitly-stored empty arrays (user removed all indicators).
       if (Array.isArray(cached)) {
-        cached.forEach(selection => this.addSelectionWithoutScroll(selection));
+        void this.showSelectionsInOrder(cached);
         return;
       }
     } catch {
@@ -346,17 +501,18 @@ export class ChartController {
       { uiid: "MARUBOZU" }
     ];
 
-    defaults.forEach(({ uiid, lookbackPeriods }) => {
+    const selections = defaults.flatMap(({ uiid, lookbackPeriods }) => {
       const selection = this.tryDefaultSelection(uiid);
-      if (!selection) return;
+      if (!selection) return [];
 
       const lookbackParam = selection.params.find(x => x.paramName === "lookbackPeriods");
       if (lookbackParam && lookbackPeriods !== undefined) {
         lookbackParam.value = lookbackPeriods;
       }
-
-      this.addSelectionWithoutScroll(selection);
+      return [selection];
     });
+
+    void this.showSelectionsInOrder(selections);
   }
 
   private tryDefaultSelection(uiid: string): IndicatorSelection | undefined {

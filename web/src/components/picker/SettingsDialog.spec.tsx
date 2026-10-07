@@ -36,6 +36,7 @@ interface FakeController {
   selections: IndicatorSelection[];
   listings: IndicatorListing[];
   deleteSelection: ReturnType<typeof vi.fn>;
+  moveSelection: ReturnType<typeof vi.fn>;
   onSettingsChange: ReturnType<typeof vi.fn>;
 }
 
@@ -50,6 +51,17 @@ function makeController(): FakeController {
     deleteSelection: vi.fn((ucid: string) => {
       const i = selections.findIndex(s => s.ucid === ucid);
       if (i >= 0) selections.splice(i, 1);
+    }),
+    moveSelection: vi.fn((ucid: string, offset: -1 | 1) => {
+      const moved = selections.find(s => s.ucid === ucid);
+      if (!moved) return;
+      const group = selections.filter(s => s.chartType === moved.chartType);
+      const target = group.at(group.indexOf(moved) + offset);
+      if (!target || group.indexOf(moved) + offset < 0) return;
+      const from = selections.indexOf(moved);
+      const to = selections.indexOf(target);
+      selections.splice(from, 1);
+      selections.splice(to, 0, moved);
     }),
     onSettingsChange: vi.fn()
   };
@@ -109,6 +121,57 @@ describe("SettingsDialog", () => {
     expect(onEditIndicator).toHaveBeenCalledWith(controller.selections[0]);
   });
 
+  it("groups indicators by chart and reorders within a group", () => {
+    const controller = makeController();
+    controller.selections.push({
+      ...makeSelection("u3", "EMA (20)"),
+      chartType: "overlay"
+    });
+    controller.selections.push(makeSelection("u4", "ADX (14)"));
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText("Price chart overlays")).toBeInTheDocument();
+    expect(screen.getByText("Oscillator charts")).toBeInTheDocument();
+
+    // Each group's first row cannot move up and its last cannot move down.
+    expect(screen.getByRole("button", { name: "move EMA (20) up" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "move EMA (20) down" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "move RSI (5) up" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "move ADX (14) down" })).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "move SMA (50) up" }));
+    expect(controller.moveSelection).toHaveBeenCalledWith("u2", -1);
+  });
+
+  it("keeps keyboard focus on the moved row's button after a move", () => {
+    const controller = makeController();
+    controller.selections.push(makeSelection("u3", "ADX (14)"));
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    // A move that does not reach the end of the group keeps the same button.
+    fireEvent.click(screen.getByRole("button", { name: "move RSI (5) down" }));
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "move RSI (5) down" }));
+
+    // A move onto the end disables the pressed button; focus goes to the opposite one.
+    fireEvent.click(screen.getByRole("button", { name: "move RSI (5) down" }));
+    expect(screen.getByRole("button", { name: "move RSI (5) down" })).toBeDisabled();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "move RSI (5) up" }));
+  });
+
   it("checks a displayed indicator from its label, with the checkbox last in the row", () => {
     const controller = makeController();
     render(
@@ -125,7 +188,7 @@ describe("SettingsDialog", () => {
     const checkbox = screen.getByRole("checkbox", { name: "select RSI (5)" });
     expect(checkbox).toBeChecked();
     expect(label).toHaveAttribute("for", checkbox.id);
-    // The checkbox is a direct child of the row, after its label and edit button.
+    // The checkbox is a direct child of the row, after its label and buttons.
     const row = checkbox.closest("li");
     expect(checkbox.parentElement).toBe(row);
     expect(row?.lastElementChild).toBe(checkbox);
