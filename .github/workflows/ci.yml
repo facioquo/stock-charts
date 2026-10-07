@@ -165,8 +165,7 @@ jobs:
       - name: Run package consumption smoke test
         run: pnpm run smoke:package-consumption
 
-  test-edge:
-    name: Test edge worker
+  test-edge-worker:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -343,7 +342,7 @@ jobs:
   gate:
     runs-on: ubuntu-slim
     timeout-minutes: 5
-    needs: [test-backend, test-edge, test-libraries, test-web, test-e2e]
+    needs: [test-backend, test-edge-worker, test-libraries, test-web, test-e2e]
     if: always()
     steps:
       - name: Verify required jobs succeeded
