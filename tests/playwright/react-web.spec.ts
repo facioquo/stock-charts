@@ -157,10 +157,17 @@ test.describe("Stock Charts React Web", () => {
     await shared.getByRole("button", { name: "BACK TO MY INDICATORS" }).click();
     await expect(shared.getByText("Showing a shared chart")).toBeHidden({ timeout: 15_000 });
     expect(new URL(shared.url()).searchParams.has("c")).toBe(false);
-    await shared.waitForLoadState("networkidle");
     await expect(shared.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
-    await shared.getByRole("button", { name: "edit settings" }).click();
-    await expect(oscillators.first()).toHaveText(/^RSI/);
+    // The list is read when the dialog opens, so reopen it until the restore has landed.
+    await expect(async () => {
+      await shared.getByRole("button", { name: "edit settings" }).click();
+      try {
+        await expect(oscillators.first()).toHaveText(/^RSI/, { timeout: 2_000 });
+      } catch (error) {
+        await shared.keyboard.press("Escape");
+        throw error;
+      }
+    }).toPass({ timeout: 30_000 });
     await fresh.close();
 
     expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
@@ -281,13 +288,14 @@ test.describe("Stock Charts React Web", () => {
 
       await expectDisplayed(page, 7);
       await expect(page.getByRole("button", { name: /^edit RSI.*5/ })).toBeVisible();
-      await page.waitForLoadState("networkidle");
 
       // Each opening indicator drew rows from its own snapshot file, at its opening parameters.
+      await expect
+        .poll(() => served)
+        .toEqual(
+          expect.arrayContaining(["SLOPE/lookbackPeriods=50.json", "RSI/lookbackPeriods=5.json"])
+        );
       expect(missing, "every selection finds its snapshot file").toEqual([]);
-      expect(served).toEqual(
-        expect.arrayContaining(["SLOPE/lookbackPeriods=50.json", "RSI/lookbackPeriods=5.json"])
-      );
 
       expect(errorCollection.pageErrors, "No uncaught page errors").toEqual([]);
     });
@@ -322,11 +330,15 @@ test.describe("Stock Charts React Web", () => {
       }, selections);
 
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
       await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+      // The snapshot answered, so the notice shows; a run that never went offline fails here.
+      await expect(
+        page.getByRole("status").filter({ hasText: "live API is unreachable" })
+      ).toBeVisible({ timeout: 15_000 });
 
       await expectDisplayed(page, catalog.length);
-      await page.waitForLoadState("networkidle");
+      // One file per distinct selection, plus the quotes and the catalog.
+      await expect.poll(() => served.length).toBeGreaterThanOrEqual(catalog.length);
       expect(missing, "every selection finds its snapshot file").toEqual([]);
 
       expect(errorCollection.pageErrors, "No uncaught page errors").toEqual([]);

@@ -43,25 +43,38 @@ const selections = [
 
 const files = await createOfflineSnapshot(config, { selections });
 
-// Listing endpoints are absolute URLs on the API origin. Relative ones resolve against
+// Listing endpoints are normally absolute URLs on the API origin; a relative one resolves
+// against the API base. Relative endpoints resolve against
 // whichever API the page is configured for, so the snapshot never points a request at
 // another environment. The snapshot paths depend only on the pathname, so they hold.
 for (const file of files) {
   if (file.path !== "indicators.json") continue;
   file.data = file.data.map(listing => {
-    const { pathname, search } = new URL(listing.endpoint);
+    const { pathname, search } = new URL(listing.endpoint, baseUrl);
     return { ...listing, endpoint: pathname + search };
   });
 }
 
 // Write beside the target, then swap, so a failed write leaves the current snapshot intact.
-const tempDir = `${outDir}.tmp`;
+const tempDir = path.resolve(`${outDir}.tmp`);
 fs.rmSync(tempDir, { recursive: true, force: true });
+// A snapshot path is slash-separated segments of file-safe characters, ending in `.json`.
+const segmentPattern = /^[\w~=&,-][\w.~=&,-]*$/;
+
+/** Resolves a library-supplied snapshot path under `root`, throwing if it could land elsewhere. */
+function snapshotTarget(root, relative) {
+  const segments = relative.split("/");
+  if (!relative.endsWith(".json") || !segments.every(segment => segmentPattern.test(segment))) {
+    throw new Error(`Unexpected snapshot path: ${relative}`);
+  }
+  const target = path.resolve(root, ...segments);
+  if (!target.startsWith(`${root}${path.sep}`))
+    throw new Error(`Snapshot path escapes ${root}: ${relative}`);
+  return target;
+}
+
 for (const { path: relative, data } of files) {
-  const target = path.resolve(tempDir, relative);
-  // The library supplies `relative`; refuse anything that would leave the snapshot folder.
-  if (!target.startsWith(`${tempDir}${path.sep}`)) throw new Error(`Unexpected path: ${relative}`);
-  // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal
+  const target = snapshotTarget(tempDir, relative);
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.writeFileSync(target, `${JSON.stringify(data)}\n`, "utf8");
 }

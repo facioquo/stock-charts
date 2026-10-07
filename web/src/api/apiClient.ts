@@ -62,8 +62,10 @@ export const BATCH_REFUSED: ReadonlySet<number> = new Set([400, 404, 405, 413, 4
  * Fetch-based client for the .NET Web API. When the API cannot answer, quotes,
  * listings, and indicator rows come from the snapshot served at {@link SNAPSHOT_URL}
  * and `isBackupActive` turns on, so the page can say it is showing saved data.
- * The flag stays on until {@link resetBackup}: one page load never mixes snapshot
- * candles with live indicator rows, and nothing re-probes the API in between.
+ * The flag follows the candles: it turns on only when quotes fall back, and stays on
+ * until {@link resetBackup}. One page load never mixes snapshot candles with live
+ * indicator rows, or live candles with snapshot rows, and nothing re-probes the API
+ * in between. A catalog served from the snapshot beside live quotes leaves it off.
  *
  * A transient failure of one indicator while quotes and listings are live returns
  * `[]`, which renders as gaps against the live candles.
@@ -78,7 +80,7 @@ export class ApiClient {
     retry: { maxAttempts: 2, baseDelayMs: 250 },
     offlineFallback: { baseUrl: SNAPSHOT_URL },
     onOffline: context => {
-      this.backupActive = true;
+      if (context === "quotes") this.backupActive = true;
       console.warn(`Backend API unavailable, using the offline snapshot for ${context}`);
     }
   });
@@ -114,7 +116,11 @@ export class ApiClient {
     // Quotes or listings came from the snapshot, so rows must too: live rows would
     // carry current dates against snapshot candles, even if the API has since recovered.
     if (this.backupActive) {
-      const rows = await fetchOfflineSnapshot(SNAPSHOT_URL, env.api, url);
+      const rows = await fetchOfflineSnapshot({
+        snapshotBaseUrl: SNAPSHOT_URL,
+        apiBaseUrl: env.api,
+        requestUrl: url
+      });
       if (Array.isArray(rows)) return rows as unknown[];
       console.warn("No snapshot rows for indicator", { uiid: selection.uiid });
       return [];

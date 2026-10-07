@@ -2,5 +2,6 @@ export { clearApiClientCache, createApiClient, peekCachedListings } from "./clie
 export type { ApiClient, ApiClientConfig, RetryConfig } from "./client";
 export { loadStaticQuotes, loadStaticIndicatorData } from "./static";
 export { fetchOfflineSnapshot } from "./offline";
+export type { FetchOfflineSnapshotOptions } from "./offline";
 export { createOfflineSnapshot } from "./snapshot";
 export type { OfflineSnapshotFile, OfflineSnapshotOptions } from "./snapshot";

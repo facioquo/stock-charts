@@ -123,7 +123,11 @@ describe("fetchOfflineSnapshot", () => {
       .mockResolvedValue({ ok: true, json: () => Promise.resolve([{ a: 1 }]) });
     vi.stubGlobal("fetch", fetchMock);
 
-    const body = await fetchOfflineSnapshot(SNAPSHOT, API, `${API}/SMA/?lookbackPeriods=20`);
+    const body = await fetchOfflineSnapshot({
+      snapshotBaseUrl: SNAPSHOT,
+      apiBaseUrl: API,
+      requestUrl: `${API}/SMA/?lookbackPeriods=20`
+    });
 
     expect(body).toEqual([{ a: 1 }]);
     expect(fetchMock).toHaveBeenCalledExactlyOnceWith(`${SNAPSHOT}/SMA/lookbackPeriods=20.json`);
@@ -131,10 +135,22 @@ describe("fetchOfflineSnapshot", () => {
 
   it("resolves to undefined when the file is missing or unreadable", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 404 }));
-    expect(await fetchOfflineSnapshot(SNAPSHOT, API, `${API}/quotes`)).toBeUndefined();
+    expect(
+      await fetchOfflineSnapshot({
+        snapshotBaseUrl: SNAPSHOT,
+        apiBaseUrl: API,
+        requestUrl: `${API}/quotes`
+      })
+    ).toBeUndefined();
 
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("offline")));
-    expect(await fetchOfflineSnapshot(SNAPSHOT, API, `${API}/quotes`)).toBeUndefined();
+    expect(
+      await fetchOfflineSnapshot({
+        snapshotBaseUrl: SNAPSHOT,
+        apiBaseUrl: API,
+        requestUrl: `${API}/quotes`
+      })
+    ).toBeUndefined();
   });
 });
 

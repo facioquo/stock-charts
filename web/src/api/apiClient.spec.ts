@@ -102,6 +102,37 @@ describe("ApiClient", () => {
     expect(api.isBackupActive).toBe(true);
   });
 
+  it("leaves backup mode off when only the listings come from the snapshot", async () => {
+    const api = new ApiClient();
+    const snapshot = snapshotOnlyFetch();
+    const live = [
+      {
+        timestamp: "2024-01-02T00:00:00Z",
+        open: 1,
+        high: 2,
+        low: 0.5,
+        close: 1.5,
+        volume: 100
+      }
+    ];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: string | URL) => {
+        const url = String(input);
+        if (url.includes("/data/chart-api/")) return snapshot(input);
+        if (url.endsWith("/quotes")) return Promise.resolve(okResponse(live));
+        return Promise.reject(new TypeError("Failed to fetch"));
+      })
+    );
+
+    api.resetBackup();
+    await api.getQuotes();
+    const listings = await api.getListings();
+
+    expect(listings.length).toBeGreaterThan(0);
+    expect(api.isBackupActive).toBe(false);
+  });
+
   it("clears backup mode when a load starts", async () => {
     const api = new ApiClient();
     vi.stubGlobal("fetch", snapshotOnlyFetch());

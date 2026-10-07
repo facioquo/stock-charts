@@ -44,16 +44,24 @@ export function offlineSnapshotPath(apiBaseUrl: string, requestUrl: string): str
   return query ? `${path}/${query}.json` : `${path}.json`;
 }
 
+/** Where to read one snapshot file: the file the live request for `requestUrl` would have been answered from. */
+export interface FetchOfflineSnapshotOptions {
+  /** Root URL of the snapshot files, as in `offlineFallback.baseUrl`. */
+  snapshotBaseUrl: string;
+  /** The API base URL the client is configured with; the snapshot path is relative to it. */
+  apiBaseUrl: string;
+  /** The absolute URL the live client would request, query string included, under `apiBaseUrl`. */
+  requestUrl: string;
+}
+
 /**
- * Fetches the snapshot file for a request URL and returns its parsed JSON, or
- * `undefined` when the file is missing or cannot be fetched or parsed (for
- * example during server-side rendering, where a relative URL does not resolve).
+ * Reads one snapshot file without a live request and returns its parsed JSON. The result is
+ * `undefined` when the file is missing, cannot be fetched or parsed, or the URLs do not parse,
+ * for example during server-side rendering, where a relative root does not resolve. The type
+ * is `unknown`: the caller validates the shape.
  */
-export async function fetchOfflineSnapshot(
-  snapshotBaseUrl: string,
-  apiBaseUrl: string,
-  requestUrl: string
-): Promise<unknown> {
+export async function fetchOfflineSnapshot(options: FetchOfflineSnapshotOptions): Promise<unknown> {
+  const { snapshotBaseUrl, apiBaseUrl, requestUrl } = options;
   const root = snapshotBaseUrl.replace(/\/+$/, "");
   try {
     const response = await fetch(`${root}/${offlineSnapshotPath(apiBaseUrl, requestUrl)}`);
