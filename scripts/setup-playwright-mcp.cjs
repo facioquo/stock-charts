@@ -20,10 +20,18 @@ const path = require("path");
 const fs = require("fs");
 
 const ROOT = path.resolve(__dirname, "..");
-const AT_PW_TEST_INDEX = path.join(ROOT, "node_modules", "@playwright", "test", "index.js");
+const AT_PW_TEST_INDEX = path.join(
+  ROOT,
+  "node_modules",
+  "@playwright",
+  "test",
+  "index.js"
+);
 
 if (!fs.existsSync(AT_PW_TEST_INDEX)) {
-  process.stdout.write("Playwright MCP shim: @playwright/test not installed, skipping.\n");
+  process.stdout.write(
+    "Playwright MCP shim: @playwright/test not installed, skipping.\n"
+  );
   process.exit(0);
 }
 
@@ -46,7 +54,13 @@ function findAllCachedPlaywrightTestJs() {
     ...(envSearchDir ? [envSearchDir] : []),
     // Windows npm default cache
     path.join(process.env["LOCALAPPDATA"] || "", "npm-cache", "_npx"),
-    path.join(process.env["USERPROFILE"] || "", "AppData", "Local", "npm-cache", "_npx"),
+    path.join(
+      process.env["USERPROFILE"] || "",
+      "AppData",
+      "Local",
+      "npm-cache",
+      "_npx"
+    ),
     // pnpm cache
     path.join(process.env["LOCALAPPDATA"] || "", "pnpm", "cache", "npx"),
     // macOS/Linux
@@ -57,7 +71,13 @@ function findAllCachedPlaywrightTestJs() {
     if (!fs.existsSync(searchDir)) continue;
     try {
       for (const hash of fs.readdirSync(searchDir)) {
-        const candidate = path.join(searchDir, hash, "node_modules", "playwright", "test.js");
+        const candidate = path.join(
+          searchDir,
+          hash,
+          "node_modules",
+          "playwright",
+          "test.js"
+        );
         if (fs.existsSync(candidate)) {
           results.push(candidate);
         }
