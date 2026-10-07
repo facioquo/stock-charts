@@ -6,7 +6,7 @@ namespace WebApi.Tests.Services;
 /// <summary>
 /// Keeps the demo's committed offline snapshot of the catalog in step with the catalog
 /// the API serves, so an indicator added or re-parameterized here cannot ship without
-/// its snapshot files. Regenerate with <c>pnpm run generate:offline-snapshot</c>.
+/// its snapshot catalog entry. Regenerate with <c>pnpm run generate:offline-snapshot</c>.
 /// </summary>
 public class OfflineSnapshotCatalogTests
 {
@@ -56,6 +56,6 @@ public class OfflineSnapshotCatalogTests
         DropDefaultFlags(snapshot);
         Assert.True(
             JsonNode.DeepEquals(served, snapshot),
-            "web/public/data/chart-api is out of date with the API catalog. Run `pnpm run generate:offline-snapshot` and commit the result.");
+            "web/public/data/chart-api is out of date with the API catalog. Run `pnpm run generate:offline-snapshot -- --apiBase=<url>` against an API that serves the new catalog, and commit the result.");
     }
 }

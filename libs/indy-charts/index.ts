@@ -155,6 +155,7 @@ export {
 export type {
   ApiClient,
   ApiClientConfig,
+  FetchOfflineSnapshotOptions,
   OfflineSnapshotFile,
   OfflineSnapshotOptions,
   RetryConfig

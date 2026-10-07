@@ -337,7 +337,7 @@ test.describe("Stock Charts React Web", () => {
       ).toBeVisible({ timeout: 15_000 });
 
       await expectDisplayed(page, catalog.length);
-      // One file per distinct selection, plus the quotes and the catalog.
+      // At least one file per selection answered.
       await expect.poll(() => served.length).toBeGreaterThanOrEqual(catalog.length);
       expect(missing, "every selection finds its snapshot file").toEqual([]);
 

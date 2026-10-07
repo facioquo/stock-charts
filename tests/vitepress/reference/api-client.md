@@ -157,6 +157,16 @@ Each request maps to one file under the snapshot root. The API base path is drop
 
 Parameters are sorted by name and percent-encoded. A missing or unreachable snapshot file is ignored, so the fallback is safe during server-side rendering.
 
+To read one snapshot file without trying the live API first, for a page that already knows its origin is down, call `fetchOfflineSnapshot`. `requestUrl` is the absolute URL the live client would request, query string included, under `apiBaseUrl`. It resolves to the parsed JSON (typed `unknown`), or `undefined` when the file is missing or unreadable.
+
+```typescript
+const rows = await fetchOfflineSnapshot({
+  snapshotBaseUrl: "/chart-api",
+  apiBaseUrl: "https://api.example.com",
+  requestUrl: "https://api.example.com/SMA/?lookbackPeriods=20"
+});
+```
+
 ## Methods
 
 The returned `ApiClient` exposes four methods. Each promise they return rejects (after `onError`) on network or HTTP failures, unless `staleCache` holds a prior response or `offlineFallback` has a snapshot file — in that case `onError` still fires but the promise resolves with that data. `getSelectionsData` returns an array with one such promise per request, not a single promise.

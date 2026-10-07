@@ -44,13 +44,16 @@ const selections = [
 const files = await createOfflineSnapshot(config, { selections });
 
 // Listing endpoints are normally absolute URLs on the API origin; a relative one resolves
-// against the API base. Relative endpoints resolve against
-// whichever API the page is configured for, so the snapshot never points a request at
-// another environment. The snapshot paths depend only on the pathname, so they hold.
+// against the API base. The snapshot keeps only pathname and query, which resolve against
+// whichever API the page is configured for, so it never points a request at another
+// environment. The snapshot paths depend only on the pathname, so they hold.
 for (const file of files) {
   if (file.path !== "indicators.json") continue;
   file.data = file.data.map(listing => {
-    const { pathname, search } = new URL(listing.endpoint, baseUrl);
+    const { pathname, search } = new URL(
+      listing.endpoint,
+      baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`
+    );
     return { ...listing, endpoint: pathname + search };
   });
 }
