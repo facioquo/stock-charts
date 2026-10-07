@@ -13,6 +13,7 @@ import { env } from "../config/env";
 import { getSettings } from "../services/userPrefs";
 import { scrollToEnd, scrollToStart } from "../services/meta";
 import { calculateOptimalBars, subscribeResize } from "../services/windowSize";
+import { buildShareUrl, decodeSelections, SHARE_PARAM } from "./shareLink";
 
 /** A restore fetch slower than this is skipped, so it cannot hold back saving user changes. */
 const RESTORE_TIMEOUT_MS = 15_000;
@@ -38,6 +39,8 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 export interface ChartState {
   loading: boolean;
   apiError: boolean;
+  /** Showing a share link's indicators, not yet the user's saved ones. */
+  sharedView: boolean;
 }
 
 /**
@@ -57,6 +60,12 @@ export class ChartController {
   /** True while startup selections are being restored, so a partial list is never saved. */
   private restoring = false;
   private loadInFlight: Promise<void> | undefined;
+  /** A user change landed while restoring, so the post-restore save is owed. */
+  private changedWhileRestoring = false;
+  /** The page was opened from a share link whose selections are not saved yet. */
+  private linkActive = false;
+  /** Set once the visitor leaves a share link, so a restore still in flight cannot save the link's list. */
+  private leavingLink = false;
   /** Restore fetches that failed or timed out. Saves keep them for this session so a transient failure does not delete a saved indicator, though they are not shown. */
   private unrestored: IndicatorSelection[] = [];
   /** Saved order of the last restore, so kept selections return to their slot. */
@@ -65,7 +74,7 @@ export class ChartController {
   /** Indicator catalog loaded from the API. */
   listings: IndicatorListing[] = [];
 
-  private state: ChartState = { loading: true, apiError: false };
+  private state: ChartState = { loading: true, apiError: false, sharedView: false };
   private readonly listeners = new Set<() => void>();
 
   constructor(api: ApiClient = apiClient) {
@@ -166,6 +175,7 @@ export class ChartController {
    */
   private async showSelectionsInOrder(selections: readonly IndicatorSelection[]): Promise<void> {
     this.restoring = true;
+    this.changedWhileRestoring = false;
     this.restoreOrder = selections.map(selection => selection.ucid);
     try {
       const pending = selections.map(async selection => {
@@ -198,8 +208,19 @@ export class ChartController {
       this.restoring = false;
     }
     this.placeAddedDuringRestoreLast(selections);
-    // Never overwrite the saved list when nothing could be restored.
-    if (this.selections.length > 0 || this.unrestored.length > 0) this.cacheSelections();
+    // Never overwrite the saved list when nothing could be restored, and keep a
+    // shared link unsaved until the user changes something.
+    if (
+      (!this.linkActive || this.userChangedWhileRestoring()) &&
+      (this.selections.length > 0 || this.unrestored.length > 0)
+    ) {
+      this.cacheSelections();
+    }
+  }
+
+  /** Read through a method: the flag is set by other calls while the restore awaits. */
+  private userChangedWhileRestoring(): boolean {
+    return this.changedWhileRestoring;
   }
 
   /** An indicator added while restoring displays first; saved order puts it after the restored ones. */
@@ -418,7 +439,12 @@ export class ChartController {
   }
 
   private cacheSelections(): void {
-    if (this.restoring) return;
+    if (this.leavingLink) return;
+    if (this.restoring) {
+      this.changedWhileRestoring = true;
+      return;
+    }
+    if (this.linkActive) this.dropShareParam();
     this.persistSelections(this.selections);
   }
 
@@ -463,7 +489,59 @@ export class ChartController {
     }
   }
 
+  /** The link's selections replace saved ones only once the user changes something. */
+  private loadSharedSelections(): boolean {
+    const encoded = new URLSearchParams(window.location.search).get(SHARE_PARAM);
+    if (!encoded) return false;
+    const shared = decodeSelections(encoded, this.listings);
+    if (shared.length === 0) {
+      console.warn("Ignoring an unreadable share link");
+      this.dropShareParam();
+      return false;
+    }
+    this.linkActive = true;
+    this.setState({ sharedView: true });
+    void this.showSelectionsInOrder(shared).then(() => {
+      // A link whose indicators all fail to load must not leave an empty chart.
+      if (!this.linkActive || this.selections.length > 0) return;
+      this.dropShareParam();
+      this.unrestored = [];
+      this.loadSavedSelections();
+    });
+    return true;
+  }
+
+  private dropShareParam(): void {
+    this.linkActive = false;
+    this.setState({ sharedView: false });
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete(SHARE_PARAM);
+      window.history.replaceState(window.history.state, "", url);
+    } catch {
+      // History may be unavailable.
+    }
+  }
+
+  /** Leaves a share link's view for the saved setup, which the link never replaced. */
+  returnToSavedSetup(): void {
+    if (!this.linkActive) return;
+    this.leavingLink = true;
+    this.dropShareParam();
+    window.location.reload();
+  }
+
+  /** A link that restores the current selections on any browser. */
+  shareUrl(): string {
+    return buildShareUrl(this.selections, this.listings);
+  }
+
   private loadSelections(): void {
+    if (this.loadSharedSelections()) return;
+    this.loadSavedSelections();
+  }
+
+  private loadSavedSelections(): void {
     let raw: string | null = null;
     try {
       raw = localStorage.getItem("selections");

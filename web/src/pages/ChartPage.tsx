@@ -13,7 +13,7 @@ import "../components/picker/picker.scss";
  * settings / indicator-picker dialogs.
  */
 export function ChartPage(): React.JSX.Element {
-  const { loading, apiError } = useChartState();
+  const { loading, apiError, sharedView } = useChartState();
   const isProduction = env.production;
   const controller = getChartController();
 
@@ -93,6 +93,29 @@ export function ChartPage(): React.JSX.Element {
           </div>
         </div>
       )}
+
+      {/* The status region stays mounted so a screen reader announces its text when it fills. */}
+      <div className={sharedView ? "shared-view-banner" : undefined}>
+        {sharedView && (
+          <span className="material-icons" aria-hidden="true">
+            link
+          </span>
+        )}
+        <span role="status" className={sharedView ? "banner-text" : undefined}>
+          {sharedView ? "Showing a shared chart." : ""}
+        </span>
+        {sharedView && (
+          <button
+            type="button"
+            className="btn-raised btn-primary"
+            onClick={() => {
+              controller.returnToSavedSetup();
+            }}
+          >
+            BACK TO MY INDICATORS
+          </button>
+        )}
+      </div>
 
       {/* SETTINGS FAB */}
       {!loading && !apiError && (

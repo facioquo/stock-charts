@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { createDefaultSelection } from "@facioquo/indy-charts";
 import type { IndicatorListing, IndicatorSelection } from "@facioquo/indy-charts";
 
 import type { ApiClient } from "../api/apiClient";
@@ -50,6 +51,7 @@ vi.mock("@facioquo/indy-charts", () => {
   };
 });
 
+import { decodeSelections, encodeSelections, SHARE_PARAM } from "./shareLink";
 import { ChartController } from "./chartController";
 
 type MockFn = ReturnType<typeof vi.fn>;
@@ -128,7 +130,11 @@ describe("ChartController", () => {
 
   it("starts in the loading state and notifies subscribers when state changes", async () => {
     const controller = new ChartController(makeApi());
-    expect(controller.getState()).toEqual({ loading: true, apiError: false });
+    expect(controller.getState()).toEqual({
+      loading: true,
+      apiError: false,
+      sharedView: false
+    });
 
     const listener = vi.fn();
     const unsubscribe = controller.subscribe(listener);
@@ -633,6 +639,207 @@ describe("ChartController", () => {
     // The singleton controller is loaded again on every page mount.
     await controller.loadCharts();
     expect(getListings).toHaveBeenCalledTimes(2);
+  });
+
+  describe("share link", () => {
+    const savedUiids = (): string[] =>
+      (JSON.parse(localStorage.getItem("selections") ?? "[]") as Array<{ uiid: string }>).map(
+        s => s.uiid
+      );
+    const catalog = ["SLOW", "FAST", "A", "B"].map(uiid => makeListing(uiid, "oscillator"));
+    const fetchRows = vi.fn().mockResolvedValue([{}]) as unknown as ApiClient["getSelectionData"];
+    const linkTo = (...uiids: string[]): void => {
+      const encoded = encodeSelections(
+        uiids.map(uiid => makeSelection(uiid, "oscillator")),
+        catalog
+      );
+      window.history.replaceState(null, "", `/?${SHARE_PARAM}=${encoded}`);
+    };
+
+    beforeEach(() => {
+      vi.mocked(createDefaultSelection).mockImplementation(listing => ({
+        ucid: `ucid-${listing.uiid}`,
+        uiid: listing.uiid,
+        label: listing.legendTemplate,
+        chartType: listing.chartType,
+        params: [],
+        results: []
+      }));
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.mocked(createDefaultSelection).mockReset();
+      window.history.replaceState(null, "", "/");
+    });
+
+    it("shows the linked indicators without overwriting the saved list", async () => {
+      linkTo("FAST", "B");
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
+      await vi.waitFor(() => {
+        expect(controller.selections.map(s => s.uiid)).toEqual(["FAST", "B"]);
+      });
+
+      expect(savedUiids()).toEqual(["A"]);
+    });
+
+    it("flags a shared view until the first change saves the linked list", async () => {
+      linkTo("FAST", "B");
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
+      expect(controller.getState().sharedView).toBe(true);
+      await vi.waitFor(() => {
+        expect(controller.selections).toHaveLength(2);
+      });
+
+      await controller.addSelection(
+        makeSelection("SLOW", "oscillator"),
+        makeListing("SLOW", "oscillator")
+      );
+
+      expect(controller.getState().sharedView).toBe(false);
+    });
+
+    it("is not a shared view without a link", async () => {
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
+
+      expect(controller.getState().sharedView).toBe(false);
+    });
+
+    it("returns to the saved setup by dropping the link and reloading", async () => {
+      const reload = vi.fn();
+      const real = window.location;
+      linkTo("FAST", "B");
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
+      await vi.waitFor(() => {
+        expect(controller.selections).toHaveLength(2);
+      });
+      vi.stubGlobal("location", {
+        get href() {
+          return real.href;
+        },
+        reload
+      });
+
+      controller.returnToSavedSetup();
+
+      expect(reload).toHaveBeenCalledTimes(1);
+      expect(real.search).toBe("");
+      expect(savedUiids()).toEqual(["A"]);
+      expect(controller.getState().sharedView).toBe(false);
+    });
+
+    it("keeps the saved list when a linked restore settles after returning", async () => {
+      const settlers: Array<() => void> = [];
+      const slow = vi.fn(
+        () =>
+          new Promise<unknown[]>(resolve => {
+            settlers.push(() => {
+              resolve([{}]);
+            });
+          })
+      ) as unknown as ApiClient["getSelectionData"];
+      const real = window.location;
+      linkTo("FAST", "B");
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], slow);
+      vi.stubGlobal("location", {
+        get href() {
+          return real.href;
+        },
+        reload: vi.fn()
+      });
+
+      controller.returnToSavedSetup();
+      settlers.forEach(settle => {
+        settle();
+      });
+      await vi.waitFor(() => {
+        expect(controller.selections.length).toBeGreaterThan(0);
+      });
+
+      expect(savedUiids()).toEqual(["A"]);
+    });
+
+    it("does not reload when no link is showing", async () => {
+      const reload = vi.fn();
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
+      vi.stubGlobal("location", { href: "http://localhost/", reload });
+
+      controller.returnToSavedSetup();
+
+      expect(reload).not.toHaveBeenCalled();
+    });
+
+    it("saves the linked list with the first change and drops the parameter", async () => {
+      linkTo("FAST", "B");
+      const historyLength = window.history.length;
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
+      await vi.waitFor(() => {
+        expect(controller.selections).toHaveLength(2);
+      });
+
+      await controller.addSelection(
+        makeSelection("SLOW", "oscillator"),
+        makeListing("SLOW", "oscillator")
+      );
+
+      expect(savedUiids()).toEqual(["FAST", "B", "SLOW"]);
+      expect(new URLSearchParams(window.location.search).has(SHARE_PARAM)).toBe(false);
+      expect(window.history.length).toBe(historyLength);
+    });
+
+    it("keeps a change made while the link is still restoring", async () => {
+      linkTo("FAST", "B");
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
+      await controller.addSelection(
+        makeSelection("SLOW", "oscillator"),
+        makeListing("SLOW", "oscillator")
+      );
+
+      await vi.waitFor(() => {
+        expect(savedUiids().sort()).toEqual(["B", "FAST", "SLOW"]);
+      });
+    });
+
+    it("drops an unreadable link and shows the saved list", async () => {
+      vi.spyOn(console, "warn").mockImplementation(() => undefined);
+      window.history.replaceState(null, "", `/?${SHARE_PARAM}=9.garbage`);
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], fetchRows);
+      await vi.waitFor(() => {
+        expect(controller.selections.map(s => s.uiid)).toEqual(["A"]);
+      });
+
+      expect(window.location.search).toBe("");
+      expect(controller.getState().sharedView).toBe(false);
+    });
+
+    it("falls back to the saved list when every linked indicator fails to load", async () => {
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
+      const getSelectionData = vi.fn((selection: { uiid: string }) =>
+        selection.uiid === "A" ? Promise.resolve([{}]) : Promise.reject(new Error("500"))
+      ) as unknown as ApiClient["getSelectionData"];
+      linkTo("FAST", "B");
+      const controller = await loadWithCache([makeSelection("A", "oscillator")], getSelectionData);
+
+      await vi.waitFor(() => {
+        expect(controller.selections.map(s => s.uiid)).toEqual(["A"]);
+      });
+      expect(savedUiids()).toEqual(["A"]);
+      expect(window.location.search).toBe("");
+      expect(controller.getState().sharedView).toBe(false);
+    });
+
+    it("builds a link that restores the displayed indicators", async () => {
+      const controller = await loadWithCache(
+        [makeSelection("A", "oscillator"), makeSelection("B", "oscillator")],
+        fetchRows
+      );
+      await vi.waitFor(() => {
+        expect(controller.selections).toHaveLength(2);
+      });
+
+      const encoded = new URL(controller.shareUrl()).searchParams.get(SHARE_PARAM) ?? "";
+      expect(decodeSelections(encoded, catalog).map(s => s.uiid)).toEqual(["A", "B"]);
+    });
   });
 
   describe("moveSelection", () => {

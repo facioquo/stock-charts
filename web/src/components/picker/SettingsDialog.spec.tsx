@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ChartController } from "../../charting/chartController";
@@ -38,6 +38,7 @@ interface FakeController {
   deleteSelection: ReturnType<typeof vi.fn>;
   moveSelection: ReturnType<typeof vi.fn>;
   onSettingsChange: ReturnType<typeof vi.fn>;
+  shareUrl: ReturnType<typeof vi.fn>;
 }
 
 function makeController(): FakeController {
@@ -63,7 +64,8 @@ function makeController(): FakeController {
       selections.splice(from, 1);
       selections.splice(to, 0, moved);
     }),
-    onSettingsChange: vi.fn()
+    onSettingsChange: vi.fn(),
+    shareUrl: vi.fn(() => "https://charts.example/?c=1.abc")
   };
 }
 
@@ -246,5 +248,61 @@ describe("SettingsDialog", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "close" }));
     expect(onClose).toHaveBeenCalled();
+  });
+
+  describe("copy link", () => {
+    function renderDialog(controller: FakeController): void {
+      render(
+        <SettingsDialog
+          controller={controller as unknown as ChartController}
+          onClose={vi.fn()}
+          onPickIndicator={vi.fn()}
+          onEditIndicator={vi.fn()}
+        />
+      );
+    }
+
+    it("copies the share link and says so", async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, { clipboard: { writeText } });
+      renderDialog(makeController());
+
+      fireEvent.click(screen.getByRole("button", { name: "copy share link" }));
+
+      expect(writeText).toHaveBeenCalledWith("https://charts.example/?c=1.abc");
+      await waitFor(() => {
+        expect(screen.getByRole("status")).toHaveTextContent("Link copied");
+      });
+    });
+
+    it("reports a clipboard that refuses the write", async () => {
+      Object.assign(navigator, {
+        clipboard: { writeText: vi.fn().mockRejectedValue(new Error("denied")) }
+      });
+      renderDialog(makeController());
+
+      fireEvent.click(screen.getByRole("button", { name: "copy share link" }));
+
+      await waitFor(() => {
+        expect(screen.getByRole("status")).toHaveTextContent("Copy failed");
+      });
+    });
+
+    it("reports a failure when the clipboard is unavailable", () => {
+      Object.assign(navigator, { clipboard: undefined });
+      renderDialog(makeController());
+
+      fireEvent.click(screen.getByRole("button", { name: "copy share link" }));
+
+      expect(screen.getByRole("status")).toHaveTextContent("Copy failed");
+    });
+
+    it("is not offered with nothing displayed", () => {
+      const controller = makeController();
+      controller.selections.length = 0;
+      renderDialog(controller);
+
+      expect(screen.queryByRole("button", { name: "copy share link" })).not.toBeInTheDocument();
+    });
   });
 });

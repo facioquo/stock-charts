@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { ColorSwatchPicker } from "./ColorSwatchPicker";
-import { presetColors } from "./indicatorStyles";
+import { presetColors } from "../../charting/indicatorStyles";
 
 describe("ColorSwatchPicker", () => {
   it("renders the current hex value", () => {

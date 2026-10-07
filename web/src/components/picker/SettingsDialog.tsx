@@ -83,9 +83,14 @@ interface DisplayedIndicatorsProps {
   onMove: ChartController["moveSelection"];
   /** Ref callback factory that records a row's move button so focus can follow a move. */
   moveButtonRef: MoveButtonRef;
+  /** Builds a link that restores the displayed indicators. */
+  shareUrl: () => string;
 }
 
-interface SelectionGroupProps extends Omit<DisplayedIndicatorsProps, "onSelectAll" | "onRemove"> {
+interface SelectionGroupProps extends Omit<
+  DisplayedIndicatorsProps,
+  "onSelectAll" | "onRemove" | "shareUrl"
+> {
   title: string;
   hint: string;
 }
@@ -175,20 +180,49 @@ function DisplayedIndicators({
   onRemove,
   onEdit,
   onMove,
-  moveButtonRef
+  moveButtonRef,
+  shareUrl
 }: DisplayedIndicatorsProps): React.JSX.Element {
+  const [copyStatus, setCopyStatus] = useState("");
+  const copyLink = (): void => {
+    setCopyStatus("");
+    const failed = (): void => {
+      setCopyStatus("Copy failed");
+    };
+    try {
+      // The clipboard is undefined outside a secure context, so this can throw synchronously.
+      navigator.clipboard.writeText(shareUrl()).then(() => {
+        setCopyStatus("Link copied");
+      }, failed);
+    } catch {
+      failed();
+    }
+  };
   const groupProps = { checked, onToggle, onEdit, onMove, moveButtonRef };
   return (
     <section className="displayed-indicators">
       <div className="dialog-section-header">
         <span>Displayed indicators</span>
         <span className="filler" />
+        <button
+          type="button"
+          className="icon-button"
+          aria-label="copy share link"
+          title="copy a link that restores these indicators"
+          onClick={copyLink}
+        >
+          <span className="material-icons">share</span>
+        </button>
         <StandardCheckbox
+          className="selection-checkbox"
           ariaLabel="select all displayed indicators"
           checked={checked.size > 0 && checked.size === selections.length}
           onChange={onSelectAll}
         />
       </div>
+      <span role="status" className="copy-link-status">
+        {copyStatus}
+      </span>
       <SelectionGroup
         {...groupProps}
         title="Price chart overlays"
@@ -399,6 +433,7 @@ export function SettingsDialog({
             onEdit={onEditIndicator}
             onMove={controls.moveSelection}
             moveButtonRef={controls.moveButtonRef}
+            shareUrl={() => controller.shareUrl()}
           />
         )}
 

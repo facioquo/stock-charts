@@ -124,6 +124,48 @@ test.describe("Stock Charts React Web", () => {
     expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
   });
 
+  test("a copied link restores the configuration in a fresh browser", async ({
+    page,
+    browser,
+    errorCollection
+  }) => {
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+
+    await page.getByRole("button", { name: "edit settings" }).click();
+    await page.getByRole("button", { name: /^move ADX.* up$/ }).click();
+    await page.getByRole("button", { name: "copy share link" }).click();
+    await expect(page.getByRole("status").filter({ hasText: "Link copied" })).toBeVisible();
+    const link = await page.evaluate(() => navigator.clipboard.readText());
+
+    const fresh = await browser.newContext();
+    const shared = await fresh.newPage();
+    await shared.goto(link);
+    await shared.waitForLoadState("networkidle");
+    await expect(shared.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+    await shared.getByRole("button", { name: "edit settings" }).click();
+    const oscillators = shared.locator(".selection-list").nth(1).locator("li label");
+    await expect(oscillators.first()).toHaveText(/^ADX/);
+    expect(await shared.evaluate(() => localStorage.getItem("selections"))).toBeNull();
+    await shared.keyboard.press("Escape");
+
+    // The shared view says so, and one click returns to the visitor's own setup.
+    await expect(
+      shared.getByRole("status").filter({ hasText: "Showing a shared chart" })
+    ).toBeVisible();
+    await shared.getByRole("button", { name: "BACK TO MY INDICATORS" }).click();
+    await expect(shared.getByText("Showing a shared chart")).toBeHidden({ timeout: 15_000 });
+    expect(new URL(shared.url()).searchParams.has("c")).toBe(false);
+    await expect(shared.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+    await shared.getByRole("button", { name: "edit settings" }).click();
+    await expect(oscillators.first()).toHaveText(/^RSI/);
+    await fresh.close();
+
+    expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
+  });
+
   test("theme toggle flips the body theme class", async ({ page, errorCollection }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
