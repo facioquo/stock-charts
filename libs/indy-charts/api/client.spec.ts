@@ -607,6 +607,19 @@ describe("createApiClient", () => {
       expect(batchCalls()).toHaveLength(1);
     });
 
+    it("answers the same selection requested twice from its echoed items", async () => {
+      mockFetchOk([
+        { selection: "SMA?lookbackPeriods=20", status: 200, data: [{ sma: 1 }] },
+        { selection: "SMA?lookbackPeriods=20", status: 200, data: [{ sma: 1 }] }
+      ]);
+
+      const rows = await Promise.all(
+        client.getSelectionsData([requests[0] as never, requests[0] as never])
+      );
+
+      expect(rows).toEqual([[{ sma: 1 }], [{ sma: 1 }]]);
+    });
+
     it("requests a selection alone when an echoed batch leaves it out", async () => {
       const fetchMock = mockFetchSequence([
         {

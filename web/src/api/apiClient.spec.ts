@@ -146,6 +146,24 @@ describe("ApiClient", () => {
       expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }], [{ c: 3 }]]);
     });
 
+    it("answers the same selection requested twice from its echoed items", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(
+          okResponse([
+            { selection: "ADX?lookbackPeriods=14", status: 200, data: [{ a: 1 }] },
+            { selection: "RSI?lookbackPeriods=5", status: 200, data: [{ b: 2 }] },
+            { selection: "ADX?lookbackPeriods=14", status: 200, data: [{ a: 1 }] }
+          ])
+        )
+      );
+      const twice = [request("ADX", 14), request("RSI", 5), request("ADX", 14)];
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(twice));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }], [{ a: 1 }]]);
+    });
+
     it("asks for a selection alone when an echoed batch has no item for it", async () => {
       const fetchMock = vi
         .fn()
