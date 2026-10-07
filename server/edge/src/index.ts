@@ -22,6 +22,28 @@ const INSTANCE = "api";
 const CACHE_STATUS = "x-edge-cache";
 
 /**
+ * The most selections one batch request may carry. Asserted against
+ * `server/batch.contract.json`, which the API and both clients check too.
+ */
+export const MAX_BATCH_SELECTIONS = 20;
+
+/**
+ * Selections a request asks the container to compute: one per `s` query key,
+ * else one. Counted by key, whatever the path, and case-insensitively, because
+ * ASP.NET binds query keys without regard to case and decodes the path; no
+ * indicator route takes a parameter named `s`.
+ */
+function selectionCount(url: URL): number {
+  let count = 0;
+  for (const key of url.searchParams.keys()) {
+    if (key.toLowerCase() === "s") {
+      count++;
+    }
+  }
+  return Math.max(count, 1);
+}
+
+/**
  * Only responses the API explicitly marks as shared-cacheable are stored. The
  * API sets `Cache-Control: public, max-age=...` on quote and indicator
  * responses; anything else (errors, the health check) goes straight through.
@@ -84,8 +106,26 @@ export default {
     // strings can bypass the cache at will. Legitimate chart loads make ~10
     // uncached requests; sustained cache-busting gets a 429 instead of
     // compute time.
+    // A batch spends one token per selection, so it costs what the same
+    // selections cost as separate requests.
+    const selections = selectionCount(new URL(request.url));
+
+    if (selections > MAX_BATCH_SELECTIONS) {
+      const refused = new Response(`At most ${MAX_BATCH_SELECTIONS} selections per request.`, {
+        status: 400
+      });
+      applyCors(refused.headers, allowedOrigin);
+      return refused;
+    }
+
     const clientIp = request.headers.get("cf-connecting-ip") ?? "unknown";
-    const { success: withinLimit } = await env.RATE_LIMITER.limit({ key: clientIp });
+    // One binding call per selection: the Workers limiter has no weighted or peek
+    // form, so a batch that outruns the remaining tokens spends them and still gets a 429.
+    let withinLimit = true;
+
+    for (let spent = 0; withinLimit && spent < selections; spent++) {
+      withinLimit = (await env.RATE_LIMITER.limit({ key: clientIp })).success;
+    }
 
     if (!withinLimit) {
       const limited = new Response("Rate limit exceeded", {

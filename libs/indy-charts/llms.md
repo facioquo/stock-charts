@@ -103,13 +103,24 @@ The component renders its sized chart frames on mount, before any data arrives, 
 
 Optional. Skip this whole section if you supply your own data.
 
-`createApiClient({ baseUrl })` expects three operations, specified in `backing-api.yml`:
+`createApiClient({ baseUrl })` expects three operations, plus an optional fourth, specified in `backing-api.yml`:
 
 | Operation | Returns | Client method |
 | --- | --- | --- |
 | `GET /quotes` | `Bar[]`, oldest first | `getQuotes()` |
 | `GET /indicators` | `IndicatorListing[]` | `getListings()` |
 | Each listing's `endpoint` | `IndicatorDataRow[]` | `getSelectionData()` |
+| `GET /indicators/batch` (optional) | One result per selection | `getSelectionsData()` |
+
+The batch lets a page load every chart's rows in one request. Without the route the client falls back to one request per indicator, so a server need not implement it. Callers restoring several indicators should call `getSelectionsData()` rather than `getSelectionData()` in a loop.
+
+Mistakes the types do not show:
+
+- `getSelectionsData()` returns an **array of promises**, one per request, not one promise. Use `await Promise.all(client.getSelectionsData(requests))`.
+- One request is not always one network call: fewer than 2 selections are not batched, and more than 20 are sent as several batch requests. A server must accept at least 20 `s` values.
+- The batch gets a single attempt; a failed or unreadable batch falls back to one retrying request per selection.
+- A `400`, `404`, `405`, `413` or `414` from the batch route stops the client asking for it again, so answer a selection you cannot run with its own `207` item rather than rejecting the request with a `400`. A `429` or `5xx` does not.
+- Answer `200` only when every selection succeeded, and `207` otherwise: a `207` is never cached, and the client takes only its `200` items.
 
 Preview the contract:
 
@@ -137,7 +148,7 @@ That distinction is the one thing most worth getting right when implementing thi
 
 ### Serving your own
 
-Any server answering those three operations works. A reference implementation of the .NET side lives in <https://github.com/facioquo/stock-charts>; `backing-api.yml` is what yours conforms to.
+Any server answering the three required operations works. A reference implementation of the .NET side lives in <https://github.com/facioquo/stock-charts>; `backing-api.yml` is what yours conforms to.
 
 Responses are camelCase, timestamps ISO 8601. Each indicator row carries a `timestamp` plus one field per `dataName` the listing declares, `null` where the indicator has not warmed up.
 
@@ -177,7 +188,7 @@ Build the files with `createOfflineSnapshot(config)` at build time against the l
 | `setupIndyChartsForVue(app, config)` | Vue adapter (`/vue` subpath), registers `<StockIndicatorChart>` |
 | `ChartManager` | Overlay + oscillators + viewport, with teardown |
 | `OverlayChart`, `OscillatorChart` | Single-canvas classes |
-| `createApiClient(config)` | Client for the three backing-API operations |
+| `createApiClient(config)` | Client for the backing-API operations |
 | `clearApiClientCache()` | Drop the quote and listing responses shared across clients |
 | `createOfflineSnapshot(config, options)` | Build the snapshot files `offlineFallback` reads |
 | `loadStaticQuotes`, `loadStaticIndicatorData` | Bring-your-own `Bar[]` / `IndicatorDataRow[]` |

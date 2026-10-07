@@ -20,5 +20,10 @@
     <Content Include="../quote-dataset.contract.json" Link="quote-dataset.contract.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <!-- Shared with the edge Worker and both clients: the batch cap and the
+         statuses that make a client stop asking for the batch. -->
+    <Content Include="../batch.contract.json" Link="batch.contract.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

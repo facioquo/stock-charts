@@ -110,13 +110,18 @@ describe("backing-api.yml ships with the package", () => {
 });
 
 describe("backing-api.yml documents the operations the client calls", () => {
-  it("covers exactly the three ApiClient methods", () => {
+  it("covers the ApiClient methods, with the batch as the optional fourth", () => {
     const operations = Object.values(spec.paths)
       .flatMap(methods => Object.values(methods))
       .map(operation => operation.operationId)
       .sort();
 
-    expect(operations).toEqual(["getIndicatorCatalog", "getIndicatorData", "getQuotes"]);
+    expect(operations).toEqual([
+      "getIndicatorBatch",
+      "getIndicatorCatalog",
+      "getIndicatorData",
+      "getQuotes"
+    ]);
   });
 
   it("names the indicator path consistently with its parameter", () => {

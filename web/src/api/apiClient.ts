@@ -32,6 +32,19 @@ export class ApiError extends Error {
   }
 }
 
+/** A selection and the catalog entry that defines how to request it. */
+export interface SelectionRequest {
+  selection: IndicatorSelection;
+  listing: IndicatorListing;
+}
+
+/** One entry of a `GET /indicators/batch` response. */
+interface BatchItem {
+  status: number;
+  data?: unknown;
+  error?: string;
+}
+
 /**
  * Human-readable message for an API failure. Prefers the server-provided
  * response body (e.g. an indicator parameter validation message) and falls back
@@ -43,6 +56,12 @@ export function describeApiError(error: unknown): string {
   if (error instanceof Error) return error.message;
   return "Unexpected error";
 }
+
+/** Most selections per batch request; matches the API's cap. */
+export const BATCH_SIZE = 20;
+
+/** Statuses meaning the backend will not answer a batch request, now or at this size. */
+export const BATCH_REFUSED: ReadonlySet<number> = new Set([400, 404, 405, 413, 414]);
 
 /**
  * Fetch-based port of the Angular `ApiService`. Talks to the .NET Web API and
@@ -56,6 +75,8 @@ export function describeApiError(error: unknown): string {
  */
 export class ApiClient {
   private backupActive = false;
+  /** Cleared when the backend refuses the batch route. */
+  private batchSupported = true;
   private cachedBackupRows: Array<{ timestamp: string; candle: unknown }> | undefined;
 
   /** Whether the API has fallen back to bundled backup data. */
@@ -131,7 +152,70 @@ export class ApiClient {
     }
   }
 
+  /**
+   * Rows for several selections from one `GET /indicators/batch` call (at most
+   * 20 per call), as one promise per request in request order. On success every
+   * promise settles together, once the batch answers. A selection the batch cannot answer
+   * (an older backend without the route, a failed item, or an unreadable
+   * response) is fetched on its own through {@link getSelectionData}, so the
+   * result matches calling that method per selection.
+   */
+  getSelectionsData(requests: readonly SelectionRequest[]): Array<Promise<unknown[]>> {
+    if (requests.length < 2 || this.backupActive || !this.batchSupported) {
+      return requests.map(({ selection, listing }) => this.getSelectionData(selection, listing));
+    }
+
+    // One request per chunk, so a list longer than the server's cap still batches.
+    const chunks: Array<Promise<BatchItem[] | undefined>> = [];
+    for (let start = 0; start < requests.length; start += BATCH_SIZE) {
+      const chunk = requests.slice(start, start + BATCH_SIZE);
+      chunks.push(this.fetchBatch(chunk));
+    }
+
+    return requests.map(async ({ selection, listing }, index) => {
+      const chunk = chunks.at(Math.floor(index / BATCH_SIZE));
+      const item = (await chunk)?.at(index % BATCH_SIZE);
+      if (item?.status === 200 && Array.isArray(item.data)) return item.data as unknown[];
+      return this.getSelectionData(selection, listing);
+    });
+  }
+
   // HELPERS
+
+  /** `undefined` when the batch could not be used; callers fall back per selection. */
+  private async fetchBatch(
+    requests: readonly SelectionRequest[]
+  ): Promise<BatchItem[] | undefined> {
+    const query = new URLSearchParams();
+    requests.forEach(({ selection, listing }) => {
+      const params = new URLSearchParams();
+      selection.params.forEach((p: IndicatorParam) => {
+        params.set(p.paramName, String(p.value));
+      });
+      const url = new URL(this.buildApiUrl(listing.endpoint, params));
+      const base = new URL(env.api.endsWith("/") ? env.api : `${env.api}/`);
+      const name = url.pathname.startsWith(base.pathname)
+        ? url.pathname.slice(base.pathname.length)
+        : url.pathname;
+      query.append("s", `${name.replace(/^\/+|\/+$/g, "")}${url.search}`);
+    });
+
+    try {
+      const batchUrl = new URL("indicators/batch", env.api.endsWith("/") ? env.api : `${env.api}/`);
+      batchUrl.search = query.toString();
+      const body = await this.getJson<unknown>(batchUrl.toString());
+      return Array.isArray(body) && body.length === requests.length
+        ? (body as BatchItem[])
+        : undefined;
+    } catch (error) {
+      // 404/405: the backend predates the route. 400/413/414: it refuses a request this
+      // size. Either way a retry would fail the same, so stop asking this session.
+      if (error instanceof ApiError && BATCH_REFUSED.has(error.status)) {
+        this.batchSupported = false;
+      }
+      return undefined;
+    }
+  }
 
   private async getJson<T>(url: string): Promise<T> {
     let response: Response;

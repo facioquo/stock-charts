@@ -8,7 +8,7 @@ namespace WebApi.Controllers;
 [ApiController]
 [Route("")]
 [OutputCache(PolicyName = OutputCachePolicies.IndicatorData)]
-public class Main(
+public partial class Main(
     IQuoteService quoteService,
     IOptions<CacheSettings> cacheSettings,
     IOptions<ApiSettings> apiSettings,
@@ -137,7 +137,10 @@ public class Main(
     private void SetClientCache()
     {
         Response.Headers.CacheControl = $"public, max-age={(int)cacheDuration.TotalSeconds}";
-        Response.Headers.Append("Vary", "Origin");
+        if (!Response.Headers.Vary.Contains("Origin"))
+        {
+            Response.Headers.Append("Vary", "Origin");
+        }
     }
 
     //////////////////////////////////////////

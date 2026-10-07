@@ -159,7 +159,7 @@ Parameters are sorted by name and percent-encoded. A missing or unreachable snap
 
 ## Methods
 
-The returned `ApiClient` exposes three methods. All return promises that reject (after `onError`) on network or HTTP failures, unless `staleCache` holds a prior response or `offlineFallback` has a snapshot file — in that case `onError` still fires but the promise resolves with that data.
+The returned `ApiClient` exposes four methods. Each promise they return rejects (after `onError`) on network or HTTP failures, unless `staleCache` holds a prior response or `offlineFallback` has a snapshot file — in that case `onError` still fires but the promise resolves with that data. `getSelectionsData` returns an array with one such promise per request, not a single promise.
 
 Successful `getQuotes()` and `getListings()` responses are shared, per resolved URL, by every client the package creates. Concurrent calls join one request, and later calls reuse the settled body for the page's lifetime. A failed request is not kept. Call `clearApiClientCache()` to force a refetch; do this before refreshing in a long-lived tab, an interval, or a Node or SSR process. The first caller's retry settings govern a shared request.
 
@@ -200,6 +200,21 @@ const rows = loadStaticIndicatorData(rawRows);
 ```
 
 Wrap the result in `loadStaticIndicatorData()` to get a typed `IndicatorDataRow[]`.
+
+### `getSelectionsData(requests): Promise<unknown[]>[]`
+
+Fetches the rows for several selections with one `GET {baseUrl}/indicators/batch` request. Pass `{ selection, listing }` pairs; it returns one promise per pair, in order. On success every promise settles together once the batch answers; only a selection that falls back to its own request settles later.
+
+```typescript
+const rows = await Promise.all(
+  client.getSelectionsData([
+    { selection: emaSelection, listing: emaListing },
+    { selection: rsiSelection, listing: rsiListing }
+  ])
+);
+```
+
+The batch is optional for a server. On a `404`, `405`, `400`, `413` or `414` the client requests each selection on its own and does not ask for the batch again. The batch gets one attempt, and a list over 20 is sent as several requests. A selection whose batch item failed is requested alone. `endpoints.batch` overrides the route.
 
 ## Data shape
 
@@ -247,7 +262,8 @@ const client = createApiClient({
   baseUrl: "https://api.example.com",
   endpoints: {
     quotes: "v2/market/quotes",
-    indicators: "v2/market/indicators"
+    indicators: "v2/market/indicators",
+    batch: "v2/market/indicators/batch"
   }
 });
 ```

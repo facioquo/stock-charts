@@ -1,6 +1,16 @@
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Mock } from "vitest";
-import { clearApiClientCache, createApiClient, peekCachedListings } from "./client";
+import {
+  BATCH_REFUSED,
+  BATCH_SIZE,
+  clearApiClientCache,
+  createApiClient,
+  peekCachedListings
+} from "./client";
 import type { ApiClient, RetryConfig } from "./client";
 import type { IndicatorListing, IndicatorParam, IndicatorSelection } from "../config/types";
 
@@ -548,6 +558,267 @@ describe("createApiClient", () => {
   // -----------------------------------------------------------------------
   // onError callback behaviour
   // -----------------------------------------------------------------------
+
+  describe("getSelectionsData", () => {
+    const requests = [
+      {
+        selection: makeSelection([makeParam("lookbackPeriods", 20)]),
+        listing: makeListing({ endpoint: "SMA/" })
+      },
+      {
+        selection: makeSelection([makeParam("lookbackPeriods", 14)]),
+        listing: makeListing({ endpoint: "RSI/" })
+      }
+    ];
+    const batchCalls = (): string[] =>
+      vi
+        .mocked(fetch)
+        .mock.calls.map(([url]) => (typeof url === "string" ? url : ""))
+        .filter(url => url.includes("/indicators/batch"));
+
+    it("answers every selection from one batch request", async () => {
+      mockFetchOk([
+        { status: 200, data: [{ a: 1 }] },
+        { status: 200, data: [{ b: 2 }] }
+      ]);
+
+      const rows = await Promise.all(client.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }]]);
+      expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
+      const url = new URL(batchCalls()[0] ?? "");
+      expect(url.pathname).toBe("/indicators/batch");
+      expect(url.searchParams.getAll("s")).toEqual([
+        "SMA?lookbackPeriods=20",
+        "RSI?lookbackPeriods=14"
+      ]);
+    });
+
+    it("requests a selection alone when its batch item failed", async () => {
+      const fetchMock = mockFetchSequence([
+        {
+          status: 207,
+          body: [
+            { status: 200, data: [{ a: 1 }] },
+            { status: 400, error: "bad" }
+          ]
+        },
+        { status: 200, body: [{ b: 2 }] }
+      ]);
+
+      const rows = await Promise.all(client.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }]]);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(String(fetchMock.mock.calls[1]?.[0])).toContain("/RSI/?lookbackPeriods=14");
+    });
+
+    it("falls back to one request per selection on a 404, and does not ask again", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((url: string) =>
+          Promise.resolve({
+            ok: !url.includes("/indicators/batch"),
+            status: url.includes("/indicators/batch") ? 404 : 200,
+            statusText: "",
+            headers: { get: () => null },
+            json: () => Promise.resolve([{ ok: 1 }])
+          } as unknown as Response)
+        )
+      );
+
+      const first = await Promise.all(client.getSelectionsData(requests));
+      expect(first).toEqual([[{ ok: 1 }], [{ ok: 1 }]]);
+      expect(batchCalls()).toHaveLength(1);
+
+      await Promise.all(client.getSelectionsData(requests));
+      expect(batchCalls()).toHaveLength(1);
+    });
+
+    it("splits a long list into batch requests no larger than the server cap, keeping every row with its selection", async () => {
+      const many = Array.from({ length: 25 }, (_, i) => ({
+        selection: makeSelection([makeParam("lookbackPeriods", i + 1)]),
+        listing: makeListing({ endpoint: "SMA/" })
+      }));
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((url: string) => {
+          const asked = new URL(url).searchParams.getAll("s");
+          return Promise.resolve({
+            ok: true,
+            status: 200,
+            statusText: "",
+            headers: { get: () => null },
+            json: () => Promise.resolve(asked.map(name => ({ status: 200, data: [{ name }] })))
+          } as unknown as Response);
+        })
+      );
+
+      const rows = await Promise.all(client.getSelectionsData(many));
+
+      expect(rows.map(row => (row as Array<{ name: string }>)[0]?.name)).toEqual(
+        many.map((_, i) => `SMA?lookbackPeriods=${i + 1}`)
+      );
+      expect(batchCalls().map(url => new URL(url).searchParams.getAll("s").length)).toEqual([
+        BATCH_SIZE,
+        5
+      ]);
+    });
+
+    it.each([...BATCH_REFUSED])("stops asking for the batch after a %i", async status => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((url: string) =>
+          Promise.resolve({
+            ok: !url.includes("/indicators/batch"),
+            status: url.includes("/indicators/batch") ? status : 200,
+            statusText: "",
+            headers: { get: () => null },
+            json: () => Promise.resolve([{ ok: 1 }])
+          } as unknown as Response)
+        )
+      );
+
+      await Promise.all(client.getSelectionsData(requests));
+      await Promise.all(client.getSelectionsData(requests));
+
+      expect(batchCalls()).toHaveLength(1);
+    });
+
+    it.each([429, 503])("keeps asking for the batch after a transient %i", async status => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn((url: string) =>
+          Promise.resolve({
+            ok: !url.includes("/indicators/batch"),
+            status: url.includes("/indicators/batch") ? status : 200,
+            statusText: "",
+            headers: { get: () => null },
+            json: () => Promise.resolve([{ ok: 1 }])
+          } as unknown as Response)
+        )
+      );
+
+      await Promise.all(client.getSelectionsData(requests));
+      await Promise.all(client.getSelectionsData(requests));
+
+      expect(batchCalls()).toHaveLength(2);
+    });
+
+    it("requests the batch at endpoints.batch when it is overridden", async () => {
+      const custom = createApiClient({
+        baseUrl: BASE_URL,
+        endpoints: { batch: "v2/batch" },
+        retry: false
+      });
+      mockFetchOk([
+        { status: 200, data: [{ a: 1 }] },
+        { status: 200, data: [{ b: 2 }] }
+      ]);
+
+      await Promise.all(custom.getSelectionsData(requests));
+
+      expect(new URL(String(vi.mocked(fetch).mock.calls[0]?.[0] as string)).pathname).toBe(
+        "/v2/batch"
+      );
+    });
+
+    it("keeps its cap and refusal set in step with the shared batch contract", () => {
+      const contract = JSON.parse(
+        readFileSync(
+          resolve(dirname(fileURLToPath(import.meta.url)), "../../../server/batch.contract.json"),
+          "utf8"
+        )
+      ) as { maxSelections: number; refusedStatuses: number[] };
+
+      expect(BATCH_SIZE).toBe(contract.maxSelections);
+      expect([...BATCH_REFUSED].sort()).toEqual([...contract.refusedStatuses].sort());
+    });
+
+    it("makes one attempt at the batch before falling back, even with retries on", async () => {
+      const retrying = createApiClient({
+        baseUrl: BASE_URL,
+        retry: { maxAttempts: 3, baseDelayMs: 1 }
+      });
+      const fetchMock = mockFetchSequence([
+        { status: 503, body: {} },
+        { status: 200, body: [{ one: 1 }] },
+        { status: 200, body: [{ two: 2 }] }
+      ]);
+
+      const rows = await Promise.all(retrying.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ one: 1 }], [{ two: 2 }]]);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+    });
+
+    it("does not batch a single selection", async () => {
+      mockFetchOk([{ ok: 1 }]);
+
+      await Promise.all(client.getSelectionsData(requests.slice(0, 1)));
+
+      expect(batchCalls()).toHaveLength(0);
+    });
+
+    it("falls back when the batch answer has the wrong length", async () => {
+      const fetchMock = mockFetchSequence([
+        { status: 200, body: [{ status: 200, data: [] }] },
+        { status: 200, body: [{ one: 1 }] },
+        { status: 200, body: [{ two: 2 }] }
+      ]);
+
+      const rows = await Promise.all(client.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ one: 1 }], [{ two: 2 }]]);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+    });
+
+    it("falls back per selection, but keeps asking for the batch, after a network failure", async () => {
+      const fetchMock = vi.fn((url: string) =>
+        url.includes("/indicators/batch")
+          ? Promise.reject(new Error("offline"))
+          : Promise.resolve({
+              ok: true,
+              status: 200,
+              statusText: "OK",
+              headers: { get: () => null },
+              json: () => Promise.resolve([{ single: url }])
+            } as unknown as Response)
+      );
+      vi.stubGlobal("fetch", fetchMock);
+
+      const first = await Promise.all(client.getSelectionsData(requests));
+      await Promise.all(client.getSelectionsData(requests));
+
+      expect(first).toHaveLength(2);
+      expect(batchCalls()).toHaveLength(2);
+      const singles = fetchMock.mock.calls.filter(([url]) => !url.includes("/indicators/batch"));
+      expect(singles.map(([url]) => new URL(url).pathname)).toEqual([
+        "/SMA/",
+        "/RSI/",
+        "/SMA/",
+        "/RSI/"
+      ]);
+    });
+
+    it("serves a batched selection from the stale cache when its single request fails", async () => {
+      vi.stubGlobal("sessionStorage", createMockStorage());
+      const stale = createApiClient({ baseUrl: BASE_URL, retry: false, staleCache: true });
+      mockFetchOk([
+        { status: 200, data: [{ a: 1 }] },
+        { status: 200, data: [{ b: 2 }] }
+      ]);
+      await Promise.all(stale.getSelectionsData(requests));
+
+      mockFetchNetworkError("Network down");
+      const rows = await stale.getSelectionData(
+        makeSelection([makeParam("lookbackPeriods", 20)]),
+        makeListing({ endpoint: "SMA/" })
+      );
+
+      expect(rows).toEqual([{ a: 1 }]);
+    });
+  });
 
   describe("onError callback", () => {
     it("works without onError callback (no error thrown)", async () => {

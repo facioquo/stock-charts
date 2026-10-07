@@ -168,24 +168,35 @@ export class ChartController {
   }
 
   /**
-   * Show startup selections in list order. Fetches run concurrently, and each
-   * chart is built as soon as it and every chart before it has settled, so
-   * arrival order cannot change the stack and one slow request holds back only
-   * the charts after it. A selection that fails to load is not shown, but stays saved for this session.
+   * Show startup selections in list order. The rows come from one batch request
+   * where the backend has the route (each selection requests its own rows
+   * concurrently otherwise), and each chart is built as soon as it and every
+   * chart before it has settled, so arrival order cannot change the stack. With
+   * a batch every selection settles together once the batch answers, and a
+   * selection that falls back to its own request settles later; on the fallback
+   * path one slow request holds back only the charts after it. The restore
+   * timeout bounds the batch round trip plus any such fallback. A selection that
+   * fails to load is not shown, but stays saved for this session.
    */
   private async showSelectionsInOrder(selections: readonly IndicatorSelection[]): Promise<void> {
     this.restoring = true;
     this.changedWhileRestoring = false;
     this.restoreOrder = selections.map(selection => selection.ucid);
     try {
-      const pending = selections.map(async selection => {
+      // One batch call for the whole restore; each selection still settles on its own.
+      const known = selections.flatMap(selection => {
         const listing = this.listings.find(x => x.uiid === selection.uiid);
-        if (!listing) return undefined;
+        return listing ? [{ selection, listing }] : [];
+      });
+      const requests = this.api.getSelectionsData(known);
+      const pending = selections.map(async selection => {
+        const index = known.findIndex(x => x.selection === selection);
+        if (index < 0) return undefined;
+        const listing = known.at(index)?.listing;
+        const request = requests.at(index);
+        if (!listing || !request) return undefined;
         try {
-          const rows = (await withTimeout(
-            this.api.getSelectionData(selection, listing),
-            RESTORE_TIMEOUT_MS
-          )) as IndicatorDataRow[];
+          const rows = (await withTimeout(request, RESTORE_TIMEOUT_MS)) as IndicatorDataRow[];
           return { selection, listing, rows };
         } catch (error) {
           this.unrestored.push(selection);

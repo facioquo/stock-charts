@@ -23,6 +23,12 @@ const DEFAULT_BASE_DELAY_MS = 500;
 const MAX_RETRY_DELAY_MS = 30_000;
 const STALE_CACHE_PREFIX = "indy-charts:stale:";
 
+/** Most selections per batch request; matches the API cap. */
+export const BATCH_SIZE = 20;
+
+/** Statuses meaning the server will not answer a batch request at this size, so asking again fails the same. */
+export const BATCH_REFUSED: ReadonlySet<number> = new Set([400, 404, 405, 413, 414]);
+
 function isTransientStatus(status: number): boolean {
   return status === 429 || (status >= 500 && status <= 599);
 }
@@ -288,6 +294,8 @@ export interface ApiClientConfig {
   endpoints?: {
     quotes?: string;
     indicators?: string;
+    /** Defaults to `indicators/batch`. */
+    batch?: string;
   };
 
   /**
@@ -399,6 +407,22 @@ export interface ApiClient {
     selection: IndicatorSelection,
     listing: IndicatorListing
   ): Promise<IndicatorDataRow[]>;
+
+  /**
+   * Rows for several selections from one `GET indicators/batch` request, as one
+   * promise per request in request order. A selection the batch cannot answer
+   * (a server without the route, a failed item, or an unreadable response) is
+   * requested on its own through {@link getSelectionData}, so each promise
+   * settles as that method would. At most 20 selections go in one request. A
+   * server that answers `404`, `405`, `400`, `413` or `414` is not asked for the
+   * batch again. On success every promise settles together, once the batch
+   * answers, so a chart cannot draw before its neighbours' rows arrive.
+   *
+   * @param requests - Selections with the listings that define their endpoints.
+   */
+  getSelectionsData(
+    requests: ReadonlyArray<{ selection: IndicatorSelection; listing: IndicatorListing }>
+  ): Array<Promise<IndicatorDataRow[]>>;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -618,7 +642,37 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
     }
   }
 
-  return {
+  let batchSupported = true;
+
+  /** `undefined` when the batch could not be used; callers fall back per selection. */
+  async function fetchBatch(
+    requests: ReadonlyArray<{ selection: IndicatorSelection; listing: IndicatorListing }>
+  ): Promise<Array<{ status: number; data?: unknown }> | undefined> {
+    const base = new URL(baseUrl);
+    const url = new URL(config.endpoints?.batch ?? "indicators/batch", baseUrl);
+    for (const { selection, listing } of requests) {
+      const request = new URL(selectionRequestUrl(config, selection, listing));
+      const name = request.pathname.startsWith(base.pathname)
+        ? request.pathname.slice(base.pathname.length)
+        : request.pathname;
+      url.searchParams.append("s", `${name.replace(/^\/+|\/+$/g, "")}${request.search}`);
+    }
+
+    try {
+      // One attempt: each selection has its own retrying request to fall back to.
+      const response = await fetchWithRetry(url.toString(), 1, baseDelayMs);
+      if (BATCH_REFUSED.has(response.status)) batchSupported = false;
+      if (!response.ok) return undefined;
+      const body = (await response.json()) as unknown;
+      return Array.isArray(body) && body.length === requests.length
+        ? (body as Array<{ status: number; data?: unknown }>)
+        : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  const client: ApiClient = {
     async getQuotes(): Promise<Bar[]> {
       const url = quotesRequestUrl(config);
       const shared = fetchShared(url, maxAttempts, baseDelayMs);
@@ -746,6 +800,32 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
         onError?.("Error fetching selection data", error);
         throw error;
       }
+    },
+
+    getSelectionsData(requests) {
+      if (requests.length < 2 || !batchSupported) {
+        return requests.map(({ selection, listing }) =>
+          client.getSelectionData(selection, listing)
+        );
+      }
+
+      // One request per chunk, so a list longer than the server's cap still batches.
+      const chunks: Array<Promise<Array<{ status: number; data?: unknown }> | undefined>> = [];
+      for (let start = 0; start < requests.length; start += BATCH_SIZE) {
+        chunks.push(fetchBatch(requests.slice(start, start + BATCH_SIZE)));
+      }
+
+      return requests.map(async ({ selection, listing }, index) => {
+        const item = (await chunks.at(Math.floor(index / BATCH_SIZE)))?.at(index % BATCH_SIZE);
+        if (item?.status === 200 && Array.isArray(item.data)) {
+          const rows = item.data as IndicatorDataRow[];
+          if (staleCache) tryStaleCacheWrite(selectionRequestUrl(config, selection, listing), rows);
+          return rows;
+        }
+        return client.getSelectionData(selection, listing);
+      });
     }
   };
+
+  return client;
 }
