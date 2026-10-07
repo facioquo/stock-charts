@@ -214,7 +214,7 @@ const rows = await Promise.all(
 );
 ```
 
-The batch is optional for a server. On a `404`, `405`, `400`, `413` or `414` the client requests each selection on its own and does not ask for the batch again. The batch gets one attempt, and a list over 20 is sent as several requests. A selection whose batch item failed is requested alone. `endpoints.batch` overrides the route.
+The batch is optional for a server. On a `404`, `405`, `400`, `413` or `414` the client requests each selection on its own and does not ask for the batch again. The batch gets one attempt, and a list over 20 is sent as several requests. A selection whose batch item failed is requested alone. Items are matched to selections by the `selection` each echoes, and by position when a server echoes nothing. `endpoints.batch` overrides the route.
 
 ## Data shape
 

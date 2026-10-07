@@ -23,6 +23,13 @@ const DEFAULT_BASE_DELAY_MS = 500;
 const MAX_RETRY_DELAY_MS = 30_000;
 const STALE_CACHE_PREFIX = "indy-charts:stale:";
 
+/** One entry of a batch response; `selection` is absent from servers that answer strictly in request order. */
+interface BatchItem {
+  selection?: string;
+  status: number;
+  data?: unknown;
+}
+
 /** Most selections per batch request; matches the API cap. */
 export const BATCH_SIZE = 20;
 
@@ -644,10 +651,15 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
 
   let batchSupported = true;
 
-  /** `undefined` when the batch could not be used; callers fall back per selection. */
+  /**
+   * One slot per request, in request order; `undefined` marks a request the batch did
+   * not answer, and an `undefined` result means the batch could not be used. Callers
+   * fall back per selection for either.
+   */
   async function fetchBatch(
     requests: ReadonlyArray<{ selection: IndicatorSelection; listing: IndicatorListing }>
-  ): Promise<Array<{ status: number; data?: unknown }> | undefined> {
+  ): Promise<Array<BatchItem | undefined> | undefined> {
+    const keys: string[] = [];
     const base = new URL(baseUrl);
     const url = new URL(config.endpoints?.batch ?? "indicators/batch", baseUrl);
     for (const { selection, listing } of requests) {
@@ -655,7 +667,9 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
       const name = request.pathname.startsWith(base.pathname)
         ? request.pathname.slice(base.pathname.length)
         : request.pathname;
-      url.searchParams.append("s", `${name.replace(/^\/+|\/+$/g, "")}${request.search}`);
+      const key = `${name.replace(/^\/+|\/+$/g, "")}${request.search}`;
+      keys.push(key);
+      url.searchParams.append("s", key);
     }
 
     try {
@@ -664,9 +678,18 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
       if (BATCH_REFUSED.has(response.status)) batchSupported = false;
       if (!response.ok) return undefined;
       const body = (await response.json()) as unknown;
-      return Array.isArray(body) && body.length === requests.length
-        ? (body as Array<{ status: number; data?: unknown }>)
-        : undefined;
+      if (!Array.isArray(body) || body.length !== requests.length) return undefined;
+      const items = body as BatchItem[];
+      // Echoed selections win over position: the order a response arrives in is not
+      // guaranteed (a cache may normalise the query), the selection it answers is.
+      if (!items.every(item => typeof item?.selection === "string")) return items;
+      const bySelection = new Map<string, BatchItem>();
+      for (const item of items) {
+        if (item.selection !== undefined && !bySelection.has(item.selection)) {
+          bySelection.set(item.selection, item);
+        }
+      }
+      return keys.map(key => bySelection.get(key));
     } catch {
       return undefined;
     }
@@ -810,7 +833,7 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
       }
 
       // One request per chunk, so a list longer than the server's cap still batches.
-      const chunks: Array<Promise<Array<{ status: number; data?: unknown }> | undefined>> = [];
+      const chunks: Array<Promise<Array<BatchItem | undefined> | undefined>> = [];
       for (let start = 0; start < requests.length; start += BATCH_SIZE) {
         chunks.push(fetchBatch(requests.slice(start, start + BATCH_SIZE)));
       }

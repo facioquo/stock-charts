@@ -594,6 +594,37 @@ describe("createApiClient", () => {
       ]);
     });
 
+    it("matches items to selections by the selection each echoes, whatever order they arrive in", async () => {
+      mockFetchOk([
+        { selection: "SMA?lookbackPeriods=20", status: 200, data: [{ sma: 1 }] },
+        { selection: "RSI?lookbackPeriods=14", status: 200, data: [{ rsi: 2 }] }
+      ]);
+      const reversed = [...requests].reverse();
+
+      const rows = await Promise.all(client.getSelectionsData(reversed));
+
+      expect(rows).toEqual([[{ rsi: 2 }], [{ sma: 1 }]]);
+      expect(batchCalls()).toHaveLength(1);
+    });
+
+    it("requests a selection alone when an echoed batch leaves it out", async () => {
+      const fetchMock = mockFetchSequence([
+        {
+          status: 200,
+          body: [
+            { selection: "SMA?lookbackPeriods=20", status: 200, data: [{ sma: 1 }] },
+            { selection: "MACD", status: 200, data: [{ macd: 3 }] }
+          ]
+        },
+        { status: 200, body: [{ rsi: 2 }] }
+      ]);
+
+      const rows = await Promise.all(client.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ sma: 1 }], [{ rsi: 2 }]]);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
     it("requests a selection alone when its batch item failed", async () => {
       const fetchMock = mockFetchSequence([
         {

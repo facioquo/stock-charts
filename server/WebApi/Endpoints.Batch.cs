@@ -24,7 +24,8 @@ public partial class Main
     private static readonly Lazy<Dictionary<string, MethodInfo>> indicatorActions = new(FindIndicatorActions);
 
     /// <summary>
-    /// Every requested selection's rows in one call, in request order.
+    /// Every requested selection's rows in one call, in request order, each item
+    /// echoing the <c>s</c> value it answers.
     /// </summary>
     /// <remarks>
     /// Each <c>s</c> value is an indicator route and its query, for example
@@ -63,7 +64,8 @@ public partial class Main
                 computed[selection] = item;
             }
 
-            items.Add(item);
+            // Echoed so a client can match items to requests however the response is ordered.
+            items.Add(item with { Selection = selection });
         }
 
         if (items.All(item => item.Status == StatusCodes.Status200OK))
@@ -213,5 +215,9 @@ public partial class Main
     private sealed record BatchItem(
         int Status,
         [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] object? Data,
-        [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Error);
+        [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Error)
+    {
+        /// <summary>The <c>s</c> value this item answers, as the request spelled it.</summary>
+        public string? Selection { get; init; }
+    }
 }

@@ -129,6 +129,41 @@ describe("ApiClient", () => {
       ]);
     });
 
+    it("matches items to selections by the selection each echoes, whatever order they arrive in", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(
+          okResponse([
+            { selection: "ADX?lookbackPeriods=14", status: 200, data: [{ a: 1 }] },
+            { selection: "MACD?lookbackPeriods=12", status: 200, data: [{ c: 3 }] },
+            { selection: "RSI?lookbackPeriods=5", status: 200, data: [{ b: 2 }] }
+          ])
+        )
+      );
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }], [{ c: 3 }]]);
+    });
+
+    it("asks for a selection alone when an echoed batch has no item for it", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          okResponse([
+            { selection: "ADX?lookbackPeriods=14", status: 200, data: [{ a: 1 }] },
+            { selection: "RSI?lookbackPeriods=5", status: 200, data: [{ b: 2 }] },
+            { selection: "ADL", status: 200, data: [{ z: 9 }] }
+          ])
+        )
+        .mockResolvedValue(okResponse([{ ok: 1 }]));
+      vi.stubGlobal("fetch", fetchMock);
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }], [{ ok: 1 }]]);
+    });
+
     it("asks for a selection alone when the batch leaves it out", async () => {
       const fetchMock = vi
         .fn()

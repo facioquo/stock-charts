@@ -17,6 +17,8 @@ namespace WebApi.Tests.Endpoints;
 public class BatchEndpointTests
 {
     private readonly Main _controller;
+    private static readonly JsonSerializerOptions WebJson = new(JsonSerializerDefaults.Web);
+
     private readonly Mock<IQuoteService> _quoteService = new();
 
     public BatchEndpointTests()
@@ -67,6 +69,21 @@ public class BatchEndpointTests
 
         OkObjectResult ok = Assert.IsType<OkObjectResult>(result);
         Assert.Equal([200, 200, 200], Statuses(Items(ok.Value)));
+    }
+
+    [Fact]
+    public async Task Batch_EchoesEachSelectionOutOfAlphabeticalOrder()
+    {
+        string[] selections = ["SLOPE?lookbackPeriods=50", "ADX?lookbackPeriods=14", "RSI?lookbackPeriods=5", "ADX?lookbackPeriods=14"];
+        OkObjectResult ok = Assert.IsType<OkObjectResult>(await Batch(selections));
+
+        using JsonDocument json = JsonDocument.Parse(JsonSerializer.Serialize(ok.Value, WebJson));
+        JsonElement[] items = [.. json.RootElement.EnumerateArray()];
+
+        Assert.Equal(selections, items.Select(item => item.GetProperty("selection").GetString()));
+        Assert.True(items[0].GetProperty("data")[0].TryGetProperty("slope", out _));
+        Assert.True(items[1].GetProperty("data")[0].TryGetProperty("adx", out _));
+        Assert.True(items[2].GetProperty("data")[0].TryGetProperty("rsi", out _));
     }
 
     [Fact]
