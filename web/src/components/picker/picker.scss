@@ -1,7 +1,8 @@
 /*
- * Styles for the settings + indicator-picker dialogs. Co-located with the components and imported from ChartPage so it
- * stays decoupled from the global theme stylesheet. Uses the same CSS
- * custom properties (--bg, --surface, --text, etc.) defined by the global theme.
+ * Styles for the settings + indicator-picker dialogs. Co-located with the
+ * components and imported from ChartPage so it stays decoupled from the global
+ * theme stylesheet. Uses the same CSS custom properties (--bg, --surface,
+ * --text, etc.) defined by the global theme.
  *
  * Related selectors (descendants, pseudo-classes, state modifiers) are nested
  * under their parent so each control reads as one cohesive unit.
