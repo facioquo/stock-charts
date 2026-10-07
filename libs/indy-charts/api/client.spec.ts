@@ -620,6 +620,17 @@ describe("createApiClient", () => {
       expect(rows).toEqual([[{ sma: 1 }], [{ sma: 1 }]]);
     });
 
+    it("matches an echoed selection ignoring case", async () => {
+      mockFetchOk([
+        { selection: "rsi?lookbackperiods=14", status: 200, data: [{ rsi: 2 }] },
+        { selection: "sma?lookbackperiods=20", status: 200, data: [{ sma: 1 }] }
+      ]);
+
+      const rows = await Promise.all(client.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ sma: 1 }], [{ rsi: 2 }]]);
+    });
+
     it("answers only the echoed items of a partly echoing batch", async () => {
       const fetchMock = mockFetchSequence([
         {

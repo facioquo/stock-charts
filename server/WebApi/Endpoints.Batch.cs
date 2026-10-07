@@ -34,9 +34,9 @@ public partial class Main
     /// (URL-encoded). The response is 200 only when every selection succeeded;
     /// otherwise 207, so a partial result is never cached as the answer.
     /// </remarks>
-    // Opts out of the controller's output cache: its VaryByQuery("*") reorders repeated
-    // `s` values, which answers a request's selections in another order than it sent
-    // them. Each selection is still cached by the Worker and the quote cache.
+    // Opts out of the controller's output cache: with it, repeated `s` values were answered
+    // in route order rather than request order (observed; the mechanism is not pinned down).
+    // Clients match items by their echoed selection either way.
     [OutputCache(NoStore = true)]
     [HttpGet("indicators/batch")]
     public async Task<IActionResult> GetIndicatorBatch()

@@ -210,7 +210,9 @@ export class ApiClient {
   ): Promise<Array<BatchItem | undefined> | undefined> {
     const keys = requests.map(request => this.selectionKey(request));
     const query = new URLSearchParams();
-    keys.forEach(key => query.append("s", key));
+    keys.forEach(key => {
+      query.append("s", key);
+    });
 
     try {
       const batchUrl = new URL("indicators/batch", env.api.endsWith("/") ? env.api : `${env.api}/`);
@@ -221,10 +223,10 @@ export class ApiClient {
       // Echoed selections win over position: the order a response arrives in is not
       // guaranteed, the selection it answers is. A response that echoes nothing is
       // read in request order; one that echoes only some items answers just those.
-      if (!items.some(item => typeof item?.selection === "string")) return items;
+      if (!items.some(item => typeof item.selection === "string")) return items;
       const bySelection = new Map<string, BatchItem>();
       items.forEach(item => {
-        const key = typeof item?.selection === "string" ? item.selection.toLowerCase() : undefined;
+        const key = typeof item.selection === "string" ? item.selection.toLowerCase() : undefined;
         if (key !== undefined && !bySelection.has(key)) bySelection.set(key, item);
       });
       return keys.map(key => bySelection.get(key.toLowerCase()));

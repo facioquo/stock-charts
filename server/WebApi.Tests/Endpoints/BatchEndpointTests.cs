@@ -89,7 +89,7 @@ public class BatchEndpointTests
     }
 
     [Fact]
-    public void Batch_OptsOutOfTheOutputCacheThatReordersRepeatedQueryValues()
+    public void Batch_OptsOutOfTheControllersOutputCache()
     {
         OutputCacheAttribute? cache = typeof(Main)
             .GetMethod(nameof(Main.GetIndicatorBatch))!

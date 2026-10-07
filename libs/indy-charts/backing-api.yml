@@ -394,7 +394,7 @@ components:
         properties:
           selection:
             type: string
-            description: The `s` value this item answers, exactly as the request spelled it. Optional, but a server should echo it; the client then matches items to requests by it rather than by position.
+            description: The `s` value this item answers, as the request spelled it. Optional, but a server should echo it; the client then matches items to requests by it, ignoring case, rather than by position.
             example: ADX?lookbackPeriods=14
           status:
             type: integer

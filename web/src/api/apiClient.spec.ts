@@ -201,6 +201,23 @@ describe("ApiClient", () => {
       expect(String(fetchMock.mock.calls[1]?.[0])).toContain("/RSI/");
     });
 
+    it("matches an echoed selection ignoring case", async () => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(
+          okResponse([
+            { selection: "rsi?lookbackperiods=5", status: 200, data: [{ b: 2 }] },
+            { selection: "adx?lookbackperiods=14", status: 200, data: [{ a: 1 }] },
+            { selection: "macd?lookbackperiods=12", status: 200, data: [{ c: 3 }] }
+          ])
+        )
+      );
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }], [{ c: 3 }]]);
+    });
+
     it("asks for a selection alone when an echoed batch has no item for it", async () => {
       const fetchMock = vi
         .fn()
