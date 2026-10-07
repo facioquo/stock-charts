@@ -4,7 +4,7 @@ layout: home
 hero:
   name: Indy Charts
   text: Financial charting, batteries included
-  tagline: Candlesticks, volume, and ten-plus technical indicators on Chart.js.
+  tagline: Candlesticks, volume, and ten-plus technical indicators on Chart.js — Vue, React, or vanilla JS.
   actions:
     - theme: brand
       text: Install

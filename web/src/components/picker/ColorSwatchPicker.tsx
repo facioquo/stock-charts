@@ -99,8 +99,8 @@ function SwatchGrid({ value, presetColors, onSelect }: SwatchGridProps): React.J
 }
 
 /**
- * Dependency-free compact color picker: a validated hex text input plus a
- * toggleable grid of 17 preset swatches.
+ * Dependency-free compact color picker (no third-party picker package):
+ * a validated hex text input plus a toggleable grid of 17 preset swatches.
  */
 export function ColorSwatchPicker({
   value,

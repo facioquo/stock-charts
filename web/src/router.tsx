@@ -17,7 +17,7 @@ function RouteSuspense({ children }: { children: React.ReactNode }) {
 /**
  * Routes:
  *   ""        -> ChartPage
- *   "settings"-> picker (lands in the stacked follow-up slice; redirects to "/" for now)
+ *   "settings"-> redirects to "/" (the settings dialog opens from ChartPage)
  *   "*"       -> NotFound
  */
 export const router = createBrowserRouter([

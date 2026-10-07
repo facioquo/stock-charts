@@ -1,7 +1,8 @@
 import { v4 as uuid } from "uuid";
 
 /**
- * Meta/title/scroll helpers. Updates document `<title>` and `<meta>` tags directly (no framework Meta service).
+ * Meta/title/scroll helpers. Updates document `<title>` and `<meta>` tags
+ * directly (no framework Meta service).
  */
 export interface MetaTag {
   name?: string;

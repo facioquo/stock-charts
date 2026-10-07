@@ -44,8 +44,8 @@ export interface ChartState {
 }
 
 /**
- * Framework-neutral chart orchestrator. Orchestrates the chart
- * lifecycle by delegating rendering/dataset/theming to {@link ChartManager},
+ * Framework-neutral chart controller. Orchestrates the chart lifecycle by
+ * delegating rendering/dataset/theming to {@link ChartManager},
  * and retains the app-specific concerns: backup-aware API calls, localStorage
  * caching, oscillator DOM container management, scrolling, and default-selection
  * hydration.
