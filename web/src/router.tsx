@@ -15,7 +15,7 @@ function RouteSuspense({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * Routes mirror the Angular `app.routes.ts`:
+ * Routes:
  *   ""        -> ChartPage
  *   "settings"-> picker (lands in the stacked follow-up slice; redirects to "/" for now)
  *   "*"       -> NotFound

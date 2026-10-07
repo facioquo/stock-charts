@@ -1,7 +1,7 @@
 # Plan: Reusable charts — external site integration
 
 Remaining work to integrate `@facioquo/indy-charts` into an external VitePress
-documentation site. Phases 1–4 (library extraction, Angular refactor, testing,
+documentation site. Phases 1–4 (library extraction, web app refactor, testing,
 and publishing prep) are complete.
 
 ## Goal
@@ -16,7 +16,7 @@ by consuming the `@facioquo/indy-charts` package as a single dependency.
 ### Library dependency chain
 
 ```text
-consumer (Angular, VitePress, etc.)
+consumer (React web app, VitePress, etc.)
   └─ @facioquo/indy-charts          (chart abstractions, API client, config, data)
        └─ @facioquo/chartjs-chart-financial  (Chart.js candlestick/OHLC/volume plugin)
             └─ chart.js              (peer dependency)
@@ -39,7 +39,7 @@ direct dependencies of `@facioquo/indy-charts` and install automatically.
 
 | Consumer | Location | Notes |
 | :--- | :--- | :--- |
-| Angular website | `client/` | Primary showcase application (complete) |
+| React website | `web/` | Primary showcase application (complete) |
 | VitePress integration test | `tests/vitepress/` | Local integration test and docs reference (complete) |
 | External VitePress docs site | Separate repository | **Remaining work below** |
 
@@ -170,7 +170,7 @@ These items are intentionally out of scope for the current plan:
 - **Higher-level oscillator container helper** — utility for dynamically
   creating oscillator canvas containers (currently consumer responsibility).
 - **Error/fallback data strategy in library** — `createApiClient()` has an
-  `onError` callback but no built-in fallback. Angular client implements its own
+  `onError` callback but no built-in fallback. The web app implements its own
   fallback via backup JSON. Consider adding optional fallback to the library.
 
 ## Reference: library public API surface

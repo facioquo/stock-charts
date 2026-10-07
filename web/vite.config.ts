@@ -1,9 +1,8 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// React + Vite config for the stock-charts demo (Angular migration).
-// Output mirrors the Angular build target (dist/app) so existing deploy
-// config (Cloudflare Pages / `_headers`) continues to work unchanged.
+// React + Vite config for the stock-charts demo. Output goes to dist/app,
+// where the deploy config (Cloudflare Pages / `_headers`) expects it.
 export default defineConfig({
   plugins: [react()],
   build: {

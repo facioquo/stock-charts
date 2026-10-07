@@ -6,11 +6,9 @@ import type { IndicatorListing, IndicatorSelection } from "@facioquo/indy-charts
 import type { ApiClient } from "../api/apiClient";
 
 /**
- * Vitest smoke-test parity port of the Angular `ChartService` spec
- * (`client/src/app/services/chart.service.spec.ts`). The Angular spec mocked a
- * canvas context and drove a real `ChartManager`; here we mock `ChartManager`
- * (the framework-agnostic core lives in `@facioquo/indy-charts` and has its own
- * tests) and verify the ChartController orchestration that was ported:
+ * Vitest smoke tests for ChartController. `ChartManager` is mocked (the
+ * framework-agnostic core lives in `@facioquo/indy-charts` and has its own
+ * tests) to verify the controller orchestration:
  * initialization, indicator add/remove lifecycle (incl. oscillator DOM),
  * theme propagation, and resize/bar-count recomputation.
  */

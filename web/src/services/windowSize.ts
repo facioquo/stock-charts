@@ -1,5 +1,5 @@
 /**
- * Port of the Angular `WindowService` resize/bar-count logic.
+ * Resize/bar-count logic.
  * `subscribeResize` debounces and de-duplicates resize events (150ms);
  * `calculateOptimalBars` keeps the ~5px-per-bar heuristic (min 20, max 500).
  */

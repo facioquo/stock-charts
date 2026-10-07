@@ -25,7 +25,7 @@ export function ChartPage(): React.JSX.Element {
     void controller.loadCharts();
   }, [controller]);
 
-  // Mirror the Angular flow: choosing an indicator closes settings and opens
+  // Choosing an indicator closes settings and opens
   // the config dialog; closing the config dialog reopens settings (which then
   // reflects any newly-added indicator).
   const openIndicatorSettings = (listing: IndicatorListing): void => {

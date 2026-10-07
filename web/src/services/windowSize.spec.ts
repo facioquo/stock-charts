@@ -3,12 +3,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { calculateOptimalBars, getWindowSize, subscribeResize } from "./windowSize";
 
 /**
- * Vitest parity port of the Angular `WindowService` spec
- * (`client/src/app/services/window.service.spec.ts`). The bar-count heuristic
- * (~5px/bar, min 20, max 500), window-size read, and the debounced/deduplicated
- * resize stream are preserved; the Angular RxJS `getResizeObservable` is
- * replaced by `subscribeResize` (callback + unsubscribe), tested here with fake
- * timers to drive the 150ms debounce deterministically.
+ * Vitest tests for the bar-count heuristic (~5px/bar, min 20, max 500), the
+ * window-size read, and the debounced/deduplicated resize subscription
+ * (`subscribeResize`), driven with fake timers for a deterministic 150ms debounce.
  */
 function setWindowSize(width: number, height: number): void {
   Object.defineProperty(window, "innerWidth", { value: width, configurable: true, writable: true });

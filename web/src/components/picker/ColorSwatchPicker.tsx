@@ -99,10 +99,8 @@ function SwatchGrid({ value, presetColors, onSelect }: SwatchGridProps): React.J
 }
 
 /**
- * Dependency-free replacement for the Angular `ngx-color` compact picker:
- * a validated hex text input plus a toggleable grid of preset swatches.
- * Reproduces the original 17-swatch Material palette UX without pulling in the
- * unmaintained `react-color` package.
+ * Dependency-free compact color picker: a validated hex text input plus a
+ * toggleable grid of 17 preset swatches.
  */
 export function ColorSwatchPicker({
   value,

@@ -3,11 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { guid, pushMetaTags, scrollToEnd, scrollToStart, titleWithSuffix } from "./meta";
 
 /**
- * Vitest parity port of the Angular `UtilityService` spec
- * (`client/src/app/services/utility.service.spec.ts`). The Angular service
- * delegated to the `@angular/platform-browser` `Meta`/`Title` services; the
- * React port manipulates `document.head` / `document.title` directly, so the
- * meta-tag assertions read the real DOM instead of mocked Angular services.
+ * Vitest tests for the meta/title/scroll helpers. They manipulate
+ * `document.head` / `document.title` directly, so the meta-tag assertions read
+ * the real DOM.
  */
 describe("meta", () => {
   describe("titleWithSuffix", () => {

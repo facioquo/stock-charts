@@ -3,8 +3,7 @@ import { useSyncExternalStore } from "react";
 import { ChartController, type ChartState } from "./chartController";
 
 /**
- * Lazily-constructed singleton ChartController, mirroring Angular's root-provided
- * `ChartService`. Constructed on first use (after `setupIndyCharts()` runs in
+ * Lazily-constructed singleton ChartController. Constructed on first use (after `setupIndyCharts()` runs in
  * `main.tsx`) rather than at module load.
  */
 let instance: ChartController | undefined;

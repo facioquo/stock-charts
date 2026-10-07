@@ -7,8 +7,7 @@ import { test, expect } from "./fixtures";
  * required: the app falls back to bundled backup quotes/indicators and, in
  * non-production mode, still renders the chart from that backup data.
  *
- * Mirrors the chart-rendering checks in `website.spec.ts` (the Angular E2E) and
- * adds React-specific UI flows: the settings dialog and the theme toggle.
+ * Covers chart rendering plus the settings dialog and the theme toggle.
  */
 test.describe("Stock Charts React Web", () => {
   test.describe.configure({ timeout: 30_000 });

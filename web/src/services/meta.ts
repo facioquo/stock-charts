@@ -1,8 +1,7 @@
 import { v4 as uuid } from "uuid";
 
 /**
- * Port of the meta/title/scroll helpers from the Angular `UtilityService`.
- * Updates document `<title>` and `<meta>` tags directly (no framework Meta service).
+ * Meta/title/scroll helpers. Updates document `<title>` and `<meta>` tags directly (no framework Meta service).
  */
 export interface MetaTag {
   name?: string;
