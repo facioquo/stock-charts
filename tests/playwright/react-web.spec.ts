@@ -257,10 +257,19 @@ test.describe("Stock Charts React Web", () => {
     /** Snapshot requests that did not return a JSON file, and the paths that did. */
     let missing: string[];
     let served: string[];
+    /** Snapshot requests sent and not yet finished, so a late response cannot be read around. */
+    let inFlight: Set<string>;
 
     test.beforeEach(async ({ page }) => {
       missing = [];
       served = [];
+      inFlight = new Set();
+      const isSnapshot = (url: string): boolean => url.includes("/data/chart-api/");
+      page.on("request", req => {
+        if (isSnapshot(req.url())) inFlight.add(req.url());
+      });
+      page.on("requestfinished", req => inFlight.delete(req.url()));
+      page.on("requestfailed", req => inFlight.delete(req.url()));
       // The configured API origin (local dev) and the production origin that
       // snapshot listings name in their endpoints.
       await page.route(/localhost:5001|charts-api\.stockindicators\.dev/, route => route.abort());
@@ -290,11 +299,10 @@ test.describe("Stock Charts React Web", () => {
       await expect(page.getByRole("button", { name: /^edit RSI.*5/ })).toBeVisible();
 
       // Each opening indicator drew rows from its own snapshot file, at its opening parameters.
-      await expect
-        .poll(() => served)
-        .toEqual(
-          expect.arrayContaining(["SLOPE/lookbackPeriods=50.json", "RSI/lookbackPeriods=5.json"])
-        );
+      await expect.poll(() => inFlight.size).toBe(0);
+      expect(served).toEqual(
+        expect.arrayContaining(["SLOPE/lookbackPeriods=50.json", "RSI/lookbackPeriods=5.json"])
+      );
       expect(missing, "every selection finds its snapshot file").toEqual([]);
 
       expect(errorCollection.pageErrors, "No uncaught page errors").toEqual([]);
@@ -337,8 +345,9 @@ test.describe("Stock Charts React Web", () => {
       ).toBeVisible({ timeout: 15_000 });
 
       await expectDisplayed(page, catalog.length);
-      // At least one file per selection answered.
-      await expect.poll(() => served.length).toBeGreaterThanOrEqual(catalog.length);
+      // Read `missing` only once every snapshot request has finished.
+      await expect.poll(() => inFlight.size).toBe(0);
+      expect(served.length, "the snapshot answered").toBeGreaterThanOrEqual(catalog.length);
       expect(missing, "every selection finds its snapshot file").toEqual([]);
 
       expect(errorCollection.pageErrors, "No uncaught page errors").toEqual([]);

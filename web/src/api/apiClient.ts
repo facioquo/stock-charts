@@ -113,7 +113,7 @@ export class ApiClient {
     });
     const url = this.buildApiUrl(listing.endpoint, params);
 
-    // Quotes or listings came from the snapshot, so rows must too: live rows would
+    // Quotes came from the snapshot, so rows must too: live rows would
     // carry current dates against snapshot candles, even if the API has since recovered.
     if (this.backupActive) {
       const rows = await fetchOfflineSnapshot({
