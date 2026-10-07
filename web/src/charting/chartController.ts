@@ -12,6 +12,7 @@ import { apiClient, type ApiClient } from "../api/apiClient";
 import { getSettings } from "../services/userPrefs";
 import { scrollToEnd, scrollToStart } from "../services/meta";
 import { calculateOptimalBars, subscribeResize } from "../services/windowSize";
+import { DEFAULT_INDICATORS } from "./defaultIndicators";
 import { buildShareUrl, decodeSelections, SHARE_PARAM } from "./shareLink";
 
 /** A restore fetch slower than this is skipped, so it cannot hold back saving user changes. */
@@ -343,6 +344,7 @@ export class ChartController {
   }
 
   private async bootstrapCharts(): Promise<void> {
+    this.api.resetBackup();
     try {
       const allQuotes = await this.api.getQuotes();
 
@@ -576,17 +578,7 @@ export class ChartController {
   }
 
   private loadDefaultSelections(): void {
-    const defaults: Array<{ uiid: string; lookbackPeriods?: number }> = [
-      { uiid: "LINEAR", lookbackPeriods: 50 },
-      { uiid: "BB" },
-      { uiid: "RSI", lookbackPeriods: 5 },
-      { uiid: "ADX" },
-      { uiid: "SUPERTREND" },
-      { uiid: "MACD" },
-      { uiid: "MARUBOZU" }
-    ];
-
-    const selections = defaults.flatMap(({ uiid, lookbackPeriods }) => {
+    const selections = DEFAULT_INDICATORS.flatMap(({ uiid, lookbackPeriods }) => {
       const selection = this.tryDefaultSelection(uiid);
       if (!selection) return [];
 

@@ -34,7 +34,9 @@ const selections = [
     const listing = listings.find(item => item.uiid === uiid);
     if (!listing) throw new Error(`No catalog listing for "${uiid}"`);
     const selection = createDefaultSelection(listing);
-    selection.params.find(p => p.paramName === "lookbackPeriods").value = lookbackPeriods;
+    const param = selection.params.find(p => p.paramName === "lookbackPeriods");
+    if (!param) throw new Error(`"${uiid}" has no lookbackPeriods parameter`);
+    param.value = lookbackPeriods;
     return selection;
   })
 ];
@@ -52,10 +54,14 @@ for (const file of files) {
   });
 }
 
-fs.rmSync(outDir, { recursive: true, force: true });
+// Write beside the target, then swap, so a failed write leaves the current snapshot intact.
+const tempDir = `${outDir}.tmp`;
+fs.rmSync(tempDir, { recursive: true, force: true });
 for (const { path: relative, data } of files) {
-  const target = path.join(outDir, relative);
+  const target = path.join(tempDir, relative);
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.writeFileSync(target, `${JSON.stringify(data)}\n`, "utf8");
 }
+fs.rmSync(outDir, { recursive: true, force: true });
+fs.renameSync(tempDir, outDir);
 console.log(`Wrote ${files.length} snapshot files from ${baseUrl} to ${outDir}`);

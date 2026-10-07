@@ -78,6 +78,7 @@ function makeApi(overrides: Partial<ApiClient> = {}): ApiClient {
   const getSelectionData = overrides.getSelectionData ?? vi.fn().mockResolvedValue([]);
   return {
     isBackupActive: false,
+    resetBackup: vi.fn(),
     getQuotes: vi.fn().mockResolvedValue([]),
     getListings: vi.fn().mockResolvedValue([]),
     getSelectionData,
@@ -203,6 +204,15 @@ describe("ChartController", () => {
 
     expect(manager(controller).initializeOverlay).toHaveBeenCalledTimes(1);
     expect(controller.getState()).toMatchObject({ offline: true, apiError: false, loading: false });
+  });
+
+  it("clears backup mode before each load so the flag reflects only that load", async () => {
+    const api = makeApi();
+    const controller = new ChartController(api);
+
+    await controller.loadCharts();
+
+    expect(api.resetBackup).toHaveBeenCalledTimes(1);
   });
 
   it("shows the API error when quotes cannot be loaded from the API or the snapshot", async () => {

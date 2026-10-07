@@ -1,4 +1,4 @@
-import { createApiClient } from "@facioquo/indy-charts";
+import { createApiClient, fetchOfflineSnapshot } from "@facioquo/indy-charts";
 import type {
   IndicatorListing,
   IndicatorParam,
@@ -62,6 +62,8 @@ export const BATCH_REFUSED: ReadonlySet<number> = new Set([400, 404, 405, 413, 4
  * Fetch-based client for the .NET Web API. When the API cannot answer, quotes,
  * listings, and indicator rows come from the snapshot served at {@link SNAPSHOT_URL}
  * and `isBackupActive` turns on, so the page can say it is showing saved data.
+ * The flag stays on until {@link resetBackup}: one page load never mixes snapshot
+ * candles with live indicator rows, and nothing re-probes the API in between.
  *
  * A transient failure of one indicator while quotes and listings are live returns
  * `[]`, which renders as gaps against the live candles.
@@ -86,13 +88,16 @@ export class ApiClient {
     return this.backupActive;
   }
 
-  async getQuotes(): Promise<Bar[]> {
+  /** Starts a load with live data expected; the load turns backup mode on if the snapshot answers. */
+  resetBackup(): void {
     this.backupActive = false;
+  }
+
+  async getQuotes(): Promise<Bar[]> {
     return this.snapshotClient.getQuotes();
   }
 
   async getListings(): Promise<IndicatorListing[]> {
-    this.backupActive = false;
     return this.snapshotClient.getListings();
   }
 
@@ -100,22 +105,20 @@ export class ApiClient {
     selection: IndicatorSelection,
     listing: IndicatorListing
   ): Promise<unknown[]> {
-    // Quotes or listings came from the snapshot, so rows must too: live rows would
-    // carry current dates against snapshot candles.
-    if (this.backupActive) {
-      try {
-        return await this.snapshotClient.getSelectionData(selection, listing);
-      } catch {
-        console.warn("No snapshot rows for indicator", { uiid: selection.uiid });
-        return [];
-      }
-    }
-
     const params = new URLSearchParams();
     selection.params.forEach((p: IndicatorParam) => {
       params.set(p.paramName, String(p.value));
     });
     const url = this.buildApiUrl(listing.endpoint, params);
+
+    // Quotes or listings came from the snapshot, so rows must too: live rows would
+    // carry current dates against snapshot candles, even if the API has since recovered.
+    if (this.backupActive) {
+      const rows = await fetchOfflineSnapshot(SNAPSHOT_URL, env.api, url);
+      if (Array.isArray(rows)) return rows as unknown[];
+      console.warn("No snapshot rows for indicator", { uiid: selection.uiid });
+      return [];
+    }
 
     try {
       return await this.getJson<unknown[]>(url);

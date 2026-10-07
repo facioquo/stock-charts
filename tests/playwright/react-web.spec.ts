@@ -247,10 +247,24 @@ test.describe("Stock Charts React Web", () => {
       }).toPass({ timeout: 60_000 });
     }
 
+    /** Snapshot requests that did not return a JSON file, and the paths that did. */
+    let missing: string[];
+    let served: string[];
+
     test.beforeEach(async ({ page }) => {
+      missing = [];
+      served = [];
       // The configured API origin (local dev) and the production origin that
       // snapshot listings name in their endpoints.
       await page.route(/localhost:5001|charts-api\.stockindicators\.dev/, route => route.abort());
+      page.on("response", res => {
+        const marker = "/data/chart-api/";
+        if (!res.url().includes(marker)) return;
+        // A missing file falls through to the dev server's index.html, which is a 200.
+        const isJson = (res.headers()["content-type"] ?? "").includes("json");
+        if (res.ok() && isJson) served.push(decodeURIComponent(res.url().split(marker)[1]));
+        else missing.push(res.url());
+      });
     });
 
     test("a fresh visitor sees the default indicators from the snapshot", async ({
@@ -267,6 +281,13 @@ test.describe("Stock Charts React Web", () => {
 
       await expectDisplayed(page, 7);
       await expect(page.getByRole("button", { name: /^edit RSI.*5/ })).toBeVisible();
+      await page.waitForLoadState("networkidle");
+
+      // Each opening indicator drew rows from its own snapshot file, at its opening parameters.
+      expect(missing, "every selection finds its snapshot file").toEqual([]);
+      expect(served).toEqual(
+        expect.arrayContaining(["SLOPE/lookbackPeriods=50.json", "RSI/lookbackPeriods=5.json"])
+      );
 
       expect(errorCollection.pageErrors, "No uncaught page errors").toEqual([]);
     });
@@ -296,14 +317,6 @@ test.describe("Stock Charts React Web", () => {
         })),
         results: []
       }));
-      const missing: string[] = [];
-      page.on("response", res => {
-        // A missing file falls through to the dev server's index.html, which is a 200.
-        const isJson = (res.headers()["content-type"] ?? "").includes("json");
-        if (res.url().includes("/data/chart-api/") && !(res.ok() && isJson)) {
-          missing.push(res.url());
-        }
-      });
       await page.addInitScript(saved => {
         localStorage.setItem("selections", JSON.stringify(saved));
       }, selections);
@@ -312,8 +325,8 @@ test.describe("Stock Charts React Web", () => {
       await page.waitForLoadState("networkidle");
       await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
 
-      // A selection whose snapshot rows are missing is dropped from the list.
       await expectDisplayed(page, catalog.length);
+      await page.waitForLoadState("networkidle");
       expect(missing, "every selection finds its snapshot file").toEqual([]);
 
       expect(errorCollection.pageErrors, "No uncaught page errors").toEqual([]);

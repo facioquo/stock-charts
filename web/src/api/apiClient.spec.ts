@@ -2,11 +2,12 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
 import { clearApiClientCache, createDefaultSelection } from "@facioquo/indy-charts";
 import type { IndicatorListing, IndicatorSelection } from "@facioquo/indy-charts";
 
+import { DEFAULT_INDICATORS } from "../charting/defaultIndicators";
 import { ApiClient, BATCH_REFUSED, BATCH_SIZE } from "./apiClient";
 
 const okResponse = (body: unknown): Response =>
@@ -22,8 +23,10 @@ afterEach(() => {
 const SNAPSHOT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../public");
 
 /** Serves the committed snapshot for `/data/chart-api/*` and fails every other request. */
-const snapshotOnlyFetch = (): ReturnType<typeof vi.fn> =>
-  vi.fn((input: string | URL) => {
+type FetchFn = (input: string | URL) => Promise<Response>;
+
+const snapshotOnlyFetch = (): Mock<FetchFn> =>
+  vi.fn<FetchFn>((input: string | URL) => {
     const url = new URL(String(input), "http://localhost");
     if (!url.pathname.startsWith("/data/chart-api/") || url.origin !== "http://localhost") {
       return Promise.reject(new TypeError("Failed to fetch"));
@@ -77,6 +80,80 @@ describe("ApiClient", () => {
     expect(quotes[0].timestamp).toBeInstanceOf(Date);
     expect(listings.length).toBeGreaterThan(0);
     expect(api.isBackupActive).toBe(true);
+  });
+
+  it("stays in backup mode when quotes come from the snapshot and listings from the API", async () => {
+    const api = new ApiClient();
+    const snapshot = snapshotOnlyFetch();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: string | URL) => {
+        const url = String(input);
+        if (url.includes("/data/chart-api/")) return snapshot(input);
+        if (url.endsWith("/indicators")) return Promise.resolve(okResponse([]));
+        return Promise.reject(new TypeError("Failed to fetch"));
+      })
+    );
+
+    api.resetBackup();
+    await api.getQuotes();
+    await api.getListings();
+
+    expect(api.isBackupActive).toBe(true);
+  });
+
+  it("clears backup mode when a load starts", async () => {
+    const api = new ApiClient();
+    vi.stubGlobal("fetch", snapshotOnlyFetch());
+    await api.getQuotes();
+    expect(api.isBackupActive).toBe(true);
+
+    api.resetBackup();
+
+    expect(api.isBackupActive).toBe(false);
+  });
+
+  it("reads snapshot rows, not live rows, once backup mode is active", async () => {
+    const api = new ApiClient();
+    const snapshot = snapshotOnlyFetch();
+    vi.stubGlobal("fetch", snapshot);
+    await api.getQuotes();
+    const listings = await api.getListings();
+    const listing = listings.find(item => item.uiid === "RSI") as IndicatorListing;
+    // The API recovers while the saved indicators are restoring.
+    const recovered = vi.fn((input: string | URL) =>
+      String(input).includes("/data/chart-api/")
+        ? snapshot(input)
+        : Promise.resolve(okResponse([{ live: true }]))
+    );
+    vi.stubGlobal("fetch", recovered);
+
+    const rows = await api.getSelectionData(createDefaultSelection(listing), listing);
+
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows).not.toEqual([{ live: true }]);
+    expect(recovered.mock.calls.every(call => String(call[0]).includes("/data/chart-api/"))).toBe(
+      true
+    );
+  });
+
+  it("holds a snapshot file for every indicator the demo opens with", async () => {
+    const api = new ApiClient();
+    vi.stubGlobal("fetch", snapshotOnlyFetch());
+    await api.getQuotes();
+    const listings = await api.getListings();
+
+    const empty: string[] = [];
+    for (const { uiid, lookbackPeriods } of DEFAULT_INDICATORS) {
+      const listing = listings.find(item => item.uiid === uiid) as IndicatorListing;
+      const selection = createDefaultSelection(
+        listing,
+        lookbackPeriods === undefined ? undefined : { lookbackPeriods }
+      );
+      if ((await api.getSelectionData(selection, listing)).length === 0) empty.push(uiid);
+    }
+
+    expect(empty).toEqual([]);
   });
 
   it("throws when the API and the snapshot are both unavailable", async () => {

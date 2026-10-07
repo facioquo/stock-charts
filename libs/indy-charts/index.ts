@@ -87,6 +87,7 @@
  * - `clearApiClientCache()` - Drop the quote and listing responses shared across clients
  * - `ApiClient` - Interface exposing `getQuotes`, `getListings`, `getSelectionData`, `getSelectionsData`
  * - `createOfflineSnapshot(config, options?)` - Build the snapshot files `offlineFallback` reads
+ * - `fetchOfflineSnapshot(snapshotBaseUrl, apiBaseUrl, requestUrl)` - Read one snapshot file without a live request
  * - `loadStaticQuotes(quotes)` - Accept `Bar[]` (string or Date timestamps), return `Bar[]` with timestamps as Date
  * - `loadStaticIndicatorData(rows)` - Pass-through helper for `IndicatorDataRow[]`
  *
@@ -147,6 +148,7 @@ export {
   clearApiClientCache,
   createApiClient,
   createOfflineSnapshot,
+  fetchOfflineSnapshot,
   loadStaticQuotes,
   loadStaticIndicatorData
 } from "./api";
