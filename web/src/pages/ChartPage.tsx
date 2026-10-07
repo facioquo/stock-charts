@@ -4,7 +4,7 @@ import { env } from "../config/env";
 import { getChartController, useChartState } from "../charting/useChart";
 import { SettingsDialog } from "../components/picker/SettingsDialog";
 import { PickConfigDialog } from "../components/picker/PickConfigDialog";
-import type { IndicatorListing } from "../types/chart.types";
+import type { IndicatorListing, IndicatorSelection } from "../types/chart.types";
 import "../components/picker/picker.scss";
 
 /**
@@ -19,6 +19,7 @@ export function ChartPage(): React.JSX.Element {
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pickListing, setPickListing] = useState<IndicatorListing | null>(null);
+  const [editUcid, setEditUcid] = useState<string | null>(null);
 
   useEffect(() => {
     void controller.loadCharts();
@@ -32,8 +33,18 @@ export function ChartPage(): React.JSX.Element {
     setPickListing(listing);
   };
 
+  // Edit reuses the config dialog, preloaded with the displayed selection.
+  const openIndicatorEdit = (selection: IndicatorSelection): void => {
+    const listing = controller.listings.find(x => x.uiid === selection.uiid);
+    if (!listing) return;
+    setSettingsOpen(false);
+    setEditUcid(selection.ucid);
+    setPickListing(listing);
+  };
+
   const closePickConfig = (): void => {
     setPickListing(null);
+    setEditUcid(null);
     setSettingsOpen(true);
   };
 
@@ -122,10 +133,16 @@ export function ChartPage(): React.JSX.Element {
           controller={controller}
           onClose={() => setSettingsOpen(false)}
           onPickIndicator={openIndicatorSettings}
+          onEditIndicator={openIndicatorEdit}
         />
       )}
       {pickListing && (
-        <PickConfigDialog listing={pickListing} controller={controller} onClose={closePickConfig} />
+        <PickConfigDialog
+          listing={pickListing}
+          controller={controller}
+          selection={controller.selections.find(s => s.ucid === editUcid)}
+          onClose={closePickConfig}
+        />
       )}
     </>
   );

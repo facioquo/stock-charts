@@ -218,6 +218,8 @@
 
 .selection-list {
   li {
+    display: flex;
+    align-items: center;
     border-radius: 4px;
 
     &:hover {
@@ -226,10 +228,8 @@
   }
 
   label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 12px 10px 16px;
+    flex: 1;
+    padding: 10px 8px 10px 16px;
     cursor: pointer;
   }
 }
@@ -437,6 +437,11 @@
   vertical-align: middle;
   accent-color: transparent;
   background-color: transparent;
+}
+
+/* Last in a list row, so it lines up under the section header's select-all. */
+.selection-checkbox {
+  margin: 0 12px 0 8px;
 }
 
 /* BUTTONS */

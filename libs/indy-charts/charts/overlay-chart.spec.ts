@@ -75,3 +75,29 @@ describe("OverlayChart.setPriceVisibility", () => {
     expect(() => overlay.setPriceVisibility(false)).not.toThrow();
   });
 });
+
+describe("OverlayChart.reorderIndicatorDatasets", () => {
+  it("restacks the indicator datasets after price and volume in the given order", () => {
+    const [price, volume] = priceAndVolume();
+    const a = { label: "A", type: "line" };
+    const b = { label: "B", type: "line" };
+    const c = { label: "C", type: "line" };
+    const datasets = [price, volume, a, b, c];
+    const { overlay, update } = withDatasets(datasets);
+
+    overlay.reorderIndicatorDatasets(
+      [c, a, b].map(dataset => ({ dataset })) as unknown as Parameters<
+        OverlayChart["reorderIndicatorDatasets"]
+      >[0]
+    );
+
+    expect(datasets.map(d => d.label)).toEqual(["Price", "Volume", "C", "A", "B"]);
+    expect(update).toHaveBeenCalledWith("none");
+  });
+
+  it("no-ops before the chart is rendered", () => {
+    const overlay = new OverlayChart({} as CanvasRenderingContext2D, settings);
+
+    expect(() => overlay.reorderIndicatorDatasets([])).not.toThrow();
+  });
+});

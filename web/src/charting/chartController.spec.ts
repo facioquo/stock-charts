@@ -30,6 +30,9 @@ vi.mock("@facioquo/indy-charts", () => {
       if (!this.selections.some(s => s.ucid === sel.ucid)) this.selections.push(sel);
     });
     createOscillator = vi.fn();
+    reorderSelections = vi.fn((ucids: string[]) => {
+      this.selections.sort((a, b) => ucids.indexOf(a.ucid) - ucids.indexOf(b.ucid));
+    });
     removeSelection = vi.fn((ucid: string) => {
       const index = this.selections.findIndex(s => s.ucid === ucid);
       if (index >= 0) this.selections.splice(index, 1);
@@ -58,6 +61,7 @@ interface MockManager {
   displaySelection: MockFn;
   createOscillator: MockFn;
   removeSelection: MockFn;
+  reorderSelections: MockFn;
   updateTheme: MockFn;
   setBarCount: MockFn;
   resize: MockFn;
@@ -222,6 +226,82 @@ describe("ChartController", () => {
     expect(cm.removeSelection).toHaveBeenCalledWith(selection.ucid);
     expect(document.getElementById(`${selection.ucid}-container`)).toBeNull();
     expect(controller.selections.some(s => s.ucid === selection.ucid)).toBe(false);
+  });
+
+  it("replaces an oscillator in place, keeping its ucid and stack position", async () => {
+    const zone = document.createElement("div");
+    zone.id = "oscillators-zone";
+    document.body.appendChild(zone);
+
+    const api = makeApi({ getSelectionData: vi.fn().mockResolvedValue([{}]) });
+    const controller = new ChartController(api);
+    const listing = makeListing("OSC", "oscillator");
+    const first = makeSelection("OSC", "oscillator");
+    const second = { ...makeSelection("OSC", "oscillator"), ucid: "second" };
+    await controller.addSelection(first, listing, false);
+    await controller.addSelection(second, listing, false);
+
+    await controller.updateSelection(first.ucid, { ...first, label: "OSC(14)" }, listing);
+
+    const order = Array.from(zone.children).map(child => child.id);
+    expect(order).toEqual([`${first.ucid}-container`, `${second.ucid}-container`]);
+    // The manager's list, and so the cached order, keeps the edited indicator first.
+    expect(controller.selections.map(s => s.ucid)).toEqual([first.ucid, second.ucid]);
+    expect(
+      JSON.parse(localStorage.getItem("selections") ?? "[]").map((s: { ucid: string }) => s.ucid)
+    ).toEqual([first.ucid, second.ucid]);
+    expect(manager(controller).removeSelection).toHaveBeenCalledWith(first.ucid);
+    expect(controller.selections.filter(s => s.ucid === first.ucid)).toHaveLength(1);
+    // The resolved label is reset to the template so new parameter values apply.
+    expect(controller.selections.find(s => s.ucid === first.ucid)?.label).toBe(
+      listing.legendTemplate
+    );
+  });
+
+  it("leaves the chart unchanged when the edited data fails to load", async () => {
+    const zone = document.createElement("div");
+    zone.id = "oscillators-zone";
+    document.body.appendChild(zone);
+
+    const getSelectionData = vi.fn().mockResolvedValueOnce([{}]);
+    const controller = new ChartController(makeApi({ getSelectionData }));
+    const listing = makeListing("OSC", "oscillator");
+    const selection = makeSelection("OSC", "oscillator");
+    await controller.addSelection(selection, listing, false);
+
+    getSelectionData.mockRejectedValueOnce(new Error("bad params"));
+    await expect(controller.updateSelection(selection.ucid, selection, listing)).rejects.toThrow(
+      "bad params"
+    );
+
+    expect(manager(controller).removeSelection).not.toHaveBeenCalled();
+    expect(document.getElementById(`${selection.ucid}-container`)).not.toBeNull();
+  });
+
+  it("removes the indicator when drawing the replacement fails, and saving again adds it back", async () => {
+    const zone = document.createElement("div");
+    zone.id = "oscillators-zone";
+    document.body.appendChild(zone);
+
+    const controller = new ChartController(
+      makeApi({ getSelectionData: vi.fn().mockResolvedValue([{}]) })
+    );
+    const listing = makeListing("OSC", "oscillator");
+    const selection = makeSelection("OSC", "oscillator");
+    await controller.addSelection(selection, listing, false);
+
+    manager(controller).processSelectionData.mockImplementationOnce(() => {
+      throw new Error("bad rows");
+    });
+    await expect(controller.updateSelection(selection.ucid, selection, listing)).rejects.toThrow(
+      "bad rows"
+    );
+    expect(controller.selections.some(s => s.ucid === selection.ucid)).toBe(false);
+
+    // The dialog's RETRY calls updateSelection again for the same ucid.
+    await controller.updateSelection(selection.ucid, selection, listing);
+    expect(controller.selections.filter(s => s.ucid === selection.ucid)).toHaveLength(1);
+    expect(document.getElementById(`${selection.ucid}-container`)).not.toBeNull();
   });
 
   it("propagates theme/tooltip settings to the chart manager", () => {

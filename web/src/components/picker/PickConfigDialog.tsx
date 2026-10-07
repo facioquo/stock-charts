@@ -18,6 +18,8 @@ import { Modal } from "./Modal";
 interface PickConfigDialogProps {
   listing: IndicatorListing;
   controller: ChartController;
+  /** A displayed selection to edit in place; omit to add a new indicator. */
+  selection?: IndicatorSelection;
   onClose: () => void;
 }
 
@@ -233,14 +235,22 @@ interface PickConfigState {
 function usePickConfig(
   listing: IndicatorListing,
   controller: ChartController,
-  onClose: () => void
+  onClose: () => void,
+  existing?: IndicatorSelection
 ): PickConfigState {
+  // Edit a copy so cancelling leaves the displayed selection untouched.
   const [selection, setSelection] = useState<IndicatorSelection>(() =>
-    controller.defaultSelection(listing.uiid)
+    existing
+      ? {
+          ...existing,
+          params: existing.params.map(p => ({ ...p })),
+          results: existing.results.map(r => ({ ...r }))
+        }
+      : controller.defaultSelection(listing.uiid)
   );
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
-  const [closeLabel, setCloseLabel] = useState("ADD");
+  const [closeLabel, setCloseLabel] = useState(existing ? "SAVE" : "ADD");
 
   const hasParams = selection.params.length > 0;
   // Style controls are hidden where they'd be no-ops: candlestick-pattern
@@ -273,7 +283,11 @@ function usePickConfig(
   const handleSubmit = async (): Promise<void> => {
     setSubmitting(true);
     try {
-      await controller.addSelection(selection, listing);
+      if (existing) {
+        await controller.updateSelection(existing.ucid, selection, listing);
+      } else {
+        await controller.addSelection(selection, listing);
+      }
       setErrorMessage(undefined);
       onClose();
     } catch (error) {
@@ -346,16 +360,17 @@ function DialogError({ message }: { message: string }): React.JSX.Element {
 
 /**
  * Port of `PickConfigComponent`: configures an indicator's parameters and line
- * styles, then adds it to the chart. Replaces Angular Material tabs / form
+ * styles, then adds it to the chart, or saves the edits to a displayed one. Replaces Angular Material tabs / form
  * fields / color picker with native controls and {@link ColorSwatchPicker}.
  */
 export function PickConfigDialog({
   listing,
   controller,
+  selection,
   onClose
 }: PickConfigDialogProps): React.JSX.Element {
   const titleId = useId();
-  const cfg = usePickConfig(listing, controller, onClose);
+  const cfg = usePickConfig(listing, controller, onClose, selection);
 
   return (
     <Modal open onClose={onClose} labelledBy={titleId} className="pick-config-dialog">

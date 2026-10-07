@@ -53,6 +53,7 @@ function defaultSelection(): IndicatorSelection {
 interface FakeController {
   defaultSelection: ReturnType<typeof vi.fn>;
   addSelection: ReturnType<typeof vi.fn>;
+  updateSelection: ReturnType<typeof vi.fn>;
 }
 
 function makeController(
@@ -60,7 +61,8 @@ function makeController(
 ): FakeController {
   return {
     defaultSelection: vi.fn(() => defaultSelection()),
-    addSelection
+    addSelection,
+    updateSelection: vi.fn().mockResolvedValue(undefined)
   };
 }
 
@@ -102,6 +104,38 @@ describe("PickConfigDialog", () => {
       expect.objectContaining({ uiid: "RSI" }),
       listing
     );
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+  });
+
+  it("edits a displayed selection in place and saves it under the same ucid", async () => {
+    const controller = makeController();
+    const existing = { ...defaultSelection(), ucid: "displayed-1" };
+    const onClose = vi.fn();
+    render(
+      <PickConfigDialog
+        listing={listing}
+        controller={controller as unknown as ChartController}
+        selection={existing}
+        onClose={onClose}
+      />
+    );
+
+    expect(screen.getByLabelText("Lookback Periods")).toHaveValue(14);
+    fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "21" } });
+    fireEvent.click(screen.getByRole("button", { name: "SAVE" }));
+
+    await waitFor(() => expect(controller.updateSelection).toHaveBeenCalledTimes(1));
+    expect(controller.updateSelection).toHaveBeenCalledWith(
+      "displayed-1",
+      expect.objectContaining({
+        params: [expect.objectContaining({ paramName: "lookbackPeriods", value: 21 })]
+      }),
+      listing
+    );
+    expect(controller.addSelection).not.toHaveBeenCalled();
+    expect(controller.defaultSelection).not.toHaveBeenCalled();
+    // The displayed selection is edited as a copy, so it is not mutated.
+    expect(existing.params[0]?.value).toBe(14);
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 

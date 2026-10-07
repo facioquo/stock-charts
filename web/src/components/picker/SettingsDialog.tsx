@@ -1,4 +1,4 @@
-import { useId, useReducer, useState } from "react";
+import { useId, useReducer, useState, type Dispatch } from "react";
 
 import type { ChartController } from "../../charting/chartController";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
@@ -11,6 +11,8 @@ interface SettingsDialogProps {
   onClose: () => void;
   /** Open the indicator config dialog for the chosen listing. */
   onPickIndicator: (listing: IndicatorListing) => void;
+  /** Open the config dialog to edit a displayed indicator in place. */
+  onEditIndicator: Dispatch<IndicatorSelection>;
 }
 
 interface ToggleRowProps {
@@ -20,10 +22,14 @@ interface ToggleRowProps {
 }
 
 function StandardCheckbox({
+  id,
+  className,
   checked,
   ariaLabel,
   onChange
 }: {
+  id?: string;
+  className?: string;
   checked: boolean;
   ariaLabel: string;
   onChange: (value: boolean) => void;
@@ -31,10 +37,11 @@ function StandardCheckbox({
   return (
     <input
       type="checkbox"
+      id={id}
       aria-label={ariaLabel}
       checked={checked}
       onChange={event => onChange(event.target.checked)}
-      className="standard-checkbox"
+      className={className ? `standard-checkbox ${className}` : "standard-checkbox"}
     />
   );
 }
@@ -58,15 +65,17 @@ interface DisplayedIndicatorsProps {
   onToggle: (ucid: string) => void;
   onSelectAll: (value: boolean) => void;
   onRemove: () => void;
+  onEdit: Dispatch<IndicatorSelection>;
 }
 
-/** List of currently-displayed indicators with multi-select removal. */
+/** List of currently-displayed indicators with edit and multi-select removal. */
 function DisplayedIndicators({
   selections,
   checked,
   onToggle,
   onSelectAll,
-  onRemove
+  onRemove,
+  onEdit
 }: DisplayedIndicatorsProps): React.JSX.Element {
   return (
     <section className="displayed-indicators">
@@ -82,15 +91,25 @@ function DisplayedIndicators({
       <ul className="selection-list">
         {selections.map(selection => (
           <li key={selection.ucid}>
-            <label>
-              <span>{selection.label}</span>
-              <span className="filler" />
-              <StandardCheckbox
-                ariaLabel={`select ${selection.label}`}
-                checked={checked.has(selection.ucid)}
-                onChange={() => onToggle(selection.ucid)}
-              />
-            </label>
+            <label htmlFor={`select-${selection.ucid}`}>{selection.label}</label>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label={`edit ${selection.label}`}
+              title={`edit ${selection.label}`}
+              onClick={() => {
+                onEdit(selection);
+              }}
+            >
+              <span className="material-icons">edit</span>
+            </button>
+            <StandardCheckbox
+              id={`select-${selection.ucid}`}
+              className="selection-checkbox"
+              ariaLabel={`select ${selection.label}`}
+              checked={checked.has(selection.ucid)}
+              onChange={() => onToggle(selection.ucid)}
+            />
           </li>
         ))}
       </ul>
@@ -241,7 +260,8 @@ function useSettingsControls(controller: ChartController): SettingsControls {
 export function SettingsDialog({
   controller,
   onClose,
-  onPickIndicator
+  onPickIndicator,
+  onEditIndicator
 }: SettingsDialogProps): React.JSX.Element {
   const titleId = useId();
   const controls = useSettingsControls(controller);
@@ -272,6 +292,7 @@ export function SettingsDialog({
             onToggle={controls.toggleChecked}
             onSelectAll={controls.selectAll}
             onRemove={controls.removeSelected}
+            onEdit={onEditIndicator}
           />
         )}
 

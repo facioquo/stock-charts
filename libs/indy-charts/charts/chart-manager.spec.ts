@@ -88,6 +88,7 @@ function createMockOverlay(): Partial<OverlayChart> {
     }),
     addIndicatorDatasets: vi.fn(),
     removeIndicatorDatasets: vi.fn(),
+    reorderIndicatorDatasets: vi.fn(),
     setPriceVisibility: vi.fn(),
     updateLegends: vi.fn(),
     updateTheme: vi.fn(),
@@ -821,6 +822,59 @@ describe("ChartManager", () => {
     it("is a no-op for unknown ucid", () => {
       mgr.removeSelection("nonexistent");
       expect(mgr.selections).toHaveLength(0);
+    });
+  });
+
+  // ----- reorderSelections -----
+
+  describe("reorderSelections", () => {
+    function addOverlays(ucids: string[]): IndicatorSelection[] {
+      const ctx = {} as CanvasRenderingContext2D;
+      mgr.initializeOverlay(ctx, makeQuotes(50), 25);
+      const listing = makeOverlayListing();
+      return ucids.map(ucid => {
+        const selection = makeSelection(listing, ucid);
+        mgr.processSelectionData(selection, listing, makeIndicatorData(makeQuotes(50)));
+        mgr.displaySelection(selection, listing);
+        return selection;
+      });
+    }
+
+    it("orders selections and restacks the overlay datasets to match", () => {
+      const [a, b, c] = addOverlays(["a", "b", "c"]);
+      const overlay = mgr.overlayChart as unknown as ReturnType<typeof createMockOverlay>;
+
+      mgr.reorderSelections(["c", "a", "b"]);
+
+      expect(mgr.selections.map(s => s.ucid)).toEqual(["c", "a", "b"]);
+      expect(overlay.reorderIndicatorDatasets).toHaveBeenCalledWith([
+        ...c.results,
+        ...a.results,
+        ...b.results
+      ]);
+      expect(overlay.updateLegends).toHaveBeenLastCalledWith(mgr.selections);
+    });
+
+    it("ignores unknown ucids and keeps unlisted selections after the listed ones", () => {
+      addOverlays(["a", "b", "c"]);
+
+      mgr.reorderSelections(["c", "nope"]);
+
+      expect(mgr.selections.map(s => s.ucid)).toEqual(["c", "a", "b"]);
+    });
+
+    it("leaves oscillators out of the overlay stack", () => {
+      const [a] = addOverlays(["a"]);
+      const listing = makeOscillatorListing();
+      const osc = makeSelection(listing, "osc");
+      mgr.processSelectionData(osc, listing, makeIndicatorData(makeQuotes(50)));
+      mgr.displaySelection(osc, listing);
+      const overlay = mgr.overlayChart as unknown as ReturnType<typeof createMockOverlay>;
+
+      mgr.reorderSelections(["osc", "a"]);
+
+      expect(mgr.selections.map(s => s.ucid)).toEqual(["osc", "a"]);
+      expect(overlay.reorderIndicatorDatasets).toHaveBeenCalledWith([...a.results]);
     });
   });
 

@@ -348,6 +348,30 @@ export class ChartManager {
   }
 
   /**
+   * Set the order of the registered selections. Listed ucids come first, in the
+   * order given; unknown ucids are ignored and unlisted selections follow in
+   * their existing order. For overlay selections the order is the layering
+   * (earlier draws over later, among results with the same `order`; bands carry a higher
+   * `order` than lines and stay behind them). The caller orders oscillator canvases itself.
+   */
+  reorderSelections(ucids: readonly string[]): void {
+    const byUcid = new Map(this._selections.map(selection => [selection.ucid, selection]));
+    const listed = ucids.flatMap(ucid => {
+      const selection = byUcid.get(ucid);
+      byUcid.delete(ucid);
+      return selection ? [selection] : [];
+    });
+    this._selections.splice(0, this._selections.length, ...listed, ...byUcid.values());
+
+    if (!this._overlayChart) return;
+    const overlayResults = this._selections
+      .filter(selection => selection.chartType === CHART_TYPES.OVERLAY)
+      .flatMap(selection => selection.results);
+    this._overlayChart.reorderIndicatorDatasets(overlayResults);
+    this._overlayChart.updateLegends(this._selections);
+  }
+
+  /**
    * Remove an indicator selection and its chart.
    */
   removeSelection(ucid: string): void {
