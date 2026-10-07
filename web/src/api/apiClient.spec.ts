@@ -25,18 +25,19 @@ const SNAPSHOT_FILES = import.meta.glob<unknown>("../../public/data/chart-api/**
   import: "default"
 });
 
-type FetchFn = (...args: [string | URL]) => Promise<Response>;
-
 /** Serves the committed snapshot for `/data/chart-api/*` and fails every other request. */
-const snapshotOnlyFetch = (): Mock<FetchFn> =>
-  vi.fn<FetchFn>((input: string | URL) => {
-    const url = new URL(String(input), "http://localhost");
-    if (!url.pathname.startsWith("/data/chart-api/") || url.origin !== "http://localhost") {
-      return Promise.reject(new TypeError("Failed to fetch"));
-    }
-    const body = SNAPSHOT_FILES[`../../public${decodeURIComponent(url.pathname)}`];
-    return Promise.resolve(body === undefined ? errorResponse(404) : okResponse(body));
-  });
+function serveSnapshot(input: string | URL): Promise<Response> {
+  const url = new URL(String(input), "http://localhost");
+  if (!url.pathname.startsWith("/data/chart-api/") || url.origin !== "http://localhost") {
+    return Promise.reject(new TypeError("Failed to fetch"));
+  }
+  const body = SNAPSHOT_FILES[`../../public${decodeURIComponent(url.pathname)}`];
+  return Promise.resolve(body === undefined ? errorResponse(404) : okResponse(body));
+}
+
+type FetchFn = typeof serveSnapshot;
+
+const snapshotOnlyFetch = (): Mock<FetchFn> => vi.fn<FetchFn>(serveSnapshot);
 
 describe("ApiClient", () => {
   beforeEach(() => {
