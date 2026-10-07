@@ -359,9 +359,9 @@ function DialogError({ message }: { message: string }): React.JSX.Element {
 }
 
 /**
- * Port of `PickConfigComponent`: configures an indicator's parameters and line
- * styles, then adds it to the chart, or saves the edits to a displayed one. Replaces Angular Material tabs / form
- * fields / color picker with native controls and {@link ColorSwatchPicker}.
+ * Configures an indicator's parameters and line styles, then adds it to the
+ * chart, or saves the edits to a displayed one. Uses native controls and
+ * {@link ColorSwatchPicker}.
  */
 export function PickConfigDialog({
   listing,

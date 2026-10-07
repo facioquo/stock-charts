@@ -1,8 +1,7 @@
 /*
- * Dark theme (default). Faithful port of `client/src/styles/theme-dark.scss`.
- * The Angular original derives colours from Material's M3 azure palette; here
- * the equivalent neutral tones are expressed as concrete custom properties so
- * the React app carries no Angular Material dependency.
+ * Dark theme (default).
+ * Neutral tones from the M3 azure palette are expressed as concrete custom
+ * properties.
  *
  * Neutral tone reference (M3 azure palette):
  *   neutral-10 #1a1c1e · neutral-20 #2f3033 · neutral-30 #46474a
@@ -25,7 +24,7 @@
   --link: #8ab4f8;
   --link-hover: #ababae;
 
-  /* brand heading: gold wordmark (unchanged from the Angular dark theme) */
+  /* brand heading: gold wordmark */
   --brand-h1: rgb(230 199 76 / 75%);
   --brand-h1-hover: rgb(230 199 76 / 90%);
 

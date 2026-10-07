@@ -1,6 +1,5 @@
 /**
- * Runtime environment config. Mirrors the Angular `environment.ts` /
- * `environment.prod.ts` pair, but driven by Vite's `import.meta.env`.
+ * Runtime environment config. Driven by Vite's `import.meta.env`.
  *
  * - `production` follows Vite's build mode (`import.meta.env.PROD`).
  * - `api` defaults per mode, overridable via `VITE_API_URL` for previews.

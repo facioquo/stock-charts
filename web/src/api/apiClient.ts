@@ -66,9 +66,8 @@ export const BATCH_SIZE = 20;
 export const BATCH_REFUSED: ReadonlySet<number> = new Set([400, 404, 405, 413, 414]);
 
 /**
- * Fetch-based port of the Angular `ApiService`. Talks to the .NET Web API and
- * falls back to bundled backup data when the backend is unavailable, preserving
- * the original backup-mode semantics:
+ * Fetch-based client for the .NET Web API. Falls back to bundled backup data
+ * when the backend is unavailable:
  *
  * `backupActive` is armed only when **quotes or listings** fall back (the
  * candlesticks would be at 2016-2019 timestamps), so `getSelectionData`
@@ -245,7 +244,7 @@ export class ApiClient {
     try {
       response = await fetch(url, { headers: { Accept: "application/json" } });
     } catch (cause) {
-      // Network/transport failure — model as status 0 (matches Angular status 0).
+      // Network/transport failure — model as status 0.
       throw new ApiError(cause instanceof Error ? cause.message : "Network error", 0, url);
     }
     if (!response.ok) {
@@ -311,5 +310,5 @@ export class ApiClient {
   }
 }
 
-/** Shared singleton, mirroring Angular's `providedIn: "root"`. */
+/** Shared singleton. */
 export const apiClient = new ApiClient();

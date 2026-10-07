@@ -44,14 +44,14 @@ export interface ChartState {
 }
 
 /**
- * Framework-neutral port of the Angular `ChartService`. Orchestrates the chart
- * lifecycle by delegating rendering/dataset/theming to {@link ChartManager},
+ * Framework-neutral chart controller. Orchestrates the chart lifecycle by
+ * delegating rendering/dataset/theming to {@link ChartManager},
  * and retains the app-specific concerns: backup-aware API calls, localStorage
  * caching, oscillator DOM container management, scrolling, and default-selection
  * hydration.
  *
  * Exposes a tiny observable store (`subscribe`/`getState`) so React can bind to
- * `loading` / `apiError` via `useSyncExternalStore` — replacing Angular signals.
+ * `loading` / `apiError` via `useSyncExternalStore`.
  */
 export class ChartController {
   private readonly chartManager: ChartManager;

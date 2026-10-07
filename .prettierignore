@@ -9,8 +9,6 @@ dist
 */dist
 build
 */build
-.angular
-*/.angular
 coverage
 */coverage
 

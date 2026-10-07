@@ -12,8 +12,7 @@ interface ModalProps {
 }
 
 /**
- * Minimal accessible modal dialog — the React replacement for Angular Material's
- * `MatDialog`. Renders an overlay with `role="dialog"`/`aria-modal`, closes on
+ * Minimal accessible modal dialog. Renders an overlay with `role="dialog"`/`aria-modal`, closes on
  * Escape or backdrop click, and moves focus into the panel on open.
  */
 export function Modal({

@@ -39,7 +39,7 @@ nunit-*.xml
 .nuget/
 
 # ========================================
-# NODE.JS / NPM / ANGULAR / PNPM
+# NODE.JS / NPM / PNPM
 # ========================================
 node_modules/
 **/node_modules/
@@ -47,7 +47,6 @@ dist/
 **/dist/
 tmp/
 out-tsc/
-.angular/
 coverage/
 **/coverage/
 test-results/

@@ -1,10 +1,6 @@
 /*
- * Global styles for the React demo. Faithful, self-contained port of the
- * Angular `client/src/styles/` theme partials plus the page-level styles from
- * `app.component.scss`, `chart.component.scss`, and `404.component.scss`. The
- * Angular originals derive colour from Angular Material's SCSS; the React app
- * intentionally carries no Material dependency, so the theme is expressed as
- * CSS custom properties (`--bg`, `--surface`, `--text`, …) toggled by the
+ * Global styles for the React demo. Theme partials plus page-level styles. The theme is
+ * expressed as CSS custom properties (`--bg`, `--surface`, `--text`, …) toggled by the
  * `.dark-theme` / `.light-theme` body class (see `services/userPrefs.ts`).
  */
 

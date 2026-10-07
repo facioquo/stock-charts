@@ -1,9 +1,9 @@
 import type { UserSettings } from "../types/chart.types";
 
 /**
- * Port of the Angular `UserService`. Persists theme / tooltip preferences in
+ * Persists theme / tooltip preferences in
  * localStorage and applies the theme class to `document.body`. Module-level
- * singleton mirrors `providedIn: "root"`.
+ * singleton.
  */
 const STORAGE_KEY = "settings";
 const isBrowser = typeof window !== "undefined";

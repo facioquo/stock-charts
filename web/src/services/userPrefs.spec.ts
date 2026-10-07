@@ -3,12 +3,8 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { changeTheme, changeTooltips, getSettings, loadSettings } from "./userPrefs";
 
 /**
- * Vitest parity port of the Angular `UserService` spec
- * (`client/src/app/services/user.service.spec.ts`). The Angular service used
- * `providedIn: "root"` DI + class methods; the React port is a module-level
- * singleton with free functions, so the assertions target the same behaviour
- * (default/cached settings, theme class application, localStorage caching)
- * against the functional API instead of an injected instance.
+ * Vitest tests for the module-level preference store: default/cached
+ * settings, theme class application, and localStorage caching.
  */
 describe("userPrefs", () => {
   beforeEach(() => {
