@@ -102,7 +102,7 @@ export function ChartPage(): React.JSX.Element {
           </span>
         )}
         <span role="status" className={sharedView ? "banner-text" : undefined}>
-          {sharedView ? "Showing a shared chart. Your own setup has not changed." : ""}
+          {sharedView ? "Showing a shared chart." : ""}
         </span>
         {sharedView && (
           <button
