@@ -681,15 +681,15 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
       if (!Array.isArray(body) || body.length !== requests.length) return undefined;
       const items = body as BatchItem[];
       // Echoed selections win over position: the order a response arrives in is not
-      // guaranteed (a cache may normalise the query), the selection it answers is.
-      if (!items.every(item => typeof item?.selection === "string")) return items;
+      // guaranteed, the selection it answers is. A response that echoes nothing is
+      // read in request order; one that echoes only some items answers just those.
+      if (!items.some(item => typeof item?.selection === "string")) return items;
       const bySelection = new Map<string, BatchItem>();
       for (const item of items) {
-        if (item.selection !== undefined && !bySelection.has(item.selection)) {
-          bySelection.set(item.selection, item);
-        }
+        const key = typeof item?.selection === "string" ? item.selection.toLowerCase() : undefined;
+        if (key !== undefined && !bySelection.has(key)) bySelection.set(key, item);
       }
-      return keys.map(key => bySelection.get(key));
+      return keys.map(key => bySelection.get(key.toLowerCase()));
     } catch {
       return undefined;
     }

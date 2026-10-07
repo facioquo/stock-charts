@@ -164,6 +164,43 @@ describe("ApiClient", () => {
       expect(rows).toEqual([[{ a: 1 }], [{ b: 2 }], [{ a: 1 }]]);
     });
 
+    it("answers only the echoed items of a partly echoing batch, and requests the rest alone", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          okResponse([
+            { status: 200, data: [{ x: 9 }] },
+            { selection: "ADX?lookbackPeriods=14", status: 200, data: [{ a: 1 }] },
+            { status: 200, data: [{ y: 8 }] }
+          ])
+        )
+        .mockResolvedValue(okResponse([{ ok: 1 }]));
+      vi.stubGlobal("fetch", fetchMock);
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ ok: 1 }], [{ ok: 1 }]]);
+    });
+
+    it("requests the right selection alone when a reordered batch fails one item", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          okResponse([
+            { selection: "RSI?lookbackPeriods=5", status: 400, error: "bad" },
+            { selection: "MACD?lookbackPeriods=12", status: 200, data: [{ c: 3 }] },
+            { selection: "ADX?lookbackPeriods=14", status: 200, data: [{ a: 1 }] }
+          ])
+        )
+        .mockResolvedValue(okResponse([{ alone: 1 }]));
+      vi.stubGlobal("fetch", fetchMock);
+
+      const rows = await Promise.all(new ApiClient().getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ a: 1 }], [{ alone: 1 }], [{ c: 3 }]]);
+      expect(String(fetchMock.mock.calls[1]?.[0])).toContain("/RSI/");
+    });
+
     it("asks for a selection alone when an echoed batch has no item for it", async () => {
       const fetchMock = vi
         .fn()

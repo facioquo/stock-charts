@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
 using WebApi.Services;
@@ -33,6 +34,10 @@ public partial class Main
     /// (URL-encoded). The response is 200 only when every selection succeeded;
     /// otherwise 207, so a partial result is never cached as the answer.
     /// </remarks>
+    // Opts out of the controller's output cache: its VaryByQuery("*") reorders repeated
+    // `s` values, which answers a request's selections in another order than it sent
+    // them. Each selection is still cached by the Worker and the quote cache.
+    [OutputCache(NoStore = true)]
     [HttpGet("indicators/batch")]
     public async Task<IActionResult> GetIndicatorBatch()
     {

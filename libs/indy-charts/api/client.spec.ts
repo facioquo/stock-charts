@@ -620,6 +620,24 @@ describe("createApiClient", () => {
       expect(rows).toEqual([[{ sma: 1 }], [{ sma: 1 }]]);
     });
 
+    it("answers only the echoed items of a partly echoing batch", async () => {
+      const fetchMock = mockFetchSequence([
+        {
+          status: 200,
+          body: [
+            { status: 200, data: [{ x: 9 }] },
+            { selection: "RSI?lookbackPeriods=14", status: 200, data: [{ rsi: 2 }] }
+          ]
+        },
+        { status: 200, body: [{ sma: 1 }] }
+      ]);
+
+      const rows = await Promise.all(client.getSelectionsData(requests));
+
+      expect(rows).toEqual([[{ sma: 1 }], [{ rsi: 2 }]]);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
     it("requests a selection alone when an echoed batch leaves it out", async () => {
       const fetchMock = mockFetchSequence([
         {

@@ -1,7 +1,9 @@
 using System.Collections;
+using System.Reflection;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -84,6 +86,16 @@ public class BatchEndpointTests
         Assert.True(items[0].GetProperty("data")[0].TryGetProperty("slope", out _));
         Assert.True(items[1].GetProperty("data")[0].TryGetProperty("adx", out _));
         Assert.True(items[2].GetProperty("data")[0].TryGetProperty("rsi", out _));
+    }
+
+    [Fact]
+    public void Batch_OptsOutOfTheOutputCacheThatReordersRepeatedQueryValues()
+    {
+        OutputCacheAttribute? cache = typeof(Main)
+            .GetMethod(nameof(Main.GetIndicatorBatch))!
+            .GetCustomAttribute<OutputCacheAttribute>();
+
+        Assert.True(cache?.NoStore);
     }
 
     [Fact]
