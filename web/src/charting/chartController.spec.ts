@@ -207,12 +207,12 @@ describe("ChartController", () => {
   });
 
   it("clears backup mode before each load so the flag reflects only that load", async () => {
-    const api = makeApi();
-    const controller = new ChartController(api);
+    const resetBackup = vi.fn();
+    const controller = new ChartController(makeApi({ resetBackup }));
 
     await controller.loadCharts();
 
-    expect(api.resetBackup).toHaveBeenCalledTimes(1);
+    expect(resetBackup).toHaveBeenCalledTimes(1);
   });
 
   it("shows the API error when quotes cannot be loaded from the API or the snapshot", async () => {

@@ -213,7 +213,8 @@ public class Service
 - **TypeScript**: Strict mode enabled, comprehensive type safety
 - **Chart.js v4+**: Financial chart types in `libs/chartjs-financial/`; bundled into `@facioquo/indy-charts` dist
 - **React Router v7**: Client-side routing
-- **Offline snapshot**: `web/public/data/chart-api/` holds every catalog indicator at its default parameters, plus the demo's opening selections. `ApiClient` reads it through the library's `offlineFallback` when the API is unreachable, so a visitor with no cache still gets charts. Regenerate it after the catalog, a default selection in `chartController.ts`, or the `@facioquo/indy-charts` version changes
+- **Offline snapshot**: `web/public/data/chart-api/` holds every catalog indicator at its default parameters, plus the demo's opening selections. `ApiClient` reads it when the API is unreachable, so a visitor with no cache still gets charts.
+  - Regenerate it after the catalog, `DEFAULT_INDICATORS`, or the `@facioquo/indy-charts` version changes.
 - **pnpm workspaces**: Unified dependency management across root and all workspace packages
 
 Client-side project dependencies are strictly in this direction only: web → indy-charts → chartjs-financial

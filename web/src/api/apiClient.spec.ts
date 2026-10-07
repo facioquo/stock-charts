@@ -20,23 +20,22 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-const SNAPSHOT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../../public");
+const SNAPSHOT_FILES = import.meta.glob<unknown>("../../public/data/chart-api/**/*.json", {
+  eager: true,
+  import: "default"
+});
+
+type FetchFn = (...args: [string | URL]) => Promise<Response>;
 
 /** Serves the committed snapshot for `/data/chart-api/*` and fails every other request. */
-type FetchFn = (input: string | URL) => Promise<Response>;
-
 const snapshotOnlyFetch = (): Mock<FetchFn> =>
   vi.fn<FetchFn>((input: string | URL) => {
     const url = new URL(String(input), "http://localhost");
     if (!url.pathname.startsWith("/data/chart-api/") || url.origin !== "http://localhost") {
       return Promise.reject(new TypeError("Failed to fetch"));
     }
-    try {
-      const file = readFileSync(resolve(SNAPSHOT_ROOT, `.${decodeURIComponent(url.pathname)}`));
-      return Promise.resolve(okResponse(JSON.parse(file.toString("utf8"))));
-    } catch {
-      return Promise.resolve(errorResponse(404));
-    }
+    const body = SNAPSHOT_FILES[`../../public${decodeURIComponent(url.pathname)}`];
+    return Promise.resolve(body === undefined ? errorResponse(404) : okResponse(body));
   });
 
 describe("ApiClient", () => {

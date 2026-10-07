@@ -58,7 +58,10 @@ for (const file of files) {
 const tempDir = `${outDir}.tmp`;
 fs.rmSync(tempDir, { recursive: true, force: true });
 for (const { path: relative, data } of files) {
-  const target = path.join(tempDir, relative);
+  const target = path.resolve(tempDir, relative);
+  // The library supplies `relative`; refuse anything that would leave the snapshot folder.
+  if (!target.startsWith(`${tempDir}${path.sep}`)) throw new Error(`Unexpected path: ${relative}`);
+  // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.writeFileSync(target, `${JSON.stringify(data)}\n`, "utf8");
 }
