@@ -1,3 +1,4 @@
+import { createApiClient } from "@facioquo/indy-charts";
 import type {
   IndicatorListing,
   IndicatorParam,
@@ -6,17 +7,9 @@ import type {
 } from "@facioquo/indy-charts";
 
 import { env } from "../config/env";
-import backupIndicators from "../data/backup-indicators.json";
-import backupQuotes from "../data/backup-quotes.json";
 
-interface ApiQuote {
-  timestamp: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-}
+/** Where the committed snapshot is served; `pnpm run generate:offline-snapshot` writes it. */
+export const SNAPSHOT_URL = "/data/chart-api";
 
 /** Error carrying an HTTP-ish status; `0` denotes a network/transport failure. */
 export class ApiError extends Error {
@@ -66,68 +59,56 @@ export const BATCH_SIZE = 20;
 export const BATCH_REFUSED: ReadonlySet<number> = new Set([400, 404, 405, 413, 414]);
 
 /**
- * Fetch-based client for the .NET Web API. Falls back to bundled backup data
- * when the backend is unavailable:
+ * Fetch-based client for the .NET Web API. When the API cannot answer, quotes,
+ * listings, and indicator rows come from the snapshot served at {@link SNAPSHOT_URL}
+ * and `isBackupActive` turns on, so the page can say it is showing saved data.
  *
- * `backupActive` is armed only when **quotes or listings** fall back (the
- * candlesticks would be at 2016-2019 timestamps), so `getSelectionData`
- * short-circuits to timestamp-aligned empty rows. A transient indicator-only
- * failure returns `[]` without arming the flag.
+ * A transient failure of one indicator while quotes and listings are live returns
+ * `[]`, which renders as gaps against the live candles.
  */
 export class ApiClient {
   private backupActive = false;
   /** Cleared when the backend refuses the batch route. */
   private batchSupported = true;
-  private cachedBackupRows: Array<{ timestamp: string; candle: unknown }> | undefined;
+  /** Reads the live API, then the snapshot; the snapshot answering turns on backup mode. */
+  private readonly snapshotClient = createApiClient({
+    baseUrl: env.api,
+    retry: { maxAttempts: 2, baseDelayMs: 250 },
+    offlineFallback: { baseUrl: SNAPSHOT_URL },
+    onOffline: context => {
+      this.backupActive = true;
+      console.warn(`Backend API unavailable, using the offline snapshot for ${context}`);
+    }
+  });
 
-  /** Whether the API has fallen back to bundled backup data. */
+  /** Whether the API has fallen back to the offline snapshot. */
   get isBackupActive(): boolean {
     return this.backupActive;
   }
 
   async getQuotes(): Promise<Bar[]> {
-    try {
-      const res = await this.getJson<ApiQuote[]>(`${env.api}/quotes`);
-      const quotes = this.toQuotes(res);
-      this.backupActive = false;
-      return quotes;
-    } catch (error) {
-      this.backupActive = true;
-      console.warn(
-        "Backend API unavailable, using client-side backup quotes",
-        this.errorInfo(error)
-      );
-      return this.toQuotes(backupQuotes);
-    }
+    this.backupActive = false;
+    return this.snapshotClient.getQuotes();
   }
 
   async getListings(): Promise<IndicatorListing[]> {
-    try {
-      const listings = await this.getJson<IndicatorListing[]>(`${env.api}/indicators`);
-      this.backupActive = false;
-      return listings;
-    } catch (error) {
-      this.backupActive = true;
-      console.warn(
-        "Backend API unavailable, using client-side backup indicators",
-        this.errorInfo(error)
-      );
-      return backupIndicators as IndicatorListing[];
-    }
+    this.backupActive = false;
+    return this.snapshotClient.getListings();
   }
 
   async getSelectionData(
     selection: IndicatorSelection,
     listing: IndicatorListing
   ): Promise<unknown[]> {
-    // When quotes/listings already fell back to backup data, live indicator
-    // results (current dates) would diverge from backup candlesticks (2016-2019).
-    // Return rows aligned to backup quote timestamps so every x-axis stays pinned.
+    // Quotes or listings came from the snapshot, so rows must too: live rows would
+    // carry current dates against snapshot candles.
     if (this.backupActive) {
-      console.warn("Backup data active, returning timestamp-aligned empty data for indicator", {
-        uiid: selection.uiid
-      });
-      return this.backupSelectionRows();
+      try {
+        return await this.snapshotClient.getSelectionData(selection, listing);
+      } catch {
+        console.warn("No snapshot rows for indicator", { uiid: selection.uiid });
+        return [];
+      }
     }
 
     const params = new URLSearchParams();
@@ -142,9 +123,8 @@ export class ApiClient {
       if (!this.isTransientBackendUnavailable(error)) {
         throw error;
       }
-      // Do NOT arm backupActive here — quotes/listings are still live, so the
-      // candlesticks are at live timestamps. Empty array renders as gaps and
-      // lets the overlay's other live datasets keep the x-axis anchored.
+      // Quotes and listings are live, so the candles are at live timestamps;
+      // an empty array renders as gaps beside the other live datasets.
       console.warn("Backend API unavailable, using empty data for indicator", {
         uiid: selection.uiid,
         status: error instanceof ApiError ? error.status : 0
@@ -260,15 +240,6 @@ export class ApiClient {
     return (await response.json()) as T;
   }
 
-  /** One backup row per quote, carrying timestamp + candle (NaN y-values -> gaps). */
-  private backupSelectionRows(): Array<{ timestamp: string; candle: unknown }> {
-    if (!this.cachedBackupRows) {
-      const quotes = backupQuotes as ApiQuote[];
-      this.cachedBackupRows = quotes.map(q => ({ timestamp: q.timestamp, candle: q }));
-    }
-    return [...this.cachedBackupRows];
-  }
-
   private buildApiUrl(endpoint: string, params: URLSearchParams): string {
     const baseUrl = env.api.endsWith("/") ? env.api : `${env.api}/`;
     const url = new URL(endpoint, baseUrl);
@@ -281,32 +252,6 @@ export class ApiClient {
     return (
       error.status === 0 || error.status === 502 || error.status === 503 || error.status === 504
     );
-  }
-
-  private toQuotes(raw: ApiQuote[]): Bar[] {
-    return raw.map((q, index) => ({
-      timestamp: this.parseTimestamp(q.timestamp, index),
-      open: q.open,
-      high: q.high,
-      low: q.low,
-      close: q.close,
-      volume: q.volume
-    }));
-  }
-
-  private parseTimestamp(value: string, index: number): Date {
-    const timestamp = new Date(value);
-    if (Number.isNaN(timestamp.getTime())) {
-      throw new Error(`Invalid quote timestamp at index ${index}: "${value}"`);
-    }
-    return timestamp;
-  }
-
-  private errorInfo(error: unknown): Record<string, unknown> {
-    if (error instanceof ApiError) {
-      return { status: error.status, url: error.url, message: error.message };
-    }
-    return { message: error instanceof Error ? error.message : String(error) };
   }
 }
 

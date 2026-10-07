@@ -13,7 +13,7 @@ import "../components/picker/picker.scss";
  * settings / indicator-picker dialogs.
  */
 export function ChartPage(): React.JSX.Element {
-  const { loading, apiError, sharedView } = useChartState();
+  const { loading, apiError, offline, sharedView } = useChartState();
   const isProduction = env.production;
   const controller = getChartController();
 
@@ -91,6 +91,18 @@ export function ChartPage(): React.JSX.Element {
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {offline && !apiError && (
+        <div role="status" className="shared-view-banner">
+          <span className="material-icons" aria-hidden="true">
+            cloud_off
+          </span>
+          <span className="banner-text">
+            The live API is unreachable. Showing saved data; indicators with custom settings may be
+            blank.
+          </span>
         </div>
       )}
 

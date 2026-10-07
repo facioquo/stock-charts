@@ -1,4 +1,4 @@
-import { test, expect } from "./fixtures";
+import { test, expect, type Page } from "./fixtures";
 
 /**
  * End-to-end coverage for the React (Vite) frontend migration. Runs under the
@@ -157,6 +157,7 @@ test.describe("Stock Charts React Web", () => {
     await shared.getByRole("button", { name: "BACK TO MY INDICATORS" }).click();
     await expect(shared.getByText("Showing a shared chart")).toBeHidden({ timeout: 15_000 });
     expect(new URL(shared.url()).searchParams.has("c")).toBe(false);
+    await shared.waitForLoadState("networkidle");
     await expect(shared.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
     await shared.getByRole("button", { name: "edit settings" }).click();
     await expect(oscillators.first()).toHaveText(/^RSI/);
@@ -210,5 +211,112 @@ test.describe("Stock Charts React Web", () => {
 
     expect(errorCollection.pageErrors, "No uncaught page errors").toEqual([]);
     expect(criticalErrors, "No critical console errors should occur").toEqual([]);
+  });
+
+  test.describe("with the API down", () => {
+    test.describe.configure({ timeout: 90_000 });
+
+    interface CatalogListing {
+      uiid: string;
+      legendTemplate: string;
+      chartType: string;
+      parameters: Array<{
+        paramName: string;
+        displayName: string;
+        minimum: number;
+        maximum: number;
+        defaultValue: number;
+      }>;
+    }
+
+    /**
+     * The settings list is read when the dialog opens, so opening it while the
+     * saved indicators are still being restored shows a partial list. Reopen it
+     * until the restore has landed.
+     */
+    async function expectDisplayed(page: Page, count: number): Promise<void> {
+      const displayed = page.locator(".displayed-indicators .selection-list li");
+      await expect(async () => {
+        await page.getByRole("button", { name: "edit settings" }).click();
+        try {
+          await expect(displayed).toHaveCount(count, { timeout: 2_000 });
+        } catch (error) {
+          await page.keyboard.press("Escape");
+          throw error;
+        }
+      }).toPass({ timeout: 60_000 });
+    }
+
+    test.beforeEach(async ({ page }) => {
+      // The configured API origin (local dev) and the production origin that
+      // snapshot listings name in their endpoints.
+      await page.route(/localhost:5001|charts-api\.stockindicators\.dev/, route => route.abort());
+    });
+
+    test("a fresh visitor sees the default indicators from the snapshot", async ({
+      page,
+      errorCollection
+    }) => {
+      await page.goto("/");
+      await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+      await expect(
+        page.getByRole("status").filter({ hasText: "live API is unreachable" })
+      ).toBeVisible({
+        timeout: 15_000
+      });
+
+      await expectDisplayed(page, 7);
+      await expect(page.getByRole("button", { name: /^edit RSI.*5/ })).toBeVisible();
+
+      expect(errorCollection.pageErrors, "No uncaught page errors").toEqual([]);
+    });
+
+    test("every catalog indicator renders from the snapshot", async ({
+      page,
+      request,
+      baseURL,
+      errorCollection
+    }) => {
+      const response = await request.get(`${baseURL}/data/chart-api/indicators.json`);
+      expect(response.ok(), "the committed snapshot lists the catalog").toBe(true);
+      const catalog = (await response.json()) as CatalogListing[];
+      expect(catalog.length).toBeGreaterThan(0);
+
+      const selections = catalog.map(listing => ({
+        ucid: `chart-${listing.uiid}`,
+        uiid: listing.uiid,
+        label: listing.legendTemplate,
+        chartType: listing.chartType,
+        params: listing.parameters.map(param => ({
+          paramName: param.paramName,
+          displayName: param.displayName,
+          minimum: param.minimum,
+          maximum: param.maximum,
+          value: param.defaultValue
+        })),
+        results: []
+      }));
+      const missing: string[] = [];
+      page.on("response", res => {
+        // A missing file falls through to the dev server's index.html, which is a 200.
+        const isJson = (res.headers()["content-type"] ?? "").includes("json");
+        if (res.url().includes("/data/chart-api/") && !(res.ok() && isJson)) {
+          missing.push(res.url());
+        }
+      });
+      await page.addInitScript(saved => {
+        localStorage.setItem("selections", JSON.stringify(saved));
+      }, selections);
+
+      await page.goto("/");
+      await page.waitForLoadState("networkidle");
+      await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+
+      // A selection whose snapshot rows are missing is dropped from the list.
+      await expectDisplayed(page, catalog.length);
+      expect(missing, "every selection finds its snapshot file").toEqual([]);
+
+      expect(errorCollection.pageErrors, "No uncaught page errors").toEqual([]);
+    });
   });
 });

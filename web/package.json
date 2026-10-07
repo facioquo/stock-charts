@@ -4,7 +4,6 @@
   "description": "React + Vite frontend for stock charts application",
   "type": "module",
   "scripts": {
-    "prebuild": "node ../scripts/generate-backup-indicators.js",
     "dev": "vite",
     "start": "vite --open",
     "build": "tsc --noEmit && vite build",

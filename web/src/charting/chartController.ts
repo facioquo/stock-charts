@@ -9,7 +9,6 @@ import {
 } from "@facioquo/indy-charts";
 
 import { apiClient, type ApiClient } from "../api/apiClient";
-import { env } from "../config/env";
 import { getSettings } from "../services/userPrefs";
 import { scrollToEnd, scrollToStart } from "../services/meta";
 import { calculateOptimalBars, subscribeResize } from "../services/windowSize";
@@ -39,6 +38,8 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 export interface ChartState {
   loading: boolean;
   apiError: boolean;
+  /** The API is unreachable and the charts show the bundled snapshot. */
+  offline: boolean;
   /** Showing a share link's indicators, not yet the user's saved ones. */
   sharedView: boolean;
 }
@@ -74,7 +75,12 @@ export class ChartController {
   /** Indicator catalog loaded from the API. */
   listings: IndicatorListing[] = [];
 
-  private state: ChartState = { loading: true, apiError: false, sharedView: false };
+  private state: ChartState = {
+    loading: true,
+    apiError: false,
+    offline: false,
+    sharedView: false
+  };
   private readonly listeners = new Set<() => void>();
 
   constructor(api: ApiClient = apiClient) {
@@ -340,12 +346,6 @@ export class ChartController {
     try {
       const allQuotes = await this.api.getQuotes();
 
-      if (env.production && this.api.isBackupActive) {
-        console.error("Backend API is unavailable in production");
-        this.setState({ apiError: true, loading: false });
-        return;
-      }
-
       const canvas = document.getElementById("chartOverlay") as HTMLCanvasElement | null;
       const ctx = canvas?.getContext("2d");
       if (!ctx) {
@@ -360,12 +360,8 @@ export class ChartController {
 
       try {
         const listings = await this.api.getListings();
-        if (env.production && this.api.isBackupActive) {
-          console.error("Backend API is unavailable in production");
-          this.setState({ apiError: true, loading: false });
-          return;
-        }
         this.listings = listings;
+        this.setState({ offline: this.api.isBackupActive });
         this.loadSelections();
       } catch (error) {
         this.logError("Error loading listings", error);
@@ -374,7 +370,7 @@ export class ChartController {
       }
     } catch (error) {
       this.logError("Error getting quotes", error);
-      this.setState({ loading: false });
+      this.setState({ apiError: true, loading: false });
     }
   }
 

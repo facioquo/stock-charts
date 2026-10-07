@@ -44,6 +44,7 @@ vi.mock("@facioquo/indy-charts", () => {
 
   return {
     ChartManager,
+    createApiClient: vi.fn(),
     createDefaultSelection: vi.fn(),
     applySelectionTokens: vi.fn()
   };
@@ -139,6 +140,7 @@ describe("ChartController", () => {
     expect(controller.getState()).toEqual({
       loading: true,
       apiError: false,
+      offline: false,
       sharedView: false
     });
 
@@ -187,6 +189,30 @@ describe("ChartController", () => {
     expect(typeof barCount).toBe("number");
     expect(controller.listings).toBe(listings);
     expect(controller.getState().loading).toBe(false);
+  });
+
+  it("renders from the snapshot and reports offline when the API is backed up", async () => {
+    const api = makeApi({
+      isBackupActive: true,
+      getListings: vi.fn().mockResolvedValue([makeListing("FOO", "overlay")])
+    });
+    document.body.innerHTML = '<canvas id="chartOverlay"></canvas>';
+
+    const controller = new ChartController(api);
+    await controller.loadCharts();
+
+    expect(manager(controller).initializeOverlay).toHaveBeenCalledTimes(1);
+    expect(controller.getState()).toMatchObject({ offline: true, apiError: false, loading: false });
+  });
+
+  it("shows the API error when quotes cannot be loaded from the API or the snapshot", async () => {
+    const api = makeApi({ getQuotes: vi.fn().mockRejectedValue(new Error("gone")) });
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const controller = new ChartController(api);
+    await controller.loadCharts();
+
+    expect(controller.getState()).toMatchObject({ apiError: true, loading: false });
   });
 
   it("processes, displays, and caches an overlay indicator via addSelection", async () => {
