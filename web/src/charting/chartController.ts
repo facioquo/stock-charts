@@ -9,10 +9,10 @@ import {
 } from "@facioquo/indy-charts";
 
 import { apiClient, type ApiClient } from "../api/apiClient";
-import { env } from "../config/env";
 import { getSettings } from "../services/userPrefs";
 import { scrollToEnd, scrollToStart } from "../services/meta";
 import { calculateOptimalBars, subscribeResize } from "../services/windowSize";
+import { DEFAULT_INDICATORS } from "./defaultIndicators";
 import { buildShareUrl, decodeSelections, SHARE_PARAM } from "./shareLink";
 
 /** A restore fetch slower than this is skipped, so it cannot hold back saving user changes. */
@@ -39,6 +39,8 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 export interface ChartState {
   loading: boolean;
   apiError: boolean;
+  /** The API is unreachable and the charts show the bundled snapshot. */
+  offline: boolean;
   /** Showing a share link's indicators, not yet the user's saved ones. */
   sharedView: boolean;
 }
@@ -74,7 +76,12 @@ export class ChartController {
   /** Indicator catalog loaded from the API. */
   listings: IndicatorListing[] = [];
 
-  private state: ChartState = { loading: true, apiError: false, sharedView: false };
+  private state: ChartState = {
+    loading: true,
+    apiError: false,
+    offline: false,
+    sharedView: false
+  };
   private readonly listeners = new Set<() => void>();
 
   constructor(api: ApiClient = apiClient) {
@@ -337,14 +344,9 @@ export class ChartController {
   }
 
   private async bootstrapCharts(): Promise<void> {
+    this.api.resetBackup();
     try {
       const allQuotes = await this.api.getQuotes();
-
-      if (env.production && this.api.isBackupActive) {
-        console.error("Backend API is unavailable in production");
-        this.setState({ apiError: true, loading: false });
-        return;
-      }
 
       const canvas = document.getElementById("chartOverlay") as HTMLCanvasElement | null;
       const ctx = canvas?.getContext("2d");
@@ -360,12 +362,8 @@ export class ChartController {
 
       try {
         const listings = await this.api.getListings();
-        if (env.production && this.api.isBackupActive) {
-          console.error("Backend API is unavailable in production");
-          this.setState({ apiError: true, loading: false });
-          return;
-        }
         this.listings = listings;
+        this.setState({ offline: this.api.isBackupActive });
         this.loadSelections();
       } catch (error) {
         this.logError("Error loading listings", error);
@@ -374,7 +372,7 @@ export class ChartController {
       }
     } catch (error) {
       this.logError("Error getting quotes", error);
-      this.setState({ loading: false });
+      this.setState({ apiError: true, loading: false });
     }
   }
 
@@ -580,17 +578,7 @@ export class ChartController {
   }
 
   private loadDefaultSelections(): void {
-    const defaults: Array<{ uiid: string; lookbackPeriods?: number }> = [
-      { uiid: "LINEAR", lookbackPeriods: 50 },
-      { uiid: "BB" },
-      { uiid: "RSI", lookbackPeriods: 5 },
-      { uiid: "ADX" },
-      { uiid: "SUPERTREND" },
-      { uiid: "MACD" },
-      { uiid: "MARUBOZU" }
-    ];
-
-    const selections = defaults.flatMap(({ uiid, lookbackPeriods }) => {
+    const selections = DEFAULT_INDICATORS.flatMap(({ uiid, lookbackPeriods }) => {
       const selection = this.tryDefaultSelection(uiid);
       if (!selection) return [];
 

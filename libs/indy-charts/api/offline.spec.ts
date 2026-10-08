@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { clearApiClientCache, createApiClient } from "./client";
-import { offlineSnapshotPath } from "./offline";
+import { fetchOfflineSnapshot, offlineSnapshotPath } from "./offline";
 import { createOfflineSnapshot } from "./snapshot";
 import type { IndicatorListing } from "../config/types";
 
@@ -113,6 +113,44 @@ describe("offlineSnapshotPath", () => {
     expect(offlineSnapshotPath("https://host.example/v1/", "https://host.example/v1/SMA/")).toBe(
       "SMA.json"
     );
+  });
+});
+
+describe("fetchOfflineSnapshot", () => {
+  it("reads the file the client would fall back to, with no request to the API", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: () => Promise.resolve([{ a: 1 }]) });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const body = await fetchOfflineSnapshot({
+      snapshotBaseUrl: SNAPSHOT,
+      apiBaseUrl: API,
+      requestUrl: `${API}/SMA/?lookbackPeriods=20`
+    });
+
+    expect(body).toEqual([{ a: 1 }]);
+    expect(fetchMock).toHaveBeenCalledExactlyOnceWith(`${SNAPSHOT}/SMA/lookbackPeriods=20.json`);
+  });
+
+  it("resolves to undefined when the file is missing or unreadable", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 404 }));
+    expect(
+      await fetchOfflineSnapshot({
+        snapshotBaseUrl: SNAPSHOT,
+        apiBaseUrl: API,
+        requestUrl: `${API}/quotes`
+      })
+    ).toBeUndefined();
+
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("offline")));
+    expect(
+      await fetchOfflineSnapshot({
+        snapshotBaseUrl: SNAPSHOT,
+        apiBaseUrl: API,
+        requestUrl: `${API}/quotes`
+      })
+    ).toBeUndefined();
   });
 });
 

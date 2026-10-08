@@ -192,6 +192,7 @@ Build the files with `createOfflineSnapshot(config)` at build time against the l
 | `createApiClient(config)` | Client for the backing-API operations |
 | `clearApiClientCache()` | Drop the quote and listing responses shared across clients |
 | `createOfflineSnapshot(config, options)` | Build the snapshot files `offlineFallback` reads |
+| `fetchOfflineSnapshot({ snapshotBaseUrl, apiBaseUrl, requestUrl })` | Read one snapshot file without a live request. `requestUrl` is the absolute URL the live client would request, under `apiBaseUrl`. Resolves to the parsed JSON, typed `unknown` (validate it), or `undefined` when the file is missing or unreadable |
 | `loadStaticQuotes`, `loadStaticIndicatorData` | Bring-your-own `Bar[]` / `IndicatorDataRow[]` |
 | `createDefaultSelection`, `applySelectionTokens`, `calculateOptimalBars` | Selection and viewport helpers |
 | `getThemeColors`, `baseOverlayConfig`, `baseOscillatorConfig` | Theme and config building blocks |

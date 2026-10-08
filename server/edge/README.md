@@ -146,7 +146,7 @@ Containers require the **Workers Paid** plan ($5/month minimum).
 | :--- | :--- | :--- |
 | `PUBLIC_BASE_URL` | [wrangler.jsonc](wrangler.jsonc) | The Worker's custom domain (`charts-api.stockindicators.dev`), so `/indicators` emits reachable absolute endpoint URLs. Must match the `routes` entry |
 | `ALLOWED_ORIGINS` | [wrangler.jsonc](wrangler.jsonc) | Production CORS allow list. Supports `*.` subdomain wildcards for preview deployments |
-| Production API URL | `web/src/config/env.ts`, `tests/vitepress/.vitepress/theme/index.ts`, `tests/playwright/vitepress.spec.ts` | Must match the deployed Worker hostname. CI's backup-indicator snapshot reads the `INDICATORS_API_BASE` repository variable, which overrides the workflow default |
+| Production API URL | `web/src/config/env.ts`, `tests/vitepress/.vitepress/theme/index.ts`, `tests/playwright/vitepress.spec.ts` | Must match the deployed Worker hostname. The offline snapshot generator (`pnpm run generate:offline-snapshot`) reads `INDICATORS_API_BASE` on a manual run |
 | `Caching:DurationMinutes` | `../WebApi/appsettings.json` | Drives the API's `max-age`, which is what the Worker cache honours |
 
 ### First cutover

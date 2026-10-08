@@ -26,6 +26,7 @@ stock-charts/
 │   │   ├── components/       # React components
 │   │   ├── services/         # Data fetching and state services
 │   │   └── styles/           # SCSS stylesheets
+│   ├── public/data/chart-api/  # Committed offline snapshot of the API (generated)
 │   ├── index.html            # App shell
 │   ├── vite.config.ts        # Vite config
 │   ├── tsconfig.json         # TypeScript config
@@ -86,6 +87,9 @@ pnpm run test:all             # Explicit all tests command
 pnpm --filter @stock-charts/web run test           # Frontend tests only
 pnpm run test:dotnet          # Backend tests only
 dotnet test --project server/WebApi.Tests/WebApi.Tests.csproj  # .NET tests directly
+
+# Offline snapshot the demo falls back to when the API is down (needs network)
+pnpm run generate:offline-snapshot   # Rewrites web/public/data/chart-api; commit the result
 
 # Releasing @facioquo/indy-charts (see .changeset/README.md)
 pnpm changeset                # Describe a consumer-visible change; commit with the PR
@@ -209,6 +213,8 @@ public class Service
 - **TypeScript**: Strict mode enabled, comprehensive type safety
 - **Chart.js v4+**: Financial chart types in `libs/chartjs-financial/`; bundled into `@facioquo/indy-charts` dist
 - **React Router v7**: Client-side routing
+- **Offline snapshot**: `web/public/data/chart-api/` holds every catalog indicator at its default parameters, plus the demo's opening selections. `ApiClient` reads it when the API is unreachable, so a visitor with no cache still gets charts.
+  - Regenerate it after the catalog, `DEFAULT_INDICATORS`, or the `@facioquo/indy-charts` version changes.
 - **pnpm workspaces**: Unified dependency management across root and all workspace packages
 
 Client-side project dependencies are strictly in this direction only: web → indy-charts → chartjs-financial

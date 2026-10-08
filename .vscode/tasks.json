@@ -190,10 +190,10 @@
     // GENERATE
     // ===================================
     {
-      "label": "Generate: Backup indicators",
-      "detail": "Generate backup-indicators.json from Web API /indicators endpoint (builds backend and starts Web API first)",
+      "label": "Generate: Offline snapshot",
+      "detail": "Write web/public/data/chart-api from the Web API (builds backend and starts Web API first)",
       "type": "shell",
-      "command": "node scripts/generate-backup-indicators.js --apiBase=https://localhost:5001",
+      "command": "pnpm run generate:offline-snapshot -- --apiBase=https://localhost:5001",
       "dependsOn": "Run: Backend services"
     },
     // ===================================

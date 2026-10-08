@@ -640,7 +640,11 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
   /** Reads the snapshot copy of `url`, validated by `parse`; `undefined` when unavailable. */
   async function readOffline<T>(url: string, parse: (body: unknown) => T): Promise<T | undefined> {
     if (!offlineFallback) return undefined;
-    const body = await fetchOfflineSnapshot(offlineFallback.baseUrl, baseUrl, url);
+    const body = await fetchOfflineSnapshot({
+      snapshotBaseUrl: offlineFallback.baseUrl,
+      apiBaseUrl: baseUrl,
+      requestUrl: url
+    });
     if (body === undefined) return undefined;
     try {
       return parse(body);
