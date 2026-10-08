@@ -154,8 +154,6 @@ jobs:
 
       - name: Build site
         run: pnpm --filter @stock-charts/web run build
-        env:
-          INDICATORS_API_BASE: ${{ vars.INDICATORS_API_BASE || 'https://charts-api.stockindicators.dev' }}
 
       - name: Save artifacts
         uses: actions/upload-artifact@v7
