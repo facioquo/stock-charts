@@ -36,6 +36,7 @@ interface FakeController {
   selections: IndicatorSelection[];
   listings: IndicatorListing[];
   deleteSelection: ReturnType<typeof vi.fn>;
+  addSelection: ReturnType<typeof vi.fn>;
   moveSelection: ReturnType<typeof vi.fn>;
   onSettingsChange: ReturnType<typeof vi.fn>;
   shareUrl: ReturnType<typeof vi.fn>;
@@ -49,6 +50,7 @@ function makeController(): FakeController {
       makeListing("RSI", "Relative Strength Index", "oscillator"),
       makeListing("SMA", "Simple Moving Average", "moving-average")
     ],
+    addSelection: vi.fn().mockResolvedValue(undefined),
     deleteSelection: vi.fn((ucid: string) => {
       const i = selections.findIndex(s => s.ucid === ucid);
       if (i >= 0) selections.splice(i, 1);
@@ -306,5 +308,90 @@ describe("SettingsDialog", () => {
 
       expect(screen.queryByRole("button", { name: "copy share link" })).not.toBeInTheDocument();
     });
+  });
+
+  it("reports a removal with the count and lets it be undone", async () => {
+    const controller = makeController();
+    controller.selections[0] = { ...controller.selections[0], uiid: "RSI" };
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
+    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
+
+    expect(screen.getByText("Removed RSI (5)")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+    expect(controller.addSelection).toHaveBeenCalledWith(
+      expect.objectContaining({ ucid: "u1" }),
+      controller.listings[0]
+    );
+    expect(screen.queryByRole("button", { name: "UNDO" })).not.toBeInTheDocument();
+    expect(await screen.findByText("Restored RSI (5)")).toBeInTheDocument();
+    expect(controller.addSelection).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("Removed RSI (5)")).not.toBeInTheDocument();
+  });
+
+  it("says so when the removed indicator's listing is gone at undo", async () => {
+    const controller = makeController();
+    controller.selections[0] = { ...controller.selections[0], uiid: "RSI" };
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
+    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
+    controller.listings.length = 0;
+    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+
+    expect(await screen.findByText("Could not restore the removed indicators")).toBeInTheDocument();
+  });
+
+  it("says so when an undo cannot restore the indicator", async () => {
+    const controller = makeController();
+    controller.selections[0] = { ...controller.selections[0], uiid: "RSI" };
+    controller.addSelection.mockRejectedValue(new Error("gone"));
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
+    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
+    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+
+    expect(await screen.findByText("Could not restore the removed indicators")).toBeInTheDocument();
+  });
+
+  it("shows the result of an add and restores the list position", () => {
+    const controller = makeController();
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+        notice="BB(20,2) added"
+        initialScrollTop={120}
+      />
+    );
+
+    expect(screen.getByText("BB(20,2) added")).toBeInTheDocument();
+    expect(document.querySelector(".dialog-body")?.scrollTop).toBe(120);
   });
 });

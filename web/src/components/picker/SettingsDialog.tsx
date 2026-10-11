@@ -1,4 +1,12 @@
-import { useId, useReducer, useRef, useState, type Dispatch } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useReducer,
+  useRef,
+  useState,
+  type Dispatch
+} from "react";
 import { flushSync } from "react-dom";
 
 import type { ChartController } from "../../charting/chartController";
@@ -15,6 +23,11 @@ interface SettingsDialogProps {
   onPickIndicator: (listing: IndicatorListing) => void;
   /** Open the config dialog to edit a displayed indicator in place. */
   onEditIndicator: Dispatch<IndicatorSelection>;
+  /** Result line of the last add, shown while the dialog is open. */
+  notice?: string;
+  /** Scroll position to restore when the dialog reopens after adding an indicator. */
+  initialScrollTop?: number;
+  onScrollChange?: Dispatch<number>;
 }
 
 interface ToggleRowProps {
@@ -119,7 +132,7 @@ function SelectionGroup({
       </div>
       <ul className="selection-list" aria-labelledby={headingId}>
         {selections.map((selection, index) => (
-          <li key={selection.ucid}>
+          <li key={selection.ucid} className={checked.has(selection.ucid) ? "selected" : undefined}>
             <label htmlFor={`select-${selection.ucid}`}>{selection.label}</label>
             <button
               type="button"
@@ -244,7 +257,7 @@ function DisplayedIndicators({
           title="remove selected indicators"
           onClick={onRemove}
         >
-          REMOVE SELECTED
+          {checked.size > 0 ? `REMOVE SELECTED (${checked.size})` : "REMOVE SELECTED"}
         </button>
       </div>
     </section>
@@ -322,6 +335,8 @@ interface SettingsControls {
   toggleChecked: (ucid: string) => void;
   selectAll: (value: boolean) => void;
   removeSelected: () => void;
+  /** Result line after a removal, with what undo needs; null when nothing was removed. */
+  removal: { text: string; undo?: () => void } | null;
   moveSelection: ChartController["moveSelection"];
   moveButtonRef: MoveButtonRef;
 }
@@ -359,9 +374,43 @@ function useSettingsControls(controller: ChartController): SettingsControls {
     setChecked(value ? new Set(controller.selections.map(s => s.ucid)) : new Set());
   };
 
+  const [removal, setRemoval] = useState<SettingsControls["removal"]>(null);
+
   const removeSelected = (): void => {
-    checked.forEach(ucid => controller.deleteSelection(ucid));
+    const removed = controller.selections.filter(s => checked.has(s.ucid));
+    for (const selection of removed) controller.deleteSelection(selection.ucid);
     setChecked(new Set());
+    if (removed.length > 0) {
+      setRemoval({
+        text:
+          removed.length === 1
+            ? `Removed ${removed[0]?.label}`
+            : `Removed ${removed.length} indicators`,
+        undo: () => {
+          // One restore per removal: a second click would draw the same indicators twice.
+          setRemoval({ text: "Restoring…" });
+          const restores = removed.flatMap(selection => {
+            const listing = controller.listings.find(x => x.uiid === selection.uiid);
+            return listing ? [controller.addSelection(selection, listing)] : [];
+          });
+          void Promise.allSettled(restores).then(results => {
+            const skipped = removed.length - restores.length;
+            const failed = skipped + results.filter(r => r.status === "rejected").length;
+            setRemoval({
+              text:
+                failed === 0
+                  ? removed.length === 1
+                    ? `Restored ${removed[0]?.label}`
+                    : `Restored ${removed.length} indicators`
+                  : failed === removed.length
+                    ? "Could not restore the removed indicators"
+                    : `Restored ${removed.length - failed} of ${removed.length} indicators`
+            });
+            forceUpdate();
+          });
+        }
+      });
+    }
     forceUpdate();
   };
 
@@ -386,6 +435,7 @@ function useSettingsControls(controller: ChartController): SettingsControls {
     toggleChecked,
     selectAll,
     removeSelected,
+    removal,
     moveSelection,
     moveButtonRef
   };
@@ -400,17 +450,52 @@ export function SettingsDialog({
   controller,
   onClose,
   onPickIndicator,
-  onEditIndicator
+  onEditIndicator,
+  notice = "",
+  initialScrollTop = 0,
+  onScrollChange
 }: SettingsDialogProps): React.JSX.Element {
   const titleId = useId();
   const controls = useSettingsControls(controller);
   const selections = controller.selections;
+  const bodyRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (bodyRef.current) bodyRef.current.scrollTop = initialScrollTop;
+  }, [initialScrollTop]);
+
+  // Filled after mount, so a screen reader announces it as an update to a live region.
+  const [announced, setAnnounced] = useState("");
+  useEffect(() => {
+    setAnnounced(notice);
+  }, [notice]);
+  const status = controls.removal?.text ?? announced;
 
   return (
     <Modal open onClose={onClose} labelledBy={titleId} className="settings-dialog">
       <DialogToolbar titleId={titleId} onClose={onClose} />
 
-      <div className="dialog-body">
+      <div
+        ref={bodyRef}
+        className="dialog-body"
+        onScroll={event => {
+          onScrollChange?.(event.currentTarget.scrollTop);
+        }}
+      >
+        {/* Mounted before it has text, so a screen reader announces the result when it fills. */}
+        <div className={status || notice ? "settings-status" : undefined}>
+          <span aria-live="polite">{status}</span>
+          {controls.removal?.undo && (
+            <button
+              type="button"
+              className="btn-text"
+              title="add back at the end of its chart"
+              onClick={controls.removal.undo}
+            >
+              UNDO
+            </button>
+          )}
+        </div>
         <ul className="general-settings">
           <ToggleRow
             label="Dark theme"
