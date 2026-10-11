@@ -225,6 +225,21 @@ describe("ChartController", () => {
     expect(controller.getState()).toMatchObject({ apiError: true, loading: false });
   });
 
+  it("retryLoad leaves the API error and loads again", async () => {
+    const getQuotes = vi.fn().mockRejectedValueOnce(new Error("gone")).mockResolvedValue([]);
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const controller = new ChartController(makeApi({ getQuotes }));
+    await controller.loadCharts();
+    expect(controller.getState().apiError).toBe(true);
+
+    const retry = controller.retryLoad();
+    expect(controller.getState()).toMatchObject({ apiError: false, loading: true });
+    await retry;
+
+    expect(getQuotes).toHaveBeenCalledTimes(2);
+    expect(controller.getState().apiError).toBe(false);
+  });
+
   it("processes, displays, and caches an overlay indicator via addSelection", async () => {
     const api = makeApi({ getSelectionData: vi.fn().mockResolvedValue([{}]) });
     const controller = new ChartController(api);
