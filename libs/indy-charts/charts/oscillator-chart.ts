@@ -1,4 +1,4 @@
-import { Chart, type ChartConfiguration, type ChartTypeRegistry, type TooltipItem } from "chart.js";
+import { Chart, type ChartConfiguration } from "chart.js";
 
 import { type ScaleValue } from "chartjs-plugin-annotation";
 
@@ -83,14 +83,9 @@ export class OscillatorChart {
     if (!this._chart) return;
 
     // Preserve theme-specific runtime options from render() that must persist
-    // across theme changes (tooltip filter for thresholds, y-axis suggested bounds)
+    // across theme changes (y-axis suggested bounds)
     const newOptions = baseOscillatorOptions(settings);
     const existingOptions = this._chart.options;
-
-    // Preserve tooltip filter (filters out threshold datasets from tooltips)
-    if (existingOptions?.plugins?.tooltip?.filter && newOptions.plugins?.tooltip) {
-      newOptions.plugins.tooltip.filter = existingOptions.plugins.tooltip.filter;
-    }
 
     // Preserve y-axis suggested bounds (set by configureYAxis during render)
     type SuggestedBounds = { suggestedMin?: number; suggestedMax?: number };
@@ -197,8 +192,6 @@ export class OscillatorChart {
     selection: IndicatorSelection,
     listing: IndicatorListing
   ): void {
-    const qtyThresholds = listing.chartConfig?.thresholds?.length ?? 0;
-
     listing.chartConfig?.thresholds?.forEach((threshold: ChartThreshold, index: number) => {
       const firstResult = selection.results?.[0];
       if (!firstResult) return;
@@ -207,13 +200,6 @@ export class OscillatorChart {
       // store a full (unsliced) copy for later dynamic slicing
       this.fullThresholdDatasets.push(structuredClone(thresholdDataset));
     });
-
-    // Hide thresholds from tooltips
-    if ((qtyThresholds ?? 0) > 0 && chartConfig.options?.plugins?.tooltip) {
-      chartConfig.options.plugins.tooltip.filter = (
-        tooltipItem: TooltipItem<keyof ChartTypeRegistry>
-      ) => tooltipItem.datasetIndex > (qtyThresholds ?? 0) - 1;
-    }
   }
 
   private configureYAxis(chartConfig: ChartConfiguration, listing: IndicatorListing): void {

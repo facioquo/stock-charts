@@ -119,3 +119,51 @@ describe("FinancialController.getMinMax", () => {
     expect(minMax([], iScale)).toEqual(EMPTY_RANGE);
   });
 });
+
+describe("FinancialController tooltip label", () => {
+  const callbacks = (
+    FinancialController.overrides as unknown as {
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (ctx: {
+              parsed: Record<string, number>;
+              dataset: { type?: string; label?: string };
+              formattedValue: string;
+            }) => string;
+          };
+        };
+      };
+    }
+  ).plugins.tooltip.callbacks;
+
+  it("describes a candle by its open, high, low, and close", () => {
+    const label = callbacks.label({
+      parsed: { o: 1, h: 3, l: 0, c: 2 },
+      dataset: { type: "candlestick" },
+      formattedValue: ""
+    });
+
+    expect(label).toBe("O: 1  H: 3  L: 0  C: 2");
+  });
+
+  it("reports an indicator line under its own label", () => {
+    const label = callbacks.label({
+      parsed: { y: 101.5 },
+      dataset: { type: "line", label: "BB(20,2)" },
+      formattedValue: "101.5"
+    });
+
+    expect(label).toBe("BB(20,2): 101.5");
+  });
+
+  it("leaves bar series such as volume out of the tooltip", () => {
+    const label = callbacks.label({
+      parsed: { y: 5000 },
+      dataset: { type: "bar", label: "Volume" },
+      formattedValue: "5000"
+    });
+
+    expect(label).toBe("");
+  });
+});

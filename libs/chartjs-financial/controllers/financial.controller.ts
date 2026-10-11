@@ -122,10 +122,17 @@ export class FinancialController extends BarController {
         intersect: false,
         mode: "index",
         callbacks: {
-          label(ctx: { parsed: ParsedFinancialLike }): string {
+          label(ctx: {
+            parsed: ParsedFinancialLike;
+            dataset: { type?: string; label?: string };
+            formattedValue: string;
+          }): string {
             const point = ctx.parsed;
             if (!isNullOrUndef(point.y)) {
-              return "";
+              // Indicator lines report their own value; bars (volume) stay out of the tooltip.
+              return ctx.dataset.type === "line"
+                ? `${ctx.dataset.label ?? ""}: ${ctx.formattedValue}`
+                : "";
             }
 
             const { o, h, l, c } = point;

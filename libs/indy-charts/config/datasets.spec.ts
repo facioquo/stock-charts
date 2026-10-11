@@ -99,6 +99,26 @@ describe("baseDataset", () => {
   });
 });
 
+describe("tooltip exclusion", () => {
+  it("flags a threshold and a hidden lineType=none series as not readings", () => {
+    const none = baseDataset(makeResult({ lineType: "none" }), makeResultConfig());
+    const threshold = createThresholdDataset(
+      { value: 70, color: "#FF0000", style: "solid", fill: null },
+      makeResult(),
+      0
+    );
+
+    expect(none.skipTooltip).toBe(true);
+    expect(threshold.skipTooltip).toBe(true);
+  });
+
+  it("leaves a drawn indicator line in the tooltip", () => {
+    const ds = baseDataset(makeResult({ lineType: "solid" }), makeResultConfig());
+
+    expect(ds.skipTooltip).toBeUndefined();
+  });
+});
+
 describe("createThresholdDataset", () => {
   it("emits one point per source point with y = threshold.value", () => {
     const sourceData: ScatterDataPoint[] = [

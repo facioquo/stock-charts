@@ -21,7 +21,7 @@ describe("userPrefs", () => {
     it("applies default settings when no cached settings exist", () => {
       loadSettings();
 
-      expect(getSettings()).toEqual({ isDarkTheme: true, showTooltips: false });
+      expect(getSettings()).toEqual({ isDarkTheme: true, showTooltips: true });
       expect(localStorage.getItem("settings")).toBeTruthy();
     });
 
@@ -32,6 +32,23 @@ describe("userPrefs", () => {
       loadSettings();
 
       expect(getSettings()).toEqual(cached);
+    });
+
+    it("turns tooltips on for a visitor whose stored value is only the old default", () => {
+      localStorage.setItem("settings", JSON.stringify({ isDarkTheme: false, showTooltips: false }));
+
+      loadSettings();
+
+      expect(getSettings()).toEqual({ isDarkTheme: false, showTooltips: true });
+    });
+
+    it("keeps tooltips off for a visitor who switched them off", () => {
+      loadSettings();
+      changeTooltips(false);
+
+      loadSettings();
+
+      expect(getSettings().showTooltips).toBe(false);
     });
 
     it("applies the cached theme to document.body on load", () => {
