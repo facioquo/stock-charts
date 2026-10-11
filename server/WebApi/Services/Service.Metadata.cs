@@ -1546,7 +1546,7 @@ public static class Metadata
                 Uiid = "FCB",
                 LegendTemplate = "FCB([P1])",
                 Endpoint = $"{baseUrl}/FCB/",
-                Category = "price-channels",
+                Category = "price-channel",
                 ChartType = "overlay",
                 Order = Order.Front,
                 Parameters =
