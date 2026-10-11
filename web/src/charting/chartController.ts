@@ -363,7 +363,6 @@ export class ChartController {
       }
 
       const barCount = calculateOptimalBars();
-      console.log(`Loading charts with ${barCount} bars`);
       this.chartManager.initializeOverlay(ctx, allQuotes, barCount);
 
       try {
