@@ -14,6 +14,20 @@
   top: -56px;
   right: 8px;
   height: 100%;
+
+  /* Full-height track for the sticky button; only the button takes pointer input. */
+  pointer-events: none;
+}
+
+.chart-caption {
+  margin: 0;
+  padding: 8px 16px 0;
+  font-size: 0.85rem;
+  color: var(--toolbar-h2);
+}
+
+.fab-label {
+  display: none;
 }
 
 .fab {
@@ -31,9 +45,23 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 3px 5px rgb(0 0 0 / 30%);
+  pointer-events: auto;
 
   &:hover {
     opacity: 0.9;
+  }
+}
+
+@media (width >= 640px) {
+  .fab {
+    width: auto;
+    padding: 0 20px 0 16px;
+    gap: 8px;
+  }
+
+  .fab-label {
+    display: inline;
+    font-weight: 500;
   }
 }
 

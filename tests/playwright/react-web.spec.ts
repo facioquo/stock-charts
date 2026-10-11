@@ -63,7 +63,7 @@ test.describe("Stock Charts React Web", () => {
     // The FAB only renders once loading completes and there is no API error.
     await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
 
-    const fab = page.getByRole("button", { name: "edit settings" });
+    const fab = page.getByRole("button", { name: "Indicators and settings" });
     await expect(fab).toBeVisible({ timeout: 15_000 });
     await fab.click();
 
@@ -79,7 +79,7 @@ test.describe("Stock Charts React Web", () => {
     await page.waitForLoadState("networkidle");
     await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
 
-    await page.getByRole("button", { name: "edit settings" }).click();
+    await page.getByRole("button", { name: "Indicators and settings" }).click();
     const displayed = page.locator(".displayed-indicators .selection-list li");
     await expect(displayed.first()).toBeVisible();
     const before = await displayed.count();
@@ -108,7 +108,7 @@ test.describe("Stock Charts React Web", () => {
     await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
 
     const oscillators = page.getByRole("list", { name: "Oscillator charts" }).locator("li label");
-    await page.getByRole("button", { name: "edit settings" }).click();
+    await page.getByRole("button", { name: "Indicators and settings" }).click();
     await expect(oscillators.first()).toHaveText(/^RSI/);
 
     await page.getByRole("button", { name: /^move ADX.* up$/ }).click();
@@ -117,7 +117,7 @@ test.describe("Stock Charts React Web", () => {
     await page.reload();
     await page.waitForLoadState("networkidle");
     await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
-    await page.getByRole("button", { name: "edit settings" }).click();
+    await page.getByRole("button", { name: "Indicators and settings" }).click();
     await expect(oscillators.first()).toHaveText(/^ADX/);
 
     expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
@@ -133,7 +133,7 @@ test.describe("Stock Charts React Web", () => {
     await page.waitForLoadState("networkidle");
     await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
 
-    await page.getByRole("button", { name: "edit settings" }).click();
+    await page.getByRole("button", { name: "Indicators and settings" }).click();
     await page.getByRole("button", { name: /^move ADX.* up$/ }).click();
     await page.getByRole("button", { name: "copy share link" }).click();
     await expect(page.getByRole("status").filter({ hasText: "Link copied" })).toBeVisible();
@@ -144,7 +144,7 @@ test.describe("Stock Charts React Web", () => {
     await shared.goto(link);
     await shared.waitForLoadState("networkidle");
     await expect(shared.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
-    await shared.getByRole("button", { name: "edit settings" }).click();
+    await shared.getByRole("button", { name: "Indicators and settings" }).click();
     const oscillators = shared.locator(".selection-list").nth(1).locator("li label");
     await expect(oscillators.first()).toHaveText(/^ADX/);
     expect(await shared.evaluate(() => localStorage.getItem("selections"))).toBeNull();
@@ -160,7 +160,7 @@ test.describe("Stock Charts React Web", () => {
     await expect(shared.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
     // The list is read when the dialog opens, so reopen it until the restore has landed.
     await expect(async () => {
-      await shared.getByRole("button", { name: "edit settings" }).click();
+      await shared.getByRole("button", { name: "Indicators and settings" }).click();
       try {
         await expect(oscillators.first()).toHaveText(/^RSI/, { timeout: 2_000 });
       } catch (error) {
@@ -178,7 +178,7 @@ test.describe("Stock Charts React Web", () => {
     await page.waitForLoadState("networkidle");
     await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
 
-    await page.getByRole("button", { name: "edit settings" }).click();
+    await page.getByRole("button", { name: "Indicators and settings" }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
 
     const themeToggle = page.getByRole("checkbox", { name: "Dark theme" });
@@ -244,7 +244,7 @@ test.describe("Stock Charts React Web", () => {
     async function expectDisplayed(page: Page, count: number): Promise<void> {
       const displayed = page.locator(".displayed-indicators .selection-list li");
       await expect(async () => {
-        await page.getByRole("button", { name: "edit settings" }).click();
+        await page.getByRole("button", { name: "Indicators and settings" }).click();
         try {
           await expect(displayed).toHaveCount(count, { timeout: 2_000 });
         } catch (error) {

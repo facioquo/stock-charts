@@ -102,6 +102,13 @@ describe("ChartPage", () => {
       fireEvent.click(screen.getByRole("button", { name: /settings/i }));
     };
 
+    it("says which data is shown and names the settings button", () => {
+      render(<ChartPage />);
+
+      expect(screen.getByText("QQQ · daily bars")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Indicators and settings" })).toBeInTheDocument();
+    });
+
     it("names an indicator that was added", () => {
       openSettings();
       fireEvent.click(screen.getByText("pick"));

@@ -7,6 +7,9 @@ import { PickConfigDialog } from "../components/picker/PickConfigDialog";
 import type { IndicatorListing, IndicatorSelection } from "../types/chart.types";
 import "../components/picker/picker.scss";
 
+// The quote service serves this one symbol at a daily interval; the quotes response names neither.
+const DEMO_SYMBOL = "QQQ";
+
 /**
  * Main chart page. Ports `ChartComponent`: bootstraps the overlay chart,
  * renders loading / API-error states, and hosts the settings FAB plus the
@@ -174,14 +177,19 @@ export function ChartPage(): React.JSX.Element {
           <button
             type="button"
             className="fab"
-            aria-label="edit settings"
+            aria-label="Indicators and settings"
             title="change indicators and settings"
             onClick={() => setSettingsOpen(true)}
           >
-            <span className="material-icons">edit</span>
+            <span className="material-icons" aria-hidden="true">
+              edit
+            </span>
+            <span className="fab-label">Indicators and settings</span>
           </button>
         </div>
       )}
+
+      {!apiError && <p className="chart-caption">{DEMO_SYMBOL} · daily bars</p>}
 
       {/* CHART (MAIN OVERLAY) — kept mounted while loading so its aspect-ratio
           reserves the chart's space and the spinner overlays it in place,
