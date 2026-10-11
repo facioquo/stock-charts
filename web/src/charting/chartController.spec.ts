@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createDefaultSelection } from "@facioquo/indy-charts";
+import { applySelectionTokens, createDefaultSelection } from "@facioquo/indy-charts";
 import type { IndicatorListing, IndicatorSelection } from "@facioquo/indy-charts";
 
 import type { ApiClient } from "../api/apiClient";
@@ -253,6 +253,21 @@ describe("ChartController", () => {
     expect(cm.displaySelection).toHaveBeenCalledWith(selection, listing);
     expect(controller.selections.some(s => s.ucid === selection.ucid)).toBe(true);
     expect(localStorage.getItem("selections")).toBeTruthy();
+  });
+
+  it("replaces label tokens before the datasets copy the labels", async () => {
+    const api = makeApi({ getSelectionData: vi.fn().mockResolvedValue([{}]) });
+    const controller = new ChartController(api);
+
+    await controller.addSelection(
+      makeSelection("TOK", "overlay"),
+      makeListing("TOK", "overlay"),
+      false
+    );
+
+    const applied = vi.mocked(applySelectionTokens).mock.invocationCallOrder.at(-1) ?? 0;
+    const processed = manager(controller).processSelectionData.mock.invocationCallOrder[0];
+    expect(applied).toBeLessThan(processed);
   });
 
   it("creates an oscillator DOM container for oscillator indicators", async () => {

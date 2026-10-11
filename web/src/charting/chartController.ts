@@ -392,8 +392,9 @@ export class ChartController {
     scrollToMe: boolean,
     before: Node | null = null
   ): void {
-    this.chartManager.processSelectionData(selection, listing, rows);
+    // Datasets copy result labels when built, so tokens must be replaced first.
     applySelectionTokens(selection);
+    this.chartManager.processSelectionData(selection, listing, rows);
     this.chartManager.displaySelection(selection, listing);
 
     if (listing.chartType === "oscillator") {
