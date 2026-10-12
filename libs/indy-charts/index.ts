@@ -41,6 +41,9 @@
  * - `createOscillator(ctx, selection, listing)` - Create a separate oscillator subchart
  *   (call after `displaySelection` so window updates can re-slice it)
  * - `setBarCount(count)` - Update viewport window (re-slices overlay indicators and oscillators)
+ * - `setWindow(start, count)`, `panBy(bars)`, `zoomBy(factor, anchor?)` - Show any run of
+ *   bars; `panBy` takes negative toward older bars. `windowStart` is the first visible bar's
+ *   history index and `windowOffset` the distance from the newest bar (0 = anchored)
  * - `updateTheme(settings)` - Apply theme changes to all charts
  * - `removeSelection(ucid)` - Remove a selection and tear down its chart
  * - `destroy()` - Clean up all chart resources

@@ -2,7 +2,7 @@
 const DEFAULT_PIXELS_PER_BAR = 5;
 
 /** Minimum number of bars to display. */
-const MIN_BARS = 20;
+export const MIN_BARS = 20;
 
 /** Maximum number of bars to display (avoids performance degradation and improves readability). */
 const MAX_BARS = 250;
