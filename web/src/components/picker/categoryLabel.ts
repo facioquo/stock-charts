@@ -2,7 +2,7 @@ const labels = new Map<string, string>(
   Object.entries({
     "candlestick-pattern": "Candlestick patterns",
     "moving-average": "Moving averages",
-    "oscillator": "Oscillators",
+    oscillator: "Oscillators",
     "price-channel": "Price channels",
     "price-characteristic": "Price characteristics",
     "price-pattern": "Price patterns",
