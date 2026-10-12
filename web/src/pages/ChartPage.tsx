@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { env } from "../config/env";
 import { getChartController, useChartState } from "../charting/useChart";
@@ -24,6 +24,21 @@ export function ChartPage(): React.JSX.Element {
   useEffect(() => {
     void controller.loadCharts();
   }, [controller]);
+
+  // The retry button unmounts with the error panel, so focus is handed to whatever replaces it.
+  const retried = useRef(false);
+  const errorRef = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!retried.current) return;
+    if (apiError) errorRef.current?.focus();
+    else if (loading) loadingRef.current?.focus();
+    else {
+      chartRef.current?.focus();
+      retried.current = false;
+    }
+  }, [apiError, loading]);
 
   // Choosing an indicator closes settings and opens
   // the config dialog; closing the config dialog reopens settings (which then
@@ -51,7 +66,13 @@ export function ChartPage(): React.JSX.Element {
   return (
     <>
       {apiError && (
-        <div role="alert" aria-live="assertive" className="api-error-container">
+        <div
+          ref={errorRef}
+          tabIndex={-1}
+          role="alert"
+          aria-live="assertive"
+          className="api-error-container"
+        >
           <div className="api-error-content">
             <span className="material-icons api-error-icon">cloud_off</span>
 
@@ -90,6 +111,17 @@ export function ChartPage(): React.JSX.Element {
                 </p>
               </>
             )}
+
+            <button
+              type="button"
+              className="btn-raised btn-primary"
+              onClick={() => {
+                retried.current = true;
+                void controller.retryLoad();
+              }}
+            >
+              TRY AGAIN
+            </button>
           </div>
         </div>
       )}
@@ -144,10 +176,24 @@ export function ChartPage(): React.JSX.Element {
       {/* CHART (MAIN OVERLAY) — kept mounted while loading so its aspect-ratio
           reserves the chart's space and the spinner overlays it in place,
           avoiding the empty → spinner → chart layout shift on load. */}
-      <div id="chart-overlay" className="chart-overlay-container" hidden={apiError}>
+      <div
+        ref={chartRef}
+        tabIndex={-1}
+        role="group"
+        aria-label="Price chart"
+        id="chart-overlay"
+        className="chart-overlay-container"
+        hidden={apiError}
+      >
         <canvas id="chartOverlay" />
         {loading && (
-          <div className="chart-loading" role="status" aria-live="polite">
+          <div
+            ref={loadingRef}
+            tabIndex={-1}
+            className="chart-loading"
+            role="status"
+            aria-live="polite"
+          >
             <p className="chart-loading-spinner">
               <img src="/assets/candle-spinner.svg" alt="Loading data" height={30} />
             </p>

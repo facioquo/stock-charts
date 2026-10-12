@@ -343,6 +343,12 @@ export class ChartController {
     return this.loadInFlight;
   }
 
+  /** Leave the API-error state and load again, for the error panel's retry control. */
+  retryLoad(): Promise<void> {
+    this.setState({ apiError: false, loading: true });
+    return this.loadCharts();
+  }
+
   private async bootstrapCharts(): Promise<void> {
     this.api.resetBackup();
     try {
