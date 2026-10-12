@@ -94,11 +94,13 @@ function ParamsPanel({ params, onUpdate }: ParamsPanelProps): React.JSX.Element 
               value={p.value ?? ""}
               onChange={event => onUpdate(i, event.target.value)}
             />
-            {invalid && (
-              <p className="field-error">
-                Valid range is {p.minimum} to {p.maximum}
-              </p>
-            )}
+            <div className="field-error-slot">
+              {invalid && (
+                <p className="field-error">
+                  Valid range is {p.minimum} to {p.maximum}
+                </p>
+              )}
+            </div>
           </div>
         );
       })}
