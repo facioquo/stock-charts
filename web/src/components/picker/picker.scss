@@ -258,7 +258,9 @@
   }
 
   label {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
     padding: 10px 8px 10px 16px;
     cursor: pointer;
   }
@@ -510,6 +512,30 @@
   cursor: pointer;
   display: inline-flex;
   padding: 4px;
+}
+
+.selection-list .icon-button,
+.selection-list .selection-checkbox {
+  flex: none;
+}
+
+/* Phone widths: 44 px icon buttons, 24 px checkboxes, and room for the label. */
+@media (width < 640px) {
+  .dialog-body {
+    padding: 16px;
+  }
+
+  .dialog-toolbar .icon-button,
+  .dialog-section-header .icon-button,
+  .selection-list .icon-button {
+    padding: 10px;
+  }
+
+  .selection-checkbox {
+    width: 24px;
+    height: 24px;
+    margin: 0 10px 0 6px;
+  }
 }
 
 .btn-text,
