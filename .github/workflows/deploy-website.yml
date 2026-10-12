@@ -277,6 +277,29 @@ jobs:
             --project-name=stock-charts
             --branch=${{ github.head_ref || github.ref_name }}
 
+      # The offline snapshot is a static file. A host rewrite that answers the
+      # path with the SPA shell returns 200 text/html, so only a JSON parse
+      # proves the snapshot is served. Preview deployments sit behind
+      # Cloudflare Access and answer with its login page, so only the public
+      # production host is checked.
+      - name: Verify the offline snapshot is served as JSON
+        if: github.ref == 'refs/heads/main'
+        env:
+          SNAPSHOT_URL: https://charts.stockindicators.dev/data/chart-api/quotes.json
+        run: |
+          for attempt in 1 2 3 4 5; do
+            if curl --fail --silent --show-error --location \
+                --connect-timeout 10 --max-time 30 "$SNAPSHOT_URL" \
+                | jq -e 'type == "array" or type == "object"' > /dev/null; then
+              echo "Snapshot served as JSON"
+              exit 0
+            fi
+            echo "Attempt $attempt did not return JSON"
+            if [ "$attempt" -lt 5 ]; then sleep 10; fi
+          done
+          echo "::error::$SNAPSHOT_URL is not served as JSON"
+          exit 1
+
       - name: Tag and draft release note
         uses: ncipollo/release-action@v1
         if: github.ref == 'refs/heads/main'

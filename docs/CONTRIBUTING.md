@@ -151,7 +151,7 @@ All contributions must pass these checks (required before PR acceptance):
 
 Submit a Pull Request with a clear description of what you've done. See [pull requests guide](http://help.github.com/pull-requests/) for details.
 
-After merge to `main`, changes may be batched before deploying. Turnaround time varies.
+Merging to `main` does not deploy. Production releases are manual: a maintainer runs the **Deploy website** workflow (`workflow_dispatch`) on `main`, and its **Verify the offline snapshot** step fails the run unless `https://charts.stockindicators.dev/data/chart-api/quotes.json` parses as JSON. Previews are behind Cloudflare Access, so the step runs on `main` only. Turnaround time varies.
 
 ## Contact us
 
