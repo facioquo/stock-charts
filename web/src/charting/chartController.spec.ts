@@ -265,8 +265,9 @@ describe("ChartController", () => {
       false
     );
 
-    const applied = vi.mocked(applySelectionTokens).mock.invocationCallOrder.at(-1) ?? 0;
+    const applied = vi.mocked(applySelectionTokens).mock.invocationCallOrder.at(-1);
     const processed = manager(controller).processSelectionData.mock.invocationCallOrder[0];
+    expect(applied).toBeDefined();
     expect(applied).toBeLessThan(processed);
   });
 
