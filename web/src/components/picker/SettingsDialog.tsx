@@ -4,6 +4,7 @@ import { flushSync } from "react-dom";
 import type { ChartController } from "../../charting/chartController";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
 import { changeTheme, changeTooltips, getSettings } from "../../services/userPrefs";
+import { categoryLabel } from "./categoryLabel";
 
 import { Modal } from "./Modal";
 
@@ -278,7 +279,7 @@ function AvailableIndicators({ listings, onPick }: AvailableIndicatorsProps): Re
           <li key={listing.uiid}>
             <button type="button" onClick={() => onPick(listing)}>
               <span className="nav-title">{listing.name}</span>
-              <span className="nav-subtitle">{listing.category}</span>
+              <span className="nav-subtitle">{categoryLabel(listing.category)}</span>
             </button>
           </li>
         ))}

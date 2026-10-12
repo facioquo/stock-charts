@@ -89,6 +89,8 @@ describe("SettingsDialog", () => {
     expect(screen.getByText("RSI (5)")).toBeInTheDocument();
     expect(screen.getByText("Relative Strength Index")).toBeInTheDocument();
     expect(screen.getByText("Simple Moving Average")).toBeInTheDocument();
+    expect(screen.getByText("Moving averages")).toBeInTheDocument();
+    expect(screen.getByText("Oscillators")).toBeInTheDocument();
   });
 
   it("opens the config dialog for a chosen indicator", () => {
