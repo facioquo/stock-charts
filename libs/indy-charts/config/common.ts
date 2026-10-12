@@ -8,8 +8,18 @@ import { getThemeColors } from "./theme-colors";
 
 export const FONT_FAMILY = "'Google Sans', Roboto, Verdana, Helvetica, Arial, sans-serif";
 
+/** Tooltip filter: drops datasets flagged `skipTooltip` (thresholds, hidden `none` series). */
+export function isTooltipReading(item: { dataset: object }): boolean {
+  return !(item.dataset as { skipTooltip?: boolean }).skipTooltip;
+}
+
 export function baseChartOptions(settings: ChartSettings): ChartOptions {
   const options: ChartOptions = {
+    // Index mode lists every series at the hovered bar, so overlays read against the candle.
+    interaction: {
+      mode: "index",
+      intersect: false
+    },
     plugins: {
       title: {
         display: false
@@ -19,6 +29,7 @@ export function baseChartOptions(settings: ChartSettings): ChartOptions {
       },
       tooltip: {
         enabled: settings.showTooltips,
+        mode: "index",
         intersect: false
       },
       annotation: {
@@ -82,6 +93,9 @@ export function baseChartOptions(settings: ChartSettings): ChartOptions {
     }
   };
 
+  // Assigned, not declared in the literal: a typed `filter` makes tsc resolve the augmented dataset union and reject the candlestick dataset in overlay-chart.
+  Object.assign(options.plugins?.tooltip ?? {}, { filter: isTooltipReading });
+
   return options;
 }
 
@@ -92,7 +106,8 @@ export function defaultXAxisOptions(): ScaleOptions {
     offset: false,
     type: "timeseries",
     time: {
-      unit: "day"
+      unit: "day",
+      tooltipFormat: "MMM d, yyyy"
     },
     adapters: {
       date: {

@@ -6,9 +6,11 @@ import type { UserSettings } from "../types/chart.types";
  * singleton.
  */
 const STORAGE_KEY = "settings";
+// Set only when the visitor flips the tooltip switch, so a stored default is not read as a choice.
+const TOOLTIPS_CHOSEN_KEY = "settings.tooltipsChosen";
 const isBrowser = typeof window !== "undefined";
 
-const defaults: UserSettings = { isDarkTheme: true, showTooltips: false };
+const defaults: UserSettings = { isDarkTheme: true, showTooltips: true };
 
 let current: UserSettings = { ...defaults };
 
@@ -35,8 +37,18 @@ export function loadSettings(): void {
     current = { ...defaults };
   }
 
+  if (!tooltipsChosen()) current.showTooltips = defaults.showTooltips;
+
   changeTheme(current.isDarkTheme);
-  changeTooltips(current.showTooltips);
+  cacheSettings();
+}
+
+function tooltipsChosen(): boolean {
+  try {
+    return localStorage.getItem(TOOLTIPS_CHOSEN_KEY) === "true";
+  } catch {
+    return false;
+  }
 }
 
 export function changeTheme(isDarkTheme: boolean): void {
@@ -52,6 +64,11 @@ export function changeTheme(isDarkTheme: boolean): void {
 export function changeTooltips(showTooltips: boolean): void {
   current.showTooltips = showTooltips;
   cacheSettings();
+  try {
+    localStorage.setItem(TOOLTIPS_CHOSEN_KEY, "true");
+  } catch {
+    // localStorage may be unavailable.
+  }
   // Actual tooltip add/remove is handled by the chart controller (theme update).
 }
 

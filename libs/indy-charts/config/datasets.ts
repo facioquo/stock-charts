@@ -134,6 +134,7 @@ export function baseDataset(r: IndicatorResult, c: IndicatorResultConfig): Indic
         data: [],
         yAxisID: "y",
         showLine: false,
+        skipTooltip: true,
         pointRadius: 0,
         borderWidth: 0,
         borderColor: r.color,
@@ -163,6 +164,7 @@ export function createThresholdDataset(
   return {
     label: "threshold",
     type: "line",
+    skipTooltip: true,
     data: lineData,
     yAxisID: "y",
     pointRadius: 0,

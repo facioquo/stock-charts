@@ -18,7 +18,10 @@ export type IndicatorPoint = ScatterDataPoint | FinancialDataPoint;
  * `IndicatorPoint[]` without casts, and keeps the shape consistent with
  * `buildDataPoints` / `buildFinancialDataPoints` / `addExtraBars` output.
  */
-export type IndicatorDataset = ChartDataset<"line" | "bar" | "candlestick", IndicatorPoint[]>;
+export type IndicatorDataset = ChartDataset<"line" | "bar" | "candlestick", IndicatorPoint[]> & {
+  /** True for a dataset that is drawn but is not a reading, so tooltips leave it out. */
+  skipTooltip?: boolean;
+};
 
 /**
  * Candlestick-pattern indicators set per-point style arrays
