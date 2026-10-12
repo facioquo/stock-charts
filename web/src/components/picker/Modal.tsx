@@ -8,6 +8,8 @@ interface ModalProps {
   /** Fallback accessible name when there is no visible title element. */
   ariaLabel?: string;
   className?: string;
+  /** When false, a backdrop click does nothing; Escape still closes. Defaults to true. */
+  closeOnBackdrop?: boolean;
   children: ReactNode;
 }
 
@@ -21,6 +23,7 @@ export function Modal({
   labelledBy,
   ariaLabel,
   className,
+  closeOnBackdrop = true,
   children
 }: ModalProps): React.JSX.Element | null {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -47,7 +50,7 @@ export function Modal({
     <div
       className="modal-backdrop"
       onMouseDown={event => {
-        if (event.target === event.currentTarget) onClose();
+        if (closeOnBackdrop && event.target === event.currentTarget) onClose();
       }}
     >
       <div

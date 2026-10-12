@@ -93,6 +93,70 @@ describe("PickConfigDialog", () => {
     expect(screen.getByRole("button", { name: "ADD" })).toBeDisabled();
   });
 
+  describe("backdrop click", () => {
+    const backdrop = (): Element => {
+      const element = document.querySelector(".modal-backdrop");
+      if (!element) throw new Error("no backdrop");
+      return element;
+    };
+
+    it("is ignored while there are unsaved edits", () => {
+      const { onClose } = renderDialog(makeController());
+      fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "21" } });
+
+      fireEvent.mouseDown(backdrop());
+
+      expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("is ignored while a style edit is unsaved", () => {
+      const { onClose } = renderDialog(makeController());
+      fireEvent.click(screen.getByRole("tab", { name: "Styles" }));
+      fireEvent.change(screen.getByLabelText("Line width"), { target: { value: "3" } });
+
+      fireEvent.mouseDown(backdrop());
+
+      expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("is ignored while an edit of a displayed indicator is unsaved", () => {
+      const existing = { ...defaultSelection(), ucid: "displayed-1" };
+      const onClose = vi.fn();
+      render(
+        <PickConfigDialog
+          listing={listing}
+          controller={makeController() as unknown as ChartController}
+          selection={existing}
+          onClose={onClose}
+        />
+      );
+      fireEvent.click(screen.getByRole("tab", { name: "Styles" }));
+      fireEvent.change(screen.getByLabelText("Line type"), { target: { value: "dash" } });
+
+      fireEvent.mouseDown(backdrop());
+
+      expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it("closes when nothing was edited", () => {
+      const { onClose } = renderDialog(makeController());
+
+      fireEvent.mouseDown(backdrop());
+
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("closes again once an edit is reverted", () => {
+      const { onClose } = renderDialog(makeController());
+      fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "21" } });
+      fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "14" } });
+
+      fireEvent.mouseDown(backdrop());
+
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+  });
+
   it("adds the selection and closes on submit", async () => {
     const controller = makeController();
     const { onClose } = renderDialog(controller);

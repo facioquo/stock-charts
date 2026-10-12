@@ -38,6 +38,7 @@ interface FakeController {
   deleteSelection: ReturnType<typeof vi.fn>;
   addSelection: ReturnType<typeof vi.fn>;
   moveSelection: ReturnType<typeof vi.fn>;
+  applyOrder: ReturnType<typeof vi.fn>;
   onSettingsChange: ReturnType<typeof vi.fn>;
   shareUrl: ReturnType<typeof vi.fn>;
 }
@@ -66,6 +67,7 @@ function makeController(): FakeController {
       selections.splice(from, 1);
       selections.splice(to, 0, moved);
     }),
+    applyOrder: vi.fn(),
     onSettingsChange: vi.fn(),
     shareUrl: vi.fn(() => "https://charts.example/?c=1.abc")
   };
@@ -336,6 +338,112 @@ describe("SettingsDialog", () => {
     expect(await screen.findByText("Restored RSI (5)")).toBeInTheDocument();
     expect(controller.addSelection).toHaveBeenCalledTimes(1);
     expect(screen.queryByText("Removed RSI (5)")).not.toBeInTheDocument();
+  });
+
+  it("puts a restored indicator back at its removed position", async () => {
+    const controller = makeController();
+    controller.selections[0] = { ...controller.selections[0], uiid: "RSI" };
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
+    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
+    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+
+    await screen.findByText("Restored RSI (5)");
+    expect(controller.applyOrder).toHaveBeenCalledWith(["u1", "u2"]);
+    expect(controller.applyOrder.mock.invocationCallOrder[0]).toBeGreaterThan(
+      controller.addSelection.mock.invocationCallOrder[0] ?? Infinity
+    );
+  });
+
+  it("keeps a reorder made between the removal and the undo", async () => {
+    const controller = makeController();
+    const sel = controller.selections;
+    sel.push(makeSelection("u3", "EMA (20)"));
+    sel[0] = { ...sel[0], uiid: "RSI" };
+    // Adding appends, as the real controller does.
+    controller.addSelection = vi.fn((selection: IndicatorSelection) => {
+      sel.push(selection);
+      return Promise.resolve();
+    });
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
+    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
+    // u3 moves above u2 after the removal: u3, u2.
+    sel.splice(0, sel.length, ...[sel[1], sel[0]].filter(Boolean));
+    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+
+    await screen.findByText("Restored RSI (5)");
+    expect(controller.applyOrder).toHaveBeenCalledWith(["u3", "u1", "u2"]);
+  });
+
+  describe("restoring several removed indicators", () => {
+    function renderThree(): FakeController {
+      const controller = makeController();
+      const sel = controller.selections;
+      sel.push(makeSelection("u3", "EMA (20)"));
+      // Adding appends, as the real controller does.
+      controller.addSelection = vi.fn((selection: IndicatorSelection) => {
+        sel.push(selection);
+        return Promise.resolve();
+      });
+      render(
+        <SettingsDialog
+          controller={controller as unknown as ChartController}
+          onClose={vi.fn()}
+          onPickIndicator={vi.fn()}
+          onEditIndicator={vi.fn()}
+        />
+      );
+      fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
+      fireEvent.click(screen.getByRole("checkbox", { name: "select SMA (50)" }));
+      fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (2)" }));
+      return controller;
+    }
+
+    it("puts two adjacent removals back in their old order", async () => {
+      const controller = renderThree();
+
+      fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+
+      await screen.findByText("Restored 2 indicators");
+      expect(controller.applyOrder).toHaveBeenCalledWith(["u1", "u2", "u3"]);
+    });
+
+    it("orders the rest around the one that came back when the other fails", async () => {
+      const controller = renderThree();
+      const sel = controller.selections;
+      controller.addSelection = vi
+        .fn()
+        .mockImplementationOnce((selection: IndicatorSelection) => {
+          sel.push(selection);
+          return Promise.resolve();
+        })
+        .mockRejectedValueOnce(new Error("gone"));
+
+      fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+
+      await screen.findByText("Restored 1 of 2 indicators");
+      // The failed one is absent from the controller; the order names it and the
+      // controller ignores the unknown ucid.
+      expect(controller.applyOrder).toHaveBeenCalledWith(["u1", "u2", "u3"]);
+      expect(sel.map(x => x.ucid)).toEqual(["u3", "u1"]);
+    });
   });
 
   it("says so when the removed indicator's listing is gone at undo", async () => {

@@ -1054,6 +1054,42 @@ describe("ChartController", () => {
     });
   });
 
+  describe("applyOrder", () => {
+    it("restores an order the indicators were removed from, in model, canvases, and saved list", async () => {
+      const zone = document.createElement("div");
+      zone.id = "oscillators-zone";
+      document.body.appendChild(zone);
+      const api = makeApi({ getSelectionData: vi.fn().mockResolvedValue([{}]) });
+      const controller = new ChartController(api);
+      for (const [uiid, chartType] of [
+        ["A", "overlay"],
+        ["X", "oscillator"],
+        ["Y", "oscillator"]
+      ] as const) {
+        await controller.addSelection(makeSelection(uiid, chartType), makeListing(uiid, chartType));
+      }
+      const before = controller.selections.map(s => s.ucid);
+      controller.deleteSelection("ucid-X");
+      await controller.addSelection(
+        makeSelection("X", "oscillator"),
+        makeListing("X", "oscillator")
+      );
+      expect(controller.selections.map(s => s.uiid)).toEqual(["A", "Y", "X"]);
+
+      controller.applyOrder(before);
+
+      expect(controller.selections.map(s => s.uiid)).toEqual(["A", "X", "Y"]);
+      expect(Array.from(zone.children).map(c => c.id)).toEqual([
+        "ucid-X-container",
+        "ucid-Y-container"
+      ]);
+      const cached = JSON.parse(localStorage.getItem("selections") ?? "[]") as Array<{
+        ucid: string;
+      }>;
+      expect(cached.map(s => s.ucid)).toEqual(before);
+    });
+  });
+
   it("propagates theme/tooltip settings to the chart manager", () => {
     const controller = new ChartController(makeApi());
 

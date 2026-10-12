@@ -170,12 +170,11 @@ export class OverlayChart {
     const yPos: ScaleValue = this._chart.scales["y"].max;
     let adjY = 10;
 
-    const sorted = [...this._latestLegendSelections]
-      .filter(x => x.chartType === CHART_TYPES.OVERLAY)
-      .sort((a, b) => a.label.localeCompare(b.label));
+    // Selection order, so the legend matches the order indicators were added in.
+    const ordered = this._latestLegendSelections.filter(x => x.chartType === CHART_TYPES.OVERLAY);
 
     if (this._chart.options?.plugins?.annotation) {
-      this._chart.options.plugins.annotation.annotations = sorted
+      this._chart.options.plugins.annotation.annotations = ordered
         .filter(selection => selection.results.length > 0 && selection.results[0] !== undefined)
         .map((selection: IndicatorSelection, index: number) => {
           const annotation = commonLegendAnnotation(
