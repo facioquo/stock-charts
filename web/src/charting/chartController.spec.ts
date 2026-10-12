@@ -256,6 +256,7 @@ describe("ChartController", () => {
   });
 
   it("replaces label tokens before the datasets copy the labels", async () => {
+    vi.mocked(applySelectionTokens).mockClear();
     const api = makeApi({ getSelectionData: vi.fn().mockResolvedValue([{}]) });
     const controller = new ChartController(api);
 
