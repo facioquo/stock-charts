@@ -20,6 +20,10 @@ export function ChartPage(): React.JSX.Element {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pickListing, setPickListing] = useState<IndicatorListing | null>(null);
   const [editUcid, setEditUcid] = useState<string | null>(null);
+  // The settings dialog remounts after each add; these carry its place and a result line across.
+  const settingsScroll = useRef(0);
+  const idsBeforePick = useRef<ReadonlySet<string>>(new Set());
+  const [addedNotice, setAddedNotice] = useState("");
 
   useEffect(() => {
     void controller.loadCharts();
@@ -44,6 +48,8 @@ export function ChartPage(): React.JSX.Element {
   // the config dialog; closing the config dialog reopens settings (which then
   // reflects any newly-added indicator).
   const openIndicatorSettings = (listing: IndicatorListing): void => {
+    idsBeforePick.current = new Set(controller.selections.map(s => s.ucid));
+    setAddedNotice("");
     setSettingsOpen(false);
     setPickListing(listing);
   };
@@ -54,10 +60,14 @@ export function ChartPage(): React.JSX.Element {
     if (!listing) return;
     setSettingsOpen(false);
     setEditUcid(selection.ucid);
+    idsBeforePick.current = new Set(controller.selections.map(s => s.ucid));
+    setAddedNotice("");
     setPickListing(listing);
   };
 
   const closePickConfig = (): void => {
+    const added = controller.selections.filter(s => !idsBeforePick.current.has(s.ucid));
+    if (added.length > 0) setAddedNotice(`${added.map(s => s.label).join(", ")} added`);
     setPickListing(null);
     setEditUcid(null);
     setSettingsOpen(true);
@@ -209,7 +219,16 @@ export function ChartPage(): React.JSX.Element {
       {settingsOpen && (
         <SettingsDialog
           controller={controller}
-          onClose={() => setSettingsOpen(false)}
+          onClose={() => {
+            settingsScroll.current = 0;
+            setAddedNotice("");
+            setSettingsOpen(false);
+          }}
+          notice={addedNotice}
+          initialScrollTop={settingsScroll.current}
+          onScrollChange={top => {
+            settingsScroll.current = top;
+          }}
           onPickIndicator={openIndicatorSettings}
           onEditIndicator={openIndicatorEdit}
         />

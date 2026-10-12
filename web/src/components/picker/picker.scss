@@ -230,7 +230,23 @@
   padding: 0;
 }
 
+.settings-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
 .selection-list {
+  li.selected {
+    background-color: var(--list-hover);
+  }
+
   li {
     display: flex;
     align-items: center;
