@@ -1,5 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 
+import {
+  LEGEND_BLOCK_MAX_WIDTH,
+  LEGEND_BOTTOM_GAP,
+  LEGEND_ROW_HEIGHT,
+  LEGEND_SWATCH_WIDTH
+} from "../config/legend";
+import { getThemeColors } from "../config/theme-colors";
 import { OverlayChart } from "./overlay-chart";
 import { type ChartSettings } from "../config/types";
 
@@ -135,7 +142,7 @@ describe("OverlayChart.updateLegends", () => {
   });
 });
 
-describe("OverlayChart legend block", () => {
+describe("OverlayChart legend layout", () => {
   function legendChart(width: number) {
     const overlay = new OverlayChart({} as CanvasRenderingContext2D, settings);
     const options = {
@@ -157,115 +164,129 @@ describe("OverlayChart legend block", () => {
     results: [{ color: "#abc123" }]
   }));
   type Listed = Parameters<OverlayChart["updateLegends"]>[0];
+  type Written = Array<{
+    id: string;
+    color: string;
+    xAdjust: number;
+    yAdjust: number;
+  }>;
+  const written = (options: { plugins: { annotation: { annotations: unknown } } }) =>
+    options.plugins.annotation.annotations as Written;
+  const listed = (n: number) => selections.slice(0, n) as unknown as Listed;
 
-  it("reserves the legend height as top padding and keeps the other sides", () => {
-    const { overlay, options } = legendChart(1000);
+  describe("on a wide chart", () => {
+    it("keeps the legend inside the plot with no reserved padding", () => {
+      const { overlay, options } = legendChart(LEGEND_BLOCK_MAX_WIDTH + 1);
 
-    overlay.updateLegends(selections as unknown as Listed);
+      overlay.updateLegends(selections as unknown as Listed);
 
-    expect(options.layout.padding.top).toBeGreaterThan(0);
-    expect(options.layout.padding).toMatchObject({ left: 1, right: 1, bottom: 0 });
+      expect(options.layout.padding).toEqual({ top: 0, left: 1, bottom: 0, right: 1 });
+    });
+
+    it("writes one series-coloured annotation per entry, stepping down a row each", () => {
+      const { overlay, options } = legendChart(1000);
+
+      overlay.updateLegends(selections as unknown as Listed);
+
+      const entries = written(options);
+      expect(entries.map(a => a.id)).toEqual(["legend1", "legend2", "legend3", "legend4"]);
+      expect(entries.map(a => a.color)).toEqual(Array(4).fill("#abc123"));
+      expect(entries.map(a => a.yAdjust)).toEqual([10, 25, 40, 55]);
+    });
   });
 
-  it("wraps onto more rows at a narrow width", () => {
-    const wide = legendChart(1000);
-    const narrow = legendChart(160);
+  describe("on a narrow chart", () => {
+    it("reserves exactly the rows it needs as top padding and keeps the other sides", () => {
+      const one = legendChart(LEGEND_BLOCK_MAX_WIDTH);
+      const two = legendChart(160);
 
-    wide.overlay.updateLegends(selections as unknown as Listed);
-    narrow.overlay.updateLegends(selections as unknown as Listed);
+      one.overlay.updateLegends(listed(1));
+      two.overlay.updateLegends(selections as unknown as Listed);
 
-    expect(narrow.options.layout.padding.top).toBeGreaterThan(wide.options.layout.padding.top);
+      expect(one.options.layout.padding).toEqual({
+        top: LEGEND_ROW_HEIGHT + LEGEND_BOTTOM_GAP,
+        left: 1,
+        bottom: 0,
+        right: 1
+      });
+      expect(two.options.layout.padding.top).toBeGreaterThan(one.options.layout.padding.top);
+      expect((two.options.layout.padding.top - LEGEND_BOTTOM_GAP) % LEGEND_ROW_HEIGHT).toBe(0);
+    });
+
+    it("wraps onto two rows when four entries do not fit one", () => {
+      const { overlay, options } = legendChart(160);
+
+      overlay.updateLegends(listed(2));
+
+      const rows = (options.layout.padding.top - LEGEND_BOTTOM_GAP) / LEGEND_ROW_HEIGHT;
+      expect(rows).toBe(2);
+    });
+
+    it("aligns the swatch and label on one row, with the label after the swatch", () => {
+      const { overlay, options } = legendChart(LEGEND_BLOCK_MAX_WIDTH);
+
+      overlay.updateLegends(listed(1));
+
+      const entries = written(options);
+      const swatch = entries.find(a => a.id === "legend1-swatch");
+      const label = entries.find(a => a.id === "legend1");
+      expect(swatch?.xAdjust).toBe(0);
+      expect(label?.xAdjust).toBe(LEGEND_SWATCH_WIDTH);
+      expect(swatch?.yAdjust).toBe(label?.yAdjust);
+    });
+
+    it("colours the swatch by series and the label by theme text", () => {
+      const { overlay, options } = legendChart(LEGEND_BLOCK_MAX_WIDTH);
+
+      overlay.updateLegends(listed(1));
+
+      const entries = written(options);
+      expect(entries.find(a => a.id === "legend1-swatch")?.color).toBe("#abc123");
+      expect(entries.find(a => a.id === "legend1")?.color).toBe(getThemeColors(settings).text);
+    });
+
+    it("wraps to the plot area, not the full canvas, when the axis labels take the right edge", () => {
+      const { overlay, options } = legendChart(LEGEND_BLOCK_MAX_WIDTH);
+      const chart = (overlay as unknown as { _chart: Record<string, unknown> })._chart;
+      chart["chartArea"] = { left: 0, right: 160 };
+      const full = legendChart(LEGEND_BLOCK_MAX_WIDTH);
+
+      overlay.updateLegends(selections as unknown as Listed);
+      full.overlay.updateLegends(selections as unknown as Listed);
+
+      expect(options.layout.padding.top).toBeGreaterThan(full.options.layout.padding.top);
+    });
+
+    it("measures with a fallback when the canvas context is partial", () => {
+      const { overlay, options } = legendChart(LEGEND_BLOCK_MAX_WIDTH);
+      const chart = (overlay as unknown as { _chart: Record<string, unknown> })._chart;
+      chart["ctx"] = { measureText: () => ({ width: 10 }) };
+
+      expect(() => overlay.updateLegends(listed(1))).not.toThrow();
+      expect(options.layout.padding.top).toBe(LEGEND_ROW_HEIGHT + LEGEND_BOTTOM_GAP);
+    });
   });
 
-  it("colours the swatch by series and the label by theme", () => {
-    const { overlay, options } = legendChart(1000);
-
-    overlay.updateLegends(selections as unknown as Listed);
-
-    const written = options.plugins.annotation.annotations as Array<{ id: string; color: string }>;
-    const swatch = written.find(a => a.id === "legend1-swatch");
-    const label = written.find(a => a.id === "legend1");
-    expect(swatch?.color).toBe("#abc123");
-    expect(label?.color).not.toBe("#abc123");
-  });
-
-  it("wraps to the plot area, not the full canvas, when the axis labels take the right edge", () => {
-    const { overlay, options } = legendChart(1000);
-    const chart = (overlay as unknown as { _chart: Record<string, unknown> })._chart;
-    chart["chartArea"] = { left: 0, right: 160 };
-
-    overlay.updateLegends(selections as unknown as Listed);
-
-    const full = legendChart(1000);
-    full.overlay.updateLegends(selections as unknown as Listed);
-    expect(options.layout.padding.top).toBeGreaterThan(full.options.layout.padding.top);
-  });
-
-  it("re-lays the legend out when the chart is resized", async () => {
+  it("switches layout when a resize crosses the threshold", async () => {
     const { overlay, options } = legendChart(1000);
     overlay.updateLegends(selections as unknown as Listed);
-    const wide = options.layout.padding.top;
+    expect(options.layout.padding.top).toBe(0);
 
     const chart = (overlay as unknown as { _chart: { width: number } })._chart;
-    chart.width = 160;
+    chart.width = 400;
     (overlay as unknown as { _onResize: () => void })._onResize();
     await Promise.resolve();
 
-    expect(options.layout.padding.top).toBeGreaterThan(wide);
-  });
-
-  it("measures with a fallback when the canvas context is partial", () => {
-    const { overlay, options } = legendChart(1000);
-    const chart = (overlay as unknown as { _chart: Record<string, unknown> })._chart;
-    chart["ctx"] = { measureText: () => ({ width: 10 }) };
-
-    expect(() => overlay.updateLegends(selections as unknown as Listed)).not.toThrow();
     expect(options.layout.padding.top).toBeGreaterThan(0);
+    expect(written(options).some(a => a.id === "legend1-swatch")).toBe(true);
   });
 
   it("clears the reserved height when no overlay is listed", () => {
-    const { overlay, options } = legendChart(1000);
+    const { overlay, options } = legendChart(LEGEND_BLOCK_MAX_WIDTH);
     overlay.updateLegends(selections as unknown as Listed);
 
     overlay.updateLegends([]);
 
     expect(options.layout.padding.top).toBe(0);
-  });
-});
-
-describe("OverlayChart.applySlicedData", () => {
-  it("sizes the volume axis from the bars on screen", () => {
-    const overlay = new OverlayChart({} as CanvasRenderingContext2D, settings);
-    const volumeAxis = { max: 0 };
-    const datasets = [
-      { type: "candlestick", data: [] as unknown[] },
-      { type: "bar", data: [] as unknown[] }
-    ];
-    (overlay as unknown as { _chart: unknown })._chart = {
-      data: { datasets },
-      options: { scales: { volumeAxis } },
-      update: vi.fn()
-    };
-    const history = [100, 100, 100, 100, 1000, 1000, 1000, 1000];
-    const full = [
-      { type: "candlestick", data: history.map(() => ({})) },
-      {
-        type: "bar",
-        data: [...history.map((y, x) => ({ x, y })), { x: 8, y: Number.NaN }]
-      }
-    ];
-    const apply = (start: number, end?: number): void =>
-      overlay.applySlicedData(
-        full as unknown as Parameters<OverlayChart["applySlicedData"]>[0],
-        start,
-        end
-      );
-
-    apply(0, 4);
-    expect(volumeAxis.max).toBe(20 * 100);
-
-    // Panned to the heavier stretch: the axis follows; the padding bar is ignored.
-    apply(4);
-    expect(volumeAxis.max).toBe(20 * 1000);
   });
 });

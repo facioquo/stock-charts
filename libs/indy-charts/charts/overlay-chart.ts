@@ -14,7 +14,12 @@ import { processQuoteData } from "../data/transformers";
 import { baseOverlayConfig, baseOverlayOptions } from "../config/overlay";
 import { commonLegendAnnotation, legendSwatchAnnotation } from "../config/annotations";
 import { FONT_FAMILY } from "../config/common";
-import { LEGEND_ROW_HEIGHT, LEGEND_SWATCH_WIDTH, layoutLegend } from "../config/legend";
+import {
+  LEGEND_BLOCK_MAX_WIDTH,
+  LEGEND_ROW_HEIGHT,
+  LEGEND_SWATCH_WIDTH,
+  layoutLegend
+} from "../config/legend";
 import {
   type ChartSettings,
   type IndicatorResult,
@@ -180,14 +185,19 @@ export class OverlayChart {
       .filter(x => x.chartType === CHART_TYPES.OVERLAY)
       .filter(selection => selection.results.length > 0 && selection.results[0] !== undefined);
 
+    const options = this._chart.options;
+    if (!options?.plugins?.annotation) return;
+
+    if (this._chart.width > LEGEND_BLOCK_MAX_WIDTH) {
+      this._applyInlineLegend(listed, xPos, yPos);
+      return;
+    }
+
     const { slots, height } = layoutLegend(
       listed.map(selection => selection.label),
       label => this._measureLegendText(label),
       this._legendWidth()
     );
-
-    const options = this._chart.options;
-    if (!options?.plugins?.annotation) return;
 
     const padding = (options.layout ??= {}).padding;
     options.layout.padding =
@@ -227,6 +237,38 @@ export class OverlayChart {
     });
 
     this._chart.update("none");
+  }
+
+  /** Wide charts: one coloured label per entry over the plot's top-left, no reserved padding. */
+  private _applyInlineLegend(
+    listed: IndicatorSelection[],
+    xPos: ScaleValue,
+    yPos: ScaleValue
+  ): void {
+    const chart = this._chart;
+    const options = chart?.options;
+    if (!chart || !options?.plugins?.annotation) return;
+
+    const padding = (options.layout ??= {}).padding;
+    options.layout.padding =
+      typeof padding === "object" && padding !== null
+        ? { ...padding, top: 0 }
+        : { top: 0, left: 1, bottom: 0, right: 1 };
+
+    options.plugins.annotation.annotations = listed.map((selection, index) => {
+      const annotation = commonLegendAnnotation(
+        selection.label,
+        xPos,
+        yPos,
+        10 + LEGEND_ROW_HEIGHT * index,
+        this.settings
+      );
+      annotation.id = "legend" + (index + 1).toString();
+      annotation.color = selection.results[0].color;
+      return annotation;
+    });
+
+    chart.update("none");
   }
 
   /** Entries start at the plot's left edge and must stay clear of the right-hand axis labels. */

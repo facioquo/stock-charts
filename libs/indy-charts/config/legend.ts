@@ -4,6 +4,12 @@ export const LEGEND_SWATCH_WIDTH = 14;
 /** Horizontal gap between entries on one row. */
 export const LEGEND_ENTRY_GAP = 12;
 
+/**
+ * Chart widths up to this many pixels get the legend as a block above the plot,
+ * where stacked in-plot rows would cover candles. Wider charts keep it in the plot.
+ */
+export const LEGEND_BLOCK_MAX_WIDTH = 600;
+
 /** Height of one legend row in pixels. */
 export const LEGEND_ROW_HEIGHT = 15;
 
