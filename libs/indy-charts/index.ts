@@ -143,8 +143,8 @@ export {
 } from "./config";
 
 // Chart abstractions
-export { ChartManager, OverlayChart, OscillatorChart } from "./charts";
-export type { ChartManagerConfig } from "./charts";
+export { ChartManager, OverlayChart, OscillatorChart, clampWindow } from "./charts";
+export type { BarWindow, ChartManagerConfig } from "./charts";
 
 // API client
 export {
@@ -165,4 +165,9 @@ export type {
 } from "./api";
 
 // Selection and sizing helpers
-export { applySelectionTokens, calculateOptimalBars, createDefaultSelection } from "./helpers";
+export {
+  MIN_BARS,
+  applySelectionTokens,
+  calculateOptimalBars,
+  createDefaultSelection
+} from "./helpers";
