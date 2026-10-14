@@ -12,7 +12,9 @@ import {
 
 import { processQuoteData } from "../data/transformers";
 import { baseOverlayConfig, baseOverlayOptions } from "../config/overlay";
-import { commonLegendAnnotation } from "../config/annotations";
+import { commonLegendAnnotation, legendSwatchAnnotation } from "../config/annotations";
+import { FONT_FAMILY } from "../config/common";
+import { LEGEND_ROW_HEIGHT, LEGEND_SWATCH_WIDTH, layoutLegend } from "../config/legend";
 import {
   type ChartSettings,
   type IndicatorResult,
@@ -70,15 +72,7 @@ export class OverlayChart {
     // Re-anchor annotations after Chart.js ResizeObserver has committed the
     // OHLC-derived scale bounds. queueMicrotask defers until after the
     // synchronous chart.update('resize') call completes, avoiding re-entrancy.
-    if (chartConfig.options) {
-      chartConfig.options.onResize = () => {
-        if (this._latestLegendSelections.length > 0) {
-          queueMicrotask(() => {
-            this._applyLegendAnnotations();
-          });
-        }
-      };
-    }
+    if (chartConfig.options) chartConfig.options.onResize = this._onResize;
 
     if (this._chart) this._chart.destroy();
     this._chart = new Chart(this.ctx, chartConfig);
@@ -162,35 +156,103 @@ export class OverlayChart {
     this._applyLegendAnnotations();
   }
 
+  private readonly _onResize = (): void => {
+    if (this._latestLegendSelections.length === 0) return;
+    queueMicrotask(() => {
+      this._applyLegendAnnotations();
+    });
+  };
+
+  /**
+   * Lay the legend out in a block above the plot: the block's height becomes
+   * the chart's top padding, so entries never cover candles or lines. Each
+   * entry is a series-coloured swatch plus a label in the theme text colour.
+   */
   private _applyLegendAnnotations(): void {
     if (!this._chart) return;
     if (!this._chart.scales["x"] || !this._chart.scales["y"]) return;
 
     const xPos: ScaleValue = this._chart.scales["x"].min;
     const yPos: ScaleValue = this._chart.scales["y"].max;
-    let adjY = 10;
 
     // Selection order, so the legend matches the order indicators were added in.
-    const ordered = this._latestLegendSelections.filter(x => x.chartType === CHART_TYPES.OVERLAY);
+    const listed = this._latestLegendSelections
+      .filter(x => x.chartType === CHART_TYPES.OVERLAY)
+      .filter(selection => selection.results.length > 0 && selection.results[0] !== undefined);
 
-    if (this._chart.options?.plugins?.annotation) {
-      this._chart.options.plugins.annotation.annotations = ordered
-        .filter(selection => selection.results.length > 0 && selection.results[0] !== undefined)
-        .map((selection: IndicatorSelection, index: number) => {
-          const annotation = commonLegendAnnotation(
-            selection.label,
-            xPos,
-            yPos,
-            adjY,
-            this.settings
-          );
-          annotation.id = "legend" + (index + 1).toString();
-          annotation.color = selection.results[0].color;
-          adjY += 15; // LEGEND_Y_OFFSET
-          return annotation;
-        });
-      this._chart.update("none");
+    const { slots, height } = layoutLegend(
+      listed.map(selection => selection.label),
+      label => this._measureLegendText(label),
+      this._legendWidth()
+    );
+
+    const options = this._chart.options;
+    if (!options?.plugins?.annotation) return;
+
+    const padding = (options.layout ??= {}).padding;
+    options.layout.padding =
+      typeof padding === "object" && padding !== null
+        ? { ...padding, top: height }
+        : { top: height, left: 1, bottom: 0, right: 1 };
+
+    // Row centres sit above the plot top (yPos), inside the reserved padding.
+    const rowCentre = (row: number): number =>
+      row * LEGEND_ROW_HEIGHT + LEGEND_ROW_HEIGHT / 2 - height;
+
+    options.plugins.annotation.annotations = listed.flatMap((selection, index) => {
+      const slot = slots[index];
+      if (!slot) return [];
+
+      const label = commonLegendAnnotation(
+        selection.label,
+        xPos,
+        yPos,
+        rowCentre(slot.row),
+        this.settings
+      );
+      label.id = "legend" + (index + 1).toString();
+      label.xAdjust = slot.x + LEGEND_SWATCH_WIDTH;
+
+      const swatch = legendSwatchAnnotation(
+        selection.results[0].color,
+        xPos,
+        yPos,
+        rowCentre(slot.row),
+        slot.x,
+        this.settings
+      );
+      swatch.id = label.id + "-swatch";
+
+      return [swatch, label];
+    });
+
+    this._chart.update("none");
+  }
+
+  /** Entries start at the plot's left edge and must stay clear of the right-hand axis labels. */
+  private _legendWidth(): number {
+    const chart = this._chart;
+    if (!chart) return 0;
+    const area = chart.chartArea as { left: number; right: number } | undefined;
+    return area ? area.right - area.left : chart.width;
+  }
+
+  private _measureLegendText(label: string): number {
+    const ctx = this._chart?.ctx;
+    if (
+      !ctx ||
+      typeof ctx.measureText !== "function" ||
+      typeof ctx.save !== "function" ||
+      typeof ctx.restore !== "function"
+    ) {
+      return label.length * 7;
     }
+
+    ctx.save();
+    ctx.font = `13px ${FONT_FAMILY}`;
+    const width = ctx.measureText(label).width;
+    ctx.restore();
+    return width;
   }
 
   updateTheme(settings: ChartSettings): void {
@@ -202,6 +264,7 @@ export class OverlayChart {
     this._chart.options = buildFinancialChartOptions(
       baseOverlayOptions(this.volumeAxisSize, settings)
     );
+    this._chart.options.onResize = this._onResize;
     this._chart.update("none");
   }
 

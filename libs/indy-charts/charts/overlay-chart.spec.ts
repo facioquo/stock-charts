@@ -122,14 +122,114 @@ describe("OverlayChart.updateLegends", () => {
 
     const written = (
       (overlay as unknown as { _chart: { options: { plugins: { annotation: unknown } } } })._chart
-        .options.plugins.annotation as { annotations: Array<{ content: string[] | string }> }
-    ).annotations;
+        .options.plugins.annotation as {
+        annotations: Array<{ id?: string; content: string[] | string }>;
+      }
+    ).annotations.filter(a => !a.id?.endsWith("-swatch"));
     expect(written.map(a => [a.content].flat().join(""))).toEqual([
       "ATR-STOP",
       "LINEAR",
       "MARUBOZU",
       "BB"
     ]);
+  });
+});
+
+describe("OverlayChart legend block", () => {
+  function legendChart(width: number) {
+    const overlay = new OverlayChart({} as CanvasRenderingContext2D, settings);
+    const options = {
+      layout: { padding: { top: 0, left: 1, bottom: 0, right: 1 } },
+      plugins: { annotation: { annotations: {} as unknown } }
+    };
+    (overlay as unknown as { _chart: unknown })._chart = {
+      width,
+      scales: { x: { min: 0 }, y: { max: 100 } },
+      options,
+      update: vi.fn()
+    };
+    return { overlay, options };
+  }
+  const selections = ["LINEAR(50)", "BB(20,2)", "SUPERTREND(10,3)", "MARUBOZU(90%)"].map(label => ({
+    ucid: label,
+    label,
+    chartType: "overlay",
+    results: [{ color: "#abc123" }]
+  }));
+  type Listed = Parameters<OverlayChart["updateLegends"]>[0];
+
+  it("reserves the legend height as top padding and keeps the other sides", () => {
+    const { overlay, options } = legendChart(1000);
+
+    overlay.updateLegends(selections as unknown as Listed);
+
+    expect(options.layout.padding.top).toBeGreaterThan(0);
+    expect(options.layout.padding).toMatchObject({ left: 1, right: 1, bottom: 0 });
+  });
+
+  it("wraps onto more rows at a narrow width", () => {
+    const wide = legendChart(1000);
+    const narrow = legendChart(160);
+
+    wide.overlay.updateLegends(selections as unknown as Listed);
+    narrow.overlay.updateLegends(selections as unknown as Listed);
+
+    expect(narrow.options.layout.padding.top).toBeGreaterThan(wide.options.layout.padding.top);
+  });
+
+  it("colours the swatch by series and the label by theme", () => {
+    const { overlay, options } = legendChart(1000);
+
+    overlay.updateLegends(selections as unknown as Listed);
+
+    const written = options.plugins.annotation.annotations as Array<{ id: string; color: string }>;
+    const swatch = written.find(a => a.id === "legend1-swatch");
+    const label = written.find(a => a.id === "legend1");
+    expect(swatch?.color).toBe("#abc123");
+    expect(label?.color).not.toBe("#abc123");
+  });
+
+  it("wraps to the plot area, not the full canvas, when the axis labels take the right edge", () => {
+    const { overlay, options } = legendChart(1000);
+    const chart = (overlay as unknown as { _chart: Record<string, unknown> })._chart;
+    chart["chartArea"] = { left: 0, right: 160 };
+
+    overlay.updateLegends(selections as unknown as Listed);
+
+    const full = legendChart(1000);
+    full.overlay.updateLegends(selections as unknown as Listed);
+    expect(options.layout.padding.top).toBeGreaterThan(full.options.layout.padding.top);
+  });
+
+  it("re-lays the legend out when the chart is resized", async () => {
+    const { overlay, options } = legendChart(1000);
+    overlay.updateLegends(selections as unknown as Listed);
+    const wide = options.layout.padding.top;
+
+    const chart = (overlay as unknown as { _chart: { width: number } })._chart;
+    chart.width = 160;
+    (overlay as unknown as { _onResize: () => void })._onResize();
+    await Promise.resolve();
+
+    expect(options.layout.padding.top).toBeGreaterThan(wide);
+  });
+
+  it("measures with a fallback when the canvas context is partial", () => {
+    const { overlay, options } = legendChart(1000);
+    const chart = (overlay as unknown as { _chart: Record<string, unknown> })._chart;
+    chart["ctx"] = { measureText: () => ({ width: 10 }) };
+
+    expect(() => overlay.updateLegends(selections as unknown as Listed)).not.toThrow();
+    expect(options.layout.padding.top).toBeGreaterThan(0);
+  });
+
+  it("clears the reserved height when no overlay is listed", () => {
+    const { overlay, options } = legendChart(1000);
+    overlay.updateLegends(selections as unknown as Listed);
+
+    overlay.updateLegends([]);
+
+    expect(options.layout.padding.top).toBe(0);
   });
 });
 

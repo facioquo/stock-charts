@@ -65,14 +65,14 @@
     font-family: Rubik, Roboto, Arial, Helvetica, sans-serif;
     font-size: 0.9em;
     font-weight: normal;
-    line-height: 0.9;
+    line-height: 1.2;
     letter-spacing: 0.55px;
     padding-left: 1px;
-    margin: 0;
+    margin: 0.2rem 0 0;
     color: var(--toolbar-h2);
 
     a {
-      padding-bottom: 0.9rem;
+      padding-bottom: 0.7rem;
 
       &:hover {
         color: var(--toolbar-h2-hover);

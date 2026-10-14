@@ -47,3 +47,19 @@ export function commonLegendAnnotation(
 
   return annotation;
 }
+
+/** A series-coloured square that precedes a legend label. */
+export function legendSwatchAnnotation(
+  color: string,
+  xPos: ScaleValue,
+  yPos: ScaleValue,
+  yAdj: number,
+  xAdj: number,
+  settings: ChartSettings
+): AnnotationOptions & LabelAnnotationOptions {
+  const annotation = commonLegendAnnotation("\u25A0", xPos, yPos, yAdj, settings);
+  annotation.id = "legend-swatch";
+  annotation.color = color;
+  annotation.xAdjust = xAdj;
+  return annotation;
+}
