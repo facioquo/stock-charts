@@ -9,6 +9,9 @@ import { type ChartSettings } from "./types";
 import { FONT_FAMILY } from "./common";
 import { getThemeColors } from "./theme-colors";
 
+/** Legend text size; the block layout measures with it, so both must agree. */
+export const LEGEND_FONT_SIZE = 13;
+
 export function commonLegendAnnotation(
   labelText: string,
   xPos: ScaleValue,
@@ -20,7 +23,7 @@ export function commonLegendAnnotation(
 
   const legendFont: FontSpec = {
     family: FONT_FAMILY,
-    size: 13,
+    size: LEGEND_FONT_SIZE,
     style: "normal",
     weight: "normal",
     lineHeight: 1

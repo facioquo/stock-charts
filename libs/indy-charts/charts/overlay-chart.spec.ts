@@ -267,6 +267,28 @@ describe("OverlayChart legend layout", () => {
     });
   });
 
+  it("anchors to the y max the padded layout produces", () => {
+    const { overlay } = legendChart(LEGEND_BLOCK_MAX_WIDTH);
+    const chart = (
+      overlay as unknown as {
+        _chart: { scales: { y: { max: number } }; update: ReturnType<typeof vi.fn> };
+      }
+    )._chart;
+    chart.update.mockImplementation(() => {
+      chart.scales.y.max = 90;
+    });
+
+    overlay.updateLegends(listed(1));
+
+    const options = (
+      overlay as unknown as {
+        _chart: { options: { plugins: { annotation: { annotations: unknown } } } };
+      }
+    )._chart.options;
+    const entry = (options.plugins.annotation.annotations as Array<{ yValue: number }>)[0];
+    expect(entry?.yValue).toBe(90);
+  });
+
   it("switches layout when a resize crosses the threshold", async () => {
     const { overlay, options } = legendChart(1000);
     overlay.updateLegends(selections as unknown as Listed);
@@ -288,5 +310,42 @@ describe("OverlayChart legend layout", () => {
     overlay.updateLegends([]);
 
     expect(options.layout.padding.top).toBe(0);
+  });
+});
+
+describe("OverlayChart.applySlicedData", () => {
+  it("sizes the volume axis from the bars on screen", () => {
+    const overlay = new OverlayChart({} as CanvasRenderingContext2D, settings);
+    const volumeAxis = { max: 0 };
+    const datasets = [
+      { type: "candlestick", data: [] as unknown[] },
+      { type: "bar", data: [] as unknown[] }
+    ];
+    (overlay as unknown as { _chart: unknown })._chart = {
+      data: { datasets },
+      options: { scales: { volumeAxis } },
+      update: vi.fn()
+    };
+    const history = [100, 100, 100, 100, 1000, 1000, 1000, 1000];
+    const full = [
+      { type: "candlestick", data: history.map(() => ({})) },
+      {
+        type: "bar",
+        data: [...history.map((y, x) => ({ x, y })), { x: 8, y: Number.NaN }]
+      }
+    ];
+    const apply = (start: number, end?: number): void =>
+      overlay.applySlicedData(
+        full as unknown as Parameters<OverlayChart["applySlicedData"]>[0],
+        start,
+        end
+      );
+
+    apply(0, 4);
+    expect(volumeAxis.max).toBe(20 * 100);
+
+    // Panned to the heavier stretch: the axis follows; the padding bar is ignored.
+    apply(4);
+    expect(volumeAxis.max).toBe(20 * 1000);
   });
 });

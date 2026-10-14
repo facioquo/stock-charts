@@ -12,7 +12,11 @@ import {
 
 import { processQuoteData } from "../data/transformers";
 import { baseOverlayConfig, baseOverlayOptions } from "../config/overlay";
-import { commonLegendAnnotation, legendSwatchAnnotation } from "../config/annotations";
+import {
+  LEGEND_FONT_SIZE,
+  commonLegendAnnotation,
+  legendSwatchAnnotation
+} from "../config/annotations";
 import { FONT_FAMILY } from "../config/common";
 import {
   LEGEND_BLOCK_MAX_WIDTH,
@@ -178,7 +182,7 @@ export class OverlayChart {
     if (!this._chart.scales["x"] || !this._chart.scales["y"]) return;
 
     const xPos: ScaleValue = this._chart.scales["x"].min;
-    const yPos: ScaleValue = this._chart.scales["y"].max;
+    let yPos: ScaleValue = this._chart.scales["y"].max;
 
     // Selection order, so the legend matches the order indicators were added in.
     const listed = this._latestLegendSelections
@@ -208,6 +212,10 @@ export class OverlayChart {
     // Row centres sit above the plot top (yPos), inside the reserved padding.
     const rowCentre = (row: number): number =>
       row * LEGEND_ROW_HEIGHT + LEGEND_ROW_HEIGHT / 2 - height;
+
+    // The padding changes the plot height, which can move the y-axis max the legend anchors to.
+    this._chart.update("none");
+    yPos = this._chart.scales["y"]?.max ?? yPos;
 
     options.plugins.annotation.annotations = listed.flatMap((selection, index) => {
       const slot = slots[index];
@@ -291,7 +299,7 @@ export class OverlayChart {
     }
 
     ctx.save();
-    ctx.font = `13px ${FONT_FAMILY}`;
+    ctx.font = `${LEGEND_FONT_SIZE}px ${FONT_FAMILY}`;
     const width = ctx.measureText(label).width;
     ctx.restore();
     return width;
