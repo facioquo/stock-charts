@@ -251,17 +251,26 @@ export class OverlayChart {
   private _applyInlineLegend(
     listed: IndicatorSelection[],
     xPos: ScaleValue,
-    yPos: ScaleValue
+    initialYPos: ScaleValue
   ): void {
+    let yPos = initialYPos;
     const chart = this._chart;
     const options = chart?.options;
     if (!chart || !options?.plugins?.annotation) return;
 
     const padding = (options.layout ??= {}).padding;
+    const hadBlock =
+      typeof padding === "object" && padding !== null && "top" in padding && padding.top !== 0;
     options.layout.padding =
       typeof padding === "object" && padding !== null
         ? { ...padding, top: 0 }
         : { top: 0, left: 1, bottom: 0, right: 1 };
+
+    // Dropping the block's padding makes the plot taller, which can move the y-axis max.
+    if (hadBlock) {
+      chart.update("none");
+      yPos = chart.scales["y"]?.max ?? yPos;
+    }
 
     options.plugins.annotation.annotations = listed.map((selection, index) => {
       const annotation = commonLegendAnnotation(
@@ -311,10 +320,10 @@ export class OverlayChart {
 
     applyFinancialElementTheme(getFinancialPalette(settings.isDarkTheme ? "dark" : "light"));
 
-    this._chart.options = buildFinancialChartOptions(
-      baseOverlayOptions(this.volumeAxisSize, settings)
-    );
-    this._chart.options.onResize = this._onResize;
+    // Set the handler before assigning: Chart.js returns its resolver, not this object, from `options`.
+    const options = buildFinancialChartOptions(baseOverlayOptions(this.volumeAxisSize, settings));
+    options.onResize = this._onResize;
+    this._chart.options = options;
     this._chart.update("none");
   }
 

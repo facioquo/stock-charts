@@ -289,6 +289,60 @@ describe("OverlayChart legend layout", () => {
     expect(entry?.yValue).toBe(90);
   });
 
+  it("drops the block padding and swatches when a narrow chart widens", () => {
+    const { overlay, options } = legendChart(LEGEND_BLOCK_MAX_WIDTH);
+    overlay.updateLegends(listed(2));
+    expect(options.layout.padding.top).toBeGreaterThan(0);
+
+    (overlay as unknown as { _chart: { width: number } })._chart.width = 1000;
+    (overlay as unknown as { _applyLegendAnnotations: () => void })._applyLegendAnnotations();
+
+    expect(options.layout.padding.top).toBe(0);
+    expect(written(options).map(a => a.id)).toEqual(["legend1", "legend2"]);
+  });
+
+  it("anchors to the y max of the taller plot when a narrow chart widens", () => {
+    const { overlay, options } = legendChart(LEGEND_BLOCK_MAX_WIDTH);
+    overlay.updateLegends(listed(1));
+    const chart = (
+      overlay as unknown as {
+        _chart: {
+          width: number;
+          scales: { y: { max: number } };
+          update: ReturnType<typeof vi.fn>;
+        };
+      }
+    )._chart;
+    chart.width = 1000;
+    chart.update.mockImplementation(() => {
+      chart.scales.y.max = 120;
+    });
+
+    (overlay as unknown as { _applyLegendAnnotations: () => void })._applyLegendAnnotations();
+
+    const entry = (options.plugins.annotation.annotations as Array<{ yValue: number }>)[0];
+    expect(entry?.yValue).toBe(120);
+  });
+
+  it("carries the resize handler on the options a theme change assigns", () => {
+    const overlay = new OverlayChart({} as CanvasRenderingContext2D, settings);
+    const assigned: Array<{ onResize?: unknown }> = [];
+    (overlay as unknown as { _chart: unknown })._chart = {
+      set options(value: { onResize?: unknown }) {
+        assigned.push(value);
+      },
+      get options() {
+        return {};
+      },
+      update: vi.fn()
+    };
+
+    overlay.updateTheme({ ...settings, isDarkTheme: false });
+
+    expect(assigned).toHaveLength(1);
+    expect(assigned[0]?.onResize).toBe((overlay as unknown as { _onResize: unknown })._onResize);
+  });
+
   it("switches layout when a resize crosses the threshold", async () => {
     const { overlay, options } = legendChart(1000);
     overlay.updateLegends(selections as unknown as Listed);
