@@ -67,7 +67,7 @@ manager.setWindow(120, 60);  // 60 bars starting at history index 120
 manager.windowOffset;        // bars behind the newest bar; 0 when anchored
 ```
 
-Counts clamp to 20 bars up to the history length, and the window never leaves the history. `setBarCount` re-anchors to the newest bar and drops any pan, so to resize without losing a pan, keep the right edge fixed with `setWindow(manager.windowStart + manager.currentBarCount - count, count)`; `setBarCount` also accepts counts below 20, which the next `panBy` or `zoomBy` raises to 20. The window is not persisted: `initializeOverlay` resets it, so reapply it after you re-initialize.
+Counts clamp to `MIN_BARS` (20) up to the history length (the whole history when it is shorter than 20), and the window never leaves the history. `clampWindow(start, count, length)` returns the window a request will become, so a caller can show the bounds before applying them. `setBarCount` re-anchors to the newest bar and drops any pan, so to resize without losing a pan, keep the right edge fixed with `setWindow(manager.windowStart + manager.currentBarCount - count, count)`; `setBarCount` also accepts counts below 20, which the next `panBy` or `zoomBy` raises to 20. The window is not persisted: `initializeOverlay` resets it, so reapply it after you re-initialize.
 
 ### Teardown
 
