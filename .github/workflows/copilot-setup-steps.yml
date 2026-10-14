@@ -66,6 +66,10 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
+      - name: Install browser for E2E tests
+        run: pnpm exec playwright install --with-deps chromium
+        continue-on-error: true
+
       - name: Environment summary
         run: |
           echo "## Copilot environment: Ready" >> $GITHUB_STEP_SUMMARY

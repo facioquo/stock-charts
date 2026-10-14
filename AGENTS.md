@@ -58,8 +58,9 @@ stock-charts/
 ## Commands
 
 ```bash
-# Setup
-# VS Code: Ctrl+Shift+P → "Tasks: Run Task" → "Setup: Dev environment"
+# Setup (or VS Code task "Setup: Dev environment")
+dotnet tool restore                    # Local .NET tools
+pnpm exec playwright install chromium  # Browser for E2E tests
 
 # Install dependencies
 pnpm install                   # Install all workspace dependencies

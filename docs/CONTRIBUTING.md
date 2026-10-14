@@ -38,6 +38,8 @@ cd stock-charts
 pnpm install
 ```
 
+Before running the E2E tests, install their browser with `pnpm exec playwright install chromium`.
+
 Or use VS Code: `Ctrl+Shift+P` → "Tasks: Run Task" → "Setup: Dev environment"
 
 ### Verify installation
