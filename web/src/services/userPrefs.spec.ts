@@ -21,34 +21,44 @@ describe("userPrefs", () => {
     it("applies default settings when no cached settings exist", () => {
       loadSettings();
 
-      expect(getSettings()).toEqual({ isDarkTheme: true, showTooltips: true });
+      expect(getSettings()).toEqual({ isDarkTheme: true, showTooltips: false });
       expect(localStorage.getItem("settings")).toBeTruthy();
     });
 
     it("loads cached settings when they exist", () => {
       const cached = { isDarkTheme: false, showTooltips: true };
       localStorage.setItem("settings", JSON.stringify(cached));
+      localStorage.setItem("settings.tooltipsChosen", "true");
 
       loadSettings();
 
       expect(getSettings()).toEqual(cached);
     });
 
-    it("turns tooltips on for a visitor whose stored value is only the old default", () => {
-      localStorage.setItem("settings", JSON.stringify({ isDarkTheme: false, showTooltips: false }));
+    it("turns tooltips off for a visitor whose stored value is only the old default", () => {
+      localStorage.setItem("settings", JSON.stringify({ isDarkTheme: false, showTooltips: true }));
 
       loadSettings();
 
-      expect(getSettings()).toEqual({ isDarkTheme: false, showTooltips: true });
+      expect(getSettings()).toEqual({ isDarkTheme: false, showTooltips: false });
     });
 
-    it("keeps tooltips off for a visitor who switched them off", () => {
-      loadSettings();
-      changeTooltips(false);
+    it("keeps tooltips off for a visitor who chose off", () => {
+      localStorage.setItem("settings", JSON.stringify({ isDarkTheme: false, showTooltips: false }));
+      localStorage.setItem("settings.tooltipsChosen", "true");
 
       loadSettings();
 
       expect(getSettings().showTooltips).toBe(false);
+    });
+
+    it("keeps tooltips on for a visitor who switched them on", () => {
+      loadSettings();
+      changeTooltips(true);
+
+      loadSettings();
+
+      expect(getSettings().showTooltips).toBe(true);
     });
 
     it("applies the cached theme to document.body on load", () => {

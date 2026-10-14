@@ -405,6 +405,13 @@ describe("chartSettingsFromOptions", () => {
     expect(result.background).toBe("#light-theme");
   });
 
+  it("leaves tooltips off unless the defaults turn them on", () => {
+    expect(chartSettingsFromOptions(baseOptions, false, undefined).showTooltips).toBe(false);
+
+    const on: IndyChartsVueOptions = { ...baseOptions, defaults: { showTooltips: true } };
+    expect(chartSettingsFromOptions(on, false, undefined).showTooltips).toBe(true);
+  });
+
   it("returns undefined background when no override and no theme background are set", () => {
     const result = chartSettingsFromOptions(baseOptions, false, undefined);
     expect(result.background).toBeUndefined();

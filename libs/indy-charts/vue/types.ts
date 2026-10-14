@@ -30,10 +30,14 @@ export interface StockIndicatorChartConfig {
 
 export type StockIndicatorChartRegistry = Record<string, StockIndicatorChartConfig>;
 
+/** Whether a chart shows hover tooltips when `defaults.showTooltips` is unset. */
+export const DEFAULT_SHOW_TOOLTIPS = false;
+
 export interface IndyChartsVueDefaults {
   indicator?: string;
   barCount?: number;
   quoteCount?: number;
+  /** Show hover tooltips. Off unless set. */
   showTooltips?: boolean;
   showRightAxisLabels?: boolean;
 }
@@ -98,7 +102,7 @@ export function chartSettingsFromOptions(
   const themeBg = isDarkTheme ? options.theme?.darkBackground : options.theme?.lightBackground;
   return {
     isDarkTheme,
-    showTooltips: options.defaults?.showTooltips ?? true,
+    showTooltips: options.defaults?.showTooltips ?? DEFAULT_SHOW_TOOLTIPS,
     showRightAxisLabels: options.defaults?.showRightAxisLabels,
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- intentional: treats empty string as absent (consistent with getThemeColors falsy check)
     background: background || themeBg
