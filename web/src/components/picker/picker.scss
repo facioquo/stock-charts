@@ -135,9 +135,17 @@
 
   li {
     display: flex;
-    align-items: center;
-    padding: 8px 8px 8px 16px;
   }
+}
+
+.toggle-row {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 8px 8px 16px;
+  cursor: pointer;
 }
 
 .toggle-label {
@@ -176,6 +184,11 @@
       border-radius: 50%;
       transition: transform 0.15s;
     }
+  }
+
+  input:focus-visible + .slider {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
   input:checked + .slider {
@@ -257,12 +270,19 @@
     }
   }
 
+  /* A name has no spaces, so it breaks only when it cannot fit. The control
+     buttons keep their touch size, so phones trade the name some padding and
+     size instead. */
   label {
     flex: 1 1 0;
     min-width: 0;
-    overflow-wrap: anywhere;
-    padding: 10px 8px 10px 16px;
+    overflow-wrap: break-word;
+    padding: 10px 4px 10px 12px;
     cursor: pointer;
+
+    @media (width <= 420px) {
+      font-size: 0.9rem;
+    }
   }
 }
 
