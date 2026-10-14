@@ -103,22 +103,24 @@ export class OscillatorChart {
   }
 
   /**
-   * Apply sliced datasets from pre-computed full datasets.
+   * Apply sliced datasets from pre-computed full datasets. `endIndex` is
+   * exclusive; omit it to run to the newest bar and its extra bars.
    */
   applySlicedData(
     selection: IndicatorSelection,
     fullDatasets: IndicatorDataset[],
-    startIndex: number
+    startIndex: number,
+    endIndex?: number
   ): void {
     // Slice threshold datasets (inserted before selection datasets in render)
     this.fullThresholdDatasets.forEach((fullDataset, i) => {
       if (!this._chart?.data.datasets[i]) return;
       if (fullDataset.data && Array.isArray(fullDataset.data)) {
-        this._chart.data.datasets[i].data = [...fullDataset.data.slice(startIndex)];
+        this._chart.data.datasets[i].data = [...fullDataset.data.slice(startIndex, endIndex)];
       }
       if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
         this._chart.data.datasets[i].backgroundColor = [
-          ...(fullDataset.backgroundColor as string[]).slice(startIndex)
+          ...(fullDataset.backgroundColor as string[]).slice(startIndex, endIndex)
         ];
       }
     });
@@ -129,29 +131,33 @@ export class OscillatorChart {
       const fullDataset = fullDatasets[resultIndex] as ExtendedChartDataset;
       if (!fullDataset.data || !Array.isArray(fullDataset.data)) return;
 
-      result.dataset.data = [...fullDataset.data.slice(startIndex)];
+      result.dataset.data = [...fullDataset.data.slice(startIndex, endIndex)];
       const ext = result.dataset as ExtendedChartDataset;
 
       // Chart.js permits Scriptable / scalar forms for these fields on its
       // base type, so guard at runtime before slicing — the `as number[]` /
       // `as string[]` casts only quiet the compiler.
       if (Array.isArray(fullDataset.pointRotation)) {
-        ext.pointRotation = [...(fullDataset.pointRotation as number[]).slice(startIndex)];
+        ext.pointRotation = [
+          ...(fullDataset.pointRotation as number[]).slice(startIndex, endIndex)
+        ];
       }
 
       if (Array.isArray(fullDataset.pointBackgroundColor)) {
         ext.pointBackgroundColor = [
-          ...(fullDataset.pointBackgroundColor as string[]).slice(startIndex)
+          ...(fullDataset.pointBackgroundColor as string[]).slice(startIndex, endIndex)
         ];
       }
 
       if (Array.isArray(fullDataset.pointBorderColor)) {
-        ext.pointBorderColor = [...(fullDataset.pointBorderColor as string[]).slice(startIndex)];
+        ext.pointBorderColor = [
+          ...(fullDataset.pointBorderColor as string[]).slice(startIndex, endIndex)
+        ];
       }
 
       if (fullDataset.backgroundColor && Array.isArray(fullDataset.backgroundColor)) {
         result.dataset.backgroundColor = [
-          ...(fullDataset.backgroundColor as string[]).slice(startIndex)
+          ...(fullDataset.backgroundColor as string[]).slice(startIndex, endIndex)
         ];
       }
     });

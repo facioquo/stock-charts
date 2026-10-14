@@ -1,4 +1,4 @@
-import { Chart, type ChartData, type ChartDataset } from "chart.js";
+import { Chart, type ChartData, type ChartDataset, type ScatterDataPoint } from "chart.js";
 
 import { type ScaleValue } from "chartjs-plugin-annotation";
 
@@ -206,34 +206,56 @@ export class OverlayChart {
   }
 
   /**
-   * Apply sliced datasets from pre-computed full datasets.
+   * Apply sliced datasets from pre-computed full datasets. `endIndex` is
+   * exclusive; omit it to run to the newest bar and its extra bars.
    */
-  applySlicedData(fullMainDatasets: ChartDataset[], startIndex: number): void {
+  applySlicedData(fullMainDatasets: ChartDataset[], startIndex: number, endIndex?: number): void {
     if (!this._chart) return;
 
     // Price dataset (candlestick - index 0)
     const fullPrice = fullMainDatasets[0];
     const currentPrice = this._chart.data.datasets[0];
     if (fullPrice && currentPrice && fullPrice.type === "candlestick") {
-      currentPrice.data = [...fullPrice.data.slice(startIndex)];
+      currentPrice.data = [...fullPrice.data.slice(startIndex, endIndex)];
     }
 
     // Volume dataset (bar - index 1)
     const fullVolume = fullMainDatasets[1];
     const currentVolume = this._chart.data.datasets[1];
     if (fullVolume && currentVolume && fullVolume.type === "bar") {
-      currentVolume.data = [...fullVolume.data.slice(startIndex)];
+      currentVolume.data = [...fullVolume.data.slice(startIndex, endIndex)];
       if (fullVolume.backgroundColor && Array.isArray(fullVolume.backgroundColor)) {
         currentVolume.backgroundColor = [
-          ...(fullVolume.backgroundColor as string[]).slice(startIndex)
+          ...(fullVolume.backgroundColor as string[]).slice(startIndex, endIndex)
         ];
       }
     }
+
+    this.fitVolumeAxis();
 
     // Match OscillatorChart.applySlicedData which also uses "none" — both charts
     // share the same setBarCount() trigger, so they must update with identical
     // semantics to avoid one snapping while the other transitions.
     this._chart.update("none");
+  }
+
+  /**
+   * Size the volume axis from the bars now on screen, the way render() sizes it
+   * from its initial window, so a pan or zoom never leaves the bars clipped or
+   * flattened against a maximum measured on a different stretch of history.
+   */
+  private fitVolumeAxis(): void {
+    const volumeAxis = this._chart?.options.scales?.["volumeAxis"];
+    const volume = this._chart?.data.datasets[1];
+    if (!volumeAxis || volume?.type !== "bar") return;
+
+    const sizes = (volume.data as ScatterDataPoint[]).flatMap(point =>
+      typeof point.y === "number" && Number.isFinite(point.y) ? [point.y] : []
+    );
+    const mean = sizes.length > 0 ? sizes.reduce((sum, y) => sum + y, 0) / sizes.length : 0;
+
+    this.volumeAxisSize = 20 * mean || 0;
+    volumeAxis.max = this.volumeAxisSize;
   }
 
   resize(): void {

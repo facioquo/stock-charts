@@ -56,6 +56,19 @@ manager.displaySelection(selection, listing);
 
 Reach for `OverlayChart` or `OscillatorChart` directly only when you want one canvas and no viewport management.
 
+### Zooming and panning
+
+Do not add a zoom plugin or rebuild datasets to show older bars. The manager's window drives every pane, so overlay and oscillators stay aligned and each y-axis rescales to the visible bars.
+
+```typescript
+manager.panBy(-30);          // 30 bars toward older history
+manager.zoomBy(0.5, 0.5);    // half the bars, the centre bar stays put
+manager.setWindow(120, 60);  // 60 bars starting at history index 120
+manager.windowOffset;        // bars behind the newest bar; 0 when anchored
+```
+
+Counts clamp to 20 bars up to the history length, and the window never leaves the history. `setBarCount` re-anchors to the newest bar and drops any pan, so to resize without losing a pan, keep the right edge fixed with `setWindow(manager.windowStart + manager.currentBarCount - count, count)`; `setBarCount` also accepts counts below 20, which the next `panBy` or `zoomBy` raises to 20. The window is not persisted: `initializeOverlay` resets it, so reapply it after you re-initialize.
+
 ### Teardown
 
 Call the wrapper's `destroy()`, never `chart.chart?.destroy()`. The latter tears down Chart.js and leaves the wrapper holding legend selections, threshold datasets, and the full quote history.

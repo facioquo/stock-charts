@@ -756,7 +756,7 @@ describe("ChartManager", () => {
 
       expect(osc.render).toHaveBeenCalledWith(selection, listing);
       // startIndex = 100 - 50 = 50
-      expect(osc.applySlicedData).toHaveBeenCalledWith(selection, expect.any(Array), 50);
+      expect(osc.applySlicedData).toHaveBeenCalledWith(selection, expect.any(Array), 50, undefined);
       // Verify the cached datasets were passed (non-empty and same shape as the
       // selection's results so a wrong-key regression on _allProcessedDatasets
       // would fail this assertion, not just slip through expect.any(Array)).
@@ -937,7 +937,7 @@ describe("ChartManager", () => {
 
       expect(mgr.currentBarCount).toBe(30);
       // startIndex = 100 - 30 = 70
-      expect(overlay.applySlicedData).toHaveBeenCalledWith(expect.any(Array), 70);
+      expect(overlay.applySlicedData).toHaveBeenCalledWith(expect.any(Array), 70, undefined);
     });
 
     it("clamps barCount to [1, totalQuotes]", () => {
@@ -1043,7 +1043,7 @@ describe("ChartManager", () => {
       mgr.setBarCount(30);
 
       // startIndex = 100 - 30 = 70
-      expect(osc.applySlicedData).toHaveBeenCalledWith(selection, expect.any(Array), 70);
+      expect(osc.applySlicedData).toHaveBeenCalledWith(selection, expect.any(Array), 70, undefined);
     });
 
     it("handles non-finite barCount gracefully", () => {
@@ -1061,6 +1061,186 @@ describe("ChartManager", () => {
       // NaN is not finite → normalizedBarCount falls back to 1
       mgr.setBarCount(NaN);
       expect(mgr.currentBarCount).toBe(1);
+    });
+  });
+
+  // ----- window (setWindow / panBy / zoomBy / windowOffset) -----
+
+  describe("window", () => {
+    const ctx = {} as CanvasRenderingContext2D;
+
+    /** Overlay + one overlay indicator + one oscillator over `total` quotes. */
+    function setup(total: number, barCount: number) {
+      const quotes = makeQuotes(total);
+      mgr.initializeOverlay(ctx, quotes, barCount);
+
+      const overlayListing = makeOverlayListing();
+      const overlaySelection = makeSelection(overlayListing, "win-overlay");
+      mgr.processSelectionData(overlaySelection, overlayListing, makeIndicatorData(quotes));
+      mgr.displaySelection(overlaySelection, overlayListing);
+
+      const oscListing = makeOscillatorListing();
+      const oscSelection = makeSelection(oscListing, "win-osc");
+      mgr.processSelectionData(oscSelection, oscListing, makeIndicatorData(quotes));
+      mgr.displaySelection(oscSelection, oscListing);
+      const osc = mgr.createOscillator(ctx, oscSelection, oscListing);
+
+      const overlay = mgr.overlayChart as unknown as ReturnType<typeof createMockOverlay>;
+      vi.mocked(overlay.applySlicedData!).mockClear();
+      vi.mocked(osc.applySlicedData).mockClear();
+
+      return { overlay, osc, overlaySelection, oscSelection };
+    }
+
+    it("is anchored to the newest bar by default", () => {
+      mgr.initializeOverlay(ctx, makeQuotes(100), 50);
+      expect(mgr.windowOffset).toBe(0);
+    });
+
+    it("setWindow slices every pane to the same range", () => {
+      const { overlay, osc, overlaySelection, oscSelection } = setup(200, 50);
+
+      mgr.setWindow(60, 40);
+
+      expect(mgr.currentBarCount).toBe(40);
+      expect(mgr.windowOffset).toBe(100); // 200 - (60 + 40)
+      expect(overlay.applySlicedData).toHaveBeenCalledWith(expect.any(Array), 60, 106);
+      expect(osc.applySlicedData).toHaveBeenCalledWith(oscSelection, expect.any(Array), 60, 106);
+      // The visible bars plus the trailing slots that keep the x-axis span constant.
+      expect(overlaySelection.results[0].dataset.data).toHaveLength(46);
+    });
+
+    it("setWindow clamps count and start", () => {
+      setup(200, 50);
+
+      mgr.setWindow(-5, 5);
+      expect(mgr.currentBarCount).toBe(20);
+      expect(mgr.windowOffset).toBe(180);
+
+      mgr.setWindow(500, 80);
+      expect(mgr.currentBarCount).toBe(80);
+      expect(mgr.windowOffset).toBe(0);
+
+      mgr.setWindow(0, 9999);
+      expect(mgr.currentBarCount).toBe(200);
+      expect(mgr.windowOffset).toBe(0);
+    });
+
+    it("setWindow is a no-op when no quotes are loaded", () => {
+      mgr.setWindow(10, 30);
+      expect(mgr.currentBarCount).toBe(250);
+      expect(mgr.windowOffset).toBe(0);
+    });
+
+    it("windowStart reports the first visible bar's history index", () => {
+      setup(200, 50);
+      expect(mgr.windowStart).toBe(150);
+
+      mgr.panBy(-30);
+      expect(mgr.windowStart).toBe(120);
+
+      mgr.setWindow(mgr.windowStart, 80);
+      expect(mgr.windowStart).toBe(120);
+      expect(mgr.currentBarCount).toBe(80);
+    });
+
+    it("plots the same number of points anchored and one bar behind", () => {
+      const { overlay } = setup(200, 50);
+      const plotted = (): number => {
+        const [, start, end] = vi.mocked(overlay.applySlicedData!).mock.calls.at(-1) ?? [];
+        return (end ?? 200 + 6) - (start as number);
+      };
+
+      mgr.panBy(-1);
+      const behind = plotted();
+      mgr.panBy(1);
+
+      expect(mgr.windowOffset).toBe(0);
+      expect(behind).toBe(50 + 6);
+    });
+
+    it("panBy moves the window and clamps at both history ends", () => {
+      const { overlay, osc, oscSelection } = setup(200, 50);
+
+      mgr.panBy(-30);
+      expect(mgr.windowOffset).toBe(30);
+      expect(overlay.applySlicedData).toHaveBeenLastCalledWith(expect.any(Array), 120, 176);
+      expect(osc.applySlicedData).toHaveBeenLastCalledWith(
+        oscSelection,
+        expect.any(Array),
+        120,
+        176
+      );
+
+      mgr.panBy(-1000);
+      expect(mgr.windowOffset).toBe(150);
+
+      mgr.panBy(1000);
+      expect(mgr.windowOffset).toBe(0);
+      expect(mgr.currentBarCount).toBe(50);
+    });
+
+    it("zoomBy scales the bar count around the anchor", () => {
+      const { overlay } = setup(400, 50);
+
+      // anchor 0.5 would start at round(375 - 50) = 325, but the window already ends at
+      // the newest bar, so start is pulled back to 300.
+      mgr.zoomBy(2);
+      expect(mgr.currentBarCount).toBe(100);
+      expect(mgr.windowOffset).toBe(0);
+
+      mgr.panBy(-100);
+      mgr.zoomBy(0.5, 0);
+      expect(mgr.currentBarCount).toBe(50);
+      // Left edge stays at index 200 (400 - 100 - 100).
+      expect(overlay.applySlicedData).toHaveBeenLastCalledWith(expect.any(Array), 200, 256);
+    });
+
+    it("zoomBy respects the minimum and maximum bar counts", () => {
+      setup(200, 50);
+
+      mgr.zoomBy(0.001);
+      expect(mgr.currentBarCount).toBe(20);
+
+      mgr.zoomBy(1000);
+      expect(mgr.currentBarCount).toBe(200);
+      expect(mgr.windowOffset).toBe(0);
+    });
+
+    it("setBarCount re-anchors to the newest bar", () => {
+      const { overlay } = setup(200, 50);
+
+      mgr.panBy(-40);
+      expect(mgr.windowOffset).toBe(40);
+
+      mgr.setBarCount(50);
+
+      expect(mgr.windowOffset).toBe(0);
+      expect(overlay.applySlicedData).toHaveBeenLastCalledWith(expect.any(Array), 150, undefined);
+    });
+
+    it("slices a selection added after the window moved to that window", () => {
+      const quotes = makeQuotes(200);
+      mgr.initializeOverlay(ctx, quotes, 50);
+      mgr.panBy(-30); // visible bars 120..169
+
+      const overlayListing = makeOverlayListing();
+      const overlaySelection = makeSelection(overlayListing, "late-overlay");
+      mgr.processSelectionData(overlaySelection, overlayListing, makeIndicatorData(quotes));
+      mgr.displaySelection(overlaySelection, overlayListing);
+
+      const points = overlaySelection.results[0].dataset.data as { y: number }[];
+      expect(points).toHaveLength(56); // 50 visible bars + 6 trailing slots
+      expect(points[0].y).toBeCloseTo(quotes[120].close * 0.99);
+      expect(points[49].y).toBeCloseTo(quotes[169].close * 0.99);
+
+      const oscListing = makeOscillatorListing();
+      const oscSelection = makeSelection(oscListing, "late-osc");
+      mgr.processSelectionData(oscSelection, oscListing, makeIndicatorData(quotes));
+      mgr.displaySelection(oscSelection, oscListing);
+      const osc = mgr.createOscillator(ctx, oscSelection, oscListing);
+
+      expect(osc.applySlicedData).toHaveBeenCalledWith(oscSelection, expect.any(Array), 120, 176);
     });
   });
 

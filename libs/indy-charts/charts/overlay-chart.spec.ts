@@ -132,3 +132,40 @@ describe("OverlayChart.updateLegends", () => {
     ]);
   });
 });
+
+describe("OverlayChart.applySlicedData", () => {
+  it("sizes the volume axis from the bars on screen", () => {
+    const overlay = new OverlayChart({} as CanvasRenderingContext2D, settings);
+    const volumeAxis = { max: 0 };
+    const datasets = [
+      { type: "candlestick", data: [] as unknown[] },
+      { type: "bar", data: [] as unknown[] }
+    ];
+    (overlay as unknown as { _chart: unknown })._chart = {
+      data: { datasets },
+      options: { scales: { volumeAxis } },
+      update: vi.fn()
+    };
+    const history = [100, 100, 100, 100, 1000, 1000, 1000, 1000];
+    const full = [
+      { type: "candlestick", data: history.map(() => ({})) },
+      {
+        type: "bar",
+        data: [...history.map((y, x) => ({ x, y })), { x: 8, y: Number.NaN }]
+      }
+    ];
+    const apply = (start: number, end?: number): void =>
+      overlay.applySlicedData(
+        full as unknown as Parameters<OverlayChart["applySlicedData"]>[0],
+        start,
+        end
+      );
+
+    apply(0, 4);
+    expect(volumeAxis.max).toBe(20 * 100);
+
+    // Panned to the heavier stretch: the axis follows; the padding bar is ignored.
+    apply(4);
+    expect(volumeAxis.max).toBe(20 * 1000);
+  });
+});

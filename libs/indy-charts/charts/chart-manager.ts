@@ -21,6 +21,7 @@ import {
 } from "../data/transformers";
 import { OverlayChart } from "./overlay-chart";
 import { OscillatorChart } from "./oscillator-chart";
+import { clampWindow, panWindow, zoomWindow, type BarWindow } from "./window";
 
 const EXTRA_BARS = 6;
 
@@ -49,6 +50,8 @@ export class ChartManager {
   private _allQuotes: Bar[] = [];
   private _allProcessedDatasets = new Map<string, ChartDataset[]>();
   private _currentBarCount = 250;
+  /** Bars between the window's end and the newest bar; 0 anchors to the newest. */
+  private _windowOffset = 0;
   private _settings: ChartSettings;
   private extraBars: number;
 
@@ -82,6 +85,19 @@ export class ChartManager {
     return this._currentBarCount;
   }
 
+  /**
+   * Bars between the end of the visible window and the newest bar.
+   * 0 means the window is anchored to the newest bar (the default).
+   */
+  get windowOffset(): number {
+    return this._windowOffset;
+  }
+
+  /** History index of the first visible bar; the `start` argument `setWindow` takes. */
+  get windowStart(): number {
+    return this.sliceStart;
+  }
+
   constructor(config: ChartManagerConfig) {
     this._settings = { ...config.settings };
     this.extraBars = config.extraBars ?? EXTRA_BARS;
@@ -100,6 +116,7 @@ export class ChartManager {
   ): void {
     this._allQuotes = allQuotes;
     this._currentBarCount = this.normalizeBarCount(barCount);
+    this._windowOffset = 0;
 
     this._overlayChart?.destroy();
     this._overlayChart = new OverlayChart(ctx, this._settings);
@@ -110,8 +127,7 @@ export class ChartManager {
     // pre-sliced data. Rendering with all historical quotes first causes
     // the y-axis to lock to the full price range (~$540–$950) even after
     // a subsequent applySlicedData() + chart.update() call.
-    const startIndex = Math.max(0, allQuotes.length - this._currentBarCount);
-    const slicedQuotes = allQuotes.slice(startIndex);
+    const slicedQuotes = allQuotes.slice(this.sliceStart);
     this._overlayChart.render(slicedQuotes, this.extraBars);
 
     // Build and store the full-history datasets separately so setBarCount()
@@ -217,46 +233,13 @@ export class ChartManager {
 
   /**
    * Display indicator on the overlay chart.
-   * Slices datasets to currentBarCount before adding so overlay indicators
+   * Slices datasets to the current window before adding so overlay indicators
    * are aligned with the windowed x-axis from the start.
    */
   private displayOnOverlay(selection: IndicatorSelection): void {
     if (!this._overlayChart) return;
 
-    // Slice indicator datasets to currentBarCount before adding to the windowed chart.
-    // Also slice style arrays (pointBackgroundColor, pointBorderColor, pointRotation,
-    // and bar backgroundColor) to keep them synchronized with the data length.
-    const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
-    if (fullDatasets) {
-      const startIndex = Math.max(0, this._allQuotes.length - this._currentBarCount);
-      selection.results.forEach((result, i) => {
-        const full = fullDatasets[i] as ExtendedChartDataset;
-        if (full && result.dataset) {
-          result.dataset.data = [...full.data.slice(startIndex)];
-          const ext = result.dataset as ExtendedChartDataset;
-          // Chart.js permits Scriptable / scalar forms for these fields on
-          // its base type, so guard at runtime before slicing — the
-          // `as number[]` / `as string[]` casts only quiet the compiler.
-          if (Array.isArray(full.pointBackgroundColor)) {
-            ext.pointBackgroundColor = [
-              ...(full.pointBackgroundColor as string[]).slice(startIndex)
-            ];
-          }
-          if (Array.isArray(full.pointBorderColor)) {
-            ext.pointBorderColor = [...(full.pointBorderColor as string[]).slice(startIndex)];
-          }
-          if (Array.isArray(full.pointRotation)) {
-            ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex)];
-          }
-          // Bar histograms (e.g. expanding/contracting series) carry a per-bar
-          // backgroundColor array; slice it alongside the data so colors stay
-          // aligned with the visible window.
-          if (Array.isArray(full.backgroundColor)) {
-            ext.backgroundColor = [...(full.backgroundColor as string[]).slice(startIndex)];
-          }
-        }
-      });
-    }
+    this.sliceOverlaySelection(selection);
 
     this._overlayChart.addIndicatorDatasets(selection.results);
     this._overlayChart.updateLegends(this._selections);
@@ -340,8 +323,12 @@ export class ChartManager {
     // future setBarCount() calls.
     const totalQuotes = this._allQuotes.length;
     if (totalQuotes > 0 && this._currentBarCount < totalQuotes) {
-      const startIndex = totalQuotes - this._currentBarCount;
-      oscillator.applySlicedData(selection, fullDatasets as IndicatorDataset[], startIndex);
+      oscillator.applySlicedData(
+        selection,
+        fullDatasets as IndicatorDataset[],
+        this.sliceStart,
+        this.sliceEnd
+      );
     }
 
     return oscillator;
@@ -421,64 +408,94 @@ export class ChartManager {
   }
 
   /**
-   * Update all charts with a new bar count (for window resize).
+   * Update all charts with a new bar count (for window resize). The window
+   * stays anchored to the newest bar, so any pan offset is cleared.
    */
   setBarCount(barCount: number): void {
     // No quotes -> nothing to do.
     if (this._allQuotes.length === 0) return;
 
-    const totalQuotes = this._allQuotes.length;
-    const normalizedBarCount = this.normalizeBarCount(barCount);
+    this.applyWindow(this.normalizeBarCount(barCount), 0);
+  }
 
-    if (normalizedBarCount === this._currentBarCount) return;
-    this._currentBarCount = normalizedBarCount;
+  /**
+   * Show `count` bars starting at history index `start`. `count` is clamped to
+   * [20, history length] and `start` to [0, length - count].
+   */
+  setWindow(start: number, count: number): void {
+    if (this._allQuotes.length === 0) return;
 
-    const startIndex = Math.max(0, totalQuotes - normalizedBarCount);
+    this.setClamped(clampWindow(start, count, this._allQuotes.length));
+  }
+
+  /**
+   * Shift the window by a signed number of bars, stopping at the history ends.
+   * Negative moves toward older bars, positive toward the newest.
+   */
+  panBy(bars: number): void {
+    if (this._allQuotes.length === 0) return;
+
+    this.setClamped(panWindow(this.currentWindow, bars, this._allQuotes.length));
+  }
+
+  /**
+   * Scale the visible bar count by `factor` (>1 zooms out, <1 zooms in) while
+   * the bar at `anchor` (0..1 across the window, default 0.5) stays put.
+   */
+  zoomBy(factor: number, anchor = 0.5): void {
+    if (this._allQuotes.length === 0) return;
+
+    this.setClamped(zoomWindow(this.currentWindow, factor, anchor, this._allQuotes.length));
+  }
+
+  private get currentWindow(): BarWindow {
+    return { start: this.sliceStart, count: this._currentBarCount };
+  }
+
+  /** History index of the first visible bar. */
+  private get sliceStart(): number {
+    return Math.max(0, this._allQuotes.length - this._currentBarCount - this._windowOffset);
+  }
+
+  /**
+   * Exclusive end index of the plotted points: the visible bars plus `extraBars`
+   * trailing slots, so a pan never changes how many points share the x axis and
+   * the bar width stays put. Anchored to the newest bar the slots are the padding
+   * after it (`undefined` reads to the end of the dataset).
+   */
+  private get sliceEnd(): number | undefined {
+    if (this._windowOffset === 0) return undefined;
+    return Math.min(
+      this.sliceStart + this._currentBarCount + this.extraBars,
+      this._allQuotes.length + this.extraBars
+    );
+  }
+
+  private setClamped(window: BarWindow): void {
+    this.applyWindow(window.count, this._allQuotes.length - window.start - window.count);
+  }
+
+  /** The one slicing path: store the window, then re-slice every pane to it. */
+  private applyWindow(barCount: number, offset: number): void {
+    if (barCount === this._currentBarCount && offset === this._windowOffset) return;
+    this._currentBarCount = barCount;
+    this._windowOffset = offset;
+
+    const startIndex = this.sliceStart;
+    const endIndex = this.sliceEnd;
 
     // Update overlay main datasets (candlestick + volume)
     const fullMainDatasets = this._allProcessedDatasets.get(OVERLAY_MAIN_KEY);
     if (this._overlayChart && fullMainDatasets) {
-      this._overlayChart.applySlicedData(fullMainDatasets, startIndex);
+      this._overlayChart.applySlicedData(fullMainDatasets, startIndex, endIndex);
       this._overlayChart.updateLegends(this._selections);
     }
 
-    // Update overlay indicator datasets to stay aligned with the windowed x-axis.
-    // Mirror the oscillator loop below but for OVERLAY selections: retrieve each
-    // indicator's full dataset from allProcessedDatasets and slice to startIndex.
-    // Also slice style arrays (pointBackgroundColor, pointBorderColor, pointRotation,
-    // and bar backgroundColor) to keep them synchronized with the data length.
+    // Overlay indicator datasets stay aligned with the windowed x-axis.
     let overlayIndicatorsUpdated = false;
     this._selections.forEach(selection => {
       if (selection.chartType !== CHART_TYPES.OVERLAY) return;
-
-      const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
-      if (!fullDatasets) return;
-
-      selection.results.forEach((result, i) => {
-        const full = fullDatasets[i] as ExtendedChartDataset;
-        if (full && result.dataset) {
-          result.dataset.data = [...full.data.slice(startIndex)];
-          const ext = result.dataset as ExtendedChartDataset;
-          if (Array.isArray(full.pointBackgroundColor)) {
-            ext.pointBackgroundColor = [
-              ...(full.pointBackgroundColor as string[]).slice(startIndex)
-            ];
-          }
-          if (Array.isArray(full.pointBorderColor)) {
-            ext.pointBorderColor = [...(full.pointBorderColor as string[]).slice(startIndex)];
-          }
-          if (Array.isArray(full.pointRotation)) {
-            ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex)];
-          }
-          // Bar histograms (e.g. expanding/contracting series) carry a per-bar
-          // backgroundColor array; slice it alongside the data so colors stay
-          // aligned with the visible window.
-          if (Array.isArray(full.backgroundColor)) {
-            ext.backgroundColor = [...(full.backgroundColor as string[]).slice(startIndex)];
-          }
-        }
-      });
-      overlayIndicatorsUpdated = true;
+      if (this.sliceOverlaySelection(selection)) overlayIndicatorsUpdated = true;
     });
 
     // Trigger a single chart refresh after all overlay indicator data has been sliced.
@@ -496,8 +513,58 @@ export class ChartManager {
 
       // Cached datasets for an oscillator selection are always indicator datasets
       // (the heterogeneous cache also holds candlestick+volume under OVERLAY_MAIN_KEY).
-      oscillator.applySlicedData(selection, fullDatasets as IndicatorDataset[], startIndex);
+      oscillator.applySlicedData(
+        selection,
+        fullDatasets as IndicatorDataset[],
+        startIndex,
+        endIndex
+      );
     });
+  }
+
+  /**
+   * Slice an overlay selection's datasets, and their per-bar style arrays
+   * (pointBackgroundColor, pointBorderColor, pointRotation, bar
+   * backgroundColor), from the cached full history to the current window.
+   * Returns false when no cached datasets exist for the selection.
+   */
+  private sliceOverlaySelection(selection: IndicatorSelection): boolean {
+    const fullDatasets = this._allProcessedDatasets.get(selection.ucid);
+    if (!fullDatasets) return false;
+
+    const startIndex = this.sliceStart;
+    const endIndex = this.sliceEnd;
+
+    selection.results.forEach((result, i) => {
+      const full = fullDatasets[i] as ExtendedChartDataset;
+      if (full && result.dataset) {
+        result.dataset.data = [...full.data.slice(startIndex, endIndex)];
+        const ext = result.dataset as ExtendedChartDataset;
+        // Chart.js permits Scriptable / scalar forms for these fields on
+        // its base type, so guard at runtime before slicing — the
+        // `as number[]` / `as string[]` casts only quiet the compiler.
+        if (Array.isArray(full.pointBackgroundColor)) {
+          ext.pointBackgroundColor = [
+            ...(full.pointBackgroundColor as string[]).slice(startIndex, endIndex)
+          ];
+        }
+        if (Array.isArray(full.pointBorderColor)) {
+          ext.pointBorderColor = [
+            ...(full.pointBorderColor as string[]).slice(startIndex, endIndex)
+          ];
+        }
+        if (Array.isArray(full.pointRotation)) {
+          ext.pointRotation = [...(full.pointRotation as number[]).slice(startIndex, endIndex)];
+        }
+        // Bar histograms (e.g. expanding/contracting series) carry a per-bar
+        // backgroundColor array; slice it alongside the data so colors stay
+        // aligned with the visible window.
+        if (Array.isArray(full.backgroundColor)) {
+          ext.backgroundColor = [...(full.backgroundColor as string[]).slice(startIndex, endIndex)];
+        }
+      }
+    });
+    return true;
   }
 
   /**
@@ -525,6 +592,7 @@ export class ChartManager {
     this._selections = [];
     this._allProcessedDatasets.clear();
     this._allQuotes = [];
+    this._windowOffset = 0;
   }
 
   private normalizeBarCount(barCount: number): number {
