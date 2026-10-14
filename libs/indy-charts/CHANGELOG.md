@@ -1,5 +1,17 @@
 # @facioquo/indy-charts
 
+## 0.15.0
+
+### Minor Changes
+
+- 7e087b4: Tooltips are off by default in the Vue adapter. Set `defaults.showTooltips: true` in `setupIndyChartsForVue` to keep them on.
+- 7c72f17: Add a visible-window API to `ChartManager`: `setWindow(start, count)`, `panBy(bars)`, and `zoomBy(factor, anchor?)` show any run of bars, not only the newest ones. Overlay and oscillator panes slice to the same window and each y-axis rescales to the visible bars. `windowOffset` reports how many bars the window sits behind the newest bar, 0 when anchored to it, and `windowStart` the history index of its first bar. `setBarCount` still re-anchors to the newest bar, and now also refits the volume axis to the visible bars.
+- 626ea19: Export `MIN_BARS`, `clampWindow`, and the `BarWindow` type so a caller can read the window a request will become before applying it with `setWindow`. The visible-window API removes the 250-bar ceiling for a window, so no maximum constant is published.
+
+### Patch Changes
+
+- e2c9466: List the overlay legend in the order of the indicator list, instead of alphabetically by label.
+
 ## 0.14.1
 
 ### Patch Changes
