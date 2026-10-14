@@ -10,7 +10,7 @@ const STORAGE_KEY = "settings";
 const TOOLTIPS_CHOSEN_KEY = "settings.tooltipsChosen";
 const isBrowser = typeof window !== "undefined";
 
-const defaults: UserSettings = { isDarkTheme: true, showTooltips: true };
+const defaults: UserSettings = { isDarkTheme: true, showTooltips: false };
 
 let current: UserSettings = { ...defaults };
 

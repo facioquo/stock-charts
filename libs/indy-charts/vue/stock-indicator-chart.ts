@@ -21,6 +21,7 @@ import { setupIndyCharts } from "../setup";
 import { indyChartsVueOptionsKey } from "./context";
 import { slug, STOCK_INDICATOR_CHART_TESTID_PREFIX } from "./slug";
 import {
+  DEFAULT_SHOW_TOOLTIPS,
   chartSettingsFromOptions,
   type IndyChartsVueOptions,
   type StockIndicatorChartConfig,
@@ -231,7 +232,7 @@ export const StockIndicatorChart = defineComponent({
 
     function currentSettings() {
       if (!options) {
-        return { isDarkTheme: false, showTooltips: true };
+        return { isDarkTheme: false, showTooltips: DEFAULT_SHOW_TOOLTIPS };
       }
 
       const background = props.background ?? props.config.background;
