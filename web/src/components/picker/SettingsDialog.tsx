@@ -36,6 +36,22 @@ interface ToggleRowProps {
   onChange: (value: boolean) => void;
 }
 
+/**
+ * Splices each restored ucid back into the current order before the nearest ucid that
+ * followed it in `before` and is still listed, or at the end when none remains. The
+ * order of every other indicator is left as it is now.
+ */
+function orderWithRestored(current: string[], before: string[], restored: string[]): string[] {
+  const restoredSet = new Set(restored);
+  const order = current.filter(ucid => !restoredSet.has(ucid));
+  for (const ucid of before.filter(u => restoredSet.has(u))) {
+    const following = before.slice(before.indexOf(ucid) + 1).find(u => order.includes(u));
+    const at = following === undefined ? order.length : order.indexOf(following);
+    order.splice(at, 0, ucid);
+  }
+  return order;
+}
+
 function StandardCheckbox({
   id,
   className,
@@ -377,6 +393,7 @@ function useSettingsControls(controller: ChartController): SettingsControls {
   const [removal, setRemoval] = useState<SettingsControls["removal"]>(null);
 
   const removeSelected = (): void => {
+    const orderBefore = controller.selections.map(s => s.ucid);
     const removed = controller.selections.filter(s => checked.has(s.ucid));
     for (const selection of removed) controller.deleteSelection(selection.ucid);
     setChecked(new Set());
@@ -394,6 +411,15 @@ function useSettingsControls(controller: ChartController): SettingsControls {
             return listing ? [controller.addSelection(selection, listing)] : [];
           });
           void Promise.allSettled(restores).then(results => {
+            // Adding appends; put each restored indicator back beside its old neighbour and
+            // leave every reorder made since the removal alone.
+            controller.applyOrder(
+              orderWithRestored(
+                controller.selections.map(s => s.ucid),
+                orderBefore,
+                removed.map(s => s.ucid)
+              )
+            );
             const skipped = removed.length - restores.length;
             const failed = skipped + results.filter(r => r.status === "rejected").length;
             setRemoval({
@@ -489,7 +515,7 @@ export function SettingsDialog({
             <button
               type="button"
               className="btn-text"
-              title="add back at the end of its chart"
+              title="add back where it was"
               onClick={controls.removal.undo}
             >
               UNDO

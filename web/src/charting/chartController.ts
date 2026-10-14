@@ -170,7 +170,17 @@ export class ChartController {
     this.removeDisplayed(ucid);
     this.showSelection(replacement, listing, data as IndicatorDataRow[], false, before);
     // Display appends; restore the original position (and overlay layering).
+    this.applyOrder(order);
+  }
+
+  /**
+   * Put the displayed indicators in the given order: overlay layering and
+   * legend, oscillator canvases, and the saved list. Unknown ucids are ignored
+   * and unlisted indicators follow in their existing order.
+   */
+  applyOrder(order: readonly string[]): void {
     this.chartManager.reorderSelections(order);
+    this.syncOscillatorDom();
     this.cacheSelections();
   }
 
@@ -275,10 +285,7 @@ export class ChartController {
     const order = this.selections.map(s =>
       s.chartType === moved.chartType ? (reordered.at(next++)?.ucid ?? s.ucid) : s.ucid
     );
-    this.chartManager.reorderSelections(order);
-
-    if (moved.chartType === "oscillator") this.syncOscillatorDom();
-    this.cacheSelections();
+    this.applyOrder(order);
   }
 
   /** Create a default selection from the indicator catalog. */

@@ -101,3 +101,34 @@ describe("OverlayChart.reorderIndicatorDatasets", () => {
     expect(() => overlay.reorderIndicatorDatasets([])).not.toThrow();
   });
 });
+
+describe("OverlayChart.updateLegends", () => {
+  it("lists legends in selection order, not alphabetically", () => {
+    const overlay = new OverlayChart({} as CanvasRenderingContext2D, settings);
+    const annotations: Array<{ content?: unknown }> = [];
+    (overlay as unknown as { _chart: unknown })._chart = {
+      scales: { x: { min: 0 }, y: { max: 100 } },
+      options: { plugins: { annotation: { annotations } } },
+      update: vi.fn()
+    };
+    const overlays = ["ATR-STOP", "LINEAR", "MARUBOZU", "BB"].map(label => ({
+      ucid: label,
+      label,
+      chartType: "overlay",
+      results: [{ color: "#fff" }]
+    }));
+
+    overlay.updateLegends(overlays as unknown as Parameters<OverlayChart["updateLegends"]>[0]);
+
+    const written = (
+      (overlay as unknown as { _chart: { options: { plugins: { annotation: unknown } } } })._chart
+        .options.plugins.annotation as { annotations: Array<{ content: string[] | string }> }
+    ).annotations;
+    expect(written.map(a => [a.content].flat().join(""))).toEqual([
+      "ATR-STOP",
+      "LINEAR",
+      "MARUBOZU",
+      "BB"
+    ]);
+  });
+});

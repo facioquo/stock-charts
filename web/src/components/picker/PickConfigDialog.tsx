@@ -40,6 +40,14 @@ function isFormValid(selection: IndicatorSelection, showStyles: boolean): boolea
   return paramsValid && colorsValid;
 }
 
+/** The user-editable values, compared to tell whether the form holds unsaved edits. */
+function editSignature(selection: IndicatorSelection): string {
+  return JSON.stringify([
+    selection.params.map(p => p.value),
+    selection.results.map(r => [r.color, r.lineType, r.lineWidth])
+  ]);
+}
+
 interface DialogTabsProps {
   tab: TabId;
   hasParams: boolean;
@@ -225,6 +233,8 @@ interface PickConfigState {
   tab: TabId;
   setTab: (tab: TabId) => void;
   formValid: boolean;
+  /** The form differs from what it opened with. */
+  dirty: boolean;
   errorMessage: string | undefined;
   submitting: boolean;
   closeLabel: string;
@@ -250,6 +260,8 @@ function usePickConfig(
         }
       : controller.defaultSelection(listing.uiid)
   );
+  const [opened] = useState(() => editSignature(selection));
+  const dirty = editSignature(selection) !== opened;
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
   const [closeLabel, setCloseLabel] = useState(existing ? "SAVE" : "ADD");
@@ -308,6 +320,7 @@ function usePickConfig(
     tab,
     setTab,
     formValid,
+    dirty,
     errorMessage,
     submitting,
     closeLabel,
@@ -375,7 +388,13 @@ export function PickConfigDialog({
   const cfg = usePickConfig(listing, controller, onClose, selection);
 
   return (
-    <Modal open onClose={onClose} labelledBy={titleId} className="pick-config-dialog">
+    <Modal
+      open
+      onClose={onClose}
+      labelledBy={titleId}
+      className="pick-config-dialog"
+      closeOnBackdrop={!cfg.dirty}
+    >
       <h2 id={titleId} className="dialog-title noselect" title={listing.name}>
         {listing.name}
       </h2>
