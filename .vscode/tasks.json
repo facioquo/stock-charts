@@ -17,17 +17,27 @@
     // DEV ENVIRONMENT SETUP
     // ===================================
     {
-      "label": "Setup: Dev environment (linux)",
-      "detail": "Install all development prerequisites (Node, .NET, pnpm)",
-      "type": "shell",
-      "command": "bash .devcontainer/post-create.sh",
-      "group": "none"
+      "label": "Setup: Dev environment",
+      "detail": "Restore .NET tools and packages, trust the HTTPS dev cert, and install the Playwright browser",
+      "dependsOn": [
+        "Install: .NET tools",
+        "Install: All package dependencies",
+        "Setup: HTTPS dev certificate",
+        "Setup: Playwright browsers"
+      ],
+      "dependsOrder": "sequence"
     },
     {
-      "label": "Setup: Chrome for Puppeteer",
-      "detail": "Install Chrome browser for Puppeteer-based accessibility testing",
+      "label": "Setup: HTTPS dev certificate",
+      "detail": "Trust the ASP.NET Core development certificate for https://localhost:5001",
       "type": "shell",
-      "command": "pnpm dlx @puppeteer/browsers install chrome",
+      "command": "dotnet dev-certs https --trust"
+    },
+    {
+      "label": "Setup: Playwright browsers",
+      "detail": "Install the Chromium build the Playwright E2E tests launch",
+      "type": "shell",
+      "command": "pnpm exec playwright install chromium",
       "presentation": {
         "echo": false,
         "clear": true,
@@ -54,13 +64,19 @@
       "label": "Git: pull",
       "detail": "Pull latest changes from Git",
       "type": "shell",
-      "command": "git pull || echo 'No remote branch'"
+      "command": "git pull || echo No remote branch"
     },
     {
       "label": "Install: All package dependencies",
       "detail": "Restore NuGet and Node.js packages across workspaces",
       "dependsOn": ["Install: Packages (NuGet)", "Install: Packages (pnpm)"],
       "dependsOrder": "parallel"
+    },
+    {
+      "label": "Install: .NET tools",
+      "detail": "Restore local .NET tools (dotnet-tools.json)",
+      "type": "shell",
+      "command": "dotnet tool restore"
     },
     {
       "label": "Install: Packages (pnpm)",
@@ -141,7 +157,7 @@
       "label": "Build: Libraries",
       "detail": "Build TypeScript libraries (chartjs-financial, indy-charts)",
       "type": "shell",
-      "command": "pnpm --filter './libs/**' run build",
+      "command": "pnpm --filter \"./libs/**\" run build",
       "group": "build",
       "problemMatcher": "$tsc"
     },
@@ -193,7 +209,7 @@
       "label": "Generate: Offline snapshot",
       "detail": "Write web/public/data/chart-api from the Web API (builds backend and starts Web API first)",
       "type": "shell",
-      "command": "pnpm run generate:offline-snapshot -- --apiBase=https://localhost:5001",
+      "command": "pnpm run generate:offline-snapshot -- --apiBase=http://localhost:5000",
       "dependsOn": "Run: Backend services"
     },
     // ===================================
@@ -286,19 +302,57 @@
     },
     {
       "label": "Lint: Backend .NET (check)",
-      "detail": "Check .NET code formatting with dotnet format (Roslynator optional)",
-      "type": "shell",
-      "command": "pnpm run lint:dotnet",
-      "dependsOn": ["Build: Backend .NET (incremental)"],
+      "detail": "Verify .NET formatting (dotnet format) and analyzers (Roslynator)",
+      "dependsOn": [
+        "Lint: Backend .NET format",
+        "Lint: Backend .NET Roslynator (analyze)"
+      ],
       "dependsOrder": "sequence",
       "group": "test",
       "problemMatcher": "$msCompile"
     },
     {
       "label": "Lint: Backend .NET (fix)",
-      "detail": "Format Backend .NET with dotnet format (Roslynator optional)",
+      "detail": "Fix .NET formatting (dotnet format) and analyzer issues (Roslynator)",
+      "dependsOn": [
+        "Lint: Backend .NET format (fix)",
+        "Lint: Backend .NET Roslynator (fix)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "none",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Lint: Backend .NET format",
+      "detail": "Verify code formatting and style with 'dotnet format'",
       "type": "shell",
-      "command": "pnpm run lint:dotnet:fix",
+      "command": "dotnet format --verify-no-changes --severity info --no-restore",
+      "group": "test",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Lint: Backend .NET format (fix)",
+      "detail": "Fix code formatting and style with 'dotnet format'",
+      "type": "shell",
+      "command": "dotnet format --severity info --no-restore",
+      "group": "none",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Lint: Backend .NET Roslynator (analyze)",
+      "detail": "Verify code style with Roslynator",
+      "type": "shell",
+      "command": "dotnet tool run roslynator analyze",
+      "dependsOn": "Install: .NET tools",
+      "group": "test",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Lint: Backend .NET Roslynator (fix)",
+      "detail": "Fix code style issues with Roslynator",
+      "type": "shell",
+      "command": "dotnet tool run roslynator fix",
+      "dependsOn": "Install: .NET tools",
       "group": "none",
       "problemMatcher": "$msCompile"
     },
@@ -372,7 +426,7 @@
       "label": "Test: Backend .NET",
       "detail": "Run .NET unit tests",
       "type": "shell",
-      "command": "pnpm run test:dotnet",
+      "command": "dotnet test --project server/WebApi.Tests/WebApi.Tests.csproj --no-restore",
       "group": "test",
       "problemMatcher": "$msCompile"
     },
@@ -476,7 +530,7 @@
     },
     {
       "label": "Run: Edge worker",
-      "detail": "Start the Cloudflare Worker and API container locally (requires Docker)",
+      "detail": "Start the Cloudflare Worker and API container locally (requires Docker; on Windows, run pnpm run edge:dev from WSL — wrangler has no local container support there)",
       "type": "shell",
       "command": "pnpm run edge:dev",
       "isBackground": true,
@@ -670,12 +724,12 @@
       "label": "Clean: Backend .NET",
       "detail": "Clean .NET build outputs (bin, obj)",
       "type": "shell",
-      "command": "dotnet clean Charts.sln -v minimal --nologo",
+      "command": "dotnet clean -v minimal --nologo && dotnet clean -c Release -v minimal --nologo",
       "problemMatcher": "$msCompile"
     },
     {
       "label": "Clean: Backend .NET (hard reset)",
-      "detail": "Deletes all bin/obj folders and runs dotnet clean command (hard clean)",
+      "detail": "Run dotnet clean, then delete bin, obj, TestResults, node_modules, and lock files",
       "type": "shell",
       "command": "bash scripts/dotnet-clean.sh",
       "group": "build",
@@ -686,18 +740,6 @@
       "detail": "Clean root level items, including npm packages",
       "type": "shell",
       "command": "pnpm run clean"
-    },
-    {
-      "label": "Delete: Claude temporary files",
-      "detail": "Delete all tmpclaude-*-cwd files (bug workaround)",
-      "type": "shell",
-      "command": "find . -maxdepth 25 -type f -name 'tmpclaude-*-cwd' -delete",
-      "options": {
-        "shell": {
-          "executable": "/bin/bash",
-          "args": ["-lc"]
-        }
-      }
     }
   ]
 }

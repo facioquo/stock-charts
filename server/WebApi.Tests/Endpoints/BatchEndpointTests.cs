@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using WebApi.Controllers;
-using WebApi.Services;
 
 namespace WebApi.Tests.Endpoints;
 
@@ -246,11 +245,10 @@ public class BatchEndpointTests
     [Fact]
     public async Task Batch_SerializesTheDocumentedWireShape()
     {
-        JsonSerializerOptions web = new(JsonSerializerDefaults.Web);
         ObjectResult multi = Assert.IsType<ObjectResult>(await Batch(
             ["ADL", "ALLIGATOR?jawPeriods=13&jawOffset=2147483647&teethPeriods=8&teethOffset=5&lipsPeriods=5&lipsOffset=3", "NOPE"]));
 
-        using JsonDocument json = JsonDocument.Parse(JsonSerializer.Serialize(multi.Value, web));
+        using JsonDocument json = JsonDocument.Parse(JsonSerializer.Serialize(multi.Value, WebJson));
         JsonElement[] items = [.. json.RootElement.EnumerateArray()];
 
         Assert.Equal(200, items[0].GetProperty("status").GetInt32());

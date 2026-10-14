@@ -10,6 +10,8 @@ namespace WebApi.Tests.Services;
 /// </summary>
 public class OfflineSnapshotCatalogTests
 {
+    private static readonly JsonSerializerOptions WebJson = new(JsonSerializerDefaults.Web);
+
     private static string SnapshotCatalogPath()
     {
         for (DirectoryInfo? dir = new(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
@@ -45,8 +47,7 @@ public class OfflineSnapshotCatalogTests
     public async Task CommittedSnapshotCatalog_MatchesTheCatalogTheApiServes()
     {
         // Snapshot listings carry relative endpoints, so an empty base URL yields the same ones.
-        JsonSerializerOptions web = new(JsonSerializerDefaults.Web);
-        JsonNode? served = JsonSerializer.SerializeToNode(Metadata.IndicatorListing(string.Empty), web);
+        JsonNode? served = JsonSerializer.SerializeToNode(Metadata.IndicatorListing(string.Empty), WebJson);
         JsonNode? snapshot = JsonNode.Parse(
             await File.ReadAllTextAsync(SnapshotCatalogPath(), TestContext.Current.CancellationToken));
 
