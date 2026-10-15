@@ -95,15 +95,22 @@ describe("ChartPage", () => {
     expect(mocks.retryLoad).toHaveBeenCalledTimes(1);
   });
 
-  it("names the date the data ends when the source has gone stale", () => {
+  it("names the date the data ends when it is stale", () => {
     mocks.apiError = false;
     mocks.staleSince = "2026-10-06";
 
     render(<ChartPage />);
 
-    expect(
-      screen.getByText("The newest data is from 2026-10-06; the data source has not updated since.")
-    ).toBeDefined();
+    expect(screen.getByText("The newest chart data is from 2026-10-06.")).toBeDefined();
+  });
+
+  it("hides the stale note while the chart data cannot load", () => {
+    mocks.apiError = true;
+    mocks.staleSince = "2026-10-06";
+
+    render(<ChartPage />);
+
+    expect(screen.queryByText(/newest chart data is from/)).toBeNull();
   });
 
   it("says nothing about freshness when the data is current", () => {
@@ -111,7 +118,7 @@ describe("ChartPage", () => {
 
     render(<ChartPage />);
 
-    expect(screen.queryByText(/data source has not updated/)).toBeNull();
+    expect(screen.queryByText(/newest chart data is from/)).toBeNull();
   });
 
   describe("after the settings dialog", () => {

@@ -364,7 +364,12 @@ export class ChartController {
     this.api.resetBackup();
     try {
       const allQuotes = await this.api.getQuotes();
-      this.setState({ staleSince: staleDataDate(allQuotes[allQuotes.length - 1]?.timestamp) });
+      // Saved snapshot data has its own offline notice; a stale note would misname the cause.
+      this.setState({
+        staleSince: this.api.isBackupActive
+          ? null
+          : staleDataDate(allQuotes[allQuotes.length - 1]?.timestamp)
+      });
 
       const canvas = document.getElementById("chartOverlay") as HTMLCanvasElement | null;
       const ctx = canvas?.getContext("2d");

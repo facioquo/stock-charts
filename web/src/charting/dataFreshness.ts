@@ -1,10 +1,10 @@
-/** Calendar days the newest bar may trail today before the data counts as stale: covers a long weekend. */
+/** Days (24 h periods) the newest bar may trail now before the data counts as stale: covers a long weekend. */
 export const STALE_AFTER_DAYS = 5;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
- * The newest bar's date (`YYYY-MM-DD`) when it trails `now` by more than
+ * The newest bar's UTC date (`YYYY-MM-DD`; daily bars stamp the session's date at 04:00-05:00Z) when it trails `now` by more than
  * {@link STALE_AFTER_DAYS}; otherwise `null`. An empty or unparsable history is
  * not reported, since there is no date to name.
  */

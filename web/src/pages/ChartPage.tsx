@@ -147,9 +147,7 @@ export function ChartPage(): React.JSX.Element {
 
       <div className={staleSince && !apiError ? "shared-view-banner" : undefined}>
         <span role="status" className={staleSince && !apiError ? "banner-text" : undefined}>
-          {staleSince && !apiError
-            ? `The newest data is from ${staleSince}; the data source has not updated since.`
-            : ""}
+          {staleSince && !apiError ? `The newest chart data is from ${staleSince}.` : ""}
         </span>
       </div>
 

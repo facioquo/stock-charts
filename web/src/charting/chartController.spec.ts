@@ -214,6 +214,38 @@ describe("ChartController", () => {
     expect(controller.getState().staleSince).toBe("2020-01-02");
   });
 
+  it("leaves the offline snapshot to the offline notice", async () => {
+    document.body.innerHTML = '<canvas id="chartOverlay"></canvas>';
+    const api = makeApi({
+      isBackupActive: true,
+      getQuotes: vi
+        .fn()
+        .mockResolvedValue([
+          { timestamp: "2020-01-02T05:00:00Z", open: 1, high: 2, low: 0.5, close: 1.5, volume: 100 }
+        ]),
+      getListings: vi.fn().mockResolvedValue([makeListing("FOO", "overlay")])
+    });
+    const controller = new ChartController(api);
+
+    await controller.loadCharts();
+
+    expect(controller.getState().offline).toBe(true);
+    expect(controller.getState().staleSince).toBeNull();
+  });
+
+  it("reports nothing stale for an empty history", async () => {
+    document.body.innerHTML = '<canvas id="chartOverlay"></canvas>';
+    const api = makeApi({
+      getQuotes: vi.fn().mockResolvedValue([]),
+      getListings: vi.fn().mockResolvedValue([makeListing("FOO", "overlay")])
+    });
+    const controller = new ChartController(api);
+
+    await controller.loadCharts();
+
+    expect(controller.getState().staleSince).toBeNull();
+  });
+
   it("reports nothing stale for a current history", async () => {
     document.body.innerHTML = '<canvas id="chartOverlay"></canvas>';
     const api = makeApi({
