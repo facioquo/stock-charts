@@ -12,6 +12,7 @@ import { apiClient, type ApiClient } from "../api/apiClient";
 import { getSettings } from "../services/userPrefs";
 import { scrollToEnd, scrollToStart } from "../services/meta";
 import { calculateOptimalBars, subscribeResize } from "../services/windowSize";
+import { staleDataDate } from "./dataFreshness";
 import { DEFAULT_INDICATORS } from "./defaultIndicators";
 import { buildShareUrl, decodeSelections, SHARE_PARAM } from "./shareLink";
 
@@ -41,6 +42,8 @@ export interface ChartState {
   apiError: boolean;
   /** The API is unreachable and the charts show the bundled snapshot. */
   offline: boolean;
+  /** Date of the newest bar when the history trails today by more than the allowance. */
+  staleSince: string | null;
   /** Showing a share link's indicators, not yet the user's saved ones. */
   sharedView: boolean;
 }
@@ -80,6 +83,7 @@ export class ChartController {
     loading: true,
     apiError: false,
     offline: false,
+    staleSince: null,
     sharedView: false
   };
   private readonly listeners = new Set<() => void>();
@@ -360,6 +364,7 @@ export class ChartController {
     this.api.resetBackup();
     try {
       const allQuotes = await this.api.getQuotes();
+      this.setState({ staleSince: staleDataDate(allQuotes[allQuotes.length - 1]?.timestamp) });
 
       const canvas = document.getElementById("chartOverlay") as HTMLCanvasElement | null;
       const ctx = canvas?.getContext("2d");

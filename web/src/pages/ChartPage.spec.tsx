@@ -7,6 +7,7 @@ import type { IndicatorListing, IndicatorSelection } from "../types/chart.types"
 const mocks = vi.hoisted(() => ({
   retryLoad: vi.fn(),
   apiError: true,
+  staleSince: null as string | null,
   selections: [] as { ucid: string; uiid: string; label: string }[]
 }));
 const listing = { uiid: "BB", name: "Bollinger Bands" } as unknown as IndicatorListing;
@@ -24,6 +25,7 @@ vi.mock("../charting/useChart", () => ({
     loading: false,
     apiError: mocks.apiError,
     offline: false,
+    staleSince: mocks.staleSince,
     sharedView: false
   })
 }));
@@ -79,6 +81,7 @@ import { ChartPage } from "./ChartPage";
 
 beforeEach(() => {
   mocks.apiError = true;
+  mocks.staleSince = null;
   mocks.selections = [{ ucid: "u1", uiid: "BB", label: "BB(20,2)" }];
   mocks.retryLoad.mockClear();
 });
@@ -90,6 +93,25 @@ describe("ChartPage", () => {
     fireEvent.click(screen.getByRole("button", { name: "TRY AGAIN" }));
 
     expect(mocks.retryLoad).toHaveBeenCalledTimes(1);
+  });
+
+  it("names the date the data ends when the source has gone stale", () => {
+    mocks.apiError = false;
+    mocks.staleSince = "2026-10-06";
+
+    render(<ChartPage />);
+
+    expect(
+      screen.getByText("The newest data is from 2026-10-06; the data source has not updated since.")
+    ).toBeDefined();
+  });
+
+  it("says nothing about freshness when the data is current", () => {
+    mocks.apiError = false;
+
+    render(<ChartPage />);
+
+    expect(screen.queryByText(/data source has not updated/)).toBeNull();
   });
 
   describe("after the settings dialog", () => {

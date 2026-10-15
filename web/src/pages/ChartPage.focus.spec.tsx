@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  state: { loading: false, apiError: true, offline: false, sharedView: false }
+  state: { loading: false, apiError: true, offline: false, staleSince: null, sharedView: false }
 }));
 
 vi.mock("../charting/useChart", () => ({
@@ -19,7 +19,13 @@ import { ChartPage } from "./ChartPage";
 
 describe("ChartPage focus after a retry", () => {
   it("follows the page from loading to the chart on success", () => {
-    mocks.state = { loading: false, apiError: true, offline: false, sharedView: false };
+    mocks.state = {
+      loading: false,
+      apiError: true,
+      offline: false,
+      staleSince: null,
+      sharedView: false
+    };
     const { rerender } = render(<ChartPage />);
     fireEvent.click(screen.getByRole("button", { name: "TRY AGAIN" }));
 
@@ -34,7 +40,13 @@ describe("ChartPage focus after a retry", () => {
   });
 
   it("returns to the error panel when the retry fails", () => {
-    mocks.state = { loading: false, apiError: true, offline: false, sharedView: false };
+    mocks.state = {
+      loading: false,
+      apiError: true,
+      offline: false,
+      staleSince: null,
+      sharedView: false
+    };
     const { rerender } = render(<ChartPage />);
     fireEvent.click(screen.getByRole("button", { name: "TRY AGAIN" }));
 

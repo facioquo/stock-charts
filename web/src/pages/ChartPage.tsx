@@ -13,7 +13,7 @@ import "../components/picker/picker.scss";
  * settings / indicator-picker dialogs.
  */
 export function ChartPage(): React.JSX.Element {
-  const { loading, apiError, offline, sharedView } = useChartState();
+  const { loading, apiError, offline, staleSince, sharedView } = useChartState();
   const isProduction = env.production;
   const controller = getChartController();
 
@@ -141,6 +141,14 @@ export function ChartPage(): React.JSX.Element {
         <span role="status" className={offline && !apiError ? "banner-text" : undefined}>
           {offline && !apiError
             ? "The live API is unreachable. Showing saved data; indicators with custom settings may be blank."
+            : ""}
+        </span>
+      </div>
+
+      <div className={staleSince && !apiError ? "shared-view-banner" : undefined}>
+        <span role="status" className={staleSince && !apiError ? "banner-text" : undefined}>
+          {staleSince && !apiError
+            ? `The newest data is from ${staleSince}; the data source has not updated since.`
             : ""}
         </span>
       </div>

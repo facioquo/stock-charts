@@ -142,6 +142,7 @@ describe("ChartController", () => {
       loading: true,
       apiError: false,
       offline: false,
+      staleSince: null,
       sharedView: false
     });
 
@@ -190,6 +191,44 @@ describe("ChartController", () => {
     expect(typeof barCount).toBe("number");
     expect(controller.listings).toBe(listings);
     expect(controller.getState().loading).toBe(false);
+  });
+
+  it("reports the newest bar's date when the history is stale", async () => {
+    const bar = (timestamp: string) => ({
+      timestamp,
+      open: 1,
+      high: 2,
+      low: 0.5,
+      close: 1.5,
+      volume: 100
+    });
+    document.body.innerHTML = '<canvas id="chartOverlay"></canvas>';
+    const api = makeApi({
+      getQuotes: vi.fn().mockResolvedValue([bar("2020-01-02T05:00:00Z")]),
+      getListings: vi.fn().mockResolvedValue([makeListing("FOO", "overlay")])
+    });
+    const controller = new ChartController(api);
+
+    await controller.loadCharts();
+
+    expect(controller.getState().staleSince).toBe("2020-01-02");
+  });
+
+  it("reports nothing stale for a current history", async () => {
+    document.body.innerHTML = '<canvas id="chartOverlay"></canvas>';
+    const api = makeApi({
+      getQuotes: vi
+        .fn()
+        .mockResolvedValue([
+          { timestamp: new Date(), open: 1, high: 2, low: 0.5, close: 1.5, volume: 100 }
+        ]),
+      getListings: vi.fn().mockResolvedValue([makeListing("FOO", "overlay")])
+    });
+    const controller = new ChartController(api);
+
+    await controller.loadCharts();
+
+    expect(controller.getState().staleSince).toBeNull();
   });
 
   it("renders from the snapshot and reports offline when the API is backed up", async () => {
