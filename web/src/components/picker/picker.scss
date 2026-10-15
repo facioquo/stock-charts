@@ -266,6 +266,20 @@
     align-items: center;
     border-radius: 4px;
 
+    /* Too narrow for the name beside four controls: the name takes its own
+       line and the controls sit beneath it, right-aligned. */
+    @media (width < 380px) {
+      flex-wrap: wrap;
+
+      label {
+        flex-basis: 100%;
+      }
+
+      .icon-button:first-of-type {
+        margin-left: auto;
+      }
+    }
+
     &:hover {
       background-color: var(--list-hover);
     }
