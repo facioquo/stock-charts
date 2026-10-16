@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { changeTheme, changeTooltips, getSettings, loadSettings } from "./userPrefs";
 
@@ -15,7 +15,14 @@ describe("userPrefs", () => {
   afterEach(() => {
     localStorage.clear();
     document.body.className = "";
+    vi.unstubAllGlobals();
   });
+
+  const systemScheme = (scheme: "light" | "dark"): void => {
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      matches: query === `(prefers-color-scheme: ${scheme})`
+    }));
+  };
 
   describe("loadSettings", () => {
     it("applies default settings when no cached settings exist", () => {
@@ -68,6 +75,62 @@ describe("userPrefs", () => {
 
       expect(document.body.classList.contains("light-theme")).toBe(true);
       expect(document.body.classList.contains("dark-theme")).toBe(false);
+    });
+  });
+
+  describe("system color scheme", () => {
+    it("follows a light system on a first visit", () => {
+      systemScheme("light");
+
+      loadSettings();
+
+      expect(getSettings().isDarkTheme).toBe(false);
+      expect(document.body.classList.contains("light-theme")).toBe(true);
+    });
+
+    it("follows a dark system on a first visit", () => {
+      systemScheme("dark");
+
+      loadSettings();
+
+      expect(getSettings().isDarkTheme).toBe(true);
+      expect(document.body.classList.contains("dark-theme")).toBe(true);
+    });
+
+    it("opens dark when the browser cannot report a scheme", () => {
+      loadSettings();
+
+      expect(getSettings().isDarkTheme).toBe(true);
+    });
+
+    it("follows the system for a visitor whose stored dark theme is only the old default", () => {
+      systemScheme("light");
+      localStorage.setItem("settings", JSON.stringify({ isDarkTheme: true, showTooltips: false }));
+
+      loadSettings();
+
+      expect(getSettings().isDarkTheme).toBe(false);
+    });
+
+    it("keeps a stored light theme on a dark system, since only a choice can have set it", () => {
+      systemScheme("dark");
+      localStorage.setItem("settings", JSON.stringify({ isDarkTheme: false, showTooltips: false }));
+
+      loadSettings();
+      loadSettings();
+
+      expect(getSettings().isDarkTheme).toBe(false);
+    });
+
+    it("keeps a dark theme the visitor chose against a light system", () => {
+      systemScheme("light");
+      loadSettings();
+      changeTheme(true);
+
+      loadSettings();
+
+      expect(getSettings().isDarkTheme).toBe(true);
+      expect(document.body.classList.contains("dark-theme")).toBe(true);
     });
   });
 

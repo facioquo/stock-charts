@@ -8,11 +8,19 @@ import type { UserSettings } from "../types/chart.types";
 const STORAGE_KEY = "settings";
 // Set only when the visitor flips the tooltip switch, so a stored default is not read as a choice.
 const TOOLTIPS_CHOSEN_KEY = "settings.tooltipsChosen";
+// Set only when the visitor flips the theme switch, so a stored default is not read as a choice.
+const THEME_CHOSEN_KEY = "settings.themeChosen";
 const isBrowser = typeof window !== "undefined";
 
 const defaults: UserSettings = { isDarkTheme: true, showTooltips: false };
 
 let current: UserSettings = { ...defaults };
+
+/** Dark unless the system asks for light; dark also when the browser cannot say. */
+function systemPrefersDark(): boolean {
+  if (!isBrowser || typeof window.matchMedia !== "function") return true;
+  return !window.matchMedia("(prefers-color-scheme: light)").matches;
+}
 
 export function getSettings(): UserSettings {
   return current;
@@ -26,7 +34,8 @@ export function loadSettings(): void {
 
   const cached = localStorage.getItem(STORAGE_KEY);
   if (cached === null) {
-    current = { ...defaults };
+    current = { ...defaults, isDarkTheme: systemPrefersDark() };
+    applyTheme(current.isDarkTheme);
     cacheSettings();
     return;
   }
@@ -39,8 +48,30 @@ export function loadSettings(): void {
 
   if (!tooltipsChosen()) current.showTooltips = defaults.showTooltips;
 
-  changeTheme(current.isDarkTheme);
+  if (!themeChosen()) {
+    // The old default was dark, so a stored light theme can only be a choice.
+    if (current.isDarkTheme) current.isDarkTheme = systemPrefersDark();
+    else markThemeChosen();
+  }
+
+  applyTheme(current.isDarkTheme);
   cacheSettings();
+}
+
+function themeChosen(): boolean {
+  try {
+    return localStorage.getItem(THEME_CHOSEN_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function markThemeChosen(): void {
+  try {
+    localStorage.setItem(THEME_CHOSEN_KEY, "true");
+  } catch {
+    // localStorage may be unavailable.
+  }
 }
 
 function tooltipsChosen(): boolean {
@@ -52,6 +83,11 @@ function tooltipsChosen(): boolean {
 }
 
 export function changeTheme(isDarkTheme: boolean): void {
+  markThemeChosen();
+  applyTheme(isDarkTheme);
+}
+
+function applyTheme(isDarkTheme: boolean): void {
   current.isDarkTheme = isDarkTheme;
   cacheSettings();
 
