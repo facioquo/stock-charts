@@ -16,6 +16,7 @@ describe("userPrefs", () => {
     localStorage.clear();
     document.body.className = "";
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   const systemScheme = (scheme: "light" | "dark"): void => {
@@ -139,9 +140,9 @@ describe("userPrefs", () => {
       expect(localStorage.getItem("settings.themeChosen")).toBeNull();
     });
 
-    it("opens with the defaults when localStorage cannot be read", () => {
+    it("follows the system scheme when localStorage cannot be read", () => {
       systemScheme("light");
-      const getItem = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
         throw new Error("blocked");
       });
 
@@ -149,7 +150,7 @@ describe("userPrefs", () => {
         loadSettings();
       }).not.toThrow();
       expect(getSettings().isDarkTheme).toBe(false);
-      getItem.mockRestore();
+      expect(document.body.classList.contains("light-theme")).toBe(true);
     });
 
     it("records a choice when a stored light theme is migrated", () => {

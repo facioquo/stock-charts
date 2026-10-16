@@ -195,6 +195,26 @@ test.describe("Stock Charts React Web", () => {
     expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
   });
 
+  test.describe("on a light system", () => {
+    test.use({ colorScheme: "light" });
+
+    test("a first visit opens light before the app script runs", async ({ page }) => {
+      // Block the app bundle: only the inline head script can have set the theme.
+      await page.route("**/src/main.tsx*", route => route.abort());
+      await page.goto("/", { waitUntil: "domcontentloaded" });
+
+      await expect(page.locator("body")).toHaveClass(/light-theme/);
+      await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#fafafa");
+    });
+
+    test("a first visit renders the chart in the light theme", async ({ page }) => {
+      await page.goto("/");
+      await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+
+      await expect(page.locator("body")).toHaveClass(/light-theme/);
+    });
+  });
+
   test("no critical console errors during chart load", async ({ page, errorCollection }) => {
     const consoleErrors: string[] = [];
     page.on("console", msg => {

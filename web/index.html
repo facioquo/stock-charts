@@ -48,6 +48,24 @@
   </head>
 
   <body class="dark-theme">
+    <!-- Paints the first frame in the right theme. Mirrors the rules in src/services/userPrefs.ts. -->
+    <script>
+      (function () {
+        try {
+          var stored = JSON.parse(localStorage.getItem("settings") || "null");
+          var chosen = localStorage.getItem("settings.themeChosen") === "true";
+          var followsSystem = localStorage.getItem("settings.themeFollowsSystem") === "true";
+          var dark;
+          if (chosen && stored && typeof stored.isDarkTheme === "boolean") dark = stored.isDarkTheme;
+          else if (stored && stored.isDarkTheme === false && !followsSystem) dark = false;
+          else dark = !window.matchMedia("(prefers-color-scheme: light)").matches;
+          document.body.className = dark ? "dark-theme" : "light-theme";
+          document.querySelector('meta[name="theme-color"]').setAttribute("content", dark ? "#121316" : "#fafafa");
+        } catch (e) {
+          // The bundle applies the theme once it loads.
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

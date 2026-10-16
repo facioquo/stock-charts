@@ -8,7 +8,8 @@ import type { UserSettings } from "../types/chart.types";
 const STORAGE_KEY = "settings";
 // Set only when the visitor flips the tooltip switch, so a stored default is not read as a choice.
 const TOOLTIPS_CHOSEN_KEY = "settings.tooltipsChosen";
-// Set only when the visitor flips the theme switch, so a stored default is not read as a choice.
+// Set when the visitor flips the theme switch, or when a stored light theme from before the system
+// scheme was followed is migrated. A stored default is not read as a choice.
 const THEME_CHOSEN_KEY = "settings.themeChosen";
 // Set when the stored theme came from the system, so a stored light value is not read back as a choice.
 const THEME_FOLLOWS_SYSTEM_KEY = "settings.themeFollowsSystem";
