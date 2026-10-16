@@ -488,7 +488,6 @@ export class ChartManager {
     const fullMainDatasets = this._allProcessedDatasets.get(OVERLAY_MAIN_KEY);
     if (this._overlayChart && fullMainDatasets) {
       this._overlayChart.applySlicedData(fullMainDatasets, startIndex, endIndex);
-      this._overlayChart.updateLegends(this._selections);
     }
 
     // Overlay indicator datasets stay aligned with the windowed x-axis.
@@ -502,6 +501,9 @@ export class ChartManager {
     if (overlayIndicatorsUpdated && this._overlayChart) {
       this._overlayChart.chart?.update("none");
     }
+
+    // The legend anchors to the y-axis max, which indicator data can move.
+    this._overlayChart?.updateLegends(this._selections);
 
     // Update oscillators
     this._selections.forEach(selection => {
