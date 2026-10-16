@@ -10,6 +10,8 @@ const STORAGE_KEY = "settings";
 const TOOLTIPS_CHOSEN_KEY = "settings.tooltipsChosen";
 // Set only when the visitor flips the theme switch, so a stored default is not read as a choice.
 const THEME_CHOSEN_KEY = "settings.themeChosen";
+// Set when the stored theme came from the system, so a stored light value is not read back as a choice.
+const THEME_FOLLOWS_SYSTEM_KEY = "settings.themeFollowsSystem";
 const isBrowser = typeof window !== "undefined";
 
 const defaults: UserSettings = { isDarkTheme: true, showTooltips: false };
@@ -19,7 +21,11 @@ let current: UserSettings = { ...defaults };
 /** Dark unless the system asks for light; dark also when the browser cannot say. */
 function systemPrefersDark(): boolean {
   if (!isBrowser || typeof window.matchMedia !== "function") return true;
-  return !window.matchMedia("(prefers-color-scheme: light)").matches;
+  try {
+    return !window.matchMedia("(prefers-color-scheme: light)").matches;
+  } catch {
+    return true;
+  }
 }
 
 export function getSettings(): UserSettings {
@@ -32,9 +38,15 @@ export function loadSettings(): void {
     return;
   }
 
-  const cached = localStorage.getItem(STORAGE_KEY);
+  let cached: string | null = null;
+  try {
+    cached = localStorage.getItem(STORAGE_KEY);
+  } catch {
+    // localStorage may be unavailable; the defaults apply.
+  }
   if (cached === null) {
-    current = { ...defaults, isDarkTheme: systemPrefersDark() };
+    current = { ...defaults };
+    followSystemTheme();
     applyTheme(current.isDarkTheme);
     cacheSettings();
     return;
@@ -49,13 +61,31 @@ export function loadSettings(): void {
   if (!tooltipsChosen()) current.showTooltips = defaults.showTooltips;
 
   if (!themeChosen()) {
-    // The old default was dark, so a stored light theme can only be a choice.
-    if (current.isDarkTheme) current.isDarkTheme = systemPrefersDark();
-    else markThemeChosen();
+    // Before the system scheme was followed the default was dark, so a stored light theme that
+    // this code did not write can only be a choice.
+    if (current.isDarkTheme === false && !themeFollowsSystem()) markThemeChosen();
+    else followSystemTheme();
   }
 
   applyTheme(current.isDarkTheme);
   cacheSettings();
+}
+
+function followSystemTheme(): void {
+  current.isDarkTheme = systemPrefersDark();
+  try {
+    localStorage.setItem(THEME_FOLLOWS_SYSTEM_KEY, "true");
+  } catch {
+    // localStorage may be unavailable.
+  }
+}
+
+function themeFollowsSystem(): boolean {
+  try {
+    return localStorage.getItem(THEME_FOLLOWS_SYSTEM_KEY) === "true";
+  } catch {
+    return false;
+  }
 }
 
 function themeChosen(): boolean {

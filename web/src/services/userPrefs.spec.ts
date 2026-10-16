@@ -98,6 +98,8 @@ describe("userPrefs", () => {
     });
 
     it("opens dark when the browser cannot report a scheme", () => {
+      vi.stubGlobal("matchMedia", undefined);
+
       loadSettings();
 
       expect(getSettings().isDarkTheme).toBe(true);
@@ -110,6 +112,53 @@ describe("userPrefs", () => {
       loadSettings();
 
       expect(getSettings().isDarkTheme).toBe(false);
+    });
+
+    it("keeps following the system after the page has stored its own light result", () => {
+      systemScheme("light");
+      loadSettings();
+      loadSettings();
+      expect(getSettings().isDarkTheme).toBe(false);
+
+      systemScheme("dark");
+      loadSettings();
+
+      expect(getSettings().isDarkTheme).toBe(true);
+      expect(document.body.classList.contains("dark-theme")).toBe(true);
+      expect(document.body.classList.contains("light-theme")).toBe(false);
+      expect(localStorage.getItem("settings.themeChosen")).toBeNull();
+    });
+
+    it("follows the system when the stored settings have no theme", () => {
+      systemScheme("light");
+      localStorage.setItem("settings", JSON.stringify({ showTooltips: false }));
+
+      loadSettings();
+
+      expect(getSettings().isDarkTheme).toBe(false);
+      expect(localStorage.getItem("settings.themeChosen")).toBeNull();
+    });
+
+    it("opens with the defaults when localStorage cannot be read", () => {
+      systemScheme("light");
+      const getItem = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+        throw new Error("blocked");
+      });
+
+      expect(() => {
+        loadSettings();
+      }).not.toThrow();
+      expect(getSettings().isDarkTheme).toBe(false);
+      getItem.mockRestore();
+    });
+
+    it("records a choice when a stored light theme is migrated", () => {
+      systemScheme("dark");
+      localStorage.setItem("settings", JSON.stringify({ isDarkTheme: false, showTooltips: false }));
+
+      loadSettings();
+
+      expect(localStorage.getItem("settings.themeChosen")).toBe("true");
     });
 
     it("keeps a stored light theme on a dark system, since only a choice can have set it", () => {
