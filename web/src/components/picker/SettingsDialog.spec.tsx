@@ -240,6 +240,25 @@ describe("SettingsDialog", () => {
     expect(controller.onSettingsChange).toHaveBeenCalled();
   });
 
+  it("toggles a setting when its label text is clicked", () => {
+    const controller = makeController();
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    const toggle = screen.getByRole("checkbox", { name: "Show tooltips" });
+    expect(toggle).not.toBeChecked();
+
+    fireEvent.click(screen.getByText("Show tooltips"));
+
+    expect(toggle).toBeChecked();
+  });
+
   it("closes via the close button", () => {
     const controller = makeController();
     const onClose = vi.fn();

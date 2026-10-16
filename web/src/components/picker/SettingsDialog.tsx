@@ -81,10 +81,12 @@ function StandardCheckbox({
 function ToggleRow({ label, checked, onChange }: ToggleRowProps): React.JSX.Element {
   return (
     <li>
-      <span className="toggle-label no-wrap">{label}</span>
-      <label className="switch">
-        <StandardCheckbox ariaLabel={label} checked={checked} onChange={onChange} />
-        <span className="slider" />
+      <label className="toggle-row">
+        <span className="toggle-label no-wrap">{label}</span>
+        <span className="switch">
+          <StandardCheckbox ariaLabel={label} checked={checked} onChange={onChange} />
+          <span className="slider" />
+        </span>
       </label>
     </li>
   );
