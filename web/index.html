@@ -51,19 +51,28 @@
     <!-- Paints the first frame in the right theme. Mirrors the rules in src/services/userPrefs.ts. -->
     <script>
       (function () {
+        var stored = null;
+        var chosen = false;
+        var followsSystem = false;
+        var systemLight = false;
+        // Each read fails on its own, as in userPrefs.ts, so a failure still reaches the system scheme.
         try {
-          var stored = JSON.parse(localStorage.getItem("settings") || "null");
-          var chosen = localStorage.getItem("settings.themeChosen") === "true";
-          var followsSystem = localStorage.getItem("settings.themeFollowsSystem") === "true";
-          var dark;
-          if (chosen && stored && typeof stored.isDarkTheme === "boolean") dark = stored.isDarkTheme;
-          else if (stored && stored.isDarkTheme === false && !followsSystem) dark = false;
-          else dark = !window.matchMedia("(prefers-color-scheme: light)").matches;
-          document.body.className = dark ? "dark-theme" : "light-theme";
-          document.querySelector('meta[name="theme-color"]').setAttribute("content", dark ? "#121316" : "#fafafa");
-        } catch (e) {
-          // The bundle applies the theme once it loads.
-        }
+          stored = JSON.parse(localStorage.getItem("settings") || "null");
+        } catch (e) {}
+        try {
+          chosen = localStorage.getItem("settings.themeChosen") === "true";
+          followsSystem = localStorage.getItem("settings.themeFollowsSystem") === "true";
+        } catch (e) {}
+        try {
+          systemLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        } catch (e) {}
+        var dark;
+        if (chosen && stored && typeof stored.isDarkTheme === "boolean") dark = stored.isDarkTheme;
+        else if (stored && stored.isDarkTheme === false && !followsSystem) dark = false;
+        else dark = !systemLight;
+        document.body.className = dark ? "dark-theme" : "light-theme";
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", dark ? "#121316" : "#fafafa");
       })();
     </script>
     <div id="root"></div>

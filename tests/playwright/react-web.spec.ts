@@ -207,6 +207,18 @@ test.describe("Stock Charts React Web", () => {
       await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute("content", "#fafafa");
     });
 
+    test("blocked storage still opens light before the app script runs", async ({ page }) => {
+      await page.addInitScript(() => {
+        Storage.prototype.getItem = () => {
+          throw new Error("blocked");
+        };
+      });
+      await page.route("**/src/main.tsx*", route => route.abort());
+      await page.goto("/", { waitUntil: "domcontentloaded" });
+
+      await expect(page.locator("body")).toHaveClass(/light-theme/);
+    });
+
     test("a first visit renders the chart in the light theme", async ({ page }) => {
       await page.goto("/");
       await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
