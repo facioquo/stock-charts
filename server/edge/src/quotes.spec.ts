@@ -110,11 +110,14 @@ describe("staleDatasets", () => {
   });
 
   function envWith(stored: Record<string, StoredBar[]>): Env {
+    const datasets = new Map(Object.entries(stored));
+
     return {
       QUOTES: {
-        get: vi.fn((key: string) =>
-          Promise.resolve(key in stored ? { json: () => Promise.resolve(stored[key]) } : null)
-        )
+        get: vi.fn((key: string) => {
+          const bars = datasets.get(key);
+          return Promise.resolve(bars === undefined ? null : { json: () => Promise.resolve(bars) });
+        })
       }
     } as unknown as Env;
   }
