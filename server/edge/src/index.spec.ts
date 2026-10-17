@@ -210,6 +210,89 @@ describe("worker.fetch", () => {
     expect(cachePut).not.toHaveBeenCalled();
   });
 
+  it("logs a cache miss that serves a stalled quote dataset", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    fetchMock.mockResolvedValue(
+      new Response("[]", {
+        status: 200,
+        headers: { "cache-control": "public, max-age=60", "x-quotes-as-of": "2018-12-31T00:00:00Z" }
+      })
+    );
+
+    const response = await worker.fetch(
+      new Request("https://api.example/quotes"),
+      makeEnv(),
+      makeCtx()
+    );
+
+    expect(response.headers.get("x-quotes-as-of")).toBe("2018-12-31T00:00:00Z");
+    expect(logged).toHaveBeenCalledWith(expect.stringContaining("Stale quote dataset served"));
+    logged.mockRestore();
+  });
+
+  it("stays quiet when the quote dataset is current", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    fetchMock.mockResolvedValue(
+      new Response("[]", {
+        status: 200,
+        headers: {
+          "cache-control": "public, max-age=60",
+          "x-quotes-as-of": new Date().toISOString()
+        }
+      })
+    );
+
+    await worker.fetch(new Request("https://api.example/quotes"), makeEnv(), makeCtx());
+
+    expect(logged).not.toHaveBeenCalled();
+    logged.mockRestore();
+  });
+
+  it("does not log a stale as-of header on a non-200 response", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    fetchMock.mockResolvedValue(
+      new Response("oops", { status: 500, headers: { "x-quotes-as-of": "2018-12-31T00:00:00Z" } })
+    );
+
+    await worker.fetch(new Request("https://api.example/quotes"), makeEnv(), makeCtx());
+
+    expect(logged).not.toHaveBeenCalled();
+    logged.mockRestore();
+  });
+
+  it("does not log a response without an as-of header", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    fetchMock.mockResolvedValue(
+      new Response("[]", { status: 200, headers: { "cache-control": "public, max-age=60" } })
+    );
+
+    await worker.fetch(new Request("https://api.example/indicators"), makeEnv(), makeCtx());
+
+    expect(logged).not.toHaveBeenCalled();
+    logged.mockRestore();
+  });
+
+  it("logs an unreadable as-of header and still serves the response", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    fetchMock.mockResolvedValue(
+      new Response("[]", {
+        status: 200,
+        headers: { "cache-control": "public, max-age=60", "x-quotes-as-of": "not a date" }
+      })
+    );
+
+    const response = await worker.fetch(
+      new Request("https://api.example/quotes"),
+      makeEnv(),
+      makeCtx()
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe("[]");
+    expect(logged).toHaveBeenCalledWith("Unreadable quote as-of header", expect.any(Error));
+    logged.mockRestore();
+  });
+
   describe("batch indicator requests", () => {
     const batchUrl = (...selections: string[]): string =>
       `https://api.example/indicators/batch?${selections

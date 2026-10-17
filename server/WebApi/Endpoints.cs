@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Options;
@@ -30,12 +31,37 @@ public partial class Main(
     public string Get()
         => "API is functioning nominally.";
 
+    /// <summary>
+    /// Timestamp of the newest bar a <c>/quotes</c> response carries, so a
+    /// client or operator can tell a stalled dataset from a current one
+    /// without parsing the body.
+    /// </summary>
+    internal const string QuotesAsOfHeader = "X-Quotes-As-Of";
+
     [HttpGet("quotes")]
     public async Task<IActionResult> GetQuotes()
     {
         IEnumerable<Bar> quotes = await quoteFeed.Get(HttpContext.RequestAborted);
+        List<Bar> served = [.. quotes.TakeLast(limitLast)];
         SetClientCache();
-        return Ok(quotes.TakeLast(limitLast));
+
+        if (served.Count > 0)
+        {
+            Response.Headers[QuotesAsOfHeader] = FormatUtc(served.Max(q => q.Timestamp));
+        }
+
+        return Ok(served);
+    }
+
+    // Bars parsed from the stored dataset carry a `Z` and arrive as UTC; the
+    // bundled backup's are unspecified and are UTC by convention.
+    private static string FormatUtc(DateTime timestamp)
+    {
+        DateTime utc = timestamp.Kind == DateTimeKind.Unspecified
+            ? DateTime.SpecifyKind(timestamp, DateTimeKind.Utc)
+            : timestamp.ToUniversalTime();
+
+        return utc.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
     }
 
     [HttpGet("indicators")]

@@ -3,7 +3,7 @@ import { getContainer } from "@cloudflare/containers";
 import { ApiContainer } from "./container";
 import { applyCors, preflightResponse, resolveAllowedOrigin, stripCors } from "./cors";
 import type { Env } from "./env";
-import { refreshQuotes } from "./quotes";
+import { isStale, refreshQuotes } from "./quotes";
 
 export { ApiContainer };
 // wrangler ≥4.120 wires the container's proxy image through
@@ -41,6 +41,31 @@ function selectionCount(url: URL): number {
     }
   }
   return Math.max(count, 1);
+}
+
+/** The newest bar's timestamp, set by the API on `/quotes` responses. */
+const QUOTES_AS_OF = "x-quotes-as-of";
+
+/**
+ * Logs a `/quotes` response whose dataset has stopped advancing. This is the
+ * check that still fires when the scheduled refresh never runs at all, which
+ * the refresh's own check cannot see. Runs on cache misses only, so it logs at
+ * most once per cache window.
+ */
+function reportStaleQuotes(response: Response): void {
+  const asOf = response.headers.get(QUOTES_AS_OF);
+
+  if (response.status !== 200 || asOf === null) {
+    return;
+  }
+
+  try {
+    if (isStale(asOf, new Date())) {
+      console.error(`Stale quote dataset served: newest bar ${asOf}`);
+    }
+  } catch (error) {
+    console.error("Unreadable quote as-of header", error);
+  }
 }
 
 /**
@@ -151,6 +176,7 @@ export default {
 
     const response = new Response(upstream.body, upstream);
     stripCors(response.headers);
+    reportStaleQuotes(response);
 
     // GET only. A HEAD response has no body, and storing it under the
     // body-less GET key would starve every subsequent GET of its payload.

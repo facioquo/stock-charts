@@ -29,6 +29,20 @@ another's cached copy (facioquo/stock-charts#517).
 
 Responses carry `x-edge-cache: HIT|MISS` so the behaviour is visible in browser devtools.
 
+## Dataset freshness
+
+`/quotes` responses carry `X-Quotes-As-Of`, the newest bar's UTC timestamp, set by the API and
+exposed to cross-origin scripts. A dataset is stale once it misses two weekdays after its newest
+bar; one is allowed so a market holiday is not an alarm.
+
+Two checks report it, and both log `Stale quote dataset`:
+
+- **The scheduled refresh** reads each stored dataset back after writing and fails the
+  invocation when one is stale, missing, or empty. That catches a run that succeeds but leaves a
+  symbol behind.
+- **The fetch path** logs when a cache miss serves a stale `/quotes`. That catches a refresh that
+  never runs at all, which the first check cannot see.
+
 ## Rate limiting
 
 Cache **misses** are rate limited per client IP (120/minute via the Workers `ratelimits`

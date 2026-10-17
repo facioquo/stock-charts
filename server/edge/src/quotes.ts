@@ -16,6 +16,14 @@ const FEED_DELAY_MINUTES = 16;
 /** Defensive bound on pagination; ~800 daily bars fit in a single page. */
 const MAX_PAGES = 10;
 
+/**
+ * Weekdays a dataset may miss before it is reported stale. One is allowed so a
+ * single market holiday does not raise a false alarm.
+ */
+export const STALE_AFTER_MISSED_WEEKDAYS = 2;
+
+const DAY_MS = 24 * 60 * 60_000;
+
 /** A single daily bar as returned by Alpaca. */
 interface AlpacaBar {
   t: string;
@@ -64,6 +72,61 @@ export function toStoredBars(bars: AlpacaBar[]): StoredBar[] {
 /** Object name a symbol's dataset is stored under. */
 export function datasetKey(symbol: string): string {
   return `${symbol}-DAILY.json`;
+}
+
+/**
+ * Counts the weekdays after the newest bar's UTC date, up to and including
+ * yesterday's. Daily bars are stamped at the session's 04:00Z, so the UTC date
+ * is the session date. Today is never counted: its bar may not exist yet.
+ * Market holidays are not known here, which is what the allowance in
+ * {@link STALE_AFTER_MISSED_WEEKDAYS} is for.
+ */
+export function missedWeekdays(newestBar: string, now: Date): number {
+  const newest = Date.parse(newestBar);
+
+  if (Number.isNaN(newest)) {
+    throw new Error(`Unparseable bar timestamp: ${newestBar}`);
+  }
+
+  const today = Math.floor(now.getTime() / DAY_MS) * DAY_MS;
+  let missed = 0;
+
+  for (let day = Math.floor(newest / DAY_MS) * DAY_MS + DAY_MS; day < today; day += DAY_MS) {
+    const weekday = new Date(day).getUTCDay();
+
+    if (weekday !== 0 && weekday !== 6) {
+      missed++;
+    }
+  }
+
+  return missed;
+}
+
+/** True when a dataset ending at `newestBar` has stopped advancing. */
+export function isStale(newestBar: string, now: Date): boolean {
+  return missedWeekdays(newestBar, now) >= STALE_AFTER_MISSED_WEEKDAYS;
+}
+
+/**
+ * Names the symbols whose stored dataset is missing, empty, or stale. Reads
+ * what R2 holds rather than what this run fetched, so a symbol the run
+ * skipped is judged by the data the API will actually serve.
+ */
+export async function staleDatasets(env: Env, symbols: string[], now: Date): Promise<string[]> {
+  const stale: string[] = [];
+
+  for (const symbol of symbols) {
+    const object = await env.QUOTES.get(datasetKey(symbol));
+    const bars = object === null ? [] : await object.json<StoredBar[]>();
+    const newest = bars.at(-1)?.Timestamp;
+
+    if (newest === undefined || isStale(newest, now)) {
+      console.error(`Stale quote dataset: ${datasetKey(symbol)} ends at ${newest ?? "nothing"}`);
+      stale.push(symbol);
+    }
+  }
+
+  return stale;
 }
 
 async function fetchBars(
@@ -144,7 +207,7 @@ export async function refreshQuotes(env: Env): Promise<void> {
 
   const historyDays = Number.parseInt(env.QUOTE_HISTORY_DAYS, 10) || 800;
   const into = new Date(Date.now() - FEED_DELAY_MINUTES * 60_000);
-  const from = new Date(into.getTime() - historyDays * 24 * 60 * 60_000);
+  const from = new Date(into.getTime() - historyDays * DAY_MS);
 
   const barsBySymbol = await fetchBars(env, symbols, from, into);
 
@@ -180,5 +243,14 @@ export async function refreshQuotes(env: Env): Promise<void> {
 
   if (failedSymbols.length > 0) {
     throw new Error(`Failed to refresh dataset(s) for: ${failedSymbols.join(", ")}`);
+  }
+
+  // A run can succeed and still leave a dataset behind: Alpaca can answer with
+  // no new bars, or with none at all for a symbol. Failing the invocation is
+  // what makes a stalled dataset visible instead of silently served.
+  const stale = await staleDatasets(env, symbols, new Date());
+
+  if (stale.length > 0) {
+    throw new Error(`Quote dataset(s) not advancing for: ${stale.join(", ")}`);
   }
 }

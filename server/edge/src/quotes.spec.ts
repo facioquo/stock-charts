@@ -2,9 +2,18 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { datasetKey, toStoredBars, type StoredBar } from "./quotes";
+import type { Env } from "./env";
+import {
+  datasetKey,
+  isStale,
+  missedWeekdays,
+  refreshQuotes,
+  staleDatasets,
+  toStoredBars,
+  type StoredBar
+} from "./quotes";
 
 /**
  * The same fixture `server/WebApi.Tests/Services/QuoteDatasetContractTests.cs`
@@ -53,5 +62,204 @@ describe("toStoredBars", () => {
 describe("datasetKey", () => {
   it("matches the object name the API requests", () => {
     expect(datasetKey("QQQ")).toBe("QQQ-DAILY.json");
+  });
+});
+
+describe("missedWeekdays", () => {
+  // 2026-10-14 is a Wednesday.
+  const wednesdayMidday = new Date("2026-10-14T15:00:00Z");
+
+  it("counts nothing when yesterday's bar is in", () => {
+    expect(missedWeekdays("2026-10-13T04:00:00Z", wednesdayMidday)).toBe(0);
+  });
+
+  it("does not count today, whose bar may not exist yet", () => {
+    expect(missedWeekdays("2026-10-14T04:00:00Z", wednesdayMidday)).toBe(0);
+  });
+
+  it("skips the weekend between Friday's bar and Monday", () => {
+    expect(missedWeekdays("2026-10-09T04:00:00Z", new Date("2026-10-12T15:00:00Z"))).toBe(0);
+  });
+
+  it("counts the weekdays a stalled dataset has missed", () => {
+    // The 2026-10-06 bar seen on 2026-10-14: Oct 7, 8, 9, 12 and 13.
+    expect(missedWeekdays("2026-10-06T04:00:00Z", wednesdayMidday)).toBe(5);
+  });
+
+  it("rejects a timestamp it cannot parse", () => {
+    expect(() => missedWeekdays("not a date", wednesdayMidday)).toThrow(/Unparseable/);
+  });
+});
+
+describe("isStale", () => {
+  const tuesdayMidday = new Date("2026-10-13T15:00:00Z");
+
+  it("allows one missed weekday, so a market holiday is not an alarm", () => {
+    expect(isStale("2026-10-09T04:00:00Z", tuesdayMidday)).toBe(false);
+  });
+
+  it("reports two missed weekdays", () => {
+    expect(isStale("2026-10-08T04:00:00Z", tuesdayMidday)).toBe(true);
+  });
+});
+
+describe("staleDatasets", () => {
+  const now = new Date("2026-10-14T15:00:00Z");
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  function envWith(stored: Record<string, StoredBar[]>): Env {
+    const datasets = new Map(Object.entries(stored));
+
+    return {
+      QUOTES: {
+        get: vi.fn((key: string) => {
+          const bars = datasets.get(key);
+          return Promise.resolve(bars === undefined ? null : { json: () => Promise.resolve(bars) });
+        })
+      }
+    } as unknown as Env;
+  }
+
+  function barAt(timestamp: string): StoredBar {
+    return { Timestamp: timestamp, Open: 1, High: 1, Low: 1, Close: 1, Volume: 1 };
+  }
+
+  it("names only the symbols whose stored dataset has stopped advancing", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const env = envWith({
+      "SPY-DAILY.json": [barAt("2026-10-12T04:00:00Z"), barAt("2026-10-13T04:00:00Z")],
+      "QQQ-DAILY.json": [barAt("2026-10-05T04:00:00Z"), barAt("2026-10-06T04:00:00Z")]
+    });
+
+    expect(await staleDatasets(env, ["SPY", "QQQ"], now)).toEqual(["QQQ"]);
+  });
+
+  it("treats a missing or empty dataset as stale", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const env = envWith({ "SPY-DAILY.json": [] });
+
+    expect(await staleDatasets(env, ["SPY", "QQQ"], now)).toEqual(["SPY", "QQQ"]);
+  });
+});
+
+describe("refreshQuotes", () => {
+  // Wednesday 2026-10-14, mid-session.
+  const now = new Date("2026-10-14T15:00:00Z");
+
+  /** An R2 stub backed by a Map, so what a run writes is what it reads back. */
+  function makeEnv(overrides?: Partial<Env>): { env: Env; stored: Map<string, string> } {
+    const stored = new Map<string, string>();
+    const env = {
+      ALPACA_KEY: "key",
+      ALPACA_SECRET: "secret",
+      QUOTE_SYMBOLS: "SPY,QQQ",
+      QUOTE_HISTORY_DAYS: "800",
+      QUOTES: {
+        put: vi.fn((key: string, body: string) => {
+          stored.set(key, body);
+          return Promise.resolve();
+        }),
+        get: vi.fn((key: string) => {
+          const body = stored.get(key);
+          return Promise.resolve(
+            body === undefined ? null : { json: () => Promise.resolve(JSON.parse(body)) }
+          );
+        })
+      },
+      ...overrides
+    } as unknown as Env;
+
+    return { env, stored };
+  }
+
+  function alpacaBars(newestBySymbol: Record<string, string>): Response {
+    const bars = Object.fromEntries(
+      Object.entries(newestBySymbol).map(([symbol, t]) => [
+        symbol,
+        [{ t, o: 1, h: 1, l: 1, c: 1, v: 1 }]
+      ])
+    );
+    return new Response(JSON.stringify({ bars, next_page_token: null }));
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(now);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it("resolves when every stored dataset is current", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(alpacaBars({ SPY: "2026-10-13T04:00:00Z", QQQ: "2026-10-14T04:00:00Z" }))
+      )
+    );
+    const { env } = makeEnv();
+
+    await expect(refreshQuotes(env)).resolves.toBeUndefined();
+  });
+
+  it("fails the run when a dataset has stopped advancing", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(alpacaBars({ SPY: "2026-10-13T04:00:00Z", QQQ: "2026-10-06T04:00:00Z" }))
+      )
+    );
+    const { env } = makeEnv();
+
+    await expect(refreshQuotes(env)).rejects.toThrow("Quote dataset(s) not advancing for: QQQ");
+  });
+
+  it("judges a symbol the run skipped by what R2 already holds", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => Promise.resolve(alpacaBars({ SPY: "2026-10-13T04:00:00Z" })))
+    );
+    const { env, stored } = makeEnv();
+    stored.set(
+      "QQQ-DAILY.json",
+      JSON.stringify([
+        { Timestamp: "2026-10-06T04:00:00Z", Open: 1, High: 1, Low: 1, Close: 1, Volume: 1 }
+      ])
+    );
+
+    await expect(refreshQuotes(env)).rejects.toThrow("not advancing for: QQQ");
+  });
+
+  it("reports a failed write before checking freshness", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(alpacaBars({ SPY: "2026-10-13T04:00:00Z", QQQ: "2026-10-14T04:00:00Z" }))
+      )
+    );
+    const { env } = makeEnv();
+    vi.mocked(env.QUOTES.put).mockRejectedValueOnce(new Error("R2 down"));
+
+    await expect(refreshQuotes(env)).rejects.toThrow("Failed to refresh dataset(s) for: SPY");
+    expect(env.QUOTES.get).not.toHaveBeenCalled();
+  });
+
+  it("skips the run, freshness check included, without credentials", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const { env } = makeEnv({ ALPACA_KEY: undefined });
+
+    await expect(refreshQuotes(env)).resolves.toBeUndefined();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(env.QUOTES.get).not.toHaveBeenCalled();
   });
 });

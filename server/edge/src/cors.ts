@@ -9,8 +9,16 @@ const CORS_RESPONSE_HEADERS = [
   "access-control-allow-credentials",
   "access-control-allow-methods",
   "access-control-allow-headers",
-  "access-control-max-age"
+  "access-control-max-age",
+  "access-control-expose-headers"
 ];
+
+/**
+ * Response headers a cross-origin script may read. `x-quotes-as-of` is the
+ * newest bar's timestamp on `/quotes`, set by the API so a stalled dataset is
+ * visible to clients.
+ */
+const EXPOSED_HEADERS = "x-quotes-as-of";
 
 /** Parses the comma-separated `ALLOWED_ORIGINS` var. */
 export function parseAllowList(allowedOrigins: string): string[] {
@@ -105,6 +113,7 @@ export function applyCors(headers: Headers, allowedOrigin: string | null): void 
   }
 
   headers.set("access-control-allow-origin", allowedOrigin);
+  headers.set("access-control-expose-headers", EXPOSED_HEADERS);
   // Deliberately no access-control-allow-credentials: the API is fully
   // anonymous, so credentialed CORS would only widen what a compromised
   // allowed origin could attempt. The header stays in CORS_RESPONSE_HEADERS
