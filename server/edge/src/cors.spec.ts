@@ -124,17 +124,21 @@ describe("cache-safe CORS handling", () => {
     const headers = new Headers({
       "access-control-allow-origin": "https://charts.stockindicators.dev",
       "access-control-allow-credentials": "true",
+      "access-control-expose-headers": "x-quotes-as-of",
       vary: "Origin",
-      "cache-control": "public, max-age=900"
+      "cache-control": "public, max-age=900",
+      "x-quotes-as-of": "2026-10-06T04:00:00Z"
     });
 
     stripCors(headers);
 
     expect(headers.get("access-control-allow-origin")).toBeNull();
     expect(headers.get("access-control-allow-credentials")).toBeNull();
+    expect(headers.get("access-control-expose-headers")).toBeNull();
     expect(headers.get("vary")).toBeNull();
-    // The caching directive itself must survive.
+    // The caching directive and the dataset's as-of stamp must survive.
     expect(headers.get("cache-control")).toBe("public, max-age=900");
+    expect(headers.get("x-quotes-as-of")).toBe("2026-10-06T04:00:00Z");
   });
 
   it("re-attaches the requesting origin, so one entry serves several sites", () => {
@@ -151,6 +155,20 @@ describe("cache-safe CORS handling", () => {
       "https://stock-charts-vitepress.pages.dev"
     );
     expect(first.get("vary")).toBe("Origin");
+  });
+
+  it("lets a cross-origin script read the quote dataset's as-of header", () => {
+    const headers = new Headers();
+    applyCors(headers, "https://charts.stockindicators.dev");
+
+    expect(headers.get("access-control-expose-headers")).toBe("x-quotes-as-of");
+  });
+
+  it("exposes nothing to a rejected origin", () => {
+    const headers = new Headers();
+    applyCors(headers, null);
+
+    expect(headers.get("access-control-expose-headers")).toBeNull();
   });
 
   it("never advertises credentialed CORS — the API is fully anonymous", () => {

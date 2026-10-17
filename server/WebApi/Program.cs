@@ -36,7 +36,8 @@ if (allowedOrigins.Length > 0)
             cors.AllowAnyHeader();
             cors.AllowAnyMethod();
             cors.WithOrigins(allowedOrigins)
-                .SetIsOriginAllowedToAllowWildcardSubdomains();
+                .SetIsOriginAllowedToAllowWildcardSubdomains()
+                .WithExposedHeaders(WebApi.Controllers.Main.QuotesAsOfHeader);
         });
     });
 

@@ -2,9 +2,17 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { datasetKey, toStoredBars, type StoredBar } from "./quotes";
+import type { Env } from "./env";
+import {
+  datasetKey,
+  isStale,
+  missedWeekdays,
+  staleDatasets,
+  toStoredBars,
+  type StoredBar
+} from "./quotes";
 
 /**
  * The same fixture `server/WebApi.Tests/Services/QuoteDatasetContractTests.cs`
@@ -53,5 +61,82 @@ describe("toStoredBars", () => {
 describe("datasetKey", () => {
   it("matches the object name the API requests", () => {
     expect(datasetKey("QQQ")).toBe("QQQ-DAILY.json");
+  });
+});
+
+describe("missedWeekdays", () => {
+  // 2026-10-14 is a Wednesday.
+  const wednesdayMidday = new Date("2026-10-14T15:00:00Z");
+
+  it("counts nothing when yesterday's bar is in", () => {
+    expect(missedWeekdays("2026-10-13T04:00:00Z", wednesdayMidday)).toBe(0);
+  });
+
+  it("does not count today, whose bar may not exist yet", () => {
+    expect(missedWeekdays("2026-10-14T04:00:00Z", wednesdayMidday)).toBe(0);
+  });
+
+  it("skips the weekend between Friday's bar and Monday", () => {
+    expect(missedWeekdays("2026-10-09T04:00:00Z", new Date("2026-10-12T15:00:00Z"))).toBe(0);
+  });
+
+  it("counts the weekdays a stalled dataset has missed", () => {
+    // The 2026-10-06 bar seen on 2026-10-14: Oct 7, 8, 9, 12 and 13.
+    expect(missedWeekdays("2026-10-06T04:00:00Z", wednesdayMidday)).toBe(5);
+  });
+
+  it("rejects a timestamp it cannot parse", () => {
+    expect(() => missedWeekdays("not a date", wednesdayMidday)).toThrow(/Unparseable/);
+  });
+});
+
+describe("isStale", () => {
+  const tuesdayMidday = new Date("2026-10-13T15:00:00Z");
+
+  it("allows one missed weekday, so a market holiday is not an alarm", () => {
+    expect(isStale("2026-10-09T04:00:00Z", tuesdayMidday)).toBe(false);
+  });
+
+  it("reports two missed weekdays", () => {
+    expect(isStale("2026-10-08T04:00:00Z", tuesdayMidday)).toBe(true);
+  });
+});
+
+describe("staleDatasets", () => {
+  const now = new Date("2026-10-14T15:00:00Z");
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  function envWith(stored: Record<string, StoredBar[]>): Env {
+    return {
+      QUOTES: {
+        get: vi.fn((key: string) =>
+          Promise.resolve(key in stored ? { json: () => Promise.resolve(stored[key]) } : null)
+        )
+      }
+    } as unknown as Env;
+  }
+
+  function barAt(timestamp: string): StoredBar {
+    return { Timestamp: timestamp, Open: 1, High: 1, Low: 1, Close: 1, Volume: 1 };
+  }
+
+  it("names only the symbols whose stored dataset has stopped advancing", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const env = envWith({
+      "SPY-DAILY.json": [barAt("2026-10-12T04:00:00Z"), barAt("2026-10-13T04:00:00Z")],
+      "QQQ-DAILY.json": [barAt("2026-10-05T04:00:00Z"), barAt("2026-10-06T04:00:00Z")]
+    });
+
+    expect(await staleDatasets(env, ["SPY", "QQQ"], now)).toEqual(["QQQ"]);
+  });
+
+  it("treats a missing or empty dataset as stale", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const env = envWith({ "SPY-DAILY.json": [] });
+
+    expect(await staleDatasets(env, ["SPY", "QQQ"], now)).toEqual(["SPY", "QQQ"]);
   });
 });

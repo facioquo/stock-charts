@@ -96,6 +96,70 @@ public class MainEndpointsTests
     }
 
     [Fact]
+    public async Task GetQuotes_SetsAsOfHeaderToNewestBar()
+    {
+        // Arrange — out of order, so the header must name the newest bar
+        // rather than the last one listed.
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([
+                new Bar(new DateTime(2026, 10, 6, 4, 0, 0, DateTimeKind.Utc), 100m, 102m, 99m, 101m, 1_000_000),
+                new Bar(new DateTime(2026, 10, 5, 4, 0, 0, DateTimeKind.Utc), 99m, 101m, 98m, 100m, 900_000)
+            ]);
+
+        DefaultHttpContext httpContext = new();
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = httpContext
+        };
+
+        // Act
+        await _controller.GetQuotes();
+
+        // Assert
+        Assert.Equal("2026-10-06T04:00:00Z", httpContext.Response.Headers["X-Quotes-As-Of"].ToString());
+    }
+
+    [Fact]
+    public async Task GetQuotes_WithUnspecifiedKind_StampsAsOfAsUtc()
+    {
+        // Arrange — the bundled backup dataset parses without a UTC marker.
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new Bar(new DateTime(2018, 12, 31), 100m, 102m, 99m, 101m, 1_000_000)]);
+
+        DefaultHttpContext httpContext = new();
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = httpContext
+        };
+
+        // Act
+        await _controller.GetQuotes();
+
+        // Assert
+        Assert.Equal("2018-12-31T00:00:00Z", httpContext.Response.Headers["X-Quotes-As-Of"].ToString());
+    }
+
+    [Fact]
+    public async Task GetQuotes_WithNoBars_OmitsAsOfHeader()
+    {
+        // Arrange
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        DefaultHttpContext httpContext = new();
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = httpContext
+        };
+
+        // Act
+        await _controller.GetQuotes();
+
+        // Assert
+        Assert.False(httpContext.Response.Headers.ContainsKey("X-Quotes-As-Of"));
+    }
+
+    [Fact]
     public void GetIndicatorCatalog_ReturnsOkResultWithMetadata()
     {
         // Arrange
