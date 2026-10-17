@@ -2,13 +2,14 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Env } from "./env";
 import {
   datasetKey,
   isStale,
   missedWeekdays,
+  refreshQuotes,
   staleDatasets,
   toStoredBars,
   type StoredBar
@@ -141,5 +142,124 @@ describe("staleDatasets", () => {
     const env = envWith({ "SPY-DAILY.json": [] });
 
     expect(await staleDatasets(env, ["SPY", "QQQ"], now)).toEqual(["SPY", "QQQ"]);
+  });
+});
+
+describe("refreshQuotes", () => {
+  // Wednesday 2026-10-14, mid-session.
+  const now = new Date("2026-10-14T15:00:00Z");
+
+  /** An R2 stub backed by a Map, so what a run writes is what it reads back. */
+  function makeEnv(overrides?: Partial<Env>): { env: Env; stored: Map<string, string> } {
+    const stored = new Map<string, string>();
+    const env = {
+      ALPACA_KEY: "key",
+      ALPACA_SECRET: "secret",
+      QUOTE_SYMBOLS: "SPY,QQQ",
+      QUOTE_HISTORY_DAYS: "800",
+      QUOTES: {
+        put: vi.fn((key: string, body: string) => {
+          stored.set(key, body);
+          return Promise.resolve();
+        }),
+        get: vi.fn((key: string) => {
+          const body = stored.get(key);
+          return Promise.resolve(
+            body === undefined ? null : { json: () => Promise.resolve(JSON.parse(body)) }
+          );
+        })
+      },
+      ...overrides
+    } as unknown as Env;
+
+    return { env, stored };
+  }
+
+  function alpacaBars(newestBySymbol: Record<string, string>): Response {
+    const bars = Object.fromEntries(
+      Object.entries(newestBySymbol).map(([symbol, t]) => [
+        symbol,
+        [{ t, o: 1, h: 1, l: 1, c: 1, v: 1 }]
+      ])
+    );
+    return new Response(JSON.stringify({ bars, next_page_token: null }));
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(now);
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it("resolves when every stored dataset is current", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(alpacaBars({ SPY: "2026-10-13T04:00:00Z", QQQ: "2026-10-14T04:00:00Z" }))
+      )
+    );
+    const { env } = makeEnv();
+
+    await expect(refreshQuotes(env)).resolves.toBeUndefined();
+  });
+
+  it("fails the run when a dataset has stopped advancing", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(alpacaBars({ SPY: "2026-10-13T04:00:00Z", QQQ: "2026-10-06T04:00:00Z" }))
+      )
+    );
+    const { env } = makeEnv();
+
+    await expect(refreshQuotes(env)).rejects.toThrow("Quote dataset(s) not advancing for: QQQ");
+  });
+
+  it("judges a symbol the run skipped by what R2 already holds", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => Promise.resolve(alpacaBars({ SPY: "2026-10-13T04:00:00Z" })))
+    );
+    const { env, stored } = makeEnv();
+    stored.set(
+      "QQQ-DAILY.json",
+      JSON.stringify([
+        { Timestamp: "2026-10-06T04:00:00Z", Open: 1, High: 1, Low: 1, Close: 1, Volume: 1 }
+      ])
+    );
+
+    await expect(refreshQuotes(env)).rejects.toThrow("not advancing for: QQQ");
+  });
+
+  it("reports a failed write before checking freshness", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(alpacaBars({ SPY: "2026-10-13T04:00:00Z", QQQ: "2026-10-14T04:00:00Z" }))
+      )
+    );
+    const { env } = makeEnv();
+    vi.mocked(env.QUOTES.put).mockRejectedValueOnce(new Error("R2 down"));
+
+    await expect(refreshQuotes(env)).rejects.toThrow("Failed to refresh dataset(s) for: SPY");
+    expect(env.QUOTES.get).not.toHaveBeenCalled();
+  });
+
+  it("skips the run, freshness check included, without credentials", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const { env } = makeEnv({ ALPACA_KEY: undefined });
+
+    await expect(refreshQuotes(env)).resolves.toBeUndefined();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(env.QUOTES.get).not.toHaveBeenCalled();
   });
 });
