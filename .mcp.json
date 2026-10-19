@@ -8,10 +8,6 @@
         "CODACY_ACCOUNT_TOKEN": "${CODACY_ACCOUNT_TOKEN}"
       }
     },
-    "microsoft-docs": {
-      "type": "http",
-      "url": "https://learn.microsoft.com/api/mcp"
-    },
     "playwright": {
       "type": "stdio",
       "command": "npx",
