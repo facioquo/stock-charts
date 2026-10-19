@@ -1,22 +1,12 @@
 {
   "mcpServers": {
-    "cloudflare": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["mcp-remote", "https://docs.mcp.cloudflare.com/mcp"]
-    },
     "codacy": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@codacy/codacy-mcp@latest"],
+      "args": ["-y", "@codacy/codacy-mcp@0.6.25"],
       "env": {
-        "CODACY_ACCOUNT_TOKEN": "${input:codacy_account_token}"
+        "CODACY_ACCOUNT_TOKEN": "${CODACY_ACCOUNT_TOKEN}"
       }
-    },
-    "context7": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"]
     },
     "microsoft-docs": {
       "type": "http",
