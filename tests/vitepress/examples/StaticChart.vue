@@ -12,6 +12,15 @@ import type { ChartDataset, ScatterDataPoint } from "chart.js";
 
 import { SAMPLE_QUOTES } from "./sample-quotes";
 
+const props = withDefaults(
+  defineProps<{
+    /** Right-hand price and volume labels; off by default for a cleaner look in documentation. */
+    showRightAxisLabels?: boolean;
+    showTooltips?: boolean;
+  }>(),
+  { showRightAxisLabels: false, showTooltips: false }
+);
+
 const quotes = loadStaticQuotes(SAMPLE_QUOTES);
 
 const canvasEl = ref<HTMLCanvasElement | null>(null);
@@ -70,8 +79,8 @@ function renderChart(): void {
   overlayChart?.destroy();
   overlayChart = new OverlayChart(canvasEl.value, {
     isDarkTheme: isDark(),
-    showTooltips: false,
-    showRightAxisLabels: false, // Cleaner look for documentation examples
+    showTooltips: props.showTooltips,
+    showRightAxisLabels: props.showRightAxisLabels,
     background: isDark() ? "#1b1b1f80" : "#ffffff80"
   });
   overlayChart.render(quotes);

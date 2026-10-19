@@ -60,8 +60,10 @@ manager.initializeOverlay(overlayCanvas, quotes, 250);
 
 - **`isDarkTheme`**: applies dark or light color palette
 - **`showTooltips`**: enables/disables hover tooltips
-- **`showRightAxisLabels`**: controls right-axis tick labels (defaults to `true`). Set to `false` for cleaner standalone charts or documentation examples. Gridlines remain visible regardless.
+- **`showRightAxisLabels`**: controls the right-hand price, oscillator, and volume labels (defaults to `true`). Set to `false` for cleaner standalone charts or documentation examples. Gridlines remain visible regardless.
 - **`background`** (optional): overrides annotation and axis-label backdrop color
+
+Every option and its default is listed in [chart options](/reference/chart-options).
 
 ## Step 4: Add an overlay indicator (EMA)
 
