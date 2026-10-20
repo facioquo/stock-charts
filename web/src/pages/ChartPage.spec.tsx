@@ -80,7 +80,6 @@ import { ChartPage } from "./ChartPage";
 beforeEach(() => {
   mocks.apiError = true;
   mocks.selections = [{ ucid: "u1", uiid: "BB", label: "BB(20,2)" }];
-  mocks.retryLoad.mockClear();
 });
 
 describe("ChartPage", () => {
