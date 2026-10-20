@@ -15,6 +15,7 @@ import type { IndyChartsVueOptions } from "./types";
 const managerSpies = vi.hoisted(() => ({ instances: [] as MockChartManager[] }));
 
 interface MockChartManager {
+  config: { settings: { background?: string } };
   initializeOverlay: ReturnType<typeof vi.fn>;
   processSelectionData: ReturnType<typeof vi.fn>;
   displaySelection: ReturnType<typeof vi.fn>;
@@ -33,7 +34,7 @@ vi.mock("../charts", () => {
     createOscillator = vi.fn();
     updateTheme = vi.fn();
     destroy = vi.fn();
-    constructor() {
+    constructor(readonly config: MockChartManager["config"]) {
       managerSpies.instances.push(this);
     }
   }
@@ -609,6 +610,58 @@ describe("StockIndicatorChart composition (with prop)", () => {
     expect(mgr.createOscillator).toHaveBeenCalledTimes(1);
 
     app.unmount();
+  });
+});
+
+describe("StockIndicatorChart registry entries", () => {
+  it("composes the companions a registry entry names in `with`", async () => {
+    managerSpies.instances.length = 0;
+    vi.stubGlobal("fetch", bollingerFetch());
+
+    const root = createTestElement("root");
+    const app = renderer.createApp(StockIndicatorChart, { indicator: "bb", id: "bb-registry" });
+    app.provide(indyChartsVueOptionsKey, {
+      ...bollingerOptions,
+      indicators: { ...bollingerOptions.indicators, bb: { uiid: "BB", with: "bbPctB" } }
+    });
+    app.mount(root);
+
+    await vi.waitFor(() => {
+      expect(
+        findByTestId(root, "stock-indicator-chart-bb-registry-oscillator-canvas")
+      ).toBeDefined();
+    });
+    expect(managerSpies.instances[0].createOscillator).toHaveBeenCalledTimes(1);
+
+    app.unmount();
+  });
+
+  it("applies a registry entry's background, and lets the props override it", async () => {
+    const options: IndyChartsVueOptions = {
+      ...bollingerOptions,
+      indicators: { ...bollingerOptions.indicators, bb: { uiid: "BB", background: "#registry" } }
+    };
+
+    for (const [props, expected] of [
+      [{}, "#registry"],
+      [{ config: { background: "#config" } }, "#config"],
+      [{ background: "#prop" }, "#prop"]
+    ] as const) {
+      managerSpies.instances.length = 0;
+      vi.stubGlobal("fetch", bollingerFetch());
+
+      const root = createTestElement("root");
+      const app = renderer.createApp(StockIndicatorChart, { indicator: "bb", ...props });
+      app.provide(indyChartsVueOptionsKey, options);
+      app.mount(root);
+
+      await vi.waitFor(() => {
+        expect(managerSpies.instances).toHaveLength(1);
+      });
+      expect(managerSpies.instances[0].config.settings.background).toBe(expected);
+
+      app.unmount();
+    }
   });
 });
 
