@@ -26,6 +26,7 @@ interface ApiClientConfig {
   endpoints?: {
     quotes?: string;       // default: "quotes"
     indicators?: string;   // default: "indicators"
+    batch?: string;        // default: "indicators/batch"
   };
 
   /**

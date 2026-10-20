@@ -377,6 +377,14 @@ test.describe("VitePress Documentation Site", () => {
     await expectCanvasToBeNonBlank(page.getByTestId("stock-indicator-chart-ema-overlay-canvas"));
   });
 
+  test("axis labels example renders both static charts", async ({ page }) => {
+    await page.goto("/examples/axis-labels");
+    const canvases = page.locator(".vp-doc canvas");
+    await expect(canvases).toHaveCount(2);
+    await expectCanvasToBeNonBlank(canvases.nth(0));
+    await expectCanvasToBeNonBlank(canvases.nth(1));
+  });
+
   test("indicators page renders nonblank overlay and oscillator charts", async ({ page }) => {
     await mockChartApi(page);
     await page.goto("/examples/indicators");

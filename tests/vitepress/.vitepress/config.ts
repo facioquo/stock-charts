@@ -47,6 +47,7 @@ export default defineConfig({
           items: [
             { text: "Overlay chart", link: "/examples/" },
             { text: "Oscillator chart", link: "/examples/indicators" },
+            { text: "Axis labels and tooltips", link: "/examples/axis-labels" },
             { text: "Custom data", link: "/examples/custom-data" }
           ]
         }
@@ -54,7 +55,10 @@ export default defineConfig({
       "/reference/": [
         {
           text: "Reference",
-          items: [{ text: "API client", link: "/reference/api-client" }]
+          items: [
+            { text: "Chart options", link: "/reference/chart-options" },
+            { text: "API client", link: "/reference/api-client" }
+          ]
         }
       ]
     },
