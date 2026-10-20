@@ -53,6 +53,7 @@
     "eslint-config-prettier": "^10.1.8",
     "jiti": "^2.7.0",
     "typescript-eslint": "^8.72.0",
-    "vitest": "^4.1.11"
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
   }
 }

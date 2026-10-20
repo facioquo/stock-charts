@@ -48,6 +48,7 @@ dist/
 tmp/
 out-tsc/
 coverage/
+.vitest/
 **/coverage/
 test-results/
 npm-debug.log*
