@@ -1,5 +1,5 @@
-import { copyFile, readFile, writeFile } from "fs/promises";
-import { resolve } from "path";
+import { readFile, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 
 import { defineConfig } from "tsdown";
 
@@ -23,25 +23,29 @@ export default defineConfig({
   },
   sourcemap: true,
   clean: true,
-  onSuccess: async () => {
-    await copyFile(resolve("README.md"), resolve("dist/README.md"));
-
+  copy: [
+    "README.md",
     // Authored as `llms.md` so markdownlint covers it, shipped under the
     // conventional `llms.txt` name agents look for.
-    await copyFile(resolve("llms.md"), resolve("dist/llms.txt"));
-    // info.version tracks the package version, so the shipped contract always
-    // states the release it belongs to without anyone editing two files.
-    const { version } = JSON.parse(await readFile(resolve("package.json"), "utf8")) as {
-      version: string;
-    };
-    const contract = await readFile(resolve("backing-api.yml"), "utf8");
-    const versioned = contract.replace(/^ {2}version: ".*"$/m, `  version: "${version}"`);
+    { from: "llms.md", rename: "llms.txt" }
+  ],
+  hooks: {
+    "build:done": async ({ options }) => {
+      // info.version tracks the package version, so the shipped contract always
+      // states the release it belongs to without anyone editing two files.
+      const version = options.pkg?.version;
+      if (!version) {
+        throw new Error("backing-api.yml: package.json has no version to stamp");
+      }
+      const contract = await readFile(resolve("backing-api.yml"), "utf8");
+      const versioned = contract.replace(/^ {2}version: ".*"$/m, `  version: "${version}"`);
 
-    // A silent no-op here would ship a contract stating the wrong release.
-    if (!versioned.includes(`  version: "${version}"`)) {
-      throw new Error(`backing-api.yml: could not set info.version to ${version}`);
+      // A silent no-op here would ship a contract stating the wrong release.
+      if (!versioned.includes(`  version: "${version}"`)) {
+        throw new Error(`backing-api.yml: could not set info.version to ${version}`);
+      }
+
+      await writeFile(resolve(options.outDir, "backing-api.yml"), versioned);
     }
-
-    await writeFile(resolve("dist/backing-api.yml"), versioned);
   }
 });
