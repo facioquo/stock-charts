@@ -81,9 +81,9 @@ The bar window is an argument rather than an option: `manager.initializeOverlay(
 | `results` | `string[]` | every result | Which result series to draw, by data name, such as `["percentB"]`. Matching ignores case. |
 | `barCount` | `number` | `defaults.barCount` | How many of the newest bars this chart shows. |
 | `quoteCount` | `number` | `defaults.quoteCount` | How many of the newest quotes this chart loads. |
-| `with` | `string \| string[]` | none | Companion indicators to draw in the same chart, by registry key. Overlays join the price chart; oscillators stack beneath it on the same time axis. Read from the `config` prop only; a registry entry's `with` is not applied. |
+| `with` | `string \| string[]` | none | Companion indicators to draw in the same chart, by registry key. Overlays join the price chart; oscillators stack beneath it on the same time axis. |
 | `chartType` | `"overlay" \| "oscillator"` | none | Layout hint that reserves the right space before the catalog loads, so a first page view does not shift. The catalog still decides how the chart draws. |
-| `background` | `string` | the theme background | Label and annotation backdrop color for this chart. Read from the `config` prop only; a registry entry's `background` is not applied. |
+| `background` | `string` | the theme background | Label and annotation backdrop color for this chart. |
 | `id` | `string` | the `indicator` prop | Stable identifier for the chart's element id and test hooks. |
 
 ## `<StockIndicatorChart>` props

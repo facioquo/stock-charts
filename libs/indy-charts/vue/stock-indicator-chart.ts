@@ -235,7 +235,7 @@ export const StockIndicatorChart = defineComponent({
         return { isDarkTheme: false, showTooltips: DEFAULT_SHOW_TOOLTIPS };
       }
 
-      const background = props.background ?? props.config.background;
+      const background = props.background ?? resolvedConfig().background;
       return chartSettingsFromOptions(options, isDarkTheme(), background);
     }
 
@@ -274,7 +274,7 @@ export const StockIndicatorChart = defineComponent({
       const seenUiids = new Set<string>();
       if (primary.uiid) seenUiids.add(primary.uiid.toLowerCase());
 
-      const companions = normalizeWithList(props.with ?? props.config.with);
+      const companions = normalizeWithList(props.with ?? primary.with);
       for (const name of companions) {
         const registered = registryConfig(options, name) ?? {};
         const uiid = registered.uiid ?? name;
