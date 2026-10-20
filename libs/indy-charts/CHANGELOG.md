@@ -1,5 +1,11 @@
 # @facioquo/indy-charts
 
+## 0.17.0
+
+### Minor Changes
+
+- 8f374fb: The volume bars under the price chart now carry a value scale: one abbreviated label, such as `5M`, in the right-hand column with the price labels. It follows `showRightAxisLabels`, so hiding the right-axis labels hides it too.
+
 ## 0.16.0
 
 ### Minor Changes
