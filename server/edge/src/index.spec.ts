@@ -52,7 +52,6 @@ describe("worker.fetch", () => {
     cachePut = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal("caches", { default: { match: cacheMatch, put: cachePut } });
     fetchMock.mockReset();
-    getContainerMock.mockClear();
   });
 
   afterEach(() => {
