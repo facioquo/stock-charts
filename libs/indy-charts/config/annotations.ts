@@ -12,6 +12,27 @@ import { getThemeColors } from "./theme-colors";
 /** Legend text size; the block layout measures with it, so both must agree. */
 export const LEGEND_FONT_SIZE = 13;
 
+/** Width of a legend label in the legend font, with a rough estimate when the canvas cannot measure. */
+export function measureLegendText(
+  ctx: CanvasRenderingContext2D | undefined,
+  label: string
+): number {
+  if (
+    !ctx ||
+    typeof ctx.measureText !== "function" ||
+    typeof ctx.save !== "function" ||
+    typeof ctx.restore !== "function"
+  ) {
+    return label.length * 7;
+  }
+
+  ctx.save();
+  ctx.font = `${LEGEND_FONT_SIZE}px ${FONT_FAMILY}`;
+  const width = ctx.measureText(label).width;
+  ctx.restore();
+  return width;
+}
+
 export function commonLegendAnnotation(
   labelText: string,
   xPos: ScaleValue,

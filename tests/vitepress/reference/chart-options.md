@@ -13,6 +13,7 @@ An option marked **required** has no default; leave it out and TypeScript report
 | `isDarkTheme` | `boolean` | required | Picks the dark or light palette for candles, volume, text, gridlines, and backdrops. |
 | `showTooltips` | `boolean` | required | Shows a tooltip on hover that lists every series at the hovered bar, volume included. |
 | `showRightAxisLabels` | `boolean` | `true` | Shows the right-hand value labels: the price scale, each oscillator scale, and the volume scale. Gridlines draw either way. |
+| `showSeriesLegend` | `boolean` | `false` | Names each line of a multi-line oscillator pane, such as ADX or MACD, in its legend with a swatch in the line's color. A single-line pane shows the indicator label alone either way. |
 | `background` | `string` | `#FAF9FD90` light, `#12131680` dark | Backdrop color behind axis labels and legend annotations. Match it to the page behind the chart. |
 
 ```typescript
@@ -59,6 +60,7 @@ The bar window is an argument rather than an option: `manager.initializeOverlay(
 | `quoteCount` | `number` | `250` | How many of the newest quotes each chart loads and computes indicators over. |
 | `showTooltips` | `boolean` | `false` | Shows hover tooltips. |
 | `showRightAxisLabels` | `boolean` | `true` | Shows the right-hand price, oscillator, and volume labels. |
+| `showSeriesLegend` | `boolean` | `false` | Names each line of a multi-line oscillator pane in its legend. |
 
 ### Theme
 

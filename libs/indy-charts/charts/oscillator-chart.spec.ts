@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { LEGEND_ENTRY_GAP, LEGEND_ROW_HEIGHT, LEGEND_SWATCH_WIDTH } from "../config/legend";
+import { getThemeColors } from "../config/theme-colors";
 import { OscillatorChart } from "./oscillator-chart";
 import {
   type ChartSettings,
@@ -58,5 +60,194 @@ describe("OscillatorChart.applySlicedData", () => {
     expect(sliced["backgroundColor"]).toEqual(["c2", "c3", "c4"]);
     expect(thresholdTarget.data).toHaveLength(3);
     expect(thresholdTarget.backgroundColor).toEqual(["c2", "c3", "c4"]);
+  });
+});
+
+describe("OscillatorChart.updateLegend", () => {
+  type Written = Array<{
+    id: string;
+    content: string[];
+    color: string;
+    xAdjust: number;
+    yAdjust: number;
+  }>;
+
+  function legendChart(
+    chartSettings: ChartSettings,
+    width = 1000,
+    ticks: Array<{ label: string | null }> = []
+  ) {
+    const chart = new OscillatorChart({} as CanvasRenderingContext2D, chartSettings);
+    const options = { plugins: { annotation: { annotations: {} as unknown } } };
+    (chart as unknown as { _chart: unknown })._chart = {
+      width,
+      scales: { x: { min: 0 }, y: { max: 100, ticks } },
+      options,
+      update: vi.fn()
+    };
+    return { chart, options };
+  }
+
+  const selection = (...results: Array<[label: string, lineType?: string]>) =>
+    ({
+      ucid: "u1",
+      label: "MACD(12,26,9)",
+      results: results.map(([label, lineType = "solid"], index) => ({
+        label,
+        lineType,
+        color: `#00000${index.toString()}`
+      }))
+    }) as unknown as IndicatorSelection;
+
+  const macd = selection(["MACD"], ["Signal"], ["Histogram", "bar"]);
+  const seriesLegend = { ...settings, showSeriesLegend: true };
+  const written = (options: { plugins: { annotation: { annotations: unknown } } }) =>
+    options.plugins.annotation.annotations as Written;
+
+  it("keeps the indicator label alone unless the series legend is on", () => {
+    const { chart, options } = legendChart(settings);
+
+    chart.updateLegend(macd);
+
+    const annotations = options.plugins.annotation.annotations as Record<
+      string,
+      { content: string[] }
+    >;
+    expect(Object.keys(annotations)).toEqual(["annotation"]);
+    expect(annotations["annotation"]?.content).toEqual(["MACD(12,26,9)"]);
+  });
+
+  it("keeps the indicator label alone on a single-line pane", () => {
+    const { chart, options } = legendChart(seriesLegend);
+
+    chart.updateLegend(selection(["RSI(14)"]));
+
+    expect(Object.keys(options.plugins.annotation.annotations as object)).toEqual(["annotation"]);
+  });
+
+  it("names each line after the indicator label, in result order", () => {
+    const { chart, options } = legendChart(seriesLegend);
+
+    chart.updateLegend(macd);
+
+    const labels = written(options).filter(a => !a.id.endsWith("-swatch"));
+    expect(labels.map(a => a.content.join(""))).toEqual([
+      "MACD(12,26,9)",
+      "MACD",
+      "Signal",
+      "Histogram"
+    ]);
+    expect(labels.map(a => a.id)).toEqual(["legend", "legend1", "legend2", "legend3"]);
+  });
+
+  it("drops the indicator label when a line already carries it", () => {
+    const { chart, options } = legendChart(seriesLegend);
+    const adx = { ...selection(["ADX(14)"], ["DI+(14)"]), label: "ADX(14)" };
+
+    chart.updateLegend(adx);
+
+    const entries = written(options);
+    expect(entries.filter(a => !a.id.endsWith("-swatch")).map(a => a.content.join(""))).toEqual([
+      "ADX(14)",
+      "DI+(14)"
+    ]);
+    expect(entries.find(a => a.id === "legend1-swatch")?.xAdjust).toBe(0);
+  });
+
+  it("colours each swatch by its line and each label by theme text", () => {
+    const { chart, options } = legendChart(seriesLegend);
+
+    chart.updateLegend(macd);
+
+    const entries = written(options);
+    expect(entries.filter(a => a.id.endsWith("-swatch")).map(a => a.color)).toEqual([
+      "#000000",
+      "#000001",
+      "#000002"
+    ]);
+    expect(entries.find(a => a.id === "legend2")?.color).toBe(getThemeColors(settings).text);
+  });
+
+  it("starts the entries after the indicator label, each label after its swatch", () => {
+    const { chart, options } = legendChart(seriesLegend);
+
+    chart.updateLegend(macd);
+
+    const entries = written(options);
+    const swatch = entries.find(a => a.id === "legend1-swatch");
+    const label = entries.find(a => a.id === "legend1");
+    // Without a canvas to measure, a label is estimated at 7 px a character.
+    expect(swatch?.xAdjust).toBe("MACD(12,26,9)".length * 7 + LEGEND_ENTRY_GAP);
+    expect(label?.xAdjust).toBe((swatch?.xAdjust ?? 0) + LEGEND_SWATCH_WIDTH);
+    expect(entries.map(a => a.yAdjust)).toEqual(Array(7).fill(1));
+  });
+
+  it("wraps entries that do not fit the pane onto rows below the label", () => {
+    const { chart, options } = legendChart(seriesLegend, 200);
+
+    chart.updateLegend(macd);
+
+    const rows = written(options)
+      .filter(a => a.id.startsWith("legend") && !a.id.endsWith("-swatch"))
+      .map(a => (a.yAdjust - 1) / LEGEND_ROW_HEIGHT);
+    expect(rows[0]).toBe(0);
+    expect(rows.at(-1)).toBeGreaterThan(0);
+    expect(written(options).find(a => a.id === "legend2-swatch")?.xAdjust).toBe(0);
+  });
+
+  it("wraps before the right-hand axis labels unless they are hidden", () => {
+    // The labels draw inside the plot (mirrored), so an entry running to the edge would cover them.
+    const ticks = [{ label: "-10000K" }, { label: null }];
+    const shown = legendChart(seriesLegend, 320, ticks);
+    const hidden = legendChart({ ...seriesLegend, showRightAxisLabels: false }, 320, ticks);
+
+    shown.chart.updateLegend(macd);
+    hidden.chart.updateLegend(macd);
+
+    const histogramRow = (options: typeof shown.options) =>
+      ((written(options).find(a => a.id === "legend3")?.yAdjust ?? 0) - 1) / LEGEND_ROW_HEIGHT;
+    expect(histogramRow(shown.options)).toBe(1);
+    expect(histogramRow(hidden.options)).toBe(0);
+  });
+
+  it("leaves hidden `none` results out", () => {
+    const { chart, options } = legendChart(seriesLegend);
+
+    chart.updateLegend(selection(["Upper"], ["Lower"], ["Hidden", "none"]));
+
+    const labels = written(options).filter(a => !a.id.endsWith("-swatch"));
+    expect(labels.map(a => a.content.join(""))).toEqual(["MACD(12,26,9)", "Upper", "Lower"]);
+  });
+
+  it("re-wraps the series legend after a resize", async () => {
+    const { chart, options } = legendChart(seriesLegend);
+    chart.updateLegend(macd);
+    expect(written(options).every(a => a.yAdjust === 1)).toBe(true);
+
+    (chart as unknown as { _chart: { width: number } })._chart.width = 200;
+    (chart as unknown as { _onResize: () => void })._onResize();
+    await Promise.resolve();
+
+    expect(written(options).some(a => a.yAdjust > 1)).toBe(true);
+  });
+
+  it("carries the resize handler on the options a theme change assigns", () => {
+    const chart = new OscillatorChart({} as CanvasRenderingContext2D, seriesLegend);
+    const assigned: Array<{ onResize?: unknown }> = [];
+    (chart as unknown as { _chart: unknown })._chart = {
+      set options(value: { onResize?: unknown }) {
+        assigned.push(value);
+      },
+      get options() {
+        return {};
+      },
+      update: vi.fn()
+    };
+
+    chart.updateTheme({ ...seriesLegend, isDarkTheme: false });
+
+    expect(assigned).toHaveLength(1);
+    expect(assigned[0]?.onResize).toBeTypeOf("function");
+    expect(assigned[0]?.onResize).toBe((chart as unknown as { _onResize: unknown })._onResize);
   });
 });

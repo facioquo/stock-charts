@@ -1,10 +1,24 @@
 import { Chart, type ChartConfiguration } from "chart.js";
 
-import { type ScaleValue } from "chartjs-plugin-annotation";
+import {
+  type AnnotationOptions,
+  type LabelAnnotationOptions,
+  type ScaleValue
+} from "chartjs-plugin-annotation";
 
 import { baseOscillatorConfig, baseOscillatorOptions } from "../config/oscillator";
 import { createThresholdDataset } from "../config/datasets";
-import { commonLegendAnnotation } from "../config/annotations";
+import {
+  commonLegendAnnotation,
+  legendSwatchAnnotation,
+  measureLegendText
+} from "../config/annotations";
+import {
+  LEGEND_ENTRY_GAP,
+  LEGEND_ROW_HEIGHT,
+  LEGEND_SWATCH_WIDTH,
+  layoutLegend
+} from "../config/legend";
 import {
   type ChartSettings,
   type ChartThreshold,
@@ -15,9 +29,18 @@ import {
   type IndicatorSelection
 } from "../config/types";
 
+/** Offset of the legend's first row below the top of the plot. */
+const LEGEND_TOP_OFFSET = 1;
+
+/** The lines a pane actually draws; `none` results are hidden datasets. */
+function drawnResults(selection: IndicatorSelection): IndicatorResult[] {
+  return selection.results.filter(result => result.lineType !== "none");
+}
+
 export class OscillatorChart {
   private _chart: Chart | undefined;
   private fullThresholdDatasets: IndicatorDataset[] = [];
+  private _legendSelection: IndicatorSelection | undefined;
 
   /**
    * Underlying Chart.js instance. Exposed read-only — assigning to this field
@@ -54,6 +77,9 @@ export class OscillatorChart {
       chartConfig.data.datasets.push(r.dataset);
     });
 
+    // A width change can re-wrap the series legend.
+    if (chartConfig.options) chartConfig.options.onResize = this._onResize;
+
     // Create chart
     if (this._chart) this._chart.destroy();
     this._chart = new Chart(this.ctx, chartConfig);
@@ -71,12 +97,109 @@ export class OscillatorChart {
     const xPos: ScaleValue = this._chart.scales["x"].min;
     const yPos: ScaleValue = this._chart.scales["y"].max;
 
-    const annotation = commonLegendAnnotation(selection.label, xPos, yPos, 1, this.settings);
+    this._legendSelection = selection;
+    const annotation = commonLegendAnnotation(
+      selection.label,
+      xPos,
+      yPos,
+      LEGEND_TOP_OFFSET,
+      this.settings
+    );
 
-    if (this._chart.options?.plugins?.annotation) {
-      this._chart.options.plugins.annotation.annotations = { annotation };
+    const options = this._chart.options;
+    if (!options?.plugins?.annotation) return;
+
+    if (!this.showsSeriesLegend(selection)) {
+      options.plugins.annotation.annotations = { annotation };
+      return;
     }
+
+    // A line labelled like the indicator, such as ADX(14), already names it.
+    const repeated = drawnResults(selection).some(result => result.label === selection.label);
+    const startX = repeated
+      ? 0
+      : measureLegendText(this._chart.ctx, selection.label) + LEGEND_ENTRY_GAP;
+    const entries = this.seriesLegend(selection, xPos, yPos, startX);
+    options.plugins.annotation.annotations = repeated ? entries : [annotation, ...entries];
   }
+
+  private showsSeriesLegend(selection: IndicatorSelection): boolean {
+    return this.settings.showSeriesLegend === true && drawnResults(selection).length > 1;
+  }
+
+  /**
+   * A series-coloured swatch and label for each line, flowing from `startX` on
+   * the first row and wrapping onto rows below it when the pane is narrow.
+   */
+  private seriesLegend(
+    selection: IndicatorSelection,
+    xPos: ScaleValue,
+    yPos: ScaleValue,
+    startX: number
+  ): Array<AnnotationOptions & LabelAnnotationOptions> {
+    const results = drawnResults(selection);
+    const { slots } = layoutLegend(
+      results.map(result => result.label),
+      label => measureLegendText(this._chart?.ctx, label),
+      this.legendWidth(),
+      startX
+    );
+
+    return results.flatMap((result, index) => {
+      const slot = slots[index];
+      if (!slot) return [];
+
+      const yAdjust = LEGEND_TOP_OFFSET + slot.row * LEGEND_ROW_HEIGHT;
+
+      const label = commonLegendAnnotation(result.label, xPos, yPos, yAdjust, this.settings);
+      label.id = "legend" + (index + 1).toString();
+      label.xAdjust = slot.x + LEGEND_SWATCH_WIDTH;
+
+      const swatch = legendSwatchAnnotation(
+        result.color,
+        xPos,
+        yPos,
+        yAdjust,
+        slot.x,
+        this.settings
+      );
+      swatch.id = label.id + "-swatch";
+
+      return [swatch, label];
+    });
+  }
+
+  /** Entries wrap before the right-hand axis labels, which draw inside the plot. */
+  private legendWidth(): number {
+    const chart = this._chart;
+    if (!chart) return 0;
+    const area = chart.chartArea as { left: number; right: number } | undefined;
+    const plotWidth = area ? area.right - area.left : chart.width;
+    return plotWidth - this.axisLabelWidth();
+  }
+
+  private axisLabelWidth(): number {
+    const y = this._chart?.scales["y"];
+    if (!y || this.settings.showRightAxisLabels === false) return 0;
+
+    const widest = Math.max(
+      0,
+      ...y.ticks.map(tick =>
+        tick.label == null ? 0 : measureLegendText(this._chart?.ctx, String(tick.label))
+      )
+    );
+    return widest > 0 ? widest + LEGEND_ENTRY_GAP : 0;
+  }
+
+  // Deferred like the overlay's: Chart.js runs onResize before it updates the new layout.
+  private readonly _onResize = (): void => {
+    const selection = this._legendSelection;
+    if (!selection || !this.showsSeriesLegend(selection)) return;
+    queueMicrotask(() => {
+      this.updateLegend(selection);
+      this._chart?.update("none");
+    });
+  };
 
   updateTheme(settings: ChartSettings): void {
     this.settings = settings;
@@ -98,6 +221,7 @@ export class OscillatorChart {
       newY.suggestedMax = existingY.suggestedMax;
     }
 
+    newOptions.onResize = this._onResize;
     this._chart.options = newOptions;
     this._chart.update("none");
   }
@@ -191,6 +315,7 @@ export class OscillatorChart {
       this._chart = undefined;
     }
     this.fullThresholdDatasets = [];
+    this._legendSelection = undefined;
   }
 
   private configureThresholds(

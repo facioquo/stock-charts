@@ -34,6 +34,22 @@ describe("layoutLegend", () => {
     expect(height).toBe(2 * LEGEND_ROW_HEIGHT + LEGEND_BOTTOM_GAP);
   });
 
+  it("starts the first row after a title and wraps the rest from the left edge", () => {
+    const { slots, height } = layoutLegend(["AAAA", "BBBB"], tenPixelsPerCharacter, 120, 60);
+
+    expect(slots).toEqual([
+      { row: 0, x: 60 },
+      { row: 1, x: 0 }
+    ]);
+    expect(height).toBe(2 * LEGEND_ROW_HEIGHT + LEGEND_BOTTOM_GAP);
+  });
+
+  it("moves the first entry under the title when it does not fit beside it", () => {
+    const { slots } = layoutLegend(["AAAA"], tenPixelsPerCharacter, 100, 60);
+
+    expect(slots).toEqual([{ row: 1, x: 0 }]);
+  });
+
   it("puts an entry wider than the row alone on a row without looping", () => {
     const { slots } = layoutLegend(["A", "B".repeat(30), "C"], tenPixelsPerCharacter, 100);
 

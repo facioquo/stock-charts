@@ -1099,7 +1099,8 @@ describe("ChartController", () => {
     expect(cm.updateTheme).toHaveBeenCalledWith(
       expect.objectContaining({
         isDarkTheme: expect.any(Boolean),
-        showTooltips: expect.any(Boolean)
+        showTooltips: expect.any(Boolean),
+        showSeriesLegend: true
       })
     );
   });

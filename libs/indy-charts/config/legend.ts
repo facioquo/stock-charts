@@ -32,17 +32,19 @@ export interface LegendLayout {
 /**
  * Flow legend entries left to right and wrap to a new row when the next entry
  * would pass `maxWidth`. An entry wider than a whole row sits alone on its row.
+ * `startX` leaves room at the start of the first row, for a title the entries follow.
  */
 export function layoutLegend(
   labels: readonly string[],
   measure: (label: string) => number,
-  maxWidth: number
+  maxWidth: number,
+  startX = 0
 ): LegendLayout {
   if (labels.length === 0) return { slots: [], height: 0 };
 
   const slots: LegendSlot[] = [];
   let row = 0;
-  let x = 0;
+  let x = startX;
 
   for (const label of labels) {
     const width = LEGEND_SWATCH_WIDTH + measure(label);

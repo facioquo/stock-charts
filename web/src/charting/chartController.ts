@@ -92,7 +92,11 @@ export class ChartController {
 
   private get chartSettings(): ChartSettings {
     const settings = getSettings();
-    return { isDarkTheme: settings.isDarkTheme, showTooltips: settings.showTooltips };
+    return {
+      isDarkTheme: settings.isDarkTheme,
+      showTooltips: settings.showTooltips,
+      showSeriesLegend: true
+    };
   }
 
   /** Read-only proxy to ChartManager selections (used by the settings UI). */

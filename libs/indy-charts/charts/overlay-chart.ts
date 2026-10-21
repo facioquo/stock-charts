@@ -13,11 +13,10 @@ import {
 import { processQuoteData } from "../data/transformers";
 import { baseOverlayConfig, baseOverlayOptions } from "../config/overlay";
 import {
-  LEGEND_FONT_SIZE,
   commonLegendAnnotation,
-  legendSwatchAnnotation
+  legendSwatchAnnotation,
+  measureLegendText
 } from "../config/annotations";
-import { FONT_FAMILY } from "../config/common";
 import {
   LEGEND_BLOCK_MAX_WIDTH,
   LEGEND_ROW_HEIGHT,
@@ -199,7 +198,7 @@ export class OverlayChart {
 
     const { slots, height } = layoutLegend(
       listed.map(selection => selection.label),
-      label => this._measureLegendText(label),
+      label => measureLegendText(this._chart?.ctx, label),
       this._legendWidth()
     );
 
@@ -294,24 +293,6 @@ export class OverlayChart {
     if (!chart) return 0;
     const area = chart.chartArea as { left: number; right: number } | undefined;
     return area ? area.right - area.left : chart.width;
-  }
-
-  private _measureLegendText(label: string): number {
-    const ctx = this._chart?.ctx;
-    if (
-      !ctx ||
-      typeof ctx.measureText !== "function" ||
-      typeof ctx.save !== "function" ||
-      typeof ctx.restore !== "function"
-    ) {
-      return label.length * 7;
-    }
-
-    ctx.save();
-    ctx.font = `${LEGEND_FONT_SIZE}px ${FONT_FAMILY}`;
-    const width = ctx.measureText(label).width;
-    ctx.restore();
-    return width;
   }
 
   updateTheme(settings: ChartSettings): void {

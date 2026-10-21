@@ -64,6 +64,7 @@ All chart classes accept a `ChartSettings` object:
 - **`isDarkTheme`**: applies dark or light color palette
 - **`showTooltips`**: enables/disables hover tooltips
 - **`showRightAxisLabels`** (optional, defaults to `true`): controls right-axis tick labels. Set to `false` for cleaner standalone charts. Gridlines remain visible regardless.
+- **`showSeriesLegend`** (optional, defaults to `false`): names each line of a multi-line oscillator pane, such as ADX or MACD, in its legend with a swatch in the line's color
 - **`background`** (optional): overrides annotation and axis-label backdrop color
 
 For indicators, the responsive viewport, and oscillator subcharts, use `ChartManager`:
