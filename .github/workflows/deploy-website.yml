@@ -228,9 +228,12 @@ jobs:
       - deploy-api
     # deploy-api only runs on main; it is 'skipped' for preview builds, which
     # must still be allowed to publish. On main, a failed API deploy must NOT
-    # be masked by a green Pages deployment.
+    # be masked by a green Pages deployment. Fork PRs get no secrets, so their
+    # preview is skipped rather than failed; the build jobs still verify them.
     if: |
       always() &&
+      (github.event_name != 'pull_request' ||
+        github.event.pull_request.head.repo.full_name == github.repository) &&
       needs.versioning.result == 'success' &&
       needs.build-backend.result == 'success' &&
       needs.build-website.result == 'success' &&
