@@ -4167,19 +4167,20 @@ public static class Metadata
                 ]
             },
 
-            // Volume Weighted Average Price (VWAP)
+            // Anchored VWAP: anchored to the first visible bar, not reset per
+            // session, so it is labeled as such until intraday data exists (#491)
             new IndicatorListing {
-                Name = "Volume Weighted Average Price (VWAP)",
+                Name = "Anchored VWAP",
                 Uiid = "VWAP",
-                LegendTemplate = "VWAP",
+                LegendTemplate = "Anchored VWAP",
                 Endpoint = $"{baseUrl}/VWAP/",
                 Category = "moving-average",
                 ChartType = "overlay",
                 Parameters = [],
                 Results = [
                     new() {
-                        DisplayName = "VWAP",
-                        TooltipTemplate = "VWAP",
+                        DisplayName = "Anchored VWAP",
+                        TooltipTemplate = "Anchored VWAP",
                         DataName = "vwap",
                         DataType = "number",
                         LineType = "solid",
