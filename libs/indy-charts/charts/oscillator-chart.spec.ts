@@ -1,13 +1,48 @@
 import { describe, expect, it, vi } from "vitest";
 
+import {
+  type Chart as ChartJs,
+  type ChartConfiguration,
+  type ChartData,
+  type ChartOptions
+} from "chart.js";
+
 import { LEGEND_ENTRY_GAP, LEGEND_ROW_HEIGHT, LEGEND_SWATCH_WIDTH } from "../config/legend";
 import { getThemeColors } from "../config/theme-colors";
 import { OscillatorChart } from "./oscillator-chart";
 import {
   type ChartSettings,
   type IndicatorDataset,
+  type IndicatorListing,
   type IndicatorSelection
 } from "../config/types";
+
+vi.mock("chart.js", async importOriginal => {
+  const actual = await importOriginal<{ Chart: typeof ChartJs }>();
+
+  /** Canvas-free stand-in for render(). Like Chart.js, it fires `onResize` while it is constructed. */
+  class Chart {
+    // The financial controllers read the shared defaults when they load.
+    static defaults = actual.Chart.defaults;
+
+    width = 1000;
+    chartArea = { left: 0, right: 1000 };
+    scales = { x: { min: 0 }, y: { max: 100, ticks: [] } };
+    options: ChartOptions;
+    data: ChartData;
+
+    constructor(_ctx: unknown, config: ChartConfiguration) {
+      this.options = config.options ?? {};
+      this.data = config.data;
+      this.options.onResize?.(this as never, { width: 1000, height: 150 });
+    }
+
+    update(): void {}
+    destroy(): void {}
+  }
+
+  return { ...actual, Chart };
+});
 
 const settings: ChartSettings = { isDarkTheme: true, showTooltips: false };
 
@@ -81,6 +116,7 @@ describe("OscillatorChart.updateLegend", () => {
     const options = { plugins: { annotation: { annotations: {} as unknown } } };
     (chart as unknown as { _chart: unknown })._chart = {
       width,
+      chartArea: { left: 0, right: width },
       scales: { x: { min: 0 }, y: { max: 100, ticks } },
       options,
       update: vi.fn()
@@ -195,6 +231,17 @@ describe("OscillatorChart.updateLegend", () => {
     expect(written(options).find(a => a.id === "legend2-swatch")?.xAdjust).toBe(0);
   });
 
+  it("wraps at the plot area, not the full canvas", () => {
+    const { chart, options } = legendChart(seriesLegend);
+    const stub = (chart as unknown as { _chart: { chartArea: { left: number; right: number } } })
+      ._chart;
+    stub.chartArea = { left: 0, right: 200 };
+
+    chart.updateLegend(macd);
+
+    expect(written(options).find(a => a.id === "legend2-swatch")?.xAdjust).toBe(0);
+  });
+
   it("wraps before the right-hand axis labels unless they are hidden", () => {
     // The labels draw inside the plot (mirrored), so an entry running to the edge would cover them.
     const ticks = [{ label: "-10000K" }, { label: null }];
@@ -219,16 +266,44 @@ describe("OscillatorChart.updateLegend", () => {
     expect(labels.map(a => a.content.join(""))).toEqual(["MACD(12,26,9)", "Upper", "Lower"]);
   });
 
+  it("keeps the indicator label alone when only one line is drawn beside a `none` result", () => {
+    const { chart, options } = legendChart(seriesLegend);
+
+    chart.updateLegend(selection(["Upper"], ["Hidden", "none"]));
+
+    expect(Object.keys(options.plugins.annotation.annotations as object)).toEqual(["annotation"]);
+  });
+
   it("re-wraps the series legend after a resize", async () => {
     const { chart, options } = legendChart(seriesLegend);
     chart.updateLegend(macd);
     expect(written(options).every(a => a.yAdjust === 1)).toBe(true);
 
-    (chart as unknown as { _chart: { width: number } })._chart.width = 200;
+    const stub = (
+      chart as unknown as { _chart: { width: number; chartArea: { left: number; right: number } } }
+    )._chart;
+    stub.width = 200;
+    stub.chartArea = { left: 0, right: 200 };
     (chart as unknown as { _onResize: () => void })._onResize();
     await Promise.resolve();
 
     expect(written(options).some(a => a.yAdjust > 1)).toBe(true);
+  });
+
+  it("keeps the legend of the selection a re-render shows", async () => {
+    // A new Chart fires onResize inside render(), while the previous selection is still current.
+    const chart = new OscillatorChart({} as CanvasRenderingContext2D, seriesLegend);
+    const listing = { chartConfig: null } as unknown as IndicatorListing;
+    const adx = { ...selection(["ADX(14)"], ["DI+(14)"]), label: "ADX(14)" };
+
+    chart.render(macd, listing);
+    chart.render(adx, listing);
+    await Promise.resolve();
+
+    const annotations = chart.chart?.options.plugins?.annotation?.annotations as Written;
+    expect(annotations.filter(a => !a.id.endsWith("-swatch")).map(a => a.content.join(""))).toEqual(
+      ["ADX(14)", "DI+(14)"]
+    );
   });
 
   it("carries the resize handler on the options a theme change assigns", () => {

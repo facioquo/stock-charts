@@ -192,10 +192,13 @@ export class OscillatorChart {
   }
 
   // Deferred like the overlay's: Chart.js runs onResize before it updates the new layout.
+  // The selection is read when the microtask runs, since a new Chart fires onResize
+  // inside render() before render() lays out the legend of the selection it shows.
   private readonly _onResize = (): void => {
-    const selection = this._legendSelection;
-    if (!selection || !this.showsSeriesLegend(selection)) return;
+    if (!this._legendSelection || !this.showsSeriesLegend(this._legendSelection)) return;
     queueMicrotask(() => {
+      const selection = this._legendSelection;
+      if (!selection) return;
       this.updateLegend(selection);
       this._chart?.update("none");
     });
