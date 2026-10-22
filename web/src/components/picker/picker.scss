@@ -315,9 +315,11 @@
 }
 
 /* Narrower than the section header, with an outline and a search icon, so it
-   reads as a field rather than another header band. */
+   reads as a field rather than another header band. Right-aligned, so its edge
+   does not sit just off the list text's left margin. */
 .listing-filter-field {
   position: relative;
+  align-self: flex-end;
   width: 100%;
   max-width: 320px;
 
@@ -346,6 +348,7 @@
 }
 
 .listing-filter-status {
+  align-self: flex-end;
   font-size: 0.8rem;
   min-height: 1.2em;
 }
