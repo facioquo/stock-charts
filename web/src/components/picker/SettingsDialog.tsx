@@ -379,9 +379,9 @@ function ListingCategory({
   const headingId = useId();
   return (
     <>
-      <div id={headingId} className="listing-category-title">
+      <h3 id={headingId} className="listing-category-title">
         {group.label}
-      </div>
+      </h3>
       <ul className="nav-list" aria-labelledby={headingId}>
         {group.listings.map(listing => (
           <li key={listing.uiid}>

@@ -601,6 +601,13 @@ describe("SettingsDialog", () => {
       ).toBeInTheDocument();
     });
 
+    it("exposes each category as a heading", () => {
+      renderDialog();
+
+      expect(screen.getByRole("heading", { name: "Oscillators" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Moving averages" })).toBeInTheDocument();
+    });
+
     it("drops a category heading when none of its indicators match", () => {
       const { input } = renderDialog();
 
