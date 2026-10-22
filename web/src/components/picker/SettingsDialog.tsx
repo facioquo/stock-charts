@@ -334,7 +334,9 @@ function AvailableIndicators({
           autoComplete="off"
           spellCheck={false}
           value={filter}
-          onChange={event => changeFilter(event.target.value)}
+          onChange={event => {
+            changeFilter(event.target.value);
+          }}
           onKeyDown={event => {
             if (event.key !== "Enter") return;
             const first = matches[0];
