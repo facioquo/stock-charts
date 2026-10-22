@@ -197,7 +197,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 50,
         "defaultValue": 21
       },
@@ -249,7 +249,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 50,
         "defaultValue": 21
       },
@@ -833,7 +833,7 @@
         "paramName": "slowPeriods",
         "dataType": "int",
         "minimum": 2,
-        "maximum": 250,
+        "maximum": 100,
         "defaultValue": 10
       }
     ],
@@ -898,7 +898,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 250,
         "defaultValue": 22
       },
@@ -939,7 +939,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 250,
         "defaultValue": 22
       },
@@ -1005,7 +1005,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 250,
         "defaultValue": 14
       }
@@ -1516,7 +1516,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 250,
         "defaultValue": 10
       }
@@ -1809,7 +1809,7 @@
         "paramName": "lookbackPeriods",
         "dataType": "int",
         "minimum": 21,
-        "maximum": 500,
+        "maximum": 250,
         "defaultValue": 100
       }
     ],
@@ -2133,7 +2133,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 250,
         "defaultValue": 14
       }
@@ -2333,7 +2333,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 250,
         "defaultValue": 14
       }
@@ -2457,7 +2457,7 @@
         "paramName": "percentOffset",
         "dataType": "number",
         "minimum": 0.1,
-        "maximum": 25,
+        "maximum": 10,
         "defaultValue": 2.5
       }
     ],
@@ -2587,16 +2587,16 @@
         "displayName": "Step Size",
         "paramName": "accelerationStep",
         "dataType": "number",
-        "minimum": 0.000001,
-        "maximum": 2500,
+        "minimum": 0.01,
+        "maximum": 0.1,
         "defaultValue": 0.02
       },
       {
         "displayName": "Max Factor",
         "paramName": "maxAccelerationFactor",
         "dataType": "number",
-        "minimum": 0.000001,
-        "maximum": 2500,
+        "minimum": 0.1,
+        "maximum": 1,
         "defaultValue": 0.2
       }
     ],
@@ -2655,7 +2655,7 @@
         "displayName": "Signal Periods",
         "paramName": "signalPeriods",
         "dataType": "int",
-        "minimum": 0,
+        "minimum": 1,
         "maximum": 50,
         "defaultValue": 9
       }
@@ -3072,7 +3072,7 @@
         "paramName": "stdDevPeriods",
         "dataType": "int",
         "minimum": 1,
-        "maximum": 250,
+        "maximum": 100,
         "defaultValue": 14
       }
     ],
@@ -3204,7 +3204,7 @@
         "paramName": "offsetPeriods",
         "dataType": "int",
         "minimum": 0,
-        "maximum": 250,
+        "maximum": 100,
         "defaultValue": 9
       }
     ],
@@ -3581,7 +3581,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 250,
         "defaultValue": 14
       }
@@ -3614,7 +3614,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 250,
         "defaultValue": 14
       }
@@ -3720,7 +3720,7 @@
         "displayName": "SMA Periods",
         "paramName": "smaPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 50,
         "defaultValue": 5
       },
@@ -3736,7 +3736,7 @@
         "displayName": "ATR Periods",
         "paramName": "atrPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 50,
         "defaultValue": 10
       }
@@ -4058,7 +4058,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 50,
         "defaultValue": 10
       },
@@ -4130,7 +4130,7 @@
         "paramName": "volumeFactor",
         "dataType": "number",
         "minimum": 0.1,
-        "maximum": 2,
+        "maximum": 1,
         "defaultValue": 0.7
       }
     ],
@@ -4439,7 +4439,7 @@
         "paramName": "middlePeriods",
         "dataType": "int",
         "minimum": 2,
-        "maximum": 100,
+        "maximum": 50,
         "defaultValue": 14
       },
       {
@@ -4480,7 +4480,7 @@
         "paramName": "lookbackPeriods",
         "dataType": "int",
         "minimum": 2,
-        "maximum": 100,
+        "maximum": 50,
         "defaultValue": 7
       },
       {
@@ -4723,7 +4723,7 @@
         "displayName": "Jaw Periods",
         "paramName": "jawPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 250,
         "defaultValue": 13
       },
@@ -4739,7 +4739,7 @@
         "displayName": "Teeth Periods",
         "paramName": "teethPeriods",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 250,
         "defaultValue": 8
       },
@@ -4818,7 +4818,7 @@
         "displayName": "Window Span",
         "paramName": "windowSpan",
         "dataType": "int",
-        "minimum": 1,
+        "minimum": 2,
         "maximum": 100,
         "defaultValue": 2
       }
