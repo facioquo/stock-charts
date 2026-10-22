@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ChartController } from "../../charting/chartController";
@@ -584,6 +584,40 @@ describe("SettingsDialog", () => {
       fireEvent.keyDown(input, { key: "Enter" });
 
       expect(onPickIndicator).not.toHaveBeenCalled();
+    });
+
+    it("groups the list under category headings", () => {
+      renderDialog();
+
+      expect(
+        within(screen.getByRole("list", { name: "Oscillators" })).getByRole("button", {
+          name: "Relative Strength Index"
+        })
+      ).toBeInTheDocument();
+      expect(
+        within(screen.getByRole("list", { name: "Moving averages" })).getByRole("button", {
+          name: "Simple Moving Average"
+        })
+      ).toBeInTheDocument();
+    });
+
+    it("drops a category heading when none of its indicators match", () => {
+      const { input } = renderDialog();
+
+      fireEvent.change(input, { target: { value: "relative" } });
+
+      expect(screen.getByRole("list", { name: "Oscillators" })).toBeInTheDocument();
+      expect(screen.queryByRole("list", { name: "Moving averages" })).toBeNull();
+    });
+
+    it("picks the first match shown, in category order, on Enter", () => {
+      const { controller, input, onPickIndicator } = renderDialog();
+
+      // RSI is listed first, but "Moving averages" sorts above "Oscillators".
+      fireEvent.change(input, { target: { value: "i" } });
+      fireEvent.keyDown(input, { key: "Enter" });
+
+      expect(onPickIndicator).toHaveBeenCalledWith(controller.listings[1]);
     });
 
     it("restores the filter when the dialog reopens after an add", () => {

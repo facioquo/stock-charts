@@ -379,9 +379,13 @@
   font-size: 1rem;
 }
 
-.nav-subtitle {
+.listing-category-title {
+  padding: 16px 16px 4px;
   font-size: 0.8rem;
+  font-weight: 500;
   color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .action-button-container {

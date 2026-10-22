@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { IndicatorListing } from "../../types/chart.types";
-import { filterListings } from "./listingFilter";
+import { filterListings, groupByCategory } from "./listingFilter";
 
 function makeListing(uiid: string, name: string, category: string): IndicatorListing {
   return {
@@ -51,5 +51,24 @@ describe("filterListings", () => {
 
   it("returns nothing when no listing matches", () => {
     expect(names("zzz")).toEqual([]);
+  });
+});
+
+describe("groupByCategory", () => {
+  it("groups listings under their category label, ordered by label", () => {
+    const groups = groupByCategory([
+      makeListing("SMA", "Simple Moving Average", "moving-average"),
+      makeListing("RSI", "Relative Strength Index", "oscillator"),
+      makeListing("EMA", "Exponential Moving Average", "moving-average")
+    ]);
+
+    expect(groups.map(g => [g.label, g.listings.map(l => l.uiid)])).toEqual([
+      ["Moving averages", ["SMA", "EMA"]],
+      ["Oscillators", ["RSI"]]
+    ]);
+  });
+
+  it("returns no groups for no listings", () => {
+    expect(groupByCategory([])).toEqual([]);
   });
 });

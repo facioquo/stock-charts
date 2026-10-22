@@ -16,3 +16,22 @@ export function filterListings(
     return words.every(word => text.includes(word));
   });
 }
+
+export interface ListingGroup {
+  category: string;
+  label: string;
+  listings: readonly IndicatorListing[];
+}
+
+/** Listings grouped under their category label, groups ordered by label, listings kept in order. */
+export function groupByCategory(listings: readonly IndicatorListing[]): ListingGroup[] {
+  const groups = new Map<string, IndicatorListing[]>();
+  for (const listing of listings) {
+    const group = groups.get(listing.category);
+    if (group) group.push(listing);
+    else groups.set(listing.category, [listing]);
+  }
+  return [...groups]
+    .map(([category, members]) => ({ category, label: categoryLabel(category), listings: members }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
