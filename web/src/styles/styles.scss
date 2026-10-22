@@ -214,4 +214,16 @@
   h2 {
     text-align: center;
   }
+
+  /* Route error screen; picker.scss buttons live in the lazy chunk that failed. */
+  .reload-button {
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font: inherit;
+    font-weight: 500;
+    color: var(--on-primary);
+    background-color: var(--control-container);
+    cursor: pointer;
+  }
 }
