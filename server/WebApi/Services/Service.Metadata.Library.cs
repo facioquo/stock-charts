@@ -44,11 +44,13 @@ public static class LibraryCatalog
     /// Defaults the demo keeps over the library's, keyed by route and parameter name.
     /// </summary>
     /// <remarks>
-    /// The library's catalog lists a Force Index lookback of 2, which reads as a
-    /// catalog slip next to the conventional 13.
+    /// Each keeps the value the indicator's author published where the library's
+    /// catalog differs: Elder's 13-period Force Index (the catalog lists 2), and
+    /// the 9-period signal line in Blau's Stochastic Momentum Index (the catalog lists 3).
     /// </remarks>
     private static readonly Dictionary<(string Route, string ParamName), double> DefaultOverrides = new() {
-        [("FORCE", "lookbackPeriods")] = 13
+        [("FORCE", "lookbackPeriods")] = 13,
+        [("SMI", "signalPeriods")] = 9
     };
 
     private static readonly Dictionary<string, LibraryListing> LibraryListings
