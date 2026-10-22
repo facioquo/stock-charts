@@ -12,8 +12,7 @@ import { flushSync } from "react-dom";
 import type { ChartController } from "../../charting/chartController";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
 import { changeTheme, changeTooltips, getSettings } from "../../services/userPrefs";
-import { categoryLabel } from "./categoryLabel";
-import { filterListings } from "./listingFilter";
+import { filterListings, groupByCategory, type ListingGroup } from "./listingFilter";
 
 import { Modal } from "./Modal";
 
@@ -295,7 +294,8 @@ interface AvailableIndicatorsProps {
 
 /**
  * List of available indicators that open the {@link PickConfigDialog}, narrowed by a
- * filter box that matches name, id, and category. Enter picks the first match.
+ * filter box that matches name, id, and category, and grouped under category headings.
+ * Enter picks the first match shown.
  */
 function AvailableIndicators({
   listings,
@@ -305,6 +305,7 @@ function AvailableIndicators({
 }: AvailableIndicatorsProps): React.JSX.Element {
   const [filter, setFilter] = useState(initialFilter);
   const matches = filterListings(listings, filter);
+  const groups = groupByCategory(matches);
   const filtering = filter.trim() !== "";
   const changeFilter = (value: string): void => {
     setFilter(value);
@@ -344,7 +345,7 @@ function AvailableIndicators({
             }}
             onKeyDown={event => {
               if (event.key !== "Enter") return;
-              const first = matches[0];
+              const first = groups[0]?.listings[0];
               if (filtering && first) {
                 event.preventDefault();
                 onPick(first);
@@ -360,17 +361,37 @@ function AvailableIndicators({
             : ""}
         </span>
       </div>
-      <ul className="nav-list">
-        {matches.map(listing => (
+      {groups.map(group => (
+        <ListingCategory key={group.category} group={group} onPick={onPick} />
+      ))}
+    </section>
+  );
+}
+
+/** One category heading and the available indicators under it. */
+function ListingCategory({
+  group,
+  onPick
+}: {
+  group: ListingGroup;
+  onPick: (listing: IndicatorListing) => void;
+}): React.JSX.Element {
+  const headingId = useId();
+  return (
+    <>
+      <h3 id={headingId} className="listing-category-title">
+        {group.label}
+      </h3>
+      <ul className="nav-list" aria-labelledby={headingId}>
+        {group.listings.map(listing => (
           <li key={listing.uiid}>
             <button type="button" onClick={() => onPick(listing)}>
               <span className="nav-title">{listing.name}</span>
-              <span className="nav-subtitle">{categoryLabel(listing.category)}</span>
             </button>
           </li>
         ))}
       </ul>
-    </section>
+    </>
   );
 }
 

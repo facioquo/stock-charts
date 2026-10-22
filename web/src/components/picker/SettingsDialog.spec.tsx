@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ChartController } from "../../charting/chartController";
@@ -584,6 +584,67 @@ describe("SettingsDialog", () => {
       fireEvent.keyDown(input, { key: "Enter" });
 
       expect(onPickIndicator).not.toHaveBeenCalled();
+    });
+
+    it("groups the list under category headings", () => {
+      renderDialog();
+
+      expect(
+        within(screen.getByRole("list", { name: "Oscillators" })).getByRole("button", {
+          name: "Relative Strength Index"
+        })
+      ).toBeInTheDocument();
+      expect(
+        within(screen.getByRole("list", { name: "Moving averages" })).getByRole("button", {
+          name: "Simple Moving Average"
+        })
+      ).toBeInTheDocument();
+    });
+
+    it("exposes each category as a heading", () => {
+      renderDialog();
+
+      expect(screen.getByRole("heading", { name: "Oscillators" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Moving averages" })).toBeInTheDocument();
+    });
+
+    it("drops a category heading when none of its indicators match", () => {
+      const { input } = renderDialog();
+
+      fireEvent.change(input, { target: { value: "relative" } });
+
+      expect(screen.getByRole("list", { name: "Oscillators" })).toBeInTheDocument();
+      expect(screen.queryByRole("list", { name: "Moving averages" })).toBeNull();
+    });
+
+    it("orders the category headings as the library docs do", () => {
+      renderDialog();
+
+      expect(screen.getAllByRole("heading").map(h => h.textContent)).toEqual([
+        "Oscillators",
+        "Moving averages"
+      ]);
+    });
+
+    it("picks the first match shown, in category order, on Enter", () => {
+      const controller = makeController();
+      // Catalog order puts SMA first, but "Oscillators" comes before "Moving averages".
+      controller.listings.reverse();
+      const onPickIndicator = vi.fn();
+      render(
+        <SettingsDialog
+          controller={controller as unknown as ChartController}
+          onClose={vi.fn()}
+          onPickIndicator={onPickIndicator}
+          onEditIndicator={vi.fn()}
+        />
+      );
+      const input = screen.getByRole("searchbox", { name: "filter available indicators" });
+
+      fireEvent.change(input, { target: { value: "i" } });
+      fireEvent.keyDown(input, { key: "Enter" });
+
+      expect(onPickIndicator).toHaveBeenCalledWith(controller.listings.find(l => l.uiid === "RSI"));
     });
 
     it("restores the filter when the dialog reopens after an add", () => {
