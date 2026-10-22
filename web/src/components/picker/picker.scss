@@ -379,14 +379,20 @@
   font-size: 1rem;
 }
 
+/* Extra space above each heading separates the categories; the first one
+   needs less, since the filter already sets it apart. */
 .listing-category-title {
   margin: 0;
-  padding: 16px 16px 4px;
+  padding: 32px 16px 6px;
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.listing-filter + .listing-category-title {
+  padding-top: 12px;
 }
 
 .action-button-container {
