@@ -4167,20 +4167,21 @@ public static class Metadata
                 ]
             },
 
-            // Anchored VWAP: anchored to the first visible bar, not reset per
-            // session, so it is labeled as such until intraday data exists (#491)
+            // VWAP anchored to the first visible bar, not reset per session.
+            // The modifier names the anchor so a future session variant can be
+            // "VWAP (session)" beside it (#491)
             new IndicatorListing {
-                Name = "Anchored VWAP",
+                Name = "Volume Weighted Average Price (VWAP), visible range",
                 Uiid = "VWAP",
-                LegendTemplate = "Anchored VWAP",
+                LegendTemplate = "VWAP (visible range)",
                 Endpoint = $"{baseUrl}/VWAP/",
                 Category = "moving-average",
                 ChartType = "overlay",
                 Parameters = [],
                 Results = [
                     new() {
-                        DisplayName = "Anchored VWAP",
-                        TooltipTemplate = "Anchored VWAP",
+                        DisplayName = "VWAP (visible range)",
+                        TooltipTemplate = "VWAP (visible range)",
                         DataName = "vwap",
                         DataType = "number",
                         LineType = "solid",
