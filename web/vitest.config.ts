@@ -11,9 +11,16 @@ export default defineConfig({
     setupFiles: ["./src/test-setup.ts"],
     coverage: {
       provider: "v8",
-      reporter: ["text", "html"],
+      reporter: ["text", "html", "lcov"],
       include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/**/*.spec.{ts,tsx}", "src/main.tsx", "src/test-setup.ts"]
+      exclude: ["src/**/*.spec.{ts,tsx}", "src/main.tsx", "src/test-setup.ts"],
+      // Set just under measured coverage so a drop fails CI; raise them as coverage grows.
+      thresholds: {
+        statements: 90,
+        branches: 79,
+        functions: 89,
+        lines: 91
+      }
     }
   }
 });

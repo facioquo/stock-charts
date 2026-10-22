@@ -22,6 +22,7 @@ export function ChartPage(): React.JSX.Element {
   const [editUcid, setEditUcid] = useState<string | null>(null);
   // The settings dialog remounts after each add; these carry its place and a result line across.
   const settingsScroll = useRef(0);
+  const settingsFilter = useRef("");
   const idsBeforePick = useRef<ReadonlySet<string>>(new Set());
   const [addedNotice, setAddedNotice] = useState("");
 
@@ -221,6 +222,7 @@ export function ChartPage(): React.JSX.Element {
           controller={controller}
           onClose={() => {
             settingsScroll.current = 0;
+            settingsFilter.current = "";
             setAddedNotice("");
             setSettingsOpen(false);
           }}
@@ -228,6 +230,10 @@ export function ChartPage(): React.JSX.Element {
           initialScrollTop={settingsScroll.current}
           onScrollChange={top => {
             settingsScroll.current = top;
+          }}
+          initialFilter={settingsFilter.current}
+          onFilterChange={text => {
+            settingsFilter.current = text;
           }}
           onPickIndicator={openIndicatorSettings}
           onEditIndicator={openIndicatorEdit}

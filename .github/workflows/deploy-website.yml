@@ -26,10 +26,15 @@ env:
   NODE_VERSION: 24
 
 jobs:
+  # Fork PRs get no secrets, so nothing here can deploy for them. Every other
+  # job needs this one, so skipping it skips the whole run; CI verifies forks.
   versioning:
     name: Define version
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    if: |
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     outputs:
       version: ${{ steps.marker.outputs.version }}
 
@@ -228,12 +233,9 @@ jobs:
       - deploy-api
     # deploy-api only runs on main; it is 'skipped' for preview builds, which
     # must still be allowed to publish. On main, a failed API deploy must NOT
-    # be masked by a green Pages deployment. Fork PRs get no secrets, so their
-    # preview is skipped rather than failed; the build jobs still verify them.
+    # be masked by a green Pages deployment.
     if: |
       always() &&
-      (github.event_name != 'pull_request' ||
-        github.event.pull_request.head.repo.full_name == github.repository) &&
       needs.versioning.result == 'success' &&
       needs.build-backend.result == 'success' &&
       needs.build-website.result == 'success' &&

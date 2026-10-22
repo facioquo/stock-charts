@@ -7,10 +7,11 @@ describe("eslint.config", () => {
     expect((config as unknown[]).length).toBeGreaterThan(0);
   });
 
-  it("includes an ignores block for dist and node_modules", () => {
+  it("includes an ignores block for dist, coverage, and node_modules", () => {
     type ConfigBlock = { ignores?: string[]; files?: string[] };
     const ignoresBlock = (config as ConfigBlock[]).find(c => "ignores" in c && !("files" in c));
     expect(ignoresBlock?.ignores).toContain("dist/**");
+    expect(ignoresBlock?.ignores).toContain("coverage/**");
     expect(ignoresBlock?.ignores).toContain("node_modules/**");
   });
 

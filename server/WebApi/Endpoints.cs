@@ -517,8 +517,9 @@ public partial class Main(
     // the leftmost visible candle instead of accumulating from the dataset
     // origin (which detaches it from anything on screen). The empty-input
     // guard avoids calling First() on an empty slice.
-    // Future: once intraday data is available, anchor per trading session
-    // (daily reset) rather than to the visible window.
+    // The catalog labels it "VWAP (visible range)" for that reason. Future:
+    // once intraday data is available, add a per-session variant (daily
+    // reset) labeled "VWAP (session)".
     [HttpGet("VWAP")]
     public Task<IActionResult> GetVwap()
         => Get(quotes => quotes.Count == 0

@@ -201,7 +201,7 @@ public class Service
 ## Technology conventions
 
 - **React v19**: hooks-based state, functional components, strict mode
-- **Vite v7**: dev server and production bundler for the React frontend
+- **Vite v8**: dev server and production bundler for the React frontend
 - **pnpm packages**: pnpm workspace dependency management
 - **NuGet**: centralized NuGet package management
 - **Markdown**: sentence case, AGENTS.md as canonical source
@@ -210,7 +210,7 @@ public class Service
 
 ### Frontend architecture
 
-- **React v19 + Vite v7**: Functional components, hooks-based state, HMR dev server
+- **React v19 + Vite v8**: Functional components, hooks-based state, hot module replacement (HMR) dev server
 - **TypeScript**: Strict mode enabled, comprehensive type safety
 - **Chart.js v4+**: Financial chart types in `libs/chartjs-financial/`; bundled into `@facioquo/indy-charts` dist
 - **React Router v7**: Client-side routing

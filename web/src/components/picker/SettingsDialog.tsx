@@ -12,7 +12,7 @@ import { flushSync } from "react-dom";
 import type { ChartController } from "../../charting/chartController";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
 import { changeTheme, changeTooltips, getSettings } from "../../services/userPrefs";
-import { categoryLabel } from "./categoryLabel";
+import { filterListings, groupByCategory, type ListingGroup } from "./listingFilter";
 
 import { Modal } from "./Modal";
 
@@ -28,6 +28,9 @@ interface SettingsDialogProps {
   /** Scroll position to restore when the dialog reopens after adding an indicator. */
   initialScrollTop?: number;
   onScrollChange?: Dispatch<number>;
+  /** Filter text to restore when the dialog reopens after adding an indicator. */
+  initialFilter?: string;
+  onFilterChange?: Dispatch<string>;
 }
 
 interface ToggleRowProps {
@@ -285,10 +288,29 @@ function DisplayedIndicators({
 interface AvailableIndicatorsProps {
   listings: readonly IndicatorListing[];
   onPick: (listing: IndicatorListing) => void;
+  initialFilter: string;
+  onFilterChange?: Dispatch<string>;
 }
 
-/** List of available indicators that open the {@link PickConfigDialog}. */
-function AvailableIndicators({ listings, onPick }: AvailableIndicatorsProps): React.JSX.Element {
+/**
+ * List of available indicators that open the {@link PickConfigDialog}, narrowed by a
+ * filter box that matches name, id, and category, and grouped under category headings.
+ * Enter picks the first match shown.
+ */
+function AvailableIndicators({
+  listings,
+  onPick,
+  initialFilter,
+  onFilterChange
+}: AvailableIndicatorsProps): React.JSX.Element {
+  const [filter, setFilter] = useState(initialFilter);
+  const matches = filterListings(listings, filter);
+  const groups = groupByCategory(matches);
+  const filtering = filter.trim() !== "";
+  const changeFilter = (value: string): void => {
+    setFilter(value);
+    onFilterChange?.(value);
+  };
   return (
     <section className="available-indicators">
       <div className="dialog-section-header column">
@@ -305,17 +327,71 @@ function AvailableIndicators({ listings, onPick }: AvailableIndicatorsProps): Re
           </a>
         </span>
       </div>
-      <ul className="nav-list">
-        {listings.map(listing => (
+      <div className="listing-filter">
+        <div className="listing-filter-field">
+          <span className="material-icons" aria-hidden="true">
+            search
+          </span>
+          <input
+            type="search"
+            className="listing-filter-input"
+            aria-label="filter available indicators"
+            placeholder="Filter by name or category"
+            autoComplete="off"
+            spellCheck={false}
+            value={filter}
+            onChange={event => {
+              changeFilter(event.target.value);
+            }}
+            onKeyDown={event => {
+              if (event.key !== "Enter") return;
+              const first = groups[0]?.listings[0];
+              if (filtering && first) {
+                event.preventDefault();
+                onPick(first);
+              }
+            }}
+          />
+        </div>
+        <span aria-live="polite" className="listing-filter-status">
+          {filtering
+            ? matches.length === 0
+              ? "No indicators match"
+              : `${matches.length} of ${listings.length} indicators`
+            : ""}
+        </span>
+      </div>
+      {groups.map(group => (
+        <ListingCategory key={group.category} group={group} onPick={onPick} />
+      ))}
+    </section>
+  );
+}
+
+/** One category heading and the available indicators under it. */
+function ListingCategory({
+  group,
+  onPick
+}: {
+  group: ListingGroup;
+  onPick: (listing: IndicatorListing) => void;
+}): React.JSX.Element {
+  const headingId = useId();
+  return (
+    <>
+      <h3 id={headingId} className="listing-category-title">
+        {group.label}
+      </h3>
+      <ul className="nav-list" aria-labelledby={headingId}>
+        {group.listings.map(listing => (
           <li key={listing.uiid}>
             <button type="button" onClick={() => onPick(listing)}>
               <span className="nav-title">{listing.name}</span>
-              <span className="nav-subtitle">{categoryLabel(listing.category)}</span>
             </button>
           </li>
         ))}
       </ul>
-    </section>
+    </>
   );
 }
 
@@ -481,7 +557,9 @@ export function SettingsDialog({
   onEditIndicator,
   notice = "",
   initialScrollTop = 0,
-  onScrollChange
+  onScrollChange,
+  initialFilter = "",
+  onFilterChange
 }: SettingsDialogProps): React.JSX.Element {
   const titleId = useId();
   const controls = useSettingsControls(controller);
@@ -551,7 +629,12 @@ export function SettingsDialog({
           />
         )}
 
-        <AvailableIndicators listings={controller.listings} onPick={onPickIndicator} />
+        <AvailableIndicators
+          listings={controller.listings}
+          onPick={onPickIndicator}
+          initialFilter={initialFilter}
+          onFilterChange={onFilterChange}
+        />
       </div>
     </Modal>
   );

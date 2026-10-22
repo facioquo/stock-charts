@@ -79,7 +79,8 @@ function snapshotTarget(root, relative) {
 for (const { path: relative, data } of files) {
   const target = snapshotTarget(tempDir, relative);
   fs.mkdirSync(path.dirname(target), { recursive: true });
-  fs.writeFileSync(target, `${JSON.stringify(data)}\n`, "utf8");
+  // Indented so a regenerated snapshot diffs line by line in review.
+  fs.writeFileSync(target, `${JSON.stringify(data, null, 2)}\n`, "utf8");
 }
 fs.rmSync(outDir, { recursive: true, force: true });
 fs.renameSync(tempDir, outDir);
