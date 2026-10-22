@@ -22,7 +22,6 @@ public static class LibraryCatalog
         ["CHEXIT-SHORT"] = "CHEXIT",
         ["CORRELATION"] = "CORR",
         ["DYN"] = "DYNAMIC",
-        ["HEIKIN-ASHI"] = "HEIKINASHI",
         ["ROCWB"] = "ROC-WB",
         ["STDEV-CH"] = "STDEV-CHANNELS",
         ["STO"] = "STOCH",

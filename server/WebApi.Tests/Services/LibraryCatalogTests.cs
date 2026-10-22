@@ -33,6 +33,16 @@ public class LibraryCatalogTests
     [InlineData("SMA", "lookbackPeriods", "SMA", "lookbackPeriods")]
     [InlineData("STOCHRSI", "rsiPeriods", "STOCH-RSI", "rsiPeriods")]
     [InlineData("STDEV-CH", "standardDeviations", "STDEV-CHANNELS", "stdDeviations")]
+    [InlineData("ATR-STOP-CLOSE", "lookbackPeriods", "ATR-STOP", "lookbackPeriods")]
+    [InlineData("CHAIKIN", "slowPeriods", "CHAIKIN-OSC", "slowPeriods")]
+    [InlineData("CHEXIT-LONG", "lookbackPeriods", "CHEXIT", "lookbackPeriods")]
+    [InlineData("CORRELATION", "lookbackPeriods", "CORR", "lookbackPeriods")]
+    [InlineData("DYN", "lookbackPeriods", "DYNAMIC", "lookbackPeriods")]
+    [InlineData("ROCWB", "stdDevPeriods", "ROC-WB", "stdDevPeriods")]
+    [InlineData("STO", "signalPeriods", "STOCH", "signalPeriods")]
+    [InlineData("ULTIMATE", "middlePeriods", "UO", "middlePeriods")]
+    [InlineData("WILLIAMSR", "lookbackPeriods", "WILLR", "lookbackPeriods")]
+    [InlineData("ZIGZAG-CL", "percentChange", "ZIGZAG", "percentChange")]
     public void Parameter_TakesBoundsAndDefaultFromTheLibrary(
         string uiid, string paramName, string libraryId, string libraryParamName)
     {
@@ -42,6 +52,23 @@ public class LibraryCatalogTests
         Assert.Equal(library.Minimum, served.Minimum);
         Assert.Equal(library.Maximum, served.Maximum);
         Assert.Equal(Convert.ToDouble(library.DefaultValue, CultureInfo.InvariantCulture), served.DefaultValue);
+    }
+
+    [Fact]
+    public void ApplyParameterBounds_ParameterMissingFromTheLibraryListing_Throws()
+    {
+        ApiListing mismatched = new() {
+            Name = "Simple Moving Average",
+            Uiid = "SMA",
+            LegendTemplate = "SMA",
+            Endpoint = "/SMA/",
+            Category = "moving-average",
+            ChartType = "overlay",
+            Parameters = [new() { DisplayName = "Unknown", ParamName = "notAParameter", DataType = "int" }],
+            Results = []
+        };
+
+        Assert.Throws<InvalidOperationException>(() => LibraryCatalog.ApplyParameterBounds(mismatched));
     }
 
     [Fact]
