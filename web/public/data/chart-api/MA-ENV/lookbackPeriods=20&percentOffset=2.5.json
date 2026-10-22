@@ -1,71 +1,5 @@
 [
   {
-    "timestamp": "2026-04-16T04:00:00Z",
-    "centerline": 595.1919999999999,
-    "upperEnvelope": 610.0717999999999,
-    "lowerEnvelope": 580.3121999999998
-  },
-  {
-    "timestamp": "2026-04-17T04:00:00Z",
-    "centerline": 597.9784999999999,
-    "upperEnvelope": 612.9279624999999,
-    "lowerEnvelope": 583.0290375
-  },
-  {
-    "timestamp": "2026-04-20T04:00:00Z",
-    "centerline": 601.213,
-    "upperEnvelope": 616.2433249999999,
-    "lowerEnvelope": 586.182675
-  },
-  {
-    "timestamp": "2026-04-21T04:00:00Z",
-    "centerline": 604.0145,
-    "upperEnvelope": 619.1148625,
-    "lowerEnvelope": 588.9141375
-  },
-  {
-    "timestamp": "2026-04-22T04:00:00Z",
-    "centerline": 607.5727499999999,
-    "upperEnvelope": 622.7620687499999,
-    "lowerEnvelope": 592.38343125
-  },
-  {
-    "timestamp": "2026-04-23T04:00:00Z",
-    "centerline": 610.7542499999998,
-    "upperEnvelope": 626.0231062499998,
-    "lowerEnvelope": 595.4853937499998
-  },
-  {
-    "timestamp": "2026-04-24T04:00:00Z",
-    "centerline": 615.2662499999999,
-    "upperEnvelope": 630.6479062499999,
-    "lowerEnvelope": 599.8845937499999
-  },
-  {
-    "timestamp": "2026-04-27T04:00:00Z",
-    "centerline": 620.3552499999998,
-    "upperEnvelope": 635.8641312499998,
-    "lowerEnvelope": 604.8463687499999
-  },
-  {
-    "timestamp": "2026-04-28T04:00:00Z",
-    "centerline": 625.32075,
-    "upperEnvelope": 640.95376875,
-    "lowerEnvelope": 609.68773125
-  },
-  {
-    "timestamp": "2026-04-29T04:00:00Z",
-    "centerline": 629.5447499999999,
-    "upperEnvelope": 645.2833687499999,
-    "lowerEnvelope": 613.8061312499999
-  },
-  {
-    "timestamp": "2026-04-30T04:00:00Z",
-    "centerline": 633.7082499999999,
-    "upperEnvelope": 649.5509562499999,
-    "lowerEnvelope": 617.8655437499999
-  },
-  {
     "timestamp": "2026-05-01T04:00:00Z",
     "centerline": 638.1657500000001,
     "upperEnvelope": 654.1198937500001,
@@ -718,5 +652,71 @@
     "centerline": 731.6767500000001,
     "upperEnvelope": 749.9686687500001,
     "lowerEnvelope": 713.38483125
+  },
+  {
+    "timestamp": "2026-10-07T04:00:00Z",
+    "centerline": 733.7462499999999,
+    "upperEnvelope": 752.0899062499999,
+    "lowerEnvelope": 715.4025937499999
+  },
+  {
+    "timestamp": "2026-10-08T04:00:00Z",
+    "centerline": 735.68475,
+    "upperEnvelope": 754.07686875,
+    "lowerEnvelope": 717.29263125
+  },
+  {
+    "timestamp": "2026-10-09T04:00:00Z",
+    "centerline": 737.50325,
+    "upperEnvelope": 755.94083125,
+    "lowerEnvelope": 719.06566875
+  },
+  {
+    "timestamp": "2026-10-12T04:00:00Z",
+    "centerline": 739.3412500000001,
+    "upperEnvelope": 757.8247812500001,
+    "lowerEnvelope": 720.85771875
+  },
+  {
+    "timestamp": "2026-10-13T04:00:00Z",
+    "centerline": 741.29325,
+    "upperEnvelope": 759.8255812499999,
+    "lowerEnvelope": 722.76091875
+  },
+  {
+    "timestamp": "2026-10-14T04:00:00Z",
+    "centerline": 742.5074999999999,
+    "upperEnvelope": 761.0701875,
+    "lowerEnvelope": 723.9448124999999
+  },
+  {
+    "timestamp": "2026-10-15T04:00:00Z",
+    "centerline": 743.0725,
+    "upperEnvelope": 761.6493125,
+    "lowerEnvelope": 724.4956875
+  },
+  {
+    "timestamp": "2026-10-16T04:00:00Z",
+    "centerline": 742.4955,
+    "upperEnvelope": 761.0578875,
+    "lowerEnvelope": 723.9331125
+  },
+  {
+    "timestamp": "2026-10-19T04:00:00Z",
+    "centerline": 741.3405,
+    "upperEnvelope": 759.8740125,
+    "lowerEnvelope": 722.8069875
+  },
+  {
+    "timestamp": "2026-10-20T04:00:00Z",
+    "centerline": 739.8295,
+    "upperEnvelope": 758.3252375000001,
+    "lowerEnvelope": 721.3337625
+  },
+  {
+    "timestamp": "2026-10-21T04:00:00Z",
+    "centerline": 739.0334999999999,
+    "upperEnvelope": 757.5093374999999,
+    "lowerEnvelope": 720.5576624999999
   }
 ]

@@ -1,104 +1,5 @@
 [
   {
-    "timestamp": "2026-04-16T04:00:00Z",
-    "highPoint": null,
-    "lowPoint": null,
-    "highLine": null,
-    "lowLine": 624.912,
-    "highTrend": null,
-    "lowTrend": 2
-  },
-  {
-    "timestamp": "2026-04-17T04:00:00Z",
-    "highPoint": null,
-    "lowPoint": null,
-    "highLine": null,
-    "lowLine": 630.688,
-    "highTrend": null,
-    "lowTrend": 2
-  },
-  {
-    "timestamp": "2026-04-20T04:00:00Z",
-    "highPoint": null,
-    "lowPoint": null,
-    "highLine": null,
-    "lowLine": 636.464,
-    "highTrend": null,
-    "lowTrend": 2
-  },
-  {
-    "timestamp": "2026-04-21T04:00:00Z",
-    "highPoint": null,
-    "lowPoint": 642.24,
-    "highLine": null,
-    "lowLine": 642.24,
-    "highTrend": null,
-    "lowTrend": 2
-  },
-  {
-    "timestamp": "2026-04-22T04:00:00Z",
-    "highPoint": null,
-    "lowPoint": null,
-    "highLine": null,
-    "lowLine": 644.554,
-    "highTrend": null,
-    "lowTrend": 2
-  },
-  {
-    "timestamp": "2026-04-23T04:00:00Z",
-    "highPoint": null,
-    "lowPoint": null,
-    "highLine": null,
-    "lowLine": 646.868,
-    "highTrend": null,
-    "lowTrend": 2
-  },
-  {
-    "timestamp": "2026-04-24T04:00:00Z",
-    "highPoint": null,
-    "lowPoint": null,
-    "highLine": null,
-    "lowLine": 649.182,
-    "highTrend": null,
-    "lowTrend": 2
-  },
-  {
-    "timestamp": "2026-04-27T04:00:00Z",
-    "highPoint": null,
-    "lowPoint": null,
-    "highLine": null,
-    "lowLine": 651.496,
-    "highTrend": null,
-    "lowTrend": 2
-  },
-  {
-    "timestamp": "2026-04-28T04:00:00Z",
-    "highPoint": null,
-    "lowPoint": 653.81,
-    "highLine": null,
-    "lowLine": 653.81,
-    "highTrend": null,
-    "lowTrend": 2
-  },
-  {
-    "timestamp": "2026-04-29T04:00:00Z",
-    "highPoint": null,
-    "lowPoint": null,
-    "highLine": null,
-    "lowLine": 658.093,
-    "highTrend": null,
-    "lowTrend": 2
-  },
-  {
-    "timestamp": "2026-04-30T04:00:00Z",
-    "highPoint": null,
-    "lowPoint": null,
-    "highLine": null,
-    "lowLine": 662.376,
-    "highTrend": null,
-    "lowTrend": 2
-  },
-  {
     "timestamp": "2026-05-01T04:00:00Z",
     "highPoint": null,
     "lowPoint": null,
@@ -993,76 +894,166 @@
     "timestamp": "2026-09-23T04:00:00Z",
     "highPoint": null,
     "lowPoint": null,
-    "highLine": null,
+    "highLine": 749.762,
     "lowLine": 719.79625,
-    "highTrend": null,
+    "highTrend": 0,
     "lowTrend": 2
   },
   {
     "timestamp": "2026-09-24T04:00:00Z",
     "highPoint": null,
     "lowPoint": null,
-    "highLine": null,
+    "highLine": 751.214,
     "lowLine": 723.7475,
-    "highTrend": null,
+    "highTrend": 0,
     "lowTrend": 2
   },
   {
     "timestamp": "2026-09-25T04:00:00Z",
     "highPoint": null,
     "lowPoint": null,
-    "highLine": null,
+    "highLine": 752.666,
     "lowLine": 727.69875,
-    "highTrend": null,
+    "highTrend": 0,
     "lowTrend": 2
   },
   {
     "timestamp": "2026-09-28T04:00:00Z",
     "highPoint": null,
     "lowPoint": 731.65,
-    "highLine": null,
+    "highLine": 754.118,
     "lowLine": 731.65,
-    "highTrend": null,
+    "highTrend": 0,
     "lowTrend": 2
   },
   {
     "timestamp": "2026-09-29T04:00:00Z",
     "highPoint": null,
     "lowPoint": null,
-    "highLine": null,
-    "lowLine": null,
-    "highTrend": null,
-    "lowTrend": null
+    "highLine": 755.57,
+    "lowLine": 733.10375,
+    "highTrend": 0,
+    "lowTrend": 2
   },
   {
     "timestamp": "2026-09-30T04:00:00Z",
     "highPoint": null,
     "lowPoint": null,
-    "highLine": null,
-    "lowLine": null,
-    "highTrend": null,
-    "lowTrend": null
+    "highLine": 757.022,
+    "lowLine": 734.5575,
+    "highTrend": 0,
+    "lowTrend": 2
   },
   {
     "timestamp": "2026-10-01T04:00:00Z",
     "highPoint": null,
     "lowPoint": null,
-    "highLine": null,
-    "lowLine": null,
-    "highTrend": null,
-    "lowTrend": null
+    "highLine": 758.474,
+    "lowLine": 736.01125,
+    "highTrend": 0,
+    "lowTrend": 2
   },
   {
     "timestamp": "2026-10-02T04:00:00Z",
     "highPoint": null,
     "lowPoint": null,
-    "highLine": null,
-    "lowLine": null,
-    "highTrend": null,
-    "lowTrend": null
+    "highLine": 759.926,
+    "lowLine": 737.465,
+    "highTrend": 0,
+    "lowTrend": 2
   },
   {
     "timestamp": "2026-10-05T04:00:00Z",
+    "highPoint": null,
+    "lowPoint": null,
+    "highLine": 761.378,
+    "lowLine": 738.91875,
+    "highTrend": 0,
+    "lowTrend": 2
+  },
+  {
+    "timestamp": "2026-10-06T04:00:00Z",
+    "highPoint": 762.83,
+    "lowPoint": null,
+    "highLine": 762.83,
+    "lowLine": 740.3725,
+    "highTrend": 0,
+    "lowTrend": 2
+  },
+  {
+    "timestamp": "2026-10-07T04:00:00Z",
+    "highPoint": null,
+    "lowPoint": null,
+    "highLine": null,
+    "lowLine": 741.82625,
+    "highTrend": null,
+    "lowTrend": 2
+  },
+  {
+    "timestamp": "2026-10-08T04:00:00Z",
+    "highPoint": null,
+    "lowPoint": 743.28,
+    "highLine": null,
+    "lowLine": 743.28,
+    "highTrend": null,
+    "lowTrend": 2
+  },
+  {
+    "timestamp": "2026-10-09T04:00:00Z",
+    "highPoint": null,
+    "lowPoint": null,
+    "highLine": null,
+    "lowLine": 737.2783333333333,
+    "highTrend": null,
+    "lowTrend": 3
+  },
+  {
+    "timestamp": "2026-10-12T04:00:00Z",
+    "highPoint": null,
+    "lowPoint": null,
+    "highLine": null,
+    "lowLine": 731.2766666666666,
+    "highTrend": null,
+    "lowTrend": 3
+  },
+  {
+    "timestamp": "2026-10-13T04:00:00Z",
+    "highPoint": null,
+    "lowPoint": null,
+    "highLine": null,
+    "lowLine": 725.275,
+    "highTrend": null,
+    "lowTrend": 3
+  },
+  {
+    "timestamp": "2026-10-14T04:00:00Z",
+    "highPoint": null,
+    "lowPoint": null,
+    "highLine": null,
+    "lowLine": 719.2733333333333,
+    "highTrend": null,
+    "lowTrend": 3
+  },
+  {
+    "timestamp": "2026-10-15T04:00:00Z",
+    "highPoint": null,
+    "lowPoint": null,
+    "highLine": null,
+    "lowLine": 713.2716666666666,
+    "highTrend": null,
+    "lowTrend": 3
+  },
+  {
+    "timestamp": "2026-10-16T04:00:00Z",
+    "highPoint": null,
+    "lowPoint": 707.27,
+    "highLine": null,
+    "lowLine": 707.27,
+    "highTrend": null,
+    "lowTrend": 3
+  },
+  {
+    "timestamp": "2026-10-19T04:00:00Z",
     "highPoint": null,
     "lowPoint": null,
     "highLine": null,
@@ -1071,7 +1062,16 @@
     "lowTrend": null
   },
   {
-    "timestamp": "2026-10-06T04:00:00Z",
+    "timestamp": "2026-10-20T04:00:00Z",
+    "highPoint": null,
+    "lowPoint": null,
+    "highLine": null,
+    "lowLine": null,
+    "highTrend": null,
+    "lowTrend": null
+  },
+  {
+    "timestamp": "2026-10-21T04:00:00Z",
     "highPoint": null,
     "lowPoint": null,
     "highLine": null,

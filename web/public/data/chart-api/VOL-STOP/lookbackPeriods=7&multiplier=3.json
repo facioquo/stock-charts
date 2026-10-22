@@ -1,82 +1,5 @@
 [
   {
-    "timestamp": "2026-04-16T04:00:00Z",
-    "sar": 605.768691987749,
-    "isStop": false,
-    "upperBand": null,
-    "lowerBand": 605.768691987749
-  },
-  {
-    "timestamp": "2026-04-17T04:00:00Z",
-    "sar": 610.5074502752134,
-    "isStop": false,
-    "upperBand": null,
-    "lowerBand": 610.5074502752134
-  },
-  {
-    "timestamp": "2026-04-20T04:00:00Z",
-    "sar": 618.9935288073258,
-    "isStop": false,
-    "upperBand": null,
-    "lowerBand": 618.9935288073258
-  },
-  {
-    "timestamp": "2026-04-21T04:00:00Z",
-    "sar": 620.5758818348506,
-    "isStop": false,
-    "upperBand": null,
-    "lowerBand": 620.5758818348506
-  },
-  {
-    "timestamp": "2026-04-22T04:00:00Z",
-    "sar": 621.2078987155863,
-    "isStop": false,
-    "upperBand": null,
-    "lowerBand": 621.2078987155863
-  },
-  {
-    "timestamp": "2026-04-23T04:00:00Z",
-    "sar": 626.7460560419311,
-    "isStop": false,
-    "upperBand": null,
-    "lowerBand": 626.7460560419311
-  },
-  {
-    "timestamp": "2026-04-24T04:00:00Z",
-    "sar": 625.9301908930838,
-    "isStop": false,
-    "upperBand": null,
-    "lowerBand": 625.9301908930838
-  },
-  {
-    "timestamp": "2026-04-27T04:00:00Z",
-    "sar": 633.3458779083576,
-    "isStop": false,
-    "upperBand": null,
-    "lowerBand": 633.3458779083576
-  },
-  {
-    "timestamp": "2026-04-28T04:00:00Z",
-    "sar": 636.4793239214493,
-    "isStop": false,
-    "upperBand": null,
-    "lowerBand": 636.4793239214493
-  },
-  {
-    "timestamp": "2026-04-29T04:00:00Z",
-    "sar": 635.9637062183851,
-    "isStop": false,
-    "upperBand": null,
-    "lowerBand": 635.9637062183851
-  },
-  {
-    "timestamp": "2026-04-30T04:00:00Z",
-    "sar": 637.9088910443302,
-    "isStop": false,
-    "upperBand": null,
-    "lowerBand": 637.9088910443302
-  },
-  {
     "timestamp": "2026-05-01T04:00:00Z",
     "sar": 640.2533351808545,
     "isStop": false,
@@ -838,5 +761,82 @@
     "isStop": false,
     "upperBand": null,
     "lowerBand": 728.8733754160281
+  },
+  {
+    "timestamp": "2026-10-07T04:00:00Z",
+    "sar": 733.3978932137384,
+    "isStop": false,
+    "upperBand": null,
+    "lowerBand": 733.3978932137384
+  },
+  {
+    "timestamp": "2026-10-08T04:00:00Z",
+    "sar": 733.7810513260614,
+    "isStop": false,
+    "upperBand": null,
+    "lowerBand": 733.7810513260614
+  },
+  {
+    "timestamp": "2026-10-09T04:00:00Z",
+    "sar": 731.2744725651955,
+    "isStop": false,
+    "upperBand": null,
+    "lowerBand": 731.2744725651955
+  },
+  {
+    "timestamp": "2026-10-12T04:00:00Z",
+    "sar": 733.0345479130247,
+    "isStop": false,
+    "upperBand": null,
+    "lowerBand": 733.0345479130247
+  },
+  {
+    "timestamp": "2026-10-13T04:00:00Z",
+    "sar": 734.0846124968783,
+    "isStop": false,
+    "upperBand": null,
+    "lowerBand": 734.0846124968783
+  },
+  {
+    "timestamp": "2026-10-14T04:00:00Z",
+    "sar": 734.6846678544672,
+    "isStop": true,
+    "upperBand": null,
+    "lowerBand": 734.6846678544672
+  },
+  {
+    "timestamp": "2026-10-15T04:00:00Z",
+    "sar": 757.7167132675996,
+    "isStop": false,
+    "upperBand": 757.7167132675996,
+    "lowerBand": null
+  },
+  {
+    "timestamp": "2026-10-16T04:00:00Z",
+    "sar": 758.780754229371,
+    "isStop": false,
+    "upperBand": 758.780754229371,
+    "lowerBand": null
+  },
+  {
+    "timestamp": "2026-10-19T04:00:00Z",
+    "sar": 745.0063607680324,
+    "isStop": false,
+    "upperBand": 745.0063607680324,
+    "lowerBand": null
+  },
+  {
+    "timestamp": "2026-10-20T04:00:00Z",
+    "sar": 746.2840235154563,
+    "isStop": false,
+    "upperBand": 746.2840235154563,
+    "lowerBand": null
+  },
+  {
+    "timestamp": "2026-10-21T04:00:00Z",
+    "sar": 746.3548772989626,
+    "isStop": false,
+    "upperBand": 746.3548772989626,
+    "lowerBand": null
   }
 ]

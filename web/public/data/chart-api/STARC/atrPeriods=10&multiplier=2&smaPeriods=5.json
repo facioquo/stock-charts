@@ -1,71 +1,5 @@
 [
   {
-    "timestamp": "2026-04-16T04:00:00Z",
-    "upperBand": 647.4856109085508,
-    "centerline": 626.941,
-    "lowerBand": 606.3963890914492
-  },
-  {
-    "timestamp": "2026-04-17T04:00:00Z",
-    "upperBand": 654.8631498176958,
-    "centerline": 634.4570000000001,
-    "lowerBand": 614.0508501823044
-  },
-  {
-    "timestamp": "2026-04-20T04:00:00Z",
-    "upperBand": 659.956534835926,
-    "centerline": 640.347,
-    "lowerBand": 620.7374651640739
-  },
-  {
-    "timestamp": "2026-04-21T04:00:00Z",
-    "upperBand": 662.7095813523335,
-    "centerline": 643.479,
-    "lowerBand": 624.2484186476665
-  },
-  {
-    "timestamp": "2026-04-22T04:00:00Z",
-    "upperBand": 666.5715232171002,
-    "centerline": 647.048,
-    "lowerBand": 627.5244767828998
-  },
-  {
-    "timestamp": "2026-04-23T04:00:00Z",
-    "upperBand": 669.0871708953902,
-    "centerline": 649.246,
-    "lowerBand": 629.4048291046098
-  },
-  {
-    "timestamp": "2026-04-24T04:00:00Z",
-    "upperBand": 672.7470538058511,
-    "centerline": 652.284,
-    "lowerBand": 631.8209461941489
-  },
-  {
-    "timestamp": "2026-04-27T04:00:00Z",
-    "upperBand": 674.9457484252661,
-    "centerline": 655.7850000000001,
-    "lowerBand": 636.6242515747341
-  },
-  {
-    "timestamp": "2026-04-28T04:00:00Z",
-    "upperBand": 677.7936735827395,
-    "centerline": 658.4550000000002,
-    "lowerBand": 639.1163264172608
-  },
-  {
-    "timestamp": "2026-04-29T04:00:00Z",
-    "upperBand": 678.1408062244656,
-    "centerline": 659.7560000000001,
-    "lowerBand": 641.3711937755346
-  },
-  {
-    "timestamp": "2026-04-30T04:00:00Z",
-    "upperBand": 681.7623256020189,
-    "centerline": 662.998,
-    "lowerBand": 644.2336743979812
-  },
-  {
     "timestamp": "2026-05-01T04:00:00Z",
     "upperBand": 683.591893041817,
     "centerline": 665.034,
@@ -718,5 +652,71 @@
     "upperBand": 767.1211621389141,
     "centerline": 749.345,
     "lowerBand": 731.568837861086
+  },
+  {
+    "timestamp": "2026-10-07T04:00:00Z",
+    "upperBand": 770.5585459250227,
+    "centerline": 752.991,
+    "lowerBand": 735.4234540749773
+  },
+  {
+    "timestamp": "2026-10-08T04:00:00Z",
+    "upperBand": 772.7897913325203,
+    "centerline": 754.0869999999999,
+    "lowerBand": 735.3842086674795
+  },
+  {
+    "timestamp": "2026-10-09T04:00:00Z",
+    "upperBand": 772.3415121992684,
+    "centerline": 754.441,
+    "lowerBand": 736.5404878007316
+  },
+  {
+    "timestamp": "2026-10-12T04:00:00Z",
+    "upperBand": 769.8154609793415,
+    "centerline": 752.423,
+    "lowerBand": 735.0305390206585
+  },
+  {
+    "timestamp": "2026-10-13T04:00:00Z",
+    "upperBand": 766.3032148814074,
+    "centerline": 749.228,
+    "lowerBand": 732.1527851185925
+  },
+  {
+    "timestamp": "2026-10-14T04:00:00Z",
+    "upperBand": 762.2806933932667,
+    "centerline": 743.4770000000001,
+    "lowerBand": 724.6733066067335
+  },
+  {
+    "timestamp": "2026-10-15T04:00:00Z",
+    "upperBand": 759.32132405394,
+    "centerline": 739.615,
+    "lowerBand": 719.90867594606
+  },
+  {
+    "timestamp": "2026-10-16T04:00:00Z",
+    "upperBand": 753.246691648546,
+    "centerline": 731.327,
+    "lowerBand": 709.407308351454
+  },
+  {
+    "timestamp": "2026-10-19T04:00:00Z",
+    "upperBand": 748.4587224836913,
+    "centerline": 725.789,
+    "lowerBand": 703.1192775163087
+  },
+  {
+    "timestamp": "2026-10-20T04:00:00Z",
+    "upperBand": 743.3697502353223,
+    "centerline": 720.503,
+    "lowerBand": 697.6362497646778
+  },
+  {
+    "timestamp": "2026-10-21T04:00:00Z",
+    "upperBand": 742.4840752117901,
+    "centerline": 719.7560000000001,
+    "lowerBand": 697.02792478821
   }
 ]

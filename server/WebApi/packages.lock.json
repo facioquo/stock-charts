@@ -4,9 +4,9 @@
     "net10.0": {
       "FacioQuo.Stock.Indicators": {
         "type": "Direct",
-        "requested": "[3.0.3, )",
-        "resolved": "3.0.3",
-        "contentHash": "meCdmln1Kr2t0ZVzybB/7Kzp/01HFw4O5A3S+HZFuBc9Qrh2zeJ9HsF+sH5MW/pMBS2WC8hQYaip+DWcdPrZHA=="
+        "requested": "[3.0.4, )",
+        "resolved": "3.0.4",
+        "contentHash": "I9rJzANvgVxykYoIFvRX5hchmoPUiqgnYzg0KsZqBMIfZAgcKZIUMO/t7dJ9c7aL7QBViwsy70n6k+lWap+ENg=="
       },
       "Roslynator.Analyzers": {
         "type": "Direct",
