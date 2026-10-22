@@ -77,6 +77,11 @@ export interface ChartSettings {
    * Gridlines still render when disabled.
    */
   showRightAxisLabels?: boolean;
+  /**
+   * Name each line of a multi-line oscillator pane in its legend, after the
+   * indicator label. Single-line panes keep the indicator label alone.
+   */
+  showSeriesLegend?: boolean;
   /** Optional override for annotation and axis-label backdrop background color. */
   background?: string;
 }

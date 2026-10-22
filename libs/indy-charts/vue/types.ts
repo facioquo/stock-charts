@@ -40,6 +40,8 @@ export interface IndyChartsVueDefaults {
   /** Show hover tooltips. Off unless set. */
   showTooltips?: boolean;
   showRightAxisLabels?: boolean;
+  /** Name each line of a multi-line oscillator pane in its legend. Off unless set. */
+  showSeriesLegend?: boolean;
 }
 
 export interface IndyChartsVueThemeOptions {
@@ -104,6 +106,7 @@ export function chartSettingsFromOptions(
     isDarkTheme,
     showTooltips: options.defaults?.showTooltips ?? DEFAULT_SHOW_TOOLTIPS,
     showRightAxisLabels: options.defaults?.showRightAxisLabels,
+    showSeriesLegend: options.defaults?.showSeriesLegend,
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- intentional: treats empty string as absent (consistent with getThemeColors falsy check)
     background: background || themeBg
   };

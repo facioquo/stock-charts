@@ -413,6 +413,14 @@ describe("chartSettingsFromOptions", () => {
     expect(chartSettingsFromOptions(on, false, undefined).showTooltips).toBe(true);
   });
 
+  it("leaves the series legend off unless the defaults turn it on", () => {
+    const off = chartSettingsFromOptions(baseOptions, false, undefined);
+    expect(off.showSeriesLegend).toBeUndefined();
+
+    const on: IndyChartsVueOptions = { ...baseOptions, defaults: { showSeriesLegend: true } };
+    expect(chartSettingsFromOptions(on, false, undefined).showSeriesLegend).toBe(true);
+  });
+
   it("returns undefined background when no override and no theme background are set", () => {
     const result = chartSettingsFromOptions(baseOptions, false, undefined);
     expect(result.background).toBeUndefined();
