@@ -210,7 +210,7 @@ public class Service
 
 ### Frontend architecture
 
-- **React v19 + Vite v8**: Functional components, hooks-based state, HMR dev server
+- **React v19 + Vite v8**: Functional components, hooks-based state, hot module replacement (HMR) dev server
 - **TypeScript**: Strict mode enabled, comprehensive type safety
 - **Chart.js v4+**: Financial chart types in `libs/chartjs-financial/`; bundled into `@facioquo/indy-charts` dist
 - **React Router v7**: Client-side routing
