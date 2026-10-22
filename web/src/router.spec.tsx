@@ -2,9 +2,12 @@ import { render, screen } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("./pages/ChartPage", () => {
-  throw new TypeError("Failed to fetch dynamically imported module: /assets/ChartPage-old.js");
-});
+// A throwing factory is rewrapped by Vitest, so throw from the export the lazy loader reads.
+vi.mock("./pages/ChartPage", () => ({
+  get ChartPage(): never {
+    throw new TypeError("Failed to fetch dynamically imported module: /assets/ChartPage-old.js");
+  }
+}));
 
 import { routes } from "./router";
 
@@ -16,5 +19,6 @@ describe("router", () => {
 
     expect(await screen.findByRole("button", { name: "Reload page" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /stock indicators/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "This demo was updated." })).toBeInTheDocument();
   });
 });
