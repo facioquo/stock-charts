@@ -1124,7 +1124,7 @@
     },
     "parameters": [
       {
-        "displayName": "Lookback Periods",
+        "displayName": "RSI Periods",
         "paramName": "rsiPeriods",
         "dataType": "int",
         "minimum": 2,
@@ -1546,7 +1546,7 @@
     "chartConfig": null,
     "parameters": [
       {
-        "displayName": "Lookback Periods",
+        "displayName": "Lookback Period",
         "paramName": "lookbackPeriods",
         "dataType": "int",
         "minimum": 1,
@@ -1854,7 +1854,7 @@
         "defaultValue": 26
       },
       {
-        "displayName": "Senkou Periods",
+        "displayName": "Senkou B Periods",
         "paramName": "senkouBPeriods",
         "dataType": "int",
         "minimum": 2,
@@ -2002,7 +2002,7 @@
       {
         "displayName": "ATR Periods",
         "paramName": "atrPeriods",
-        "dataType": "number",
+        "dataType": "int",
         "minimum": 2,
         "maximum": 250,
         "defaultValue": 10
@@ -2584,7 +2584,7 @@
     "chartConfig": null,
     "parameters": [
       {
-        "displayName": "Step Size",
+        "displayName": "Acceleration Step",
         "paramName": "accelerationStep",
         "dataType": "number",
         "minimum": 0.01,
@@ -2592,7 +2592,7 @@
         "defaultValue": 0.02
       },
       {
-        "displayName": "Max Factor",
+        "displayName": "Max Acceleration Factor",
         "paramName": "maxAccelerationFactor",
         "dataType": "number",
         "minimum": 0.1,
@@ -2912,7 +2912,7 @@
         "defaultValue": 35
       },
       {
-        "displayName": "Smooth Periods",
+        "displayName": "Smoothing Periods",
         "paramName": "smoothPeriods",
         "dataType": "int",
         "minimum": 1,
@@ -3068,7 +3068,7 @@
         "defaultValue": 5
       },
       {
-        "displayName": "StdDev Periods",
+        "displayName": "Standard deviation Periods",
         "paramName": "stdDevPeriods",
         "dataType": "int",
         "minimum": 1,
@@ -3910,7 +3910,7 @@
     },
     "parameters": [
       {
-        "displayName": "Lookback Periods (%K)",
+        "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
         "minimum": 1,
@@ -3918,7 +3918,7 @@
         "defaultValue": 14
       },
       {
-        "displayName": "Signal Periods (%D)",
+        "displayName": "Signal Periods",
         "paramName": "signalPeriods",
         "dataType": "int",
         "minimum": 1,

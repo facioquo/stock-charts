@@ -35,24 +35,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/ALMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Offset",
-                        ParamName = "offset",
-                        DataType = "number"
-                    },
-                    new() {
-                        DisplayName = "Sigma",
-                        ParamName = "sigma",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "ALMA",
@@ -96,14 +78,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Aroon Up",
@@ -145,14 +119,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Oscillator",
@@ -174,19 +140,6 @@ public static class Metadata
                 Category = "price-trend",
                 ChartType = "overlay",
                 Order = Order.Front,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Multiplier",
-                        ParamName = "multiplier",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Buy Stop",
@@ -218,19 +171,6 @@ public static class Metadata
                 Category = "price-trend",
                 ChartType = "overlay",
                 Order = Order.Front,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Multiplier",
-                        ParamName = "multiplier",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Buy Stop",
@@ -276,14 +216,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "ADX",
@@ -329,14 +261,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/ATR/",
                 Category = "price-characteristic",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Average True Range",
@@ -357,14 +281,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/ATR/",
                 Category = "price-characteristic",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Average True Range Percent",
@@ -395,19 +311,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Fast Periods",
-                        ParamName = "fastPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Slow Periods",
-                        ParamName = "slowPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Awesome Oscillator",
@@ -438,14 +341,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Smooth Periods",
-                        ParamName = "smoothPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Balance of Power",
@@ -476,14 +371,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Beta",
@@ -521,19 +408,6 @@ public static class Metadata
                 Category = "price-channel",
                 ChartType = "overlay",
                 Order = Order.BehindPrice,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Standard Deviations",
-                        ParamName = "standardDeviations",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Upper Band",
@@ -603,19 +477,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Standard Deviations",
-                        ParamName = "standardDeviations",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "%B",
@@ -646,14 +507,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "CMF",
@@ -684,19 +537,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Fast Periods",
-                        ParamName = "fastPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Slow Periods",
-                        ParamName = "slowPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Chaikin Oscillator",
@@ -717,14 +557,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/CMO/",
                 Category = "oscillator",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Chande Momentum Oscillator",
@@ -745,19 +577,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/CHEXIT-LONG/",
                 Category = "stop-and-reverse",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Multiplier",
-                        ParamName = "multiplier",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Chandelier Exit",
@@ -778,19 +597,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/CHEXIT-SHORT/",
                 Category = "stop-and-reverse",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Multiplier",
-                        ParamName = "multiplier",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Chandelier Exit",
@@ -839,14 +645,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Choppiness",
@@ -898,14 +696,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "CCI",
@@ -954,24 +744,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "rsiPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Streak Periods",
-                        ParamName = "streakPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Rank Periods",
-                        ParamName = "rankPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "CRSI",
@@ -1005,14 +777,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Correlation",
@@ -1051,14 +815,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "DPO",
@@ -1079,14 +835,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/DOJI/",
                 Category = "candlestick-pattern",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Max Price Change %",
-                        ParamName = "maxPriceChangePercent",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         TooltipTemplate = "DOJI([P1]%)",
@@ -1132,14 +880,6 @@ public static class Metadata
                 Category = "price-channel",
                 ChartType = "overlay",
                 Order = Order.BehindPrice,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = MetadataHelpers.GetPriceBandResults("DONCHIAN", ChartColors.StandardOrange)
             },
 
@@ -1151,14 +891,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/DEMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "DEMA",
@@ -1179,14 +911,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/DYN/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Dynamic",
@@ -1207,14 +931,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/ELDER-RAY/",
                 Category = "price-trend",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Bull Power",
@@ -1245,14 +961,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/EPMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "EPMA",
@@ -1273,14 +981,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/EMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "EMA",
@@ -1301,14 +1001,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/FISHER/",
                 Category = "price-transform",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Fisher Transform",
@@ -1347,14 +1039,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Force Index",
@@ -1375,14 +1059,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/FRACTAL/",
                 Category = "price-pattern",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Window Span",
-                        ParamName = "windowSpan",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Fractal Bull",
@@ -1414,14 +1090,6 @@ public static class Metadata
                 Category = "price-channel",
                 ChartType = "overlay",
                 Order = Order.Front,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Window Span",
-                        ParamName = "windowSpan",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         TooltipTemplate = "Upper Band",
@@ -1535,14 +1203,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/HMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "HMA",
@@ -1576,14 +1236,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Hurst Exponent",
@@ -1605,24 +1257,6 @@ public static class Metadata
                 Category = "price-trend",
                 ChartType = "overlay",
                 Order = Order.BehindPrice,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Tenkan Periods",
-                        ParamName = "tenkanPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Kijun Periods",
-                        ParamName = "kijunPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Senkou Periods",
-                        ParamName = "senkouBPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Tenkan-sen",
@@ -1685,24 +1319,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/KAMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "ER Periods",
-                        ParamName = "erPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Fast Periods",
-                        ParamName = "fastPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Slow Periods",
-                        ParamName = "slowPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "KAMA",
@@ -1724,24 +1340,6 @@ public static class Metadata
                 Category = "price-channel",
                 ChartType = "overlay",
                 Order = Order.BehindPrice,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "EMA Periods",
-                        ParamName = "emaPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Multiplier",
-                        ParamName = "multiplier",
-                        DataType = "number"
-                    },
-                    new() {
-                        DisplayName = "ATR Periods",
-                        ParamName = "atrPeriods",
-                        DataType = "number"
-                    }
-                ],
                 Results = MetadataHelpers.GetPriceBandResults("KELTNER", ChartColors.StandardOrange)
             },
 
@@ -1763,24 +1361,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Fast Periods",
-                        ParamName = "fastPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Slow Periods",
-                        ParamName = "slowPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Signal Periods",
-                        ParamName = "signalPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "KVO",
@@ -1809,14 +1389,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/SLOPE/",
                 Category = "price-characteristic",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Linear Regression",
@@ -1837,14 +1409,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/MARUBOZU/",
                 Category = "candlestick-pattern",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Min Body Percent %",
-                        ParamName = "minBodyPercent",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Marubozu",
@@ -1866,19 +1430,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/MAMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Fast Limit",
-                        ParamName = "fastLimit",
-                        DataType = "number"
-                    },
-                    new() {
-                        DisplayName = "Slow Limit",
-                        ParamName = "slowLimit",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "MAMA",
@@ -1935,14 +1486,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "MFI",
@@ -1973,24 +1516,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Fast Periods",
-                        ParamName = "fastPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Slow Periods",
-                        ParamName = "slowPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Signal Periods",
-                        ParamName = "signalPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "MACD",
@@ -2028,19 +1553,6 @@ public static class Metadata
                 Category = "price-channel",
                 ChartType = "overlay",
                 Order = Order.BehindPrice,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Percent Offset",
-                        ParamName = "percentOffset",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Upper Envelope",
@@ -2106,19 +1618,6 @@ public static class Metadata
                 Category = "stop-and-reverse",
                 ChartType = "overlay",
 
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Step Size",
-                        ParamName = "accelerationStep",
-                        DataType = "number"
-                    },
-                    new() {
-                        DisplayName = "Max Factor",
-                        ParamName = "maxAccelerationFactor",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Parabolic SAR",
@@ -2150,24 +1649,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Fast Periods",
-                        ParamName = "fastPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Slow Periods",
-                        ParamName = "slowPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Signal Periods",
-                        ParamName = "signalPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "PVO",
@@ -2295,24 +1776,6 @@ public static class Metadata
                 Category = "price-pattern",
                 ChartType = "overlay",
                 Order = Order.Front,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Left Span",
-                        ParamName = "leftSpan",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Right Span",
-                        ParamName = "rightSpan",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Max Trend Periods",
-                        ParamName = "maxTrendPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "High Point",
@@ -2369,24 +1832,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Time Periods",
-                        ParamName = "timePeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Smooth Periods",
-                        ParamName = "smoothPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Signal Periods",
-                        ParamName = "signalPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "PMO",
@@ -2429,14 +1874,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "PRS %",
@@ -2557,14 +1994,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/ROC/",
                 Category = "oscillator",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Rate of Change",
@@ -2595,24 +2024,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "EMA Periods",
-                        ParamName = "emaPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "StdDev Periods",
-                        ParamName = "stdDevPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "ROC",
@@ -2685,14 +2096,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "RSI",
@@ -2714,19 +2117,6 @@ public static class Metadata
                 Category = "price-channel",
                 ChartType = "overlay",
                 Order = Order.BehindPrice,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Window Periods",
-                        ParamName = "windowPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Offset Periods",
-                        ParamName = "offsetPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "R3",
@@ -2830,24 +2220,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Cycle Periods",
-                        ParamName = "cyclePeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Fast Periods",
-                        ParamName = "fastPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Slow Periods",
-                        ParamName = "slowPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Schaff Trend Cycle",
@@ -2868,14 +2240,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/SMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "SMA",
@@ -2900,14 +2264,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/SMA-ANALYSIS/",
                 Category = "price-characteristic",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Mean Absolute Deviation",
@@ -2927,14 +2283,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/SMA-ANALYSIS/",
                 Category = "price-characteristic",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Mean Absolute Percentage Error",
@@ -2954,14 +2302,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/SMA-ANALYSIS/",
                 Category = "price-characteristic",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Mean Squared Error",
@@ -2982,14 +2322,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/SLOPE/",
                 Category = "price-characteristic",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Slope",
@@ -3010,14 +2342,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/SMMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "SMMA",
@@ -3038,14 +2362,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/STDEV/",
                 Category = "price-characteristic",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Standard Deviation",
@@ -3066,14 +2382,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/STDEV/",
                 Category = "price-characteristic",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Z-Score",
@@ -3095,19 +2403,6 @@ public static class Metadata
                 Category = "price-channel",
                 ChartType = "overlay",
                 Order = Order.BehindPrice,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Standard Deviations",
-                        ParamName = "standardDeviations",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Upper Channel",
@@ -3159,24 +2454,6 @@ public static class Metadata
                 Category = "price-channel",
                 ChartType = "overlay",
                 Order = Order.BehindPrice,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "SMA Periods",
-                        ParamName = "smaPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Multiplier",
-                        ParamName = "multiplier",
-                        DataType = "number"
-                    },
-                    new() {
-                        DisplayName = "ATR Periods",
-                        ParamName = "atrPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = MetadataHelpers.GetPriceBandResults("STARC", ChartColors.StandardOrange)
             },
 
@@ -3213,29 +2490,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "First Smooth Periods",
-                        ParamName = "firstSmoothPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Second Smooth Periods",
-                        ParamName = "secondSmoothPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Signal Periods",
-                        ParamName = "signalPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "SMI",
@@ -3289,19 +2543,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods (%K)",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Signal Periods (%D)",
-                        ParamName = "signalPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "%K",
@@ -3355,29 +2596,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "RSI Periods",
-                        ParamName = "rsiPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Stochastic Periods",
-                        ParamName = "stochPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Signal Periods",
-                        ParamName = "signalPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Smooth Periods",
-                        ParamName = "smoothPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Oscillator",
@@ -3407,19 +2625,6 @@ public static class Metadata
                 Category = "price-trend",
                 ChartType = "overlay",
                 Order = Order.Front,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Multiplier",
-                        ParamName = "multiplier",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Upper Band",
@@ -3457,19 +2662,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/T3/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Volume Factor",
-                        ParamName = "volumeFactor",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "T3",
@@ -3490,14 +2682,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/TEMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "TEMA",
@@ -3528,14 +2712,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "TRIX",
@@ -3601,24 +2777,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Smooth Periods",
-                        ParamName = "smoothPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Signal Periods",
-                        ParamName = "signalPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "TSI",
@@ -3647,14 +2805,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/ULCER/",
                 Category = "price-characteristic",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Ulcer Index",
@@ -3703,24 +2853,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Short Periods",
-                        ParamName = "shortPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Middle Periods",
-                        ParamName = "middlePeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Long Periods",
-                        ParamName = "longPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Ultimate Oscillator",
@@ -3742,19 +2874,6 @@ public static class Metadata
                 Category = "stop-and-reverse",
                 ChartType = "overlay",
                 Order = Order.Front,
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Multiplier",
-                        ParamName = "multiplier",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Upper Band",
@@ -3787,7 +2906,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/VWAP/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters = [],
                 Results = [
                     new() {
                         DisplayName = "VWAP (visible range)",
@@ -3808,14 +2926,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/VWMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "VWMA",
@@ -3836,14 +2946,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/VORTEX/",
                 Category = "price-trend",
                 ChartType = "oscillator",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "VI+",
@@ -3872,14 +2974,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/WMA/",
                 Category = "moving-average",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "WMA",
@@ -3928,14 +3022,6 @@ public static class Metadata
                         }
                     ]
                 },
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Lookback Periods",
-                        ParamName = "lookbackPeriods",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Williams %R",
@@ -3956,39 +3042,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/ALLIGATOR/",
                 Category = "price-trend",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Jaw Periods",
-                        ParamName = "jawPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Jaw Offset",
-                        ParamName = "jawOffset",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Teeth Periods",
-                        ParamName = "teethPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Teeth Offset",
-                        ParamName = "teethOffset",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Lips Periods",
-                        ParamName = "lipsPeriods",
-                        DataType = "int"
-                    },
-                    new() {
-                        DisplayName = "Lips Offset",
-                        ParamName = "lipsOffset",
-                        DataType = "int"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Jaw",
@@ -4025,14 +3078,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/ZIGZAG-CLOSE/",
                 Category = "price-transform",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Percent Change",
-                        ParamName = "percentChange",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Zig Zag",
@@ -4069,14 +3114,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/ZIGZAG-HIGHLOW/",
                 Category = "price-transform",
                 ChartType = "overlay",
-                Parameters =
-                [
-                    new() {
-                        DisplayName = "Percent Change",
-                        ParamName = "percentChange",
-                        DataType = "number"
-                    }
-                ],
                 Results = [
                     new() {
                         DisplayName = "Zig Zag",
@@ -4106,6 +3143,6 @@ public static class Metadata
             },
         ];
 
-        return [.. listing.Select(LibraryCatalog.ApplyParameterBounds).OrderBy(x => x.Name)];
+        return [.. listing.Select(LibraryCatalog.WithLibraryParameters).OrderBy(x => x.Name)];
     }
 }

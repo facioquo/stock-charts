@@ -1,4 +1,7 @@
 using System.Globalization;
+using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
+using WebApi.Controllers;
 using WebApi.Models;
 using ApiListing = WebApi.Models.IndicatorListing;
 
@@ -8,71 +11,134 @@ public class LibraryCatalogTests
 {
     private static readonly List<ApiListing> Served = [.. Metadata.IndicatorListing(string.Empty)];
 
-    private static IndicatorParamConfig ServedParam(string uiid, string paramName)
-        => Served.Single(l => l.Uiid == uiid).Parameters.Single(p => p.ParamName == paramName);
+    private static readonly HashSet<string> ServedRoutes
+        = [.. Served.Select(listing => LibraryCatalog.RouteOf(listing.Endpoint))];
 
-    private static IndicatorParam LibraryParam(string libraryId, string paramName)
-        => Catalog.Get(Style.Series).Single(l => l.Uiid == libraryId)
-            .Parameters!.Single(p => p.ParameterName == paramName);
+    /// <summary>
+    /// Each GET action's query parameters, keyed by route: what the endpoint actually binds.
+    /// </summary>
+    private static readonly Dictionary<string, ParameterInfo[]> EndpointParameters
+        = typeof(Main).GetMethods()
+            .SelectMany(method => method.GetCustomAttributes<HttpGetAttribute>()
+                .Where(get => get.Template is not null)
+                .Select(get => (Route: get.Template!, Method: method)))
+            .ToDictionary(
+                action => action.Route,
+                action => action.Method.GetParameters()
+                    .Where(p => p.ParameterType.IsPrimitive || p.ParameterType == typeof(decimal))
+                    .ToArray(),
+                StringComparer.Ordinal);
+
+    private static IndicatorParam LibraryParam(string route, string apiName)
+    {
+        string libraryName = LibraryCatalog.ApiParamNames
+            .Where(entry => entry.Key.Route == route && entry.Value == apiName)
+            .Select(entry => entry.Key.LibraryName)
+            .DefaultIfEmpty(apiName)
+            .Single();
+
+        return LibraryCatalog.LibraryListings[LibraryCatalog.LibraryIdOf(route)]
+            .Parameters!.Single(p => p.ParameterName == libraryName);
+    }
 
     [Fact]
     public void EveryParameter_HasADefaultWithinItsBounds()
     {
         List<string> invalid = [.. Served
             .SelectMany(l => l.Parameters.Select(p => (l.Uiid, Param: p)))
-            .Where(x => x.Param.DefaultValue is not double value
-                || value < x.Param.Minimum
-                || value > x.Param.Maximum)
+            .Where(x => x.Param.DefaultValue < x.Param.Minimum || x.Param.DefaultValue > x.Param.Maximum)
             .Select(x => $"{x.Uiid}.{x.Param.ParamName}: {x.Param.DefaultValue} not in [{x.Param.Minimum}, {x.Param.Maximum}]")];
 
         Assert.True(invalid.Count == 0, string.Join('\n', invalid));
     }
 
-    [Theory]
-    [InlineData("CHOP", "lookbackPeriods", "CHOP", "lookbackPeriods")]
-    [InlineData("SMA", "lookbackPeriods", "SMA", "lookbackPeriods")]
-    [InlineData("STOCHRSI", "rsiPeriods", "STOCH-RSI", "rsiPeriods")]
-    [InlineData("STDEV-CH", "standardDeviations", "STDEV-CHANNELS", "stdDeviations")]
-    [InlineData("ATR-STOP-CLOSE", "lookbackPeriods", "ATR-STOP", "lookbackPeriods")]
-    [InlineData("CHAIKIN", "slowPeriods", "CHAIKIN-OSC", "slowPeriods")]
-    [InlineData("CHEXIT-LONG", "lookbackPeriods", "CHEXIT", "lookbackPeriods")]
-    [InlineData("CORRELATION", "lookbackPeriods", "CORR", "lookbackPeriods")]
-    [InlineData("DYN", "lookbackPeriods", "DYNAMIC", "lookbackPeriods")]
-    [InlineData("ROCWB", "stdDevPeriods", "ROC-WB", "stdDevPeriods")]
-    [InlineData("STO", "signalPeriods", "STOCH", "signalPeriods")]
-    [InlineData("ULTIMATE", "middlePeriods", "UO", "middlePeriods")]
-    [InlineData("WILLIAMSR", "lookbackPeriods", "WILLR", "lookbackPeriods")]
-    [InlineData("ZIGZAG-CL", "percentChange", "ZIGZAG", "percentChange")]
-    public void Parameter_TakesBoundsAndDefaultFromTheLibrary(
-        string uiid, string paramName, string libraryId, string libraryParamName)
+    [Fact]
+    public void EveryParameter_TakesItsNameBoundsAndDefaultFromTheLibrary()
     {
-        IndicatorParamConfig served = ServedParam(uiid, paramName);
-        IndicatorParam library = LibraryParam(libraryId, libraryParamName);
+        List<string> drift = [];
 
-        Assert.Equal(library.Minimum, served.Minimum);
-        Assert.Equal(library.Maximum, served.Maximum);
-        Assert.Equal(Convert.ToDouble(library.DefaultValue, CultureInfo.InvariantCulture), served.DefaultValue);
+        foreach (ApiListing listing in Served)
+        {
+            string route = LibraryCatalog.RouteOf(listing.Endpoint);
+
+            foreach (IndicatorParamConfig served in listing.Parameters)
+            {
+                IndicatorParam library = LibraryParam(route, served.ParamName);
+                double libraryDefault = Convert.ToDouble(library.DefaultValue, CultureInfo.InvariantCulture);
+
+                if (served.DisplayName != library.DisplayName
+                    || served.Minimum != library.Minimum
+                    || served.Maximum != library.Maximum
+                    || served.DefaultValue != libraryDefault)
+                {
+                    drift.Add($"{listing.Uiid}.{served.ParamName}");
+                }
+            }
+        }
+
+        Assert.True(drift.Count == 0, "Served values differ from the library: " + string.Join(", ", drift));
     }
 
     [Fact]
-    public void ApplyParameterBounds_ParameterMissingFromTheLibraryListing_Throws()
+    public void EveryRoute_ServesExactlyTheParametersItsEndpointAccepts()
     {
-        ApiListing mismatched = new() {
-            Name = "Simple Moving Average",
-            Uiid = "SMA",
-            LegendTemplate = "SMA",
-            Endpoint = "/SMA/",
-            Category = "moving-average",
-            ChartType = "overlay",
-            Parameters = [new() { DisplayName = "Unknown", ParamName = "notAParameter", DataType = "int" }],
-            Results = []
-        };
+        List<string> mismatched = [];
 
-        Assert.Throws<InvalidOperationException>(() => LibraryCatalog.ApplyParameterBounds(mismatched));
+        foreach (ApiListing listing in Served)
+        {
+            string route = LibraryCatalog.RouteOf(listing.Endpoint);
+            Assert.True(EndpointParameters.TryGetValue(route, out ParameterInfo[]? accepted), $"{listing.Uiid}: no GET /{route} action.");
+
+            string served = string.Join(", ", listing.Parameters.Select(p => $"{p.ParamName}:{p.DataType}"));
+            string bound = string.Join(", ", accepted.Select(p => $"{p.Name}:{(p.ParameterType == typeof(int) ? "int" : "number")}"));
+
+            if (served != bound)
+            {
+                mismatched.Add($"{listing.Uiid}: catalog [{served}], endpoint [{bound}]");
+            }
+        }
+
+        Assert.True(mismatched.Count == 0, string.Join('\n', mismatched));
     }
 
     [Fact]
-    public void ApplyParameterBounds_ListingWithoutALibraryCounterpart_Throws()
+    public void EveryLibraryListing_IsChartedOrMarkedNotOffered()
+    {
+        HashSet<string> charted = [.. ServedRoutes.Select(LibraryCatalog.LibraryIdOf)];
+
+        List<string> unaccounted = [.. LibraryCatalog.LibraryListings.Keys
+            .Where(id => !charted.Contains(id) && !LibraryCatalog.NotOffered.Contains(id))];
+        List<string> wronglyMarked = [.. LibraryCatalog.NotOffered.Where(charted.Contains)];
+
+        Assert.True(unaccounted.Count == 0, "Library listings the demo neither charts nor marks not offered: " + string.Join(", ", unaccounted));
+        Assert.True(wronglyMarked.Count == 0, "Marked not offered but charted: " + string.Join(", ", wronglyMarked));
+    }
+
+    [Fact]
+    public void EveryMapEntry_NamesAServedRouteAndARealLibraryValue()
+    {
+        List<string> stale = [];
+
+        stale.AddRange(LibraryCatalog.LibraryIdByRoute
+            .Where(alias => !ServedRoutes.Contains(alias.Key) || !LibraryCatalog.LibraryListings.ContainsKey(alias.Value))
+            .Select(alias => $"route alias {alias.Key} -> {alias.Value}"));
+
+        stale.AddRange(LibraryCatalog.ApiParamNames.Keys
+            .Concat(LibraryCatalog.NotServed)
+            .Where(key => !ServedRoutes.Contains(key.Route)
+                || LibraryCatalog.LibraryListings[LibraryCatalog.LibraryIdOf(key.Route)]
+                    .Parameters?.Any(p => p.ParameterName == key.LibraryName) != true)
+            .Select(key => $"parameter {key.Route}.{key.LibraryName}"));
+
+        stale.AddRange(LibraryCatalog.NotOffered
+            .Where(id => !LibraryCatalog.LibraryListings.ContainsKey(id))
+            .Select(id => $"not offered {id}"));
+
+        Assert.True(stale.Count == 0, "Stale entries: " + string.Join(", ", stale));
+    }
+
+    [Fact]
+    public void WithLibraryParameters_ListingWithoutALibraryCounterpart_Throws()
     {
         ApiListing unknown = new() {
             Name = "Unknown",
@@ -81,10 +147,9 @@ public class LibraryCatalogTests
             Endpoint = "/UNKNOWN/",
             Category = "oscillator",
             ChartType = "oscillator",
-            Parameters = [new() { DisplayName = "Lookback", ParamName = "lookbackPeriods", DataType = "int" }],
             Results = []
         };
 
-        Assert.Throws<InvalidOperationException>(() => LibraryCatalog.ApplyParameterBounds(unknown));
+        Assert.Throws<InvalidOperationException>(() => LibraryCatalog.WithLibraryParameters(unknown));
     }
 }
