@@ -136,8 +136,8 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: "@facioquo"
 
-      # Installed apart from the step that writes, with lifecycle scripts off,
-      # so no dependency of the tool runs code beside the write token.
+      # Installed in a step of its own with install scripts off, so no
+      # dependency runs code while installing.
       - name: Install the screenshot tool
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}

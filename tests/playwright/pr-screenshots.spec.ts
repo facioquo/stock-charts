@@ -26,6 +26,11 @@ const NOW = new Date("2026-10-21T15:00:00Z");
  * run to run.
  */
 async function chartSettled(page: Page): Promise<void> {
+  // Each call measures its own half second, so one made right after a resize
+  // cannot return on a frame recorded before it.
+  await page.evaluate(() => {
+    delete (window as unknown as { settled?: unknown }).settled;
+  });
   await page.waitForFunction(
     () => {
       const canvases = [...document.querySelectorAll("canvas")];
