@@ -55,17 +55,28 @@ describe("filterListings", () => {
 });
 
 describe("groupByCategory", () => {
-  it("groups listings under their category label, ordered by label", () => {
+  it("groups listings under their category label, in the library docs' order", () => {
     const groups = groupByCategory([
       makeListing("SMA", "Simple Moving Average", "moving-average"),
       makeListing("RSI", "Relative Strength Index", "oscillator"),
-      makeListing("EMA", "Exponential Moving Average", "moving-average")
+      makeListing("EMA", "Exponential Moving Average", "moving-average"),
+      makeListing("ADX", "Average Directional Index", "price-trend")
     ]);
 
     expect(groups.map(g => [g.label, g.listings.map(l => l.uiid)])).toEqual([
-      ["Moving averages", ["SMA", "EMA"]],
-      ["Oscillators", ["RSI"]]
+      ["Price trends", ["ADX"]],
+      ["Oscillators", ["RSI"]],
+      ["Moving averages", ["SMA", "EMA"]]
     ]);
+  });
+
+  it("puts a category the docs do not list after the known ones", () => {
+    const groups = groupByCategory([
+      makeListing("NEW", "New Thing", "new-category"),
+      makeListing("SMA", "Simple Moving Average", "moving-average")
+    ]);
+
+    expect(groups.map(g => g.label)).toEqual(["Moving averages", "New category"]);
   });
 
   it("returns no groups for no listings", () => {

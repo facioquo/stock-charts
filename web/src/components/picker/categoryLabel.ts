@@ -1,19 +1,20 @@
+/** Display labels, in the order the library's indicator docs list their categories. */
 const labels = new Map<string, string>(
   Object.entries({
-    "candlestick-pattern": "Candlestick patterns",
-    "moving-average": "Moving averages",
-    oscillator: "Oscillators",
-    "price-channel": "Price channels",
-    "price-characteristic": "Price characteristics",
-    "price-pattern": "Price patterns",
-    "price-transform": "Price transforms",
     "price-trend": "Price trends",
+    "price-channel": "Price channels",
+    oscillator: "Oscillators",
     "stop-and-reverse": "Stop and reverse",
-    "volume-based": "Volume-based"
+    "candlestick-pattern": "Candlestick patterns",
+    "price-pattern": "Price patterns",
+    "volume-based": "Volume-based",
+    "moving-average": "Moving averages",
+    "price-transform": "Price transforms",
+    "price-characteristic": "Price characteristics"
   })
 );
 
-/** Catalog category slugs that have a display label. */
+/** Catalog category slugs that have a display label, in docs order. */
 export const labelledCategories: readonly string[] = [...labels.keys()];
 
 /** Human label for a catalog category slug; an unknown slug falls back to sentence case. */

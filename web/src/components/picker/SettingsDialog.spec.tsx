@@ -617,14 +617,34 @@ describe("SettingsDialog", () => {
       expect(screen.queryByRole("list", { name: "Moving averages" })).toBeNull();
     });
 
-    it("picks the first match shown, in category order, on Enter", () => {
-      const { controller, input, onPickIndicator } = renderDialog();
+    it("orders the category headings as the library docs do", () => {
+      renderDialog();
 
-      // RSI is listed first, but "Moving averages" sorts above "Oscillators".
+      expect(screen.getAllByRole("heading").map(h => h.textContent)).toEqual([
+        "Oscillators",
+        "Moving averages"
+      ]);
+    });
+
+    it("picks the first match shown, in category order, on Enter", () => {
+      const controller = makeController();
+      // Catalog order puts SMA first, but "Oscillators" comes before "Moving averages".
+      controller.listings.reverse();
+      const onPickIndicator = vi.fn();
+      render(
+        <SettingsDialog
+          controller={controller as unknown as ChartController}
+          onClose={vi.fn()}
+          onPickIndicator={onPickIndicator}
+          onEditIndicator={vi.fn()}
+        />
+      );
+      const input = screen.getByRole("searchbox", { name: "filter available indicators" });
+
       fireEvent.change(input, { target: { value: "i" } });
       fireEvent.keyDown(input, { key: "Enter" });
 
-      expect(onPickIndicator).toHaveBeenCalledWith(controller.listings[1]);
+      expect(onPickIndicator).toHaveBeenCalledWith(controller.listings.find(l => l.uiid === "RSI"));
     });
 
     it("restores the filter when the dialog reopens after an add", () => {
