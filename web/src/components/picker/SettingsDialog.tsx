@@ -13,6 +13,7 @@ import type { ChartController } from "../../charting/chartController";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
 import { changeTheme, changeTooltips, getSettings } from "../../services/userPrefs";
 import { categoryLabel } from "./categoryLabel";
+import { filterListings } from "./listingFilter";
 
 import { Modal } from "./Modal";
 
@@ -28,6 +29,9 @@ interface SettingsDialogProps {
   /** Scroll position to restore when the dialog reopens after adding an indicator. */
   initialScrollTop?: number;
   onScrollChange?: Dispatch<number>;
+  /** Filter text to restore when the dialog reopens after adding an indicator. */
+  initialFilter?: string;
+  onFilterChange?: Dispatch<string>;
 }
 
 interface ToggleRowProps {
@@ -285,10 +289,27 @@ function DisplayedIndicators({
 interface AvailableIndicatorsProps {
   listings: readonly IndicatorListing[];
   onPick: (listing: IndicatorListing) => void;
+  initialFilter: string;
+  onFilterChange?: Dispatch<string>;
 }
 
-/** List of available indicators that open the {@link PickConfigDialog}. */
-function AvailableIndicators({ listings, onPick }: AvailableIndicatorsProps): React.JSX.Element {
+/**
+ * List of available indicators that open the {@link PickConfigDialog}, narrowed by a
+ * filter box that matches name, id, and category. Enter picks the first match.
+ */
+function AvailableIndicators({
+  listings,
+  onPick,
+  initialFilter,
+  onFilterChange
+}: AvailableIndicatorsProps): React.JSX.Element {
+  const [filter, setFilter] = useState(initialFilter);
+  const matches = filterListings(listings, filter);
+  const filtering = filter.trim() !== "";
+  const changeFilter = (value: string): void => {
+    setFilter(value);
+    onFilterChange?.(value);
+  };
   return (
     <section className="available-indicators">
       <div className="dialog-section-header column">
@@ -305,8 +326,34 @@ function AvailableIndicators({ listings, onPick }: AvailableIndicatorsProps): Re
           </a>
         </span>
       </div>
+      <div className="listing-filter">
+        <input
+          type="search"
+          aria-label="filter available indicators"
+          placeholder="Filter by name or category"
+          autoComplete="off"
+          spellCheck={false}
+          value={filter}
+          onChange={event => changeFilter(event.target.value)}
+          onKeyDown={event => {
+            if (event.key !== "Enter") return;
+            const first = matches[0];
+            if (filtering && first) {
+              event.preventDefault();
+              onPick(first);
+            }
+          }}
+        />
+        <span aria-live="polite" className="listing-filter-status">
+          {filtering
+            ? matches.length === 0
+              ? "No indicators match"
+              : `${matches.length} of ${listings.length} indicators`
+            : ""}
+        </span>
+      </div>
       <ul className="nav-list">
-        {listings.map(listing => (
+        {matches.map(listing => (
           <li key={listing.uiid}>
             <button type="button" onClick={() => onPick(listing)}>
               <span className="nav-title">{listing.name}</span>
@@ -481,7 +528,9 @@ export function SettingsDialog({
   onEditIndicator,
   notice = "",
   initialScrollTop = 0,
-  onScrollChange
+  onScrollChange,
+  initialFilter = "",
+  onFilterChange
 }: SettingsDialogProps): React.JSX.Element {
   const titleId = useId();
   const controls = useSettingsControls(controller);
@@ -551,7 +600,12 @@ export function SettingsDialog({
           />
         )}
 
-        <AvailableIndicators listings={controller.listings} onPick={onPickIndicator} />
+        <AvailableIndicators
+          listings={controller.listings}
+          onPick={onPickIndicator}
+          initialFilter={initialFilter}
+          onFilterChange={onFilterChange}
+        />
       </div>
     </Modal>
   );

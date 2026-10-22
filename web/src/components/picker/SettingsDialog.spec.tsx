@@ -521,4 +521,76 @@ describe("SettingsDialog", () => {
     expect(screen.getByText("BB(20,2) added")).toBeInTheDocument();
     expect(document.querySelector(".dialog-body")?.scrollTop).toBe(120);
   });
+
+  describe("available indicator filter", () => {
+    function renderDialog(props: Partial<Parameters<typeof SettingsDialog>[0]> = {}) {
+      const controller = makeController();
+      const onPickIndicator = vi.fn();
+      const onFilterChange = vi.fn();
+      render(
+        <SettingsDialog
+          controller={controller as unknown as ChartController}
+          onClose={vi.fn()}
+          onPickIndicator={onPickIndicator}
+          onEditIndicator={vi.fn()}
+          onFilterChange={onFilterChange}
+          {...props}
+        />
+      );
+      const input = screen.getByRole("searchbox", { name: "filter available indicators" });
+      return { controller, onPickIndicator, onFilterChange, input };
+    }
+
+    it("narrows the list to matching names and reports the count", () => {
+      const { input, onFilterChange } = renderDialog();
+
+      fireEvent.change(input, { target: { value: "simple" } });
+
+      expect(screen.getByRole("button", { name: /Simple Moving Average/ })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /Relative Strength Index/ })).toBeNull();
+      expect(screen.getByText("1 of 2 indicators")).toBeInTheDocument();
+      expect(onFilterChange).toHaveBeenLastCalledWith("simple");
+    });
+
+    it("matches the category label", () => {
+      const { input } = renderDialog();
+
+      fireEvent.change(input, { target: { value: "oscillators" } });
+
+      expect(screen.getByRole("button", { name: /Relative Strength Index/ })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /Simple Moving Average/ })).toBeNull();
+    });
+
+    it("says so when nothing matches", () => {
+      const { input } = renderDialog();
+
+      fireEvent.change(input, { target: { value: "zzz" } });
+
+      expect(screen.getByText("No indicators match")).toBeInTheDocument();
+    });
+
+    it("picks the first match on Enter", () => {
+      const { controller, input, onPickIndicator } = renderDialog();
+
+      fireEvent.change(input, { target: { value: "sma" } });
+      fireEvent.keyDown(input, { key: "Enter" });
+
+      expect(onPickIndicator).toHaveBeenCalledWith(controller.listings[1]);
+    });
+
+    it("picks nothing on Enter while the filter is blank", () => {
+      const { input, onPickIndicator } = renderDialog();
+
+      fireEvent.keyDown(input, { key: "Enter" });
+
+      expect(onPickIndicator).not.toHaveBeenCalled();
+    });
+
+    it("restores the filter when the dialog reopens after an add", () => {
+      const { input } = renderDialog({ initialFilter: "relative" });
+
+      expect(input).toHaveValue("relative");
+      expect(screen.queryByRole("button", { name: /Simple Moving Average/ })).toBeNull();
+    });
+  });
 });
