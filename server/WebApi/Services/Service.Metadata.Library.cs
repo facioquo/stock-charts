@@ -117,7 +117,7 @@ public static class LibraryCatalog
         return path[(path.LastIndexOf('/') + 1)..];
     }
 
-    private static IndicatorParamConfig FromLibrary(string uiid, string route, IndicatorParam param)
+    internal static IndicatorParamConfig FromLibrary(string uiid, string route, IndicatorParam param)
     {
         if (param.Minimum is not double minimum
             || param.Maximum is not double maximum

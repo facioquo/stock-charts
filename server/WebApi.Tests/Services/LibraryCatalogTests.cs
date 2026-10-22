@@ -137,6 +137,24 @@ public class LibraryCatalogTests
         Assert.True(stale.Count == 0, "Stale entries: " + string.Join(", ", stale));
     }
 
+    [Theory]
+    [InlineData(null, 100d, 14)]
+    [InlineData(1d, null, 14)]
+    [InlineData(1d, 100d, null)]
+    public void FromLibrary_ParameterWithoutBoundsOrDefault_Throws(double? minimum, double? maximum, int? defaultValue)
+    {
+        IndicatorParam unbounded = new() {
+            DisplayName = "Lookback Periods",
+            ParameterName = "lookbackPeriods",
+            DataType = "Int32",
+            Minimum = minimum,
+            Maximum = maximum,
+            DefaultValue = defaultValue
+        };
+
+        Assert.Throws<InvalidOperationException>(() => LibraryCatalog.FromLibrary("SMA", "SMA", unbounded));
+    }
+
     [Fact]
     public void WithLibraryParameters_ListingWithoutALibraryCounterpart_Throws()
     {
