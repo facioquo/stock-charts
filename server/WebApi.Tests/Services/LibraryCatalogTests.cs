@@ -44,12 +44,6 @@ public class LibraryCatalogTests
         Assert.Equal(Convert.ToDouble(library.DefaultValue, CultureInfo.InvariantCulture), served.DefaultValue);
     }
 
-    [Theory]
-    [InlineData("FORCE", "lookbackPeriods", 13)]
-    [InlineData("SMI", "signalPeriods", 9)]
-    public void Override_KeepsThePublishedDefault(string uiid, string paramName, double expected)
-        => Assert.Equal(expected, ServedParam(uiid, paramName).DefaultValue);
-
     [Fact]
     public void ApplyParameterBounds_ListingWithoutALibraryCounterpart_Throws()
     {

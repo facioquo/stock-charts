@@ -40,19 +40,6 @@ public static class LibraryCatalog
         [("STDEV-CH", "standardDeviations")] = "stdDeviations"
     };
 
-    /// <summary>
-    /// Defaults the demo keeps over the library's, keyed by route and parameter name.
-    /// </summary>
-    /// <remarks>
-    /// Each keeps the value the indicator's author published where the library's
-    /// catalog differs: Elder's 13-period Force Index (the catalog lists 2), and
-    /// the 9-period signal line in Blau's Stochastic Momentum Index (the catalog lists 3).
-    /// </remarks>
-    private static readonly Dictionary<(string Route, string ParamName), double> DefaultOverrides = new() {
-        [("FORCE", "lookbackPeriods")] = 13,
-        [("SMI", "signalPeriods")] = 9
-    };
-
     private static readonly Dictionary<string, LibraryListing> LibraryListings
         = Catalog.Get(Style.Series).ToDictionary(listing => listing.Uiid, StringComparer.Ordinal);
 
@@ -98,9 +85,9 @@ public static class LibraryCatalog
                 $"{uiid}.{param.ParamName}: no bounded library parameter '{libraryName}' on '{source.Uiid}'.");
         }
 
-        double? defaultValue = DefaultOverrides.TryGetValue((route, param.ParamName), out double kept)
-            ? kept
-            : match.DefaultValue is null ? null : Convert.ToDouble(match.DefaultValue, CultureInfo.InvariantCulture);
+        double? defaultValue = match.DefaultValue is null
+            ? null
+            : Convert.ToDouble(match.DefaultValue, CultureInfo.InvariantCulture);
 
         return param with {
             Minimum = minimum,
