@@ -312,10 +312,36 @@
   gap: 4px;
   padding: 12px 0 8px;
   background-color: var(--surface);
+}
 
-  input {
+/* Narrower than the section header, with an outline and a search icon, so it
+   reads as a field rather than another header band. */
+.listing-filter-field {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+
+  .material-icons {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .listing-filter-input {
     width: 100%;
     box-sizing: border-box;
+    padding-left: 34px;
+    background-color: var(--surface);
+    border-color: var(--text-muted);
+
+    &:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
   }
 }
 

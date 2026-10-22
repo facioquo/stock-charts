@@ -327,25 +327,31 @@ function AvailableIndicators({
         </span>
       </div>
       <div className="listing-filter">
-        <input
-          type="search"
-          aria-label="filter available indicators"
-          placeholder="Filter by name or category"
-          autoComplete="off"
-          spellCheck={false}
-          value={filter}
-          onChange={event => {
-            changeFilter(event.target.value);
-          }}
-          onKeyDown={event => {
-            if (event.key !== "Enter") return;
-            const first = matches[0];
-            if (filtering && first) {
-              event.preventDefault();
-              onPick(first);
-            }
-          }}
-        />
+        <div className="listing-filter-field">
+          <span className="material-icons" aria-hidden="true">
+            search
+          </span>
+          <input
+            type="search"
+            className="listing-filter-input"
+            aria-label="filter available indicators"
+            placeholder="Filter by name or category"
+            autoComplete="off"
+            spellCheck={false}
+            value={filter}
+            onChange={event => {
+              changeFilter(event.target.value);
+            }}
+            onKeyDown={event => {
+              if (event.key !== "Enter") return;
+              const first = matches[0];
+              if (filtering && first) {
+                event.preventDefault();
+                onPick(first);
+              }
+            }}
+          />
+        </div>
         <span aria-live="polite" className="listing-filter-status">
           {filtering
             ? matches.length === 0
