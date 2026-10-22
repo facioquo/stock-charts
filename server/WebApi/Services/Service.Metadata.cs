@@ -4167,19 +4167,21 @@ public static class Metadata
                 ]
             },
 
-            // Volume Weighted Average Price (VWAP)
+            // VWAP anchored to the first visible bar, not reset per session.
+            // The modifier names the anchor so a future session variant can be
+            // "VWAP (session)" beside it (#491)
             new IndicatorListing {
-                Name = "Volume Weighted Average Price (VWAP)",
+                Name = "Volume Weighted Average Price (VWAP), visible range",
                 Uiid = "VWAP",
-                LegendTemplate = "VWAP",
+                LegendTemplate = "VWAP (visible range)",
                 Endpoint = $"{baseUrl}/VWAP/",
                 Category = "moving-average",
                 ChartType = "overlay",
                 Parameters = [],
                 Results = [
                     new() {
-                        DisplayName = "VWAP",
-                        TooltipTemplate = "VWAP",
+                        DisplayName = "VWAP (visible range)",
+                        TooltipTemplate = "VWAP (visible range)",
                         DataName = "vwap",
                         DataType = "number",
                         LineType = "solid",
