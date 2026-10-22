@@ -1,7 +1,8 @@
 import { Suspense, lazy } from "react";
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate, type RouteObject } from "react-router-dom";
 
 import { App } from "./components/App";
+import { RouteError } from "./pages/RouteError";
 
 const LazyChartPage = lazy(() =>
   import("./pages/ChartPage").then(module => ({ default: module.ChartPage }))
@@ -19,29 +20,40 @@ function RouteSuspense({ children }: { children: React.ReactNode }) {
  *   ""        -> ChartPage
  *   "settings"-> redirects to "/" (the settings dialog opens from ChartPage)
  *   "*"       -> NotFound
+ *
+ * RouteError is bundled eagerly so it still renders when a lazy chunk is gone.
+ * The pathless child keeps the header on screen; the root entry covers App.
  */
-export const router = createBrowserRouter([
+export const routes: RouteObject[] = [
   {
     path: "/",
     element: <App />,
+    errorElement: <RouteError />,
     children: [
       {
-        index: true,
-        element: (
-          <RouteSuspense>
-            <LazyChartPage />
-          </RouteSuspense>
-        )
-      },
-      { path: "settings", element: <Navigate to="/" replace /> },
-      {
-        path: "*",
-        element: (
-          <RouteSuspense>
-            <LazyNotFound />
-          </RouteSuspense>
-        )
+        errorElement: <RouteError />,
+        children: [
+          {
+            index: true,
+            element: (
+              <RouteSuspense>
+                <LazyChartPage />
+              </RouteSuspense>
+            )
+          },
+          { path: "settings", element: <Navigate to="/" replace /> },
+          {
+            path: "*",
+            element: (
+              <RouteSuspense>
+                <LazyNotFound />
+              </RouteSuspense>
+            )
+          }
+        ]
       }
     ]
   }
-]);
+];
+
+export const router = createBrowserRouter(routes);
