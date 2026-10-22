@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ChartController } from "../../charting/chartController";
+import { getSettings } from "../../services/userPrefs";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
 
 import { SettingsDialog } from "./SettingsDialog";
@@ -257,6 +258,30 @@ describe("SettingsDialog", () => {
     fireEvent.click(screen.getByText("Show tooltips"));
 
     expect(toggle).toBeChecked();
+  });
+
+  it("switches the series legend off and on, redrawing the charts each time", () => {
+    const controller = makeController();
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    const toggle = screen.getByRole("checkbox", { name: "Show series legend" });
+    expect(toggle).toBeChecked();
+
+    fireEvent.click(toggle);
+    expect(toggle).not.toBeChecked();
+    expect(getSettings().showSeriesLegend).toBe(false);
+
+    fireEvent.click(toggle);
+    expect(toggle).toBeChecked();
+    expect(getSettings().showSeriesLegend).toBe(true);
+    expect(controller.onSettingsChange).toHaveBeenCalledTimes(2);
   });
 
   it("closes via the close button", () => {
