@@ -397,3 +397,5 @@ PR titles follow Conventional Commits format: `type: Subject` (no scope)
 - `type` is lowercase: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`, `plan`
 - `Subject` starts with an uppercase letter; keep total title length ≤ 65 characters
 - Ignore for PRs labeled `bot`, `dependencies`, or `automated`
+
+Before and after screenshots of the React site are opt-in: add the `pr-screenshots` label to a pull request that changes what the site shows, and `.github/workflows/pr-screenshots.yml` writes the changed scenes into its description on every push while the label stays ("Pull request screenshots" in `@facioquo/react-ui`'s `llms.txt`). The scenes live in `tests/playwright/pr-screenshots.spec.ts`; when a change alters a view no scene shows, add one there. Never edit the description between the `pr-screenshots` markers.
