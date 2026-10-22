@@ -398,4 +398,10 @@ PR titles follow Conventional Commits format: `type: Subject` (no scope)
 - `Subject` starts with an uppercase letter; keep total title length ≤ 65 characters
 - Ignore for PRs labeled `bot`, `dependencies`, or `automated`
 
-Pull request screenshots of the React site are opt-in. To get them, add the `pr-screenshots` label to a pull request that changes what the site shows. While the label stays, `.github/workflows/pr-screenshots.yml` writes before and after images of the changed scenes into the description on each push. The scenes live in `tests/playwright/pr-screenshots.spec.ts`. If a change alters a view that no scene shows, add a scene there. CI owns the section between the `pr-screenshots` markers, so leave it unedited unless you are fixing the workflow itself. The full rules are under "Pull request screenshots" in `@facioquo/react-ui`'s `llms.txt`.
+Pull request screenshots of the React site are opt-in:
+
+- Add the `pr-screenshots` label to a pull request that changes what the site shows.
+- While the label stays, `.github/workflows/pr-screenshots.yml` writes before and after images of changed scenes into the description.
+- The scenes live in `tests/playwright/pr-screenshots.spec.ts`; add one there when a change alters a view no scene shows.
+- CI owns the section between the `pr-screenshots` markers; leave it unedited unless you are fixing that workflow.
+- The full rules are under "Pull request screenshots" in `@facioquo/react-ui`'s `llms.txt`.
