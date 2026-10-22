@@ -1,82 +1,5 @@
 [
   {
-    "timestamp": "2026-04-16T04:00:00Z",
-    "upperBand": 637.65,
-    "centerline": 596.625,
-    "lowerBand": 555.6,
-    "width": 0.13752357008170954
-  },
-  {
-    "timestamp": "2026-04-17T04:00:00Z",
-    "upperBand": 642.18,
-    "centerline": 598.89,
-    "lowerBand": 555.6,
-    "width": 0.14456744978209676
-  },
-  {
-    "timestamp": "2026-04-20T04:00:00Z",
-    "upperBand": 649.99,
-    "centerline": 602.7950000000001,
-    "lowerBand": 555.6,
-    "width": 0.15658723114823445
-  },
-  {
-    "timestamp": "2026-04-21T04:00:00Z",
-    "upperBand": 649.99,
-    "centerline": 602.7950000000001,
-    "lowerBand": 555.6,
-    "width": 0.15658723114823445
-  },
-  {
-    "timestamp": "2026-04-22T04:00:00Z",
-    "upperBand": 650.15,
-    "centerline": 602.875,
-    "lowerBand": 555.6,
-    "width": 0.15683184739788505
-  },
-  {
-    "timestamp": "2026-04-23T04:00:00Z",
-    "upperBand": 655.32,
-    "centerline": 605.46,
-    "lowerBand": 555.6,
-    "width": 0.1647012189079378
-  },
-  {
-    "timestamp": "2026-04-24T04:00:00Z",
-    "upperBand": 656.92,
-    "centerline": 606.26,
-    "lowerBand": 555.6,
-    "width": 0.16712301652756234
-  },
-  {
-    "timestamp": "2026-04-27T04:00:00Z",
-    "upperBand": 664.43,
-    "centerline": 610.015,
-    "lowerBand": 555.6,
-    "width": 0.17840544904633482
-  },
-  {
-    "timestamp": "2026-04-28T04:00:00Z",
-    "upperBand": 664.43,
-    "centerline": 610.015,
-    "lowerBand": 555.6,
-    "width": 0.17840544904633482
-  },
-  {
-    "timestamp": "2026-04-29T04:00:00Z",
-    "upperBand": 664.43,
-    "centerline": 614.335,
-    "lowerBand": 564.24,
-    "width": 0.16308691511960077
-  },
-  {
-    "timestamp": "2026-04-30T04:00:00Z",
-    "upperBand": 664.43,
-    "centerline": 618.185,
-    "lowerBand": 571.94,
-    "width": 0.14961540639129048
-  },
-  {
     "timestamp": "2026-05-01T04:00:00Z",
     "upperBand": 668.67,
     "centerline": 620.3050000000001,
@@ -838,5 +761,82 @@
     "centerline": 728.4749999999999,
     "lowerBand": 700.04,
     "width": 0.07806719516798794
+  },
+  {
+    "timestamp": "2026-10-07T04:00:00Z",
+    "upperBand": 762.83,
+    "centerline": 731.435,
+    "lowerBand": 700.04,
+    "width": 0.08584494862838131
+  },
+  {
+    "timestamp": "2026-10-08T04:00:00Z",
+    "upperBand": 762.83,
+    "centerline": 731.435,
+    "lowerBand": 700.04,
+    "width": 0.08584494862838131
+  },
+  {
+    "timestamp": "2026-10-09T04:00:00Z",
+    "upperBand": 762.83,
+    "centerline": 731.435,
+    "lowerBand": 700.04,
+    "width": 0.08584494862838131
+  },
+  {
+    "timestamp": "2026-10-12T04:00:00Z",
+    "upperBand": 762.83,
+    "centerline": 731.435,
+    "lowerBand": 700.04,
+    "width": 0.08584494862838131
+  },
+  {
+    "timestamp": "2026-10-13T04:00:00Z",
+    "upperBand": 762.83,
+    "centerline": 731.435,
+    "lowerBand": 700.04,
+    "width": 0.08584494862838131
+  },
+  {
+    "timestamp": "2026-10-14T04:00:00Z",
+    "upperBand": 762.83,
+    "centerline": 731.435,
+    "lowerBand": 700.04,
+    "width": 0.08584494862838131
+  },
+  {
+    "timestamp": "2026-10-15T04:00:00Z",
+    "upperBand": 762.83,
+    "centerline": 738.075,
+    "lowerBand": 713.32,
+    "width": 0.06707990380381396
+  },
+  {
+    "timestamp": "2026-10-16T04:00:00Z",
+    "upperBand": 762.83,
+    "centerline": 739.01,
+    "lowerBand": 715.19,
+    "width": 0.06446462158834114
+  },
+  {
+    "timestamp": "2026-10-19T04:00:00Z",
+    "upperBand": 762.83,
+    "centerline": 735.05,
+    "lowerBand": 707.27,
+    "width": 0.07558669478266793
+  },
+  {
+    "timestamp": "2026-10-20T04:00:00Z",
+    "upperBand": 762.83,
+    "centerline": 735.05,
+    "lowerBand": 707.27,
+    "width": 0.07558669478266793
+  },
+  {
+    "timestamp": "2026-10-21T04:00:00Z",
+    "upperBand": 762.83,
+    "centerline": 735.05,
+    "lowerBand": 707.27,
+    "width": 0.07558669478266793
   }
 ]

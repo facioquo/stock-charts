@@ -1,82 +1,5 @@
 [
   {
-    "timestamp": "2026-04-16T04:00:00Z",
-    "zigZag": 607.0213333333334,
-    "pointType": null,
-    "retraceHigh": 705.9965517241379,
-    "retraceLow": 587.64
-  },
-  {
-    "timestamp": "2026-04-17T04:00:00Z",
-    "zigZag": 611.3064444444444,
-    "pointType": null,
-    "retraceHigh": 707.2824137931035,
-    "retraceLow": 590.31
-  },
-  {
-    "timestamp": "2026-04-20T04:00:00Z",
-    "zigZag": 615.5915555555556,
-    "pointType": null,
-    "retraceHigh": 708.568275862069,
-    "retraceLow": 592.98
-  },
-  {
-    "timestamp": "2026-04-21T04:00:00Z",
-    "zigZag": 619.8766666666667,
-    "pointType": null,
-    "retraceHigh": 709.8541379310345,
-    "retraceLow": 595.65
-  },
-  {
-    "timestamp": "2026-04-22T04:00:00Z",
-    "zigZag": 624.1617777777777,
-    "pointType": null,
-    "retraceHigh": 711.14,
-    "retraceLow": 598.32
-  },
-  {
-    "timestamp": "2026-04-23T04:00:00Z",
-    "zigZag": 628.4468888888889,
-    "pointType": null,
-    "retraceHigh": 712.4258620689656,
-    "retraceLow": 600.99
-  },
-  {
-    "timestamp": "2026-04-24T04:00:00Z",
-    "zigZag": 632.732,
-    "pointType": null,
-    "retraceHigh": 713.711724137931,
-    "retraceLow": 603.66
-  },
-  {
-    "timestamp": "2026-04-27T04:00:00Z",
-    "zigZag": 637.0171111111111,
-    "pointType": null,
-    "retraceHigh": 714.9975862068966,
-    "retraceLow": 606.33
-  },
-  {
-    "timestamp": "2026-04-28T04:00:00Z",
-    "zigZag": 641.3022222222222,
-    "pointType": null,
-    "retraceHigh": 716.283448275862,
-    "retraceLow": 609
-  },
-  {
-    "timestamp": "2026-04-29T04:00:00Z",
-    "zigZag": 645.5873333333333,
-    "pointType": null,
-    "retraceHigh": 717.5693103448276,
-    "retraceLow": 611.67
-  },
-  {
-    "timestamp": "2026-04-30T04:00:00Z",
-    "zigZag": 649.8724444444445,
-    "pointType": null,
-    "retraceHigh": 718.8551724137931,
-    "retraceLow": 614.34
-  },
-  {
     "timestamp": "2026-05-01T04:00:00Z",
     "zigZag": 654.1575555555555,
     "pointType": null,
@@ -508,335 +431,412 @@
     "zigZag": 663.2683333333333,
     "pointType": null,
     "retraceHigh": 751.7087837837838,
-    "retraceLow": null
+    "retraceLow": 662.1496610169492
   },
   {
     "timestamp": "2026-07-31T04:00:00Z",
     "zigZag": 665.3866666666667,
     "pointType": null,
     "retraceHigh": 751.9454054054054,
-    "retraceLow": null
+    "retraceLow": 663.1493220338983
   },
   {
     "timestamp": "2026-08-03T04:00:00Z",
     "zigZag": 667.505,
     "pointType": null,
     "retraceHigh": 752.1820270270271,
-    "retraceLow": null
+    "retraceLow": 664.1489830508475
   },
   {
     "timestamp": "2026-08-04T04:00:00Z",
     "zigZag": 669.6233333333333,
     "pointType": null,
     "retraceHigh": 752.4186486486486,
-    "retraceLow": null
+    "retraceLow": 665.1486440677966
   },
   {
     "timestamp": "2026-08-05T04:00:00Z",
     "zigZag": 671.7416666666667,
     "pointType": null,
     "retraceHigh": 752.6552702702703,
-    "retraceLow": null
+    "retraceLow": 666.1483050847457
   },
   {
     "timestamp": "2026-08-06T04:00:00Z",
     "zigZag": 673.86,
     "pointType": null,
     "retraceHigh": 752.8918918918919,
-    "retraceLow": null
+    "retraceLow": 667.1479661016949
   },
   {
     "timestamp": "2026-08-07T04:00:00Z",
     "zigZag": 675.9783333333334,
     "pointType": null,
     "retraceHigh": 753.1285135135136,
-    "retraceLow": null
+    "retraceLow": 668.1476271186441
   },
   {
     "timestamp": "2026-08-10T04:00:00Z",
     "zigZag": 678.0966666666667,
     "pointType": null,
     "retraceHigh": 753.3651351351351,
-    "retraceLow": null
+    "retraceLow": 669.1472881355933
   },
   {
     "timestamp": "2026-08-11T04:00:00Z",
     "zigZag": 680.215,
     "pointType": null,
     "retraceHigh": 753.6017567567568,
-    "retraceLow": null
+    "retraceLow": 670.1469491525423
   },
   {
     "timestamp": "2026-08-12T04:00:00Z",
     "zigZag": 682.3333333333334,
     "pointType": null,
     "retraceHigh": 753.8383783783784,
-    "retraceLow": null
+    "retraceLow": 671.1466101694915
   },
   {
     "timestamp": "2026-08-13T04:00:00Z",
     "zigZag": 684.4516666666667,
     "pointType": null,
     "retraceHigh": 754.075,
-    "retraceLow": null
+    "retraceLow": 672.1462711864407
   },
   {
     "timestamp": "2026-08-14T04:00:00Z",
     "zigZag": 686.57,
     "pointType": null,
     "retraceHigh": 754.3116216216216,
-    "retraceLow": null
+    "retraceLow": 673.1459322033899
   },
   {
     "timestamp": "2026-08-17T04:00:00Z",
     "zigZag": 688.6883333333334,
     "pointType": null,
     "retraceHigh": 754.5482432432433,
-    "retraceLow": null
+    "retraceLow": 674.145593220339
   },
   {
     "timestamp": "2026-08-18T04:00:00Z",
     "zigZag": 690.8066666666666,
     "pointType": null,
     "retraceHigh": 754.7848648648649,
-    "retraceLow": null
+    "retraceLow": 675.1452542372881
   },
   {
     "timestamp": "2026-08-19T04:00:00Z",
     "zigZag": 692.925,
     "pointType": null,
     "retraceHigh": 755.0214864864865,
-    "retraceLow": null
+    "retraceLow": 676.1449152542373
   },
   {
     "timestamp": "2026-08-20T04:00:00Z",
     "zigZag": 695.0433333333333,
     "pointType": null,
     "retraceHigh": 755.2581081081081,
-    "retraceLow": null
+    "retraceLow": 677.1445762711865
   },
   {
     "timestamp": "2026-08-21T04:00:00Z",
     "zigZag": 697.1616666666666,
     "pointType": null,
     "retraceHigh": 755.4947297297298,
-    "retraceLow": null
+    "retraceLow": 678.1442372881356
   },
   {
     "timestamp": "2026-08-24T04:00:00Z",
     "zigZag": 699.28,
     "pointType": null,
     "retraceHigh": 755.7313513513513,
-    "retraceLow": null
+    "retraceLow": 679.1438983050847
   },
   {
     "timestamp": "2026-08-25T04:00:00Z",
     "zigZag": 701.3983333333333,
     "pointType": null,
     "retraceHigh": 755.967972972973,
-    "retraceLow": null
+    "retraceLow": 680.1435593220339
   },
   {
     "timestamp": "2026-08-26T04:00:00Z",
     "zigZag": 703.5166666666667,
     "pointType": null,
     "retraceHigh": 756.2045945945946,
-    "retraceLow": null
+    "retraceLow": 681.143220338983
   },
   {
     "timestamp": "2026-08-27T04:00:00Z",
     "zigZag": 705.635,
     "pointType": null,
     "retraceHigh": 756.4412162162162,
-    "retraceLow": null
+    "retraceLow": 682.1428813559322
   },
   {
     "timestamp": "2026-08-28T04:00:00Z",
     "zigZag": 707.7533333333333,
     "pointType": null,
     "retraceHigh": 756.6778378378378,
-    "retraceLow": null
+    "retraceLow": 683.1425423728814
   },
   {
     "timestamp": "2026-08-31T04:00:00Z",
     "zigZag": 709.8716666666667,
     "pointType": null,
     "retraceHigh": 756.9144594594594,
-    "retraceLow": null
+    "retraceLow": 684.1422033898305
   },
   {
     "timestamp": "2026-09-01T04:00:00Z",
     "zigZag": 711.99,
     "pointType": null,
     "retraceHigh": 757.1510810810811,
-    "retraceLow": null
+    "retraceLow": 685.1418644067796
   },
   {
     "timestamp": "2026-09-02T04:00:00Z",
     "zigZag": 714.1083333333333,
     "pointType": null,
     "retraceHigh": 757.3877027027027,
-    "retraceLow": null
+    "retraceLow": 686.1415254237288
   },
   {
     "timestamp": "2026-09-03T04:00:00Z",
     "zigZag": 716.2266666666667,
     "pointType": null,
     "retraceHigh": 757.6243243243243,
-    "retraceLow": null
+    "retraceLow": 687.141186440678
   },
   {
     "timestamp": "2026-09-04T04:00:00Z",
     "zigZag": 718.345,
     "pointType": null,
     "retraceHigh": 757.8609459459459,
-    "retraceLow": null
+    "retraceLow": 688.1408474576272
   },
   {
     "timestamp": "2026-09-08T04:00:00Z",
     "zigZag": 720.4633333333334,
     "pointType": null,
     "retraceHigh": 758.0975675675676,
-    "retraceLow": null
+    "retraceLow": 689.1405084745762
   },
   {
     "timestamp": "2026-09-09T04:00:00Z",
     "zigZag": 722.5816666666667,
     "pointType": null,
     "retraceHigh": 758.3341891891891,
-    "retraceLow": null
+    "retraceLow": 690.1401694915254
   },
   {
     "timestamp": "2026-09-10T04:00:00Z",
     "zigZag": 724.7,
     "pointType": null,
     "retraceHigh": 758.5708108108108,
-    "retraceLow": null
+    "retraceLow": 691.1398305084746
   },
   {
     "timestamp": "2026-09-11T04:00:00Z",
     "zigZag": 726.8183333333334,
     "pointType": null,
     "retraceHigh": 758.8074324324324,
-    "retraceLow": null
+    "retraceLow": 692.1394915254238
   },
   {
     "timestamp": "2026-09-14T04:00:00Z",
     "zigZag": 728.9366666666666,
     "pointType": null,
     "retraceHigh": 759.0440540540541,
-    "retraceLow": null
+    "retraceLow": 693.1391525423729
   },
   {
     "timestamp": "2026-09-15T04:00:00Z",
     "zigZag": 731.055,
     "pointType": null,
     "retraceHigh": 759.2806756756756,
-    "retraceLow": null
+    "retraceLow": 694.138813559322
   },
   {
     "timestamp": "2026-09-16T04:00:00Z",
     "zigZag": 733.1733333333333,
     "pointType": null,
     "retraceHigh": 759.5172972972973,
-    "retraceLow": null
+    "retraceLow": 695.1384745762712
   },
   {
     "timestamp": "2026-09-17T04:00:00Z",
     "zigZag": 735.2916666666666,
     "pointType": null,
     "retraceHigh": 759.7539189189189,
-    "retraceLow": null
+    "retraceLow": 696.1381355932203
   },
   {
     "timestamp": "2026-09-18T04:00:00Z",
     "zigZag": 737.41,
     "pointType": null,
     "retraceHigh": 759.9905405405406,
-    "retraceLow": null
+    "retraceLow": 697.1377966101695
   },
   {
     "timestamp": "2026-09-21T04:00:00Z",
     "zigZag": 739.5283333333333,
     "pointType": null,
     "retraceHigh": 760.2271621621621,
-    "retraceLow": null
+    "retraceLow": 698.1374576271187
   },
   {
     "timestamp": "2026-09-22T04:00:00Z",
     "zigZag": 741.6466666666666,
     "pointType": null,
     "retraceHigh": 760.4637837837838,
-    "retraceLow": null
+    "retraceLow": 699.1371186440678
   },
   {
     "timestamp": "2026-09-23T04:00:00Z",
     "zigZag": 743.765,
     "pointType": null,
     "retraceHigh": 760.7004054054054,
-    "retraceLow": null
+    "retraceLow": 700.1367796610169
   },
   {
     "timestamp": "2026-09-24T04:00:00Z",
     "zigZag": 745.8833333333333,
     "pointType": null,
     "retraceHigh": 760.937027027027,
-    "retraceLow": null
+    "retraceLow": 701.1364406779661
   },
   {
     "timestamp": "2026-09-25T04:00:00Z",
     "zigZag": 748.0016666666667,
     "pointType": null,
     "retraceHigh": 761.1736486486486,
-    "retraceLow": null
+    "retraceLow": 702.1361016949153
   },
   {
     "timestamp": "2026-09-28T04:00:00Z",
     "zigZag": 750.12,
     "pointType": null,
     "retraceHigh": 761.4102702702703,
-    "retraceLow": null
+    "retraceLow": 703.1357627118645
   },
   {
     "timestamp": "2026-09-29T04:00:00Z",
     "zigZag": 752.2383333333333,
     "pointType": null,
     "retraceHigh": 761.6468918918919,
-    "retraceLow": null
+    "retraceLow": 704.1354237288135
   },
   {
     "timestamp": "2026-09-30T04:00:00Z",
     "zigZag": 754.3566666666667,
     "pointType": null,
     "retraceHigh": 761.8835135135135,
-    "retraceLow": null
+    "retraceLow": 705.1350847457627
   },
   {
     "timestamp": "2026-10-01T04:00:00Z",
     "zigZag": 756.475,
     "pointType": null,
     "retraceHigh": 762.1201351351351,
-    "retraceLow": null
+    "retraceLow": 706.1347457627119
   },
   {
     "timestamp": "2026-10-02T04:00:00Z",
     "zigZag": 758.5933333333334,
     "pointType": null,
     "retraceHigh": 762.3567567567568,
-    "retraceLow": null
+    "retraceLow": 707.134406779661
   },
   {
     "timestamp": "2026-10-05T04:00:00Z",
     "zigZag": 760.7116666666667,
     "pointType": null,
     "retraceHigh": 762.5933783783784,
-    "retraceLow": null
+    "retraceLow": 708.1340677966102
   },
   {
     "timestamp": "2026-10-06T04:00:00Z",
     "zigZag": 762.83,
-    "pointType": null,
+    "pointType": "H",
     "retraceHigh": 762.83,
-    "retraceLow": null
+    "retraceLow": 709.1337288135593
+  },
+  {
+    "timestamp": "2026-10-07T04:00:00Z",
+    "zigZag": 758.9481818181819,
+    "pointType": null,
+    "retraceHigh": null,
+    "retraceLow": 710.1333898305085
+  },
+  {
+    "timestamp": "2026-10-08T04:00:00Z",
+    "zigZag": 755.0663636363637,
+    "pointType": null,
+    "retraceHigh": null,
+    "retraceLow": 711.1330508474576
+  },
+  {
+    "timestamp": "2026-10-09T04:00:00Z",
+    "zigZag": 751.1845454545454,
+    "pointType": null,
+    "retraceHigh": null,
+    "retraceLow": 712.1327118644068
+  },
+  {
+    "timestamp": "2026-10-12T04:00:00Z",
+    "zigZag": 747.3027272727272,
+    "pointType": null,
+    "retraceHigh": null,
+    "retraceLow": 713.1323728813559
+  },
+  {
+    "timestamp": "2026-10-13T04:00:00Z",
+    "zigZag": 743.420909090909,
+    "pointType": null,
+    "retraceHigh": null,
+    "retraceLow": 714.132033898305
+  },
+  {
+    "timestamp": "2026-10-14T04:00:00Z",
+    "zigZag": 739.5390909090909,
+    "pointType": null,
+    "retraceHigh": null,
+    "retraceLow": 715.1316949152542
+  },
+  {
+    "timestamp": "2026-10-15T04:00:00Z",
+    "zigZag": 735.6572727272727,
+    "pointType": null,
+    "retraceHigh": null,
+    "retraceLow": 716.1313559322034
+  },
+  {
+    "timestamp": "2026-10-16T04:00:00Z",
+    "zigZag": 731.7754545454545,
+    "pointType": null,
+    "retraceHigh": null,
+    "retraceLow": 717.1310169491526
+  },
+  {
+    "timestamp": "2026-10-19T04:00:00Z",
+    "zigZag": 727.8936363636363,
+    "pointType": null,
+    "retraceHigh": null,
+    "retraceLow": 718.1306779661016
+  },
+  {
+    "timestamp": "2026-10-20T04:00:00Z",
+    "zigZag": 724.0118181818182,
+    "pointType": null,
+    "retraceHigh": null,
+    "retraceLow": 719.1303389830508
+  },
+  {
+    "timestamp": "2026-10-21T04:00:00Z",
+    "zigZag": 720.13,
+    "pointType": null,
+    "retraceHigh": null,
+    "retraceLow": 720.13
   }
 ]

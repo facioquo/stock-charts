@@ -225,6 +225,7 @@ Client-side project dependencies are strictly in this direction only: web → in
 - **C# / .NET 10**: Latest language features, record types for DTOs
 - **ASP.NET Core Web API**: REST endpoints for chart data, running as a Cloudflare Container built from `server/Dockerfile`
 - **FacioQuo.Stock.Indicators**: NuGet library used in `server/WebApi/Services/` to compute every indicator the API serves
+- **Indicator catalog**: `Service.Metadata.cs` holds presentation only (names, colors, thresholds, tooltips). `LibraryCatalog` fills each parameter's bounds and default from the library's `Catalog`, so the demo offers what the library accepts. A route or parameter named differently from the library needs an entry in its alias maps
 - **Cloudflare Worker** (`server/edge/`): the API's front door. Answers CORS preflight, serves cached responses, and forwards misses to the container. Also owns the `scheduled` cron that refreshes quote datasets from Alpaca into R2
 - **R2**: stores one quote dataset per symbol, keyed by symbol and bar interval. The container holds no storage credentials. It fetches datasets over plain HTTP from an internal hostname. The Worker's `outboundByHost` handler resolves that through its R2 binding
 - **Directory.Packages.props**: Centralized NuGet version management

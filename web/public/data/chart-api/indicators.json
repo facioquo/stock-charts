@@ -486,14 +486,14 @@
         "paramName": "fastPeriods",
         "dataType": "int",
         "minimum": 1,
-        "maximum": 50,
+        "maximum": 100,
         "defaultValue": 5
       },
       {
         "displayName": "Slow Periods",
         "paramName": "slowPeriods",
         "dataType": "int",
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 250,
         "defaultValue": 34
       }
@@ -825,14 +825,14 @@
         "paramName": "fastPeriods",
         "dataType": "int",
         "minimum": 1,
-        "maximum": 50,
+        "maximum": 100,
         "defaultValue": 3
       },
       {
         "displayName": "Slow Periods",
         "paramName": "slowPeriods",
         "dataType": "int",
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 100,
         "defaultValue": 10
       }
@@ -1397,7 +1397,7 @@
         "dataType": "int",
         "minimum": 1,
         "maximum": 250,
-        "defaultValue": 20
+        "defaultValue": 14
       }
     ],
     "results": [
@@ -1766,7 +1766,7 @@
         "dataType": "int",
         "minimum": 2,
         "maximum": 250,
-        "defaultValue": 20
+        "defaultValue": 14
       }
     ],
     "results": [
@@ -1808,7 +1808,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 21,
+        "minimum": 20,
         "maximum": 250,
         "defaultValue": 100
       }
@@ -1849,7 +1849,7 @@
         "displayName": "Kijun Periods",
         "paramName": "kijunPeriods",
         "dataType": "int",
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 250,
         "defaultValue": 26
       },
@@ -1857,7 +1857,7 @@
         "displayName": "Senkou Periods",
         "paramName": "senkouBPeriods",
         "dataType": "int",
-        "minimum": 3,
+        "minimum": 2,
         "maximum": 250,
         "defaultValue": 52
       }
@@ -1954,7 +1954,7 @@
         "displayName": "Slow Periods",
         "paramName": "slowPeriods",
         "dataType": "int",
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 250,
         "defaultValue": 30
       }
@@ -2074,7 +2074,7 @@
         "paramName": "fastPeriods",
         "dataType": "int",
         "minimum": 3,
-        "maximum": 100,
+        "maximum": 200,
         "defaultValue": 34
       },
       {
@@ -2082,7 +2082,7 @@
         "paramName": "slowPeriods",
         "dataType": "int",
         "minimum": 4,
-        "maximum": 200,
+        "maximum": 250,
         "defaultValue": 55
       },
       {
@@ -2168,7 +2168,7 @@
         "dataType": "number",
         "minimum": 80,
         "maximum": 100,
-        "defaultValue": 90
+        "defaultValue": 95
       }
     ],
     "results": [
@@ -2201,7 +2201,7 @@
         "dataType": "int",
         "minimum": 1,
         "maximum": 250,
-        "defaultValue": 10
+        "defaultValue": 14
       }
     ],
     "results": [
@@ -2256,7 +2256,7 @@
         "displayName": "Fast Limit",
         "paramName": "fastLimit",
         "dataType": "number",
-        "minimum": 0.1,
+        "minimum": 0.01,
         "maximum": 0.99,
         "defaultValue": 0.5
       },
@@ -2265,7 +2265,7 @@
         "paramName": "slowLimit",
         "dataType": "number",
         "minimum": 0.01,
-        "maximum": 0.5,
+        "maximum": 0.99,
         "defaultValue": 0.05
       }
     ],
@@ -2448,7 +2448,7 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 250,
         "defaultValue": 20
       },
@@ -2647,7 +2647,7 @@
         "displayName": "Slow Periods",
         "paramName": "slowPeriods",
         "dataType": "int",
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 250,
         "defaultValue": 26
       },
@@ -2815,7 +2815,7 @@
         "paramName": "leftSpan",
         "dataType": "int",
         "minimum": 2,
-        "maximum": 50,
+        "maximum": 100,
         "defaultValue": 2
       },
       {
@@ -2823,15 +2823,15 @@
         "paramName": "rightSpan",
         "dataType": "int",
         "minimum": 2,
-        "maximum": 50,
+        "maximum": 100,
         "defaultValue": 2
       },
       {
         "displayName": "Max Trend Periods",
         "paramName": "maxTrendPeriods",
         "dataType": "int",
-        "minimum": 3,
-        "maximum": 250,
+        "minimum": 2,
+        "maximum": 1000,
         "defaultValue": 20
       }
     ],
@@ -3057,15 +3057,15 @@
         "dataType": "int",
         "minimum": 1,
         "maximum": 250,
-        "defaultValue": 14
+        "defaultValue": 20
       },
       {
         "displayName": "EMA Periods",
         "paramName": "emaPeriods",
         "dataType": "int",
         "minimum": 1,
-        "maximum": 50,
-        "defaultValue": 3
+        "maximum": 100,
+        "defaultValue": 5
       },
       {
         "displayName": "StdDev Periods",
@@ -3073,7 +3073,7 @@
         "dataType": "int",
         "minimum": 1,
         "maximum": 100,
-        "defaultValue": 14
+        "defaultValue": 5
       }
     ],
     "results": [
@@ -3197,7 +3197,7 @@
         "dataType": "int",
         "minimum": 1,
         "maximum": 250,
-        "defaultValue": 11
+        "defaultValue": 20
       },
       {
         "displayName": "Offset Periods",
@@ -3205,7 +3205,7 @@
         "dataType": "int",
         "minimum": 0,
         "maximum": 100,
-        "defaultValue": 9
+        "defaultValue": 0
       }
     ],
     "results": [
@@ -3385,7 +3385,7 @@
         "dataType": "int",
         "minimum": 1,
         "maximum": 250,
-        "defaultValue": 10
+        "defaultValue": 20
       }
     ],
     "results": [
@@ -3449,9 +3449,9 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 250,
-        "defaultValue": 14
+        "defaultValue": 20
       }
     ],
     "results": [
@@ -3482,9 +3482,9 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 250,
-        "defaultValue": 14
+        "defaultValue": 20
       }
     ],
     "results": [
@@ -3515,9 +3515,9 @@
         "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 250,
-        "defaultValue": 14
+        "defaultValue": 20
       }
     ],
     "results": [
@@ -3655,7 +3655,7 @@
         "displayName": "Standard Deviations",
         "paramName": "standardDeviations",
         "dataType": "number",
-        "minimum": 0.1,
+        "minimum": 0.01,
         "maximum": 10,
         "defaultValue": 2
       }
@@ -3846,7 +3846,7 @@
         "dataType": "int",
         "minimum": 1,
         "maximum": 50,
-        "defaultValue": 9
+        "defaultValue": 3
       }
     ],
     "results": [
@@ -4122,14 +4122,14 @@
         "paramName": "lookbackPeriods",
         "dataType": "int",
         "minimum": 1,
-        "maximum": 63,
+        "maximum": 250,
         "defaultValue": 5
       },
       {
         "displayName": "Volume Factor",
         "paramName": "volumeFactor",
         "dataType": "number",
-        "minimum": 0.1,
+        "minimum": 0.01,
         "maximum": 1,
         "defaultValue": 0.7
       }
@@ -4297,7 +4297,7 @@
         "paramName": "smoothPeriods",
         "dataType": "int",
         "minimum": 1,
-        "maximum": 100,
+        "maximum": 250,
         "defaultValue": 13
       },
       {
@@ -4438,7 +4438,7 @@
         "displayName": "Middle Periods",
         "paramName": "middlePeriods",
         "dataType": "int",
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 50,
         "defaultValue": 14
       },
@@ -4446,7 +4446,7 @@
         "displayName": "Long Periods",
         "paramName": "longPeriods",
         "dataType": "int",
-        "minimum": 3,
+        "minimum": 1,
         "maximum": 250,
         "defaultValue": 28
       }
@@ -4487,7 +4487,7 @@
         "displayName": "Multiplier",
         "paramName": "multiplier",
         "dataType": "number",
-        "minimum": 0.5,
+        "minimum": 0.1,
         "maximum": 10,
         "defaultValue": 3
       }
@@ -4557,7 +4557,7 @@
         "dataType": "int",
         "minimum": 1,
         "maximum": 250,
-        "defaultValue": 20
+        "defaultValue": 14
       }
     ],
     "results": [
@@ -4634,7 +4634,7 @@
         "dataType": "int",
         "minimum": 1,
         "maximum": 250,
-        "defaultValue": 20
+        "defaultValue": 14
       }
     ],
     "results": [
@@ -4732,7 +4732,7 @@
         "paramName": "jawOffset",
         "dataType": "int",
         "minimum": 1,
-        "maximum": 30,
+        "maximum": 50,
         "defaultValue": 8
       },
       {
@@ -4748,7 +4748,7 @@
         "paramName": "teethOffset",
         "dataType": "int",
         "minimum": 1,
-        "maximum": 30,
+        "maximum": 50,
         "defaultValue": 5
       },
       {
@@ -4764,7 +4764,7 @@
         "paramName": "lipsOffset",
         "dataType": "int",
         "minimum": 1,
-        "maximum": 30,
+        "maximum": 50,
         "defaultValue": 3
       }
     ],

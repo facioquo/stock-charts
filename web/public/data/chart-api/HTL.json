@@ -1,71 +1,5 @@
 [
   {
-    "timestamp": "2026-04-16T04:00:00Z",
-    "dcPeriods": 25,
-    "trendline": 594.48825,
-    "smoothPrice": 631.57275
-  },
-  {
-    "timestamp": "2026-04-17T04:00:00Z",
-    "dcPeriods": 24,
-    "trendline": 595.8663816666667,
-    "smoothPrice": 639.4905000000001
-  },
-  {
-    "timestamp": "2026-04-20T04:00:00Z",
-    "dcPeriods": 24,
-    "trendline": 597.4861762500001,
-    "smoothPrice": 643.421
-  },
-  {
-    "timestamp": "2026-04-21T04:00:00Z",
-    "dcPeriods": 24,
-    "trendline": 599.22946875,
-    "smoothPrice": 645.4590000000001
-  },
-  {
-    "timestamp": "2026-04-22T04:00:00Z",
-    "dcPeriods": 24,
-    "trendline": 601.1949166666666,
-    "smoothPrice": 648.4765
-  },
-  {
-    "timestamp": "2026-04-23T04:00:00Z",
-    "dcPeriods": 25,
-    "trendline": 603.1636658333333,
-    "smoothPrice": 649.8885000000001
-  },
-  {
-    "timestamp": "2026-04-24T04:00:00Z",
-    "dcPeriods": 26,
-    "trendline": 605.2100061858976,
-    "smoothPrice": 654.579
-  },
-  {
-    "timestamp": "2026-04-27T04:00:00Z",
-    "dcPeriods": 27,
-    "trendline": 607.2729296047008,
-    "smoothPrice": 658.6185
-  },
-  {
-    "timestamp": "2026-04-28T04:00:00Z",
-    "dcPeriods": 28,
-    "trendline": 609.1814001465201,
-    "smoothPrice": 658.6685
-  },
-  {
-    "timestamp": "2026-04-29T04:00:00Z",
-    "dcPeriods": 29,
-    "trendline": 610.9766057560735,
-    "smoothPrice": 659.2774999999999
-  },
-  {
-    "timestamp": "2026-04-30T04:00:00Z",
-    "dcPeriods": 31,
-    "trendline": 612.4906919218002,
-    "smoothPrice": 660.626
-  },
-  {
     "timestamp": "2026-05-01T04:00:00Z",
     "dcPeriods": 32,
     "trendline": 614.0785021104798,
@@ -718,5 +652,71 @@
     "dcPeriods": 17,
     "trendline": 731.6019264705882,
     "smoothPrice": 754.5647500000001
+  },
+  {
+    "timestamp": "2026-10-07T04:00:00Z",
+    "dcPeriods": 17,
+    "trendline": 734.2249705882354,
+    "smoothPrice": 756.0029999999999
+  },
+  {
+    "timestamp": "2026-10-08T04:00:00Z",
+    "dcPeriods": 17,
+    "trendline": 736.8735735294118,
+    "smoothPrice": 754.08825
+  },
+  {
+    "timestamp": "2026-10-09T04:00:00Z",
+    "dcPeriods": 17,
+    "trendline": 739.5173823529411,
+    "smoothPrice": 752.4135
+  },
+  {
+    "timestamp": "2026-10-12T04:00:00Z",
+    "dcPeriods": 18,
+    "trendline": 741.2114183006536,
+    "smoothPrice": 749.641
+  },
+  {
+    "timestamp": "2026-10-13T04:00:00Z",
+    "dcPeriods": 18,
+    "trendline": 742.6545236928105,
+    "smoothPrice": 745.9442499999999
+  },
+  {
+    "timestamp": "2026-10-14T04:00:00Z",
+    "dcPeriods": 18,
+    "trendline": 743.738670751634,
+    "smoothPrice": 740.356
+  },
+  {
+    "timestamp": "2026-10-15T04:00:00Z",
+    "dcPeriods": 18,
+    "trendline": 744.0129305555555,
+    "smoothPrice": 732.03525
+  },
+  {
+    "timestamp": "2026-10-16T04:00:00Z",
+    "dcPeriods": 19,
+    "trendline": 743.5258611111112,
+    "smoothPrice": 724.15975
+  },
+  {
+    "timestamp": "2026-10-19T04:00:00Z",
+    "dcPeriods": 19,
+    "trendline": 742.5229152046783,
+    "smoothPrice": 721.007
+  },
+  {
+    "timestamp": "2026-10-20T04:00:00Z",
+    "dcPeriods": 19,
+    "trendline": 741.2312200292397,
+    "smoothPrice": 718.3460000000001
+  },
+  {
+    "timestamp": "2026-10-21T04:00:00Z",
+    "dcPeriods": 19,
+    "trendline": 740.1136052631579,
+    "smoothPrice": 720.3555
   }
 ]

@@ -40,26 +40,17 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 9,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Offset",
                         ParamName = "offset",
-                        DataType = "number",
-                        DefaultValue = 0.85,
-                        Minimum = 0,
-                        Maximum = 1
+                        DataType = "number"
                     },
                     new() {
                         DisplayName = "Sigma",
                         ParamName = "sigma",
-                        DataType = "number",
-                        DefaultValue = 6,
-                        Minimum = 0.1,
-                        Maximum = 10
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -110,10 +101,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 25,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -162,10 +150,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 25,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -194,18 +179,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 21,
-                        Minimum = 2,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Multiplier",
                         ParamName = "multiplier",
-                        DataType = "number",
-                        DefaultValue = 3,
-                        Minimum = 0.1,
-                        Maximum = 10
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -244,18 +223,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 21,
-                        Minimum = 2,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Multiplier",
                         ParamName = "multiplier",
-                        DataType = "number",
-                        DefaultValue = 3,
-                        Minimum = 0.1,
-                        Maximum = 10
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -308,10 +281,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -364,10 +334,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -395,10 +362,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -436,18 +400,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Fast Periods",
                         ParamName = "fastPeriods",
-                        DataType = "int",
-                        DefaultValue = 5,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Slow Periods",
                         ParamName = "slowPeriods",
-                        DataType = "int",
-                        DefaultValue = 34,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -485,10 +443,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Smooth Periods",
                         ParamName = "smoothPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -526,10 +481,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 50,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -574,18 +526,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Standard Deviations",
                         ParamName = "standardDeviations",
-                        DataType = "number",
-                        DefaultValue = 2,
-                        Minimum = 0.01,
-                        Maximum = 10
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -662,18 +608,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Standard Deviations",
                         ParamName = "standardDeviations",
-                        DataType = "number",
-                        DefaultValue = 2,
-                        Minimum = 0.01,
-                        Maximum = 10
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -711,10 +651,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -752,18 +689,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Fast Periods",
                         ParamName = "fastPeriods",
-                        DataType = "int",
-                        DefaultValue = 3,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Slow Periods",
                         ParamName = "slowPeriods",
-                        DataType = "int",
-                        DefaultValue = 10,
-                        Minimum = 2,
-                        Maximum = 100
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -791,10 +722,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -822,18 +750,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 22,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Multiplier",
                         ParamName = "multiplier",
-                        DataType = "number",
-                        DefaultValue = 3,
-                        Minimum = 1,
-                        Maximum = 10
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -861,18 +783,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 22,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Multiplier",
                         ParamName = "multiplier",
-                        DataType = "number",
-                        DefaultValue = 3,
-                        Minimum = 1,
-                        Maximum = 10
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -928,10 +844,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -990,10 +903,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1049,26 +959,17 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "rsiPeriods",
-                        DataType = "int",
-                        DefaultValue = 3,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Streak Periods",
                         ParamName = "streakPeriods",
-                        DataType = "int",
-                        DefaultValue = 2,
-                        Minimum = 2,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Rank Periods",
                         ParamName = "rankPeriods",
-                        DataType = "int",
-                        DefaultValue = 100,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1109,10 +1010,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1158,10 +1056,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1189,10 +1084,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Max Price Change %",
                         ParamName = "maxPriceChangePercent",
-                        DataType = "number",
-                        DefaultValue = 0.1,
-                        Minimum = 0,
-                        Maximum = 0.5
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -1245,10 +1137,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = MetadataHelpers.GetPriceBandResults("DONCHIAN", ChartColors.StandardOrange)
@@ -1267,10 +1156,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1298,10 +1184,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 10,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1329,10 +1212,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 13,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1370,10 +1250,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 10,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1401,10 +1278,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1432,10 +1306,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 10,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1481,10 +1352,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 13,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1512,10 +1380,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Window Span",
                         ParamName = "windowSpan",
-                        DataType = "int",
-                        DefaultValue = 2,
-                        Minimum = 2,
-                        Maximum = 100
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1554,10 +1419,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Window Span",
                         ParamName = "windowSpan",
-                        DataType = "int",
-                        DefaultValue = 2,
-                        Minimum = 2,
-                        Maximum = 30
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1678,10 +1540,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1722,10 +1581,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 100,
-                        Minimum = 21,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1754,26 +1610,17 @@ public static class Metadata
                     new() {
                         DisplayName = "Tenkan Periods",
                         ParamName = "tenkanPeriods",
-                        DataType = "int",
-                        DefaultValue = 9,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Kijun Periods",
                         ParamName = "kijunPeriods",
-                        DataType = "int",
-                        DefaultValue = 26,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Senkou Periods",
                         ParamName = "senkouBPeriods",
-                        DataType = "int",
-                        DefaultValue = 52,
-                        Minimum = 3,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1843,26 +1690,17 @@ public static class Metadata
                     new() {
                         DisplayName = "ER Periods",
                         ParamName = "erPeriods",
-                        DataType = "int",
-                        DefaultValue = 10,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Fast Periods",
                         ParamName = "fastPeriods",
-                        DataType = "int",
-                        DefaultValue = 2,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Slow Periods",
                         ParamName = "slowPeriods",
-                        DataType = "int",
-                        DefaultValue = 30,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1891,26 +1729,17 @@ public static class Metadata
                     new() {
                         DisplayName = "EMA Periods",
                         ParamName = "emaPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Multiplier",
                         ParamName = "multiplier",
-                        DataType = "number",
-                        DefaultValue = 2,
-                        Minimum = 0.01,
-                        Maximum = 10
+                        DataType = "number"
                     },
                     new() {
                         DisplayName = "ATR Periods",
                         ParamName = "atrPeriods",
-                        DataType = "number",
-                        DefaultValue = 10,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "number"
                     }
                 ],
                 Results = MetadataHelpers.GetPriceBandResults("KELTNER", ChartColors.StandardOrange)
@@ -1939,26 +1768,17 @@ public static class Metadata
                     new() {
                         DisplayName = "Fast Periods",
                         ParamName = "fastPeriods",
-                        DataType = "int",
-                        DefaultValue = 34,
-                        Minimum = 3,
-                        Maximum = 100
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Slow Periods",
                         ParamName = "slowPeriods",
-                        DataType = "int",
-                        DefaultValue = 55,
-                        Minimum = 4,
-                        Maximum = 200
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Signal Periods",
                         ParamName = "signalPeriods",
-                        DataType = "int",
-                        DefaultValue = 13,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -1994,10 +1814,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -2025,10 +1842,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Min Body Percent %",
                         ParamName = "minBodyPercent",
-                        DataType = "number",
-                        DefaultValue = 90,
-                        Minimum = 80,
-                        Maximum = 100
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -2057,18 +1871,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Fast Limit",
                         ParamName = "fastLimit",
-                        DataType = "number",
-                        DefaultValue = 0.5,
-                        Minimum = 0.1,
-                        Maximum = 0.99
+                        DataType = "number"
                     },
                     new() {
                         DisplayName = "Slow Limit",
                         ParamName = "slowLimit",
-                        DataType = "number",
-                        DefaultValue = 0.05,
-                        Minimum = 0.01,
-                        Maximum = 0.5
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -2132,10 +1940,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -2173,26 +1978,17 @@ public static class Metadata
                     new() {
                         DisplayName = "Fast Periods",
                         ParamName = "fastPeriods",
-                        DataType = "int",
-                        DefaultValue = 12,
-                        Minimum = 1,
-                        Maximum = 200
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Slow Periods",
                         ParamName = "slowPeriods",
-                        DataType = "int",
-                        DefaultValue = 26,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Signal Periods",
                         ParamName = "signalPeriods",
-                        DataType = "int",
-                        DefaultValue = 9,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -2237,18 +2033,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Percent Offset",
                         ParamName = "percentOffset",
-                        DataType = "number",
-                        DefaultValue = 2.5,
-                        Minimum = 0.1,
-                        Maximum = 10
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -2321,18 +2111,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Step Size",
                         ParamName = "accelerationStep",
-                        DataType = "number",
-                        DefaultValue = 0.02,
-                        Minimum = 0.01,
-                        Maximum = 0.1
+                        DataType = "number"
                     },
                     new() {
                         DisplayName = "Max Factor",
                         ParamName = "maxAccelerationFactor",
-                        DataType = "number",
-                        DefaultValue = 0.2,
-                        Minimum = 0.1,
-                        Maximum = 1
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -2371,26 +2155,17 @@ public static class Metadata
                     new() {
                         DisplayName = "Fast Periods",
                         ParamName = "fastPeriods",
-                        DataType = "int",
-                        DefaultValue = 12,
-                        Minimum = 1,
-                        Maximum = 100
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Slow Periods",
                         ParamName = "slowPeriods",
-                        DataType = "int",
-                        DefaultValue = 26,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Signal Periods",
                         ParamName = "signalPeriods",
-                        DataType = "int",
-                        DefaultValue = 9,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -2525,26 +2300,17 @@ public static class Metadata
                     new() {
                         DisplayName = "Left Span",
                         ParamName = "leftSpan",
-                        DataType = "int",
-                        DefaultValue = 2,
-                        Minimum = 2,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Right Span",
                         ParamName = "rightSpan",
-                        DataType = "int",
-                        DefaultValue = 2,
-                        Minimum = 2,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Max Trend Periods",
                         ParamName = "maxTrendPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 3,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -2608,26 +2374,17 @@ public static class Metadata
                     new() {
                         DisplayName = "Time Periods",
                         ParamName = "timePeriods",
-                        DataType = "int",
-                        DefaultValue = 35,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Smooth Periods",
                         ParamName = "smoothPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 100
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Signal Periods",
                         ParamName = "signalPeriods",
-                        DataType = "int",
-                        DefaultValue = 10,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -2677,10 +2434,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -2808,10 +2562,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -2849,26 +2600,17 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "EMA Periods",
                         ParamName = "emaPeriods",
-                        DataType = "int",
-                        DefaultValue = 3,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "StdDev Periods",
                         ParamName = "stdDevPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 100
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -2948,10 +2690,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -2980,18 +2719,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Window Periods",
                         ParamName = "windowPeriods",
-                        DataType = "int",
-                        DefaultValue = 11,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Offset Periods",
                         ParamName = "offsetPeriods",
-                        DataType = "int",
-                        DefaultValue = 9,
-                        Minimum = 0,
-                        Maximum = 100
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3102,26 +2835,17 @@ public static class Metadata
                     new() {
                         DisplayName = "Cycle Periods",
                         ParamName = "cyclePeriods",
-                        DataType = "int",
-                        DefaultValue = 10,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Fast Periods",
                         ParamName = "fastPeriods",
-                        DataType = "int",
-                        DefaultValue = 23,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Slow Periods",
                         ParamName = "slowPeriods",
-                        DataType = "int",
-                        DefaultValue = 50,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3149,10 +2873,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 10,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3184,10 +2905,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3214,10 +2932,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3244,10 +2959,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3275,10 +2987,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3306,10 +3015,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3337,10 +3043,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3368,10 +3071,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3400,18 +3100,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Standard Deviations",
                         ParamName = "standardDeviations",
-                        DataType = "number",
-                        DefaultValue = 2,
-                        Minimum = 0.1,
-                        Maximum = 10
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -3470,26 +3164,17 @@ public static class Metadata
                     new() {
                         DisplayName = "SMA Periods",
                         ParamName = "smaPeriods",
-                        DataType = "int",
-                        DefaultValue = 5,
-                        Minimum = 2,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Multiplier",
                         ParamName = "multiplier",
-                        DataType = "number",
-                        DefaultValue = 2,
-                        Minimum = 1,
-                        Maximum = 10
+                        DataType = "number"
                     },
                     new() {
                         DisplayName = "ATR Periods",
                         ParamName = "atrPeriods",
-                        DataType = "int",
-                        DefaultValue = 10,
-                        Minimum = 2,
-                        Maximum = 50
+                        DataType = "int"
                     }
                 ],
                 Results = MetadataHelpers.GetPriceBandResults("STARC", ChartColors.StandardOrange)
@@ -3533,34 +3218,22 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 13,
-                        Minimum = 1,
-                        Maximum = 300
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "First Smooth Periods",
                         ParamName = "firstSmoothPeriods",
-                        DataType = "int",
-                        DefaultValue = 25,
-                        Minimum = 1,
-                        Maximum = 300
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Second Smooth Periods",
                         ParamName = "secondSmoothPeriods",
-                        DataType = "int",
-                        DefaultValue = 2,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Signal Periods",
                         ParamName = "signalPeriods",
-                        DataType = "int",
-                        DefaultValue = 9,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3621,18 +3294,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods (%K)",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Signal Periods (%D)",
                         ParamName = "signalPeriods",
-                        DataType = "int",
-                        DefaultValue = 3,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3693,34 +3360,22 @@ public static class Metadata
                     new() {
                         DisplayName = "RSI Periods",
                         ParamName = "rsiPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Stochastic Periods",
                         ParamName = "stochPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Signal Periods",
                         ParamName = "signalPeriods",
-                        DataType = "int",
-                        DefaultValue = 3,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Smooth Periods",
                         ParamName = "smoothPeriods",
-                        DataType = "int",
-                        DefaultValue = 1,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3757,18 +3412,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 10,
-                        Minimum = 2,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Multiplier",
                         ParamName = "multiplier",
-                        DataType = "number",
-                        DefaultValue = 3,
-                        Minimum = 0.1,
-                        Maximum = 10
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -3813,18 +3462,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 5,
-                        Minimum = 1,
-                        Maximum = 63
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Volume Factor",
                         ParamName = "volumeFactor",
-                        DataType = "number",
-                        DefaultValue = 0.7,
-                        Minimum = 0.1,
-                        Maximum = 1
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -3852,10 +3495,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3893,10 +3533,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -3969,26 +3606,17 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 25,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Smooth Periods",
                         ParamName = "smoothPeriods",
-                        DataType = "int",
-                        DefaultValue = 13,
-                        Minimum = 1,
-                        Maximum = 100
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Signal Periods",
                         ParamName = "signalPeriods",
-                        DataType = "int",
-                        DefaultValue = 7,
-                        Minimum = 0,
-                        Maximum = 50
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -4024,10 +3652,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -4083,26 +3708,17 @@ public static class Metadata
                     new() {
                         DisplayName = "Short Periods",
                         ParamName = "shortPeriods",
-                        DataType = "int",
-                        DefaultValue = 7,
-                        Minimum = 1,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Middle Periods",
                         ParamName = "middlePeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Long Periods",
                         ParamName = "longPeriods",
-                        DataType = "int",
-                        DefaultValue = 28,
-                        Minimum = 3,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -4131,18 +3747,12 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 7,
-                        Minimum = 2,
-                        Maximum = 50
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Multiplier",
                         ParamName = "multiplier",
-                        DataType = "number",
-                        DefaultValue = 3,
-                        Minimum = 0.5,
-                        Maximum = 10
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -4203,10 +3813,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -4234,10 +3841,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 2,
-                        Maximum = 100
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -4273,10 +3877,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 20,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -4332,10 +3933,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Lookback Periods",
                         ParamName = "lookbackPeriods",
-                        DataType = "int",
-                        DefaultValue = 14,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -4363,50 +3961,32 @@ public static class Metadata
                     new() {
                         DisplayName = "Jaw Periods",
                         ParamName = "jawPeriods",
-                        DataType = "int",
-                        DefaultValue = 13,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Jaw Offset",
                         ParamName = "jawOffset",
-                        DataType = "int",
-                        DefaultValue = 8,
-                        Minimum = 1,
-                        Maximum = 30
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Teeth Periods",
                         ParamName = "teethPeriods",
-                        DataType = "int",
-                        DefaultValue = 8,
-                        Minimum = 2,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Teeth Offset",
                         ParamName = "teethOffset",
-                        DataType = "int",
-                        DefaultValue = 5,
-                        Minimum = 1,
-                        Maximum = 30
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Lips Periods",
                         ParamName = "lipsPeriods",
-                        DataType = "int",
-                        DefaultValue = 5,
-                        Minimum = 1,
-                        Maximum = 250
+                        DataType = "int"
                     },
                     new() {
                         DisplayName = "Lips Offset",
                         ParamName = "lipsOffset",
-                        DataType = "int",
-                        DefaultValue = 3,
-                        Minimum = 1,
-                        Maximum = 30
+                        DataType = "int"
                     }
                 ],
                 Results = [
@@ -4450,10 +4030,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Percent Change",
                         ParamName = "percentChange",
-                        DataType = "number",
-                        DefaultValue = 5,
-                        Minimum = 1,
-                        Maximum = 200
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -4497,10 +4074,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Percent Change",
                         ParamName = "percentChange",
-                        DataType = "number",
-                        DefaultValue = 5,
-                        Minimum = 1,
-                        Maximum = 200
+                        DataType = "number"
                     }
                 ],
                 Results = [
@@ -4532,6 +4106,6 @@ public static class Metadata
             },
         ];
 
-        return [.. listing.OrderBy(x => x.Name)];
+        return [.. listing.Select(LibraryCatalog.ApplyParameterBounds).OrderBy(x => x.Name)];
     }
 }

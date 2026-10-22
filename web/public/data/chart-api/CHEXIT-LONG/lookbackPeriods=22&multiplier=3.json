@@ -1,482 +1,482 @@
 [
   {
-    "timestamp": "2026-04-16T04:00:00Z",
-    "chandelierExit": 610.9794052263209
-  },
-  {
-    "timestamp": "2026-04-17T04:00:00Z",
-    "chandelierExit": 618.9012504433063
-  },
-  {
-    "timestamp": "2026-04-20T04:00:00Z",
-    "chandelierExit": 619.4661936049743
-  },
-  {
-    "timestamp": "2026-04-21T04:00:00Z",
-    "chandelierExit": 619.9350029865662
-  },
-  {
-    "timestamp": "2026-04-22T04:00:00Z",
-    "chandelierExit": 624.9675028508133
-  },
-  {
-    "timestamp": "2026-04-23T04:00:00Z",
-    "chandelierExit": 626.3994345394126
-  },
-  {
-    "timestamp": "2026-04-24T04:00:00Z",
-    "chandelierExit": 633.5199147876211
-  },
-  {
-    "timestamp": "2026-04-27T04:00:00Z",
-    "chandelierExit": 634.4176459336384
-  },
-  {
-    "timestamp": "2026-04-28T04:00:00Z",
-    "chandelierExit": 634.3541165730185
-  },
-  {
-    "timestamp": "2026-04-29T04:00:00Z",
-    "chandelierExit": 635.053020365154
-  },
-  {
-    "timestamp": "2026-04-30T04:00:00Z",
-    "chandelierExit": 639.1160648940106
-  },
-  {
     "timestamp": "2026-05-01T04:00:00Z",
-    "chandelierExit": 646.6107892170102
+    "chandelierExit": 646.6107892460492
   },
   {
     "timestamp": "2026-05-04T04:00:00Z",
-    "chandelierExit": 647.6768897071461
+    "chandelierExit": 647.6768897348651
   },
   {
     "timestamp": "2026-05-05T04:00:00Z",
-    "chandelierExit": 653.6368038113667
+    "chandelierExit": 653.6368038378258
   },
   {
     "timestamp": "2026-05-06T04:00:00Z",
-    "chandelierExit": 666.2008127290318
+    "chandelierExit": 666.2008127542882
   },
   {
     "timestamp": "2026-05-07T04:00:00Z",
-    "chandelierExit": 671.5232757868031
+    "chandelierExit": 671.5232758109115
   },
   {
     "timestamp": "2026-05-08T04:00:00Z",
-    "chandelierExit": 680.613126887403
+    "chandelierExit": 680.6131269104155
   },
   {
     "timestamp": "2026-05-11T04:00:00Z",
-    "chandelierExit": 684.6548029379755
+    "chandelierExit": 684.6548029599421
   },
   {
     "timestamp": "2026-05-12T04:00:00Z",
-    "chandelierExit": 683.7318573498858
+    "chandelierExit": 683.7318573708537
   },
   {
     "timestamp": "2026-05-13T04:00:00Z",
-    "chandelierExit": 685.5870001976183
+    "chandelierExit": 685.5870002176332
   },
   {
     "timestamp": "2026-05-14T04:00:00Z",
-    "chandelierExit": 691.3519092795447
+    "chandelierExit": 691.3519092986498
   },
   {
     "timestamp": "2026-05-15T04:00:00Z",
-    "chandelierExit": 690.8131861304745
+    "chandelierExit": 690.8131861487112
   },
   {
     "timestamp": "2026-05-18T04:00:00Z",
-    "chandelierExit": 690.4884958518165
+    "chandelierExit": 690.4884958692244
   },
   {
     "timestamp": "2026-05-19T04:00:00Z",
-    "chandelierExit": 690.4008369494612
+    "chandelierExit": 690.4008369660778
   },
   {
     "timestamp": "2026-05-20T04:00:00Z",
-    "chandelierExit": 690.2585261790312
+    "chandelierExit": 690.2585261948924
   },
   {
     "timestamp": "2026-05-21T04:00:00Z",
-    "chandelierExit": 690.2945022618024
+    "chandelierExit": 690.2945022769428
   },
   {
     "timestamp": "2026-05-22T04:00:00Z",
-    "chandelierExit": 690.7011157953569
+    "chandelierExit": 690.701115809809
   },
   {
     "timestamp": "2026-05-26T04:00:00Z",
-    "chandelierExit": 699.410155986477
+    "chandelierExit": 699.4101560002722
   },
   {
     "timestamp": "2026-05-27T04:00:00Z",
-    "chandelierExit": 701.7960579870917
+    "chandelierExit": 701.7960580002598
   },
   {
     "timestamp": "2026-05-28T04:00:00Z",
-    "chandelierExit": 705.2816917149512
+    "chandelierExit": 705.2816917275208
   },
   {
     "timestamp": "2026-05-29T04:00:00Z",
-    "chandelierExit": 710.7929784551807
+    "chandelierExit": 710.7929784671788
   },
   {
     "timestamp": "2026-06-01T04:00:00Z",
-    "chandelierExit": 714.9682976163089
+    "chandelierExit": 714.9682976277617
   },
   {
     "timestamp": "2026-06-02T04:00:00Z",
-    "chandelierExit": 716.1967840882947
+    "chandelierExit": 716.196784099227
   },
   {
     "timestamp": "2026-06-03T04:00:00Z",
-    "chandelierExit": 718.5585211751904
+    "chandelierExit": 718.5585211856259
   },
   {
     "timestamp": "2026-06-04T04:00:00Z",
-    "chandelierExit": 718.3365429399545
+    "chandelierExit": 718.3365429499155
   },
   {
     "timestamp": "2026-06-05T04:00:00Z",
-    "chandelierExit": 714.772154624502
+    "chandelierExit": 714.7721546340103
   },
   {
     "timestamp": "2026-06-08T04:00:00Z",
-    "chandelierExit": 713.8972839597519
+    "chandelierExit": 713.897283968828
   },
   {
     "timestamp": "2026-06-09T04:00:00Z",
-    "chandelierExit": 710.1228619615814
+    "chandelierExit": 710.1228619702449
   },
   {
     "timestamp": "2026-06-10T04:00:00Z",
-    "chandelierExit": 709.386368236055
+    "chandelierExit": 709.3863682443247
   },
   {
     "timestamp": "2026-06-11T04:00:00Z",
-    "chandelierExit": 707.803806043507
+    "chandelierExit": 707.8038060514009
   },
   {
     "timestamp": "2026-06-12T04:00:00Z",
-    "chandelierExit": 707.9295421324385
+    "chandelierExit": 707.9295421399735
   },
   {
     "timestamp": "2026-06-15T04:00:00Z",
-    "chandelierExit": 706.5781993082368
+    "chandelierExit": 706.5781993154293
   },
   {
     "timestamp": "2026-06-16T04:00:00Z",
-    "chandelierExit": 706.4964629760442
+    "chandelierExit": 706.4964629829097
   },
   {
     "timestamp": "2026-06-17T04:00:00Z",
-    "chandelierExit": 706.4034419316786
+    "chandelierExit": 706.403441938232
   },
   {
     "timestamp": "2026-06-18T04:00:00Z",
-    "chandelierExit": 705.6791945711477
+    "chandelierExit": 705.6791945774033
   },
   {
     "timestamp": "2026-06-22T04:00:00Z",
-    "chandelierExit": 706.1346857270046
+    "chandelierExit": 706.1346857329759
   },
   {
     "timestamp": "2026-06-23T04:00:00Z",
-    "chandelierExit": 704.5158363757771
+    "chandelierExit": 704.5158363814769
   },
   {
     "timestamp": "2026-06-24T04:00:00Z",
-    "chandelierExit": 704.4105710859691
+    "chandelierExit": 704.4105710914098
   },
   {
     "timestamp": "2026-06-25T04:00:00Z",
-    "chandelierExit": 703.5041814911523
+    "chandelierExit": 703.5041814963457
   },
   {
     "timestamp": "2026-06-26T04:00:00Z",
-    "chandelierExit": 703.7230823324635
+    "chandelierExit": 703.7230823374209
   },
   {
     "timestamp": "2026-06-29T04:00:00Z",
-    "chandelierExit": 703.1274876809879
+    "chandelierExit": 703.12748768572
   },
   {
     "timestamp": "2026-06-30T04:00:00Z",
-    "chandelierExit": 703.3226018773066
+    "chandelierExit": 703.3226018818236
   },
   {
     "timestamp": "2026-07-01T04:00:00Z",
-    "chandelierExit": 703.8102108828837
+    "chandelierExit": 703.8102108871952
   },
   {
     "timestamp": "2026-07-02T04:00:00Z",
-    "chandelierExit": 702.6761103882071
+    "chandelierExit": 702.6761103923228
   },
   {
     "timestamp": "2026-07-06T04:00:00Z",
-    "chandelierExit": 702.9149235523795
+    "chandelierExit": 702.914923556308
   },
   {
     "timestamp": "2026-07-07T04:00:00Z",
-    "chandelierExit": 699.4519724818169
+    "chandelierExit": 699.4519724855669
   },
   {
     "timestamp": "2026-07-08T04:00:00Z",
-    "chandelierExit": 700.0021100962798
+    "chandelierExit": 700.0021100998594
   },
   {
     "timestamp": "2026-07-09T04:00:00Z",
-    "chandelierExit": 700.3083778191761
+    "chandelierExit": 700.308377822593
   },
   {
     "timestamp": "2026-07-10T04:00:00Z",
-    "chandelierExit": 701.0793606455773
+    "chandelierExit": 701.0793606488387
   },
   {
     "timestamp": "2026-07-13T04:00:00Z",
-    "chandelierExit": 700.9868897071419
+    "chandelierExit": 700.9868897102551
   },
   {
     "timestamp": "2026-07-14T04:00:00Z",
-    "chandelierExit": 701.5933947204536
+    "chandelierExit": 701.5933947234254
   },
   {
     "timestamp": "2026-07-15T04:00:00Z",
-    "chandelierExit": 701.6664222331603
+    "chandelierExit": 701.666422235997
   },
   {
     "timestamp": "2026-07-16T04:00:00Z",
-    "chandelierExit": 701.594312131653
+    "chandelierExit": 701.5943121343607
   },
   {
     "timestamp": "2026-07-17T04:00:00Z",
-    "chandelierExit": 700.9704797620324
+    "chandelierExit": 700.970479764617
   },
   {
     "timestamp": "2026-07-20T04:00:00Z",
-    "chandelierExit": 701.5586397728491
+    "chandelierExit": 701.5586397753164
   },
   {
     "timestamp": "2026-07-21T04:00:00Z",
-    "chandelierExit": 701.6291561468106
+    "chandelierExit": 701.6291561491656
   },
   {
     "timestamp": "2026-07-22T04:00:00Z",
-    "chandelierExit": 702.7982854128646
+    "chandelierExit": 702.7982854151126
   },
   {
     "timestamp": "2026-07-23T04:00:00Z",
-    "chandelierExit": 694.6597269850071
+    "chandelierExit": 694.6597269871529
   },
   {
     "timestamp": "2026-07-24T04:00:00Z",
-    "chandelierExit": 695.2365575765976
+    "chandelierExit": 695.2365575786459
   },
   {
     "timestamp": "2026-07-27T04:00:00Z",
-    "chandelierExit": 694.9621685958432
+    "chandelierExit": 694.9621685977984
   },
   {
     "timestamp": "2026-07-28T04:00:00Z",
-    "chandelierExit": 694.9607063869413
+    "chandelierExit": 694.9607063888076
   },
   {
     "timestamp": "2026-07-29T04:00:00Z",
-    "chandelierExit": 694.3293106420803
+    "chandelierExit": 694.3293106438617
   },
   {
     "timestamp": "2026-07-30T04:00:00Z",
-    "chandelierExit": 693.0938874310766
+    "chandelierExit": 693.0938874327771
   },
   {
     "timestamp": "2026-07-31T04:00:00Z",
-    "chandelierExit": 687.2096198205733
+    "chandelierExit": 687.2096198221964
   },
   {
     "timestamp": "2026-08-03T04:00:00Z",
-    "chandelierExit": 686.100318919638
+    "chandelierExit": 686.1003189211874
   },
   {
     "timestamp": "2026-08-04T04:00:00Z",
-    "chandelierExit": 680.242122605109
+    "chandelierExit": 680.2421226065879
   },
   {
     "timestamp": "2026-08-05T04:00:00Z",
-    "chandelierExit": 682.8049806685132
+    "chandelierExit": 682.8049806699248
   },
   {
     "timestamp": "2026-08-06T04:00:00Z",
-    "chandelierExit": 683.4220270017626
+    "chandelierExit": 683.4220270031101
   },
   {
     "timestamp": "2026-08-07T04:00:00Z",
-    "chandelierExit": 684.2496621380461
+    "chandelierExit": 684.2496621393324
   },
   {
     "timestamp": "2026-08-10T04:00:00Z",
-    "chandelierExit": 685.6805865863167
+    "chandelierExit": 685.6805865875446
   },
   {
     "timestamp": "2026-08-11T04:00:00Z",
-    "chandelierExit": 686.6401053778478
+    "chandelierExit": 686.6401053790198
   },
   {
     "timestamp": "2026-08-12T04:00:00Z",
-    "chandelierExit": 687.3303278606729
+    "chandelierExit": 687.3303278617916
   },
   {
     "timestamp": "2026-08-13T04:00:00Z",
-    "chandelierExit": 693.309403867006
+    "chandelierExit": 693.3094038680739
   },
   {
     "timestamp": "2026-08-14T04:00:00Z",
-    "chandelierExit": 694.7812491457784
+    "chandelierExit": 694.7812491467978
   },
   {
     "timestamp": "2026-08-17T04:00:00Z",
-    "chandelierExit": 696.0302832755157
+    "chandelierExit": 696.0302832764887
   },
   {
     "timestamp": "2026-08-18T04:00:00Z",
-    "chandelierExit": 695.8759522175377
+    "chandelierExit": 695.8759522184665
   },
   {
     "timestamp": "2026-08-19T04:00:00Z",
-    "chandelierExit": 696.4445452985588
+    "chandelierExit": 696.4445452994453
   },
   {
     "timestamp": "2026-08-20T04:00:00Z",
-    "chandelierExit": 697.161156875897
+    "chandelierExit": 697.1611568767432
   },
   {
     "timestamp": "2026-08-21T04:00:00Z",
-    "chandelierExit": 697.9938315633563
+    "chandelierExit": 697.993831564164
   },
   {
     "timestamp": "2026-08-24T04:00:00Z",
-    "chandelierExit": 698.213202855931
+    "chandelierExit": 698.2132028567021
   },
   {
     "timestamp": "2026-08-25T04:00:00Z",
-    "chandelierExit": 698.8357845442977
+    "chandelierExit": 698.8357845450338
   },
   {
     "timestamp": "2026-08-26T04:00:00Z",
-    "chandelierExit": 699.7927943377388
+    "chandelierExit": 699.7927943384414
   },
   {
     "timestamp": "2026-08-27T04:00:00Z",
-    "chandelierExit": 700.0040309587506
+    "chandelierExit": 700.0040309594212
   },
   {
     "timestamp": "2026-08-28T04:00:00Z",
-    "chandelierExit": 700.3529386424437
+    "chandelierExit": 700.3529386430839
   },
   {
     "timestamp": "2026-08-31T04:00:00Z",
-    "chandelierExit": 701.3064414314235
+    "chandelierExit": 701.3064414320346
   },
   {
     "timestamp": "2026-09-01T04:00:00Z",
-    "chandelierExit": 701.180239548177
+    "chandelierExit": 701.1802395487603
   },
   {
     "timestamp": "2026-09-02T04:00:00Z",
-    "chandelierExit": 702.072274114169
+    "chandelierExit": 702.0722741147257
   },
   {
     "timestamp": "2026-09-03T04:00:00Z",
-    "chandelierExit": 702.2433071089795
+    "chandelierExit": 702.243307109511
   },
   {
     "timestamp": "2026-09-04T04:00:00Z",
-    "chandelierExit": 702.9983840585713
+    "chandelierExit": 702.9983840590786
   },
   {
     "timestamp": "2026-09-08T04:00:00Z",
-    "chandelierExit": 703.5861847831817
+    "chandelierExit": 703.5861847836659
   },
   {
     "timestamp": "2026-09-09T04:00:00Z",
-    "chandelierExit": 704.2311309294007
+    "chandelierExit": 704.231130929863
   },
   {
     "timestamp": "2026-09-10T04:00:00Z",
-    "chandelierExit": 704.3244886144279
+    "chandelierExit": 704.3244886148691
   },
   {
     "timestamp": "2026-09-11T04:00:00Z",
-    "chandelierExit": 704.4879209501357
+    "chandelierExit": 704.4879209505569
   },
   {
     "timestamp": "2026-09-14T04:00:00Z",
-    "chandelierExit": 704.2075609069477
+    "chandelierExit": 704.2075609073498
   },
   {
     "timestamp": "2026-09-15T04:00:00Z",
-    "chandelierExit": 704.7847172293592
+    "chandelierExit": 704.784717229743
   },
   {
     "timestamp": "2026-09-16T04:00:00Z",
-    "chandelierExit": 704.5392755371156
+    "chandelierExit": 704.5392755374819
   },
   {
     "timestamp": "2026-09-17T04:00:00Z",
-    "chandelierExit": 693.636126649065
+    "chandelierExit": 693.6361266494147
   },
   {
     "timestamp": "2026-09-18T04:00:00Z",
-    "chandelierExit": 694.1301663468347
+    "chandelierExit": 694.1301663471685
   },
   {
     "timestamp": "2026-09-21T04:00:00Z",
-    "chandelierExit": 711.6219769674332
+    "chandelierExit": 711.6219769677518
   },
   {
     "timestamp": "2026-09-22T04:00:00Z",
-    "chandelierExit": 717.1487052870953
+    "chandelierExit": 717.1487052873994
   },
   {
     "timestamp": "2026-09-23T04:00:00Z",
-    "chandelierExit": 717.3139914104091
+    "chandelierExit": 717.3139914106994
   },
   {
     "timestamp": "2026-09-24T04:00:00Z",
-    "chandelierExit": 717.636082709936
+    "chandelierExit": 717.636082710213
   },
   {
     "timestamp": "2026-09-25T04:00:00Z",
-    "chandelierExit": 718.1896698594843
+    "chandelierExit": 718.1896698597488
   },
   {
     "timestamp": "2026-09-28T04:00:00Z",
-    "chandelierExit": 717.8146848658714
+    "chandelierExit": 717.8146848661238
   },
   {
     "timestamp": "2026-09-29T04:00:00Z",
-    "chandelierExit": 718.5217446446954
+    "chandelierExit": 718.5217446449363
   },
   {
     "timestamp": "2026-09-30T04:00:00Z",
-    "chandelierExit": 718.9062107972093
+    "chandelierExit": 718.9062107974393
   },
   {
     "timestamp": "2026-10-01T04:00:00Z",
-    "chandelierExit": 719.0972921246088
+    "chandelierExit": 719.0972921248284
   },
   {
     "timestamp": "2026-10-02T04:00:00Z",
-    "chandelierExit": 724.9219606643993
+    "chandelierExit": 724.921960664609
   },
   {
     "timestamp": "2026-10-05T04:00:00Z",
-    "chandelierExit": 727.6039169978358
+    "chandelierExit": 727.6039169980359
   },
   {
     "timestamp": "2026-10-06T04:00:00Z",
-    "chandelierExit": 733.9369207706615
+    "chandelierExit": 733.9369207708525
+  },
+  {
+    "timestamp": "2026-10-07T04:00:00Z",
+    "chandelierExit": 734.1804698267227
+  },
+  {
+    "timestamp": "2026-10-08T04:00:00Z",
+    "chandelierExit": 733.5109030164172
+  },
+  {
+    "timestamp": "2026-10-09T04:00:00Z",
+    "chandelierExit": 734.1154074247619
+  },
+  {
+    "timestamp": "2026-10-12T04:00:00Z",
+    "chandelierExit": 734.5465252690909
+  },
+  {
+    "timestamp": "2026-10-13T04:00:00Z",
+    "chandelierExit": 734.862592302314
+  },
+  {
+    "timestamp": "2026-10-14T04:00:00Z",
+    "chandelierExit": 733.791110834027
+  },
+  {
+    "timestamp": "2026-10-15T04:00:00Z",
+    "chandelierExit": 733.2135603415712
+  },
+  {
+    "timestamp": "2026-10-16T04:00:00Z",
+    "chandelierExit": 731.7070348714998
+  },
+  {
+    "timestamp": "2026-10-19T04:00:00Z",
+    "chandelierExit": 731.1158060137044
+  },
+  {
+    "timestamp": "2026-10-20T04:00:00Z",
+    "chandelierExit": 730.8773602858088
+  },
+  {
+    "timestamp": "2026-10-21T04:00:00Z",
+    "chandelierExit": 730.8652075455448
   }
 ]

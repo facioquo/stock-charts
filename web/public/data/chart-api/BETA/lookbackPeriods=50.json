@@ -1,115 +1,5 @@
 [
   {
-    "timestamp": "2026-04-16T04:00:00Z",
-    "beta": 1.2205580308804993,
-    "betaUp": null,
-    "betaDown": null,
-    "ratio": null,
-    "convexity": null,
-    "returnsEval": 0.004974577867051577,
-    "returnsMrkt": 0.0025437656305822287
-  },
-  {
-    "timestamp": "2026-04-17T04:00:00Z",
-    "beta": 1.2029719195554984,
-    "betaUp": null,
-    "betaDown": null,
-    "ratio": null,
-    "convexity": null,
-    "returnsEval": 0.01299167720678951,
-    "returnsMrkt": 0.012159137884338422
-  },
-  {
-    "timestamp": "2026-04-20T04:00:00Z",
-    "beta": 1.2049581116098653,
-    "betaUp": null,
-    "betaDown": null,
-    "ratio": null,
-    "convexity": null,
-    "returnsEval": -0.003013580380127334,
-    "returnsMrkt": -0.001788581246655152
-  },
-  {
-    "timestamp": "2026-04-21T04:00:00Z",
-    "beta": 1.2117701128323541,
-    "betaUp": null,
-    "betaDown": null,
-    "ratio": null,
-    "convexity": null,
-    "returnsEval": -0.003919446484480615,
-    "returnsMrkt": -0.0068849729821244265
-  },
-  {
-    "timestamp": "2026-04-22T04:00:00Z",
-    "beta": 1.217931243786706,
-    "betaUp": null,
-    "betaDown": null,
-    "ratio": null,
-    "convexity": null,
-    "returnsEval": 0.016833788650192583,
-    "returnsMrkt": 0.01035643761276317
-  },
-  {
-    "timestamp": "2026-04-23T04:00:00Z",
-    "beta": 1.2179980031576991,
-    "betaUp": null,
-    "betaDown": null,
-    "ratio": null,
-    "convexity": null,
-    "returnsEval": -0.005625224207545632,
-    "returnsMrkt": -0.003922947131608678
-  },
-  {
-    "timestamp": "2026-04-24T04:00:00Z",
-    "beta": 1.2315629537635575,
-    "betaUp": null,
-    "betaDown": null,
-    "ratio": null,
-    "convexity": null,
-    "returnsEval": 0.019220141234264743,
-    "returnsMrkt": 0.007848562273260029
-  },
-  {
-    "timestamp": "2026-04-27T04:00:00Z",
-    "beta": 1.223932853723733,
-    "betaUp": null,
-    "betaDown": null,
-    "ratio": null,
-    "convexity": null,
-    "returnsEval": 0.0005422340040968088,
-    "returnsMrkt": 0.00167373979298846
-  },
-  {
-    "timestamp": "2026-04-28T04:00:00Z",
-    "beta": 1.2300911968907193,
-    "betaUp": null,
-    "betaDown": null,
-    "ratio": null,
-    "convexity": null,
-    "returnsEval": -0.01007105437466116,
-    "returnsMrkt": -0.004873001335356175
-  },
-  {
-    "timestamp": "2026-04-29T04:00:00Z",
-    "beta": 1.2295811088049717,
-    "betaUp": null,
-    "betaDown": null,
-    "ratio": null,
-    "convexity": null,
-    "returnsEval": 0.0060828175610943,
-    "returnsMrkt": -0.0001264613309351903
-  },
-  {
-    "timestamp": "2026-04-30T04:00:00Z",
-    "beta": 1.2227760136301051,
-    "betaUp": null,
-    "betaDown": null,
-    "ratio": null,
-    "convexity": null,
-    "returnsEval": 0.009099291101739793,
-    "returnsMrkt": 0.009584170660071
-  },
-  {
     "timestamp": "2026-05-01T04:00:00Z",
     "beta": 1.2236488749188112,
     "betaUp": null,
@@ -1198,5 +1088,115 @@
     "convexity": null,
     "returnsEval": 0.004662143395627538,
     "returnsMrkt": 0.005329238551169624
+  },
+  {
+    "timestamp": "2026-10-07T04:00:00Z",
+    "beta": 1.4603355188248304,
+    "betaUp": null,
+    "betaDown": null,
+    "ratio": null,
+    "convexity": null,
+    "returnsEval": -0.002468355680180112,
+    "returnsMrkt": -0.002502887947631982
+  },
+  {
+    "timestamp": "2026-10-08T04:00:00Z",
+    "beta": 1.4863263876624349,
+    "betaUp": null,
+    "betaDown": null,
+    "ratio": null,
+    "convexity": null,
+    "returnsEval": -0.013513870192942146,
+    "returnsMrkt": -0.004207681914688233
+  },
+  {
+    "timestamp": "2026-10-09T04:00:00Z",
+    "beta": 1.4128275782826558,
+    "betaUp": null,
+    "betaDown": null,
+    "ratio": null,
+    "convexity": null,
+    "returnsEval": 0.005030100334448173,
+    "returnsMrkt": 0.005982839716751842
+  },
+  {
+    "timestamp": "2026-10-12T04:00:00Z",
+    "beta": 1.4305437093943216,
+    "betaUp": null,
+    "betaDown": null,
+    "ratio": null,
+    "convexity": null,
+    "returnsEval": -0.007001570694566417,
+    "returnsMrkt": -0.0006165624076762688
+  },
+  {
+    "timestamp": "2026-10-13T04:00:00Z",
+    "beta": 1.4608949245295257,
+    "betaUp": null,
+    "betaDown": null,
+    "ratio": null,
+    "convexity": null,
+    "returnsEval": -0.0031635388739946757,
+    "returnsMrkt": 0
+  },
+  {
+    "timestamp": "2026-10-14T04:00:00Z",
+    "beta": 1.4080013979138135,
+    "betaUp": null,
+    "betaDown": null,
+    "ratio": null,
+    "convexity": null,
+    "returnsEval": -0.019707116346619258,
+    "returnsMrkt": -0.010770792900016701
+  },
+  {
+    "timestamp": "2026-10-15T04:00:00Z",
+    "beta": 1.3915062237771287,
+    "betaUp": null,
+    "betaDown": null,
+    "ratio": null,
+    "convexity": null,
+    "returnsEval": -0.0010905574188768696,
+    "returnsMrkt": 0.002754498798154925
+  },
+  {
+    "timestamp": "2026-10-16T04:00:00Z",
+    "beta": 1.45531093745472,
+    "betaUp": null,
+    "betaDown": null,
+    "ratio": null,
+    "convexity": null,
+    "returnsEval": -0.025226932531344892,
+    "returnsMrkt": -0.010929421978050358
+  },
+  {
+    "timestamp": "2026-10-19T04:00:00Z",
+    "beta": 1.4600701864836714,
+    "betaUp": null,
+    "betaDown": null,
+    "ratio": null,
+    "convexity": null,
+    "returnsEval": 0.011960778788988602,
+    "returnsMrkt": 0.004277283237372753
+  },
+  {
+    "timestamp": "2026-10-20T04:00:00Z",
+    "beta": 1.4473463757438494,
+    "betaUp": null,
+    "betaDown": null,
+    "ratio": null,
+    "convexity": null,
+    "returnsEval": -0.00153137224875044,
+    "returnsMrkt": 0.00324810853117663
+  },
+  {
+    "timestamp": "2026-10-21T04:00:00Z",
+    "beta": 1.460180134755036,
+    "betaUp": null,
+    "betaDown": null,
+    "ratio": null,
+    "convexity": null,
+    "returnsEval": 0.011210105826745309,
+    "returnsMrkt": 0.005252961291916325
   }
 ]

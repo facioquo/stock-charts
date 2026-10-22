@@ -1,842 +1,842 @@
 [
   {
-    "timestamp": "2026-04-16T04:00:00Z",
-    "centerline": 635.2772857142859,
-    "upperChannel": 683.3491291650004,
-    "lowerChannel": 587.2054422635714,
+    "timestamp": "2026-05-01T04:00:00Z",
+    "centerline": 682.8040714285715,
+    "upperChannel": 718.7138811294041,
+    "lowerChannel": 646.894261727739,
     "breakPoint": true
   },
   {
-    "timestamp": "2026-04-17T04:00:00Z",
-    "centerline": 639.2842293233084,
-    "upperChannel": 687.3560727740229,
-    "lowerChannel": 591.2123858725939,
-    "breakPoint": false
-  },
-  {
-    "timestamp": "2026-04-20T04:00:00Z",
-    "centerline": 643.2911729323309,
-    "upperChannel": 691.3630163830454,
-    "lowerChannel": 595.2193294816165,
-    "breakPoint": false
-  },
-  {
-    "timestamp": "2026-04-21T04:00:00Z",
-    "centerline": 647.2981165413535,
-    "upperChannel": 695.369959992068,
-    "lowerChannel": 599.226273090639,
-    "breakPoint": false
-  },
-  {
-    "timestamp": "2026-04-22T04:00:00Z",
-    "centerline": 651.305060150376,
-    "upperChannel": 699.3769036010905,
-    "lowerChannel": 603.2332166996615,
-    "breakPoint": false
-  },
-  {
-    "timestamp": "2026-04-23T04:00:00Z",
-    "centerline": 655.3120037593985,
-    "upperChannel": 703.383847210113,
-    "lowerChannel": 607.240160308684,
-    "breakPoint": false
-  },
-  {
-    "timestamp": "2026-04-24T04:00:00Z",
-    "centerline": 659.3189473684213,
-    "upperChannel": 707.3907908191358,
-    "lowerChannel": 611.2471039177068,
-    "breakPoint": false
-  },
-  {
-    "timestamp": "2026-04-27T04:00:00Z",
-    "centerline": 663.3258909774438,
-    "upperChannel": 711.3977344281583,
-    "lowerChannel": 615.2540475267293,
-    "breakPoint": false
-  },
-  {
-    "timestamp": "2026-04-28T04:00:00Z",
-    "centerline": 667.3328345864663,
-    "upperChannel": 715.4046780371808,
-    "lowerChannel": 619.2609911357519,
-    "breakPoint": false
-  },
-  {
-    "timestamp": "2026-04-29T04:00:00Z",
-    "centerline": 671.3397781954889,
-    "upperChannel": 719.4116216462033,
-    "lowerChannel": 623.2679347447744,
-    "breakPoint": false
-  },
-  {
-    "timestamp": "2026-04-30T04:00:00Z",
-    "centerline": 675.3467218045114,
-    "upperChannel": 723.4185652552259,
-    "lowerChannel": 627.2748783537969,
-    "breakPoint": false
-  },
-  {
-    "timestamp": "2026-05-01T04:00:00Z",
-    "centerline": 679.3536654135339,
-    "upperChannel": 727.4255088642484,
-    "lowerChannel": 631.2818219628194,
-    "breakPoint": false
-  },
-  {
     "timestamp": "2026-05-04T04:00:00Z",
-    "centerline": 683.3606090225564,
-    "upperChannel": 731.4324524732709,
-    "lowerChannel": 635.288765571842,
+    "centerline": 685.558984962406,
+    "upperChannel": 721.4687946632386,
+    "lowerChannel": 649.6491752615735,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-05T04:00:00Z",
-    "centerline": 687.3675526315792,
-    "upperChannel": 735.4393960822937,
-    "lowerChannel": 639.2957091808647,
+    "centerline": 688.3138984962405,
+    "upperChannel": 724.223708197073,
+    "lowerChannel": 652.404088795408,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-06T04:00:00Z",
-    "centerline": 691.3744962406017,
-    "upperChannel": 739.4463396913162,
-    "lowerChannel": 643.3026527898872,
+    "centerline": 691.0688120300753,
+    "upperChannel": 726.9786217309078,
+    "lowerChannel": 655.1590023292428,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-07T04:00:00Z",
-    "centerline": 695.3814398496243,
-    "upperChannel": 743.4532833003387,
-    "lowerChannel": 647.3095963989098,
+    "centerline": 693.8237255639098,
+    "upperChannel": 729.7335352647423,
+    "lowerChannel": 657.9139158630772,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-08T04:00:00Z",
-    "centerline": 699.3883834586468,
-    "upperChannel": 747.4602269093613,
-    "lowerChannel": 651.3165400079323,
+    "centerline": 696.5786390977445,
+    "upperChannel": 732.488448798577,
+    "lowerChannel": 660.668829396912,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-11T04:00:00Z",
-    "centerline": 703.3953270676693,
-    "upperChannel": 751.4671705183838,
-    "lowerChannel": 655.3234836169548,
+    "centerline": 699.333552631579,
+    "upperChannel": 735.2433623324115,
+    "lowerChannel": 663.4237429307465,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-12T04:00:00Z",
-    "centerline": 707.4022706766918,
-    "upperChannel": 755.4741141274063,
-    "lowerChannel": 659.3304272259774,
+    "centerline": 702.0884661654135,
+    "upperChannel": 737.998275866246,
+    "lowerChannel": 666.178656464581,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-13T04:00:00Z",
-    "centerline": 711.4092142857144,
-    "upperChannel": 759.4810577364289,
-    "lowerChannel": 663.3373708349999,
+    "centerline": 704.8433796992482,
+    "upperChannel": 740.7531894000807,
+    "lowerChannel": 668.9335699984157,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-14T04:00:00Z",
-    "centerline": 718.7747142857143,
-    "upperChannel": 749.6420547931178,
-    "lowerChannel": 687.9073737783107,
-    "breakPoint": true
+    "centerline": 707.5982932330827,
+    "upperChannel": 743.5081029339152,
+    "lowerChannel": 671.6884835322502,
+    "breakPoint": false
   },
   {
     "timestamp": "2026-05-15T04:00:00Z",
-    "centerline": 719.0473759398496,
-    "upperChannel": 749.9147164472532,
-    "lowerChannel": 688.1800354324461,
+    "centerline": 710.3532067669174,
+    "upperChannel": 746.2630164677499,
+    "lowerChannel": 674.4433970660849,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-18T04:00:00Z",
-    "centerline": 719.3200375939849,
-    "upperChannel": 750.1873781013885,
-    "lowerChannel": 688.4526970865813,
+    "centerline": 713.1081203007519,
+    "upperChannel": 749.0179300015844,
+    "lowerChannel": 677.1983105999194,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-19T04:00:00Z",
-    "centerline": 719.5926992481203,
-    "upperChannel": 750.4600397555239,
-    "lowerChannel": 688.7253587407167,
+    "centerline": 715.8630338345864,
+    "upperChannel": 751.7728435354189,
+    "lowerChannel": 679.9532241337539,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-20T04:00:00Z",
-    "centerline": 719.8653609022556,
-    "upperChannel": 750.7327014096592,
-    "lowerChannel": 688.998020394852,
+    "centerline": 718.6179473684211,
+    "upperChannel": 754.5277570692537,
+    "lowerChannel": 682.7081376675886,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-21T04:00:00Z",
-    "centerline": 720.138022556391,
-    "upperChannel": 751.0053630637946,
-    "lowerChannel": 689.2706820489874,
+    "centerline": 721.3728609022556,
+    "upperChannel": 757.2826706030881,
+    "lowerChannel": 685.4630512014231,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-22T04:00:00Z",
-    "centerline": 720.4106842105264,
-    "upperChannel": 751.27802471793,
-    "lowerChannel": 689.5433437031228,
+    "centerline": 724.1277744360904,
+    "upperChannel": 760.0375841369229,
+    "lowerChannel": 688.2179647352579,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-26T04:00:00Z",
-    "centerline": 720.6833458646616,
-    "upperChannel": 751.5506863720652,
-    "lowerChannel": 689.8160053572581,
+    "centerline": 726.8826879699249,
+    "upperChannel": 762.7924976707574,
+    "lowerChannel": 690.9728782690923,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-27T04:00:00Z",
-    "centerline": 720.9560075187969,
-    "upperChannel": 751.8233480262005,
-    "lowerChannel": 690.0886670113933,
+    "centerline": 729.6376015037594,
+    "upperChannel": 765.5474112045919,
+    "lowerChannel": 693.7277918029268,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-28T04:00:00Z",
-    "centerline": 721.2286691729323,
-    "upperChannel": 752.0960096803359,
-    "lowerChannel": 690.3613286655287,
+    "centerline": 732.3925150375941,
+    "upperChannel": 768.3023247384266,
+    "lowerChannel": 696.4827053367616,
     "breakPoint": false
   },
   {
     "timestamp": "2026-05-29T04:00:00Z",
-    "centerline": 721.5013308270677,
-    "upperChannel": 752.3686713344713,
-    "lowerChannel": 690.6339903196641,
+    "centerline": 735.1474285714286,
+    "upperChannel": 771.0572382722611,
+    "lowerChannel": 699.2376188705961,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-01T04:00:00Z",
-    "centerline": 721.773992481203,
-    "upperChannel": 752.6413329886066,
-    "lowerChannel": 690.9066519737994,
-    "breakPoint": false
+    "centerline": 732.0024285714287,
+    "upperChannel": 762.7539807070527,
+    "lowerChannel": 701.2508764358047,
+    "breakPoint": true
   },
   {
     "timestamp": "2026-06-02T04:00:00Z",
-    "centerline": 722.0466541353384,
-    "upperChannel": 752.913994642742,
-    "lowerChannel": 691.1793136279348,
+    "centerline": 731.1520413533835,
+    "upperChannel": 761.9035934890076,
+    "lowerChannel": 700.4004892177595,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-03T04:00:00Z",
-    "centerline": 722.3193157894736,
-    "upperChannel": 753.1866562968772,
-    "lowerChannel": 691.4519752820701,
+    "centerline": 730.3016541353385,
+    "upperChannel": 761.0532062709625,
+    "lowerChannel": 699.5501019997145,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-04T04:00:00Z",
-    "centerline": 722.591977443609,
-    "upperChannel": 753.4593179510126,
-    "lowerChannel": 691.7246369362055,
+    "centerline": 729.4512669172934,
+    "upperChannel": 760.2028190529174,
+    "lowerChannel": 698.6997147816694,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-05T04:00:00Z",
-    "centerline": 722.8646390977443,
-    "upperChannel": 753.7319796051479,
-    "lowerChannel": 691.9972985903407,
+    "centerline": 728.6008796992483,
+    "upperChannel": 759.3524318348723,
+    "lowerChannel": 697.8493275636242,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-08T04:00:00Z",
-    "centerline": 723.1373007518797,
-    "upperChannel": 754.0046412592833,
-    "lowerChannel": 692.2699602444761,
+    "centerline": 727.7504924812031,
+    "upperChannel": 758.5020446168271,
+    "lowerChannel": 696.9989403455791,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-09T04:00:00Z",
-    "centerline": 723.409962406015,
-    "upperChannel": 754.2773029134186,
-    "lowerChannel": 692.5426218986114,
+    "centerline": 726.900105263158,
+    "upperChannel": 757.651657398782,
+    "lowerChannel": 696.148553127534,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-10T04:00:00Z",
-    "centerline": 723.6826240601504,
-    "upperChannel": 754.549964567554,
-    "lowerChannel": 692.8152835527468,
+    "centerline": 726.049718045113,
+    "upperChannel": 756.801270180737,
+    "lowerChannel": 695.298165909489,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-11T04:00:00Z",
-    "centerline": 723.9552857142858,
-    "upperChannel": 754.8226262216893,
-    "lowerChannel": 693.0879452068822,
+    "centerline": 725.1993308270678,
+    "upperChannel": 755.9508829626918,
+    "lowerChannel": 694.4477786914438,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-12T04:00:00Z",
-    "centerline": 729.7665714285714,
-    "upperChannel": 751.2422286711333,
-    "lowerChannel": 708.2909141860096,
-    "breakPoint": true
+    "centerline": 724.3489436090227,
+    "upperChannel": 755.1004957446468,
+    "lowerChannel": 693.5973914733987,
+    "breakPoint": false
   },
   {
     "timestamp": "2026-06-15T04:00:00Z",
-    "centerline": 728.9677744360902,
-    "upperChannel": 750.443431678652,
-    "lowerChannel": 707.4921171935283,
+    "centerline": 723.4985563909777,
+    "upperChannel": 754.2501085266017,
+    "lowerChannel": 692.7470042553537,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-16T04:00:00Z",
-    "centerline": 728.168977443609,
-    "upperChannel": 749.6446346861709,
-    "lowerChannel": 706.6933202010472,
+    "centerline": 722.6481691729325,
+    "upperChannel": 753.3997213085565,
+    "lowerChannel": 691.8966170373085,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-17T04:00:00Z",
-    "centerline": 727.3701804511278,
-    "upperChannel": 748.8458376936896,
-    "lowerChannel": 705.8945232085659,
+    "centerline": 721.7977819548873,
+    "upperChannel": 752.5493340905114,
+    "lowerChannel": 691.0462298192633,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-18T04:00:00Z",
-    "centerline": 726.5713834586466,
-    "upperChannel": 748.0470407012084,
-    "lowerChannel": 705.0957262160847,
+    "centerline": 720.9473947368423,
+    "upperChannel": 751.6989468724663,
+    "lowerChannel": 690.1958426012183,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-22T04:00:00Z",
-    "centerline": 725.7725864661654,
-    "upperChannel": 747.2482437087273,
-    "lowerChannel": 704.2969292236036,
+    "centerline": 720.0970075187972,
+    "upperChannel": 750.8485596544213,
+    "lowerChannel": 689.3454553831732,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-23T04:00:00Z",
-    "centerline": 724.9737894736842,
-    "upperChannel": 746.449446716246,
-    "lowerChannel": 703.4981322311223,
+    "centerline": 719.246620300752,
+    "upperChannel": 749.9981724363761,
+    "lowerChannel": 688.495068165128,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-24T04:00:00Z",
-    "centerline": 724.1749924812029,
-    "upperChannel": 745.6506497237648,
-    "lowerChannel": 702.6993352386411,
+    "centerline": 718.3962330827069,
+    "upperChannel": 749.1477852183309,
+    "lowerChannel": 687.6446809470829,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-25T04:00:00Z",
-    "centerline": 723.3761954887218,
-    "upperChannel": 744.8518527312837,
-    "lowerChannel": 701.90053824616,
+    "centerline": 717.5458458646618,
+    "upperChannel": 748.2973980002859,
+    "lowerChannel": 686.7942937290378,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-26T04:00:00Z",
-    "centerline": 722.5773984962407,
-    "upperChannel": 744.0530557388025,
-    "lowerChannel": 701.1017412536788,
+    "centerline": 716.6954586466168,
+    "upperChannel": 747.4470107822408,
+    "lowerChannel": 685.9439065109927,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-29T04:00:00Z",
-    "centerline": 721.7786015037593,
-    "upperChannel": 743.2542587463212,
-    "lowerChannel": 700.3029442611975,
+    "centerline": 715.8450714285716,
+    "upperChannel": 746.5966235641956,
+    "lowerChannel": 685.0935192929476,
     "breakPoint": false
   },
   {
     "timestamp": "2026-06-30T04:00:00Z",
-    "centerline": 720.9798045112782,
-    "upperChannel": 742.45546175384,
-    "lowerChannel": 699.5041472687163,
-    "breakPoint": false
+    "centerline": 730.4655714285714,
+    "upperChannel": 762.0627260908191,
+    "lowerChannel": 698.8684167663237,
+    "breakPoint": true
   },
   {
     "timestamp": "2026-07-01T04:00:00Z",
-    "centerline": 720.1810075187971,
-    "upperChannel": 741.6566647613589,
-    "lowerChannel": 698.7053502762352,
+    "centerline": 728.103590225564,
+    "upperChannel": 759.7007448878117,
+    "lowerChannel": 696.5064355633162,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-02T04:00:00Z",
-    "centerline": 719.3822105263158,
-    "upperChannel": 740.8578677688777,
-    "lowerChannel": 697.906553283754,
+    "centerline": 725.7416090225565,
+    "upperChannel": 757.3387636848042,
+    "lowerChannel": 694.1444543603088,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-06T04:00:00Z",
-    "centerline": 718.5834135338346,
-    "upperChannel": 740.0590707763964,
-    "lowerChannel": 697.1077562912727,
+    "centerline": 723.3796278195489,
+    "upperChannel": 754.9767824817966,
+    "lowerChannel": 691.7824731573012,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-07T04:00:00Z",
-    "centerline": 717.7846165413534,
-    "upperChannel": 739.2602737839153,
-    "lowerChannel": 696.3089592987916,
+    "centerline": 721.0176466165415,
+    "upperChannel": 752.6148012787892,
+    "lowerChannel": 689.4204919542938,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-08T04:00:00Z",
-    "centerline": 716.9858195488722,
-    "upperChannel": 738.461476791434,
-    "lowerChannel": 695.5101623063103,
+    "centerline": 718.6556654135338,
+    "upperChannel": 750.2528200757815,
+    "lowerChannel": 687.0585107512861,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-09T04:00:00Z",
-    "centerline": 716.187022556391,
-    "upperChannel": 737.6626797989528,
-    "lowerChannel": 694.7113653138291,
+    "centerline": 716.2936842105264,
+    "upperChannel": 747.8908388727741,
+    "lowerChannel": 684.6965295482787,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-10T04:00:00Z",
-    "centerline": 715.3882255639098,
-    "upperChannel": 736.8638828064717,
-    "lowerChannel": 693.912568321348,
+    "centerline": 713.9317030075188,
+    "upperChannel": 745.5288576697665,
+    "lowerChannel": 682.3345483452711,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-13T04:00:00Z",
-    "centerline": 714.5894285714286,
-    "upperChannel": 736.0650858139904,
-    "lowerChannel": 693.1137713288667,
+    "centerline": 711.5697218045113,
+    "upperChannel": 743.166876466759,
+    "lowerChannel": 679.9725671422636,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-14T04:00:00Z",
-    "centerline": 697.0779285714286,
-    "upperChannel": 731.7746490216383,
-    "lowerChannel": 662.381208121219,
-    "breakPoint": true
+    "centerline": 709.2077406015037,
+    "upperChannel": 740.8048952637514,
+    "lowerChannel": 677.610585939256,
+    "breakPoint": false
   },
   {
     "timestamp": "2026-07-15T04:00:00Z",
-    "centerline": 697.4634097744361,
-    "upperChannel": 732.1601302246457,
-    "lowerChannel": 662.7666893242264,
+    "centerline": 706.8457593984963,
+    "upperChannel": 738.442914060744,
+    "lowerChannel": 675.2486047362486,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-16T04:00:00Z",
-    "centerline": 697.8488909774437,
-    "upperChannel": 732.5456114276534,
-    "lowerChannel": 663.152170527234,
+    "centerline": 704.4837781954886,
+    "upperChannel": 736.0809328577363,
+    "lowerChannel": 672.8866235332409,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-17T04:00:00Z",
-    "centerline": 698.2343721804511,
-    "upperChannel": 732.9310926306608,
-    "lowerChannel": 663.5376517302415,
+    "centerline": 702.1217969924812,
+    "upperChannel": 733.7189516547289,
+    "lowerChannel": 670.5246423302335,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-20T04:00:00Z",
-    "centerline": 698.6198533834587,
-    "upperChannel": 733.3165738336684,
-    "lowerChannel": 663.923132933249,
+    "centerline": 699.7598157894738,
+    "upperChannel": 731.3569704517215,
+    "lowerChannel": 668.1626611272261,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-21T04:00:00Z",
-    "centerline": 699.0053345864662,
-    "upperChannel": 733.7020550366759,
-    "lowerChannel": 664.3086141362566,
+    "centerline": 697.3978345864662,
+    "upperChannel": 728.9949892487139,
+    "lowerChannel": 665.8006799242185,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-22T04:00:00Z",
-    "centerline": 699.3908157894737,
-    "upperChannel": 734.0875362396833,
-    "lowerChannel": 664.694095339264,
+    "centerline": 695.0358533834587,
+    "upperChannel": 726.6330080457064,
+    "lowerChannel": 663.438698721211,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-23T04:00:00Z",
-    "centerline": 699.7762969924812,
-    "upperChannel": 734.4730174426909,
-    "lowerChannel": 665.0795765422715,
+    "centerline": 692.6738721804511,
+    "upperChannel": 724.2710268426988,
+    "lowerChannel": 661.0767175182034,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-24T04:00:00Z",
-    "centerline": 700.1617781954888,
-    "upperChannel": 734.8584986456984,
-    "lowerChannel": 665.4650577452791,
+    "centerline": 690.3118909774437,
+    "upperChannel": 721.9090456396914,
+    "lowerChannel": 658.714736315196,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-27T04:00:00Z",
-    "centerline": 700.5472593984963,
-    "upperChannel": 735.243979848706,
-    "lowerChannel": 665.8505389482866,
+    "centerline": 687.949909774436,
+    "upperChannel": 719.5470644366837,
+    "lowerChannel": 656.3527551121883,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-28T04:00:00Z",
-    "centerline": 700.9327406015038,
-    "upperChannel": 735.6294610517135,
-    "lowerChannel": 666.2360201512942,
+    "centerline": 685.5879285714286,
+    "upperChannel": 717.1850832336763,
+    "lowerChannel": 653.9907739091809,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-29T04:00:00Z",
-    "centerline": 701.3182218045113,
-    "upperChannel": 736.014942254721,
-    "lowerChannel": 666.6215013543016,
-    "breakPoint": false
+    "centerline": 698.1885714285714,
+    "upperChannel": 732.2034298730806,
+    "lowerChannel": 664.1737129840623,
+    "breakPoint": true
   },
   {
     "timestamp": "2026-07-30T04:00:00Z",
-    "centerline": 701.7037030075188,
-    "upperChannel": 736.4004234577285,
-    "lowerChannel": 667.0069825573091,
+    "centerline": 699.6558270676692,
+    "upperChannel": 733.6706855121784,
+    "lowerChannel": 665.64096862316,
     "breakPoint": false
   },
   {
     "timestamp": "2026-07-31T04:00:00Z",
-    "centerline": 702.0891842105264,
-    "upperChannel": 736.785904660736,
-    "lowerChannel": 667.3924637603167,
+    "centerline": 701.1230827067669,
+    "upperChannel": 735.1379411512761,
+    "lowerChannel": 667.1082242622577,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-03T04:00:00Z",
-    "centerline": 702.4746654135339,
-    "upperChannel": 737.1713858637436,
-    "lowerChannel": 667.7779449633242,
+    "centerline": 702.5903383458647,
+    "upperChannel": 736.6051967903738,
+    "lowerChannel": 668.5754799013555,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-04T04:00:00Z",
-    "centerline": 702.8601466165414,
-    "upperChannel": 737.5568670667511,
-    "lowerChannel": 668.1634261663318,
+    "centerline": 704.0575939849624,
+    "upperChannel": 738.0724524294716,
+    "lowerChannel": 670.0427355404532,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-05T04:00:00Z",
-    "centerline": 703.2456278195489,
-    "upperChannel": 737.9423482697586,
-    "lowerChannel": 668.5489073693392,
+    "centerline": 705.5248496240602,
+    "upperChannel": 739.5397080685693,
+    "lowerChannel": 671.509991179551,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-06T04:00:00Z",
-    "centerline": 703.6311090225564,
-    "upperChannel": 738.3278294727661,
-    "lowerChannel": 668.9343885723467,
+    "centerline": 706.9921052631579,
+    "upperChannel": 741.0069637076671,
+    "lowerChannel": 672.9772468186487,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-07T04:00:00Z",
-    "centerline": 704.016590225564,
-    "upperChannel": 738.7133106757736,
-    "lowerChannel": 669.3198697753543,
+    "centerline": 708.4593609022556,
+    "upperChannel": 742.4742193467648,
+    "lowerChannel": 674.4445024577465,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-10T04:00:00Z",
-    "centerline": 704.4020714285715,
-    "upperChannel": 739.0987918787812,
-    "lowerChannel": 669.7053509783618,
+    "centerline": 709.9266165413534,
+    "upperChannel": 743.9414749858626,
+    "lowerChannel": 675.9117580968442,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-11T04:00:00Z",
-    "centerline": 722.9405000000002,
-    "upperChannel": 737.3881448859323,
-    "lowerChannel": 708.492855114068,
-    "breakPoint": true
+    "centerline": 711.3938721804511,
+    "upperChannel": 745.4087306249603,
+    "lowerChannel": 677.379013735942,
+    "breakPoint": false
   },
   {
     "timestamp": "2026-08-12T04:00:00Z",
-    "centerline": 722.357105263158,
-    "upperChannel": 736.8047501490902,
-    "lowerChannel": 707.9094603772259,
+    "centerline": 712.8611278195489,
+    "upperChannel": 746.875986264058,
+    "lowerChannel": 678.8462693750397,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-13T04:00:00Z",
-    "centerline": 721.7737105263159,
-    "upperChannel": 736.221355412248,
-    "lowerChannel": 707.3260656403837,
+    "centerline": 714.3283834586466,
+    "upperChannel": 748.3432419031558,
+    "lowerChannel": 680.3135250141374,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-14T04:00:00Z",
-    "centerline": 721.1903157894737,
-    "upperChannel": 735.6379606754059,
-    "lowerChannel": 706.7426709035416,
+    "centerline": 715.7956390977444,
+    "upperChannel": 749.8104975422535,
+    "lowerChannel": 681.7807806532352,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-17T04:00:00Z",
-    "centerline": 720.6069210526317,
-    "upperChannel": 735.0545659385639,
-    "lowerChannel": 706.1592761666996,
+    "centerline": 717.2628947368421,
+    "upperChannel": 751.2777531813513,
+    "lowerChannel": 683.2480362923329,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-18T04:00:00Z",
-    "centerline": 720.0235263157896,
-    "upperChannel": 734.4711712017217,
-    "lowerChannel": 705.5758814298574,
+    "centerline": 718.7301503759398,
+    "upperChannel": 752.745008820449,
+    "lowerChannel": 684.7152919314307,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-19T04:00:00Z",
-    "centerline": 719.4401315789476,
-    "upperChannel": 733.8877764648797,
-    "lowerChannel": 704.9924866930154,
+    "centerline": 720.1974060150376,
+    "upperChannel": 754.2122644595468,
+    "lowerChannel": 686.1825475705284,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-20T04:00:00Z",
-    "centerline": 718.8567368421054,
-    "upperChannel": 733.3043817280376,
-    "lowerChannel": 704.4090919561733,
+    "centerline": 721.6646616541353,
+    "upperChannel": 755.6795200986445,
+    "lowerChannel": 687.6498032096262,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-21T04:00:00Z",
-    "centerline": 718.2733421052633,
-    "upperChannel": 732.7209869911954,
-    "lowerChannel": 703.8256972193311,
+    "centerline": 723.1319172932331,
+    "upperChannel": 757.1467757377422,
+    "lowerChannel": 689.1170588487239,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-24T04:00:00Z",
-    "centerline": 717.6899473684211,
-    "upperChannel": 732.1375922543533,
-    "lowerChannel": 703.242302482489,
+    "centerline": 724.5991729323308,
+    "upperChannel": 758.61403137684,
+    "lowerChannel": 690.5843144878216,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-25T04:00:00Z",
-    "centerline": 717.106552631579,
-    "upperChannel": 731.5541975175112,
-    "lowerChannel": 702.6589077456468,
+    "centerline": 726.0664285714286,
+    "upperChannel": 760.0812870159377,
+    "lowerChannel": 692.0515701269194,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-26T04:00:00Z",
-    "centerline": 716.523157894737,
-    "upperChannel": 730.9708027806691,
-    "lowerChannel": 702.0755130088048,
-    "breakPoint": false
+    "centerline": 708.5843571428574,
+    "upperChannel": 731.9831384091968,
+    "lowerChannel": 685.1855758765179,
+    "breakPoint": true
   },
   {
     "timestamp": "2026-08-27T04:00:00Z",
-    "centerline": 715.9397631578948,
-    "upperChannel": 730.387408043827,
-    "lowerChannel": 701.4921182719627,
+    "centerline": 709.5994511278197,
+    "upperChannel": 732.9982323941592,
+    "lowerChannel": 686.2006698614803,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-28T04:00:00Z",
-    "centerline": 715.3563684210528,
-    "upperChannel": 729.804013306985,
-    "lowerChannel": 700.9087235351207,
+    "centerline": 710.6145451127821,
+    "upperChannel": 734.0133263791216,
+    "lowerChannel": 687.2157638464427,
     "breakPoint": false
   },
   {
     "timestamp": "2026-08-31T04:00:00Z",
-    "centerline": 714.7729736842107,
-    "upperChannel": 729.2206185701428,
-    "lowerChannel": 700.3253287982785,
+    "centerline": 711.6296390977445,
+    "upperChannel": 735.028420364084,
+    "lowerChannel": 688.230857831405,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-01T04:00:00Z",
-    "centerline": 714.1895789473685,
-    "upperChannel": 728.6372238333007,
-    "lowerChannel": 699.7419340614364,
+    "centerline": 712.6447330827069,
+    "upperChannel": 736.0435143490464,
+    "lowerChannel": 689.2459518163674,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-02T04:00:00Z",
-    "centerline": 713.6061842105264,
-    "upperChannel": 728.0538290964586,
-    "lowerChannel": 699.1585393245942,
+    "centerline": 713.6598270676693,
+    "upperChannel": 737.0586083340088,
+    "lowerChannel": 690.2610458013298,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-03T04:00:00Z",
-    "centerline": 713.0227894736843,
-    "upperChannel": 727.4704343596164,
-    "lowerChannel": 698.5751445877521,
+    "centerline": 714.6749210526318,
+    "upperChannel": 738.0737023189713,
+    "lowerChannel": 691.2761397862923,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-04T04:00:00Z",
-    "centerline": 712.4393947368422,
-    "upperChannel": 726.8870396227744,
-    "lowerChannel": 697.9917498509101,
+    "centerline": 715.6900150375942,
+    "upperChannel": 739.0887963039337,
+    "lowerChannel": 692.2912337712547,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-08T04:00:00Z",
-    "centerline": 711.8560000000002,
-    "upperChannel": 726.3036448859324,
-    "lowerChannel": 697.4083551140681,
+    "centerline": 716.7051090225566,
+    "upperChannel": 740.1038902888961,
+    "lowerChannel": 693.3063277562171,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-09T04:00:00Z",
-    "centerline": 706.6664285714285,
-    "upperChannel": 741.1413806779942,
-    "lowerChannel": 672.1914764648627,
-    "breakPoint": true
+    "centerline": 717.720203007519,
+    "upperChannel": 741.1189842738585,
+    "lowerChannel": 694.3214217411795,
+    "breakPoint": false
   },
   {
     "timestamp": "2026-09-10T04:00:00Z",
-    "centerline": 709.2990939849624,
-    "upperChannel": 743.7740460915281,
-    "lowerChannel": 674.8241418783966,
+    "centerline": 718.7352969924814,
+    "upperChannel": 742.1340782588209,
+    "lowerChannel": 695.3365157261419,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-11T04:00:00Z",
-    "centerline": 711.9317593984963,
-    "upperChannel": 746.406711505062,
-    "lowerChannel": 677.4568072919305,
+    "centerline": 719.7503909774438,
+    "upperChannel": 743.1491722437833,
+    "lowerChannel": 696.3516097111043,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-14T04:00:00Z",
-    "centerline": 714.56442481203,
-    "upperChannel": 749.0393769185957,
-    "lowerChannel": 680.0894727054642,
+    "centerline": 720.7654849624062,
+    "upperChannel": 744.1642662287456,
+    "lowerChannel": 697.3667036960667,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-15T04:00:00Z",
-    "centerline": 717.1970902255639,
-    "upperChannel": 751.6720423321296,
-    "lowerChannel": 682.7221381189981,
+    "centerline": 721.7805789473686,
+    "upperChannel": 745.179360213708,
+    "lowerChannel": 698.3817976810291,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-16T04:00:00Z",
-    "centerline": 719.8297556390978,
-    "upperChannel": 754.3047077456636,
-    "lowerChannel": 685.3548035325321,
+    "centerline": 722.795672932331,
+    "upperChannel": 746.1944541986704,
+    "lowerChannel": 699.3968916659915,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-17T04:00:00Z",
-    "centerline": 722.4624210526315,
-    "upperChannel": 756.9373731591973,
-    "lowerChannel": 687.9874689460657,
+    "centerline": 723.8107669172934,
+    "upperChannel": 747.2095481836329,
+    "lowerChannel": 700.411985650954,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-18T04:00:00Z",
-    "centerline": 725.0950864661654,
-    "upperChannel": 759.5700385727312,
-    "lowerChannel": 690.6201343595997,
+    "centerline": 724.8258609022558,
+    "upperChannel": 748.2246421685953,
+    "lowerChannel": 701.4270796359164,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-21T04:00:00Z",
-    "centerline": 727.7277518796993,
-    "upperChannel": 762.2027039862651,
-    "lowerChannel": 693.2527997731336,
+    "centerline": 725.8409548872182,
+    "upperChannel": 749.2397361535577,
+    "lowerChannel": 702.4421736208787,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-22T04:00:00Z",
-    "centerline": 730.360417293233,
-    "upperChannel": 764.8353693997988,
-    "lowerChannel": 695.8854651866673,
+    "centerline": 726.8560488721806,
+    "upperChannel": 750.2548301385201,
+    "lowerChannel": 703.4572676058411,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-23T04:00:00Z",
-    "centerline": 732.9930827067669,
-    "upperChannel": 767.4680348133327,
-    "lowerChannel": 698.5181306002012,
+    "centerline": 727.871142857143,
+    "upperChannel": 751.2699241234825,
+    "lowerChannel": 704.4723615908035,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-24T04:00:00Z",
-    "centerline": 735.6257481203008,
-    "upperChannel": 770.1007002268666,
-    "lowerChannel": 701.1507960137351,
-    "breakPoint": false
+    "centerline": 751.6894285714284,
+    "upperChannel": 778.8273596090002,
+    "lowerChannel": 724.5514975338566,
+    "breakPoint": true
   },
   {
     "timestamp": "2026-09-25T04:00:00Z",
-    "centerline": 738.2584135338345,
-    "upperChannel": 772.7333656404003,
-    "lowerChannel": 703.7834614272688,
+    "centerline": 750.3572255639097,
+    "upperChannel": 777.4951566014814,
+    "lowerChannel": 723.2192945263379,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-28T04:00:00Z",
-    "centerline": 740.8910789473684,
-    "upperChannel": 775.3660310539342,
-    "lowerChannel": 706.4161268408027,
+    "centerline": 749.0250225563908,
+    "upperChannel": 776.1629535939626,
+    "lowerChannel": 721.887091518819,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-29T04:00:00Z",
-    "centerline": 743.5237443609021,
-    "upperChannel": 777.9986964674679,
-    "lowerChannel": 709.0487922543364,
+    "centerline": 747.6928195488721,
+    "upperChannel": 774.8307505864439,
+    "lowerChannel": 720.5548885113003,
     "breakPoint": false
   },
   {
     "timestamp": "2026-09-30T04:00:00Z",
-    "centerline": 746.156409774436,
-    "upperChannel": 780.6313618810018,
-    "lowerChannel": 711.6814576678703,
+    "centerline": 746.3606165413532,
+    "upperChannel": 773.498547578925,
+    "lowerChannel": 719.2226855037815,
     "breakPoint": false
   },
   {
     "timestamp": "2026-10-01T04:00:00Z",
-    "centerline": 748.78907518797,
-    "upperChannel": 783.2640272945357,
-    "lowerChannel": 714.3141230814042,
+    "centerline": 745.0284135338344,
+    "upperChannel": 772.1663445714062,
+    "lowerChannel": 717.8904824962626,
     "breakPoint": false
   },
   {
     "timestamp": "2026-10-02T04:00:00Z",
-    "centerline": 751.4217406015036,
-    "upperChannel": 785.8966927080694,
-    "lowerChannel": 716.9467884949379,
+    "centerline": 743.6962105263157,
+    "upperChannel": 770.8341415638874,
+    "lowerChannel": 716.5582794887439,
     "breakPoint": false
   },
   {
     "timestamp": "2026-10-05T04:00:00Z",
-    "centerline": 754.0544060150376,
-    "upperChannel": 788.5293581216033,
-    "lowerChannel": 719.5794539084718,
+    "centerline": 742.3640075187968,
+    "upperChannel": 769.5019385563686,
+    "lowerChannel": 715.226076481225,
     "breakPoint": false
   },
   {
     "timestamp": "2026-10-06T04:00:00Z",
-    "centerline": 756.6870714285715,
-    "upperChannel": 791.1620235351372,
-    "lowerChannel": 722.2121193220057,
+    "centerline": 741.0318045112781,
+    "upperChannel": 768.1697355488499,
+    "lowerChannel": 713.8938734737063,
+    "breakPoint": false
+  },
+  {
+    "timestamp": "2026-10-07T04:00:00Z",
+    "centerline": 739.6996015037593,
+    "upperChannel": 766.837532541331,
+    "lowerChannel": 712.5616704661875,
+    "breakPoint": false
+  },
+  {
+    "timestamp": "2026-10-08T04:00:00Z",
+    "centerline": 738.3673984962404,
+    "upperChannel": 765.5053295338122,
+    "lowerChannel": 711.2294674586686,
+    "breakPoint": false
+  },
+  {
+    "timestamp": "2026-10-09T04:00:00Z",
+    "centerline": 737.0351954887217,
+    "upperChannel": 764.1731265262935,
+    "lowerChannel": 709.8972644511499,
+    "breakPoint": false
+  },
+  {
+    "timestamp": "2026-10-12T04:00:00Z",
+    "centerline": 735.7029924812028,
+    "upperChannel": 762.8409235187746,
+    "lowerChannel": 708.5650614436311,
+    "breakPoint": false
+  },
+  {
+    "timestamp": "2026-10-13T04:00:00Z",
+    "centerline": 734.3707894736841,
+    "upperChannel": 761.5087205112559,
+    "lowerChannel": 707.2328584361123,
+    "breakPoint": false
+  },
+  {
+    "timestamp": "2026-10-14T04:00:00Z",
+    "centerline": 733.0385864661653,
+    "upperChannel": 760.176517503737,
+    "lowerChannel": 705.9006554285935,
+    "breakPoint": false
+  },
+  {
+    "timestamp": "2026-10-15T04:00:00Z",
+    "centerline": 731.7063834586464,
+    "upperChannel": 758.8443144962182,
+    "lowerChannel": 704.5684524210747,
+    "breakPoint": false
+  },
+  {
+    "timestamp": "2026-10-16T04:00:00Z",
+    "centerline": 730.3741804511277,
+    "upperChannel": 757.5121114886995,
+    "lowerChannel": 703.2362494135559,
+    "breakPoint": false
+  },
+  {
+    "timestamp": "2026-10-19T04:00:00Z",
+    "centerline": 729.0419774436089,
+    "upperChannel": 756.1799084811806,
+    "lowerChannel": 701.9040464060371,
+    "breakPoint": false
+  },
+  {
+    "timestamp": "2026-10-20T04:00:00Z",
+    "centerline": 727.7097744360901,
+    "upperChannel": 754.8477054736619,
+    "lowerChannel": 700.5718433985184,
+    "breakPoint": false
+  },
+  {
+    "timestamp": "2026-10-21T04:00:00Z",
+    "centerline": 726.3775714285713,
+    "upperChannel": 753.5155024661431,
+    "lowerChannel": 699.2396403909995,
     "breakPoint": false
   }
 ]

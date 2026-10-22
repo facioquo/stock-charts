@@ -6,7 +6,9 @@ public record IndicatorParamConfig
     public required string DisplayName { get; init; }
     public required string ParamName { get; init; }
     public required string DataType { get; init; }
-    public required double Minimum { get; init; } // greater than
-    public required double Maximum { get; init; } // less than
+
+    // Bounds and default come from the library catalog; see LibraryCatalog.
+    public double Minimum { get; init; }
+    public double Maximum { get; init; }
     public double? DefaultValue { get; init; }
 }

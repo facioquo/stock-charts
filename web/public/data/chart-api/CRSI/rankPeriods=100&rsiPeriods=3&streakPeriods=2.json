@@ -1,93 +1,5 @@
 [
   {
-    "timestamp": "2026-04-16T04:00:00Z",
-    "streak": 12,
-    "rsi": 99.16321102572532,
-    "rsiStreak": 99.97363811012585,
-    "percentRank": 64,
-    "connorsRsi": 87.71228304528371
-  },
-  {
-    "timestamp": "2026-04-17T04:00:00Z",
-    "streak": 13,
-    "rsi": 99.49786625570806,
-    "rsiStreak": 99.98681379450386,
-    "percentRank": 88,
-    "connorsRsi": 95.82822668340397
-  },
-  {
-    "timestamp": "2026-04-20T04:00:00Z",
-    "streak": -1,
-    "rsi": 87.20538224905603,
-    "rsiStreak": 6.6682714937243475,
-    "percentRank": 31,
-    "connorsRsi": 41.62455124759346
-  },
-  {
-    "timestamp": "2026-04-21T04:00:00Z",
-    "streak": -2,
-    "rsi": 70.31008087380623,
-    "rsiStreak": 5.883787389475984,
-    "percentRank": 27,
-    "connorsRsi": 34.39795608776074
-  },
-  {
-    "timestamp": "2026-04-22T04:00:00Z",
-    "streak": 1,
-    "rsi": 86.7648935633713,
-    "rsiStreak": 44.8278909204799,
-    "percentRank": 96,
-    "connorsRsi": 75.86426149461707
-  },
-  {
-    "timestamp": "2026-04-23T04:00:00Z",
-    "streak": -1,
-    "rsi": 67.65415067758994,
-    "rsiStreak": 28.889226675727357,
-    "percentRank": 24,
-    "connorsRsi": 40.1811257844391
-  },
-  {
-    "timestamp": "2026-04-24T04:00:00Z",
-    "streak": 1,
-    "rsi": 84.76059295316307,
-    "rsiStreak": 58.441602613596004,
-    "percentRank": 97,
-    "connorsRsi": 80.06739852225303
-  },
-  {
-    "timestamp": "2026-04-27T04:00:00Z",
-    "streak": 2,
-    "rsi": 85.1004556928842,
-    "rsiStreak": 70.64218834870023,
-    "percentRank": 46,
-    "connorsRsi": 67.24754801386148
-  },
-  {
-    "timestamp": "2026-04-28T04:00:00Z",
-    "streak": -1,
-    "rsi": 52.47749111305681,
-    "rsiStreak": 25.58145023614425,
-    "percentRank": 18,
-    "connorsRsi": 32.01964711640036
-  },
-  {
-    "timestamp": "2026-04-29T04:00:00Z",
-    "streak": 1,
-    "rsi": 64.63595285224713,
-    "rsiStreak": 59.78456528734653,
-    "percentRank": 70,
-    "connorsRsi": 64.80683937986456
-  },
-  {
-    "timestamp": "2026-04-30T04:00:00Z",
-    "streak": 2,
-    "rsi": 77.58326065616151,
-    "rsiStreak": 72.44772178244305,
-    "percentRank": 80,
-    "connorsRsi": 76.67699414620152
-  },
-  {
     "timestamp": "2026-05-01T04:00:00Z",
     "streak": 3,
     "rsi": 85.91955881555285,
@@ -958,5 +870,93 @@
     "rsiStreak": 97.7347472976769,
     "percentRank": 64,
     "connorsRsi": 85.13858994206795
+  },
+  {
+    "timestamp": "2026-10-07T04:00:00Z",
+    "streak": -1,
+    "rsi": 78.0124068450671,
+    "rsiStreak": 12.602222187720514,
+    "percentRank": 41,
+    "connorsRsi": 43.8715430109292
+  },
+  {
+    "timestamp": "2026-10-08T04:00:00Z",
+    "streak": -2,
+    "rsi": 32.914507597161005,
+    "rsiStreak": 10.090872472803412,
+    "percentRank": 15,
+    "connorsRsi": 19.33512668998814
+  },
+  {
+    "timestamp": "2026-10-09T04:00:00Z",
+    "streak": 1,
+    "rsi": 49.11594354510484,
+    "rsiStreak": 59.051619848981986,
+    "percentRank": 67,
+    "connorsRsi": 58.389187798028935
+  },
+  {
+    "timestamp": "2026-10-12T04:00:00Z",
+    "streak": -1,
+    "rsi": 32.5967622497036,
+    "rsiStreak": 34.21145290602034,
+    "percentRank": 27,
+    "connorsRsi": 31.26940505190798
+  },
+  {
+    "timestamp": "2026-10-13T04:00:00Z",
+    "streak": -2,
+    "rsi": 26.580274829872906,
+    "rsiStreak": 24.081519642655593,
+    "percentRank": 36,
+    "connorsRsi": 28.887264824176167
+  },
+  {
+    "timestamp": "2026-10-14T04:00:00Z",
+    "streak": -3,
+    "rsi": 9.774932067215516,
+    "rsiStreak": 15.124725887671119,
+    "percentRank": 4,
+    "connorsRsi": 9.633219318295545
+  },
+  {
+    "timestamp": "2026-10-15T04:00:00Z",
+    "streak": -4,
+    "rsi": 9.296647008670774,
+    "rsiStreak": 8.673067132083048,
+    "percentRank": 47,
+    "connorsRsi": 21.656571380251275
+  },
+  {
+    "timestamp": "2026-10-16T04:00:00Z",
+    "streak": -5,
+    "rsi": 3.4484085824366275,
+    "rsiStreak": 4.680232619574198,
+    "percentRank": 2,
+    "connorsRsi": 3.3762137340036085
+  },
+  {
+    "timestamp": "2026-10-19T04:00:00Z",
+    "streak": 1,
+    "rsi": 32.76831208175362,
+    "rsiStreak": 85.39039790049783,
+    "percentRank": 85,
+    "connorsRsi": 67.71956999408381
+  },
+  {
+    "timestamp": "2026-10-20T04:00:00Z",
+    "streak": -1,
+    "rsi": 30.942187639145942,
+    "rsiStreak": 54.580443114172674,
+    "percentRank": 46,
+    "connorsRsi": 43.840876917772874
+  },
+  {
+    "timestamp": "2026-10-21T04:00:00Z",
+    "streak": 1,
+    "rsi": 57.13318877693326,
+    "rsiStreak": 73.61821696989858,
+    "percentRank": 81,
+    "connorsRsi": 70.58380191561061
   }
 ]

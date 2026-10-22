@@ -1,82 +1,5 @@
 [
   {
-    "timestamp": "2026-04-16T04:00:00Z",
-    "upper": 0.18266120017074172,
-    "lower": -8.87417956050399,
-    "upperIsExpanding": false,
-    "lowerIsExpanding": true
-  },
-  {
-    "timestamp": "2026-04-17T04:00:00Z",
-    "upper": 3.0400354304535995,
-    "lower": -11.32203104815676,
-    "upperIsExpanding": true,
-    "lowerIsExpanding": true
-  },
-  {
-    "timestamp": "2026-04-20T04:00:00Z",
-    "upper": 4.32526602220355,
-    "lower": -14.601788813309668,
-    "upperIsExpanding": true,
-    "lowerIsExpanding": true
-  },
-  {
-    "timestamp": "2026-04-21T04:00:00Z",
-    "upper": 6.7751131730188945,
-    "lower": -16.75782452858391,
-    "upperIsExpanding": true,
-    "lowerIsExpanding": true
-  },
-  {
-    "timestamp": "2026-04-22T04:00:00Z",
-    "upper": 9.543065552782991,
-    "lower": -18.808978916061392,
-    "upperIsExpanding": true,
-    "lowerIsExpanding": true
-  },
-  {
-    "timestamp": "2026-04-23T04:00:00Z",
-    "upper": 12.520396652277213,
-    "lower": -19.11168751439402,
-    "upperIsExpanding": true,
-    "lowerIsExpanding": true
-  },
-  {
-    "timestamp": "2026-04-24T04:00:00Z",
-    "upper": 15.204126610981348,
-    "lower": -18.09141634536718,
-    "upperIsExpanding": true,
-    "lowerIsExpanding": false
-  },
-  {
-    "timestamp": "2026-04-27T04:00:00Z",
-    "upper": 16.61272459098302,
-    "lower": -18.235441118414087,
-    "upperIsExpanding": true,
-    "lowerIsExpanding": true
-  },
-  {
-    "timestamp": "2026-04-28T04:00:00Z",
-    "upper": 17.334017915301843,
-    "lower": -17.82549743158654,
-    "upperIsExpanding": true,
-    "lowerIsExpanding": false
-  },
-  {
-    "timestamp": "2026-04-29T04:00:00Z",
-    "upper": 17.90314888960461,
-    "lower": -18.346524415017598,
-    "upperIsExpanding": true,
-    "lowerIsExpanding": true
-  },
-  {
-    "timestamp": "2026-04-30T04:00:00Z",
-    "upper": 18.258714783372056,
-    "lower": -18.972080193043894,
-    "upperIsExpanding": true,
-    "lowerIsExpanding": true
-  },
-  {
     "timestamp": "2026-05-01T04:00:00Z",
     "upper": 19.536203440036502,
     "lower": -16.887792232836205,
@@ -838,5 +761,82 @@
     "lower": -7.3276912079544445,
     "upperIsExpanding": false,
     "lowerIsExpanding": false
+  },
+  {
+    "timestamp": "2026-10-07T04:00:00Z",
+    "upper": 8.567269527951794,
+    "lower": -8.602784674019404,
+    "upperIsExpanding": false,
+    "lowerIsExpanding": true
+  },
+  {
+    "timestamp": "2026-10-08T04:00:00Z",
+    "upper": 8.672000554134229,
+    "lower": -10.115780483414369,
+    "upperIsExpanding": true,
+    "lowerIsExpanding": true
+  },
+  {
+    "timestamp": "2026-10-09T04:00:00Z",
+    "upper": 9.934552531491931,
+    "lower": -11.50704553790547,
+    "upperIsExpanding": true,
+    "lowerIsExpanding": true
+  },
+  {
+    "timestamp": "2026-10-12T04:00:00Z",
+    "upper": 10.891113238862658,
+    "lower": -10.993817437601706,
+    "upperIsExpanding": true,
+    "lowerIsExpanding": false
+  },
+  {
+    "timestamp": "2026-10-13T04:00:00Z",
+    "upper": 12.801016952134432,
+    "lower": -8.459837331448966,
+    "upperIsExpanding": true,
+    "lowerIsExpanding": false
+  },
+  {
+    "timestamp": "2026-10-14T04:00:00Z",
+    "upper": 12.848140942160512,
+    "lower": -7.036305323855686,
+    "upperIsExpanding": true,
+    "lowerIsExpanding": false
+  },
+  {
+    "timestamp": "2026-10-15T04:00:00Z",
+    "upper": 12.057085886583877,
+    "lower": -5.680175285444079,
+    "upperIsExpanding": false,
+    "lowerIsExpanding": false
+  },
+  {
+    "timestamp": "2026-10-16T04:00:00Z",
+    "upper": 10.709410785093269,
+    "lower": -3.317817376419839,
+    "upperIsExpanding": false,
+    "lowerIsExpanding": false
+  },
+  {
+    "timestamp": "2026-10-19T04:00:00Z",
+    "upper": 9.463722137878676,
+    "lower": -0.15390890569244675,
+    "upperIsExpanding": false,
+    "lowerIsExpanding": false
+  },
+  {
+    "timestamp": "2026-10-20T04:00:00Z",
+    "upper": 7.940101286879781,
+    "lower": -3.8981747464590626,
+    "upperIsExpanding": false,
+    "lowerIsExpanding": true
+  },
+  {
+    "timestamp": "2026-10-21T04:00:00Z",
+    "upper": 5.508281548698847,
+    "lower": -7.291366434303541,
+    "upperIsExpanding": false,
+    "lowerIsExpanding": true
   }
 ]
