@@ -3,36 +3,25 @@ name: PR screenshots
 # Before and after screenshots of the React site's scenes, written into a pull
 # request's description ("Pull request screenshots" in @facioquo/react-ui's
 # llms.txt). Opt-in: a pull request gets them only while it carries the
-# `pr-screenshots` label, and adding the label runs it. A push to main stores
-# the scenes every pull request compares against; workflow_dispatch on main
-# seeds the first baseline.
+# `pr-screenshots` label, and adding the label runs it. The after scenes come
+# from the pull request, and the before scenes from its base commit, so
+# nothing runs on main.
 #
 # It never gates a merge: screenshots inform a review. The scenes come from
 # tests/playwright/pr-screenshots.spec.ts.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, labeled]
-  push:
-    branches: [main]
-    paths:
-      - "web/**"
-      - "libs/chartjs-financial/**"
-      - "libs/indy-charts/**"
-      - "tests/playwright/**"
-      - "pnpm-lock.yaml"
-      - ".github/workflows/pr-screenshots.yml"
-  workflow_dispatch:
 
-# A pull request's run is superseded by its next push. Baseline runs queue, so
-# the older commit's scenes never land after a newer one's. Adding some other
-# label starts a run that does nothing, so it takes a group of its own rather
-# than cancelling a capture.
+# A pull request's run is superseded by its next push. Adding some other label
+# starts a run that does nothing, so it takes a group of its own rather than
+# cancelling a capture.
 concurrency:
   group: >-
-    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}${{
+    ${{ github.workflow }}-${{ github.event.pull_request.number }}${{
     github.event.action == 'labeled' && github.event.label.name != 'pr-screenshots'
     && format('-{0}', github.run_id) || '' }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -41,32 +30,54 @@ env:
   NODE_VERSION: 24
 
 jobs:
+  # The after side captures the pull request; the before side captures its
+  # base commit with that commit's own code, unless an earlier push already
+  # stored the base's scenes on the pr-screenshots branch.
   capture:
-    # On a pull request: only while it carries the label, never as a draft,
-    # and not when some other label is added. A fork's pull request is left
-    # out, as its token cannot write the screenshots back. Otherwise: main.
+    # Only while the pull request carries the label, never as a draft, and
+    # not when some other label is added. A fork's pull request is left out,
+    # as its token cannot write the screenshots back.
     if: >-
-      ${{ github.event_name == 'pull_request'
-      && contains(github.event.pull_request.labels.*.name, 'pr-screenshots')
+      ${{ contains(github.event.pull_request.labels.*.name, 'pr-screenshots')
       && !github.event.pull_request.draft
       && (github.event.action != 'labeled' || github.event.label.name == 'pr-screenshots')
-      && github.event.pull_request.head.repo.full_name == github.repository
-      || github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+      && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Each side independent: a base that fails to build must not cancel the
+    # pull request's own capture.
+    strategy:
+      fail-fast: false
+      matrix:
+        side: [after, before]
 
     steps:
+      - name: Look for the base's stored scenes
+        id: stored
+        if: matrix.side == 'before'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if gh api "repos/$GITHUB_REPOSITORY/contents/base/$BASE_SHA/scenes.json?ref=pr-screenshots" --silent; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout repository
+        if: steps.stored.outputs.found != 'true'
         uses: actions/checkout@v7
         with:
+          ref: ${{ matrix.side == 'before' && github.event.pull_request.base.sha || '' }}
           persist-credentials: false
 
       - name: Setup pnpm
+        if: steps.stored.outputs.found != 'true'
         uses: pnpm/action-setup@v6
         with:
           run_install: false
 
       - name: Setup Node.js
+        if: steps.stored.outputs.found != 'true'
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -74,43 +85,50 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
+        if: steps.stored.outputs.found != 'true'
         run: pnpm install --frozen-lockfile --filter "@stock-charts/web..." --filter @stock-charts/playwright-tests
 
       # The dev server runs from source but reads the libraries' dist/ output.
       - name: Build libraries
+        if: steps.stored.outputs.found != 'true'
         run: |
           pnpm --filter @facioquo/chartjs-chart-financial run build
           pnpm --filter @facioquo/indy-charts run build
 
       - name: Install Playwright Chromium
+        if: steps.stored.outputs.found != 'true'
         run: pnpm --filter @stock-charts/playwright-tests exec playwright install --with-deps chromium
 
       # Never a failure: a capture problem leaves the description saying this
-      # push has no screenshots.
+      # push has no screenshots. Playwright's global timeout stops it at a
+      # limit, keeping the scenes it took; the step's own is the backstop.
       - name: Capture PR screenshots
         id: capture-screenshots
+        if: steps.stored.outputs.found != 'true'
         continue-on-error: true
         timeout-minutes: 5
         working-directory: tests/playwright
-        run: pnpm exec playwright test --project=pr-screenshots
+        run: pnpm exec playwright test --project=pr-screenshots --global-timeout=240000
         env:
           CI: true
           PR_SCREENSHOTS: ${{ runner.temp }}/pr-screenshots
 
-      # Only a complete capture: a partial one would list its failed scenes as
-      # removed.
+      # Whatever the capture took, even when it ran out of time: scenes.txt
+      # names the rest, which the description lists as not captured.
       - name: Upload PR screenshots
-        if: steps.capture-screenshots.outcome == 'success'
+        if: steps.capture-screenshots.outcome != 'skipped'
         uses: actions/upload-artifact@v7
         with:
-          name: pr-screenshots
-          path: ${{ runner.temp }}/pr-screenshots/*.png
+          name: pr-screenshots-${{ matrix.side }}
+          path: |
+            ${{ runner.temp }}/pr-screenshots/*.png
+            ${{ runner.temp }}/pr-screenshots/scenes.txt
           if-no-files-found: ignore
           retention-days: 1
 
   # A job of its own so the write token never sits beside the site's install
-  # and build. With no artifact, publish writes that the push has no
-  # screenshots, and baseline leaves main's scenes as they were.
+  # and build. With no after artifact, publish writes that the push has no
+  # screenshots; with no before artifact, it reads the base's stored scenes.
   publish:
     runs-on: ubuntu-latest
     needs: capture
@@ -126,8 +144,15 @@ jobs:
         uses: actions/download-artifact@v8
         continue-on-error: true
         with:
-          name: pr-screenshots
-          path: ${{ runner.temp }}/pr-screenshots
+          name: pr-screenshots-after
+          path: ${{ runner.temp }}/pr-screenshots/after
+
+      - name: Download the base's screenshots
+        uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: pr-screenshots-before
+          path: ${{ runner.temp }}/pr-screenshots/before
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -141,10 +166,9 @@ jobs:
       - name: Install the screenshot tool
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
-        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" @facioquo/react-ui@0.31.0
+        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" @facioquo/react-ui@0.32.0
 
       - name: Publish PR screenshots
         env:
           GH_TOKEN: ${{ github.token }}
-          MODE: ${{ github.event_name == 'pull_request' && 'publish' || 'baseline' }}
-        run: '"$RUNNER_TEMP/tool/node_modules/.bin/facioquo-pr-screenshots" "$MODE" "$RUNNER_TEMP/pr-screenshots"'
+        run: '"$RUNNER_TEMP/tool/node_modules/.bin/facioquo-pr-screenshots" publish "$RUNNER_TEMP/pr-screenshots"'

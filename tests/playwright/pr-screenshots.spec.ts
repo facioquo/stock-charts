@@ -1,3 +1,4 @@
+import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { test, expect, type Page } from "@playwright/test";
@@ -8,7 +9,7 @@ import { test, expect, type Page } from "@playwright/test";
  * `<scene>.png`. The live API is refused, so every scene renders from the
  * bundled snapshot, and the clock is held still, so the same code always draws
  * the same pixels. `.github/workflows/pr-screenshots.yml` compares them with
- * main's and shows the changed ones in the pull request description.
+ * the base commit's and shows the changed ones in the pull request description.
  *
  * Runs only as the `pr-screenshots` project, which playwright.config.ts adds
  * when PR_SCREENSHOTS names the output directory.
@@ -97,6 +98,11 @@ const SCENES: { name: string; open?: (page: Page) => Promise<void> }[] = [
     }
   }
 ];
+
+// Every scene this run means to take, written before the first one, so a
+// scene missing from a capture cut short reads as not captured, not removed.
+mkdirSync(OUT, { recursive: true });
+writeFileSync(join(OUT, "scenes.txt"), SCENES.map(({ name }) => `${name}\n`).join(""));
 
 test.describe("PR screenshots", () => {
   test.beforeEach(async ({ page }) => {
