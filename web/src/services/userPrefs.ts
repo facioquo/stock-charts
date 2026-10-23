@@ -1,7 +1,7 @@
 import type { UserSettings } from "../types/chart.types";
 
 /**
- * Persists theme / tooltip preferences in
+ * Persists theme / tooltip / series legend preferences in
  * localStorage and applies the theme class to `document.body`. Module-level
  * singleton.
  */
@@ -10,7 +10,7 @@ const STORAGE_KEY = "settings";
 const TOOLTIPS_CHOSEN_KEY = "settings.tooltipsChosen";
 const isBrowser = typeof window !== "undefined";
 
-const defaults: UserSettings = { isDarkTheme: true, showTooltips: false };
+const defaults: UserSettings = { isDarkTheme: true, showTooltips: false, showSeriesLegend: true };
 
 let current: UserSettings = { ...defaults };
 
@@ -32,7 +32,8 @@ export function loadSettings(): void {
   }
 
   try {
-    current = JSON.parse(cached) as UserSettings;
+    // Settings saved before a preference existed take its default.
+    current = { ...defaults, ...(JSON.parse(cached) as Partial<UserSettings>) };
   } catch {
     current = { ...defaults };
   }
@@ -70,6 +71,12 @@ export function changeTooltips(showTooltips: boolean): void {
     // localStorage may be unavailable.
   }
   // Actual tooltip add/remove is handled by the chart controller (theme update).
+}
+
+export function changeSeriesLegend(showSeriesLegend: boolean): void {
+  current.showSeriesLegend = showSeriesLegend;
+  cacheSettings();
+  // The chart controller redraws the legends (theme update).
 }
 
 function cacheSettings(): void {

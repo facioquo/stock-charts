@@ -95,7 +95,7 @@ export class ChartController {
     return {
       isDarkTheme: settings.isDarkTheme,
       showTooltips: settings.showTooltips,
-      showSeriesLegend: true
+      showSeriesLegend: settings.showSeriesLegend
     };
   }
 

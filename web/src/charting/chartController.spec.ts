@@ -50,6 +50,7 @@ vi.mock("@facioquo/indy-charts", () => {
   };
 });
 
+import { changeSeriesLegend } from "../services/userPrefs";
 import { decodeSelections, encodeSelections, SHARE_PARAM } from "./shareLink";
 import { ChartController } from "./chartController";
 
@@ -1102,6 +1103,18 @@ describe("ChartController", () => {
         showTooltips: expect.any(Boolean),
         showSeriesLegend: true
       })
+    );
+  });
+
+  it("passes the visitor's series legend choice to the chart manager", () => {
+    const controller = new ChartController(makeApi());
+
+    changeSeriesLegend(false);
+    controller.onSettingsChange();
+    changeSeriesLegend(true);
+
+    expect(manager(controller).updateTheme).toHaveBeenCalledWith(
+      expect.objectContaining({ showSeriesLegend: false })
     );
   });
 
