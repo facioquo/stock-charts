@@ -44,7 +44,10 @@ jobs:
       && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Each side independent: a base that fails to build must not cancel the
+    # pull request's own capture.
     strategy:
+      fail-fast: false
       matrix:
         side: [after, before]
 
