@@ -28,6 +28,11 @@ permissions:
 
 env:
   NODE_VERSION: 24
+  # The PR screenshot tool (`facioquo-pr-screenshots` in @facioquo/react-ui),
+  # installed by both plan and publish. One value, because plan computes the
+  # keys that publish records, and two versions must never disagree about
+  # them. At least 0.33.0, the first with plan.
+  SCREENSHOT_TOOL_VERSION: 0.33.0
 
 jobs:
   # Decides what this push needs before anything is built. A commit's content
@@ -37,8 +42,10 @@ jobs:
   # ones the description records, the description already shows this push:
   # no capture and no publish.
   #
-  # Every step continues on error. A plan that fails leaves its outputs empty,
-  # which captures and publishes everything, as before plan existed.
+  # Every step continues on error and is time-boxed, since continue-on-error
+  # absorbs a failure but not a hang. A plan that fails leaves its outputs
+  # empty, which captures and publishes everything, as before plan existed,
+  # and the last step warns that it did.
   plan:
     # Only while the pull request carries the label, never as a draft, and
     # not when some other label is added. A fork's pull request is left out,
@@ -63,6 +70,8 @@ jobs:
 
     steps:
       - name: Setup Node.js
+        continue-on-error: true
+        timeout-minutes: 2
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -72,9 +81,10 @@ jobs:
       # The same pinned tool as the publish job, installed the same way.
       - name: Install the screenshot tool
         continue-on-error: true
+        timeout-minutes: 2
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
-        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" @facioquo/react-ui@0.33.0
+        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" "@facioquo/react-ui@$SCREENSHOT_TOOL_VERSION"
 
       # What the scenes render from: the React site with its bundled snapshot,
       # the chart libraries it builds, the capture spec and its config, the
@@ -83,6 +93,7 @@ jobs:
       - name: Plan PR screenshots
         id: plan
         continue-on-error: true
+        timeout-minutes: 2
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
@@ -91,6 +102,10 @@ jobs:
           "package.json" "pnpm-lock.yaml" "pnpm-workspace.yaml" ".npmrc"
           ".github/workflows/pr-screenshots.yml"
           "!web/**/*.spec.ts" "!web/**/*.spec.tsx" "!libs/**/*.spec.ts" "!**/*.md"
+
+      - name: Warn when the plan produced no keys
+        if: steps.plan.outputs.key == ''
+        run: echo "::warning title=PR screenshot plan failed::No content keys, so capture and publish run in full; see the plan steps above"
 
   # The after side captures the pull request; the before side captures its
   # base commit with that commit's own code. The before side is left out of
@@ -205,7 +220,7 @@ jobs:
       - name: Install the screenshot tool
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
-        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" @facioquo/react-ui@0.33.0
+        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" "@facioquo/react-ui@$SCREENSHOT_TOOL_VERSION"
 
       # Plan's keys: the base's scenes are stored and read by content key, and
       # both keys are recorded in the description for the next push's plan.
