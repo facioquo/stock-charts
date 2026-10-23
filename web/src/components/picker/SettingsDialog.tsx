@@ -447,7 +447,7 @@ function useSettingsControls(controller: ChartController): SettingsControls {
   const initial = getSettings();
   const [isDarkTheme, setIsDarkTheme] = useState(initial.isDarkTheme);
   const [showTooltips, setShowTooltips] = useState(initial.showTooltips);
-  const [showSeriesLegend, setShowSeriesLegend] = useState(initial.showSeriesLegend ?? true);
+  const [showSeriesLegend, setShowSeriesLegend] = useState(initial.showSeriesLegend);
   const [checked, setChecked] = useState<ReadonlySet<string>>(new Set());
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
 

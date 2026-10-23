@@ -133,6 +133,7 @@ describe("ChartController", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    changeSeriesLegend(true);
     localStorage.clear();
     document.body.innerHTML = "";
   });
@@ -1111,7 +1112,6 @@ describe("ChartController", () => {
 
     changeSeriesLegend(false);
     controller.onSettingsChange();
-    changeSeriesLegend(true);
 
     expect(manager(controller).updateTheme).toHaveBeenCalledWith(
       expect.objectContaining({ showSeriesLegend: false })

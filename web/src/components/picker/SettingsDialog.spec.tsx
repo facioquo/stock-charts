@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ChartController } from "../../charting/chartController";
-import { getSettings } from "../../services/userPrefs";
+import { changeSeriesLegend, getSettings } from "../../services/userPrefs";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
 
 import { SettingsDialog } from "./SettingsDialog";
@@ -75,6 +75,7 @@ function makeController(): FakeController {
 }
 
 afterEach(() => {
+  changeSeriesLegend(true);
   document.body.className = "";
 });
 
@@ -282,6 +283,20 @@ describe("SettingsDialog", () => {
     expect(toggle).toBeChecked();
     expect(getSettings().showSeriesLegend).toBe(true);
     expect(controller.onSettingsChange).toHaveBeenCalledTimes(2);
+  });
+
+  it("starts with the series legend switch off when the visitor saved it off", () => {
+    changeSeriesLegend(false);
+    render(
+      <SettingsDialog
+        controller={makeController() as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    expect(screen.getByRole("checkbox", { name: "Show series legend" })).not.toBeChecked();
   });
 
   it("closes via the close button", () => {
