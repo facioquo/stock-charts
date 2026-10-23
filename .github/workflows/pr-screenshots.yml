@@ -30,10 +30,16 @@ env:
   NODE_VERSION: 24
 
 jobs:
-  # The after side captures the pull request; the before side captures its
-  # base commit with that commit's own code, unless an earlier push already
-  # stored the base's scenes on the pr-screenshots branch.
-  capture:
+  # Decides what this push needs before anything is built. A commit's content
+  # key hashes every file the scenes render from, so a base whose key an
+  # earlier pull request already stored is not captured again, however far
+  # main moved through unrelated merges; and when neither key differs from the
+  # ones the description records, the description already shows this push:
+  # no capture and no publish.
+  #
+  # Every step continues on error. A plan that fails leaves its outputs empty,
+  # which captures and publishes everything, as before plan existed.
+  plan:
     # Only while the pull request carries the label, never as a draft, and
     # not when some other label is added. A fork's pull request is left out,
     # as its token cannot write the screenshots back.
@@ -43,41 +49,78 @@ jobs:
       && (github.event.action != 'labeled' || github.event.label.name == 'pr-screenshots')
       && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      packages: read
+      # Reading the live description, where the last publish recorded its keys.
+      pull-requests: read
+    outputs:
+      key: ${{ steps.plan.outputs.key }}
+      base-key: ${{ steps.plan.outputs.base-key }}
+      base-stored: ${{ steps.plan.outputs.base-stored }}
+      current: ${{ steps.plan.outputs.current }}
+
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: https://npm.pkg.github.com
+          scope: "@facioquo"
+
+      # The same pinned tool as the publish job, installed the same way.
+      - name: Install the screenshot tool
+        continue-on-error: true
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" @facioquo/react-ui@0.33.0
+
+      # What the scenes render from: the React site with its bundled snapshot,
+      # the chart libraries it builds, the capture spec and its config, the
+      # workspace manifests, and this file; less unit specs and Markdown,
+      # which no scene renders. Quoted, so the shell never expands a glob.
+      - name: Plan PR screenshots
+        id: plan
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          "$RUNNER_TEMP/tool/node_modules/.bin/facioquo-pr-screenshots" plan
+          "web/**" "libs/**" "tests/playwright/**"
+          "package.json" "pnpm-lock.yaml" "pnpm-workspace.yaml" ".npmrc"
+          ".github/workflows/pr-screenshots.yml"
+          "!web/**/*.spec.ts" "!web/**/*.spec.tsx" "!libs/**/*.spec.ts" "!**/*.md"
+
+  # The after side captures the pull request; the before side captures its
+  # base commit with that commit's own code. The before side is left out of
+  # the matrix when plan found the base's scenes already stored, so it costs
+  # nothing, and the job is skipped when the description is already current.
+  capture:
+    needs: plan
+    if: ${{ !cancelled() && needs.plan.result != 'skipped' && needs.plan.outputs.current != 'true' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     # Each side independent: a base that fails to build must not cancel the
     # pull request's own capture.
     strategy:
       fail-fast: false
       matrix:
-        side: [after, before]
+        side: ${{ fromJSON(needs.plan.outputs.base-stored == 'true' && '["after"]' || '["after","before"]') }}
 
     steps:
-      - name: Look for the base's stored scenes
-        id: stored
-        if: matrix.side == 'before'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          if gh api "repos/$GITHUB_REPOSITORY/contents/base/$BASE_SHA/scenes.json?ref=pr-screenshots" --silent; then
-            echo "found=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Checkout repository
-        if: steps.stored.outputs.found != 'true'
         uses: actions/checkout@v7
         with:
           ref: ${{ matrix.side == 'before' && github.event.pull_request.base.sha || '' }}
           persist-credentials: false
 
       - name: Setup pnpm
-        if: steps.stored.outputs.found != 'true'
         uses: pnpm/action-setup@v6
         with:
           run_install: false
 
       - name: Setup Node.js
-        if: steps.stored.outputs.found != 'true'
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -85,18 +128,15 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        if: steps.stored.outputs.found != 'true'
         run: pnpm install --frozen-lockfile --filter "@stock-charts/web..." --filter @stock-charts/playwright-tests
 
       # The dev server runs from source but reads the libraries' dist/ output.
       - name: Build libraries
-        if: steps.stored.outputs.found != 'true'
         run: |
           pnpm --filter @facioquo/chartjs-chart-financial run build
           pnpm --filter @facioquo/indy-charts run build
 
       - name: Install Playwright Chromium
-        if: steps.stored.outputs.found != 'true'
         run: pnpm --filter @stock-charts/playwright-tests exec playwright install --with-deps chromium
 
       # Never a failure: a capture problem leaves the description saying this
@@ -104,7 +144,6 @@ jobs:
       # limit, keeping the scenes it took; the step's own is the backstop.
       - name: Capture PR screenshots
         id: capture-screenshots
-        if: steps.stored.outputs.found != 'true'
         continue-on-error: true
         timeout-minutes: 5
         working-directory: tests/playwright
@@ -131,7 +170,7 @@ jobs:
   # screenshots; with no before artifact, it reads the base's stored scenes.
   publish:
     runs-on: ubuntu-latest
-    needs: capture
+    needs: [plan, capture]
     if: ${{ !cancelled() && needs.capture.result != 'skipped' }}
     timeout-minutes: 5
     permissions:
@@ -166,9 +205,13 @@ jobs:
       - name: Install the screenshot tool
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
-        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" @facioquo/react-ui@0.32.0
+        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" @facioquo/react-ui@0.33.0
 
+      # Plan's keys: the base's scenes are stored and read by content key, and
+      # both keys are recorded in the description for the next push's plan.
       - name: Publish PR screenshots
         env:
           GH_TOKEN: ${{ github.token }}
+          PR_SCREENSHOTS_KEY: ${{ needs.plan.outputs.key }}
+          PR_SCREENSHOTS_BASE_KEY: ${{ needs.plan.outputs.base-key }}
         run: '"$RUNNER_TEMP/tool/node_modules/.bin/facioquo-pr-screenshots" publish "$RUNNER_TEMP/pr-screenshots"'
