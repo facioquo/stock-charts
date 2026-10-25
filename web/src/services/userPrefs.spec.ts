@@ -30,13 +30,13 @@ describe("userPrefs", () => {
       expect(getSettings()).toEqual({
         isDarkTheme: true,
         showTooltips: false,
-        showSeriesLegend: true
+        showSeriesLegend: false
       });
       expect(localStorage.getItem("settings")).toBeTruthy();
     });
 
     it("loads cached settings when they exist", () => {
-      const cached = { isDarkTheme: false, showTooltips: true, showSeriesLegend: false };
+      const cached = { isDarkTheme: false, showTooltips: true, showSeriesLegend: true };
       localStorage.setItem("settings", JSON.stringify(cached));
       localStorage.setItem("settings.tooltipsChosen", "true");
 
@@ -53,7 +53,7 @@ describe("userPrefs", () => {
       expect(getSettings()).toEqual({
         isDarkTheme: false,
         showTooltips: false,
-        showSeriesLegend: true
+        showSeriesLegend: false
       });
     });
 
@@ -75,21 +75,21 @@ describe("userPrefs", () => {
       expect(getSettings().showTooltips).toBe(true);
     });
 
-    it("shows the series legend for a visitor whose settings predate it", () => {
+    it("leaves the series legend off for a visitor whose settings predate it", () => {
       localStorage.setItem("settings", JSON.stringify({ isDarkTheme: false, showTooltips: false }));
 
       loadSettings();
 
-      expect(getSettings().showSeriesLegend).toBe(true);
+      expect(getSettings().showSeriesLegend).toBe(false);
     });
 
-    it("keeps the series legend off for a visitor who switched it off", () => {
+    it("keeps the series legend on for a visitor who switched it on", () => {
       loadSettings();
-      changeSeriesLegend(false);
+      changeSeriesLegend(true);
 
       loadSettings();
 
-      expect(getSettings().showSeriesLegend).toBe(false);
+      expect(getSettings().showSeriesLegend).toBe(true);
     });
 
     it("applies the cached theme to document.body on load", () => {
@@ -157,13 +157,13 @@ describe("userPrefs", () => {
 
   describe("changeSeriesLegend", () => {
     it("updates and caches the series legend setting", () => {
-      changeSeriesLegend(false);
+      changeSeriesLegend(true);
 
-      expect(getSettings().showSeriesLegend).toBe(false);
+      expect(getSettings().showSeriesLegend).toBe(true);
       const parsed = JSON.parse(localStorage.getItem("settings") as string) as {
         showSeriesLegend: boolean;
       };
-      expect(parsed.showSeriesLegend).toBe(false);
+      expect(parsed.showSeriesLegend).toBe(true);
     });
   });
 });

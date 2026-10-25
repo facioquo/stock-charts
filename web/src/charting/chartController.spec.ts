@@ -133,7 +133,7 @@ describe("ChartController", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-    changeSeriesLegend(true);
+    changeSeriesLegend(false);
     localStorage.clear();
     document.body.innerHTML = "";
   });
@@ -1102,7 +1102,7 @@ describe("ChartController", () => {
       expect.objectContaining({
         isDarkTheme: expect.any(Boolean),
         showTooltips: expect.any(Boolean),
-        showSeriesLegend: true
+        showSeriesLegend: false
       })
     );
   });
@@ -1110,11 +1110,11 @@ describe("ChartController", () => {
   it("passes the visitor's series legend choice to the chart manager", () => {
     const controller = new ChartController(makeApi());
 
-    changeSeriesLegend(false);
+    changeSeriesLegend(true);
     controller.onSettingsChange();
 
     expect(manager(controller).updateTheme).toHaveBeenCalledWith(
-      expect.objectContaining({ showSeriesLegend: false })
+      expect.objectContaining({ showSeriesLegend: true })
     );
   });
 

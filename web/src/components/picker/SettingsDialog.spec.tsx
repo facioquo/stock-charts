@@ -75,7 +75,7 @@ function makeController(): FakeController {
 }
 
 afterEach(() => {
-  changeSeriesLegend(true);
+  changeSeriesLegend(false);
   document.body.className = "";
 });
 
@@ -261,7 +261,7 @@ describe("SettingsDialog", () => {
     expect(toggle).toBeChecked();
   });
 
-  it("switches the series legend off and on, redrawing the charts each time", () => {
+  it("switches the series legend on and off, redrawing the charts each time", () => {
     const controller = makeController();
     render(
       <SettingsDialog
@@ -273,20 +273,20 @@ describe("SettingsDialog", () => {
     );
 
     const toggle = screen.getByRole("checkbox", { name: "Show series legend" });
-    expect(toggle).toBeChecked();
-
-    fireEvent.click(toggle);
     expect(toggle).not.toBeChecked();
-    expect(getSettings().showSeriesLegend).toBe(false);
 
     fireEvent.click(toggle);
     expect(toggle).toBeChecked();
     expect(getSettings().showSeriesLegend).toBe(true);
+
+    fireEvent.click(toggle);
+    expect(toggle).not.toBeChecked();
+    expect(getSettings().showSeriesLegend).toBe(false);
     expect(controller.onSettingsChange).toHaveBeenCalledTimes(2);
   });
 
-  it("starts with the series legend switch off when the visitor saved it off", () => {
-    changeSeriesLegend(false);
+  it("starts with the series legend switch on when the visitor saved it on", () => {
+    changeSeriesLegend(true);
     render(
       <SettingsDialog
         controller={makeController() as unknown as ChartController}
@@ -296,7 +296,7 @@ describe("SettingsDialog", () => {
       />
     );
 
-    expect(screen.getByRole("checkbox", { name: "Show series legend" })).not.toBeChecked();
+    expect(screen.getByRole("checkbox", { name: "Show series legend" })).toBeChecked();
   });
 
   it("closes via the close button", () => {
