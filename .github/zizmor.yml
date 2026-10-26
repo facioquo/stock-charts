@@ -1,0 +1,6 @@
+# This repository pins actions to major tags (`@v7`), not commit SHAs.
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        "*": ref-pin
