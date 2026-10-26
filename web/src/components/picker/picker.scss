@@ -292,7 +292,7 @@
     flex: 1 1 0;
     min-width: 0;
     overflow-wrap: break-word;
-    padding: 10px 4px 10px 12px;
+    padding: 10px 4px 10px 16px;
     cursor: pointer;
 
     @media (width <= 420px) {
@@ -605,6 +605,10 @@
 /* Last in a list row, so it lines up under the section header's select-all. */
 .selection-checkbox {
   margin: 0 12px 0 8px;
+}
+
+.displayed-indicators > .dialog-section-header > .selection-checkbox {
+  margin-right: 0;
 }
 
 /* BUTTONS */
