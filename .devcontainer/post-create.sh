@@ -29,5 +29,8 @@ dotnet tool restore
 echo "📦 Installing Node dependencies..."
 pnpm install --frozen-lockfile --loglevel=error --config.confirmModulesPurge=false
 
+echo "🔎 Installing the Codacy MCP server..."
+pnpm run setup:codacy-mcp
+
 # cleanup
 sudo apt-get autoremove --purge -y

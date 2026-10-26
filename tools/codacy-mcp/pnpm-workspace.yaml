@@ -1,0 +1,5 @@
+# Its own workspace root, so the root workspace never installs this tree.
+allowBuilds:
+  # usage telemetry
+  '@scarf/scarf': false
+  unrs-resolver: false

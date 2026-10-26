@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "roslynator.dotnet.cli": {
-      "version": "1.0.0",
+      "version": "1.0.1",
       "commands": [
         "roslynator"
       ],
@@ -13,13 +13,6 @@
       "version": "4.8.1",
       "commands": [
         "dotnet-outdated"
-      ],
-      "rollForward": true
-    },
-    "swashbuckle.aspnetcore.cli": {
-      "version": "10.2.3",
-      "commands": [
-        "swagger"
       ],
       "rollForward": true
     },

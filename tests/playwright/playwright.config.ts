@@ -53,7 +53,7 @@ export default defineConfig({
         reactSite,
         {
           command:
-            "pnpm --filter @stock-charts/vitepress-example run build && pnpm --filter @stock-charts/vitepress-example run preview:test",
+            "pnpm --filter @stock-charts/vitepress-example run build:libs && pnpm --filter @stock-charts/vitepress-example run build && pnpm --filter @stock-charts/vitepress-example run preview:test",
           url: "http://localhost:4302",
           cwd: workspaceRoot,
           reuseExistingServer: !process.env["CI"],

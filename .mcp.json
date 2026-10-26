@@ -2,8 +2,8 @@
   "mcpServers": {
     "codacy": {
       "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@codacy/codacy-mcp@latest"],
+      "command": "node",
+      "args": ["scripts/codacy-mcp.mjs"],
       "env": {
         "CODACY_ACCOUNT_TOKEN": "${CODACY_ACCOUNT_TOKEN}"
       }
