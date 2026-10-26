@@ -864,7 +864,11 @@ describe("SettingsDialog", () => {
       fireEvent.click(screen.getByRole("button", { name: "A to Z" }));
 
       const list = screen.getByRole("list", { name: "Available indicators, A to Z" });
-      expect(within(list).getAllByRole("listitem").map(item => item.textContent)).toEqual([
+      expect(
+        within(list)
+          .getAllByRole("listitem")
+          .map(item => item.textContent)
+      ).toEqual([
         "Average Directional IndexOscillators",
         "Relative Strength IndexOscillators",
         "Simple Moving AverageMoving averages"

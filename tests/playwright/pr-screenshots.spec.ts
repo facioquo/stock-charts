@@ -90,6 +90,16 @@ const SCENES: { name: string; open?: (page: Page) => Promise<void> }[] = [
     }
   },
   {
+    name: "indicators-a-to-z",
+    open: async page => {
+      await page.getByRole("button", { name: "edit settings" }).click();
+      const order = page.getByRole("button", { name: "A to Z" });
+      await order.click();
+      await order.scrollIntoViewIfNeeded();
+      await expect(page.getByRole("list", { name: "Available indicators, A to Z" })).toBeVisible();
+    }
+  },
+  {
     name: "indicator-settings",
     open: async page => {
       await page.getByRole("button", { name: "edit settings" }).click();
@@ -115,7 +125,9 @@ test.describe("PR screenshots", () => {
   for (const { name, open } of SCENES) {
     test(name, async ({ page }) => {
       await page.goto("/");
-      await expect(page.getByText("Showing saved data")).toBeVisible({ timeout: 15_000 });
+      await expect(page.getByRole("button", { name: "Live API unreachable" })).toBeVisible({
+        timeout: 15_000
+      });
       await chartSettled(page);
       await redrawWithFonts(page);
       // Opening a dialog can load another font and redraw the charts behind it.

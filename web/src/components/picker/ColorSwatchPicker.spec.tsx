@@ -13,7 +13,9 @@ describe("ColorSwatchPicker", () => {
   it("emits hex input edits verbatim", () => {
     const onChange = vi.fn();
     render(<ColorSwatchPicker value="#1E88E5" presetColors={presetColors} onChange={onChange} />);
-    fireEvent.change(screen.getByRole("textbox", { name: "Color" }), { target: { value: "#abcabc" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Color" }), {
+      target: { value: "#abcabc" }
+    });
     expect(onChange).toHaveBeenCalledWith("#abcabc");
   });
 

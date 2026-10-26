@@ -75,7 +75,8 @@ export function baseOscillatorOptions(settings: ChartSettings): ChartOptions {
     // condense large values in one unit for the whole axis, so 5M and 15M are
     // not labelled 5000K and 15M
     const unit = axisUnit(values);
-    if (unit && numValue !== 0) return `${Number((numValue / unit.divisor).toFixed(2))}${unit.suffix}`;
+    if (unit && numValue !== 0)
+      return `${Number((numValue / unit.divisor).toFixed(2))}${unit.suffix}`;
     // otherwise, condense small display values
     else if (v > 10) return Math.trunc(numValue);
     else if (v > 0.001) return Math.round((numValue + Number.EPSILON) * 100000) / 100000;

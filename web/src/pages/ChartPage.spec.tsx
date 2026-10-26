@@ -100,7 +100,9 @@ describe("ChartPage", () => {
 
     const warning = screen.getByRole("button", { name: "Live API unreachable" });
     expect(warning).toHaveAccessibleDescription(/live API is unreachable/);
-    expect(screen.getByText(/Showing saved data/, { selector: "[role=status]" })).toBeInTheDocument();
+    expect(
+      screen.getByText(/Showing saved data/, { selector: "[role=status]" })
+    ).toBeInTheDocument();
     expect(screen.queryByRole("region")).toBeNull();
   });
 
