@@ -1,50 +1,30 @@
 {
-  "name": "Dev Container",
+  "name": "stock-charts",
   "image": "mcr.microsoft.com/devcontainers/base:bookworm",
   "features": {
     "ghcr.io/devcontainers/features/node:2": {
-      "version": "24"
+      "version": "lts"
     },
     "ghcr.io/devcontainers/features/dotnet:2": {
       "version": "10.0"
     },
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers/features/copilot-cli:1": {},
-    // wrangler builds and runs the API container image locally
-    "ghcr.io/devcontainers/features/docker-in-docker:4": {},
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "installZsh": true,
-      "installOhMyZsh": true,
-      "upgradePackages": true,
-      "username": "vscode",
-      "userUid": "automatic",
-      "userGid": "automatic"
-    },
-    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:4": {}
   },
   "customizations": {
     "vscode": {
       "extensions": [
-        "christian-kohler.npm-intellisense",
-        "dbaeumer.vscode-eslint",
         "DavidAnson.vscode-markdownlint",
-        "dotjoshjohnson.xml",
+        "DotJoshJohnson.xml",
         "EditorConfig.EditorConfig",
         "esbenp.prettier-vscode",
         "GitHub.vscode-github-actions",
-        "mikestead.dotenv",
-        "ms-azuretools.vscode-containers",
         "ms-dotnettools.csdevkit",
         "ms-playwright.playwright",
-        "redhat.vscode-yaml",
-        "vitest.explorer"
+        "redhat.vscode-yaml"
       ],
       "settings": {
-        "chat.tools.global.autoApprove": true,
-        "dotnet.defaultSolution": "Charts.sln",
-        "editor.formatOnSave": true,
-        "terminal.integrated.allowInUntrustedWorkspace": true,
-        "terminal.integrated.defaultProfile.linux": "bash"
+        "dotnet.defaultSolution": "Charts.sln"
       }
     }
   },
@@ -52,6 +32,6 @@
     "DISABLE_TELEMETRY": "1",
     "DOTNET_CLI_TELEMETRY_OPTOUT": "1"
   },
-  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "postCreateCommand": ".devcontainer/post-create.sh",
   "remoteUser": "vscode"
 }
