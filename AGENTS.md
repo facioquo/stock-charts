@@ -204,6 +204,7 @@ public class Service
 ## Technology conventions
 
 - **React v19**: hooks-based state, functional components, strict mode
+- **Primer React**: every control in the React demo is a stock `@primer/react` component, with `@primer/octicons-react` icons and `@primer/primitives` tokens
 - **Vite v8**: dev server and production bundler for the React frontend
 - **pnpm packages**: pnpm workspace dependency management
 - **NuGet**: centralized NuGet package management
@@ -214,6 +215,9 @@ public class Service
 ### Frontend architecture
 
 - **React v19 + Vite v8**: Functional components, hooks-based state, hot module replacement (HMR) dev server
+- **Primer React**: `PrimerRoot` wraps the app in Primer's `ThemeProvider` and `BaseStyles`, following the site's dark/light switch.
+  - Controls take Primer's colors as shipped. The site theme (`--bg`, `--text`, …) colors only the page, the title block, the site's own text, and the charts.
+  - Only public Primer packages are used, so anyone can contribute.
 - **TypeScript**: Strict mode enabled, comprehensive type safety
 - **Chart.js v4+**: Financial chart types in `libs/chartjs-financial/`; bundled into `@facioquo/indy-charts` dist
 - **React Router v7**: Client-side routing

@@ -1,20 +1,16 @@
 import {
-  createContext,
-  useContext,
   useEffect,
   useId,
   useLayoutEffect,
   useReducer,
   useRef,
   useState,
-  type Dispatch,
-  type PropsWithChildren,
-  type RefObject,
-  type UIEventHandler
+  type Dispatch
 } from "react";
 import { flushSync } from "react-dom";
 import {
   ActionList,
+  ActionMenu,
   Banner,
   Button,
   Checkbox,
@@ -22,21 +18,32 @@ import {
   Heading,
   IconButton,
   Link,
+  SegmentedControl,
   Stack,
   Text,
   TextInput,
-  ToggleSwitch
+  ToggleSwitch,
+  VisuallyHidden
 } from "@primer/react";
-import { GrabberIcon, LinkIcon, PencilIcon, SearchIcon } from "@primer/octicons-react";
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  GrabberIcon,
+  LinkIcon,
+  PencilIcon,
+  SearchIcon
+} from "@primer/octicons-react";
 
 import type { ChartController } from "../../charting/chartController";
-import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
+import type { IndicatorListing, IndicatorSelection, ListingOrder } from "../../types/chart.types";
 import {
+  changeListingOrder,
   changeSeriesLegend,
   changeTheme,
   changeTooltips,
   getSettings
 } from "../../services/userPrefs";
+import { categoryLabel } from "./categoryLabel";
 import { filterListings, groupByCategory, type ListingGroup } from "./listingFilter";
 
 interface SettingsDialogProps {
@@ -78,7 +85,10 @@ function orderWithRestored(current: string[], before: string[], restored: string
   return order;
 }
 
-/** A labelled on/off switch in the general-settings list, laid out as Primer documents it. */
+/**
+ * A labelled on/off switch in the general-settings list, laid out as Primer documents it.
+ * The switch is a button, which a `<label>` cannot target, so the words toggle it by click.
+ */
 function ToggleRow({ label, checked, onChange }: ToggleRowProps): React.JSX.Element {
   const labelId = useId();
   return (
@@ -90,7 +100,14 @@ function ToggleRow({ label, checked, onChange }: ToggleRowProps): React.JSX.Elem
       wrap="wrap"
       gap="condensed"
     >
-      <Text id={labelId} weight="semibold">
+      <Text
+        id={labelId}
+        weight="semibold"
+        className="toggle-label"
+        onClick={() => {
+          onChange(!checked);
+        }}
+      >
         {label}
       </Text>
       <ToggleSwitch aria-labelledby={labelId} checked={checked} onChange={onChange} />
@@ -132,7 +149,16 @@ function SelectionGroup({
   const [draggedUcid, setDraggedUcid] = useState<string | null>(null);
   /** Gap the dragged row would land in: 0 is above the first row, `length` below the last. */
   const [dropGap, setDropGap] = useState<number | null>(null);
+  const [moveStatus, setMoveStatus] = useState("");
   if (selections.length === 0) return null;
+
+  /** Moves a row one place and says where it went; a row already at that end stays put. */
+  const moveOne = (selection: IndicatorSelection, index: number, offset: -1 | 1): void => {
+    const target = index + offset;
+    if (target < 0 || target >= selections.length) return;
+    onMove(selection.ucid, offset);
+    setMoveStatus(`${selection.label} moved to ${target + 1} of ${selections.length}`);
+  };
 
   const draggedIndex = selections.findIndex(selection => selection.ucid === draggedUcid);
   // The gaps on either side of the dragged row leave it where it is.
@@ -202,29 +228,62 @@ function SelectionGroup({
               endDrag();
             }}
           >
-            <IconButton
-              icon={GrabberIcon}
-              variant="invisible"
-              className="drag-handle"
-              aria-label={`reorder ${selection.label}`}
-              aria-keyshortcuts="ArrowUp ArrowDown"
-              description="Drag to reorder, or use the arrow keys"
-              draggable
-              onDragStart={event => {
-                event.dataTransfer.effectAllowed = "move";
-                event.dataTransfer.setData("text/plain", selection.ucid);
-                setDraggedUcid(selection.ucid);
-              }}
-              onDragEnd={endDrag}
-              onKeyDown={event => {
-                if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
-                event.preventDefault();
-                const handle = event.currentTarget;
-                onMove(selection.ucid, event.key === "ArrowUp" ? -1 : 1);
-                // React may move this row's node, which drops focus to <body>.
-                handle.focus();
-              }}
-            />
+            {/* Drag it, press the arrow keys on it, or tap it for a move menu: a tap needs no
+                drag, which touch and switch users may not have. The arrow handler prevents
+                the default, so the menu does not also open on an arrow key. */}
+            <ActionMenu>
+              <ActionMenu.Anchor>
+                <IconButton
+                  icon={GrabberIcon}
+                  variant="invisible"
+                  className="drag-handle"
+                  aria-label={`reorder ${selection.label}`}
+                  aria-keyshortcuts="ArrowUp ArrowDown"
+                  description="Drag, use the arrow keys, or select to move"
+                  draggable
+                  onDragStart={event => {
+                    event.dataTransfer.effectAllowed = "move";
+                    event.dataTransfer.setData("text/plain", selection.ucid);
+                    setDraggedUcid(selection.ucid);
+                  }}
+                  onDragEnd={endDrag}
+                  onKeyDown={event => {
+                    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+                    event.preventDefault();
+                    const handle = event.currentTarget;
+                    moveOne(selection, index, event.key === "ArrowUp" ? -1 : 1);
+                    // React may move this row's node, which drops focus to <body>.
+                    handle.focus();
+                  }}
+                />
+              </ActionMenu.Anchor>
+              <ActionMenu.Overlay>
+                <ActionList aria-label={`move ${selection.label}`}>
+                  <ActionList.Item
+                    disabled={index === 0}
+                    onSelect={() => {
+                      moveOne(selection, index, -1);
+                    }}
+                  >
+                    <ActionList.LeadingVisual>
+                      <ArrowUpIcon />
+                    </ActionList.LeadingVisual>
+                    Move up
+                  </ActionList.Item>
+                  <ActionList.Item
+                    disabled={index === selections.length - 1}
+                    onSelect={() => {
+                      moveOne(selection, index, 1);
+                    }}
+                  >
+                    <ActionList.LeadingVisual>
+                      <ArrowDownIcon />
+                    </ActionList.LeadingVisual>
+                    Move down
+                  </ActionList.Item>
+                </ActionList>
+              </ActionMenu.Overlay>
+            </ActionMenu>
             <label htmlFor={`select-${selection.ucid}`}>{selection.label}</label>
             <IconButton
               icon={PencilIcon}
@@ -238,11 +297,14 @@ function SelectionGroup({
               id={`select-${selection.ucid}`}
               aria-label={`select ${selection.label}`}
               checked={checked.has(selection.ucid)}
-              onChange={() => onToggle(selection.ucid)}
+              onChange={() => {
+                onToggle(selection.ucid);
+              }}
             />
           </li>
         ))}
       </ul>
+      <VisuallyHidden role="status">{moveStatus}</VisuallyHidden>
     </>
   );
 }
@@ -290,7 +352,9 @@ function DisplayedIndicators({
         <Checkbox
           aria-label="select all displayed indicators"
           checked={checked.size > 0 && checked.size === selections.length}
-          onChange={event => onSelectAll(event.target.checked)}
+          onChange={event => {
+            onSelectAll(event.target.checked);
+          }}
         />
       </div>
       <Text as="p" size="small" role="status" className="copy-link-status">
@@ -329,10 +393,16 @@ interface AvailableIndicatorsProps {
   onFilterChange?: Dispatch<string>;
 }
 
+const listingOrders: readonly { value: ListingOrder; label: string }[] = [
+  { value: "category", label: "By category" },
+  { value: "name", label: "A to Z" }
+];
+
 /**
  * List of available indicators that open the {@link PickConfigDialog}, narrowed by a
- * filter box that matches name, id, and category, and grouped under category headings.
- * Enter picks the first match shown.
+ * filter box that matches name, id, and category. Grouped under category headings, or
+ * listed A to Z with each category beneath its name, as the visitor last chose. Enter
+ * picks the first match shown.
  */
 function AvailableIndicators({
   listings,
@@ -341,8 +411,11 @@ function AvailableIndicators({
   onFilterChange
 }: AvailableIndicatorsProps): React.JSX.Element {
   const [filter, setFilter] = useState(initialFilter);
+  const [order, setOrder] = useState(getSettings().listingOrder);
   const matches = filterListings(listings, filter);
   const groups = groupByCategory(matches);
+  const alphabetical = [...matches].sort((a, b) => a.name.localeCompare(b.name));
+  const firstShown = order === "name" ? alphabetical[0] : groups[0]?.listings[0];
   const filtering = filter.trim() !== "";
   const changeFilter = (value: string): void => {
     setFilter(value);
@@ -381,24 +454,56 @@ function AvailableIndicators({
           }}
           onKeyDown={event => {
             if (event.key !== "Enter") return;
-            const first = groups[0]?.listings[0];
-            if (filtering && first) {
+            if (filtering && firstShown) {
               event.preventDefault();
-              onPick(first);
+              onPick(firstShown);
             }
           }}
         />
-        <Text size="small" aria-live="polite" className="listing-filter-status muted-text">
-          {filtering
-            ? matches.length === 0
-              ? "No indicators match"
-              : `${matches.length} of ${listings.length} indicators`
-            : ""}
-        </Text>
+        <div className="listing-filter-footer">
+          <SegmentedControl
+            aria-label="Order available indicators"
+            size="small"
+            onChange={selectedIndex => {
+              const next = selectedIndex === 1 ? "name" : "category";
+              setOrder(next);
+              changeListingOrder(next);
+            }}
+          >
+            {listingOrders.map(option => (
+              <SegmentedControl.Button key={option.value} selected={order === option.value}>
+                {option.label}
+              </SegmentedControl.Button>
+            ))}
+          </SegmentedControl>
+          <Text size="small" aria-live="polite" className="muted-text">
+            {filtering
+              ? matches.length === 0
+                ? "No indicators match"
+                : `${matches.length} of ${listings.length} indicators`
+              : ""}
+          </Text>
+        </div>
       </div>
-      {groups.map(group => (
-        <ListingCategory key={group.category} group={group} onPick={onPick} />
-      ))}
+      {order === "name" ? (
+        <ActionList aria-label="Available indicators, A to Z">
+          {alphabetical.map(listing => (
+            <ActionList.Item
+              key={listing.uiid}
+              onSelect={() => {
+                onPick(listing);
+              }}
+            >
+              {listing.name}
+              <ActionList.Description variant="block">
+                {categoryLabel(listing.category)}
+              </ActionList.Description>
+            </ActionList.Item>
+          ))}
+        </ActionList>
+      ) : (
+        groups.map(group => <ListingCategory key={group.category} group={group} onPick={onPick} />)
+      )}
     </section>
   );
 }
@@ -421,33 +526,17 @@ function ListingCategory({
       </div>
       <ActionList aria-labelledby={headingId}>
         {group.listings.map(listing => (
-          <ActionList.Item key={listing.uiid} onSelect={() => onPick(listing)}>
+          <ActionList.Item
+            key={listing.uiid}
+            onSelect={() => {
+              onPick(listing);
+            }}
+          >
             {listing.name}
           </ActionList.Item>
         ))}
       </ActionList>
     </>
-  );
-}
-
-interface ScrollBody {
-  ref: RefObject<HTMLDivElement | null>;
-  onScroll: UIEventHandler<HTMLDivElement>;
-}
-
-const ScrollBodyContext = createContext<ScrollBody | null>(null);
-
-/**
- * The dialog's scrolling body, with its ref and scroll handler from context so the
- * position survives a reopen. Module-level, so `renderBody` keeps one identity and
- * the content below it is not remounted on every render.
- */
-function ScrollRestoringBody({ children }: PropsWithChildren): React.JSX.Element {
-  const scroll = useContext(ScrollBodyContext);
-  return (
-    <Dialog.Body ref={scroll?.ref} className="settings-body" onScroll={scroll?.onScroll}>
-      {children}
-    </Dialog.Body>
   );
 }
 
@@ -463,8 +552,15 @@ interface SettingsControls {
   selectAll: (value: boolean) => void;
   removeSelected: () => void;
   /** Result line after a removal, with what undo needs; null when nothing was removed. */
-  removal: { text: string; undo?: () => void } | null;
+  removal: Removal | null;
   moveSelection: ChartController["moveSelection"];
+}
+
+interface Removal {
+  text: string;
+  /** Set when an undo failed for some or all indicators; otherwise the result is information. */
+  tone?: "warning" | "critical";
+  undo?: () => void;
 }
 
 /** State + handlers backing the settings dialog (theme, tooltips, series legend, selection). */
@@ -539,16 +635,21 @@ function useSettingsControls(controller: ChartController): SettingsControls {
             );
             const skipped = removed.length - restores.length;
             const failed = skipped + results.filter(r => r.status === "rejected").length;
-            setRemoval({
-              text:
-                failed === 0
-                  ? removed.length === 1
-                    ? `Restored ${removed[0]?.label}`
-                    : `Restored ${removed.length} indicators`
-                  : failed === removed.length
-                    ? "Could not restore the removed indicators"
-                    : `Restored ${removed.length - failed} of ${removed.length} indicators`
-            });
+            setRemoval(
+              failed === 0
+                ? {
+                    text:
+                      removed.length === 1
+                        ? `Restored ${removed[0]?.label}`
+                        : `Restored ${removed.length} indicators`
+                  }
+                : failed === removed.length
+                  ? { text: "Could not restore the removed indicators", tone: "critical" }
+                  : {
+                      text: `Restored ${removed.length - failed} of ${removed.length} indicators`,
+                      tone: "warning"
+                    }
+            );
             forceUpdate();
           });
         }
@@ -608,24 +709,26 @@ export function SettingsDialog({
     setAnnounced(notice);
   }, [notice]);
   const status = controls.removal?.text ?? announced;
-
-  const scrollBody: ScrollBody = {
-    ref: bodyRef,
-    onScroll: event => {
-      onScrollChange?.(event.currentTarget.scrollTop);
-    }
-  };
+  const tone = controls.removal?.tone;
 
   return (
-    <ScrollBodyContext.Provider value={scrollBody}>
-      <Dialog title="Chart settings" onClose={onClose} renderBody={ScrollRestoringBody}>
+    <Dialog title="Chart settings" onClose={onClose}>
+      {/* A direct child fills Dialog's body slot, ref and scroll handler included, so the
+          position survives the reopen after an add. */}
+      <Dialog.Body
+        ref={bodyRef}
+        className="settings-body"
+        onScroll={event => {
+          onScrollChange?.(event.currentTarget.scrollTop);
+        }}
+      >
         {/* Mounted before it has text, so a screen reader announces the result when it fills. */}
         <div aria-live="polite" className="settings-status">
           {status && (
             <Banner
-              title="Result"
+              title={tone ? "Indicator restore problem" : "Indicator update"}
               hideTitle
-              variant="info"
+              variant={tone ?? "info"}
               description={status}
               primaryAction={
                 controls.removal?.undo && (
@@ -672,7 +775,7 @@ export function SettingsDialog({
           initialFilter={initialFilter}
           onFilterChange={onFilterChange}
         />
-      </Dialog>
-    </ScrollBodyContext.Provider>
+      </Dialog.Body>
+    </Dialog>
   );
 }

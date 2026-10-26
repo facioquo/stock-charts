@@ -1,7 +1,7 @@
-import type { UserSettings } from "../types/chart.types";
+import type { ListingOrder, UserSettings } from "../types/chart.types";
 
 /**
- * Persists theme / tooltip / series legend preferences in
+ * Persists theme / tooltip / series legend / listing order preferences in
  * localStorage and applies the theme class to `document.body`. Module-level
  * singleton.
  */
@@ -10,7 +10,12 @@ const STORAGE_KEY = "settings";
 const TOOLTIPS_CHOSEN_KEY = "settings.tooltipsChosen";
 const isBrowser = typeof window !== "undefined";
 
-const defaults: UserSettings = { isDarkTheme: true, showTooltips: false, showSeriesLegend: false };
+const defaults: UserSettings = {
+  isDarkTheme: true,
+  showTooltips: false,
+  showSeriesLegend: false,
+  listingOrder: "category"
+};
 
 let current: UserSettings = { ...defaults };
 const themeListeners = new Set<() => void>();
@@ -48,6 +53,7 @@ export function loadSettings(): void {
   }
 
   if (!tooltipsChosen()) current.showTooltips = defaults.showTooltips;
+  if (current.listingOrder !== "name") current.listingOrder = defaults.listingOrder;
 
   changeTheme(current.isDarkTheme);
   cacheSettings();
@@ -87,6 +93,11 @@ export function changeSeriesLegend(showSeriesLegend: boolean): void {
   current.showSeriesLegend = showSeriesLegend;
   cacheSettings();
   // The chart controller redraws the legends (theme update).
+}
+
+export function changeListingOrder(listingOrder: ListingOrder): void {
+  current.listingOrder = listingOrder;
+  cacheSettings();
 }
 
 function cacheSettings(): void {

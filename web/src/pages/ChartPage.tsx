@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Banner, Button, IconButton } from "@primer/react";
-import { CloudOfflineIcon, LinkIcon, PencilIcon } from "@primer/octicons-react";
+import { Banner, Button, IconButton, VisuallyHidden } from "@primer/react";
+import { AlertIcon, CloudOfflineIcon, LinkIcon, PencilIcon } from "@primer/octicons-react";
 
 import { env } from "../config/env";
 import { getChartController, useChartState } from "../charting/useChart";
@@ -8,6 +8,9 @@ import { SettingsDialog } from "../components/picker/SettingsDialog";
 import { PickConfigDialog } from "../components/picker/PickConfigDialog";
 import type { IndicatorListing, IndicatorSelection } from "../types/chart.types";
 import "../components/picker/picker.scss";
+
+const OFFLINE_NOTICE =
+  "The live API is unreachable. Showing saved data; indicators with custom settings may be blank.";
 
 /**
  * Main chart page. Ports `ChartComponent`: bootstraps the overlay chart,
@@ -139,16 +142,20 @@ export function ChartPage(): React.JSX.Element {
       )}
 
       {/* Mounted before it has text, so a screen reader announces the notice when it fills. */}
-      <div role="status" className="page-banner">
-        {offline && !apiError && (
-          <Banner
-            title="Offline"
-            hideTitle
-            variant="warning"
-            description="The live API is unreachable. Showing saved data; indicators with custom settings may be blank."
+      <VisuallyHidden role="status">{offline && !apiError ? OFFLINE_NOTICE : ""}</VisuallyHidden>
+      {/* In the header beside the settings button, but scrolls away with the page. */}
+      {offline && !apiError && !loading && (
+        <div className="offline-indicator">
+          <IconButton
+            icon={AlertIcon}
+            variant="invisible"
+            size="large"
+            className="offline-icon"
+            aria-label="Live API unreachable"
+            description={OFFLINE_NOTICE}
           />
-        )}
-      </div>
+        </div>
+      )}
 
       {/* The status region stays mounted so a screen reader announces its text when it fills. */}
       <div role="status" className="page-banner">

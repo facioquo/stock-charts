@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  changeListingOrder,
   changeSeriesLegend,
   changeTheme,
   changeTooltips,
@@ -30,13 +31,19 @@ describe("userPrefs", () => {
       expect(getSettings()).toEqual({
         isDarkTheme: true,
         showTooltips: false,
-        showSeriesLegend: false
+        showSeriesLegend: false,
+        listingOrder: "category"
       });
       expect(localStorage.getItem("settings")).toBeTruthy();
     });
 
     it("loads cached settings when they exist", () => {
-      const cached = { isDarkTheme: false, showTooltips: true, showSeriesLegend: true };
+      const cached = {
+        isDarkTheme: false,
+        showTooltips: true,
+        showSeriesLegend: true,
+        listingOrder: "name"
+      };
       localStorage.setItem("settings", JSON.stringify(cached));
       localStorage.setItem("settings.tooltipsChosen", "true");
 
@@ -53,7 +60,8 @@ describe("userPrefs", () => {
       expect(getSettings()).toEqual({
         isDarkTheme: false,
         showTooltips: false,
-        showSeriesLegend: false
+        showSeriesLegend: false,
+        listingOrder: "category"
       });
     });
 
@@ -164,6 +172,26 @@ describe("userPrefs", () => {
         showSeriesLegend: boolean;
       };
       expect(parsed.showSeriesLegend).toBe(true);
+    });
+  });
+
+  describe("changeListingOrder", () => {
+    it("updates and caches the listing order", () => {
+      changeListingOrder("name");
+
+      expect(getSettings().listingOrder).toBe("name");
+      const parsed = JSON.parse(localStorage.getItem("settings") as string) as {
+        listingOrder: string;
+      };
+      expect(parsed.listingOrder).toBe("name");
+    });
+
+    it("lists by category when a stored order is not one the dialog knows", () => {
+      localStorage.setItem("settings", JSON.stringify({ listingOrder: "newest" }));
+
+      loadSettings();
+
+      expect(getSettings().listingOrder).toBe("category");
     });
   });
 });

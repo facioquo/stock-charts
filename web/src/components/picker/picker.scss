@@ -6,17 +6,34 @@
  * theme.
  */
 
-/* SETTINGS BUTTON: pinned to the chart's top-right corner while the page scrolls. */
+/* SETTINGS BUTTON: pinned to the chart's top-right corner while the page scrolls. The
+   column runs the page's height, so it lets clicks through to the charts beside the
+   button, and sits above the chart canvases that follow it. */
 .fab-container {
   position: absolute;
   top: -56px;
   right: 8px;
+  z-index: 1;
   height: 100%;
+  pointer-events: none;
 }
 
 .fab {
   position: sticky;
   top: 8px;
+  pointer-events: auto;
+}
+
+/* Offline warning: in the header, left of the settings button, scrolling with the page. */
+.offline-indicator {
+  position: absolute;
+  top: -48px;
+  right: calc(8px + var(--base-size-40) + var(--base-size-8));
+  z-index: 1;
+}
+
+.offline-icon {
+  color: var(--fgColor-attention);
 }
 
 /* Site-level notices above the chart; empty regions take no space. */
@@ -37,6 +54,10 @@
 
 .muted-text {
   color: var(--fgColor-muted);
+}
+
+.toggle-label {
+  cursor: pointer;
 }
 
 .dialog-section-header {
@@ -173,8 +194,12 @@
   background-color: var(--overlay-bgColor);
 }
 
-.listing-filter-status {
-  align-self: flex-end;
+.listing-filter-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--base-size-8);
   min-height: 1.5em;
 }
 
@@ -182,6 +207,12 @@
 .param-container {
   max-width: 220px;
   margin: 0 auto;
+}
+
+/* The space Primer's validation line takes (its top margin and one small line), held
+   free while the field is valid. Nested to outrank Primer's own layout class. */
+.param-container .reserve-validation {
+  padding-bottom: calc(var(--base-size-4) + var(--base-size-16));
 }
 
 .style-inputs {

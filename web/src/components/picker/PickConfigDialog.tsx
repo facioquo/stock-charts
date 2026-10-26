@@ -63,8 +63,6 @@ interface DialogTabsProps {
   onSelect: (tab: TabId) => void;
 }
 
-const TAB_IDS: readonly TabId[] = ["params", "styles"];
-
 /** Switches between the params and styles panels, when the indicator has both. */
 function DialogTabs({ tab, onSelect }: DialogTabsProps): React.JSX.Element {
   return (
@@ -72,8 +70,7 @@ function DialogTabs({ tab, onSelect }: DialogTabsProps): React.JSX.Element {
       aria-label="Indicator settings"
       fullWidth
       onChange={index => {
-        const next = TAB_IDS[index];
-        if (next) onSelect(next);
+        onSelect(index === 0 ? "params" : "styles");
       }}
     >
       <SegmentedControl.Button selected={tab === "params"}>Params</SegmentedControl.Button>
@@ -94,7 +91,9 @@ function ParamsPanel({ params, onUpdate }: ParamsPanelProps): React.JSX.Element 
       {params.map((p, i) => {
         const invalid = paramInvalid(p);
         return (
-          <FormControl key={p.paramName}>
+          // A valid field keeps the error line's height free, so showing it does not
+          // move the fields below while the visitor types.
+          <FormControl key={p.paramName} className={invalid ? undefined : "reserve-validation"}>
             <FormControl.Label>{p.displayName}</FormControl.Label>
             <TextInput
               type="number"
@@ -104,7 +103,9 @@ function ParamsPanel({ params, onUpdate }: ParamsPanelProps): React.JSX.Element 
               validationStatus={invalid ? "error" : undefined}
               aria-invalid={invalid}
               value={p.value ?? ""}
-              onChange={event => onUpdate(i, event.target.value)}
+              onChange={event => {
+                onUpdate(i, event.target.value);
+              }}
             />
             {invalid && (
               <FormControl.Validation variant="error">
@@ -142,7 +143,13 @@ function LabeledSelect({
   return (
     <FormControl disabled={disabled}>
       <FormControl.Label>{label}</FormControl.Label>
-      <Select value={String(value)} disabled={disabled} onChange={e => onChange(e.target.value)}>
+      <Select
+        value={String(value)}
+        disabled={disabled}
+        onChange={event => {
+          onChange(event.target.value);
+        }}
+      >
         {options.map(option => (
           <Select.Option key={option.value} value={String(option.value)}>
             {option.name}
@@ -363,7 +370,8 @@ export function PickConfigDialog({
       title={listing.name}
       onClose={() => void requestClose()}
       footerButtons={[
-        { content: "Cancel", onClick: () => void requestClose() },
+        // Cancel is an explicit choice to leave, so only Escape, X and the backdrop ask.
+        { content: "Cancel", onClick: onClose },
         {
           content: cfg.closeLabel,
           buttonType: "primary",

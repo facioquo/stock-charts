@@ -7,13 +7,13 @@ import { presetColors } from "../../charting/indicatorStyles";
 describe("ColorSwatchPicker", () => {
   it("renders the current hex value", () => {
     render(<ColorSwatchPicker value="#1E88E5" presetColors={presetColors} onChange={vi.fn()} />);
-    expect(screen.getByRole("textbox")).toHaveValue("#1E88E5");
+    expect(screen.getByRole("textbox", { name: "Color" })).toHaveValue("#1E88E5");
   });
 
   it("emits hex input edits verbatim", () => {
     const onChange = vi.fn();
     render(<ColorSwatchPicker value="#1E88E5" presetColors={presetColors} onChange={onChange} />);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "#abcabc" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Color" }), { target: { value: "#abcabc" } });
     expect(onChange).toHaveBeenCalledWith("#abcabc");
   });
 
@@ -37,15 +37,19 @@ describe("ColorSwatchPicker", () => {
 
   it("flags an invalid hex value", () => {
     render(<ColorSwatchPicker value="nope" presetColors={presetColors} onChange={vi.fn()} />);
-    expect(screen.getByText("Invalid HEX color")).toBeInTheDocument();
-    expect(screen.getByRole("textbox")).toHaveAttribute("aria-invalid", "true");
+    const field = screen.getByRole("textbox", { name: "Color" });
+    expect(field).toHaveAttribute("aria-invalid", "true");
+    const describedBy = (field.getAttribute("aria-describedby") ?? "").split(" ");
+    expect(describedBy.map(id => document.getElementById(id)?.textContent)).toContain(
+      "Invalid HEX color"
+    );
   });
 
   it("disables interaction when disabled", () => {
     render(
       <ColorSwatchPicker value="#1E88E5" presetColors={presetColors} disabled onChange={vi.fn()} />
     );
-    expect(screen.getByRole("textbox")).toBeDisabled();
+    expect(screen.getByRole("textbox", { name: "Color" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "choose color" })).toBeDisabled();
   });
 });

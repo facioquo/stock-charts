@@ -14,7 +14,11 @@ export type {
   Bar
 } from "@facioquo/indy-charts";
 
+/** How the settings dialog lists available indicators: under category headings, or A to Z. */
+export type ListingOrder = "category" | "name";
+
 /** Settings the demo saves; the series legend choice is always set here. */
 export interface UserSettings extends ChartSettings {
   showSeriesLegend: boolean;
+  listingOrder: ListingOrder;
 }

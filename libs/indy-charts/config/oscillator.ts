@@ -1,4 +1,9 @@
-import { type CartesianScaleOptions, type ChartConfiguration, type ChartOptions } from "chart.js";
+import {
+  type CartesianScaleOptions,
+  type ChartConfiguration,
+  type ChartOptions,
+  type Tick
+} from "chart.js";
 
 import { type ChartSettings } from "./types";
 import { baseChartOptions } from "./common";
@@ -15,6 +20,22 @@ import { baseChartOptions } from "./common";
  * enough ticks to spare the bounds. See issue #495.
  */
 const MIN_TICKS_TO_TRIM_BOUNDS = 4;
+
+/** Suffixes for large axis labels, largest first. */
+const AXIS_UNITS = [
+  { divisor: 1_000_000_000, suffix: "B" },
+  { divisor: 1_000_000, suffix: "M" },
+  { divisor: 1_000, suffix: "K" }
+] as const;
+
+/**
+ * The unit for every label on an axis: the largest one its biggest tick reaches, so a
+ * pane spanning 3 billion reads 1B to 3B rather than 1000M to 3000M. None below 1,000.
+ */
+function axisUnit(values: readonly Tick[]): (typeof AXIS_UNITS)[number] | undefined {
+  const largest = Math.max(0, ...values.map(tick => Math.abs(tick.value)));
+  return AXIS_UNITS.find(unit => largest >= unit.divisor);
+}
 
 export function baseOscillatorConfig(settings: ChartSettings): ChartConfiguration {
   const config: ChartConfiguration = {
@@ -50,10 +71,12 @@ export function baseOscillatorOptions(settings: ChartSettings): ChartOptions {
     // axis range is still readable (issue #495).
     if (values.length >= MIN_TICKS_TO_TRIM_BOUNDS && (index === 0 || index === values.length - 1))
       return null;
-    // otherwise, condense large/small display values
-    else if (v > 10000000000) return Math.trunc(numValue / 1000000000) + "B";
-    else if (v > 10000000) return Math.trunc(numValue / 1000000) + "M";
-    else if (v > 10000) return Math.trunc(numValue / 1000) + "K";
+
+    // condense large values in one unit for the whole axis, so 5M and 15M are
+    // not labelled 5000K and 15M
+    const unit = axisUnit(values);
+    if (unit && numValue !== 0) return `${Number((numValue / unit.divisor).toFixed(2))}${unit.suffix}`;
+    // otherwise, condense small display values
     else if (v > 10) return Math.trunc(numValue);
     else if (v > 0.001) return Math.round((numValue + Number.EPSILON) * 100000) / 100000;
     else if (v > 0) return numValue.toExponential(2);

@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { ActionList, ActionMenu, FormControl, IconButton, Stack, TextInput } from "@primer/react";
 import { PaintbrushIcon } from "@primer/octicons-react";
 
@@ -33,19 +34,27 @@ export function ColorSwatchPicker({
   onChange
 }: ColorSwatchPickerProps): React.JSX.Element {
   const invalid = !isValidHexColor(value);
+  // FormControl wires only a direct-child input, and this one sits in a Stack beside its menu.
+  const inputId = useId();
+  const errorId = `${inputId}-error`;
+  const showError = invalid && !disabled;
 
   return (
     <FormControl disabled={disabled}>
-      <FormControl.Label>{label}</FormControl.Label>
+      <FormControl.Label htmlFor={inputId}>{label}</FormControl.Label>
       <Stack direction="horizontal" align="center" gap="condensed">
         <TextInput
+          id={inputId}
           value={value}
           disabled={disabled}
           leadingVisual={<ColorSwatch color={value} />}
-          validationStatus={invalid && !disabled ? "error" : undefined}
+          validationStatus={showError ? "error" : undefined}
           aria-invalid={invalid}
+          aria-describedby={showError ? errorId : undefined}
           pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3}|[A-Fa-f0-9]{8})$"
-          onChange={event => onChange(event.target.value)}
+          onChange={event => {
+            onChange(event.target.value);
+          }}
         />
         <ActionMenu>
           <ActionMenu.Anchor>
@@ -57,7 +66,9 @@ export function ColorSwatchPicker({
                 <ActionList.Item
                   key={color}
                   selected={color.toUpperCase() === value.toUpperCase()}
-                  onSelect={() => onChange(color.toUpperCase())}
+                  onSelect={() => {
+                    onChange(color.toUpperCase());
+                  }}
                 >
                   <ActionList.LeadingVisual>
                     <ColorSwatch color={color} />
@@ -69,8 +80,10 @@ export function ColorSwatchPicker({
           </ActionMenu.Overlay>
         </ActionMenu>
       </Stack>
-      {invalid && !disabled && (
-        <FormControl.Validation variant="error">Invalid HEX color</FormControl.Validation>
+      {showError && (
+        <FormControl.Validation id={errorId} variant="error">
+          Invalid HEX color
+        </FormControl.Validation>
       )}
     </FormControl>
   );

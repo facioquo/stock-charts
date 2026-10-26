@@ -163,6 +163,27 @@ describe("PickConfigDialog", () => {
       answer(prompt, "Cancel");
     });
 
+    it("asks from the close button too", async () => {
+      const { onClose } = renderDialog(makeController());
+      fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "21" } });
+
+      fireEvent.click(screen.getByRole("button", { name: "Close" }));
+
+      const prompt = await discardPrompt();
+      expect(onClose).not.toHaveBeenCalled();
+      answer(prompt, "Cancel");
+    });
+
+    it("closes from Cancel without asking, since Cancel is the choice to leave", () => {
+      const { onClose } = renderDialog(makeController());
+      fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "21" } });
+
+      fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+      expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
     it("closes without asking when nothing was edited", () => {
       const { onClose } = renderDialog(makeController());
 

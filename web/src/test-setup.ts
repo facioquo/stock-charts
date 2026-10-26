@@ -17,28 +17,22 @@ if (typeof window.matchMedia !== "function") {
 
 // Primer's tooltips use the popover API; without it they load a polyfill that
 // jsdom cannot run. These make the API present and inert.
-if (!Reflect.has(HTMLElement.prototype, "popover")) {
-  Object.defineProperty(HTMLElement.prototype, "popover", {
+const elementPrototypeHtml = HTMLElement.prototype;
+if (!Reflect.has(elementPrototypeHtml, "popover")) {
+  Object.defineProperty(elementPrototypeHtml, "popover", {
     configurable: true,
-    get(this: HTMLElement) {
-      return this.getAttribute("popover");
-    },
-    set(this: HTMLElement, value: string | null) {
-      if (value === null) this.removeAttribute("popover");
-      else this.setAttribute("popover", value);
-    }
+    writable: true,
+    value: null
   });
-  HTMLElement.prototype.showPopover = function showPopover(): void {};
-  HTMLElement.prototype.hidePopover = function hidePopover(): void {};
-  HTMLElement.prototype.togglePopover = function togglePopover(): boolean {
-    return false;
-  };
+  elementPrototypeHtml.showPopover = () => undefined;
+  elementPrototypeHtml.hidePopover = () => undefined;
+  elementPrototypeHtml.togglePopover = () => false;
 }
 
 if (typeof globalThis.ResizeObserver !== "function") {
   globalThis.ResizeObserver = class {
-    observe(): void {}
-    unobserve(): void {}
-    disconnect(): void {}
+    observe = (): undefined => undefined;
+    unobserve = (): undefined => undefined;
+    disconnect = (): undefined => undefined;
   };
 }

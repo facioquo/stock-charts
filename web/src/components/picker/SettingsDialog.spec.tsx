@@ -2,7 +2,12 @@ import { createEvent, fireEvent, render, screen, waitFor, within } from "@testin
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ChartController } from "../../charting/chartController";
-import { changeSeriesLegend, getSettings } from "../../services/userPrefs";
+import {
+  changeListingOrder,
+  changeSeriesLegend,
+  changeTooltips,
+  getSettings
+} from "../../services/userPrefs";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
 
 import { SettingsDialog } from "./SettingsDialog";
@@ -83,6 +88,8 @@ function clickUndo(): void {
 
 afterEach(() => {
   changeSeriesLegend(false);
+  changeListingOrder("category");
+  changeTooltips(false);
   document.body.className = "";
 });
 
@@ -174,6 +181,29 @@ describe("SettingsDialog", () => {
 
     fireEvent.keyDown(reorderHandle, { key: "ArrowUp" });
     expect(controller.moveSelection).toHaveBeenLastCalledWith("u1", -1);
+    expect(screen.getByText("RSI (5) moved to 1 of 3")).toHaveAttribute("role", "status");
+  });
+
+  it("moves a row from its handle's menu, for a pointer that cannot drag", async () => {
+    const controller = makeController();
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "reorder RSI (5)" }));
+    expect(await screen.findByRole("menuitem", { name: "Move up" })).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
+    fireEvent.click(screen.getByRole("menuitem", { name: "Move down" }));
+
+    expect(controller.moveSelection).toHaveBeenCalledWith("u1", 1);
+    expect(screen.getByText("RSI (5) moved to 2 of 2")).toHaveAttribute("role", "status");
   });
 
   it("reorders displayed indicators by dragging within their chart group", () => {
@@ -337,6 +367,25 @@ describe("SettingsDialog", () => {
     expect(controller.onSettingsChange).toHaveBeenCalled();
   });
 
+  it("toggles a setting when its label text is clicked", () => {
+    const controller = makeController();
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByText("Show tooltips"));
+
+    expect(screen.getByRole("button", { name: "Show tooltips" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+  });
+
   it("names each switch from the text of its row", () => {
     const controller = makeController();
     render(
@@ -434,7 +483,7 @@ describe("SettingsDialog", () => {
 
       expect(writeText).toHaveBeenCalledWith("https://charts.example/?c=1.abc");
       await waitFor(() => {
-        expect(screen.getByRole("status")).toHaveTextContent("Link copied");
+        expect(screen.getByText("Link copied")).toHaveAttribute("role", "status");
       });
     });
 
@@ -447,7 +496,7 @@ describe("SettingsDialog", () => {
       fireEvent.click(screen.getByRole("button", { name: "copy share link" }));
 
       await waitFor(() => {
-        expect(screen.getByRole("status")).toHaveTextContent("Copy failed");
+        expect(screen.getByText("Copy failed")).toHaveAttribute("role", "status");
       });
     });
 
@@ -457,7 +506,7 @@ describe("SettingsDialog", () => {
 
       fireEvent.click(screen.getByRole("button", { name: "copy share link" }));
 
-      expect(screen.getByRole("status")).toHaveTextContent("Copy failed");
+      expect(screen.getByText("Copy failed")).toHaveAttribute("role", "status");
     });
 
     it("is not offered with nothing displayed", () => {
@@ -638,9 +687,17 @@ describe("SettingsDialog", () => {
 
     fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
     fireEvent.click(screen.getByRole("button", { name: "Remove selected(1)" }));
+    expect(screen.getByRole("region", { name: "Indicator update" })).toHaveAttribute(
+      "data-variant",
+      "info"
+    );
     clickUndo();
 
     expect(await screen.findByText("Could not restore the removed indicators")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Indicator restore problem" })).toHaveAttribute(
+      "data-variant",
+      "critical"
+    );
   });
 
   it("shows the result of an add and restores the list position", () => {
@@ -785,6 +842,48 @@ describe("SettingsDialog", () => {
       fireEvent.change(input, { target: { value: "i" } });
       fireEvent.keyDown(input, { key: "Enter" });
 
+      expect(onPickIndicator).toHaveBeenCalledWith(controller.listings.find(l => l.uiid === "RSI"));
+    });
+
+    it("lists A to Z with each category beneath, and remembers the choice", () => {
+      const controller = makeController();
+      controller.listings.push(makeListing("ADX", "Average Directional Index", "oscillator"));
+      render(
+        <SettingsDialog
+          controller={controller as unknown as ChartController}
+          onClose={vi.fn()}
+          onPickIndicator={vi.fn()}
+          onEditIndicator={vi.fn()}
+        />
+      );
+      expect(screen.getByRole("button", { name: "By category" })).toHaveAttribute(
+        "aria-pressed",
+        "true"
+      );
+
+      fireEvent.click(screen.getByRole("button", { name: "A to Z" }));
+
+      const list = screen.getByRole("list", { name: "Available indicators, A to Z" });
+      expect(within(list).getAllByRole("listitem").map(item => item.textContent)).toEqual([
+        "Average Directional IndexOscillators",
+        "Relative Strength IndexOscillators",
+        "Simple Moving AverageMoving averages"
+      ]);
+      expect(screen.queryByRole("heading", { name: "Oscillators" })).toBeNull();
+      expect(getSettings().listingOrder).toBe("name");
+    });
+
+    it("opens A to Z for a visitor who chose it, and picks its first match on Enter", () => {
+      changeListingOrder("name");
+      const { input, onPickIndicator, controller } = renderDialog();
+
+      fireEvent.change(input, { target: { value: "i" } });
+      fireEvent.keyDown(input, { key: "Enter" });
+
+      expect(screen.getByRole("button", { name: "A to Z" })).toHaveAttribute(
+        "aria-pressed",
+        "true"
+      );
       expect(onPickIndicator).toHaveBeenCalledWith(controller.listings.find(l => l.uiid === "RSI"));
     });
 

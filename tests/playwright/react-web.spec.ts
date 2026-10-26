@@ -307,9 +307,7 @@ test.describe("Stock Charts React Web", () => {
     }) => {
       await page.goto("/");
       await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
-      await expect(
-        page.getByRole("status").filter({ hasText: "live API is unreachable" })
-      ).toBeVisible({
+      await expect(page.getByRole("button", { name: "Live API unreachable" })).toBeVisible({
         timeout: 15_000
       });
 
@@ -358,9 +356,9 @@ test.describe("Stock Charts React Web", () => {
       await page.goto("/");
       await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
       // The snapshot answered, so the notice shows; a run that never went offline fails here.
-      await expect(
-        page.getByRole("status").filter({ hasText: "live API is unreachable" })
-      ).toBeVisible({ timeout: 15_000 });
+      await expect(page.getByRole("button", { name: "Live API unreachable" })).toBeVisible({
+        timeout: 15_000
+      });
 
       await expectDisplayed(page, catalog.length);
       // Read `missing` only once every snapshot request has finished.
