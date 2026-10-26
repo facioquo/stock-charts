@@ -10,7 +10,9 @@ engines:
   # Lizard's file-length rule; generated lockfiles stay in the Trivy scan
   lizard:
     exclude_paths:
+      - "pnpm-lock.yaml"
       - "**/pnpm-lock.yaml"
   metric:
     exclude_paths:
+      - "pnpm-lock.yaml"
       - "**/pnpm-lock.yaml"

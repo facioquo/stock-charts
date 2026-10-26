@@ -12,5 +12,4 @@ minimumReleaseAgeStrict: false
 allowBuilds:
   '@parcel/watcher': false
   esbuild: false
-  # wrangler's local runtime; its install script fetches the platform binary
   workerd: true
