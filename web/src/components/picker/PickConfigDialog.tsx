@@ -144,6 +144,7 @@ function LabeledSelect({
     <FormControl disabled={disabled}>
       <FormControl.Label>{label}</FormControl.Label>
       <Select
+        block
         value={String(value)}
         disabled={disabled}
         onChange={event => {
@@ -205,15 +206,17 @@ function StyleColor({ result, index, onUpdate }: StyleRowProps): React.JSX.Eleme
 /** Line-type / width / color controls for a single indicator result series. */
 function StyleRow({ result, index, onUpdate }: StyleRowProps): React.JSX.Element {
   return (
-    <Stack as="section" gap="condensed" className="style-container">
-      <Heading as="h3" variant="small">
-        {result.displayName}
-      </Heading>
-      <div className="style-inputs">
-        <StyleSelects result={result} index={index} onUpdate={onUpdate} />
-        <StyleColor result={result} index={index} onUpdate={onUpdate} />
-      </div>
-    </Stack>
+    <section className="style-container">
+      <Stack gap="condensed" className="style-body">
+        <Heading as="h3" variant="small">
+          {result.displayName}
+        </Heading>
+        <div className="style-inputs">
+          <StyleSelects result={result} index={index} onUpdate={onUpdate} />
+          <StyleColor result={result} index={index} onUpdate={onUpdate} />
+        </div>
+      </Stack>
+    </section>
   );
 }
 

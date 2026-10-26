@@ -45,6 +45,8 @@ export function ColorSwatchPicker({
       <Stack direction="horizontal" align="center" gap="condensed">
         <TextInput
           id={inputId}
+          block
+          className="color-hex"
           value={value}
           disabled={disabled}
           leadingVisual={<ColorSwatch color={value} />}

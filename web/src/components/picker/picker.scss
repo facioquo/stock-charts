@@ -215,11 +215,37 @@
   padding-bottom: calc(var(--base-size-4) + var(--base-size-16));
 }
 
+/* A style row's three fields sit side by side when they fit and stack one per line
+   when they do not; never two and one. The query measures the row, not the window,
+   so it holds in the dialog at any viewport. */
+.style-container {
+  container-type: inline-size;
+}
+
+.style-body {
+  max-width: 320px;
+  margin: 0 auto;
+
+  @container (width >= 480px) {
+    max-width: none;
+  }
+}
+
 .style-inputs {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--base-size-16);
   align-items: start;
+
+  @container (width >= 480px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The hex field fills its column beside the menu button. */
+.color-hex {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 /* Preview of the series' line, drawn from its chosen style, under all three fields. */
