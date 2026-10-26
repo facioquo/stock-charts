@@ -146,7 +146,7 @@ All contributions must pass these checks (required before PR acceptance):
 
 Codacy analyzes every pull request as a required check. To see its findings before you push, connect an AI agent to the Codacy MCP server declared in `.mcp.json`:
 
-1. Install the pinned server: `pnpm run setup:codacy-mcp` (also part of "Setup: Dev environment"). Re-run it after the version in `tools/codacy-mcp/package.json` changes.
+1. Install the pinned server: `pnpm run setup:codacy-mcp` (also part of "Setup: Dev environment"). After changing the version in `tools/codacy-mcp/package.json` (`pnpm run deps:update` reaches it too), re-lock with `pnpm install --dir tools/codacy-mcp`, then re-run setup.
 2. Create an account token under Codacy → My account → Access management, then expose it as `CODACY_ACCOUNT_TOKEN` in your shell or in the `env` block of `~/.claude/settings.json`. Never commit it.
 
 The server starts from that local install rather than `npx`, because a cold `npx` install outlasts the agent's 30-second startup limit and can leave a broken cache behind.

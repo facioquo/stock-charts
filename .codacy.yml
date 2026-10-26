@@ -7,7 +7,10 @@ exclude_paths:
   # advisories sit in Codacy's bundled linters, fixable only upstream
   - "tools/codacy-mcp/**"
 engines:
+  # Lizard's file-length rule; generated lockfiles stay in the Trivy scan
   lizard:
     exclude_paths:
-      # generated
+      - "**/pnpm-lock.yaml"
+  metric:
+    exclude_paths:
       - "**/pnpm-lock.yaml"

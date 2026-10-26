@@ -16,7 +16,7 @@
   "scripts": {
     "postinstall": "node scripts/setup-playwright-mcp.cjs",
     "setup:codacy-mcp": "pnpm install --dir tools/codacy-mcp --frozen-lockfile",
-    "clean": "rm -rf node_modules .codacy && pnpm -r run clean",
+    "clean": "rm -rf node_modules tools/codacy-mcp/node_modules .codacy && pnpm -r run clean",
     "deps:check": "ncu --deep --peer",
     "deps:update": "ncu --deep --peer --target semver --upgrade",
     "build": "pnpm -r --workspace-concurrency=1 run build",

@@ -7,18 +7,15 @@
  * fails every later launch.
  */
 
-import { existsSync } from "node:fs";
+// Raised when the install is missing, or partial with a module half-written
+const INCOMPLETE_INSTALL = new Set(["ERR_MODULE_NOT_FOUND", "ERR_UNSUPPORTED_DIR_IMPORT"]);
 
-const ENTRY = new URL(
-  "../tools/codacy-mcp/node_modules/@codacy/codacy-mcp/dist/index.js",
-  import.meta.url
-);
-
-if (!existsSync(ENTRY)) {
+try {
+  await import("../tools/codacy-mcp/node_modules/@codacy/codacy-mcp/dist/index.js");
+} catch (error) {
+  if (!INCOMPLETE_INSTALL.has(error?.code)) throw error;
   process.stderr.write(
-    "Codacy MCP server is not installed. Run `pnpm run setup:codacy-mcp`, then reconnect.\n"
+    `Codacy MCP server is missing or incomplete (${error.code}). Run \`pnpm run setup:codacy-mcp\`, then reconnect.\n`
   );
   process.exit(1);
 }
-
-await import("../tools/codacy-mcp/node_modules/@codacy/codacy-mcp/dist/index.js");
