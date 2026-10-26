@@ -100,19 +100,6 @@ function ToggleRow({ label, checked, onChange }: ToggleRowProps): React.JSX.Elem
   );
 }
 
-type MoveButtonNode = HTMLButtonElement;
-/** Records a row's move button under `ucid:offset`, so focus can follow a move. */
-function makeMoveButtonRef(buttons: Map<string, MoveButtonNode>) {
-  return (ucid: string, offset: -1 | 1) =>
-    (node: MoveButtonNode | null): void => {
-      const key = `${ucid}:${offset}`;
-      if (node) buttons.set(key, node);
-      else buttons.delete(key);
-    };
-}
-
-type MoveButtonRef = ReturnType<typeof makeMoveButtonRef>;
-
 interface DisplayedIndicatorsProps {
   selections: readonly IndicatorSelection[];
   checked: ReadonlySet<string>;
@@ -121,8 +108,6 @@ interface DisplayedIndicatorsProps {
   onRemove: () => void;
   onEdit: Dispatch<IndicatorSelection>;
   onMove: ChartController["moveSelection"];
-  /** Ref callback factory that records a row's move button so focus can follow a move. */
-  moveButtonRef: MoveButtonRef;
   /** Builds a link that restores the displayed indicators. */
   shareUrl: () => string;
 }
@@ -143,49 +128,105 @@ function SelectionGroup({
   checked,
   onToggle,
   onEdit,
-  onMove,
-  moveButtonRef
+  onMove
 }: SelectionGroupProps): React.JSX.Element | null {
   const headingId = useId();
+  const [draggedUcid, setDraggedUcid] = useState<string | null>(null);
+  /** Gap the dragged row would land in: 0 is above the first row, `length` below the last. */
+  const [dropGap, setDropGap] = useState<number | null>(null);
   if (selections.length === 0) return null;
+
+  const draggedIndex = selections.findIndex(selection => selection.ucid === draggedUcid);
+  // The gaps on either side of the dragged row leave it where it is.
+  const isMovingGap = (gap: number): boolean =>
+    draggedIndex >= 0 && gap !== draggedIndex && gap !== draggedIndex + 1;
+
+  const endDrag = (): void => {
+    setDraggedUcid(null);
+    setDropGap(null);
+  };
+
+  const moveToGap = (gap: number): void => {
+    if (!draggedUcid || !isMovingGap(gap)) return;
+    const targetIndex = gap > draggedIndex ? gap - 1 : gap;
+    const offset = draggedIndex < targetIndex ? 1 : -1;
+    for (let step = draggedIndex; step !== targetIndex; step += offset) {
+      onMove(draggedUcid, offset);
+    }
+  };
+
   return (
     <>
       <div className="selection-group-header">
-        <span id={headingId} className="selection-group-title">
+        <h3 id={headingId} className="selection-group-title">
           {title}
-        </span>
+        </h3>
         <span className="selection-group-hint">{hint}</span>
       </div>
       <ul className="selection-list" aria-labelledby={headingId}>
         {selections.map((selection, index) => (
-          <li key={selection.ucid} className={checked.has(selection.ucid) ? "selected" : undefined}>
+          <li
+            key={selection.ucid}
+            className={
+              [
+                checked.has(selection.ucid) && "selected",
+                draggedUcid === selection.ucid && "dragging",
+                dropGap === index && "drop-before",
+                dropGap === selections.length && index === selections.length - 1 && "drop-after"
+              ]
+                .filter(Boolean)
+                .join(" ") || undefined
+            }
+            onDragOver={event => {
+              // Drag state is per group, so a row from the other group is never a target.
+              if (!draggedUcid) return;
+              const { top, height } = event.currentTarget.getBoundingClientRect();
+              const gap = event.clientY < top + height / 2 ? index : index + 1;
+              if (!isMovingGap(gap)) {
+                setDropGap(null);
+                return;
+              }
+              event.preventDefault();
+              event.dataTransfer.dropEffect = "move";
+              setDropGap(gap);
+            }}
+            onDragLeave={event => {
+              if (event.currentTarget.parentElement?.contains(event.relatedTarget as Node | null))
+                return;
+              setDropGap(null);
+            }}
+            onDrop={event => {
+              if (dropGap === null) return;
+              event.preventDefault();
+              moveToGap(dropGap);
+              endDrag();
+            }}
+          >
+            <button
+              type="button"
+              className="icon-button drag-handle"
+              aria-label={`reorder ${selection.label}`}
+              aria-keyshortcuts="ArrowUp ArrowDown"
+              title="drag to reorder; use arrow keys to move"
+              draggable
+              onDragStart={event => {
+                event.dataTransfer.effectAllowed = "move";
+                event.dataTransfer.setData("text/plain", selection.ucid);
+                setDraggedUcid(selection.ucid);
+              }}
+              onDragEnd={endDrag}
+              onKeyDown={event => {
+                if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+                event.preventDefault();
+                const handle = event.currentTarget;
+                onMove(selection.ucid, event.key === "ArrowUp" ? -1 : 1);
+                // React may move this row's node, which drops focus to <body>.
+                handle.focus();
+              }}
+            >
+              <span className="material-icons">drag_indicator</span>
+            </button>
             <label htmlFor={`select-${selection.ucid}`}>{selection.label}</label>
-            <button
-              type="button"
-              className="icon-button"
-              aria-label={`move ${selection.label} up`}
-              ref={moveButtonRef(selection.ucid, -1)}
-              title="move up"
-              disabled={index === 0}
-              onClick={() => {
-                onMove(selection.ucid, -1);
-              }}
-            >
-              <span className="material-icons">arrow_upward</span>
-            </button>
-            <button
-              type="button"
-              className="icon-button"
-              aria-label={`move ${selection.label} down`}
-              ref={moveButtonRef(selection.ucid, 1)}
-              title="move down"
-              disabled={index === selections.length - 1}
-              onClick={() => {
-                onMove(selection.ucid, 1);
-              }}
-            >
-              <span className="material-icons">arrow_downward</span>
-            </button>
             <button
               type="button"
               className="icon-button"
@@ -220,7 +261,6 @@ function DisplayedIndicators({
   onRemove,
   onEdit,
   onMove,
-  moveButtonRef,
   shareUrl
 }: DisplayedIndicatorsProps): React.JSX.Element {
   const [copyStatus, setCopyStatus] = useState("");
@@ -238,7 +278,7 @@ function DisplayedIndicators({
       failed();
     }
   };
-  const groupProps = { checked, onToggle, onEdit, onMove, moveButtonRef };
+  const groupProps = { checked, onToggle, onEdit, onMove };
   return (
     <section className="displayed-indicators">
       <div className="dialog-section-header">
@@ -439,7 +479,6 @@ interface SettingsControls {
   /** Result line after a removal, with what undo needs; null when nothing was removed. */
   removal: { text: string; undo?: () => void } | null;
   moveSelection: ChartController["moveSelection"];
-  moveButtonRef: MoveButtonRef;
 }
 
 /** State + handlers backing the settings dialog (theme, tooltips, series legend, selection). */
@@ -532,16 +571,9 @@ function useSettingsControls(controller: ChartController): SettingsControls {
     forceUpdate();
   };
 
-  // A move re-renders the row (React moves the swapped node) or disables the
-  // pressed button at the end of its group; either drops focus to <body>.
-  const moveButtons = useRef(new Map<string, MoveButtonNode>());
-  const moveButtonRef = makeMoveButtonRef(moveButtons.current);
-
   const moveSelection = (ucid: string, offset: -1 | 1): void => {
     controller.moveSelection(ucid, offset);
     flushSync(forceUpdate);
-    const same = moveButtons.current.get(`${ucid}:${offset}`);
-    (same && !same.disabled ? same : moveButtons.current.get(`${ucid}:${-offset}`))?.focus();
   };
 
   return {
@@ -556,8 +588,7 @@ function useSettingsControls(controller: ChartController): SettingsControls {
     selectAll,
     removeSelected,
     removal,
-    moveSelection,
-    moveButtonRef
+    moveSelection
   };
 }
 
@@ -645,7 +676,6 @@ export function SettingsDialog({
             onRemove={controls.removeSelected}
             onEdit={onEditIndicator}
             onMove={controls.moveSelection}
-            moveButtonRef={controls.moveButtonRef}
             shareUrl={() => controller.shareUrl()}
           />
         )}

@@ -40,4 +40,8 @@
   --primary: #8ab4f8;
   --primary-container: #00458f;
   --on-primary-container: #cbe6ff;
+
+  /* native form controls: dark rendering, Primer accent emphasis (dark) when checked */
+  --control-scheme: dark;
+  --checkbox-accent: #1f6feb;
 }

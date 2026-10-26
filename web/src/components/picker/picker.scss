@@ -223,18 +223,21 @@
   font-weight: 400;
 }
 
+/* Spaced like the available indicators' category headings, with a hint beneath. */
 .selection-group-header {
   display: flex;
   flex-direction: column;
-  padding: 12px 16px 4px;
+  gap: 2px;
+  padding: 12px 16px 6px;
 }
 
-.selection-group-title {
-  font-weight: 500;
+.selection-list + .selection-group-header {
+  padding-top: 32px;
 }
 
 .selection-group-hint {
   font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .selection-list,
@@ -266,22 +269,51 @@
     align-items: center;
     border-radius: 4px;
 
-    /* Too narrow for the name beside four controls: the name takes its own
-       line and the controls sit beneath it, right-aligned. */
+    /* Too narrow for the name beside its controls: the drag handle and name
+       keep the first line and the other controls sit beneath, right-aligned. */
     @media (width < 380px) {
       flex-wrap: wrap;
 
       label {
-        flex-basis: 100%;
+        flex-basis: calc(100% - 44px);
       }
 
-      .icon-button:first-of-type {
+      label + .icon-button {
         margin-left: auto;
       }
     }
 
     &:hover {
       background-color: var(--list-hover);
+    }
+
+    &.dragging {
+      opacity: 0.45;
+    }
+
+    /* The insertion line sits in the gap the dragged row would land in. */
+    &.drop-before,
+    &.drop-after {
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        left: 0;
+        height: 2px;
+        border-radius: 1px;
+        background-color: var(--accent);
+        pointer-events: none;
+      }
+    }
+
+    &.drop-before::after {
+      top: -1px;
+    }
+
+    &.drop-after::after {
+      bottom: -1px;
     }
   }
 
@@ -292,7 +324,7 @@
     flex: 1 1 0;
     min-width: 0;
     overflow-wrap: break-word;
-    padding: 10px 4px 10px 16px;
+    padding: 10px 4px;
     cursor: pointer;
 
     @media (width <= 420px) {
@@ -379,16 +411,21 @@
   font-size: 1rem;
 }
 
-/* Extra space above each heading separates the categories; the first one
-   needs less, since the filter already sets it apart. */
-.listing-category-title {
+/* Category headings share one look across the dialog's sections. */
+.listing-category-title,
+.selection-group-title {
   margin: 0;
-  padding: 32px 16px 6px;
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+/* Extra space above each heading separates the categories; the first one
+   needs less, since the filter already sets it apart. */
+.listing-category-title {
+  padding: 32px 16px 6px;
 }
 
 .listing-filter + .listing-category-title {
@@ -575,7 +612,7 @@
   min-height: 1.5em;
 }
 
-.modal-panel input,
+.modal-panel input:not([type="checkbox"]),
 .modal-panel select {
   background-color: var(--bg);
   color: var(--text);
@@ -589,26 +626,20 @@
   }
 }
 
+/* A native checkbox; only its size and checked color are set. */
 .standard-checkbox {
   width: 1rem;
   height: 1rem;
-  min-width: 1rem;
-  min-height: 1rem;
-  padding: 0;
   margin: 0;
   cursor: pointer;
   vertical-align: middle;
-  accent-color: transparent;
-  background-color: transparent;
+  color-scheme: var(--control-scheme);
+  accent-color: var(--checkbox-accent);
 }
 
 /* Last in a list row, so it lines up under the section header's select-all. */
 .selection-checkbox {
   margin: 0 12px 0 8px;
-}
-
-.displayed-indicators > .dialog-section-header > .selection-checkbox {
-  margin-right: 0;
 }
 
 /* BUTTONS */
@@ -626,6 +657,21 @@
   flex: none;
 }
 
+.displayed-indicators > .dialog-section-header > .selection-checkbox {
+  margin-right: 0;
+}
+
+/* The glyph's dots sit 7 px inside its box; with the button padding, the
+   margin lines them up with the group header text, 16 px in. */
+.selection-list .drag-handle {
+  margin-left: 5px;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
 /* Phone widths: 44 px icon buttons, 24 px checkboxes, and room for the label. */
 @media (width < 640px) {
   .dialog-body {
@@ -640,6 +686,10 @@
   .dialog-section-header .icon-button,
   .selection-list .icon-button {
     padding: 10px;
+  }
+
+  .selection-list .drag-handle {
+    margin-left: -1px;
   }
 
   .selection-checkbox {
