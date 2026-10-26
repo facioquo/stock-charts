@@ -51,6 +51,8 @@ stock-charts/
 │   └── vitepress/            # Docs site (Cloudflare Pages) + indy-charts integration host
 ├── docs/                     # Documentation
 ├── scripts/                  # Setup and utility scripts
+├── tools/
+│   └── codacy-mcp/           # Pinned Codacy Model Context Protocol (MCP) server; its own pnpm workspace, outside the root one
 └── .github/
     └── workflows/            # CI/CD configs
 ```
@@ -61,6 +63,7 @@ stock-charts/
 # Setup (or VS Code task "Setup: Dev environment")
 dotnet tool restore                    # Local .NET tools
 pnpm exec playwright install chromium  # Browser for E2E tests
+pnpm run setup:codacy-mcp              # Codacy MCP server that .mcp.json starts (optional)
 
 # Install dependencies
 pnpm install                   # Install all workspace dependencies
@@ -240,7 +243,7 @@ Client-side project dependencies are strictly in this direction only: web → in
 - `WebApi.Tests` is a self-hosting xUnit.net v3 executable
 - The project carries no VSTest packages and no `.runsettings` file
 - Name the project with `--project`
-- Place test application arguments (`--coverlet`, `--report-xunit-trx`) after a `--` separator
+- Place test application arguments (`--report-xunit-trx`) after a `--` separator
 - Unrecognized tokens become test filters and silently match zero tests
 
 #### Caching

@@ -32,9 +32,11 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "10.x"
           dotnet-quality: "ga"
@@ -59,79 +61,45 @@ jobs:
 
       # Microsoft.Testing.Platform runner (opted in via global.json): the project
       # goes to `--project`, and everything after `--` is passed to the test
-      # application (coverlet.MTP and the xUnit TRX reporter). Any token
-      # `dotnet test` does not recognize is forwarded to the test application as
-      # a filter, which silently matches zero tests -- hence no bare
-      # `-warnAsError` here. The "Build .NET solution" step above already
-      # enforces warnings-as-errors over these same projects and configuration.
-      - name: Run backend tests with coverage
+      # application (the xUnit TRX reporter). Any token `dotnet test` does not
+      # recognize is forwarded to the test application as a filter, which
+      # silently matches zero tests -- hence no bare `-warnAsError` here. The
+      # build step above already enforces warnings-as-errors over these same
+      # projects and configuration, so the tests run against its output.
+      - name: Run backend tests
         run: |
           dotnet test --project server/WebApi.Tests/WebApi.Tests.csproj \
             --configuration Release \
-            --results-directory ./server/coverage \
-            --property:ContinuousIntegrationBuild=true \
+            --no-build \
+            --results-directory ./server/test-results \
             -- \
-            --coverlet \
-            --coverlet-output-format cobertura \
             --report-xunit-trx \
             --report-xunit-trx-filename backend.trx
 
-      - name: Convert coverage to lcov format
-        run: |
-          dotnet tool run reportgenerator \
-            -reports:"server/coverage/coverage.cobertura*.xml" \
-            -targetdir:"server/coverage" \
-            -reporttypes:"lcov"
-
-      - name: Upload backend coverage to Codecov
-        if: always()
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./server/coverage/lcov.info
-          flags: backend
-          name: backend-coverage
-          fail_ci_if_error: false
-
       - name: Publish backend test results
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v3
         if: success() || failure()
         with:
           name: xUnit Tests
-          path: server/coverage/*.trx
+          path: server/test-results/*.trx
           reporter: dotnet-trx
 
   test-libraries:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
-    # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
-    # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
-    permissions:
-      contents: read
-      packages: read
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
         with:
-          run_install: false
+          persist-credentials: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Setup pnpm, Node.js, and dependencies
+        uses: pnpm/setup@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-          registry-url: https://npm.pkg.github.com
-          scope: "@facioquo"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
+          runtime: node@${{ env.NODE_VERSION }}
+          require-lockfile: true
 
       - name: Build libraries
         run: |
@@ -174,34 +142,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
-    # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
-    permissions:
-      contents: read
-      packages: read
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
         with:
-          run_install: false
+          persist-credentials: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Setup pnpm, Node.js, and dependencies
+        uses: pnpm/setup@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-          registry-url: https://npm.pkg.github.com
-          scope: "@facioquo"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
+          runtime: node@${{ env.NODE_VERSION }}
+          require-lockfile: true
 
       - name: Check edge worker formatting
         run: pnpm --filter @stock-charts/edge run format:check
@@ -216,45 +168,21 @@ jobs:
         run: pnpm --filter @stock-charts/edge run test
 
   test-web:
-    needs: [test-libraries]
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
-    # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
-    permissions:
-      contents: read
-      packages: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
         with:
-          run_install: false
+          persist-credentials: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Setup pnpm, Node.js, and dependencies
+        uses: pnpm/setup@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-          registry-url: https://npm.pkg.github.com
-          scope: "@facioquo"
-
-      - name: Verify GitHub Packages auth
-        run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "Authorization: Bearer ${NODE_AUTH_TOKEN}" \
-            https://npm.pkg.github.com/@facioquo/indy-charts)
-          echo "Registry auth check: HTTP ${STATUS}"
-          [ "$STATUS" = "200" ] || { echo "Expected 200, got ${STATUS}"; exit 1; }
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          cache: true
+          runtime: node@${{ env.NODE_VERSION }}
+          require-lockfile: true
 
       - name: Build libraries
         # web/ consumes @facioquo/indy-charts via workspace:* and imports from
@@ -275,53 +203,32 @@ jobs:
       - name: Lint CSS
         run: pnpm run lint:css
 
+      # Coverage here enforces the thresholds in web/vitest.config.ts.
       - name: Run web unit tests with coverage
         run: pnpm --filter @stock-charts/web run test:coverage
-
-      - name: Upload frontend coverage to Codecov
-        if: always()
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./web/coverage/lcov.info
-          flags: frontend
-          name: frontend-coverage
-          fail_ci_if_error: false
 
       - name: Build web app
         run: pnpm --filter @stock-charts/web run build
 
+  # Gated on the library job, whose lint and unit tests catch most breakage in
+  # the code both sites render, before browser minutes start.
   test-e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [test-libraries, test-web]
-    # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
-    # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
-    permissions:
-      contents: read
-      packages: read
+    needs: [test-libraries]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
         with:
-          run_install: false
+          persist-credentials: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Setup pnpm, Node.js, and dependencies
+        uses: pnpm/setup@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-          registry-url: https://npm.pkg.github.com
-          scope: "@facioquo"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
+          runtime: node@${{ env.NODE_VERSION }}
+          require-lockfile: true
 
       - name: Build libraries
         # React dev server (used by Playwright's webServer config) runs from
@@ -330,8 +237,10 @@ jobs:
           pnpm --filter @facioquo/chartjs-chart-financial run build
           pnpm --filter @facioquo/indy-charts run build
 
+      # Headless runs use only the headless shell, so the full browser build
+      # is not downloaded.
       - name: Install Playwright Chromium
-        run: pnpm --filter @stock-charts/playwright-tests exec playwright install --with-deps chromium
+        run: pnpm --filter @stock-charts/playwright-tests exec playwright install --with-deps --only-shell chromium
 
       - name: Run E2E tests
         run: pnpm run test:e2e
@@ -351,7 +260,7 @@ jobs:
     if: always()
     steps:
       - name: Verify required jobs succeeded
-        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped') }}
         run: |
           echo "One or more required jobs did not succeed."
           exit 1
