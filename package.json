@@ -19,7 +19,7 @@
     "clean": "rm -rf node_modules .codacy && pnpm -r run clean",
     "deps:check": "ncu --deep --peer",
     "deps:update": "ncu --deep --peer --target semver --upgrade",
-    "build": "pnpm -r run build",
+    "build": "pnpm -r --workspace-concurrency=1 run build",
     "build:prod": "pnpm -r --if-present run build:prod",
     "start": "pnpm --filter @stock-charts/web run start",
     "serve": "pnpm --filter @stock-charts/web run dev",
