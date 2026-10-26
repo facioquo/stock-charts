@@ -16,3 +16,11 @@ engines:
     exclude_paths:
       - "pnpm-lock.yaml"
       - "**/pnpm-lock.yaml"
+  # xss/no-mixed-html reads DOM nodes as HTML strings. Both files are test-only
+  # code: the spec hands elements to Testing Library (`within`, `fireEvent`), and
+  # the setup stubs jsdom's missing popover API on `HTMLElement.prototype`.
+  # Neither builds markup, and the repo's own ESLint still lints both in CI.
+  eslint-8:
+    exclude_paths:
+      - "web/src/components/picker/SettingsDialog.spec.tsx"
+      - "web/src/test-setup.ts"
