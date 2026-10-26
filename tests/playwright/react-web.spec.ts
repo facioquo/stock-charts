@@ -88,7 +88,7 @@ test.describe("Stock Charts React Web", () => {
     const lookback = page.getByLabel("Lookback Periods");
     await expect(lookback).toHaveValue("5");
     await lookback.fill("9");
-    await page.getByRole("button", { name: "SAVE" }).click();
+    await page.getByRole("button", { name: "Save" }).click();
 
     // Saving reopens the settings list: same number of indicators, new parameter.
     await expect(page.getByRole("button", { name: /^edit RSI.*9/ })).toBeVisible({
@@ -111,9 +111,23 @@ test.describe("Stock Charts React Web", () => {
     await page.getByRole("button", { name: "edit settings" }).click();
     await expect(oscillators.first()).toHaveText(/^RSI/);
 
-    await page
-      .getByRole("button", { name: /^reorder ADX/ })
-      .dragTo(page.getByRole("list", { name: "Oscillator charts" }).locator("li").first());
+    // A stepped drag, as a pointer makes: Chrome starts a drag only once the pointer
+    // has moved off the handle, which a single jump to the target does not do.
+    const handleButton = page.getByRole("button", { name: /^reorder ADX/ });
+    await handleButton.scrollIntoViewIfNeeded();
+    const handle = await handleButton.boundingBox();
+    const firstRow = await page
+      .getByRole("list", { name: "Oscillator charts" })
+      .locator("li")
+      .first()
+      .boundingBox();
+    if (!handle || !firstRow) throw new Error("reorder handle or target row is not laid out");
+    await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(handle.x + handle.width / 2 + 5, handle.y + 5, { steps: 3 });
+    // The upper half of a row drops into the gap above it.
+    await page.mouse.move(firstRow.x + 80, firstRow.y + 4, { steps: 10 });
+    await page.mouse.up();
     await expect(oscillators.first()).toHaveText(/^ADX/);
 
     await page.reload();
@@ -156,7 +170,7 @@ test.describe("Stock Charts React Web", () => {
     await expect(
       shared.getByRole("status").filter({ hasText: "Showing a shared chart" })
     ).toBeVisible();
-    await shared.getByRole("button", { name: "BACK TO MY INDICATORS" }).click();
+    await shared.getByRole("button", { name: "Back to my indicators" }).click();
     await expect(shared.getByText("Showing a shared chart")).toBeHidden({ timeout: 15_000 });
     expect(new URL(shared.url()).searchParams.has("c")).toBe(false);
     await expect(shared.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
@@ -183,16 +197,20 @@ test.describe("Stock Charts React Web", () => {
     await page.getByRole("button", { name: "edit settings" }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
 
-    const themeToggle = page.getByRole("checkbox", { name: "Dark theme" });
-    const wasDark = await themeToggle.isChecked();
+    // Primer's ToggleSwitch is a button whose pressed state is the setting.
+    const themeToggle = page.getByRole("button", { name: "Dark theme" });
+    const wasDark = (await themeToggle.getAttribute("aria-pressed")) === "true";
 
-    // The checkbox is visually hidden inside a custom switch, so click the label
-    // text: the whole row is one label, so the words toggle it as the slider does.
-    await page.getByText("Dark theme", { exact: true }).click();
+    await themeToggle.click();
 
     const expectedClass = wasDark ? "light-theme" : "dark-theme";
     await expect(page.locator("body")).toHaveClass(new RegExp(expectedClass));
-    expect(await themeToggle.isChecked()).toBe(!wasDark);
+    await expect(themeToggle).toHaveAttribute("aria-pressed", String(!wasDark));
+    // The controls switch to Primer's matching theme with the page.
+    await expect(page.locator("[data-color-mode]").first()).toHaveAttribute(
+      "data-color-mode",
+      wasDark ? "light" : "dark"
+    );
 
     expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
   });

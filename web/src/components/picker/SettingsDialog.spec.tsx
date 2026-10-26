@@ -74,6 +74,13 @@ function makeController(): FakeController {
   };
 }
 
+/** Primer's Banner renders its action once per responsive layout; jsdom shows both. */
+function clickUndo(): void {
+  const undo = screen.getAllByRole("button", { name: "Undo" }).at(0);
+  if (!undo) throw new Error("no Undo button");
+  fireEvent.click(undo);
+}
+
 afterEach(() => {
   changeSeriesLegend(false);
   document.body.className = "";
@@ -303,7 +310,7 @@ describe("SettingsDialog", () => {
       />
     );
 
-    const removeButton = screen.getByRole("button", { name: "REMOVE SELECTED" });
+    const removeButton = screen.getByRole("button", { name: /^Remove selected/ });
     expect(removeButton).toBeDisabled();
 
     // check the first displayed indicator, then remove
@@ -326,11 +333,11 @@ describe("SettingsDialog", () => {
       />
     );
 
-    fireEvent.click(screen.getByLabelText("Dark theme"));
+    fireEvent.click(screen.getByRole("button", { name: "Dark theme" }));
     expect(controller.onSettingsChange).toHaveBeenCalled();
   });
 
-  it("toggles a setting when its label text is clicked", () => {
+  it("names each switch from the text of its row", () => {
     const controller = makeController();
     render(
       <SettingsDialog
@@ -341,12 +348,12 @@ describe("SettingsDialog", () => {
       />
     );
 
-    const toggle = screen.getByRole("checkbox", { name: "Show tooltips" });
-    expect(toggle).not.toBeChecked();
+    const toggle = screen.getByRole("button", { name: "Show tooltips" });
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
 
-    fireEvent.click(screen.getByText("Show tooltips"));
+    fireEvent.click(toggle);
 
-    expect(toggle).toBeChecked();
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
   });
 
   it("switches the series legend on and off, redrawing the charts each time", () => {
@@ -360,15 +367,15 @@ describe("SettingsDialog", () => {
       />
     );
 
-    const toggle = screen.getByRole("checkbox", { name: "Show series legend" });
-    expect(toggle).not.toBeChecked();
+    const toggle = screen.getByRole("button", { name: "Show series legend" });
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
 
     fireEvent.click(toggle);
-    expect(toggle).toBeChecked();
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
     expect(getSettings().showSeriesLegend).toBe(true);
 
     fireEvent.click(toggle);
-    expect(toggle).not.toBeChecked();
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
     expect(getSettings().showSeriesLegend).toBe(false);
     expect(controller.onSettingsChange).toHaveBeenCalledTimes(2);
   });
@@ -384,7 +391,10 @@ describe("SettingsDialog", () => {
       />
     );
 
-    expect(screen.getByRole("checkbox", { name: "Show series legend" })).toBeChecked();
+    expect(screen.getByRole("button", { name: "Show series legend" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
   });
 
   it("closes via the close button", () => {
@@ -399,7 +409,7 @@ describe("SettingsDialog", () => {
       />
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "close" }));
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(onClose).toHaveBeenCalled();
   });
 
@@ -472,16 +482,16 @@ describe("SettingsDialog", () => {
     );
 
     fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
-    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove selected(1)" }));
 
     expect(screen.getByText("Removed RSI (5)")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+    clickUndo();
     expect(controller.addSelection).toHaveBeenCalledWith(
       expect.objectContaining({ ucid: "u1" }),
       controller.listings[0]
     );
-    expect(screen.queryByRole("button", { name: "UNDO" })).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("button", { name: "Undo" })).toHaveLength(0);
     expect(await screen.findByText("Restored RSI (5)")).toBeInTheDocument();
     expect(controller.addSelection).toHaveBeenCalledTimes(1);
     expect(screen.queryByText("Removed RSI (5)")).not.toBeInTheDocument();
@@ -500,8 +510,8 @@ describe("SettingsDialog", () => {
     );
 
     fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
-    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
-    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove selected(1)" }));
+    clickUndo();
 
     await screen.findByText("Restored RSI (5)");
     expect(controller.applyOrder).toHaveBeenCalledWith(["u1", "u2"]);
@@ -530,10 +540,10 @@ describe("SettingsDialog", () => {
     );
 
     fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
-    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove selected(1)" }));
     // u3 moves above u2 after the removal: u3, u2.
     sel.splice(0, sel.length, ...[sel[1], sel[0]].filter(Boolean));
-    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+    clickUndo();
 
     await screen.findByText("Restored RSI (5)");
     expect(controller.applyOrder).toHaveBeenCalledWith(["u3", "u1", "u2"]);
@@ -559,14 +569,14 @@ describe("SettingsDialog", () => {
       );
       fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
       fireEvent.click(screen.getByRole("checkbox", { name: "select SMA (50)" }));
-      fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (2)" }));
+      fireEvent.click(screen.getByRole("button", { name: "Remove selected(2)" }));
       return controller;
     }
 
     it("puts two adjacent removals back in their old order", async () => {
       const controller = renderThree();
 
-      fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+      clickUndo();
 
       await screen.findByText("Restored 2 indicators");
       expect(controller.applyOrder).toHaveBeenCalledWith(["u1", "u2", "u3"]);
@@ -583,7 +593,7 @@ describe("SettingsDialog", () => {
         })
         .mockRejectedValueOnce(new Error("gone"));
 
-      fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+      clickUndo();
 
       await screen.findByText("Restored 1 of 2 indicators");
       // The failed one is absent from the controller; the order names it and the
@@ -606,9 +616,9 @@ describe("SettingsDialog", () => {
     );
 
     fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
-    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove selected(1)" }));
     controller.listings.length = 0;
-    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+    clickUndo();
 
     expect(await screen.findByText("Could not restore the removed indicators")).toBeInTheDocument();
   });
@@ -627,8 +637,8 @@ describe("SettingsDialog", () => {
     );
 
     fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
-    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
-    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove selected(1)" }));
+    clickUndo();
 
     expect(await screen.findByText("Could not restore the removed indicators")).toBeInTheDocument();
   });
@@ -647,7 +657,7 @@ describe("SettingsDialog", () => {
     );
 
     expect(screen.getByText("BB(20,2) added")).toBeInTheDocument();
-    expect(document.querySelector(".dialog-body")?.scrollTop).toBe(120);
+    expect(document.querySelector(".settings-body")?.scrollTop).toBe(120);
   });
 
   describe("available indicator filter", () => {
@@ -752,7 +762,7 @@ describe("SettingsDialog", () => {
       expect(available).not.toBeNull();
       expect(
         within(available as HTMLElement)
-          .getAllByRole("heading")
+          .getAllByRole("heading", { level: 3 })
           .map(h => h.textContent)
       ).toEqual(["Oscillators", "Moving averages"]);
     });

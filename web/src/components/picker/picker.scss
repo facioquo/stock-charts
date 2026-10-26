@@ -1,14 +1,12 @@
 /*
- * Styles for the settings + indicator-picker dialogs. Co-located with the
- * components and imported from ChartPage so it stays decoupled from the global
- * theme stylesheet. Uses the same CSS custom properties (--bg, --surface,
- * --text, etc.) defined by the global theme.
- *
- * Related selectors (descendants, pseudo-classes, state modifiers) are nested
- * under their parent so each control reads as one cohesive unit.
+ * Layout for the settings + indicator-config dialogs. The dialogs and every
+ * control in them are Primer components as shipped; these rules only place
+ * them and draw the two custom elements, the reorderable indicator rows and
+ * the color swatches. Colors and sizes are Primer tokens, so they follow its
+ * theme.
  */
 
-/* SETTINGS FAB */
+/* SETTINGS BUTTON: pinned to the chart's top-right corner while the page scrolls. */
 .fab-container {
   position: absolute;
   top: -56px;
@@ -19,272 +17,85 @@
 .fab {
   position: sticky;
   top: 8px;
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  border: none;
-  cursor: pointer;
-  opacity: 0.6;
-  background-color: var(--primary-container);
-  color: var(--text);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 3px 5px rgb(0 0 0 / 30%);
-
-  &:hover {
-    opacity: 0.9;
-  }
 }
 
-/* MODAL / DIALOG */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5vh 16px;
-  background-color: rgb(0 0 0 / 50%);
-  overflow-y: auto;
+/* Site-level notices above the chart; empty regions take no space. */
+.page-banner:not(:empty) {
+  margin: 16px 16px 8px;
 }
 
-.modal-panel {
-  width: 100%;
-  max-width: 560px;
-  background-color: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 40%);
-  outline: none;
-}
-
-.dialog-toolbar {
-  display: flex;
-  align-items: center;
-  padding: 12px 12px 12px 40px;
-  border-bottom: 1px solid var(--border);
-  font-size: 1.25rem;
-  font-weight: 500;
-}
-
-.dialog-title {
-  text-align: center;
-  font-size: 1.3em;
-  font-weight: 400;
-  margin: 0;
-  padding: 16px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.filler {
-  flex: 1 1 auto;
-}
-
-.dialog-body {
-  padding: 32px;
-  max-height: calc(100vh - 200px);
-  overflow-y: auto;
-}
-
-.dialog-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  border-bottom: 1px solid var(--border);
-}
-
-.dialog-tab {
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text-muted);
-  padding: 8px 16px;
-  cursor: pointer;
-  font: inherit;
-
-  &.active {
-    color: var(--text);
-    border-bottom-color: var(--accent);
-  }
-}
-
-.dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 0 32px 16px;
-}
-
-.dialog-error {
-  .error {
-    color: var(--error);
-    font-weight: 500;
-  }
-}
-
-/* TOGGLES */
+/* SETTINGS DIALOG */
 .general-settings {
-  list-style: none;
   margin: 0;
   padding: 0;
-
-  li {
-    display: flex;
-  }
+  list-style: none;
 }
 
-.toggle-row {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  min-width: 0;
-  box-sizing: border-box;
-  min-height: 44px;
-  padding: 8px 8px 8px 16px;
-  cursor: pointer;
+.settings-status:not(:empty) {
+  margin-bottom: var(--base-size-16);
 }
 
-.toggle-label {
-  font-size: large;
-  flex: 1 1 auto;
+.muted-text {
+  color: var(--fgColor-muted);
 }
 
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-
-  input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .slider {
-    position: absolute;
-    inset: 0;
-    background-color: var(--border);
-    border-radius: 24px;
-    transition: background-color 0.15s;
-
-    &::before {
-      content: "";
-      position: absolute;
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      top: 3px;
-      background-color: var(--on-primary);
-      border-radius: 50%;
-      transition: transform 0.15s;
-    }
-  }
-
-  input:focus-visible + .slider {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  input:checked + .slider {
-    background-color: var(--control-container);
-
-    &::before {
-      transform: translateX(20px);
-    }
-  }
-}
-
-/* SECTION HEADERS + LISTS */
 .dialog-section-header {
   display: flex;
   align-items: center;
-  padding: 10px 12px 10px 16px;
-  margin-top: 16px;
-  background-color: var(--bg);
-  border-radius: 4px;
-  font-size: 1.2em;
-  font-weight: 500;
+  gap: var(--base-size-8);
+  margin-top: var(--base-size-24);
+  padding: 0 var(--base-size-8) var(--base-size-8) 0;
+  border-bottom: var(--borderWidth-thin) solid var(--borderColor-default);
+
+  h2 {
+    flex: 1 1 auto;
+  }
 
   &.column {
     flex-direction: column;
     align-items: flex-start;
+    gap: var(--base-size-4);
   }
 }
 
-.help-link {
-  font-size: 0.75rem;
-  font-weight: 400;
-}
-
-/* Spaced like the available indicators' category headings, with a hint beneath. */
 .selection-group-header {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 12px 16px 6px;
+  gap: var(--base-size-4);
+  padding: var(--base-size-16) 0 var(--base-size-8);
 }
 
-.selection-list + .selection-group-header {
-  padding-top: 32px;
+.copy-link-status {
+  min-height: 1.5em;
+  margin: var(--base-size-4) var(--base-size-8) 0 0;
+  text-align: right;
 }
 
-.selection-group-hint {
-  font-size: 0.8rem;
-  color: var(--text-muted);
+.action-button-container {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--base-size-16);
 }
 
-.selection-list,
-.nav-list {
-  list-style: none;
+/* Reorderable rows: drag handle, name, edit, and a checkbox under the select-all. */
+.selection-list {
   margin: 0;
   padding: 0;
-}
-
-.settings-status {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 16px;
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-}
-
-.selection-list {
-  li.selected {
-    background-color: var(--list-hover);
-  }
+  list-style: none;
 
   li {
     display: flex;
     align-items: center;
-    border-radius: 4px;
-
-    /* Too narrow for the name beside its controls: the drag handle and name
-       keep the first line and the other controls sit beneath, right-aligned. */
-    @media (width < 380px) {
-      flex-wrap: wrap;
-
-      label {
-        flex-basis: calc(100% - 44px);
-      }
-
-      label + .icon-button {
-        margin-left: auto;
-      }
-    }
+    gap: var(--base-size-4);
+    padding-right: var(--base-size-8);
+    border-radius: var(--borderRadius-medium);
 
     &:hover {
-      background-color: var(--list-hover);
+      background-color: var(--control-transparent-bgColor-hover);
+    }
+
+    &.selected {
+      background-color: var(--control-transparent-bgColor-selected);
     }
 
     &.dragging {
@@ -303,7 +114,7 @@
         left: 0;
         height: 2px;
         border-radius: 1px;
-        background-color: var(--accent);
+        background-color: var(--borderColor-accent-emphasis);
         pointer-events: none;
       }
     }
@@ -315,414 +126,81 @@
     &.drop-after::after {
       bottom: -1px;
     }
+
+    /* Too narrow for the name beside its controls: the drag handle and name
+       keep the first line and the other controls sit beneath, right-aligned. */
+    @media (width < 380px) {
+      flex-wrap: wrap;
+
+      label {
+        flex-basis: calc(100% - var(--base-size-40));
+      }
+
+      label + * {
+        margin-left: auto;
+      }
+    }
   }
 
-  /* A name has no spaces, so it breaks only when it cannot fit. The control
-     buttons keep their touch size, so phones trade the name some padding and
-     size instead. */
+  /* A name has no spaces, so it breaks only when it cannot fit. */
   label {
     flex: 1 1 0;
     min-width: 0;
     overflow-wrap: break-word;
-    padding: 10px 4px;
+    padding: var(--base-size-8) var(--base-size-4);
     cursor: pointer;
+  }
 
-    @media (width <= 420px) {
-      font-size: 0.9rem;
+  .drag-handle {
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
     }
   }
 }
 
-/* Pinned to the top of the scrolling dialog body, so it stays in reach in a long list.
-   The negative offset matches the body's top padding, so rows do not show above it. */
+/* Pinned to the top of the scrolling dialog body, so it stays in reach in a long
+   list. The negative offset matches Primer's dialog body padding. */
 .listing-filter {
   position: sticky;
-  top: -32px;
+  top: calc(var(--base-size-16) * -1);
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 12px 0 8px;
-  background-color: var(--surface);
-}
-
-/* Narrower than the section header, with an outline and a search icon, so it
-   reads as a field rather than another header band. Right-aligned, so its edge
-   does not sit just off the list text's left margin. */
-.listing-filter-field {
-  position: relative;
-  align-self: flex-end;
-  width: 100%;
-  max-width: 320px;
-
-  .material-icons {
-    position: absolute;
-    left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 20px;
-    color: var(--text-muted);
-    pointer-events: none;
-  }
-
-  .listing-filter-input {
-    width: 100%;
-    box-sizing: border-box;
-    padding-left: 34px;
-    background-color: var(--surface);
-    border-color: var(--text-muted);
-
-    &:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 1px;
-    }
-  }
+  gap: var(--base-size-4);
+  padding: var(--base-size-16) 0 var(--base-size-8);
+  background-color: var(--overlay-bgColor);
 }
 
 .listing-filter-status {
   align-self: flex-end;
-  font-size: 0.8rem;
-  min-height: 1.2em;
-}
-
-.nav-list {
-  button {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    text-align: left;
-    background: none;
-    border: none;
-    border-bottom: 1px solid var(--border);
-    color: var(--text);
-    padding: 12px 16px;
-    cursor: pointer;
-    font: inherit;
-    min-height: 48px;
-    justify-content: center;
-
-    &:hover {
-      background-color: var(--list-hover);
-    }
-  }
-}
-
-.nav-title {
-  font-size: 1rem;
-}
-
-/* Category headings share one look across the dialog's sections. */
-.listing-category-title,
-.selection-group-title {
-  margin: 0;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-/* Extra space above each heading separates the categories; the first one
-   needs less, since the filter already sets it apart. */
-.listing-category-title {
-  padding: 32px 16px 6px;
-}
-
-.listing-filter + .listing-category-title {
-  padding-top: 12px;
-}
-
-.action-button-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 12px 8px 24px 0;
-}
-
-.copy-link-status {
-  display: block;
-  padding: 4px 16px 0;
-  text-align: right;
-  font-size: 0.85rem;
-  min-height: 1.2em;
-}
-
-.shared-view-banner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
-  margin: 16px 16px 8px;
-  padding: 8px 12px;
-  background-color: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-
-  .banner-text {
-    flex: 1 1 16rem;
-  }
-}
-
-/* PARAM + STYLE FORMS */
-.param-container {
-  margin: 1rem auto 0;
-  max-width: 220px;
-}
-
-.param-input {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
-
-  input {
-    text-align: center;
-  }
-}
-
-.style-container {
-  margin: 1rem 0;
-  padding-bottom: 2.5rem;
-  // border-bottom: 1px solid var(--border);
-
-  h3 {
-    font-size: 1em;
-    font-weight: 400;
-    margin: 0 0 8px 8px;
-  }
-
-  @media screen and (width <=700px) {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 200px;
-  }
-
-  .style-input {
-    display: inline-flex;
-    flex-direction: column;
-    margin: 0 1rem 0.5rem 0;
-    width: 150px;
-
-    @media screen and (width <=700px) {
-      display: block;
-      width: 100%;
-
-      select {
-        width: 100%;
-      }
-    }
-  }
-
-  .line-sample {
-    width: 100%;
-    margin-top: 8px;
-  }
-
-  /* COLOR PICKER */
-  .color-field {
-    position: relative;
-    display: inline-flex;
-    flex-direction: column;
-    margin-bottom: 0.5rem;
-    width: 150px;
-
-    @media screen and (width <=700px) {
-      display: block;
-      width: 100%;
-
-      .color-input-row {
-        input {
-          // width: 100%;
-        }
-      }
-    }
-
-    .color-input-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .color-hex-input {
-      width: 100px;
-
-      &.invalid {
-        border-color: var(--error);
-      }
-    }
-
-    .color-toggle {
-      width: 28px;
-      height: 28px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .swatch-grid {
-      position: absolute;
-      z-index: 1100;
-      top: 100%;
-      left: 0;
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 4px;
-      padding: 8px;
-      background-color: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
-    }
-
-    .swatch {
-      width: 24px;
-      height: 24px;
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      cursor: pointer;
-
-      &[aria-selected="true"] {
-        outline: 2px solid var(--text);
-      }
-    }
-  }
-}
-
-.field-label {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-left: 8px;
-  margin-bottom: 2px;
-
-  @media screen and (width <=700px) {
-    display: block;
-  }
-}
-
-.field-error {
-  color: var(--error);
-  font-size: 0.8rem;
-  margin: 2px 0 0;
-}
-
-/* Holds the error line's height so showing it does not move the dialog. */
-.field-error-slot {
   min-height: 1.5em;
 }
 
-.modal-panel input:not([type="checkbox"]),
-.modal-panel select {
-  background-color: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 6px 8px;
-  font: inherit;
-
-  &:disabled {
-    opacity: 0.5;
-  }
+/* INDICATOR CONFIG DIALOG */
+.param-container {
+  max-width: 220px;
+  margin: 0 auto;
 }
 
-/* A native checkbox; only its size and checked color are set. */
-.standard-checkbox {
-  width: 1rem;
-  height: 1rem;
-  margin: 0;
-  cursor: pointer;
-  vertical-align: middle;
-  color-scheme: var(--control-scheme);
-  accent-color: var(--checkbox-accent);
+.style-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--base-size-16);
+  align-items: start;
 }
 
-/* Last in a list row, so it lines up under the section header's select-all. */
-.selection-checkbox {
-  margin: 0 12px 0 8px;
+/* Preview of the series' line, drawn from its chosen style, under all three fields. */
+.line-sample {
+  grid-column: 1 / -1;
+  width: 100%;
 }
 
-/* BUTTONS */
-.icon-button {
-  background: none;
-  border: none;
-  color: var(--text);
-  cursor: pointer;
-  display: inline-flex;
-  padding: 4px;
-}
-
-.selection-list .icon-button,
-.selection-list .selection-checkbox {
-  flex: none;
-}
-
-.displayed-indicators > .dialog-section-header > .selection-checkbox {
-  margin-right: 0;
-}
-
-/* The glyph's dots sit 7 px inside its box; with the button padding, the
-   margin lines them up with the group header text, 16 px in. */
-.selection-list .drag-handle {
-  margin-left: 5px;
-  cursor: grab;
-
-  &:active {
-    cursor: grabbing;
-  }
-}
-
-/* Phone widths: 44 px icon buttons, 24 px checkboxes, and room for the label. */
-@media (width < 640px) {
-  .dialog-body {
-    padding: 16px;
-  }
-
-  .listing-filter {
-    top: -16px;
-  }
-
-  .dialog-toolbar .icon-button,
-  .dialog-section-header .icon-button,
-  .selection-list .icon-button {
-    padding: 10px;
-  }
-
-  .selection-list .drag-handle {
-    margin-left: -1px;
-  }
-
-  .selection-checkbox {
-    width: 24px;
-    height: 24px;
-    margin: 0 10px 0 6px;
-  }
-}
-
-.btn-text,
-.btn-raised {
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font: inherit;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.btn-text {
-  background: none;
-  color: var(--link);
-}
-
-.btn-raised {
-  color: var(--on-primary);
-}
-
-.btn-primary {
-  background-color: var(--control-container);
-}
-
-.btn-raised:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
+.color-swatch {
+  display: inline-block;
+  width: var(--base-size-16);
+  height: var(--base-size-16);
+  border: var(--borderWidth-thin) solid var(--borderColor-default);
+  border-radius: var(--borderRadius-small);
 }

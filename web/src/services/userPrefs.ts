@@ -13,9 +13,18 @@ const isBrowser = typeof window !== "undefined";
 const defaults: UserSettings = { isDarkTheme: true, showTooltips: false, showSeriesLegend: false };
 
 let current: UserSettings = { ...defaults };
+const themeListeners = new Set<() => void>();
 
 export function getSettings(): UserSettings {
   return current;
+}
+
+/** Subscribes to theme changes, in the shape `useSyncExternalStore` takes. */
+export function subscribeToTheme(listener: () => void): () => void {
+  themeListeners.add(listener);
+  return () => {
+    themeListeners.delete(listener);
+  };
 }
 
 export function loadSettings(): void {
@@ -55,6 +64,7 @@ function tooltipsChosen(): boolean {
 export function changeTheme(isDarkTheme: boolean): void {
   current.isDarkTheme = isDarkTheme;
   cacheSettings();
+  for (const listener of themeListeners) listener();
 
   if (!isBrowser) return;
   const themeClass = isDarkTheme ? "dark-theme" : "light-theme";

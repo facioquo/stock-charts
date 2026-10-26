@@ -9,6 +9,8 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: ["./src/test-setup.ts"],
+    // Primer imports its own CSS, which Node cannot load; inlined, Vite handles it.
+    server: { deps: { inline: [/@primer\/react/] } },
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],

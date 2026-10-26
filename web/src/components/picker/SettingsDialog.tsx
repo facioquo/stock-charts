@@ -1,13 +1,33 @@
 import {
+  createContext,
+  useContext,
   useEffect,
   useId,
   useLayoutEffect,
   useReducer,
   useRef,
   useState,
-  type Dispatch
+  type Dispatch,
+  type PropsWithChildren,
+  type RefObject,
+  type UIEventHandler
 } from "react";
 import { flushSync } from "react-dom";
+import {
+  ActionList,
+  Banner,
+  Button,
+  Checkbox,
+  Dialog,
+  Heading,
+  IconButton,
+  Link,
+  Stack,
+  Text,
+  TextInput,
+  ToggleSwitch
+} from "@primer/react";
+import { GrabberIcon, LinkIcon, PencilIcon, SearchIcon } from "@primer/octicons-react";
 
 import type { ChartController } from "../../charting/chartController";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
@@ -18,8 +38,6 @@ import {
   getSettings
 } from "../../services/userPrefs";
 import { filterListings, groupByCategory, type ListingGroup } from "./listingFilter";
-
-import { Modal } from "./Modal";
 
 interface SettingsDialogProps {
   controller: ChartController;
@@ -60,43 +78,23 @@ function orderWithRestored(current: string[], before: string[], restored: string
   return order;
 }
 
-function StandardCheckbox({
-  id,
-  className,
-  checked,
-  ariaLabel,
-  onChange
-}: {
-  id?: string;
-  className?: string;
-  checked: boolean;
-  ariaLabel: string;
-  onChange: (value: boolean) => void;
-}): React.JSX.Element {
-  return (
-    <input
-      type="checkbox"
-      id={id}
-      aria-label={ariaLabel}
-      checked={checked}
-      onChange={event => onChange(event.target.checked)}
-      className={className ? `standard-checkbox ${className}` : "standard-checkbox"}
-    />
-  );
-}
-
-/** A single labelled on/off switch used in the general-settings list. */
+/** A labelled on/off switch in the general-settings list, laid out as Primer documents it. */
 function ToggleRow({ label, checked, onChange }: ToggleRowProps): React.JSX.Element {
+  const labelId = useId();
   return (
-    <li>
-      <label className="toggle-row">
-        <span className="toggle-label no-wrap">{label}</span>
-        <span className="switch">
-          <StandardCheckbox ariaLabel={label} checked={checked} onChange={onChange} />
-          <span className="slider" />
-        </span>
-      </label>
-    </li>
+    <Stack
+      as="li"
+      direction="horizontal"
+      align="center"
+      justify="space-between"
+      wrap="wrap"
+      gap="condensed"
+    >
+      <Text id={labelId} weight="semibold">
+        {label}
+      </Text>
+      <ToggleSwitch aria-labelledby={labelId} checked={checked} onChange={onChange} />
+    </Stack>
   );
 }
 
@@ -158,10 +156,12 @@ function SelectionGroup({
   return (
     <>
       <div className="selection-group-header">
-        <h3 id={headingId} className="selection-group-title">
+        <Heading as="h3" variant="small" id={headingId}>
           {title}
-        </h3>
-        <span className="selection-group-hint">{hint}</span>
+        </Heading>
+        <Text size="small" className="muted-text">
+          {hint}
+        </Text>
       </div>
       <ul className="selection-list" aria-labelledby={headingId}>
         {selections.map((selection, index) => (
@@ -202,12 +202,13 @@ function SelectionGroup({
               endDrag();
             }}
           >
-            <button
-              type="button"
-              className="icon-button drag-handle"
+            <IconButton
+              icon={GrabberIcon}
+              variant="invisible"
+              className="drag-handle"
               aria-label={`reorder ${selection.label}`}
               aria-keyshortcuts="ArrowUp ArrowDown"
-              title="drag to reorder; use arrow keys to move"
+              description="Drag to reorder, or use the arrow keys"
               draggable
               onDragStart={event => {
                 event.dataTransfer.effectAllowed = "move";
@@ -223,25 +224,19 @@ function SelectionGroup({
                 // React may move this row's node, which drops focus to <body>.
                 handle.focus();
               }}
-            >
-              <span className="material-icons">drag_indicator</span>
-            </button>
+            />
             <label htmlFor={`select-${selection.ucid}`}>{selection.label}</label>
-            <button
-              type="button"
-              className="icon-button"
+            <IconButton
+              icon={PencilIcon}
+              variant="invisible"
               aria-label={`edit ${selection.label}`}
-              title={`edit ${selection.label}`}
               onClick={() => {
                 onEdit(selection);
               }}
-            >
-              <span className="material-icons">edit</span>
-            </button>
-            <StandardCheckbox
+            />
+            <Checkbox
               id={`select-${selection.ucid}`}
-              className="selection-checkbox"
-              ariaLabel={`select ${selection.label}`}
+              aria-label={`select ${selection.label}`}
               checked={checked.has(selection.ucid)}
               onChange={() => onToggle(selection.ucid)}
             />
@@ -282,27 +277,25 @@ function DisplayedIndicators({
   return (
     <section className="displayed-indicators">
       <div className="dialog-section-header">
-        <span>Displayed indicators</span>
-        <span className="filler" />
-        <button
-          type="button"
-          className="icon-button"
+        <Heading as="h2" variant="medium">
+          Displayed indicators
+        </Heading>
+        <IconButton
+          icon={LinkIcon}
+          variant="invisible"
           aria-label="copy share link"
-          title="copy a link that restores these indicators"
+          description="Copy a link that restores these indicators"
           onClick={copyLink}
-        >
-          <span className="material-icons">share</span>
-        </button>
-        <StandardCheckbox
-          className="selection-checkbox"
-          ariaLabel="select all displayed indicators"
+        />
+        <Checkbox
+          aria-label="select all displayed indicators"
           checked={checked.size > 0 && checked.size === selections.length}
-          onChange={onSelectAll}
+          onChange={event => onSelectAll(event.target.checked)}
         />
       </div>
-      <span role="status" className="copy-link-status">
+      <Text as="p" size="small" role="status" className="copy-link-status">
         {copyStatus}
-      </span>
+      </Text>
       <SelectionGroup
         {...groupProps}
         title="Price chart overlays"
@@ -316,15 +309,14 @@ function DisplayedIndicators({
         selections={selections.filter(s => s.chartType === "oscillator")}
       />
       <div className="action-button-container">
-        <button
-          type="button"
-          className="btn-raised btn-primary"
+        <Button
+          variant="danger"
           disabled={checked.size === 0}
-          title="remove selected indicators"
+          count={checked.size > 0 ? checked.size : undefined}
           onClick={onRemove}
         >
-          {checked.size > 0 ? `REMOVE SELECTED (${checked.size})` : "REMOVE SELECTED"}
-        </button>
+          Remove selected
+        </Button>
       </div>
     </section>
   );
@@ -359,52 +351,50 @@ function AvailableIndicators({
   return (
     <section className="available-indicators">
       <div className="dialog-section-header column">
-        <span>Available indicators</span>
-        <span className="help-link">
-          » more info in our{" "}
-          <a
-            title="indicator documentation"
+        <Heading as="h2" variant="medium">
+          Available indicators
+        </Heading>
+        <Text size="small" className="muted-text">
+          More info in our{" "}
+          <Link
+            inline
             target="_blank"
             rel="noopener"
             href="https://dotnet.stockindicators.dev/indicators/"
           >
             online docs
-          </a>
-        </span>
+          </Link>
+        </Text>
       </div>
       <div className="listing-filter">
-        <div className="listing-filter-field">
-          <span className="material-icons" aria-hidden="true">
-            search
-          </span>
-          <input
-            type="search"
-            className="listing-filter-input"
-            aria-label="filter available indicators"
-            placeholder="Filter by name or category"
-            autoComplete="off"
-            spellCheck={false}
-            value={filter}
-            onChange={event => {
-              changeFilter(event.target.value);
-            }}
-            onKeyDown={event => {
-              if (event.key !== "Enter") return;
-              const first = groups[0]?.listings[0];
-              if (filtering && first) {
-                event.preventDefault();
-                onPick(first);
-              }
-            }}
-          />
-        </div>
-        <span aria-live="polite" className="listing-filter-status">
+        <TextInput
+          type="search"
+          block
+          leadingVisual={SearchIcon}
+          aria-label="filter available indicators"
+          placeholder="Filter by name or category"
+          autoComplete="off"
+          spellCheck={false}
+          value={filter}
+          onChange={event => {
+            changeFilter(event.target.value);
+          }}
+          onKeyDown={event => {
+            if (event.key !== "Enter") return;
+            const first = groups[0]?.listings[0];
+            if (filtering && first) {
+              event.preventDefault();
+              onPick(first);
+            }
+          }}
+        />
+        <Text size="small" aria-live="polite" className="listing-filter-status muted-text">
           {filtering
             ? matches.length === 0
               ? "No indicators match"
               : `${matches.length} of ${listings.length} indicators`
             : ""}
-        </span>
+        </Text>
       </div>
       {groups.map(group => (
         <ListingCategory key={group.category} group={group} onPick={onPick} />
@@ -424,44 +414,40 @@ function ListingCategory({
   const headingId = useId();
   return (
     <>
-      <h3 id={headingId} className="listing-category-title">
-        {group.label}
-      </h3>
-      <ul className="nav-list" aria-labelledby={headingId}>
+      <div className="selection-group-header">
+        <Heading as="h3" variant="small" id={headingId}>
+          {group.label}
+        </Heading>
+      </div>
+      <ActionList aria-labelledby={headingId}>
         {group.listings.map(listing => (
-          <li key={listing.uiid}>
-            <button type="button" onClick={() => onPick(listing)}>
-              <span className="nav-title">{listing.name}</span>
-            </button>
-          </li>
+          <ActionList.Item key={listing.uiid} onSelect={() => onPick(listing)}>
+            {listing.name}
+          </ActionList.Item>
         ))}
-      </ul>
+      </ActionList>
     </>
   );
 }
 
-/** Toolbar with the dialog title and a close button. */
-function DialogToolbar({
-  titleId,
-  onClose
-}: {
-  titleId: string;
-  onClose: () => void;
-}): React.JSX.Element {
+interface ScrollBody {
+  ref: RefObject<HTMLDivElement | null>;
+  onScroll: UIEventHandler<HTMLDivElement>;
+}
+
+const ScrollBodyContext = createContext<ScrollBody | null>(null);
+
+/**
+ * The dialog's scrolling body, with its ref and scroll handler from context so the
+ * position survives a reopen. Module-level, so `renderBody` keeps one identity and
+ * the content below it is not remounted on every render.
+ */
+function ScrollRestoringBody({ children }: PropsWithChildren): React.JSX.Element {
+  const scroll = useContext(ScrollBodyContext);
   return (
-    <div className="dialog-toolbar">
-      <span id={titleId}>Chart settings</span>
-      <span className="filler" />
-      <button
-        type="button"
-        className="icon-button"
-        aria-label="close"
-        title="close"
-        onClick={onClose}
-      >
-        <span className="material-icons">close</span>
-      </button>
-    </div>
+    <Dialog.Body ref={scroll?.ref} className="settings-body" onScroll={scroll?.onScroll}>
+      {children}
+    </Dialog.Body>
   );
 }
 
@@ -608,7 +594,6 @@ export function SettingsDialog({
   initialFilter = "",
   onFilterChange
 }: SettingsDialogProps): React.JSX.Element {
-  const titleId = useId();
   const controls = useSettingsControls(controller);
   const selections = controller.selections;
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -624,32 +609,33 @@ export function SettingsDialog({
   }, [notice]);
   const status = controls.removal?.text ?? announced;
 
-  return (
-    <Modal open onClose={onClose} labelledBy={titleId} className="settings-dialog">
-      <DialogToolbar titleId={titleId} onClose={onClose} />
+  const scrollBody: ScrollBody = {
+    ref: bodyRef,
+    onScroll: event => {
+      onScrollChange?.(event.currentTarget.scrollTop);
+    }
+  };
 
-      <div
-        ref={bodyRef}
-        className="dialog-body"
-        onScroll={event => {
-          onScrollChange?.(event.currentTarget.scrollTop);
-        }}
-      >
+  return (
+    <ScrollBodyContext.Provider value={scrollBody}>
+      <Dialog title="Chart settings" onClose={onClose} renderBody={ScrollRestoringBody}>
         {/* Mounted before it has text, so a screen reader announces the result when it fills. */}
-        <div className={status || notice ? "settings-status" : undefined}>
-          <span aria-live="polite">{status}</span>
-          {controls.removal?.undo && (
-            <button
-              type="button"
-              className="btn-text"
-              title="add back where it was"
-              onClick={controls.removal.undo}
-            >
-              UNDO
-            </button>
+        <div aria-live="polite" className="settings-status">
+          {status && (
+            <Banner
+              title="Result"
+              hideTitle
+              variant="info"
+              description={status}
+              primaryAction={
+                controls.removal?.undo && (
+                  <Banner.PrimaryAction onClick={controls.removal.undo}>Undo</Banner.PrimaryAction>
+                )
+              }
+            />
           )}
         </div>
-        <ul className="general-settings">
+        <Stack as="ul" gap="normal" className="general-settings">
           <ToggleRow
             label="Dark theme"
             checked={controls.isDarkTheme}
@@ -665,7 +651,7 @@ export function SettingsDialog({
             checked={controls.showSeriesLegend}
             onChange={controls.onToggleSeriesLegend}
           />
-        </ul>
+        </Stack>
 
         {selections.length > 0 && (
           <DisplayedIndicators
@@ -686,7 +672,7 @@ export function SettingsDialog({
           initialFilter={initialFilter}
           onFilterChange={onFilterChange}
         />
-      </div>
-    </Modal>
+      </Dialog>
+    </ScrollBodyContext.Provider>
   );
 }

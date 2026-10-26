@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { Banner, Button, IconButton } from "@primer/react";
+import { CloudOfflineIcon, LinkIcon, PencilIcon } from "@primer/octicons-react";
 
 import { env } from "../config/env";
 import { getChartController, useChartState } from "../charting/useChart";
@@ -85,7 +87,7 @@ export function ChartPage(): React.JSX.Element {
           className="api-error-container"
         >
           <div className="api-error-content">
-            <span className="material-icons api-error-icon">cloud_off</span>
+            <CloudOfflineIcon size={48} className="api-error-icon" />
 
             {isProduction ? (
               <>
@@ -123,64 +125,64 @@ export function ChartPage(): React.JSX.Element {
               </>
             )}
 
-            <button
-              type="button"
-              className="btn-raised btn-primary"
+            <Button
+              variant="primary"
               onClick={() => {
                 retried.current = true;
                 void controller.retryLoad();
               }}
             >
-              TRY AGAIN
-            </button>
+              Try again
+            </Button>
           </div>
         </div>
       )}
 
       {/* Mounted before it has text, so a screen reader announces the notice when it fills. */}
-      <div className={offline && !apiError ? "shared-view-banner" : undefined}>
-        <span role="status" className={offline && !apiError ? "banner-text" : undefined}>
-          {offline && !apiError
-            ? "The live API is unreachable. Showing saved data; indicators with custom settings may be blank."
-            : ""}
-        </span>
+      <div role="status" className="page-banner">
+        {offline && !apiError && (
+          <Banner
+            title="Offline"
+            hideTitle
+            variant="warning"
+            description="The live API is unreachable. Showing saved data; indicators with custom settings may be blank."
+          />
+        )}
       </div>
 
       {/* The status region stays mounted so a screen reader announces its text when it fills. */}
-      <div className={sharedView ? "shared-view-banner" : undefined}>
+      <div role="status" className="page-banner">
         {sharedView && (
-          <span className="material-icons" aria-hidden="true">
-            link
-          </span>
-        )}
-        <span role="status" className={sharedView ? "banner-text" : undefined}>
-          {sharedView ? "Showing a shared chart." : ""}
-        </span>
-        {sharedView && (
-          <button
-            type="button"
-            className="btn-raised btn-primary"
-            onClick={() => {
-              controller.returnToSavedSetup();
-            }}
-          >
-            BACK TO MY INDICATORS
-          </button>
+          <Banner
+            title="Shared chart"
+            hideTitle
+            variant="info"
+            leadingVisual={<LinkIcon />}
+            description="Showing a shared chart."
+            primaryAction={
+              <Banner.PrimaryAction
+                onClick={() => {
+                  controller.returnToSavedSetup();
+                }}
+              >
+                Back to my indicators
+              </Banner.PrimaryAction>
+            }
+          />
         )}
       </div>
 
-      {/* SETTINGS FAB */}
+      {/* SETTINGS BUTTON */}
       {!loading && !apiError && (
         <div className="fab-container">
-          <button
-            type="button"
+          <IconButton
+            icon={PencilIcon}
+            size="large"
             className="fab"
             aria-label="edit settings"
-            title="change indicators and settings"
+            description="Change indicators and settings"
             onClick={() => setSettingsOpen(true)}
-          >
-            <span className="material-icons">edit</span>
-          </button>
+          />
         </div>
       )}
 

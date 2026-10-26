@@ -86,7 +86,7 @@ describe("ChartPage", () => {
   it("offers a retry when the chart data cannot be loaded", () => {
     render(<ChartPage />);
 
-    fireEvent.click(screen.getByRole("button", { name: "TRY AGAIN" }));
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
 
     expect(mocks.retryLoad).toHaveBeenCalledTimes(1);
   });

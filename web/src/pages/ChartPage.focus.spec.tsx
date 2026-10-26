@@ -21,7 +21,7 @@ describe("ChartPage focus after a retry", () => {
   it("follows the page from loading to the chart on success", () => {
     mocks.state = { loading: false, apiError: true, offline: false, sharedView: false };
     const { rerender } = render(<ChartPage />);
-    fireEvent.click(screen.getByRole("button", { name: "TRY AGAIN" }));
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
 
     mocks.state = { ...mocks.state, apiError: false, loading: true };
     rerender(<ChartPage />);
@@ -36,7 +36,7 @@ describe("ChartPage focus after a retry", () => {
   it("returns to the error panel when the retry fails", () => {
     mocks.state = { loading: false, apiError: true, offline: false, sharedView: false };
     const { rerender } = render(<ChartPage />);
-    fireEvent.click(screen.getByRole("button", { name: "TRY AGAIN" }));
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
 
     mocks.state = { ...mocks.state, apiError: false, loading: true };
     rerender(<ChartPage />);
