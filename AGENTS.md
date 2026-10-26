@@ -52,7 +52,7 @@ stock-charts/
 ├── docs/                     # Documentation
 ├── scripts/                  # Setup and utility scripts
 ├── tools/
-│   └── codacy-mcp/           # Pinned Codacy MCP server; its own pnpm workspace, outside the root one
+│   └── codacy-mcp/           # Pinned Codacy Model Context Protocol (MCP) server; its own pnpm workspace, outside the root one
 └── .github/
     └── workflows/            # CI/CD configs
 ```

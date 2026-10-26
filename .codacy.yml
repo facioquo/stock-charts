@@ -3,3 +3,11 @@ exclude_paths:
   - ".claude/**"
   - "tests/vitepress/.vitepress/theme/custom.css"
   - "web/**/*.scss"
+  # Codacy's own MCP server, a developer tool that never ships; its remaining
+  # advisories sit in Codacy's bundled linters, fixable only upstream
+  - "tools/codacy-mcp/**"
+engines:
+  lizard:
+    exclude_paths:
+      # generated
+      - "**/pnpm-lock.yaml"
