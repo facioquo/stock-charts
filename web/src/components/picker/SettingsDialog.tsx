@@ -430,9 +430,9 @@ interface SettingsControls {
   showTooltips: boolean;
   showSeriesLegend: boolean;
   checked: ReadonlySet<string>;
-  onToggleTheme: (value: boolean) => void;
-  onToggleTooltips: (value: boolean) => void;
-  onToggleSeriesLegend: (value: boolean) => void;
+  onToggleTheme: ToggleRowProps["onChange"];
+  onToggleTooltips: ToggleRowProps["onChange"];
+  onToggleSeriesLegend: ToggleRowProps["onChange"];
   toggleChecked: (ucid: string) => void;
   selectAll: (value: boolean) => void;
   removeSelected: () => void;

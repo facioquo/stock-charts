@@ -15,4 +15,6 @@ export type {
 } from "@facioquo/indy-charts";
 
 /** Settings the demo saves; the series legend choice is always set here. */
-export type UserSettings = ChartSettings & { showSeriesLegend: boolean };
+export interface UserSettings extends ChartSettings {
+  showSeriesLegend: boolean;
+}
