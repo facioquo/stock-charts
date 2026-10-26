@@ -9,15 +9,7 @@ packages:
 minimumReleaseAge: 0
 minimumReleaseAgeStrict: false
 
-overrides:
-  flatted: ">=3.4.2"
-
 allowBuilds:
   '@parcel/watcher': false
   esbuild: false
-  lmdb: false
-  msgpackr-extract: false
-  unrs-resolver: false
-  vue-demi: false
-  # wrangler's local runtime; its install script fetches the platform binary
   workerd: true

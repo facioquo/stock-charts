@@ -7,7 +7,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="coverlet.MTP" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Moq" />
     <PackageReference Include="xunit.v3" />
   </ItemGroup>

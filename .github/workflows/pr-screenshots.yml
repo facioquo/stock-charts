@@ -72,7 +72,7 @@ jobs:
       - name: Setup Node.js
         continue-on-error: true
         timeout-minutes: 2
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: https://npm.pkg.github.com
@@ -136,7 +136,7 @@ jobs:
           run_install: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -209,7 +209,7 @@ jobs:
           path: ${{ runner.temp }}/pr-screenshots/before
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: https://npm.pkg.github.com

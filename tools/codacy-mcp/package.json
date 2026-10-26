@@ -1,0 +1,11 @@
+{
+  "name": "@stock-charts/codacy-mcp",
+  "private": true,
+  "description": "Pinned Codacy MCP server, installed by `pnpm run setup:codacy-mcp` and started from .mcp.json",
+  "license": "Apache-2.0",
+  "type": "module",
+  "packageManager": "pnpm@12.15.0",
+  "dependencies": {
+    "@codacy/codacy-mcp": "0.7.0"
+  }
+}

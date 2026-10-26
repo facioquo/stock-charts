@@ -20,10 +20,8 @@
   },
   "dependencies": {
     "@facioquo/indy-charts": "workspace:*",
-    "chart.js": "~4.5.1",
-    "chartjs-adapter-date-fns": "^3.0.0",
+    "chart.js": "~4.6.1",
     "chartjs-plugin-annotation": "^3.1.0",
-    "date-fns": "^4.4.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router-dom": "^7.18.4",
@@ -38,16 +36,16 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "@vitest/coverage-v8": "^5.0.5",
-    "@vitest/eslint-plugin": "1.6.27",
+    "@vitest/eslint-plugin": "1.6.28",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
     "jiti": "^2.7.0",
     "jsdom": "^30.1.3",
-    "sass": "^1.105.2",
+    "sass": "^1.106.1",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.72.0",
-    "vite": "^8.3.4",
+    "typescript-eslint": "^8.72.1",
+    "vite": "^8.3.5",
     "vitest": "^5.0.5"
   }
 }

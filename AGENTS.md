@@ -51,6 +51,8 @@ stock-charts/
 │   └── vitepress/            # Docs site (Cloudflare Pages) + indy-charts integration host
 ├── docs/                     # Documentation
 ├── scripts/                  # Setup and utility scripts
+├── tools/
+│   └── codacy-mcp/           # Pinned Codacy Model Context Protocol (MCP) server; its own pnpm workspace, outside the root one
 └── .github/
     └── workflows/            # CI/CD configs
 ```
@@ -61,6 +63,7 @@ stock-charts/
 # Setup (or VS Code task "Setup: Dev environment")
 dotnet tool restore                    # Local .NET tools
 pnpm exec playwright install chromium  # Browser for E2E tests
+pnpm run setup:codacy-mcp              # Codacy MCP server that .mcp.json starts (optional)
 
 # Install dependencies
 pnpm install                   # Install all workspace dependencies

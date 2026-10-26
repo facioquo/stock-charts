@@ -5,7 +5,7 @@
   "author": "facioquo",
   "license": "Apache-2.0",
   "type": "module",
-  "packageManager": "pnpm@11.24.0",
+  "packageManager": "pnpm@12.15.0",
   "engines": {
     "node": ">=24"
   },
@@ -15,10 +15,11 @@
   },
   "scripts": {
     "postinstall": "node scripts/setup-playwright-mcp.cjs",
-    "clean": "rm -rf node_modules .codacy && pnpm -r run clean",
+    "setup:codacy-mcp": "pnpm install --dir tools/codacy-mcp --frozen-lockfile",
+    "clean": "rm -rf node_modules tools/codacy-mcp/node_modules .codacy && pnpm -r run clean",
     "deps:check": "ncu --deep --peer",
     "deps:update": "ncu --deep --peer --target semver --upgrade",
-    "build": "pnpm -r run build",
+    "build": "pnpm -r --workspace-concurrency=1 run build",
     "build:prod": "pnpm -r --if-present run build:prod",
     "start": "pnpm --filter @stock-charts/web run start",
     "serve": "pnpm --filter @stock-charts/web run dev",
@@ -64,13 +65,13 @@
     "@playwright/test": "1.64.1",
     "eslint": "^10.13.0",
     "globals": "^17.13.0",
-    "markdownlint-cli2": "^0.23.3",
+    "markdownlint-cli2": "^0.24.0",
     "npm-check-updates": "^23.1.1",
     "postcss-scss": "^4.0.9",
     "prettier": "^3.9.10",
     "stylelint": "^17.16.0",
     "stylelint-config-standard": "^40.0.0",
-    "stylelint-scss": "^7.3.0",
+    "stylelint-scss": "^7.4.0",
     "typescript": "^6.0.3"
   }
 }
