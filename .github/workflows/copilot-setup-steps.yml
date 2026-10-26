@@ -39,9 +39,7 @@ jobs:
         continue-on-error: true
 
       - name: Build .NET Solution
-        run: |
-          dotnet clean Charts.sln
-          dotnet build Charts.sln --no-incremental
+        run: dotnet build Charts.sln
         continue-on-error: true
 
       - name: Setup pnpm

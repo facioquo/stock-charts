@@ -151,8 +151,9 @@ jobs:
           pnpm --filter @facioquo/chartjs-chart-financial run build
           pnpm --filter @facioquo/indy-charts run build
 
+      # Headless capture uses only the headless shell.
       - name: Install Playwright Chromium
-        run: pnpm --filter @stock-charts/playwright-tests exec playwright install --with-deps chromium
+        run: pnpm --filter @stock-charts/playwright-tests exec playwright install --with-deps --only-shell chromium
 
       # Never a failure: a capture problem leaves the description saying this
       # push has no screenshots. Playwright's global timeout stops it at a
