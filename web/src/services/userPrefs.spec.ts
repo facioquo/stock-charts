@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { changeTheme, changeTooltips, getSettings, loadSettings } from "./userPrefs";
+import {
+  changeSeriesLegend,
+  changeTheme,
+  changeTooltips,
+  getSettings,
+  loadSettings
+} from "./userPrefs";
 
 /**
  * Vitest tests for the module-level preference store: default/cached
@@ -21,12 +27,16 @@ describe("userPrefs", () => {
     it("applies default settings when no cached settings exist", () => {
       loadSettings();
 
-      expect(getSettings()).toEqual({ isDarkTheme: true, showTooltips: false });
+      expect(getSettings()).toEqual({
+        isDarkTheme: true,
+        showTooltips: false,
+        showSeriesLegend: false
+      });
       expect(localStorage.getItem("settings")).toBeTruthy();
     });
 
     it("loads cached settings when they exist", () => {
-      const cached = { isDarkTheme: false, showTooltips: true };
+      const cached = { isDarkTheme: false, showTooltips: true, showSeriesLegend: true };
       localStorage.setItem("settings", JSON.stringify(cached));
       localStorage.setItem("settings.tooltipsChosen", "true");
 
@@ -40,7 +50,11 @@ describe("userPrefs", () => {
 
       loadSettings();
 
-      expect(getSettings()).toEqual({ isDarkTheme: false, showTooltips: false });
+      expect(getSettings()).toEqual({
+        isDarkTheme: false,
+        showTooltips: false,
+        showSeriesLegend: false
+      });
     });
 
     it("keeps tooltips off for a visitor who chose off", () => {
@@ -59,6 +73,23 @@ describe("userPrefs", () => {
       loadSettings();
 
       expect(getSettings().showTooltips).toBe(true);
+    });
+
+    it("leaves the series legend off for a visitor whose settings predate it", () => {
+      localStorage.setItem("settings", JSON.stringify({ isDarkTheme: false, showTooltips: false }));
+
+      loadSettings();
+
+      expect(getSettings().showSeriesLegend).toBe(false);
+    });
+
+    it("keeps the series legend on for a visitor who switched it on", () => {
+      loadSettings();
+      changeSeriesLegend(true);
+
+      loadSettings();
+
+      expect(getSettings().showSeriesLegend).toBe(true);
     });
 
     it("applies the cached theme to document.body on load", () => {
@@ -121,6 +152,18 @@ describe("userPrefs", () => {
       expect(cached).toBeTruthy();
       const parsed = JSON.parse(cached as string) as { showTooltips: boolean };
       expect(parsed.showTooltips).toBe(true);
+    });
+  });
+
+  describe("changeSeriesLegend", () => {
+    it("updates and caches the series legend setting", () => {
+      changeSeriesLegend(true);
+
+      expect(getSettings().showSeriesLegend).toBe(true);
+      const parsed = JSON.parse(localStorage.getItem("settings") as string) as {
+        showSeriesLegend: boolean;
+      };
+      expect(parsed.showSeriesLegend).toBe(true);
     });
   });
 });

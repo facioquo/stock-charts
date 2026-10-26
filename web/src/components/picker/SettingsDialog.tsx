@@ -11,7 +11,12 @@ import { flushSync } from "react-dom";
 
 import type { ChartController } from "../../charting/chartController";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
-import { changeTheme, changeTooltips, getSettings } from "../../services/userPrefs";
+import {
+  changeSeriesLegend,
+  changeTheme,
+  changeTooltips,
+  getSettings
+} from "../../services/userPrefs";
 import { filterListings, groupByCategory, type ListingGroup } from "./listingFilter";
 
 import { Modal } from "./Modal";
@@ -423,9 +428,11 @@ function DialogToolbar({
 interface SettingsControls {
   isDarkTheme: boolean;
   showTooltips: boolean;
+  showSeriesLegend: boolean;
   checked: ReadonlySet<string>;
-  onToggleTheme: (value: boolean) => void;
-  onToggleTooltips: (value: boolean) => void;
+  onToggleTheme: ToggleRowProps["onChange"];
+  onToggleTooltips: ToggleRowProps["onChange"];
+  onToggleSeriesLegend: ToggleRowProps["onChange"];
   toggleChecked: (ucid: string) => void;
   selectAll: (value: boolean) => void;
   removeSelected: () => void;
@@ -435,11 +442,12 @@ interface SettingsControls {
   moveButtonRef: MoveButtonRef;
 }
 
-/** State + handlers backing the settings dialog (theme, tooltips, selection). */
+/** State + handlers backing the settings dialog (theme, tooltips, series legend, selection). */
 function useSettingsControls(controller: ChartController): SettingsControls {
   const initial = getSettings();
   const [isDarkTheme, setIsDarkTheme] = useState(initial.isDarkTheme);
   const [showTooltips, setShowTooltips] = useState(initial.showTooltips);
+  const [showSeriesLegend, setShowSeriesLegend] = useState(initial.showSeriesLegend);
   const [checked, setChecked] = useState<ReadonlySet<string>>(new Set());
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
 
@@ -452,6 +460,12 @@ function useSettingsControls(controller: ChartController): SettingsControls {
   const onToggleTooltips = (value: boolean): void => {
     setShowTooltips(value);
     changeTooltips(value);
+    controller.onSettingsChange();
+  };
+
+  const onToggleSeriesLegend = (value: boolean): void => {
+    setShowSeriesLegend(value);
+    changeSeriesLegend(value);
     controller.onSettingsChange();
   };
 
@@ -533,9 +547,11 @@ function useSettingsControls(controller: ChartController): SettingsControls {
   return {
     isDarkTheme,
     showTooltips,
+    showSeriesLegend,
     checked,
     onToggleTheme,
     onToggleTooltips,
+    onToggleSeriesLegend,
     toggleChecked,
     selectAll,
     removeSelected,
@@ -612,6 +628,11 @@ export function SettingsDialog({
             label="Show tooltips"
             checked={controls.showTooltips}
             onChange={controls.onToggleTooltips}
+          />
+          <ToggleRow
+            label="Show series legend"
+            checked={controls.showSeriesLegend}
+            onChange={controls.onToggleSeriesLegend}
           />
         </ul>
 
