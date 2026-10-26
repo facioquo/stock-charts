@@ -12,15 +12,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Write access is granted only to the deploy job that publishes and tags.
 permissions:
-  contents: write
-  # `packages: read` lets GITHUB_TOKEN resolve @facioquo scope from GitHub
-  # Packages (.npmrc routes @facioquo:registry=https://npm.pkg.github.com).
-  packages: read
-  # `deployments`/`pull-requests` let wrangler-action record the Pages
-  # deployment and surface its preview URL on the PR.
-  deployments: write
-  pull-requests: write
+  contents: read
 
 env:
   NODE_VERSION: 24
@@ -30,7 +24,7 @@ jobs:
   # job needs this one, so skipping it skips the whole run; CI verifies forks.
   versioning:
     name: Define version
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     timeout-minutes: 5
     if: |
       github.event_name != 'pull_request' ||
@@ -51,55 +45,22 @@ jobs:
             echo "| Version | ${{ steps.marker.outputs.version }} |"
           } >> "$GITHUB_STEP_SUMMARY"
 
-  # Verification gate only. The deployable artifact is the container image,
-  # which wrangler builds from server/Dockerfile in the deploy-api job.
-  build-backend:
-    name: Build backend
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs:
-      - versioning
-
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v6
-        with:
-          dotnet-version: "10.x"
-          dotnet-quality: "ga"
-          cache: true
-          cache-dependency-path: "**/packages.lock.json"
-
-      - name: Replace cache markers
-        uses: jacobtomlinson/gha-find-replace@v3
-        with:
-          find: "YYYY.MM.DD"
-          replace: "${{ needs.versioning.outputs.version }}"
-          regex: false
-
-      - name: Build .NET solution
-        run: >
-          dotnet build Charts.sln
-          --configuration Release
-          --property:ContinuousIntegrationBuild=true
-          -warnAsError
-
   # Verification gate only — no push. Catches a broken server/Dockerfile on the
   # PR that changes it, rather than at deploy-api's first real build on main.
   validate-container:
     name: Validate container image
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # On main, deploy-api builds the same image for real.
+    if: github.event_name == 'pull_request'
     needs:
       - versioning
 
     steps:
       - name: Checkout sources
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Build container image (no push)
         run: docker build --platform linux/amd64 -f server/Dockerfile server/
@@ -115,26 +76,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup pnpm, Node.js, and dependencies
+        uses: pnpm/setup@v3
         with:
-          run_install: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-          registry-url: https://npm.pkg.github.com
-          scope: "@facioquo"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
+          runtime: node@${{ env.NODE_VERSION }}
+          require-lockfile: true
 
       - name: Replace cache markers
         uses: jacobtomlinson/gha-find-replace@v3
@@ -166,6 +115,7 @@ jobs:
           name: web
           path: web/dist/app
           include-hidden-files: true
+          retention-days: 1
 
   # Builds the container image from server/Dockerfile and deploys it together
   # with the Worker that fronts it and refreshes quote datasets.
@@ -173,35 +123,24 @@ jobs:
     name: Deploy API
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # main only merges through CI's required `gate`, which builds and tests
+    # the backend, so this job does not rebuild it first.
     if: github.ref == 'refs/heads/main'
     needs:
       - versioning
-      - build-backend
 
     steps:
       - name: Checkout sources
         uses: actions/checkout@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+      - name: Setup pnpm, Node.js, and dependencies
+        uses: pnpm/setup@v3
         with:
-          run_install: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-          registry-url: https://npm.pkg.github.com
-          scope: "@facioquo"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
+          runtime: node@${{ env.NODE_VERSION }}
+          require-lockfile: true
 
       # Must run before the image is built: the marker becomes the ETag the
       # /indicators endpoint serves.
@@ -228,7 +167,6 @@ jobs:
     timeout-minutes: 15
     needs:
       - versioning
-      - build-backend
       - build-website
       - deploy-api
     # deploy-api only runs on main; it is 'skipped' for preview builds, which
@@ -237,9 +175,15 @@ jobs:
     if: |
       always() &&
       needs.versioning.result == 'success' &&
-      needs.build-backend.result == 'success' &&
       needs.build-website.result == 'success' &&
       (needs.deploy-api.result == 'success' || needs.deploy-api.result == 'skipped')
+
+    permissions:
+      # The release tag
+      contents: write
+      # wrangler-action records the Pages deployment and its preview URL.
+      deployments: write
+      pull-requests: write
 
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'charts.stockindicators.dev' || 'preview' }}

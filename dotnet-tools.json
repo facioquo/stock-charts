@@ -15,13 +15,6 @@
         "dotnet-outdated"
       ],
       "rollForward": true
-    },
-    "dotnet-reportgenerator-globaltool": {
-      "version": "5.5.11",
-      "commands": [
-        "reportgenerator"
-      ],
-      "rollForward": true
     }
   }
 }
