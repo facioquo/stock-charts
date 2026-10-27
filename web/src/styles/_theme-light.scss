@@ -35,4 +35,8 @@
   --primary: #00458f;
   --primary-container: #cce5ff;
   --on-primary-container: #001e2c;
+
+  /* native form controls: light rendering, Primer accent emphasis (light) when checked */
+  --control-scheme: light;
+  --checkbox-accent: #0969da;
 }

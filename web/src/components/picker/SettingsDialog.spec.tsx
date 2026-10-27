@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { createEvent, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ChartController } from "../../charting/chartController";
@@ -150,19 +150,29 @@ describe("SettingsDialog", () => {
     expect(screen.getByText("Price chart overlays")).toBeInTheDocument();
     expect(screen.getByText("Oscillator charts")).toBeInTheDocument();
 
-    // Each group's first row cannot move up and its last cannot move down.
-    expect(screen.getByRole("button", { name: "move EMA (20) up" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "move EMA (20) down" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "move RSI (5) up" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "move ADX (14) down" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "reorder EMA (20)" })).toHaveAttribute(
+      "draggable",
+      "true"
+    );
+    const oscillatorList = screen.getByRole("list", { name: "Oscillator charts" });
+    const reorderHandle = screen.getByRole("button", { name: "reorder RSI (5)" });
+    fireEvent.keyDown(reorderHandle, { key: "ArrowDown" });
+    expect(controller.moveSelection).toHaveBeenCalledWith("u1", 1);
+    expect(document.activeElement).toBe(reorderHandle);
+    expect(
+      within(oscillatorList)
+        .getAllByRole("checkbox")
+        .map(checkbox => checkbox.getAttribute("aria-label"))
+    ).toEqual(["select SMA (50)", "select RSI (5)", "select ADX (14)"]);
 
-    fireEvent.click(screen.getByRole("button", { name: "move SMA (50) up" }));
-    expect(controller.moveSelection).toHaveBeenCalledWith("u2", -1);
+    fireEvent.keyDown(reorderHandle, { key: "ArrowUp" });
+    expect(controller.moveSelection).toHaveBeenLastCalledWith("u1", -1);
   });
 
-  it("keeps keyboard focus on the moved row's button after a move", () => {
+  it("reorders displayed indicators by dragging within their chart group", () => {
     const controller = makeController();
     controller.selections.push(makeSelection("u3", "ADX (14)"));
+    controller.selections.push(makeSelection("u4", "MACD (12,26,9)"));
     render(
       <SettingsDialog
         controller={controller as unknown as ChartController}
@@ -172,14 +182,91 @@ describe("SettingsDialog", () => {
       />
     );
 
-    // A move that does not reach the end of the group keeps the same button.
-    fireEvent.click(screen.getByRole("button", { name: "move RSI (5) down" }));
-    expect(document.activeElement).toBe(screen.getByRole("button", { name: "move RSI (5) down" }));
+    const dataTransfer = {
+      effectAllowed: "none",
+      dropEffect: "none",
+      getData: vi.fn(() => "u1"),
+      setData: vi.fn()
+    } as unknown as DataTransfer;
+    const rowOf = (label: string): HTMLElement => {
+      const row = screen.getByText(label).closest("li");
+      expect(row).not.toBeNull();
+      // Every row spans y 0-40 in these tests, so its midpoint is y 20.
+      vi.spyOn(row as HTMLElement, "getBoundingClientRect").mockReturnValue(
+        new DOMRect(0, 0, 200, 40)
+      );
+      return row as HTMLElement;
+    };
+    // jsdom has no DragEvent, so the pointer position is set on the event by hand.
+    const dragOver = (row: HTMLElement, clientY: number): boolean => {
+      const event = createEvent.dragOver(row, { dataTransfer });
+      Object.defineProperty(event, "clientY", { value: clientY });
+      return fireEvent(row, event);
+    };
+    const handle = screen.getByRole("button", { name: "reorder RSI (5)" });
+    const dragged = rowOf("RSI (5)");
+    const neighbor = rowOf("SMA (50)");
+    const target = rowOf("MACD (12,26,9)");
 
-    // A move onto the end disables the pressed button; focus goes to the opposite one.
-    fireEvent.click(screen.getByRole("button", { name: "move RSI (5) down" }));
-    expect(screen.getByRole("button", { name: "move RSI (5) down" })).toBeDisabled();
-    expect(document.activeElement).toBe(screen.getByRole("button", { name: "move RSI (5) up" }));
+    fireEvent.dragStart(handle, { dataTransfer });
+
+    // The gaps on either side of the dragged row would not move it, so neither is marked.
+    expect(dragOver(dragged, 30)).toBe(true);
+    expect(dragOver(neighbor, 10)).toBe(true);
+    expect(document.querySelector(".drop-before, .drop-after")).toBeNull();
+
+    // The insertion line marks the gap between rows, not the row under the pointer.
+    dragOver(target, 10);
+    expect(target).toHaveClass("drop-before");
+    dragOver(target, 30);
+    expect(target).toHaveClass("drop-after");
+    expect(target).not.toHaveClass("drop-before");
+
+    fireEvent.drop(target, { dataTransfer });
+    fireEvent.dragEnd(handle, { dataTransfer });
+    expect(document.querySelector(".drop-before, .drop-after")).toBeNull();
+
+    expect(controller.moveSelection).toHaveBeenNthCalledWith(1, "u1", 1);
+    expect(controller.moveSelection).toHaveBeenCalledTimes(3);
+    expect(controller.moveSelection).toHaveBeenNthCalledWith(2, "u1", 1);
+    expect(controller.moveSelection).toHaveBeenNthCalledWith(3, "u1", 1);
+    expect(
+      within(screen.getByRole("list", { name: "Oscillator charts" }))
+        .getAllByRole("checkbox")
+        .map(checkbox => checkbox.getAttribute("aria-label"))
+    ).toEqual(["select SMA (50)", "select ADX (14)", "select MACD (12,26,9)", "select RSI (5)"]);
+  });
+
+  it("does not allow a drag to reorder across chart groups", () => {
+    const controller = makeController();
+    controller.selections.push({ ...makeSelection("u3", "EMA (20)"), chartType: "overlay" });
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    const dataTransfer = {
+      effectAllowed: "none",
+      dropEffect: "none",
+      getData: vi.fn(() => "u1"),
+      setData: vi.fn()
+    } as unknown as DataTransfer;
+    fireEvent.dragStart(screen.getByRole("button", { name: "reorder RSI (5)" }), {
+      dataTransfer
+    });
+    const overlayTarget = screen.getByText("EMA (20)").closest("li");
+    expect(overlayTarget).not.toBeNull();
+    // An unprevented dragover tells the browser the row is not a drop target.
+    expect(fireEvent.dragOver(overlayTarget as HTMLElement, { dataTransfer })).toBe(true);
+    expect(overlayTarget).not.toHaveClass("drop-before");
+    expect(overlayTarget).not.toHaveClass("drop-after");
+    fireEvent.drop(overlayTarget as HTMLElement, { dataTransfer });
+
+    expect(controller.moveSelection).not.toHaveBeenCalled();
   });
 
   it("checks a displayed indicator from its label, with the checkbox last in the row", () => {
@@ -198,9 +285,10 @@ describe("SettingsDialog", () => {
     const checkbox = screen.getByRole("checkbox", { name: "select RSI (5)" });
     expect(checkbox).toBeChecked();
     expect(label).toHaveAttribute("for", checkbox.id);
-    // The checkbox is a direct child of the row, after its label and buttons.
+    // The drag handle leads the row; the checkbox is a direct child, after the label and buttons.
     const row = checkbox.closest("li");
     expect(checkbox.parentElement).toBe(row);
+    expect(row?.firstElementChild).toBe(screen.getByRole("button", { name: "reorder RSI (5)" }));
     expect(row?.lastElementChild).toBe(checkbox);
   });
 
@@ -660,10 +748,13 @@ describe("SettingsDialog", () => {
     it("orders the category headings as the library docs do", () => {
       renderDialog();
 
-      expect(screen.getAllByRole("heading").map(h => h.textContent)).toEqual([
-        "Oscillators",
-        "Moving averages"
-      ]);
+      const available = document.querySelector<HTMLElement>(".available-indicators");
+      expect(available).not.toBeNull();
+      expect(
+        within(available as HTMLElement)
+          .getAllByRole("heading")
+          .map(h => h.textContent)
+      ).toEqual(["Oscillators", "Moving averages"]);
     });
 
     it("picks the first match shown, in category order, on Enter", () => {

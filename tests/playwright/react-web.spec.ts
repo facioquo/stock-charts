@@ -111,7 +111,23 @@ test.describe("Stock Charts React Web", () => {
     await page.getByRole("button", { name: "edit settings" }).click();
     await expect(oscillators.first()).toHaveText(/^RSI/);
 
-    await page.getByRole("button", { name: /^move ADX.* up$/ }).click();
+    // A stepped drag, as a pointer makes: Chrome starts a drag only once the pointer
+    // has moved off the handle, which a single jump to the target does not do.
+    const handleButton = page.getByRole("button", { name: /^reorder ADX/ });
+    await handleButton.scrollIntoViewIfNeeded();
+    const handle = await handleButton.boundingBox();
+    const firstRow = await page
+      .getByRole("list", { name: "Oscillator charts" })
+      .locator("li")
+      .first()
+      .boundingBox();
+    if (!handle || !firstRow) throw new Error("reorder handle or target row is not laid out");
+    await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(handle.x + handle.width / 2 + 5, handle.y + 5, { steps: 3 });
+    // The upper half of a row drops into the gap above it.
+    await page.mouse.move(firstRow.x + 80, firstRow.y + 4, { steps: 10 });
+    await page.mouse.up();
     await expect(oscillators.first()).toHaveText(/^ADX/);
 
     await page.reload();
@@ -134,7 +150,7 @@ test.describe("Stock Charts React Web", () => {
     await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
 
     await page.getByRole("button", { name: "edit settings" }).click();
-    await page.getByRole("button", { name: /^move ADX.* up$/ }).click();
+    await page.getByRole("button", { name: /^reorder ADX/ }).press("ArrowUp");
     await page.getByRole("button", { name: "copy share link" }).click();
     await expect(page.getByRole("status").filter({ hasText: "Link copied" })).toBeVisible();
     const link = await page.evaluate(() => navigator.clipboard.readText());

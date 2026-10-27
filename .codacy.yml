@@ -16,3 +16,9 @@ engines:
     exclude_paths:
       - "pnpm-lock.yaml"
       - "**/pnpm-lock.yaml"
+  # xss/no-mixed-html reads DOM nodes as HTML strings. This spec hands elements
+  # to Testing Library (`within`, `fireEvent`) and builds no markup; the repo's
+  # own ESLint still lints it in CI.
+  eslint-8:
+    exclude_paths:
+      - "web/src/components/picker/SettingsDialog.spec.tsx"
