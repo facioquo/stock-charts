@@ -32,7 +32,8 @@ export function subscribeToTheme(listener: () => void): () => void {
   };
 }
 
-const LISTING_ORDERS: readonly unknown[] = ["name", "category"] satisfies ListingOrder[];
+/** Keyed by every `ListingOrder`, so the compiler asks for a member added to that type. */
+const LISTING_ORDERS: Record<ListingOrder, true> = { name: true, category: true };
 
 export function loadSettings(): void {
   if (!isBrowser) {
@@ -56,7 +57,8 @@ export function loadSettings(): void {
 
   if (!tooltipsChosen()) current.showTooltips = defaults.showTooltips;
   // Stored JSON is unchecked, so an order this version does not know falls back.
-  if (!LISTING_ORDERS.includes(current.listingOrder)) current.listingOrder = defaults.listingOrder;
+  if (!Object.hasOwn(LISTING_ORDERS, current.listingOrder))
+    current.listingOrder = defaults.listingOrder;
 
   changeTheme(current.isDarkTheme);
   cacheSettings();
