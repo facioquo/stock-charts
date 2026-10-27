@@ -51,7 +51,7 @@ export function ColorSwatchPicker({
           disabled={disabled}
           leadingVisual={<ColorSwatch color={value} />}
           validationStatus={showError ? "error" : undefined}
-          aria-invalid={invalid}
+          aria-invalid={showError}
           aria-describedby={showError ? errorId : undefined}
           pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3}|[A-Fa-f0-9]{8})$"
           onChange={event => {

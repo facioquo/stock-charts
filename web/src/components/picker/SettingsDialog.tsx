@@ -465,7 +465,7 @@ function AvailableIndicators({
             aria-label="Order available indicators"
             size="small"
             onChange={selectedIndex => {
-              const next = selectedIndex === 1 ? "name" : "category";
+              const next = listingOrders.at(selectedIndex)?.value ?? "category";
               setOrder(next);
               changeListingOrder(next);
             }}

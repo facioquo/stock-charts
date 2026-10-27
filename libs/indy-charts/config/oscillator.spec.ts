@@ -96,8 +96,43 @@ describe("baseOscillatorOptions", () => {
       const callback = yTickCallback();
       const billions = [-3, -2, -1, 0, 1].map((b): Tick => ({ value: b * 1_000_000_000 }));
       expect(callback(-2_000_000_000, 1, billions)).toBe("-2B");
-      const thousands = [0, 500, 1_000, 1_500, 2_000].map((value): Tick => ({ value }));
-      expect(callback(1_500, 3, thousands)).toBe("1.5K");
+      const thousands = [0, 10_000, 15_000, 20_000, 25_000].map((value): Tick => ({ value }));
+      expect(callback(15_000, 2, thousands)).toBe("15K");
+    });
+
+    it("picks the unit from drawn labels, not a trimmed bound", () => {
+      const callback = yTickCallback();
+      // The 1,000,000 bound is dropped, so the drawn labels top out at 800K.
+      const values = [0, 200_000, 400_000, 600_000, 800_000, 1_000_000].map((value): Tick => ({
+        value
+      }));
+
+      expect(values.map((tick, i) => callback(tick.value, i, values))).toEqual([
+        null,
+        "200K",
+        "400K",
+        "600K",
+        "800K",
+        null
+      ]);
+    });
+
+    it("keeps plain numbers on an axis in the low thousands", () => {
+      const callback = yTickCallback();
+      const values = [0, 2_000, 4_000, 6_000, 8_000, 10_000].map((value): Tick => ({ value }));
+
+      expect(callback(6_000, 3, values)).toBe(6_000);
+    });
+
+    it.each([
+      [10_000, "10K"],
+      [1_000_000, "1M"],
+      [1_000_000_000, "1B"]
+    ])("switches unit when the largest drawn label is exactly %d", (largest, label) => {
+      const callback = yTickCallback();
+      const values = [0, largest / 2, largest].map((value): Tick => ({ value }));
+
+      expect(callback(largest, 2, values)).toBe(label);
     });
 
     it("leaves small values unscaled", () => {

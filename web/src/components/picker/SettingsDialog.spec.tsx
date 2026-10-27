@@ -184,6 +184,26 @@ describe("SettingsDialog", () => {
     expect(screen.getByText("RSI (5) moved to 1 of 3")).toHaveAttribute("role", "status");
   });
 
+  it("leaves a row at either end of its group where it is, and says nothing", () => {
+    const controller = makeController();
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    fireEvent.keyDown(screen.getByRole("button", { name: "reorder RSI (5)" }), { key: "ArrowUp" });
+    fireEvent.keyDown(screen.getByRole("button", { name: "reorder SMA (50)" }), {
+      key: "ArrowDown"
+    });
+
+    expect(controller.moveSelection).not.toHaveBeenCalled();
+    expect(screen.queryByText(/moved to/)).toBeNull();
+  });
+
   it("moves a row from its handle's menu, for a pointer that cannot drag", async () => {
     const controller = makeController();
     render(
@@ -645,6 +665,10 @@ describe("SettingsDialog", () => {
       clickUndo();
 
       await screen.findByText("Restored 1 of 2 indicators");
+      expect(screen.getByRole("region", { name: "Indicator restore problem" })).toHaveAttribute(
+        "data-variant",
+        "warning"
+      );
       // The failed one is absent from the controller; the order names it and the
       // controller ignores the unknown ucid.
       expect(controller.applyOrder).toHaveBeenCalledWith(["u1", "u2", "u3"]);
@@ -879,7 +903,20 @@ describe("SettingsDialog", () => {
 
     it("opens A to Z for a visitor who chose it, and picks its first match on Enter", () => {
       changeListingOrder("name");
-      const { input, onPickIndicator, controller } = renderDialog();
+      const controller = makeController();
+      // First A to Z, but in "Moving averages", which comes after "Oscillators" by category.
+      const alma = makeListing("ALMA", "Arnaud Legoux Moving Average", "moving-average");
+      controller.listings.push(alma);
+      const onPickIndicator = vi.fn();
+      render(
+        <SettingsDialog
+          controller={controller as unknown as ChartController}
+          onClose={vi.fn()}
+          onPickIndicator={onPickIndicator}
+          onEditIndicator={vi.fn()}
+        />
+      );
+      const input = screen.getByRole("searchbox", { name: "filter available indicators" });
 
       fireEvent.change(input, { target: { value: "i" } });
       fireEvent.keyDown(input, { key: "Enter" });
@@ -888,7 +925,7 @@ describe("SettingsDialog", () => {
         "aria-pressed",
         "true"
       );
-      expect(onPickIndicator).toHaveBeenCalledWith(controller.listings.find(l => l.uiid === "RSI"));
+      expect(onPickIndicator).toHaveBeenCalledWith(alma);
     });
 
     it("restores the filter when the dialog reopens after an add", () => {

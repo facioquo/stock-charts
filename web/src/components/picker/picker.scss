@@ -36,6 +36,11 @@
   color: var(--fgColor-attention);
 }
 
+.offline-notice {
+  margin: 0;
+  padding: var(--base-size-12) var(--base-size-16);
+}
+
 /* Site-level notices above the chart; empty regions take no space. */
 .page-banner:not(:empty) {
   margin: 16px 16px 8px;

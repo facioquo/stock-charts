@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Banner, Button, IconButton, VisuallyHidden } from "@primer/react";
+import { AnchoredOverlay, Banner, Button, IconButton, Text, VisuallyHidden } from "@primer/react";
 import { AlertIcon, CloudOfflineIcon, LinkIcon, PencilIcon } from "@primer/octicons-react";
 
 import { env } from "../config/env";
@@ -11,6 +11,44 @@ import "../components/picker/picker.scss";
 
 const OFFLINE_NOTICE =
   "The live API is unreachable. Showing saved data; indicators with custom settings may be blank.";
+
+/**
+ * A warning icon that opens the offline explanation when pressed, so a touch or
+ * keyboard visitor can read it; a tooltip alone shows only on hover.
+ */
+function OfflineNotice(): React.JSX.Element {
+  const [open, setOpen] = useState(false);
+  return (
+    <AnchoredOverlay
+      open={open}
+      onOpen={() => {
+        setOpen(true);
+      }}
+      onClose={() => {
+        setOpen(false);
+      }}
+      side="outside-bottom"
+      align="end"
+      width="medium"
+      renderAnchor={anchorProps => (
+        <IconButton
+          {...anchorProps}
+          icon={AlertIcon}
+          variant="invisible"
+          size="large"
+          className="offline-icon"
+          aria-label="Live API unreachable"
+          // The open notice says more than the name; its tooltip would cover it.
+          unsafeDisableTooltip={open}
+        />
+      )}
+    >
+      <Text as="p" size="small" className="offline-notice">
+        {OFFLINE_NOTICE}
+      </Text>
+    </AnchoredOverlay>
+  );
+}
 
 /**
  * Main chart page. Ports `ChartComponent`: bootstraps the overlay chart,
@@ -146,14 +184,7 @@ export function ChartPage(): React.JSX.Element {
       {/* In the header beside the settings button, but scrolls away with the page. */}
       {offline && !apiError && !loading && (
         <div className="offline-indicator">
-          <IconButton
-            icon={AlertIcon}
-            variant="invisible"
-            size="large"
-            className="offline-icon"
-            aria-label="Live API unreachable"
-            description={OFFLINE_NOTICE}
-          />
+          <OfflineNotice />
         </div>
       )}
 

@@ -21,20 +21,31 @@ import { baseChartOptions } from "./common";
  */
 const MIN_TICKS_TO_TRIM_BOUNDS = 4;
 
-/** Suffixes for large axis labels, largest first. */
+/**
+ * Suffixes for large axis labels, largest first, each taken once the biggest label
+ * reaches its floor. K waits for 10,000 so a pane in the low thousands keeps plain
+ * numbers rather than reading 0.2K to 0.8K.
+ */
 const AXIS_UNITS = [
-  { divisor: 1_000_000_000, suffix: "B" },
-  { divisor: 1_000_000, suffix: "M" },
-  { divisor: 1_000, suffix: "K" }
+  { floor: 1_000_000_000, divisor: 1_000_000_000, suffix: "B" },
+  { floor: 1_000_000, divisor: 1_000_000, suffix: "M" },
+  { floor: 10_000, divisor: 1_000, suffix: "K" }
 ] as const;
 
+/** Whether the label at `index` is dropped as a bound; see {@link MIN_TICKS_TO_TRIM_BOUNDS}. */
+function isTrimmedBound(index: number, count: number): boolean {
+  return count >= MIN_TICKS_TO_TRIM_BOUNDS && (index === 0 || index === count - 1);
+}
+
 /**
- * The unit for every label on an axis: the largest one its biggest tick reaches, so a
- * pane spanning 3 billion reads 1B to 3B rather than 1000M to 3000M. None below 1,000.
+ * The unit for every label on an axis: the largest one its biggest drawn label reaches,
+ * so a pane spanning 3 billion reads 1B to 3B rather than 1000M to 3000M. A trimmed
+ * bound is never drawn, so it does not count.
  */
 function axisUnit(values: readonly Tick[]): (typeof AXIS_UNITS)[number] | undefined {
-  const largest = Math.max(0, ...values.map(tick => Math.abs(tick.value)));
-  return AXIS_UNITS.find(unit => largest >= unit.divisor);
+  const drawn = values.filter((_, index) => !isTrimmedBound(index, values.length));
+  const largest = Math.max(0, ...drawn.map(tick => Math.abs(tick.value)));
+  return AXIS_UNITS.find(unit => largest >= unit.floor);
 }
 
 export function baseOscillatorConfig(settings: ChartSettings): ChartConfiguration {
@@ -69,8 +80,7 @@ export function baseOscillatorOptions(settings: ChartSettings): ChartOptions {
     // Drop the first and last y-axis labels only when the pane has enough
     // gridlines to spare them; on short panes keep the bounds visible so the
     // axis range is still readable (issue #495).
-    if (values.length >= MIN_TICKS_TO_TRIM_BOUNDS && (index === 0 || index === values.length - 1))
-      return null;
+    if (isTrimmedBound(index, values.length)) return null;
 
     // condense large values in one unit for the whole axis, so 5M and 15M are
     // not labelled 5000K and 15M

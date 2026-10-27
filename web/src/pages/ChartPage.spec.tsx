@@ -93,17 +93,19 @@ describe("ChartPage", () => {
     expect(mocks.retryLoad).toHaveBeenCalledTimes(1);
   });
 
-  it("flags the offline snapshot with a warning icon beside the settings button", () => {
+  it("flags the offline snapshot with a warning icon beside the settings button", async () => {
     mocks.apiError = false;
     mocks.offline = true;
     render(<ChartPage />);
 
-    const warning = screen.getByRole("button", { name: "Live API unreachable" });
-    expect(warning).toHaveAccessibleDescription(/live API is unreachable/);
     expect(
       screen.getByText(/Showing saved data/, { selector: "[role=status]" })
     ).toBeInTheDocument();
     expect(screen.queryByRole("region")).toBeNull();
+
+    // Pressing the icon shows the explanation, for visitors a hover tooltip never reaches.
+    fireEvent.click(screen.getByRole("button", { name: "Live API unreachable" }));
+    expect(await screen.findByText(/Showing saved data/, { selector: "p" })).toBeInTheDocument();
   });
 
   it("shows no warning while the live API answers", () => {

@@ -54,4 +54,12 @@ describe("ColorSwatchPicker", () => {
     expect(screen.getByRole("textbox", { name: "Color" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "choose color" })).toBeDisabled();
   });
+
+  it("does not report a disabled field as invalid", () => {
+    render(
+      <ColorSwatchPicker value="nope" presetColors={presetColors} disabled onChange={vi.fn()} />
+    );
+    expect(screen.getByRole("textbox", { name: "Color" })).toHaveAttribute("aria-invalid", "false");
+    expect(screen.queryByText("Invalid HEX color")).toBeNull();
+  });
 });
