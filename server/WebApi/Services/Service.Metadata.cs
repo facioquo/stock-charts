@@ -2956,7 +2956,7 @@ public static class Metadata
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
-                        DisplayName = "VI+",
+                        DisplayName = "VI-",
                         TooltipTemplate = "VI-",
                         DataName = "nvi",
                         DataType = "number",

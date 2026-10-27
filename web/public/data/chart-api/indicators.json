@@ -4606,7 +4606,7 @@
         "fill": null
       },
       {
-        "displayName": "VI+",
+        "displayName": "VI-",
         "tooltipTemplate": "VI-",
         "dataName": "nvi",
         "dataType": "number",
