@@ -41,3 +41,9 @@ if (typeof globalThis.ResizeObserver !== "function") {
     disconnect = (): undefined => undefined;
   };
 }
+
+// Pointer capture, which the touch drag on a reorder handle takes.
+if (typeof HTMLElement.prototype.setPointerCapture !== "function") {
+  HTMLElement.prototype.setPointerCapture = () => undefined;
+  HTMLElement.prototype.releasePointerCapture = () => undefined;
+}

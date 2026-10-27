@@ -150,6 +150,11 @@ function SelectionGroup({
   /** Gap the dragged row would land in: 0 is above the first row, `length` below the last. */
   const [dropGap, setDropGap] = useState<number | null>(null);
   const [moveStatus, setMoveStatus] = useState("");
+  const listRef = useRef<HTMLUListElement>(null);
+  /** A touch on a handle: where it began, and whether it has moved far enough to be a drag. */
+  const touch = useRef<{ startY: number; dragging: boolean } | null>(null);
+  /** Set when a touch drag ends, so the click that follows does not also open the menu. */
+  const suppressClick = useRef(false);
   if (selections.length === 0) return null;
 
   /** Moves a row one place and says where it went; a row already at that end stays put. */
@@ -168,6 +173,16 @@ function SelectionGroup({
   const endDrag = (): void => {
     setDraggedUcid(null);
     setDropGap(null);
+  };
+
+  /** The gap a pointer at `clientY` points into, measured against the rows on screen. */
+  const gapAt = (clientY: number): number => {
+    const rows = [...(listRef.current?.children ?? [])];
+    const index = rows.findIndex(row => {
+      const { top, height } = row.getBoundingClientRect();
+      return clientY < top + height / 2;
+    });
+    return index === -1 ? rows.length : index;
   };
 
   const moveToGap = (gap: number): void => {
@@ -189,7 +204,7 @@ function SelectionGroup({
           {hint}
         </Text>
       </div>
-      <ul className="selection-list" aria-labelledby={headingId}>
+      <ul ref={listRef} className="selection-list" aria-labelledby={headingId}>
         {selections.map((selection, index) => (
           <li
             key={selection.ucid}
@@ -229,8 +244,10 @@ function SelectionGroup({
             }}
           >
             {/* Drag it, press the arrow keys on it, or tap it for a move menu: a tap needs no
-                drag, which touch and switch users may not have. The arrow handler prevents
-                the default, so the menu does not also open on an arrow key. */}
+                drag, which switch users may not have. The arrow handler prevents the default,
+                so the menu does not also open on an arrow key. A mouse drags with HTML drag
+                and drop; touch never starts one, so a finger drags through pointer events,
+                and the handle takes no touch scrolling (`touch-action: none`). */}
             <ActionMenu>
               <ActionMenu.Anchor>
                 <IconButton
@@ -242,11 +259,54 @@ function SelectionGroup({
                   description="Drag, use the arrow keys, or select to move"
                   draggable
                   onDragStart={event => {
+                    // A long press can start the browser's own drag; the touch path has it.
+                    if (touch.current) {
+                      event.preventDefault();
+                      return;
+                    }
                     event.dataTransfer.effectAllowed = "move";
                     event.dataTransfer.setData("text/plain", selection.ucid);
                     setDraggedUcid(selection.ucid);
                   }}
                   onDragEnd={endDrag}
+                  onPointerDown={event => {
+                    if (event.pointerType !== "touch") return;
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                    touch.current = { startY: event.clientY, dragging: false };
+                  }}
+                  onPointerMove={event => {
+                    const current = touch.current;
+                    if (!current) return;
+                    if (!current.dragging) {
+                      // A small wobble is still a tap, which opens the move menu.
+                      if (Math.abs(event.clientY - current.startY) < 8) return;
+                      current.dragging = true;
+                      setDraggedUcid(selection.ucid);
+                      return;
+                    }
+                    const gap = gapAt(event.clientY);
+                    setDropGap(isMovingGap(gap) ? gap : null);
+                  }}
+                  onPointerUp={() => {
+                    const dragged = touch.current?.dragging ?? false;
+                    touch.current = null;
+                    if (!dragged) return;
+                    suppressClick.current = true;
+                    if (dropGap !== null) moveToGap(dropGap);
+                    endDrag();
+                  }}
+                  onPointerCancel={() => {
+                    // A mouse drag cancels its pointer as HTML drag and drop takes over.
+                    if (!touch.current) return;
+                    touch.current = null;
+                    endDrag();
+                  }}
+                  onClick={event => {
+                    if (!suppressClick.current) return;
+                    suppressClick.current = false;
+                    // Primer's anchor skips a click whose default is prevented.
+                    event.preventDefault();
+                  }}
                   onKeyDown={event => {
                     if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
                     event.preventDefault();
@@ -284,7 +344,10 @@ function SelectionGroup({
                 </ActionList>
               </ActionMenu.Overlay>
             </ActionMenu>
-            <label htmlFor={`select-${selection.ucid}`}>{selection.label}</label>
+            {/* One line: a name too long for a phone is cut short; `title` shows it whole. */}
+            <label htmlFor={`select-${selection.ucid}`} title={selection.label}>
+              {selection.label}
+            </label>
             <IconButton
               icon={PencilIcon}
               variant="invisible"
@@ -394,15 +457,15 @@ interface AvailableIndicatorsProps {
 }
 
 const listingOrders: readonly { value: ListingOrder; label: string }[] = [
-  { value: "category", label: "By category" },
-  { value: "name", label: "A to Z" }
+  { value: "name", label: "A to Z" },
+  { value: "category", label: "By category" }
 ];
 
 /**
  * List of available indicators that open the {@link PickConfigDialog}, narrowed by a
- * filter box that matches name, id, and category. Grouped under category headings, or
- * listed A to Z with each category beneath its name, as the visitor last chose. Enter
- * picks the first match shown.
+ * filter box that matches name, id, and category. Listed A to Z with each category
+ * beneath its name, or grouped under category headings, as the visitor last chose.
+ * Enter picks the first match shown.
  */
 function AvailableIndicators({
   listings,
@@ -440,32 +503,31 @@ function AvailableIndicators({
         </Text>
       </div>
       <div className="listing-filter">
-        <TextInput
-          type="search"
-          block
-          leadingVisual={SearchIcon}
-          aria-label="filter available indicators"
-          placeholder="Filter by name or category"
-          autoComplete="off"
-          spellCheck={false}
-          value={filter}
-          onChange={event => {
-            changeFilter(event.target.value);
-          }}
-          onKeyDown={event => {
-            if (event.key !== "Enter") return;
-            if (filtering && firstShown) {
-              event.preventDefault();
-              onPick(firstShown);
-            }
-          }}
-        />
-        <div className="listing-filter-footer">
+        <div className="listing-filter-row">
+          <TextInput
+            type="search"
+            className="listing-filter-input"
+            leadingVisual={SearchIcon}
+            aria-label="filter available indicators"
+            placeholder="Filter by name or category"
+            autoComplete="off"
+            spellCheck={false}
+            value={filter}
+            onChange={event => {
+              changeFilter(event.target.value);
+            }}
+            onKeyDown={event => {
+              if (event.key !== "Enter") return;
+              if (filtering && firstShown) {
+                event.preventDefault();
+                onPick(firstShown);
+              }
+            }}
+          />
           <SegmentedControl
             aria-label="Order available indicators"
-            size="small"
             onChange={selectedIndex => {
-              const next = listingOrders.at(selectedIndex)?.value ?? "category";
+              const next = listingOrders.at(selectedIndex)?.value ?? "name";
               setOrder(next);
               changeListingOrder(next);
             }}
@@ -476,14 +538,14 @@ function AvailableIndicators({
               </SegmentedControl.Button>
             ))}
           </SegmentedControl>
-          <Text size="small" aria-live="polite" className="muted-text">
-            {filtering
-              ? matches.length === 0
-                ? "No indicators match"
-                : `${matches.length} of ${listings.length} indicators`
-              : ""}
-          </Text>
         </div>
+        <Text size="small" aria-live="polite" className="listing-filter-status muted-text">
+          {filtering
+            ? matches.length === 0
+              ? "No indicators match"
+              : `${matches.length} of ${listings.length} indicators`
+            : ""}
+        </Text>
       </div>
       {order === "name" ? (
         <ActionList aria-label="Available indicators, A to Z">
@@ -712,7 +774,7 @@ export function SettingsDialog({
   const tone = controls.removal?.tone;
 
   return (
-    <Dialog title="Chart settings" onClose={onClose}>
+    <Dialog title="Chart settings" className="settings-dialog" onClose={onClose}>
       {/* A direct child fills Dialog's body slot, ref and scroll handler included, so the
           position survives the reopen after an add. */}
       <Dialog.Body

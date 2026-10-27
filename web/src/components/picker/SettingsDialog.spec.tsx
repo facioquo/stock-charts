@@ -88,7 +88,7 @@ function clickUndo(): void {
 
 afterEach(() => {
   changeSeriesLegend(false);
-  changeListingOrder("category");
+  changeListingOrder("name");
   changeTooltips(false);
   document.body.className = "";
 });
@@ -292,6 +292,75 @@ describe("SettingsDialog", () => {
         .getAllByRole("checkbox")
         .map(checkbox => checkbox.getAttribute("aria-label"))
     ).toEqual(["select SMA (50)", "select ADX (14)", "select MACD (12,26,9)", "select RSI (5)"]);
+  });
+
+  describe("touch drag", () => {
+    /** Lays the oscillator rows out 40px tall from the top, as jsdom draws nothing. */
+    function layOutRows(): void {
+      const rows = within(screen.getByRole("list", { name: "Oscillator charts" })).getAllByRole(
+        "listitem"
+      );
+      rows.forEach((row, i) => {
+        vi.spyOn(row, "getBoundingClientRect").mockReturnValue(
+          DOMRect.fromRect({ x: 0, y: i * 40, width: 300, height: 40 })
+        );
+      });
+    }
+
+    function renderTwo(): FakeController {
+      const controller = makeController();
+      render(
+        <SettingsDialog
+          controller={controller as unknown as ChartController}
+          onClose={vi.fn()}
+          onPickIndicator={vi.fn()}
+          onEditIndicator={vi.fn()}
+        />
+      );
+      layOutRows();
+      return controller;
+    }
+
+    it("moves a row dragged by finger into the gap it is released over", () => {
+      const controller = renderTwo();
+      const handle = screen.getByRole("button", { name: "reorder SMA (50)" });
+
+      fireEvent.pointerDown(handle, { pointerType: "touch", pointerId: 1, clientY: 60 });
+      fireEvent.pointerMove(handle, { pointerType: "touch", pointerId: 1, clientY: 40 });
+      fireEvent.pointerMove(handle, { pointerType: "touch", pointerId: 1, clientY: 5 });
+      expect(handle.closest("li")).toHaveClass("dragging");
+      fireEvent.pointerUp(handle, { pointerType: "touch", pointerId: 1, clientY: 5 });
+      fireEvent.click(handle);
+
+      expect(controller.moveSelection).toHaveBeenCalledWith("u2", -1);
+      // The click that ends a drag does not also open the move menu.
+      expect(screen.queryByRole("menu")).toBeNull();
+    });
+
+    it("treats a touch that barely moves as a tap", () => {
+      const controller = renderTwo();
+      const handle = screen.getByRole("button", { name: "reorder SMA (50)" });
+
+      fireEvent.pointerDown(handle, { pointerType: "touch", pointerId: 1, clientY: 60 });
+      fireEvent.pointerMove(handle, { pointerType: "touch", pointerId: 1, clientY: 63 });
+      fireEvent.pointerUp(handle, { pointerType: "touch", pointerId: 1, clientY: 63 });
+
+      expect(handle.closest("li")).not.toHaveClass("dragging");
+      expect(controller.moveSelection).not.toHaveBeenCalled();
+    });
+
+    it("leaves a mouse drag running when its pointer is cancelled", () => {
+      renderTwo();
+      const handle = screen.getByRole("button", { name: "reorder SMA (50)" });
+      const dataTransfer = { effectAllowed: "none", setData: vi.fn() };
+
+      fireEvent.pointerDown(handle, { pointerType: "mouse", pointerId: 1 });
+      fireEvent.dragStart(handle, { dataTransfer });
+      // Chrome cancels the mouse pointer once HTML drag and drop takes over.
+      fireEvent.pointerCancel(handle, { pointerType: "mouse", pointerId: 1 });
+
+      expect(handle.closest("li")).toHaveClass("dragging");
+    });
   });
 
   it("does not allow a drag to reorder across chart groups", () => {
@@ -806,6 +875,7 @@ describe("SettingsDialog", () => {
     });
 
     it("groups the list under category headings", () => {
+      changeListingOrder("category");
       renderDialog();
 
       expect(
@@ -821,6 +891,7 @@ describe("SettingsDialog", () => {
     });
 
     it("exposes each category as a heading", () => {
+      changeListingOrder("category");
       renderDialog();
 
       expect(screen.getByRole("heading", { name: "Oscillators" })).toBeInTheDocument();
@@ -828,6 +899,7 @@ describe("SettingsDialog", () => {
     });
 
     it("drops a category heading when none of its indicators match", () => {
+      changeListingOrder("category");
       const { input } = renderDialog();
 
       fireEvent.change(input, { target: { value: "relative" } });
@@ -837,6 +909,7 @@ describe("SettingsDialog", () => {
     });
 
     it("orders the category headings as the library docs do", () => {
+      changeListingOrder("category");
       renderDialog();
 
       const available = document.querySelector<HTMLElement>(".available-indicators");
@@ -849,6 +922,7 @@ describe("SettingsDialog", () => {
     });
 
     it("picks the first match shown, in category order, on Enter", () => {
+      changeListingOrder("category");
       const controller = makeController();
       // Catalog order puts SMA first, but "Oscillators" comes before "Moving averages".
       controller.listings.reverse();
@@ -869,7 +943,7 @@ describe("SettingsDialog", () => {
       expect(onPickIndicator).toHaveBeenCalledWith(controller.listings.find(l => l.uiid === "RSI"));
     });
 
-    it("lists A to Z with each category beneath, and remembers the choice", () => {
+    it("lists A to Z by default, with each category beneath its name", () => {
       const controller = makeController();
       controller.listings.push(makeListing("ADX", "Average Directional Index", "oscillator"));
       render(
@@ -880,13 +954,11 @@ describe("SettingsDialog", () => {
           onEditIndicator={vi.fn()}
         />
       );
-      expect(screen.getByRole("button", { name: "By category" })).toHaveAttribute(
+
+      expect(screen.getByRole("button", { name: "A to Z" })).toHaveAttribute(
         "aria-pressed",
         "true"
       );
-
-      fireEvent.click(screen.getByRole("button", { name: "A to Z" }));
-
       const list = screen.getByRole("list", { name: "Available indicators, A to Z" });
       expect(
         within(list)
@@ -898,7 +970,16 @@ describe("SettingsDialog", () => {
         "Simple Moving AverageMoving averages"
       ]);
       expect(screen.queryByRole("heading", { name: "Oscillators" })).toBeNull();
-      expect(getSettings().listingOrder).toBe("name");
+    });
+
+    it("groups by category when chosen, and remembers the choice", () => {
+      renderDialog();
+
+      fireEvent.click(screen.getByRole("button", { name: "By category" }));
+
+      expect(screen.getByRole("heading", { name: "Oscillators" })).toBeInTheDocument();
+      expect(screen.queryByRole("list", { name: "Available indicators, A to Z" })).toBeNull();
+      expect(getSettings().listingOrder).toBe("category");
     });
 
     it("opens A to Z for a visitor who chose it, and picks its first match on Enter", () => {

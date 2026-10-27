@@ -14,7 +14,7 @@ export type {
   Bar
 } from "@facioquo/indy-charts";
 
-/** How the settings dialog lists available indicators: under category headings, or A to Z. */
+/** How the settings dialog lists available indicators: A to Z, or under category headings. */
 export type ListingOrder = "category" | "name";
 
 /** Settings the demo saves; the series legend choice is always set here. */

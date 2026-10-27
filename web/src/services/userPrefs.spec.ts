@@ -32,7 +32,7 @@ describe("userPrefs", () => {
         isDarkTheme: true,
         showTooltips: false,
         showSeriesLegend: false,
-        listingOrder: "category"
+        listingOrder: "name"
       });
       expect(localStorage.getItem("settings")).toBeTruthy();
     });
@@ -61,7 +61,7 @@ describe("userPrefs", () => {
         isDarkTheme: false,
         showTooltips: false,
         showSeriesLegend: false,
-        listingOrder: "category"
+        listingOrder: "name"
       });
     });
 
@@ -186,8 +186,16 @@ describe("userPrefs", () => {
       expect(parsed.listingOrder).toBe("name");
     });
 
-    it("lists by category when a stored order is not one the dialog knows", () => {
+    it("lists A to Z when a stored order is not one the dialog knows", () => {
       localStorage.setItem("settings", JSON.stringify({ listingOrder: "newest" }));
+
+      loadSettings();
+
+      expect(getSettings().listingOrder).toBe("name");
+    });
+
+    it("keeps a visitor's choice to group by category", () => {
+      localStorage.setItem("settings", JSON.stringify({ listingOrder: "category" }));
 
       loadSettings();
 

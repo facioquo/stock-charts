@@ -14,7 +14,7 @@ const defaults: UserSettings = {
   isDarkTheme: true,
   showTooltips: false,
   showSeriesLegend: false,
-  listingOrder: "category"
+  listingOrder: "name"
 };
 
 let current: UserSettings = { ...defaults };
@@ -53,7 +53,8 @@ export function loadSettings(): void {
   }
 
   if (!tooltipsChosen()) current.showTooltips = defaults.showTooltips;
-  if (current.listingOrder !== "name") current.listingOrder = defaults.listingOrder;
+  if (current.listingOrder !== "name" && current.listingOrder !== "category")
+    current.listingOrder = defaults.listingOrder;
 
   changeTheme(current.isDarkTheme);
   cacheSettings();

@@ -46,6 +46,26 @@
   margin: 16px 16px 8px;
 }
 
+/* SETTINGS DIALOG: Primer's padding on a phone, more room around the content above that.
+   The header widens with the body so the title lines up with what is below it. */
+div.settings-body {
+  --settings-body-top: var(--base-size-16);
+
+  padding: var(--settings-body-top) var(--base-size-16);
+
+  @media (width >= 768px) {
+    --settings-body-top: var(--base-size-24);
+
+    padding-inline: var(--base-size-32);
+  }
+}
+
+.settings-dialog [data-component="Dialog.Header"] {
+  @media (width >= 768px) {
+    padding-inline: var(--base-size-24);
+  }
+}
+
 /* SETTINGS DIALOG */
 .general-settings {
   margin: 0;
@@ -152,33 +172,22 @@
     &.drop-after::after {
       bottom: -1px;
     }
-
-    /* Too narrow for the name beside its controls: the drag handle and name
-       keep the first line and the other controls sit beneath, right-aligned. */
-    @media (width < 380px) {
-      flex-wrap: wrap;
-
-      label {
-        flex-basis: calc(100% - var(--base-size-40));
-      }
-
-      label + * {
-        margin-left: auto;
-      }
-    }
   }
 
-  /* A name has no spaces, so it breaks only when it cannot fit. */
+  /* Every row keeps one line; a name too long for it ends in an ellipsis. */
   label {
     flex: 1 1 0;
     min-width: 0;
-    overflow-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     padding: var(--base-size-8) var(--base-size-4);
     cursor: pointer;
   }
 
   .drag-handle {
     cursor: grab;
+    touch-action: none;
 
     &:active {
       cursor: grabbing;
@@ -187,10 +196,10 @@
 }
 
 /* Pinned to the top of the scrolling dialog body, so it stays in reach in a long
-   list. The negative offset matches Primer's dialog body padding. */
+   list. The negative offset matches the body's top padding. */
 .listing-filter {
   position: sticky;
-  top: calc(var(--base-size-16) * -1);
+  top: calc(var(--settings-body-top) * -1);
   z-index: 1;
   display: flex;
   flex-direction: column;
@@ -199,12 +208,22 @@
   background-color: var(--overlay-bgColor);
 }
 
-.listing-filter-footer {
+/* The filter and the order toggle share a line; on a phone too narrow for both,
+   the toggle drops beneath. */
+.listing-filter-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: var(--base-size-8);
+}
+
+.listing-filter-input {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.listing-filter-status {
+  align-self: flex-end;
   min-height: 1.5em;
 }
 

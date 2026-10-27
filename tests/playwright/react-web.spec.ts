@@ -99,6 +99,52 @@ test.describe("Stock Charts React Web", () => {
     expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
   });
 
+  test.describe("on a touch screen", () => {
+    test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
+
+    test("a finger drag on a handle reorders rather than scrolling", async ({
+      page,
+      errorCollection
+    }) => {
+      await page.goto("/");
+      await page.waitForLoadState("networkidle");
+      await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+
+      const oscillators = page.getByRole("list", { name: "Oscillator charts" });
+      await page.getByRole("button", { name: "edit settings" }).click();
+      await expect(oscillators.locator("li label").first()).toHaveText(/^RSI/);
+
+      const handle = page.getByRole("button", { name: /^reorder ADX/ });
+      await handle.scrollIntoViewIfNeeded();
+      const from = await handle.boundingBox();
+      const firstRow = await oscillators.locator("li").first().boundingBox();
+      if (!from || !firstRow) throw new Error("reorder handle or target row is not laid out");
+      const body = page.locator(".settings-body");
+      const scrollBefore = await body.evaluate(element => element.scrollTop);
+
+      // Playwright's touchscreen only taps, so the drag goes in as raw touch events.
+      const cdp = await page.context().newCDPSession(page);
+      const x = from.x + from.width / 2;
+      const touchAt = (type: string, y: number) =>
+        cdp.send("Input.dispatchTouchEvent", {
+          type,
+          touchPoints: type === "touchEnd" ? [] : [{ x, y }]
+        });
+      await touchAt("touchStart", from.y + from.height / 2);
+      for (let y = from.y + from.height / 2; y > firstRow.y + 4; y -= 6) {
+        await touchAt("touchMove", y);
+      }
+      await touchAt("touchMove", firstRow.y + 4);
+      await touchAt("touchEnd", firstRow.y + 4);
+
+      await expect(oscillators.locator("li label").first()).toHaveText(/^ADX/);
+      expect(await body.evaluate(element => element.scrollTop)).toBe(scrollBefore);
+      await expect(page.getByRole("menu")).toHaveCount(0);
+
+      expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
+    });
+  });
+
   test("a reordered indicator keeps its place after a reload", async ({
     page,
     errorCollection
