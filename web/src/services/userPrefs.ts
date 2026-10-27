@@ -57,7 +57,8 @@ export function loadSettings(): void {
 
   if (!tooltipsChosen()) current.showTooltips = defaults.showTooltips;
   // Stored JSON is unchecked, so an order this version does not know falls back.
-  if (!Object.hasOwn(LISTING_ORDERS, current.listingOrder))
+  // Compared by identity: a key lookup would coerce an array or object to a string.
+  if (!Object.keys(LISTING_ORDERS).includes(current.listingOrder))
     current.listingOrder = defaults.listingOrder;
 
   changeTheme(current.isDarkTheme);

@@ -351,6 +351,19 @@ describe("SettingsDialog", () => {
       expect(await screen.findByRole("menu")).toBeInTheDocument();
     });
 
+    it("opens the move menu on a mouse click after a touch drag with no click", async () => {
+      renderTwo();
+      const handle = screen.getByRole("button", { name: "reorder SMA (50)" });
+
+      fireEvent.pointerDown(handle, { pointerType: "touch", pointerId: 1, clientY: 60 });
+      fireEvent.pointerMove(handle, { pointerType: "touch", pointerId: 1, clientY: 5 });
+      fireEvent.pointerUp(handle, { pointerType: "touch", pointerId: 1, clientY: 5 });
+      fireEvent.pointerDown(handle, { pointerType: "mouse", pointerId: 2 });
+      fireEvent.click(handle);
+
+      expect(await screen.findByRole("menu")).toBeInTheDocument();
+    });
+
     it("treats a touch that barely moves as a tap", () => {
       const controller = renderTwo();
       const handle = screen.getByRole("button", { name: "reorder SMA (50)" });

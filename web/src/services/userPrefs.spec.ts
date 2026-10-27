@@ -186,13 +186,17 @@ describe("userPrefs", () => {
       expect(parsed.listingOrder).toBe("name");
     });
 
-    it("lists A to Z when a stored order is not one the dialog knows", () => {
-      localStorage.setItem("settings", JSON.stringify({ listingOrder: "newest" }));
+    // An array or object that stringifies to a known order must not pass, or throw.
+    it.each([["newest"], [["name"]], [{ toString: "x" }]])(
+      "lists A to Z when the stored order is %j",
+      listingOrder => {
+        localStorage.setItem("settings", JSON.stringify({ listingOrder }));
 
-      loadSettings();
+        loadSettings();
 
-      expect(getSettings().listingOrder).toBe("name");
-    });
+        expect(getSettings().listingOrder).toBe("name");
+      }
+    );
 
     it("keeps a visitor's choice to group by category", () => {
       localStorage.setItem("settings", JSON.stringify({ listingOrder: "category" }));

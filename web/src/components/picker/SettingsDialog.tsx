@@ -270,9 +270,9 @@ function SelectionGroup({
                   }}
                   onDragEnd={endDrag}
                   onPointerDown={event => {
-                    if (event.pointerType !== "touch") return;
-                    // A drag need not end in a click, so a flag it left must not eat this tap.
+                    // A drag need not end in a click, so a flag it left must not eat this press.
                     suppressClick.current = false;
+                    if (event.pointerType !== "touch") return;
                     event.currentTarget.setPointerCapture(event.pointerId);
                     touch.current = { startY: event.clientY, dragging: false };
                   }}
@@ -310,6 +310,7 @@ function SelectionGroup({
                     event.preventDefault();
                   }}
                   onKeyDown={event => {
+                    suppressClick.current = false;
                     if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
                     event.preventDefault();
                     const handle = event.currentTarget;
