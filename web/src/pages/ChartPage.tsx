@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { AnchoredOverlay, Banner, Button, IconButton, Text, VisuallyHidden } from "@primer/react";
+import { AlertIcon, CloudOfflineIcon, LinkIcon, PencilIcon } from "@primer/octicons-react";
 
 import { env } from "../config/env";
 import { getChartController, useChartState } from "../charting/useChart";
@@ -6,6 +8,47 @@ import { SettingsDialog } from "../components/picker/SettingsDialog";
 import { PickConfigDialog } from "../components/picker/PickConfigDialog";
 import type { IndicatorListing, IndicatorSelection } from "../types/chart.types";
 import "../components/picker/picker.scss";
+
+const OFFLINE_NOTICE =
+  "The live API is unreachable. Showing saved data; indicators with custom settings may be blank.";
+
+/**
+ * A warning icon that opens the offline explanation when pressed, so a touch or
+ * keyboard visitor can read it; a tooltip alone shows only on hover.
+ */
+function OfflineNotice(): React.JSX.Element {
+  const [open, setOpen] = useState(false);
+  return (
+    <AnchoredOverlay
+      open={open}
+      onOpen={() => {
+        setOpen(true);
+      }}
+      onClose={() => {
+        setOpen(false);
+      }}
+      side="outside-bottom"
+      align="end"
+      width="medium"
+      renderAnchor={anchorProps => (
+        <IconButton
+          {...anchorProps}
+          icon={AlertIcon}
+          variant="invisible"
+          size="large"
+          className="offline-icon"
+          aria-label="Live API unreachable"
+          // The open notice says more than the name; its tooltip would cover it.
+          unsafeDisableTooltip={open}
+        />
+      )}
+    >
+      <Text as="p" size="small" className="offline-notice">
+        {OFFLINE_NOTICE}
+      </Text>
+    </AnchoredOverlay>
+  );
+}
 
 /**
  * Main chart page. Ports `ChartComponent`: bootstraps the overlay chart,
@@ -85,7 +128,7 @@ export function ChartPage(): React.JSX.Element {
           className="api-error-container"
         >
           <div className="api-error-content">
-            <span className="material-icons api-error-icon">cloud_off</span>
+            <CloudOfflineIcon size={48} className="api-error-icon" />
 
             {isProduction ? (
               <>
@@ -123,64 +166,61 @@ export function ChartPage(): React.JSX.Element {
               </>
             )}
 
-            <button
-              type="button"
-              className="btn-raised btn-primary"
+            <Button
+              variant="primary"
               onClick={() => {
                 retried.current = true;
                 void controller.retryLoad();
               }}
             >
-              TRY AGAIN
-            </button>
+              Try again
+            </Button>
           </div>
         </div>
       )}
 
       {/* Mounted before it has text, so a screen reader announces the notice when it fills. */}
-      <div className={offline && !apiError ? "shared-view-banner" : undefined}>
-        <span role="status" className={offline && !apiError ? "banner-text" : undefined}>
-          {offline && !apiError
-            ? "The live API is unreachable. Showing saved data; indicators with custom settings may be blank."
-            : ""}
-        </span>
-      </div>
+      <VisuallyHidden role="status">{offline && !apiError ? OFFLINE_NOTICE : ""}</VisuallyHidden>
+      {/* In the header beside the settings button, but scrolls away with the page. */}
+      {offline && !apiError && !loading && (
+        <div className="offline-indicator">
+          <OfflineNotice />
+        </div>
+      )}
 
       {/* The status region stays mounted so a screen reader announces its text when it fills. */}
-      <div className={sharedView ? "shared-view-banner" : undefined}>
+      <div role="status" className="page-banner">
         {sharedView && (
-          <span className="material-icons" aria-hidden="true">
-            link
-          </span>
-        )}
-        <span role="status" className={sharedView ? "banner-text" : undefined}>
-          {sharedView ? "Showing a shared chart." : ""}
-        </span>
-        {sharedView && (
-          <button
-            type="button"
-            className="btn-raised btn-primary"
-            onClick={() => {
-              controller.returnToSavedSetup();
-            }}
-          >
-            BACK TO MY INDICATORS
-          </button>
+          <Banner
+            title="Shared chart"
+            hideTitle
+            variant="info"
+            leadingVisual={<LinkIcon />}
+            description="Showing a shared chart."
+            primaryAction={
+              <Banner.PrimaryAction
+                onClick={() => {
+                  controller.returnToSavedSetup();
+                }}
+              >
+                Back to my indicators
+              </Banner.PrimaryAction>
+            }
+          />
         )}
       </div>
 
-      {/* SETTINGS FAB */}
+      {/* SETTINGS BUTTON */}
       {!loading && !apiError && (
         <div className="fab-container">
-          <button
-            type="button"
+          <IconButton
+            icon={PencilIcon}
+            size="large"
             className="fab"
             aria-label="edit settings"
-            title="change indicators and settings"
+            description="Change indicators and settings"
             onClick={() => setSettingsOpen(true)}
-          >
-            <span className="material-icons">edit</span>
-          </button>
+          />
         </div>
       )}
 

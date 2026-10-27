@@ -2,7 +2,12 @@ import { createEvent, fireEvent, render, screen, waitFor, within } from "@testin
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ChartController } from "../../charting/chartController";
-import { changeSeriesLegend, getSettings } from "../../services/userPrefs";
+import {
+  changeListingOrder,
+  changeSeriesLegend,
+  changeTooltips,
+  getSettings
+} from "../../services/userPrefs";
 import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
 
 import { SettingsDialog } from "./SettingsDialog";
@@ -74,8 +79,17 @@ function makeController(): FakeController {
   };
 }
 
+/** Primer's Banner renders its action once per responsive layout; jsdom shows both. */
+function clickUndo(): void {
+  const undo = screen.getAllByRole("button", { name: "Undo" }).at(0);
+  if (!undo) throw new Error("no Undo button");
+  fireEvent.click(undo);
+}
+
 afterEach(() => {
   changeSeriesLegend(false);
+  changeListingOrder("name");
+  changeTooltips(false);
   document.body.className = "";
 });
 
@@ -167,6 +181,49 @@ describe("SettingsDialog", () => {
 
     fireEvent.keyDown(reorderHandle, { key: "ArrowUp" });
     expect(controller.moveSelection).toHaveBeenLastCalledWith("u1", -1);
+    expect(screen.getByText("RSI (5) moved to 1 of 3")).toHaveAttribute("role", "status");
+  });
+
+  it("leaves a row at either end of its group where it is, and says nothing", () => {
+    const controller = makeController();
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    fireEvent.keyDown(screen.getByRole("button", { name: "reorder RSI (5)" }), { key: "ArrowUp" });
+    fireEvent.keyDown(screen.getByRole("button", { name: "reorder SMA (50)" }), {
+      key: "ArrowDown"
+    });
+
+    expect(controller.moveSelection).not.toHaveBeenCalled();
+    expect(screen.queryByText(/moved to/)).toBeNull();
+  });
+
+  it("moves a row from its handle's menu, for a pointer that cannot drag", async () => {
+    const controller = makeController();
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "reorder RSI (5)" }));
+    expect(await screen.findByRole("menuitem", { name: "Move up" })).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    );
+    fireEvent.click(screen.getByRole("menuitem", { name: "Move down" }));
+
+    expect(controller.moveSelection).toHaveBeenCalledWith("u1", 1);
+    expect(screen.getByText("RSI (5) moved to 2 of 2")).toHaveAttribute("role", "status");
   });
 
   it("reorders displayed indicators by dragging within their chart group", () => {
@@ -237,6 +294,102 @@ describe("SettingsDialog", () => {
     ).toEqual(["select SMA (50)", "select ADX (14)", "select MACD (12,26,9)", "select RSI (5)"]);
   });
 
+  describe("touch drag", () => {
+    /** Lays the oscillator rows out 40px tall from the top, as jsdom draws nothing. */
+    function layOutRows(): void {
+      const rows = within(screen.getByRole("list", { name: "Oscillator charts" })).getAllByRole(
+        "listitem"
+      );
+      rows.forEach((row, i) => {
+        vi.spyOn(row, "getBoundingClientRect").mockReturnValue(
+          DOMRect.fromRect({ x: 0, y: i * 40, width: 300, height: 40 })
+        );
+      });
+    }
+
+    function renderTwo(): FakeController {
+      const controller = makeController();
+      render(
+        <SettingsDialog
+          controller={controller as unknown as ChartController}
+          onClose={vi.fn()}
+          onPickIndicator={vi.fn()}
+          onEditIndicator={vi.fn()}
+        />
+      );
+      layOutRows();
+      return controller;
+    }
+
+    it("moves a row dragged by finger into the gap it is released over", () => {
+      const controller = renderTwo();
+      const handle = screen.getByRole("button", { name: "reorder SMA (50)" });
+
+      fireEvent.pointerDown(handle, { pointerType: "touch", pointerId: 1, clientY: 60 });
+      fireEvent.pointerMove(handle, { pointerType: "touch", pointerId: 1, clientY: 40 });
+      fireEvent.pointerMove(handle, { pointerType: "touch", pointerId: 1, clientY: 5 });
+      expect(handle.closest("li")).toHaveClass("dragging");
+      fireEvent.pointerUp(handle, { pointerType: "touch", pointerId: 1, clientY: 5 });
+      fireEvent.click(handle);
+
+      expect(controller.moveSelection).toHaveBeenCalledWith("u2", -1);
+      // The click that ends a drag does not also open the move menu.
+      expect(screen.queryByRole("menu")).toBeNull();
+    });
+
+    it("opens the move menu on the next tap when a drag ended without a click", async () => {
+      renderTwo();
+      const handle = screen.getByRole("button", { name: "reorder SMA (50)" });
+
+      fireEvent.pointerDown(handle, { pointerType: "touch", pointerId: 1, clientY: 60 });
+      fireEvent.pointerMove(handle, { pointerType: "touch", pointerId: 1, clientY: 5 });
+      fireEvent.pointerUp(handle, { pointerType: "touch", pointerId: 1, clientY: 5 });
+      fireEvent.pointerDown(handle, { pointerType: "touch", pointerId: 2, clientY: 5 });
+      fireEvent.pointerUp(handle, { pointerType: "touch", pointerId: 2, clientY: 5 });
+      fireEvent.click(handle);
+
+      expect(await screen.findByRole("menu")).toBeInTheDocument();
+    });
+
+    it("opens the move menu on a mouse click after a touch drag with no click", async () => {
+      renderTwo();
+      const handle = screen.getByRole("button", { name: "reorder SMA (50)" });
+
+      fireEvent.pointerDown(handle, { pointerType: "touch", pointerId: 1, clientY: 60 });
+      fireEvent.pointerMove(handle, { pointerType: "touch", pointerId: 1, clientY: 5 });
+      fireEvent.pointerUp(handle, { pointerType: "touch", pointerId: 1, clientY: 5 });
+      fireEvent.pointerDown(handle, { pointerType: "mouse", pointerId: 2 });
+      fireEvent.click(handle);
+
+      expect(await screen.findByRole("menu")).toBeInTheDocument();
+    });
+
+    it("treats a touch that barely moves as a tap", () => {
+      const controller = renderTwo();
+      const handle = screen.getByRole("button", { name: "reorder SMA (50)" });
+
+      fireEvent.pointerDown(handle, { pointerType: "touch", pointerId: 1, clientY: 60 });
+      fireEvent.pointerMove(handle, { pointerType: "touch", pointerId: 1, clientY: 63 });
+      fireEvent.pointerUp(handle, { pointerType: "touch", pointerId: 1, clientY: 63 });
+
+      expect(handle.closest("li")).not.toHaveClass("dragging");
+      expect(controller.moveSelection).not.toHaveBeenCalled();
+    });
+
+    it("leaves a mouse drag running when its pointer is cancelled", () => {
+      renderTwo();
+      const handle = screen.getByRole("button", { name: "reorder SMA (50)" });
+      const dataTransfer = { effectAllowed: "none", setData: vi.fn() };
+
+      fireEvent.pointerDown(handle, { pointerType: "mouse", pointerId: 1 });
+      fireEvent.dragStart(handle, { dataTransfer });
+      // Chrome cancels the mouse pointer once HTML drag and drop takes over.
+      fireEvent.pointerCancel(handle, { pointerType: "mouse", pointerId: 1 });
+
+      expect(handle.closest("li")).toHaveClass("dragging");
+    });
+  });
+
   it("does not allow a drag to reorder across chart groups", () => {
     const controller = makeController();
     controller.selections.push({ ...makeSelection("u3", "EMA (20)"), chartType: "overlay" });
@@ -303,7 +456,7 @@ describe("SettingsDialog", () => {
       />
     );
 
-    const removeButton = screen.getByRole("button", { name: "REMOVE SELECTED" });
+    const removeButton = screen.getByRole("button", { name: /^Remove selected/ });
     expect(removeButton).toBeDisabled();
 
     // check the first displayed indicator, then remove
@@ -326,7 +479,7 @@ describe("SettingsDialog", () => {
       />
     );
 
-    fireEvent.click(screen.getByLabelText("Dark theme"));
+    fireEvent.click(screen.getByRole("button", { name: "Dark theme" }));
     expect(controller.onSettingsChange).toHaveBeenCalled();
   });
 
@@ -341,12 +494,31 @@ describe("SettingsDialog", () => {
       />
     );
 
-    const toggle = screen.getByRole("checkbox", { name: "Show tooltips" });
-    expect(toggle).not.toBeChecked();
-
     fireEvent.click(screen.getByText("Show tooltips"));
 
-    expect(toggle).toBeChecked();
+    expect(screen.getByRole("button", { name: "Show tooltips" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+  });
+
+  it("names each switch from the text of its row", () => {
+    const controller = makeController();
+    render(
+      <SettingsDialog
+        controller={controller as unknown as ChartController}
+        onClose={vi.fn()}
+        onPickIndicator={vi.fn()}
+        onEditIndicator={vi.fn()}
+      />
+    );
+
+    const toggle = screen.getByRole("button", { name: "Show tooltips" });
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(toggle);
+
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
   });
 
   it("switches the series legend on and off, redrawing the charts each time", () => {
@@ -360,15 +532,15 @@ describe("SettingsDialog", () => {
       />
     );
 
-    const toggle = screen.getByRole("checkbox", { name: "Show series legend" });
-    expect(toggle).not.toBeChecked();
+    const toggle = screen.getByRole("button", { name: "Show series legend" });
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
 
     fireEvent.click(toggle);
-    expect(toggle).toBeChecked();
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
     expect(getSettings().showSeriesLegend).toBe(true);
 
     fireEvent.click(toggle);
-    expect(toggle).not.toBeChecked();
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
     expect(getSettings().showSeriesLegend).toBe(false);
     expect(controller.onSettingsChange).toHaveBeenCalledTimes(2);
   });
@@ -384,7 +556,10 @@ describe("SettingsDialog", () => {
       />
     );
 
-    expect(screen.getByRole("checkbox", { name: "Show series legend" })).toBeChecked();
+    expect(screen.getByRole("button", { name: "Show series legend" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
   });
 
   it("closes via the close button", () => {
@@ -399,7 +574,7 @@ describe("SettingsDialog", () => {
       />
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "close" }));
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(onClose).toHaveBeenCalled();
   });
 
@@ -424,7 +599,7 @@ describe("SettingsDialog", () => {
 
       expect(writeText).toHaveBeenCalledWith("https://charts.example/?c=1.abc");
       await waitFor(() => {
-        expect(screen.getByRole("status")).toHaveTextContent("Link copied");
+        expect(screen.getByText("Link copied")).toHaveAttribute("role", "status");
       });
     });
 
@@ -437,7 +612,7 @@ describe("SettingsDialog", () => {
       fireEvent.click(screen.getByRole("button", { name: "copy share link" }));
 
       await waitFor(() => {
-        expect(screen.getByRole("status")).toHaveTextContent("Copy failed");
+        expect(screen.getByText("Copy failed")).toHaveAttribute("role", "status");
       });
     });
 
@@ -447,7 +622,7 @@ describe("SettingsDialog", () => {
 
       fireEvent.click(screen.getByRole("button", { name: "copy share link" }));
 
-      expect(screen.getByRole("status")).toHaveTextContent("Copy failed");
+      expect(screen.getByText("Copy failed")).toHaveAttribute("role", "status");
     });
 
     it("is not offered with nothing displayed", () => {
@@ -472,16 +647,16 @@ describe("SettingsDialog", () => {
     );
 
     fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
-    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove selected(1)" }));
 
     expect(screen.getByText("Removed RSI (5)")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+    clickUndo();
     expect(controller.addSelection).toHaveBeenCalledWith(
       expect.objectContaining({ ucid: "u1" }),
       controller.listings[0]
     );
-    expect(screen.queryByRole("button", { name: "UNDO" })).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("button", { name: "Undo" })).toHaveLength(0);
     expect(await screen.findByText("Restored RSI (5)")).toBeInTheDocument();
     expect(controller.addSelection).toHaveBeenCalledTimes(1);
     expect(screen.queryByText("Removed RSI (5)")).not.toBeInTheDocument();
@@ -500,8 +675,8 @@ describe("SettingsDialog", () => {
     );
 
     fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
-    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
-    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove selected(1)" }));
+    clickUndo();
 
     await screen.findByText("Restored RSI (5)");
     expect(controller.applyOrder).toHaveBeenCalledWith(["u1", "u2"]);
@@ -530,10 +705,10 @@ describe("SettingsDialog", () => {
     );
 
     fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
-    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove selected(1)" }));
     // u3 moves above u2 after the removal: u3, u2.
     sel.splice(0, sel.length, ...[sel[1], sel[0]].filter(Boolean));
-    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+    clickUndo();
 
     await screen.findByText("Restored RSI (5)");
     expect(controller.applyOrder).toHaveBeenCalledWith(["u3", "u1", "u2"]);
@@ -559,14 +734,14 @@ describe("SettingsDialog", () => {
       );
       fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
       fireEvent.click(screen.getByRole("checkbox", { name: "select SMA (50)" }));
-      fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (2)" }));
+      fireEvent.click(screen.getByRole("button", { name: "Remove selected(2)" }));
       return controller;
     }
 
     it("puts two adjacent removals back in their old order", async () => {
       const controller = renderThree();
 
-      fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+      clickUndo();
 
       await screen.findByText("Restored 2 indicators");
       expect(controller.applyOrder).toHaveBeenCalledWith(["u1", "u2", "u3"]);
@@ -583,9 +758,13 @@ describe("SettingsDialog", () => {
         })
         .mockRejectedValueOnce(new Error("gone"));
 
-      fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+      clickUndo();
 
       await screen.findByText("Restored 1 of 2 indicators");
+      expect(screen.getByRole("region", { name: "Indicator restore problem" })).toHaveAttribute(
+        "data-variant",
+        "warning"
+      );
       // The failed one is absent from the controller; the order names it and the
       // controller ignores the unknown ucid.
       expect(controller.applyOrder).toHaveBeenCalledWith(["u1", "u2", "u3"]);
@@ -606,9 +785,9 @@ describe("SettingsDialog", () => {
     );
 
     fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
-    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove selected(1)" }));
     controller.listings.length = 0;
-    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+    clickUndo();
 
     expect(await screen.findByText("Could not restore the removed indicators")).toBeInTheDocument();
   });
@@ -627,10 +806,18 @@ describe("SettingsDialog", () => {
     );
 
     fireEvent.click(screen.getByRole("checkbox", { name: "select RSI (5)" }));
-    fireEvent.click(screen.getByRole("button", { name: "REMOVE SELECTED (1)" }));
-    fireEvent.click(screen.getByRole("button", { name: "UNDO" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove selected(1)" }));
+    expect(screen.getByRole("region", { name: "Indicator update" })).toHaveAttribute(
+      "data-variant",
+      "info"
+    );
+    clickUndo();
 
     expect(await screen.findByText("Could not restore the removed indicators")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Indicator restore problem" })).toHaveAttribute(
+      "data-variant",
+      "critical"
+    );
   });
 
   it("shows the result of an add and restores the list position", () => {
@@ -647,7 +834,7 @@ describe("SettingsDialog", () => {
     );
 
     expect(screen.getByText("BB(20,2) added")).toBeInTheDocument();
-    expect(document.querySelector(".dialog-body")?.scrollTop).toBe(120);
+    expect(document.querySelector(".settings-body")?.scrollTop).toBe(120);
   });
 
   describe("available indicator filter", () => {
@@ -715,6 +902,7 @@ describe("SettingsDialog", () => {
     });
 
     it("groups the list under category headings", () => {
+      changeListingOrder("category");
       renderDialog();
 
       expect(
@@ -730,6 +918,7 @@ describe("SettingsDialog", () => {
     });
 
     it("exposes each category as a heading", () => {
+      changeListingOrder("category");
       renderDialog();
 
       expect(screen.getByRole("heading", { name: "Oscillators" })).toBeInTheDocument();
@@ -737,6 +926,7 @@ describe("SettingsDialog", () => {
     });
 
     it("drops a category heading when none of its indicators match", () => {
+      changeListingOrder("category");
       const { input } = renderDialog();
 
       fireEvent.change(input, { target: { value: "relative" } });
@@ -746,18 +936,20 @@ describe("SettingsDialog", () => {
     });
 
     it("orders the category headings as the library docs do", () => {
+      changeListingOrder("category");
       renderDialog();
 
       const available = document.querySelector<HTMLElement>(".available-indicators");
       expect(available).not.toBeNull();
       expect(
         within(available as HTMLElement)
-          .getAllByRole("heading")
+          .getAllByRole("heading", { level: 3 })
           .map(h => h.textContent)
       ).toEqual(["Oscillators", "Moving averages"]);
     });
 
     it("picks the first match shown, in category order, on Enter", () => {
+      changeListingOrder("category");
       const controller = makeController();
       // Catalog order puts SMA first, but "Oscillators" comes before "Moving averages".
       controller.listings.reverse();
@@ -776,6 +968,72 @@ describe("SettingsDialog", () => {
       fireEvent.keyDown(input, { key: "Enter" });
 
       expect(onPickIndicator).toHaveBeenCalledWith(controller.listings.find(l => l.uiid === "RSI"));
+    });
+
+    it("lists A to Z by default, with each category beneath its name", () => {
+      const controller = makeController();
+      controller.listings.push(makeListing("ADX", "Average Directional Index", "oscillator"));
+      render(
+        <SettingsDialog
+          controller={controller as unknown as ChartController}
+          onClose={vi.fn()}
+          onPickIndicator={vi.fn()}
+          onEditIndicator={vi.fn()}
+        />
+      );
+
+      expect(screen.getByRole("button", { name: "A to Z" })).toHaveAttribute(
+        "aria-pressed",
+        "true"
+      );
+      const list = screen.getByRole("list", { name: "Available indicators, A to Z" });
+      expect(
+        within(list)
+          .getAllByRole("listitem")
+          .map(item => item.textContent)
+      ).toEqual([
+        "Average Directional IndexOscillators",
+        "Relative Strength IndexOscillators",
+        "Simple Moving AverageMoving averages"
+      ]);
+      expect(screen.queryByRole("heading", { name: "Oscillators" })).toBeNull();
+    });
+
+    it("groups by category when chosen, and remembers the choice", () => {
+      renderDialog();
+
+      fireEvent.click(screen.getByRole("button", { name: "By category" }));
+
+      expect(screen.getByRole("heading", { name: "Oscillators" })).toBeInTheDocument();
+      expect(screen.queryByRole("list", { name: "Available indicators, A to Z" })).toBeNull();
+      expect(getSettings().listingOrder).toBe("category");
+    });
+
+    it("opens A to Z for a visitor who chose it, and picks its first match on Enter", () => {
+      changeListingOrder("name");
+      const controller = makeController();
+      // First A to Z, but in "Moving averages", which comes after "Oscillators" by category.
+      const alma = makeListing("ALMA", "Arnaud Legoux Moving Average", "moving-average");
+      controller.listings.push(alma);
+      const onPickIndicator = vi.fn();
+      render(
+        <SettingsDialog
+          controller={controller as unknown as ChartController}
+          onClose={vi.fn()}
+          onPickIndicator={onPickIndicator}
+          onEditIndicator={vi.fn()}
+        />
+      );
+      const input = screen.getByRole("searchbox", { name: "filter available indicators" });
+
+      fireEvent.change(input, { target: { value: "i" } });
+      fireEvent.keyDown(input, { key: "Enter" });
+
+      expect(screen.getByRole("button", { name: "A to Z" })).toHaveAttribute(
+        "aria-pressed",
+        "true"
+      );
+      expect(onPickIndicator).toHaveBeenCalledWith(alma);
     });
 
     it("restores the filter when the dialog reopens after an add", () => {

@@ -1,7 +1,9 @@
 /*
- * Global styles for the React demo. Theme partials plus page-level styles. The theme is
- * expressed as CSS custom properties (`--bg`, `--surface`, `--text`, …) toggled by the
- * `.dark-theme` / `.light-theme` body class (see `services/userPrefs.ts`).
+ * Global styles for the React demo. Theme partials plus page-level styles. The site
+ * theme is expressed as CSS custom properties (`--bg`, `--surface`, `--text`, …) toggled
+ * by the `.dark-theme` / `.light-theme` body class (see `services/userPrefs.ts`). It
+ * colors the page, the title block, and the site's own content; every control is a
+ * Primer component in Primer's matching light or dark theme (see `PrimerRoot`).
  */
 
 @use "theme-dark"; // default theme
@@ -10,15 +12,6 @@
 
 :root {
   --toolbar-height: 56px;
-  --accent: #ff9800;
-  --primary: #00458f;
-  --primary-container: #cce5ff;
-  --on-primary-container: #001e2c;
-
-  /* theme-independent semantic tokens */
-  --on-primary: #fff; /* foreground on filled primary surfaces + switch knob */
-  --error: #d32f2f; /* inline validation + error text */
-  --control-container: #00458f; /* settings/picker raised buttons + active switches — stays dark in both themes */
 }
 
 /* HEADER / TOOLBAR — faithful port of `.main-toolbar` in app.component.scss */
@@ -174,6 +167,9 @@
 }
 
 .api-error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   max-width: 480px;
   text-align: center;
   background-color: var(--surface);
@@ -183,7 +179,6 @@
 }
 
 .api-error-icon {
-  font-size: 48px;
   color: var(--text-muted);
 }
 
@@ -213,17 +208,5 @@
   h1,
   h2 {
     text-align: center;
-  }
-
-  /* Route error screen; picker.scss buttons live in the lazy chunk that failed. */
-  .reload-button {
-    border: none;
-    border-radius: 4px;
-    padding: 8px 16px;
-    font: inherit;
-    font-weight: 500;
-    color: var(--on-primary);
-    background-color: var(--control-container);
-    cursor: pointer;
   }
 }

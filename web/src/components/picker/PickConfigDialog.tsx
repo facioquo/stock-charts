@@ -1,4 +1,15 @@
-import { useId, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  Banner,
+  Dialog,
+  FormControl,
+  Heading,
+  SegmentedControl,
+  Select,
+  Stack,
+  TextInput,
+  useConfirm
+} from "@primer/react";
 
 import { describeApiError } from "../../api/apiClient";
 import type { ChartController } from "../../charting/chartController";
@@ -13,7 +24,6 @@ import {
   presetColors,
   userSpecifiedWidth
 } from "../../charting/indicatorStyles";
-import { Modal } from "./Modal";
 
 interface PickConfigDialogProps {
   listing: IndicatorListing;
@@ -50,29 +60,22 @@ function editSignature(selection: IndicatorSelection): string {
 
 interface DialogTabsProps {
   tab: TabId;
-  hasParams: boolean;
-  showStyles: boolean;
   onSelect: (tab: TabId) => void;
 }
 
-/** Tab strip switching between the params and styles panels. */
-function DialogTabs({ tab, hasParams, showStyles, onSelect }: DialogTabsProps): React.JSX.Element {
-  const renderTab = (id: TabId, label: string): React.JSX.Element => (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={tab === id}
-      className={tab === id ? "dialog-tab active" : "dialog-tab"}
-      onClick={() => onSelect(id)}
-    >
-      {label}
-    </button>
-  );
+/** Switches between the params and styles panels, when the indicator has both. */
+function DialogTabs({ tab, onSelect }: DialogTabsProps): React.JSX.Element {
   return (
-    <div className="dialog-tabs" role="tablist">
-      {hasParams && renderTab("params", "Params")}
-      {showStyles && renderTab("styles", "Styles")}
-    </div>
+    <SegmentedControl
+      aria-label="Indicator settings"
+      fullWidth
+      onChange={index => {
+        onSelect(index === 0 ? "params" : "styles");
+      }}
+    >
+      <SegmentedControl.Button selected={tab === "params"}>Params</SegmentedControl.Button>
+      <SegmentedControl.Button selected={tab === "styles"}>Styles</SegmentedControl.Button>
+    </SegmentedControl>
   );
 }
 
@@ -84,35 +87,35 @@ interface ParamsPanelProps {
 /** Editable list of the indicator's numeric parameters with range validation. */
 function ParamsPanel({ params, onUpdate }: ParamsPanelProps): React.JSX.Element {
   return (
-    <div className="param-container">
+    <Stack gap="normal" className="param-container">
       {params.map((p, i) => {
         const invalid = paramInvalid(p);
         return (
-          <div key={p.paramName} className="param-input">
-            <label className="field-label" htmlFor={`param-${i}`}>
-              {p.displayName}
-            </label>
-            <input
-              id={`param-${i}`}
+          // A valid field keeps the error line's height free, so showing it does not
+          // move the fields below while the visitor types.
+          <FormControl key={p.paramName} className={invalid ? undefined : "reserve-validation"}>
+            <FormControl.Label>{p.displayName}</FormControl.Label>
+            <TextInput
               type="number"
-              required
+              block
               min={p.minimum}
               max={p.maximum}
+              validationStatus={invalid ? "error" : undefined}
               aria-invalid={invalid}
               value={p.value ?? ""}
-              onChange={event => onUpdate(i, event.target.value)}
+              onChange={event => {
+                onUpdate(i, event.target.value);
+              }}
             />
-            <div className="field-error-slot">
-              {invalid && (
-                <p className="field-error">
-                  Valid range is {p.minimum} to {p.maximum}
-                </p>
-              )}
-            </div>
-          </div>
+            {invalid && (
+              <FormControl.Validation variant="error">
+                Valid range is {p.minimum} to {p.maximum}
+              </FormControl.Validation>
+            )}
+          </FormControl>
         );
       })}
-    </div>
+    </Stack>
   );
 }
 
@@ -122,7 +125,6 @@ interface SelectOption {
 }
 
 interface LabeledSelectProps {
-  id: string;
   label: string;
   value: string | number;
   disabled?: boolean;
@@ -130,9 +132,8 @@ interface LabeledSelectProps {
   onChange: (rawValue: string) => void;
 }
 
-/** A labelled `<select>` populated from `{ value, name }` options. */
+/** A labelled Primer `Select` populated from `{ value, name }` options. */
 function LabeledSelect({
-  id,
   label,
   value,
   disabled = false,
@@ -140,18 +141,23 @@ function LabeledSelect({
   onChange
 }: LabeledSelectProps): React.JSX.Element {
   return (
-    <div className="style-input">
-      <label className="field-label" htmlFor={id}>
-        {label}
-      </label>
-      <select id={id} value={value} disabled={disabled} onChange={e => onChange(e.target.value)}>
+    <FormControl disabled={disabled}>
+      <FormControl.Label>{label}</FormControl.Label>
+      <Select
+        block
+        value={String(value)}
+        disabled={disabled}
+        onChange={event => {
+          onChange(event.target.value);
+        }}
+      >
         {options.map(option => (
-          <option key={option.value} value={option.value}>
+          <Select.Option key={option.value} value={String(option.value)}>
             {option.name}
-          </option>
+          </Select.Option>
         ))}
-      </select>
-    </div>
+      </Select>
+    </FormControl>
   );
 }
 
@@ -166,14 +172,12 @@ function StyleSelects({ result, index, onUpdate }: StyleRowProps): React.JSX.Ele
   return (
     <>
       <LabeledSelect
-        id={`linetype-${index}`}
         label="Line type"
         value={result.lineType}
         options={lineTypes}
         onChange={value => onUpdate(index, { lineType: value })}
       />
       <LabeledSelect
-        id={`linewidth-${index}`}
         label="Line width"
         value={result.lineWidth}
         disabled={!userSpecifiedWidth(result.lineType)}
@@ -202,11 +206,17 @@ function StyleColor({ result, index, onUpdate }: StyleRowProps): React.JSX.Eleme
 /** Line-type / width / color controls for a single indicator result series. */
 function StyleRow({ result, index, onUpdate }: StyleRowProps): React.JSX.Element {
   return (
-    <div className="style-container">
-      <h3>{result.displayName}</h3>
-      <StyleSelects result={result} index={index} onUpdate={onUpdate} />
-      <StyleColor result={result} index={index} onUpdate={onUpdate} />
-    </div>
+    <section className="style-container">
+      <Stack gap="condensed" className="style-body">
+        <Heading as="h3" variant="small">
+          {result.displayName}
+        </Heading>
+        <div className="style-inputs">
+          <StyleSelects result={result} index={index} onUpdate={onUpdate} />
+          <StyleColor result={result} index={index} onUpdate={onUpdate} />
+        </div>
+      </Stack>
+    </section>
   );
 }
 
@@ -218,11 +228,11 @@ interface StylesPanelProps {
 /** Per-series style controls for the indicator. */
 function StylesPanel({ results, onUpdate }: StylesPanelProps): React.JSX.Element {
   return (
-    <div className="styles-container">
+    <Stack gap="spacious">
       {results.map((r, i) => (
         <StyleRow key={r.dataName} result={r} index={i} onUpdate={onUpdate} />
       ))}
-    </div>
+    </Stack>
   );
 }
 
@@ -264,7 +274,7 @@ function usePickConfig(
   const dirty = editSignature(selection) !== opened;
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
-  const [closeLabel, setCloseLabel] = useState(existing ? "SAVE" : "ADD");
+  const [closeLabel, setCloseLabel] = useState(existing ? "Save" : "Add");
 
   const hasParams = selection.params.length > 0;
   // Style controls are hidden where they'd be no-ops: candlestick-pattern
@@ -307,7 +317,7 @@ function usePickConfig(
     } catch (error) {
       console.error("Error adding selection to chart:", error);
       setErrorMessage(describeApiError(error));
-      setCloseLabel("RETRY");
+      setCloseLabel("Retry");
     } finally {
       setSubmitting(false);
     }
@@ -330,53 +340,10 @@ function usePickConfig(
   };
 }
 
-interface DialogActionsProps {
-  closeLabel: string;
-  disabled: boolean;
-  onClose: () => void;
-  onSubmit: () => void;
-}
-
-/** Cancel / submit footer for the config dialog. */
-function DialogActions({
-  closeLabel,
-  disabled,
-  onClose,
-  onSubmit
-}: DialogActionsProps): React.JSX.Element {
-  return (
-    <div className="dialog-actions">
-      <button type="button" className="btn-text" onClick={onClose}>
-        CANCEL
-      </button>
-      <button
-        type="button"
-        className="btn-raised btn-primary"
-        disabled={disabled}
-        onClick={onSubmit}
-      >
-        {closeLabel}
-      </button>
-    </div>
-  );
-}
-
-/** Inline validation / submit error message block. */
-function DialogError({ message }: { message: string }): React.JSX.Element {
-  return (
-    <div className="dialog-error">
-      <p>
-        <small>Please correct the following error:</small>
-      </p>
-      <p className="error">{message}</p>
-    </div>
-  );
-}
-
 /**
  * Configures an indicator's parameters and line styles, then adds it to the
- * chart, or saves the edits to a displayed one. Uses native controls and
- * {@link ColorSwatchPicker}.
+ * chart, or saves the edits to a displayed one. Closing with unsaved edits asks
+ * first, so a stray Escape or backdrop click does not lose them.
  */
 export function PickConfigDialog({
   listing,
@@ -384,29 +351,42 @@ export function PickConfigDialog({
   selection,
   onClose
 }: PickConfigDialogProps): React.JSX.Element {
-  const titleId = useId();
   const cfg = usePickConfig(listing, controller, onClose, selection);
+  const confirm = useConfirm();
+
+  const requestClose = async (): Promise<void> => {
+    if (
+      cfg.dirty &&
+      !(await confirm({
+        title: "Discard changes?",
+        content: "Your edits to this indicator will be lost.",
+        confirmButtonContent: "Discard",
+        confirmButtonType: "danger"
+      }))
+    )
+      return;
+    onClose();
+  };
 
   return (
-    <Modal
-      open
-      onClose={onClose}
-      labelledBy={titleId}
-      className="pick-config-dialog"
-      closeOnBackdrop={!cfg.dirty}
+    <Dialog
+      title={listing.name}
+      onClose={() => void requestClose()}
+      footerButtons={[
+        // Cancel is an explicit choice to leave, so only Escape, X and the backdrop ask.
+        { content: "Cancel", onClick: onClose },
+        {
+          content: cfg.closeLabel,
+          buttonType: "primary",
+          disabled: !cfg.formValid || cfg.submitting,
+          loading: cfg.submitting,
+          onClick: () => void cfg.handleSubmit()
+        }
+      ]}
     >
-      <h2 id={titleId} className="dialog-title noselect" title={listing.name}>
-        {listing.name}
-      </h2>
+      <Stack gap="normal">
+        {cfg.hasParams && cfg.showStyles && <DialogTabs tab={cfg.tab} onSelect={cfg.setTab} />}
 
-      <DialogTabs
-        tab={cfg.tab}
-        hasParams={cfg.hasParams}
-        showStyles={cfg.showStyles}
-        onSelect={cfg.setTab}
-      />
-
-      <div className="dialog-body">
         {cfg.hasParams && cfg.tab === "params" && (
           <ParamsPanel params={cfg.selection.params} onUpdate={cfg.updateParam} />
         )}
@@ -415,15 +395,15 @@ export function PickConfigDialog({
           <StylesPanel results={cfg.selection.results} onUpdate={cfg.updateResult} />
         )}
 
-        {cfg.errorMessage && <DialogError message={cfg.errorMessage} />}
-      </div>
-
-      <DialogActions
-        closeLabel={cfg.closeLabel}
-        disabled={!cfg.formValid || cfg.submitting}
-        onClose={onClose}
-        onSubmit={() => void cfg.handleSubmit()}
-      />
-    </Modal>
+        {cfg.errorMessage && (
+          <Banner
+            title="Could not apply the indicator"
+            variant="critical"
+            role="alert"
+            description={cfg.errorMessage}
+          />
+        )}
+      </Stack>
+    </Dialog>
   );
 }

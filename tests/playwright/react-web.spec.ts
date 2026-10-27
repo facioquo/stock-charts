@@ -88,7 +88,7 @@ test.describe("Stock Charts React Web", () => {
     const lookback = page.getByLabel("Lookback Periods");
     await expect(lookback).toHaveValue("5");
     await lookback.fill("9");
-    await page.getByRole("button", { name: "SAVE" }).click();
+    await page.getByRole("button", { name: "Save" }).click();
 
     // Saving reopens the settings list: same number of indicators, new parameter.
     await expect(page.getByRole("button", { name: /^edit RSI.*9/ })).toBeVisible({
@@ -97,6 +97,52 @@ test.describe("Stock Charts React Web", () => {
     await expect(displayed).toHaveCount(before);
 
     expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
+  });
+
+  test.describe("on a touch screen", () => {
+    test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
+
+    test("a finger drag on a handle reorders rather than scrolling", async ({
+      page,
+      errorCollection
+    }) => {
+      await page.goto("/");
+      await page.waitForLoadState("networkidle");
+      await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
+
+      const oscillators = page.getByRole("list", { name: "Oscillator charts" });
+      await page.getByRole("button", { name: "edit settings" }).click();
+      await expect(oscillators.locator("li label").first()).toHaveText(/^RSI/);
+
+      const handle = page.getByRole("button", { name: /^reorder ADX/ });
+      await handle.scrollIntoViewIfNeeded();
+      const from = await handle.boundingBox();
+      const firstRow = await oscillators.locator("li").first().boundingBox();
+      if (!from || !firstRow) throw new Error("reorder handle or target row is not laid out");
+      const body = page.locator(".settings-body");
+      const scrollBefore = await body.evaluate(element => element.scrollTop);
+
+      // Playwright's touchscreen only taps, so the drag goes in as raw touch events.
+      const cdp = await page.context().newCDPSession(page);
+      const x = from.x + from.width / 2;
+      const touchAt = (type: string, y: number) =>
+        cdp.send("Input.dispatchTouchEvent", {
+          type,
+          touchPoints: type === "touchEnd" ? [] : [{ x, y }]
+        });
+      await touchAt("touchStart", from.y + from.height / 2);
+      for (let y = from.y + from.height / 2; y > firstRow.y + 4; y -= 6) {
+        await touchAt("touchMove", y);
+      }
+      await touchAt("touchMove", firstRow.y + 4);
+      await touchAt("touchEnd", firstRow.y + 4);
+
+      await expect(oscillators.locator("li label").first()).toHaveText(/^ADX/);
+      expect(await body.evaluate(element => element.scrollTop)).toBe(scrollBefore);
+      await expect(page.getByRole("menu")).toHaveCount(0);
+
+      expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
+    });
   });
 
   test("a reordered indicator keeps its place after a reload", async ({
@@ -170,7 +216,7 @@ test.describe("Stock Charts React Web", () => {
     await expect(
       shared.getByRole("status").filter({ hasText: "Showing a shared chart" })
     ).toBeVisible();
-    await shared.getByRole("button", { name: "BACK TO MY INDICATORS" }).click();
+    await shared.getByRole("button", { name: "Back to my indicators" }).click();
     await expect(shared.getByText("Showing a shared chart")).toBeHidden({ timeout: 15_000 });
     expect(new URL(shared.url()).searchParams.has("c")).toBe(false);
     await expect(shared.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
@@ -197,16 +243,20 @@ test.describe("Stock Charts React Web", () => {
     await page.getByRole("button", { name: "edit settings" }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
 
-    const themeToggle = page.getByRole("checkbox", { name: "Dark theme" });
-    const wasDark = await themeToggle.isChecked();
+    // Primer's ToggleSwitch is a button whose pressed state is the setting.
+    const themeToggle = page.getByRole("button", { name: "Dark theme" });
+    const wasDark = (await themeToggle.getAttribute("aria-pressed")) === "true";
 
-    // The checkbox is visually hidden inside a custom switch, so click the label
-    // text: the whole row is one label, so the words toggle it as the slider does.
-    await page.getByText("Dark theme", { exact: true }).click();
+    await themeToggle.click();
 
     const expectedClass = wasDark ? "light-theme" : "dark-theme";
     await expect(page.locator("body")).toHaveClass(new RegExp(expectedClass));
-    expect(await themeToggle.isChecked()).toBe(!wasDark);
+    await expect(themeToggle).toHaveAttribute("aria-pressed", String(!wasDark));
+    // The controls switch to Primer's matching theme with the page.
+    await expect(page.locator("[data-color-mode]").first()).toHaveAttribute(
+      "data-color-mode",
+      wasDark ? "light" : "dark"
+    );
 
     expect(errorCollection.pageErrors, "No uncaught page errors should occur").toEqual([]);
   });
@@ -303,9 +353,7 @@ test.describe("Stock Charts React Web", () => {
     }) => {
       await page.goto("/");
       await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
-      await expect(
-        page.getByRole("status").filter({ hasText: "live API is unreachable" })
-      ).toBeVisible({
+      await expect(page.getByRole("button", { name: "Live API unreachable" })).toBeVisible({
         timeout: 15_000
       });
 
@@ -354,9 +402,9 @@ test.describe("Stock Charts React Web", () => {
       await page.goto("/");
       await expect(page.locator("#chartOverlay")).toBeVisible({ timeout: 15_000 });
       // The snapshot answered, so the notice shows; a run that never went offline fails here.
-      await expect(
-        page.getByRole("status").filter({ hasText: "live API is unreachable" })
-      ).toBeVisible({ timeout: 15_000 });
+      await expect(page.getByRole("button", { name: "Live API unreachable" })).toBeVisible({
+        timeout: 15_000
+      });
 
       await expectDisplayed(page, catalog.length);
       // Read `missing` only once every snapshot request has finished.

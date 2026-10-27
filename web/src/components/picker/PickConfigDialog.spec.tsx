@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { ApiError } from "../../api/apiClient";
@@ -78,48 +78,71 @@ function renderDialog(controller: FakeController, onClose = vi.fn()): { onClose:
 }
 
 describe("PickConfigDialog", () => {
-  it("renders the title and tabs with a valid default form", () => {
+  it("renders the title and view switch with a valid default form", () => {
     renderDialog(makeController());
     expect(screen.getByRole("heading", { name: "Relative Strength Index" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Params" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Styles" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "ADD" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Params" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Styles" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add" })).toBeEnabled();
   });
 
   it("disables submit and shows a range error for an out-of-range param", () => {
     renderDialog(makeController());
     fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "999" } });
     expect(screen.getByText("Valid range is 1 to 250")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "ADD" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Add" })).toBeDisabled();
   });
 
-  describe("backdrop click", () => {
-    const backdrop = (): Element => {
-      const element = document.querySelector(".modal-backdrop");
-      if (!element) throw new Error("no backdrop");
-      return element;
+  // Escape and a backdrop click reach the same Primer close request.
+  describe("closing", () => {
+    const pressEscape = (): void => {
+      fireEvent.keyDown(document.activeElement ?? document.body, { key: "Escape" });
+    };
+    /** The confirmation Primer opens over the dialog. */
+    const discardPrompt = async (): Promise<HTMLElement> => {
+      const prompt = await screen.findByRole("alertdialog");
+      expect(within(prompt).getByText("Discard changes?")).toBeInTheDocument();
+      return prompt;
+    };
+    const answer = (prompt: HTMLElement, button: "Cancel" | "Discard"): void => {
+      fireEvent.click(within(prompt).getByRole("button", { name: button }));
     };
 
-    it("is ignored while there are unsaved edits", () => {
+    it("asks before discarding unsaved edits, and keeps them on cancel", async () => {
       const { onClose } = renderDialog(makeController());
       fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "21" } });
 
-      fireEvent.mouseDown(backdrop());
+      pressEscape();
 
+      answer(await discardPrompt(), "Cancel");
+      await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
       expect(onClose).not.toHaveBeenCalled();
+      expect(screen.getByLabelText("Lookback Periods")).toHaveValue(21);
     });
 
-    it("is ignored while a style edit is unsaved", () => {
+    it("closes once the discard is confirmed", async () => {
       const { onClose } = renderDialog(makeController());
-      fireEvent.click(screen.getByRole("tab", { name: "Styles" }));
+      fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "21" } });
+
+      pressEscape();
+      answer(await discardPrompt(), "Discard");
+
+      await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    });
+
+    it("asks while a style edit is unsaved", async () => {
+      const { onClose } = renderDialog(makeController());
+      fireEvent.click(screen.getByRole("button", { name: "Styles" }));
       fireEvent.change(screen.getByLabelText("Line width"), { target: { value: "3" } });
 
-      fireEvent.mouseDown(backdrop());
+      pressEscape();
 
+      const prompt = await discardPrompt();
       expect(onClose).not.toHaveBeenCalled();
+      answer(prompt, "Cancel");
     });
 
-    it("is ignored while an edit of a displayed indicator is unsaved", () => {
+    it("asks while an edit of a displayed indicator is unsaved", async () => {
       const existing = { ...defaultSelection(), ucid: "displayed-1" };
       const onClose = vi.fn();
       render(
@@ -130,28 +153,51 @@ describe("PickConfigDialog", () => {
           onClose={onClose}
         />
       );
-      fireEvent.click(screen.getByRole("tab", { name: "Styles" }));
+      fireEvent.click(screen.getByRole("button", { name: "Styles" }));
       fireEvent.change(screen.getByLabelText("Line type"), { target: { value: "dash" } });
 
-      fireEvent.mouseDown(backdrop());
+      pressEscape();
 
+      const prompt = await discardPrompt();
       expect(onClose).not.toHaveBeenCalled();
+      answer(prompt, "Cancel");
     });
 
-    it("closes when nothing was edited", () => {
+    it("asks from the close button too", async () => {
+      const { onClose } = renderDialog(makeController());
+      fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "21" } });
+
+      fireEvent.click(screen.getByRole("button", { name: "Close" }));
+
+      const prompt = await discardPrompt();
+      expect(onClose).not.toHaveBeenCalled();
+      answer(prompt, "Cancel");
+    });
+
+    it("closes from Cancel without asking, since Cancel is the choice to leave", () => {
+      const { onClose } = renderDialog(makeController());
+      fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "21" } });
+
+      fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+      expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("closes without asking when nothing was edited", () => {
       const { onClose } = renderDialog(makeController());
 
-      fireEvent.mouseDown(backdrop());
+      pressEscape();
 
       expect(onClose).toHaveBeenCalledTimes(1);
     });
 
-    it("closes again once an edit is reverted", () => {
+    it("closes without asking once an edit is reverted", () => {
       const { onClose } = renderDialog(makeController());
       fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "21" } });
       fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "14" } });
 
-      fireEvent.mouseDown(backdrop());
+      pressEscape();
 
       expect(onClose).toHaveBeenCalledTimes(1);
     });
@@ -161,7 +207,7 @@ describe("PickConfigDialog", () => {
     const controller = makeController();
     const { onClose } = renderDialog(controller);
 
-    fireEvent.click(screen.getByRole("button", { name: "ADD" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
 
     await waitFor(() => expect(controller.addSelection).toHaveBeenCalledTimes(1));
     expect(controller.addSelection).toHaveBeenCalledWith(
@@ -186,7 +232,7 @@ describe("PickConfigDialog", () => {
 
     expect(screen.getByLabelText("Lookback Periods")).toHaveValue(14);
     fireEvent.change(screen.getByLabelText("Lookback Periods"), { target: { value: "21" } });
-    fireEvent.click(screen.getByRole("button", { name: "SAVE" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
     await waitFor(() => expect(controller.updateSelection).toHaveBeenCalledTimes(1));
     expect(controller.updateSelection).toHaveBeenCalledWith(
@@ -203,7 +249,7 @@ describe("PickConfigDialog", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
 
-  it("surfaces a server validation error and switches to RETRY", async () => {
+  it("surfaces a server validation error and switches to Retry", async () => {
     const controller = makeController(
       vi
         .fn()
@@ -213,21 +259,21 @@ describe("PickConfigDialog", () => {
     );
     const { onClose } = renderDialog(controller);
 
-    fireEvent.click(screen.getByRole("button", { name: "ADD" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
 
     expect(await screen.findByText("Lookback out of range")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "RETRY" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  it("switches to the styles tab and shows the result controls", () => {
+  it("switches to the styles view and shows the result controls", () => {
     renderDialog(makeController());
-    fireEvent.click(screen.getByRole("tab", { name: "Styles" }));
+    fireEvent.click(screen.getByRole("button", { name: "Styles" }));
     expect(screen.getByLabelText("Line type")).toBeInTheDocument();
     expect(screen.getByLabelText("Line width")).toBeInTheDocument();
   });
 
-  it("hides the styles tab for candle-only listings (e.g. Heikin-Ashi)", () => {
+  it("hides the styles view for candle-only listings (e.g. Heikin-Ashi)", () => {
     // Candle series take colors from the themed candlestick element defaults,
     // so per-result style controls would be no-ops.
     const candleListing: IndicatorListing = {
@@ -257,7 +303,7 @@ describe("PickConfigDialog", () => {
       />
     );
 
-    expect(screen.queryByRole("tab", { name: "Styles" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "ADD" })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: "Styles" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add" })).toBeEnabled();
   });
 });

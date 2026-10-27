@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
+  changeListingOrder,
   changeSeriesLegend,
   changeTheme,
   changeTooltips,
@@ -30,13 +31,19 @@ describe("userPrefs", () => {
       expect(getSettings()).toEqual({
         isDarkTheme: true,
         showTooltips: false,
-        showSeriesLegend: false
+        showSeriesLegend: false,
+        listingOrder: "name"
       });
       expect(localStorage.getItem("settings")).toBeTruthy();
     });
 
     it("loads cached settings when they exist", () => {
-      const cached = { isDarkTheme: false, showTooltips: true, showSeriesLegend: true };
+      const cached = {
+        isDarkTheme: false,
+        showTooltips: true,
+        showSeriesLegend: true,
+        listingOrder: "name"
+      };
       localStorage.setItem("settings", JSON.stringify(cached));
       localStorage.setItem("settings.tooltipsChosen", "true");
 
@@ -53,7 +60,8 @@ describe("userPrefs", () => {
       expect(getSettings()).toEqual({
         isDarkTheme: false,
         showTooltips: false,
-        showSeriesLegend: false
+        showSeriesLegend: false,
+        listingOrder: "name"
       });
     });
 
@@ -164,6 +172,38 @@ describe("userPrefs", () => {
         showSeriesLegend: boolean;
       };
       expect(parsed.showSeriesLegend).toBe(true);
+    });
+  });
+
+  describe("changeListingOrder", () => {
+    it("updates and caches the listing order", () => {
+      changeListingOrder("name");
+
+      expect(getSettings().listingOrder).toBe("name");
+      const parsed = JSON.parse(localStorage.getItem("settings") as string) as {
+        listingOrder: string;
+      };
+      expect(parsed.listingOrder).toBe("name");
+    });
+
+    // An array or object that stringifies to a known order must not pass, or throw.
+    it.each([["newest"], [["name"]], [{ toString: "x" }]])(
+      "lists A to Z when the stored order is %j",
+      listingOrder => {
+        localStorage.setItem("settings", JSON.stringify({ listingOrder }));
+
+        loadSettings();
+
+        expect(getSettings().listingOrder).toBe("name");
+      }
+    );
+
+    it("keeps a visitor's choice to group by category", () => {
+      localStorage.setItem("settings", JSON.stringify({ listingOrder: "category" }));
+
+      loadSettings();
+
+      expect(getSettings().listingOrder).toBe("category");
     });
   });
 });

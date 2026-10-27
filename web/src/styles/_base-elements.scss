@@ -33,23 +33,19 @@ main {
   min-height: 100vh;
 }
 
+/* Primer's BaseStyles sets its typeface and text color on the app root for the
+   controls; the site's own text keeps the site's. */
+header,
+.api-error-content :is(h2, p, ul),
+.container :is(h1, h2, p) {
+  font-family: Rubik, "Google Sans", Roboto, "Helvetica Neue", sans-serif;
+  color: var(--text);
+}
+
 /* TYPOGRAPHY */
 h1,
 h2 {
   font-weight: 600;
-}
-
-a {
-  color: var(--link);
-  text-decoration: underline;
-
-  &:visited {
-    color: var(--link);
-  }
-
-  &:hover {
-    color: var(--link-hover);
-  }
 }
 
 /* ALIGNMENT + UTILITIES */
@@ -75,11 +71,6 @@ a {
 .filler {
   flex: 1 1 auto;
   text-align: center;
-}
-
-/* COMMON CONTROLS */
-.error {
-  color: var(--error);
 }
 
 /* SCROLLBAR (faithful port of picker/_scrollbar-theme.scss; colours come from

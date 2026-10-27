@@ -1,4 +1,5 @@
 import { useRouteError } from "react-router-dom";
+import { Button } from "@primer/react";
 
 /*
  * Browser messages for a dynamic import whose chunk no longer exists: Chromium,
@@ -28,17 +29,14 @@ export function RouteError(): React.JSX.Element {
           ? "A newer version went live while this tab was open."
           : "This page failed to load."}
       </h2>
-      <p>
-        <button
-          type="button"
-          className="reload-button"
-          onClick={() => {
-            window.location.reload();
-          }}
-        >
-          Reload page
-        </button>
-      </p>
+      <Button
+        variant="primary"
+        onClick={() => {
+          window.location.reload();
+        }}
+      >
+        Reload page
+      </Button>
     </div>
   );
 }

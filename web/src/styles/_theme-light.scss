@@ -9,15 +9,10 @@
   --bg: #fafafa;
   --surface: #fff;
   --border: #e0e0e0;
-  --list-hover: #f1f1f1;
 
   /* text */
   --text: #1f1f1f;
   --text-muted: #5f6368;
-
-  /* links: azure accent, hover fades to neutral-30 */
-  --link: #1a73e8;
-  --link-hover: #46474a;
 
   /* brand heading: neutral-40 → neutral-10 on hover */
   --brand-h1: #5e5e62;
@@ -30,13 +25,4 @@
   /* scrollbar: shared neutral tones (neutral-40 / neutral-30) */
   --scrollbar: #5e5e62;
   --scrollbar-hover: #46474a;
-
-  /* primary interactive color: azure primary for light surfaces */
-  --primary: #00458f;
-  --primary-container: #cce5ff;
-  --on-primary-container: #001e2c;
-
-  /* native form controls: light rendering, Primer accent emphasis (light) when checked */
-  --control-scheme: light;
-  --checkbox-accent: #0969da;
 }

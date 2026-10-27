@@ -1,7 +1,7 @@
-import type { UserSettings } from "../types/chart.types";
+import type { ListingOrder, UserSettings } from "../types/chart.types";
 
 /**
- * Persists theme / tooltip / series legend preferences in
+ * Persists theme / tooltip / series legend / listing order preferences in
  * localStorage and applies the theme class to `document.body`. Module-level
  * singleton.
  */
@@ -10,13 +10,30 @@ const STORAGE_KEY = "settings";
 const TOOLTIPS_CHOSEN_KEY = "settings.tooltipsChosen";
 const isBrowser = typeof window !== "undefined";
 
-const defaults: UserSettings = { isDarkTheme: true, showTooltips: false, showSeriesLegend: false };
+const defaults: UserSettings = {
+  isDarkTheme: true,
+  showTooltips: false,
+  showSeriesLegend: false,
+  listingOrder: "name"
+};
 
 let current: UserSettings = { ...defaults };
+const themeListeners = new Set<() => void>();
 
 export function getSettings(): UserSettings {
   return current;
 }
+
+/** Subscribes to theme changes, in the shape `useSyncExternalStore` takes. */
+export function subscribeToTheme(listener: () => void): () => void {
+  themeListeners.add(listener);
+  return () => {
+    themeListeners.delete(listener);
+  };
+}
+
+/** Keyed by every `ListingOrder`, so the compiler asks for a member added to that type. */
+const LISTING_ORDERS: Record<ListingOrder, true> = { name: true, category: true };
 
 export function loadSettings(): void {
   if (!isBrowser) {
@@ -39,6 +56,10 @@ export function loadSettings(): void {
   }
 
   if (!tooltipsChosen()) current.showTooltips = defaults.showTooltips;
+  // Stored JSON is unchecked, so an order this version does not know falls back.
+  // Compared by identity: a key lookup would coerce an array or object to a string.
+  if (!Object.keys(LISTING_ORDERS).includes(current.listingOrder))
+    current.listingOrder = defaults.listingOrder;
 
   changeTheme(current.isDarkTheme);
   cacheSettings();
@@ -55,6 +76,7 @@ function tooltipsChosen(): boolean {
 export function changeTheme(isDarkTheme: boolean): void {
   current.isDarkTheme = isDarkTheme;
   cacheSettings();
+  for (const listener of themeListeners) listener();
 
   if (!isBrowser) return;
   const themeClass = isDarkTheme ? "dark-theme" : "light-theme";
@@ -77,6 +99,11 @@ export function changeSeriesLegend(showSeriesLegend: boolean): void {
   current.showSeriesLegend = showSeriesLegend;
   cacheSettings();
   // The chart controller redraws the legends (theme update).
+}
+
+export function changeListingOrder(listingOrder: ListingOrder): void {
+  current.listingOrder = listingOrder;
+  cacheSettings();
 }
 
 function cacheSettings(): void {

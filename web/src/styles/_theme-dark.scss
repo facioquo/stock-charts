@@ -14,15 +14,10 @@
   --bg: #121316;
   --surface: #1e1f24;
   --border: #2c2d33;
-  --list-hover: #222;
 
   /* text (neutral-90 / muted neutral-60) */
   --text: #e3e3e6;
   --text-muted: #9aa0a6;
-
-  /* links: azure accent, hover fades to neutral-70 (matches a:hover override) */
-  --link: #8ab4f8;
-  --link-hover: #ababae;
 
   /* brand heading: gold wordmark */
   --brand-h1: rgb(230 199 76 / 75%);
@@ -35,13 +30,4 @@
   /* scrollbar: neutral-40 track/thumb, neutral-30 on hover */
   --scrollbar: #5e5e62;
   --scrollbar-hover: #46474a;
-
-  /* primary interactive color: azure-80 for visibility on dark surfaces */
-  --primary: #8ab4f8;
-  --primary-container: #00458f;
-  --on-primary-container: #cbe6ff;
-
-  /* native form controls: dark rendering, Primer accent emphasis (dark) when checked */
-  --control-scheme: dark;
-  --checkbox-accent: #1f6feb;
 }

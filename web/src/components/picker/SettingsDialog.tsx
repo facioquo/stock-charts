@@ -8,18 +8,43 @@ import {
   type Dispatch
 } from "react";
 import { flushSync } from "react-dom";
+import {
+  ActionList,
+  ActionMenu,
+  Banner,
+  Button,
+  Checkbox,
+  Dialog,
+  Heading,
+  IconButton,
+  Link,
+  SegmentedControl,
+  Stack,
+  Text,
+  TextInput,
+  ToggleSwitch,
+  VisuallyHidden
+} from "@primer/react";
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  GrabberIcon,
+  LinkIcon,
+  PencilIcon,
+  SearchIcon
+} from "@primer/octicons-react";
 
 import type { ChartController } from "../../charting/chartController";
-import type { IndicatorListing, IndicatorSelection } from "../../types/chart.types";
+import type { IndicatorListing, IndicatorSelection, ListingOrder } from "../../types/chart.types";
 import {
+  changeListingOrder,
   changeSeriesLegend,
   changeTheme,
   changeTooltips,
   getSettings
 } from "../../services/userPrefs";
+import { categoryLabel } from "./categoryLabel";
 import { filterListings, groupByCategory, type ListingGroup } from "./listingFilter";
-
-import { Modal } from "./Modal";
 
 interface SettingsDialogProps {
   controller: ChartController;
@@ -60,43 +85,33 @@ function orderWithRestored(current: string[], before: string[], restored: string
   return order;
 }
 
-function StandardCheckbox({
-  id,
-  className,
-  checked,
-  ariaLabel,
-  onChange
-}: {
-  id?: string;
-  className?: string;
-  checked: boolean;
-  ariaLabel: string;
-  onChange: (value: boolean) => void;
-}): React.JSX.Element {
-  return (
-    <input
-      type="checkbox"
-      id={id}
-      aria-label={ariaLabel}
-      checked={checked}
-      onChange={event => onChange(event.target.checked)}
-      className={className ? `standard-checkbox ${className}` : "standard-checkbox"}
-    />
-  );
-}
-
-/** A single labelled on/off switch used in the general-settings list. */
+/**
+ * A labelled on/off switch in the general-settings list, laid out as Primer documents it.
+ * The switch is a button, which a `<label>` cannot target, so the words toggle it by click.
+ */
 function ToggleRow({ label, checked, onChange }: ToggleRowProps): React.JSX.Element {
+  const labelId = useId();
   return (
-    <li>
-      <label className="toggle-row">
-        <span className="toggle-label no-wrap">{label}</span>
-        <span className="switch">
-          <StandardCheckbox ariaLabel={label} checked={checked} onChange={onChange} />
-          <span className="slider" />
-        </span>
-      </label>
-    </li>
+    <Stack
+      as="li"
+      direction="horizontal"
+      align="center"
+      justify="space-between"
+      wrap="wrap"
+      gap="condensed"
+    >
+      <Text
+        id={labelId}
+        weight="semibold"
+        className="toggle-label"
+        onClick={() => {
+          onChange(!checked);
+        }}
+      >
+        {label}
+      </Text>
+      <ToggleSwitch aria-labelledby={labelId} checked={checked} onChange={onChange} />
+    </Stack>
   );
 }
 
@@ -134,7 +149,21 @@ function SelectionGroup({
   const [draggedUcid, setDraggedUcid] = useState<string | null>(null);
   /** Gap the dragged row would land in: 0 is above the first row, `length` below the last. */
   const [dropGap, setDropGap] = useState<number | null>(null);
+  const [moveStatus, setMoveStatus] = useState("");
+  const listRef = useRef<HTMLUListElement>(null);
+  /** A touch on a handle: where it began, and whether it has moved far enough to be a drag. */
+  const touch = useRef<{ startY: number; dragging: boolean } | null>(null);
+  /** Set when a touch drag ends, so the click that follows does not also open the menu. */
+  const suppressClick = useRef(false);
   if (selections.length === 0) return null;
+
+  /** Moves a row one place and says where it went; a row already at that end stays put. */
+  const moveOne = (selection: IndicatorSelection, index: number, offset: -1 | 1): void => {
+    const target = index + offset;
+    if (target < 0 || target >= selections.length) return;
+    onMove(selection.ucid, offset);
+    setMoveStatus(`${selection.label} moved to ${target + 1} of ${selections.length}`);
+  };
 
   const draggedIndex = selections.findIndex(selection => selection.ucid === draggedUcid);
   // The gaps on either side of the dragged row leave it where it is.
@@ -144,6 +173,16 @@ function SelectionGroup({
   const endDrag = (): void => {
     setDraggedUcid(null);
     setDropGap(null);
+  };
+
+  /** The gap a pointer at `clientY` points into, measured against the rows on screen. */
+  const gapAt = (clientY: number): number => {
+    const rows = [...(listRef.current?.children ?? [])];
+    const index = rows.findIndex(row => {
+      const { top, height } = row.getBoundingClientRect();
+      return clientY < top + height / 2;
+    });
+    return index === -1 ? rows.length : index;
   };
 
   const moveToGap = (gap: number): void => {
@@ -158,12 +197,14 @@ function SelectionGroup({
   return (
     <>
       <div className="selection-group-header">
-        <h3 id={headingId} className="selection-group-title">
+        <Heading as="h3" variant="small" id={headingId}>
           {title}
-        </h3>
-        <span className="selection-group-hint">{hint}</span>
+        </Heading>
+        <Text size="small" className="muted-text">
+          {hint}
+        </Text>
       </div>
-      <ul className="selection-list" aria-labelledby={headingId}>
+      <ul ref={listRef} className="selection-list" aria-labelledby={headingId}>
         {selections.map((selection, index) => (
           <li
             key={selection.ucid}
@@ -202,52 +243,133 @@ function SelectionGroup({
               endDrag();
             }}
           >
-            <button
-              type="button"
-              className="icon-button drag-handle"
-              aria-label={`reorder ${selection.label}`}
-              aria-keyshortcuts="ArrowUp ArrowDown"
-              title="drag to reorder; use arrow keys to move"
-              draggable
-              onDragStart={event => {
-                event.dataTransfer.effectAllowed = "move";
-                event.dataTransfer.setData("text/plain", selection.ucid);
-                setDraggedUcid(selection.ucid);
-              }}
-              onDragEnd={endDrag}
-              onKeyDown={event => {
-                if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
-                event.preventDefault();
-                const handle = event.currentTarget;
-                onMove(selection.ucid, event.key === "ArrowUp" ? -1 : 1);
-                // React may move this row's node, which drops focus to <body>.
-                handle.focus();
-              }}
-            >
-              <span className="material-icons">drag_indicator</span>
-            </button>
-            <label htmlFor={`select-${selection.ucid}`}>{selection.label}</label>
-            <button
-              type="button"
-              className="icon-button"
+            {/* Drag it, press the arrow keys on it, or tap it for a move menu: a tap needs no
+                drag, which switch users may not have. The arrow handler prevents the default,
+                so the menu does not also open on an arrow key. A mouse drags with HTML drag
+                and drop; touch never starts one, so a finger drags through pointer events,
+                and the handle takes no touch scrolling (`touch-action: none`). */}
+            <ActionMenu>
+              <ActionMenu.Anchor>
+                <IconButton
+                  icon={GrabberIcon}
+                  variant="invisible"
+                  className="drag-handle"
+                  aria-label={`reorder ${selection.label}`}
+                  aria-keyshortcuts="ArrowUp ArrowDown"
+                  description="Drag, use the arrow keys, or select to move"
+                  draggable
+                  onDragStart={event => {
+                    // A long press can start the browser's own drag; the touch path has it.
+                    if (touch.current) {
+                      event.preventDefault();
+                      return;
+                    }
+                    event.dataTransfer.effectAllowed = "move";
+                    event.dataTransfer.setData("text/plain", selection.ucid);
+                    setDraggedUcid(selection.ucid);
+                  }}
+                  onDragEnd={endDrag}
+                  onPointerDown={event => {
+                    // A drag need not end in a click, so a flag it left must not eat this press.
+                    suppressClick.current = false;
+                    if (event.pointerType !== "touch") return;
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                    touch.current = { startY: event.clientY, dragging: false };
+                  }}
+                  onPointerMove={event => {
+                    const current = touch.current;
+                    if (!current) return;
+                    if (!current.dragging) {
+                      // A small wobble is still a tap, which opens the move menu.
+                      if (Math.abs(event.clientY - current.startY) < 8) return;
+                      current.dragging = true;
+                      setDraggedUcid(selection.ucid);
+                      return;
+                    }
+                    const gap = gapAt(event.clientY);
+                    setDropGap(isMovingGap(gap) ? gap : null);
+                  }}
+                  onPointerUp={() => {
+                    const dragged = touch.current?.dragging ?? false;
+                    touch.current = null;
+                    if (!dragged) return;
+                    suppressClick.current = true;
+                    if (dropGap !== null) moveToGap(dropGap);
+                    endDrag();
+                  }}
+                  onPointerCancel={() => {
+                    // A mouse drag cancels its pointer as HTML drag and drop takes over.
+                    if (!touch.current) return;
+                    touch.current = null;
+                    endDrag();
+                  }}
+                  onClick={event => {
+                    if (!suppressClick.current) return;
+                    suppressClick.current = false;
+                    // Primer's anchor skips a click whose default is prevented.
+                    event.preventDefault();
+                  }}
+                  onKeyDown={event => {
+                    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+                    event.preventDefault();
+                    const handle = event.currentTarget;
+                    moveOne(selection, index, event.key === "ArrowUp" ? -1 : 1);
+                    // React may move this row's node, which drops focus to <body>.
+                    handle.focus();
+                  }}
+                />
+              </ActionMenu.Anchor>
+              <ActionMenu.Overlay>
+                <ActionList aria-label={`move ${selection.label}`}>
+                  <ActionList.Item
+                    disabled={index === 0}
+                    onSelect={() => {
+                      moveOne(selection, index, -1);
+                    }}
+                  >
+                    <ActionList.LeadingVisual>
+                      <ArrowUpIcon />
+                    </ActionList.LeadingVisual>
+                    Move up
+                  </ActionList.Item>
+                  <ActionList.Item
+                    disabled={index === selections.length - 1}
+                    onSelect={() => {
+                      moveOne(selection, index, 1);
+                    }}
+                  >
+                    <ActionList.LeadingVisual>
+                      <ArrowDownIcon />
+                    </ActionList.LeadingVisual>
+                    Move down
+                  </ActionList.Item>
+                </ActionList>
+              </ActionMenu.Overlay>
+            </ActionMenu>
+            {/* One line: a name too long for a phone is cut short; `title` shows it whole. */}
+            <label htmlFor={`select-${selection.ucid}`} title={selection.label}>
+              {selection.label}
+            </label>
+            <IconButton
+              icon={PencilIcon}
+              variant="invisible"
               aria-label={`edit ${selection.label}`}
-              title={`edit ${selection.label}`}
               onClick={() => {
                 onEdit(selection);
               }}
-            >
-              <span className="material-icons">edit</span>
-            </button>
-            <StandardCheckbox
+            />
+            <Checkbox
               id={`select-${selection.ucid}`}
-              className="selection-checkbox"
-              ariaLabel={`select ${selection.label}`}
+              aria-label={`select ${selection.label}`}
               checked={checked.has(selection.ucid)}
-              onChange={() => onToggle(selection.ucid)}
+              onChange={() => {
+                onToggle(selection.ucid);
+              }}
             />
           </li>
         ))}
       </ul>
+      <VisuallyHidden role="status">{moveStatus}</VisuallyHidden>
     </>
   );
 }
@@ -282,27 +404,27 @@ function DisplayedIndicators({
   return (
     <section className="displayed-indicators">
       <div className="dialog-section-header">
-        <span>Displayed indicators</span>
-        <span className="filler" />
-        <button
-          type="button"
-          className="icon-button"
+        <Heading as="h2" variant="medium">
+          Displayed indicators
+        </Heading>
+        <IconButton
+          icon={LinkIcon}
+          variant="invisible"
           aria-label="copy share link"
-          title="copy a link that restores these indicators"
+          description="Copy a link that restores these indicators"
           onClick={copyLink}
-        >
-          <span className="material-icons">share</span>
-        </button>
-        <StandardCheckbox
-          className="selection-checkbox"
-          ariaLabel="select all displayed indicators"
+        />
+        <Checkbox
+          aria-label="select all displayed indicators"
           checked={checked.size > 0 && checked.size === selections.length}
-          onChange={onSelectAll}
+          onChange={event => {
+            onSelectAll(event.target.checked);
+          }}
         />
       </div>
-      <span role="status" className="copy-link-status">
+      <Text as="p" size="small" role="status" className="copy-link-status">
         {copyStatus}
-      </span>
+      </Text>
       <SelectionGroup
         {...groupProps}
         title="Price chart overlays"
@@ -316,15 +438,14 @@ function DisplayedIndicators({
         selections={selections.filter(s => s.chartType === "oscillator")}
       />
       <div className="action-button-container">
-        <button
-          type="button"
-          className="btn-raised btn-primary"
+        <Button
+          variant="danger"
           disabled={checked.size === 0}
-          title="remove selected indicators"
+          count={checked.size > 0 ? checked.size : undefined}
           onClick={onRemove}
         >
-          {checked.size > 0 ? `REMOVE SELECTED (${checked.size})` : "REMOVE SELECTED"}
-        </button>
+          Remove selected
+        </Button>
       </div>
     </section>
   );
@@ -337,9 +458,15 @@ interface AvailableIndicatorsProps {
   onFilterChange?: Dispatch<string>;
 }
 
+const listingOrders: readonly { value: ListingOrder; label: string }[] = [
+  { value: "name", label: "A to Z" },
+  { value: "category", label: "By category" }
+];
+
 /**
  * List of available indicators that open the {@link PickConfigDialog}, narrowed by a
- * filter box that matches name, id, and category, and grouped under category headings.
+ * filter box that matches name, id, and category. Listed A to Z with each category
+ * beneath its name, or grouped under category headings, as the visitor last chose.
  * Enter picks the first match shown.
  */
 function AvailableIndicators({
@@ -349,8 +476,11 @@ function AvailableIndicators({
   onFilterChange
 }: AvailableIndicatorsProps): React.JSX.Element {
   const [filter, setFilter] = useState(initialFilter);
+  const [order, setOrder] = useState(getSettings().listingOrder);
   const matches = filterListings(listings, filter);
   const groups = groupByCategory(matches);
+  const alphabetical = [...matches].sort((a, b) => a.name.localeCompare(b.name));
+  const firstShown = order === "name" ? alphabetical[0] : groups[0]?.listings[0];
   const filtering = filter.trim() !== "";
   const changeFilter = (value: string): void => {
     setFilter(value);
@@ -359,27 +489,27 @@ function AvailableIndicators({
   return (
     <section className="available-indicators">
       <div className="dialog-section-header column">
-        <span>Available indicators</span>
-        <span className="help-link">
-          » more info in our{" "}
-          <a
-            title="indicator documentation"
+        <Heading as="h2" variant="medium">
+          Available indicators
+        </Heading>
+        <Text size="small" className="muted-text">
+          More info in our{" "}
+          <Link
+            inline
             target="_blank"
             rel="noopener"
             href="https://dotnet.stockindicators.dev/indicators/"
           >
             online docs
-          </a>
-        </span>
+          </Link>
+        </Text>
       </div>
       <div className="listing-filter">
-        <div className="listing-filter-field">
-          <span className="material-icons" aria-hidden="true">
-            search
-          </span>
-          <input
+        <div className="listing-filter-row">
+          <TextInput
             type="search"
             className="listing-filter-input"
+            leadingVisual={SearchIcon}
             aria-label="filter available indicators"
             placeholder="Filter by name or category"
             autoComplete="off"
@@ -390,25 +520,54 @@ function AvailableIndicators({
             }}
             onKeyDown={event => {
               if (event.key !== "Enter") return;
-              const first = groups[0]?.listings[0];
-              if (filtering && first) {
+              if (filtering && firstShown) {
                 event.preventDefault();
-                onPick(first);
+                onPick(firstShown);
               }
             }}
           />
+          <SegmentedControl
+            aria-label="Order available indicators"
+            onChange={selectedIndex => {
+              const next = listingOrders.at(selectedIndex)?.value ?? "name";
+              setOrder(next);
+              changeListingOrder(next);
+            }}
+          >
+            {listingOrders.map(option => (
+              <SegmentedControl.Button key={option.value} selected={order === option.value}>
+                {option.label}
+              </SegmentedControl.Button>
+            ))}
+          </SegmentedControl>
         </div>
-        <span aria-live="polite" className="listing-filter-status">
+        <Text size="small" aria-live="polite" className="listing-filter-status muted-text">
           {filtering
             ? matches.length === 0
               ? "No indicators match"
               : `${matches.length} of ${listings.length} indicators`
             : ""}
-        </span>
+        </Text>
       </div>
-      {groups.map(group => (
-        <ListingCategory key={group.category} group={group} onPick={onPick} />
-      ))}
+      {order === "name" ? (
+        <ActionList aria-label="Available indicators, A to Z">
+          {alphabetical.map(listing => (
+            <ActionList.Item
+              key={listing.uiid}
+              onSelect={() => {
+                onPick(listing);
+              }}
+            >
+              {listing.name}
+              <ActionList.Description variant="block">
+                {categoryLabel(listing.category)}
+              </ActionList.Description>
+            </ActionList.Item>
+          ))}
+        </ActionList>
+      ) : (
+        groups.map(group => <ListingCategory key={group.category} group={group} onPick={onPick} />)
+      )}
     </section>
   );
 }
@@ -424,44 +583,24 @@ function ListingCategory({
   const headingId = useId();
   return (
     <>
-      <h3 id={headingId} className="listing-category-title">
-        {group.label}
-      </h3>
-      <ul className="nav-list" aria-labelledby={headingId}>
+      <div className="selection-group-header">
+        <Heading as="h3" variant="small" id={headingId}>
+          {group.label}
+        </Heading>
+      </div>
+      <ActionList aria-labelledby={headingId}>
         {group.listings.map(listing => (
-          <li key={listing.uiid}>
-            <button type="button" onClick={() => onPick(listing)}>
-              <span className="nav-title">{listing.name}</span>
-            </button>
-          </li>
+          <ActionList.Item
+            key={listing.uiid}
+            onSelect={() => {
+              onPick(listing);
+            }}
+          >
+            {listing.name}
+          </ActionList.Item>
         ))}
-      </ul>
+      </ActionList>
     </>
-  );
-}
-
-/** Toolbar with the dialog title and a close button. */
-function DialogToolbar({
-  titleId,
-  onClose
-}: {
-  titleId: string;
-  onClose: () => void;
-}): React.JSX.Element {
-  return (
-    <div className="dialog-toolbar">
-      <span id={titleId}>Chart settings</span>
-      <span className="filler" />
-      <button
-        type="button"
-        className="icon-button"
-        aria-label="close"
-        title="close"
-        onClick={onClose}
-      >
-        <span className="material-icons">close</span>
-      </button>
-    </div>
   );
 }
 
@@ -477,8 +616,15 @@ interface SettingsControls {
   selectAll: (value: boolean) => void;
   removeSelected: () => void;
   /** Result line after a removal, with what undo needs; null when nothing was removed. */
-  removal: { text: string; undo?: () => void } | null;
+  removal: Removal | null;
   moveSelection: ChartController["moveSelection"];
+}
+
+interface Removal {
+  text: string;
+  /** Set when an undo failed for some or all indicators; otherwise the result is information. */
+  tone?: "warning" | "critical";
+  undo?: () => void;
 }
 
 /** State + handlers backing the settings dialog (theme, tooltips, series legend, selection). */
@@ -553,16 +699,21 @@ function useSettingsControls(controller: ChartController): SettingsControls {
             );
             const skipped = removed.length - restores.length;
             const failed = skipped + results.filter(r => r.status === "rejected").length;
-            setRemoval({
-              text:
-                failed === 0
-                  ? removed.length === 1
-                    ? `Restored ${removed[0]?.label}`
-                    : `Restored ${removed.length} indicators`
-                  : failed === removed.length
-                    ? "Could not restore the removed indicators"
-                    : `Restored ${removed.length - failed} of ${removed.length} indicators`
-            });
+            setRemoval(
+              failed === 0
+                ? {
+                    text:
+                      removed.length === 1
+                        ? `Restored ${removed[0]?.label}`
+                        : `Restored ${removed.length} indicators`
+                  }
+                : failed === removed.length
+                  ? { text: "Could not restore the removed indicators", tone: "critical" }
+                  : {
+                      text: `Restored ${removed.length - failed} of ${removed.length} indicators`,
+                      tone: "warning"
+                    }
+            );
             forceUpdate();
           });
         }
@@ -608,7 +759,6 @@ export function SettingsDialog({
   initialFilter = "",
   onFilterChange
 }: SettingsDialogProps): React.JSX.Element {
-  const titleId = useId();
   const controls = useSettingsControls(controller);
   const selections = controller.selections;
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -623,33 +773,36 @@ export function SettingsDialog({
     setAnnounced(notice);
   }, [notice]);
   const status = controls.removal?.text ?? announced;
+  const tone = controls.removal?.tone;
 
   return (
-    <Modal open onClose={onClose} labelledBy={titleId} className="settings-dialog">
-      <DialogToolbar titleId={titleId} onClose={onClose} />
-
-      <div
+    <Dialog title="Chart settings" className="settings-dialog" onClose={onClose}>
+      {/* A direct child fills Dialog's body slot, ref and scroll handler included, so the
+          position survives the reopen after an add. */}
+      <Dialog.Body
         ref={bodyRef}
-        className="dialog-body"
+        className="settings-body"
         onScroll={event => {
           onScrollChange?.(event.currentTarget.scrollTop);
         }}
       >
         {/* Mounted before it has text, so a screen reader announces the result when it fills. */}
-        <div className={status || notice ? "settings-status" : undefined}>
-          <span aria-live="polite">{status}</span>
-          {controls.removal?.undo && (
-            <button
-              type="button"
-              className="btn-text"
-              title="add back where it was"
-              onClick={controls.removal.undo}
-            >
-              UNDO
-            </button>
+        <div aria-live="polite" className="settings-status">
+          {status && (
+            <Banner
+              title={tone ? "Indicator restore problem" : "Indicator update"}
+              hideTitle
+              variant={tone ?? "info"}
+              description={status}
+              primaryAction={
+                controls.removal?.undo && (
+                  <Banner.PrimaryAction onClick={controls.removal.undo}>Undo</Banner.PrimaryAction>
+                )
+              }
+            />
           )}
         </div>
-        <ul className="general-settings">
+        <Stack as="ul" gap="normal" className="general-settings">
           <ToggleRow
             label="Dark theme"
             checked={controls.isDarkTheme}
@@ -665,7 +818,7 @@ export function SettingsDialog({
             checked={controls.showSeriesLegend}
             onChange={controls.onToggleSeriesLegend}
           />
-        </ul>
+        </Stack>
 
         {selections.length > 0 && (
           <DisplayedIndicators
@@ -686,7 +839,7 @@ export function SettingsDialog({
           initialFilter={initialFilter}
           onFilterChange={onFilterChange}
         />
-      </div>
-    </Modal>
+      </Dialog.Body>
+    </Dialog>
   );
 }
