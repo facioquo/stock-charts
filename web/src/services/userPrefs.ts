@@ -32,6 +32,8 @@ export function subscribeToTheme(listener: () => void): () => void {
   };
 }
 
+const LISTING_ORDERS: readonly unknown[] = ["name", "category"] satisfies ListingOrder[];
+
 export function loadSettings(): void {
   if (!isBrowser) {
     current = { ...defaults };
@@ -53,8 +55,8 @@ export function loadSettings(): void {
   }
 
   if (!tooltipsChosen()) current.showTooltips = defaults.showTooltips;
-  if (current.listingOrder !== "name" && current.listingOrder !== "category")
-    current.listingOrder = defaults.listingOrder;
+  // Stored JSON is unchecked, so an order this version does not know falls back.
+  if (!LISTING_ORDERS.includes(current.listingOrder)) current.listingOrder = defaults.listingOrder;
 
   changeTheme(current.isDarkTheme);
   cacheSettings();
