@@ -310,7 +310,6 @@ function SelectionGroup({
                     event.preventDefault();
                   }}
                   onKeyDown={event => {
-                    suppressClick.current = false;
                     if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
                     event.preventDefault();
                     const handle = event.currentTarget;
