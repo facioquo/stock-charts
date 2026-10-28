@@ -147,6 +147,7 @@ jobs:
 
     steps:
       - name: Checkout repository
+        id: checkout-repository
         continue-on-error: ${{ matrix.side == 'before' }}
         uses: actions/checkout@v7
         with:
@@ -154,12 +155,14 @@ jobs:
           persist-credentials: false
 
       - name: Setup pnpm
+        id: setup-pnpm
         continue-on-error: ${{ matrix.side == 'before' }}
         uses: pnpm/action-setup@v6
         with:
           run_install: false
 
       - name: Setup Node.js
+        id: setup-node-js
         continue-on-error: ${{ matrix.side == 'before' }}
         uses: actions/setup-node@v7
         with:
@@ -168,11 +171,13 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
+        id: install-dependencies
         continue-on-error: ${{ matrix.side == 'before' }}
         run: pnpm install --frozen-lockfile --filter "@stock-charts/web..." --filter @stock-charts/playwright-tests
 
       # The dev server runs from source but reads the libraries' dist/ output.
       - name: Build libraries
+        id: build-libraries
         continue-on-error: ${{ matrix.side == 'before' }}
         run: |
           pnpm --filter @facioquo/chartjs-chart-financial run build
@@ -180,14 +185,22 @@ jobs:
 
       # Headless capture uses only the headless shell.
       - name: Install Playwright Chromium
+        id: install-playwright-chromium
         continue-on-error: ${{ matrix.side == 'before' }}
         run: pnpm --filter @stock-charts/playwright-tests exec playwright install --with-deps --only-shell chromium
+
+      # A base that did not install or build is not captured: its scenes
+      # would show the failure rather than the base.
+      - name: Warn when the base did not set up
+        if: ${{ matrix.side == 'before' && contains(steps.*.outcome, 'failure') }}
+        run: echo "::warning title=PR screenshots::The base commit did not install or build, so its scenes were not captured"
 
       # Never a failure: a capture problem leaves the description saying this
       # push has no screenshots. Playwright's global timeout stops it at a
       # limit, keeping the scenes it took; the step's own is the backstop.
       - name: Capture PR screenshots
         id: capture-screenshots
+        if: ${{ success() && !contains(steps.*.outcome, 'failure') }}
         continue-on-error: true
         timeout-minutes: 5
         working-directory: tests/playwright
@@ -199,6 +212,7 @@ jobs:
       # Whatever the capture took, even when it ran out of time: scenes.txt
       # names the rest, which the description lists as not captured.
       - name: Upload PR screenshots
+        id: upload-pr-screenshots
         continue-on-error: ${{ matrix.side == 'before' }}
         if: steps.capture-screenshots.outcome != 'skipped'
         uses: actions/upload-artifact@v7
