@@ -40,16 +40,14 @@ public static class MetadataHelpers
             ]
         };
 
-    public static List<IndicatorResultConfig> GetPriceBandResults(string name)
+    public static List<ChartResult> GetPriceBandResults(string name)
         => GetPriceBandResults(name, ChartColors.StandardOrange);
 
-    public static List<IndicatorResultConfig> GetPriceBandResults(string name, string color)
+    public static List<ChartResult> GetPriceBandResults(string name, string color)
         => [
-            new IndicatorResultConfig {
-                DisplayName = "Upper Band",
+            new ChartResult {
                 TooltipTemplate = $"{name} Upper Band",
                 DataName = "upperBand",
-                DataType = "number",
                 LineType = "solid",
                 LineWidth = 1,
                 DefaultColor = color,
@@ -60,19 +58,15 @@ public static class MetadataHelpers
                 }
             },
             new() {
-                DisplayName = "Centerline",
                 TooltipTemplate = $"{name} Centerline",
                 DataName = "centerline",
-                DataType = "number",
                 LineType = "dash",
                 LineWidth = 1,
                 DefaultColor = color
             },
             new() {
-                DisplayName = "Lower Band",
                 TooltipTemplate = $"{name} Lower Band",
                 DataName = "lowerBand",
-                DataType = "number",
                 LineType = "solid",
                 LineWidth = 1,
                 DefaultColor = color
