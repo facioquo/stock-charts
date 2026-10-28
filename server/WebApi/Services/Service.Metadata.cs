@@ -3,24 +3,28 @@ namespace WebApi.Services;
 public static class Metadata
 {
     public static IEnumerable<IndicatorListing> IndicatorListing(string baseUrl)
+        => [.. ChartListings(baseUrl).Select(LibraryCatalog.Build).OrderBy(x => x.Name)];
+
+    /// <summary>
+    /// How the demo charts each library listing. A name, category, chart type, display name, or
+    /// axis bound is set only where the demo differs from the library; <see cref="LibraryCatalog"/>
+    /// supplies the rest.
+    /// </summary>
+    internal static List<ChartListing> ChartListings(string baseUrl)
     {
         // Organized alphabetically
 
-        List<IndicatorListing> listing = [
+        List<ChartListing> listing = [
             // Accumulation Distribution Line (ADL)
             new() {
-                Name = "Accumulation Distribution Line (ADL)",
                 Uiid = "ADL",
                 LegendTemplate = "ADL",
                 Endpoint = $"{baseUrl}/ADL/",
-                Category = "volume-based",
-                ChartType = "oscillator",
                 Results = [
                     new() {
                         DisplayName = "ADL",
                         TooltipTemplate = "ADL",
                         DataName = "adl",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -28,19 +32,15 @@ public static class Metadata
             },
 
             // Arnaud Legoux Moving Average (ALMA)
-            new IndicatorListing {
-                Name = "Arnaud Legoux Moving Average (ALMA)",
+            new ChartListing {
                 Uiid = "ALMA",
                 LegendTemplate = "ALMA([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/ALMA/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "ALMA",
                         TooltipTemplate = "ALMA([P1],[P2],[P3])",
                         DataName = "alma",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -48,17 +48,11 @@ public static class Metadata
             },
 
             // Aroon Up/Down
-            new IndicatorListing {
-                Name = "Aroon Up/Down",
+            new ChartListing {
                 Uiid = "AROON UP/DOWN",
                 LegendTemplate = "AROON([P1]) Up/Down",
                 Endpoint = $"{baseUrl}/AROON/",
-                Category = "price-trend",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
-                    MinimumYAxis = 0,
-                    MaximumYAxis = 100,
-
                     Thresholds =
                     [
                         new() {
@@ -80,18 +74,14 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "Aroon Up",
                         TooltipTemplate = "Aroon Up",
                         DataName = "aroonUp",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
-                        DisplayName = "Aroon Down",
                         TooltipTemplate = "Aroon Down",
                         DataName = "aroonDown",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     }
@@ -99,17 +89,12 @@ public static class Metadata
             },
 
             // Aroon Oscillator
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Aroon Oscillator",
                 Uiid = "AROON OSC",
                 LegendTemplate = "AROON([P1]) Oscillator",
                 Endpoint = $"{baseUrl}/AROON/",
-                Category = "price-trend",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
-                    MinimumYAxis = -100,
-                    MaximumYAxis = 100,
-
                     Thresholds =
                     [
                         new() {
@@ -121,10 +106,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "Oscillator",
                         TooltipTemplate = "AROON([P1]) Oscillator",
                         DataName = "oscillator",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -132,29 +115,23 @@ public static class Metadata
             },
 
             // ATR Trailing Stop (Close offset)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "ATR Trailing Stop (Close offset)",
                 Uiid = "ATR-STOP-CLOSE",
                 LegendTemplate = "ATR-STOP([P1],[P2],CLOSE)",
                 Endpoint = $"{baseUrl}/ATR-STOP-CLOSE/",
-                Category = "price-trend",
-                ChartType = "overlay",
                 Order = Order.Front,
                 Results = [
                     new() {
-                        DisplayName = "Buy Stop",
                         TooltipTemplate = "ATR-STOP([P1],[P2],CLOSE) Buy Stop",
                         DataName = "buyStop",
-                        DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
-                        DisplayName = "Sell Stop",
                         TooltipTemplate = "ATR-STOP([P1],[P2],CLOSE) Sell Stop",
                         DataName = "sellStop",
-                        DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
                         DefaultColor = ChartColors.StandardRed
@@ -163,29 +140,23 @@ public static class Metadata
             },
 
             // ATR Trailing Stop (High/Low offset)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "ATR Trailing Stop (High/Low offset)",
                 Uiid = "ATR-STOP-HL",
                 LegendTemplate = "ATR-STOP([P1],[P2],HIGH/LOW)",
                 Endpoint = $"{baseUrl}/ATR-STOP-HL/",
-                Category = "price-trend",
-                ChartType = "overlay",
                 Order = Order.Front,
                 Results = [
                     new() {
-                        DisplayName = "Buy Stop",
                         TooltipTemplate = "ATR-STOP([P1],[P2],HIGH/LOW) Buy Stop",
                         DataName = "buyStop",
-                        DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
-                        DisplayName = "Sell Stop",
                         TooltipTemplate = "ATR-STOP([P1],[P2],HIGH/LOW) Sell Stop",
                         DataName = "sellStop",
-                        DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
                         DefaultColor = ChartColors.StandardRed
@@ -194,13 +165,10 @@ public static class Metadata
             },
 
             // Average Directional Index (ADX)
-            new IndicatorListing {
-                Name = "Average Directional Index (ADX)",
+            new ChartListing {
                 Uiid = "ADX",
                 LegendTemplate = "ADX([P1])",
                 Endpoint = $"{baseUrl}/ADX/",
-                Category = "price-trend",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -218,10 +186,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "ADX",
                         TooltipTemplate = "ADX([P1])",
                         DataName = "adx",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
@@ -229,7 +195,6 @@ public static class Metadata
                         DisplayName = "DI+",
                         TooltipTemplate = "DI+([P1])",
                         DataName = "pdi",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardGreen
                     },
@@ -237,7 +202,6 @@ public static class Metadata
                         DisplayName = "DI-",
                         TooltipTemplate = "DI-([P1])",
                         DataName = "mdi",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     },
@@ -245,7 +209,6 @@ public static class Metadata
                         DisplayName = "ADX Rating",
                         TooltipTemplate = "ADXR([P1])",
                         DataName = "adxr",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 2,
                         DefaultColor = ChartColors.StandardGrayTransparent
@@ -254,19 +217,15 @@ public static class Metadata
             },
 
             // Average True Range
-            new IndicatorListing {
-                Name = "Average True Range (ATR)",
+            new ChartListing {
                 Uiid = "ATR",
                 LegendTemplate = "ATR([P1])",
                 Endpoint = $"{baseUrl}/ATR/",
-                Category = "price-characteristic",
-                ChartType = "oscillator",
                 Results = [
                     new() {
                         DisplayName = "Average True Range",
                         TooltipTemplate = "ATR([P1])",
                         DataName = "atr",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -274,19 +233,16 @@ public static class Metadata
             },
 
             // Average True Range Percent
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Average True Range (ATR) Percent",
                 Uiid = "ATRP",
                 LegendTemplate = "ATR([P1]) %",
                 Endpoint = $"{baseUrl}/ATR/",
-                Category = "price-characteristic",
-                ChartType = "oscillator",
                 Results = [
                     new() {
                         DisplayName = "Average True Range Percent",
                         TooltipTemplate = "ATR([P1]) %",
                         DataName = "atrp",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -294,13 +250,11 @@ public static class Metadata
             },
 
             // Awesome Oscillator
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Awesome Oscillator (AO)",
                 Uiid = "AO",
                 LegendTemplate = "AO([P1],[P2])",
                 Endpoint = $"{baseUrl}/AWESOME/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -316,7 +270,6 @@ public static class Metadata
                         DisplayName = "Awesome Oscillator",
                         TooltipTemplate = "AO([P1],[P2])",
                         DataName = "oscillator",
-                        DataType = "number",
                         LineType = "bar",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -324,13 +277,10 @@ public static class Metadata
             },
 
             // Balance of Power (BOP)
-            new IndicatorListing {
-                Name = "Balance of Power (BOP)",
+            new ChartListing {
                 Uiid = "BOP",
                 LegendTemplate = "BOP([P1])",
                 Endpoint = $"{baseUrl}/BOP/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -346,7 +296,6 @@ public static class Metadata
                         DisplayName = "Balance of Power",
                         TooltipTemplate = "BOP([P1])",
                         DataName = "bop",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -354,13 +303,10 @@ public static class Metadata
             },
 
             // Beta
-            new IndicatorListing {
-                Name = "Beta",
+            new ChartListing {
                 Uiid = "BETA",
                 LegendTemplate = "BETA([P1])",
                 Endpoint = $"{baseUrl}/BETA/",
-                Category = "price-characteristic",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -373,10 +319,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "Beta",
                         TooltipTemplate = "Beta",
                         DataName = "beta",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
@@ -384,7 +328,6 @@ public static class Metadata
                         DisplayName = "Beta+",
                         TooltipTemplate = "Beta+",
                         DataName = "betaUp",
-                        DataType = "number",
                         LineType = "dash",
                         DefaultColor = ChartColors.StandardGreen
                     },
@@ -392,7 +335,6 @@ public static class Metadata
                         DisplayName = "Beta-",
                         TooltipTemplate = "Beta-",
                         DataName = "betaDown",
-                        DataType = "number",
                         LineType = "dash",
                         DefaultColor = ChartColors.StandardRed
                     }
@@ -400,20 +342,15 @@ public static class Metadata
             },
 
             // Bollinger Bands
-            new IndicatorListing {
-                Name = "Bollinger Bands®",
+            new ChartListing {
                 Uiid = "BB",
                 LegendTemplate = "BB([P1],[P2])",
                 Endpoint = $"{baseUrl}/BB/",
-                Category = "price-channel",
-                ChartType = "overlay",
                 Order = Order.BehindPrice,
                 Results = [
                     new() {
-                        DisplayName = "Upper Band",
                         TooltipTemplate = "BB([P1],[P2]) Upper Band",
                         DataName = "upperBand",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardOrange,
@@ -427,16 +364,13 @@ public static class Metadata
                         DisplayName = "Centerline",
                         TooltipTemplate = "BB([P1],[P2]) Centerline",
                         DataName = "sma",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardOrange
                     },
                     new() {
-                        DisplayName = "Lower Band",
                         TooltipTemplate = "BB([P1],[P2]) Lower Band",
                         DataName = "lowerBand",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardOrange
@@ -445,13 +379,12 @@ public static class Metadata
             },
 
             // Bollinger Bands %B
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Bollinger Bands® %B",
                 Uiid = "BB-PCTB",
                 LegendTemplate = "BB([P1],[P2]) %B",
                 Endpoint = $"{baseUrl}/BB/",
                 Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -479,10 +412,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "%B",
                         TooltipTemplate = "BB([P1],[P2]) %B",
                         DataName = "percentB",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue,
                     }
@@ -490,13 +421,10 @@ public static class Metadata
             },
 
             // Chaikin Money Flow
-            new IndicatorListing {
-                Name = "Chaikin Money Flow (CMF)",
+            new ChartListing {
                 Uiid = "CMF",
                 LegendTemplate = "CMF([P1])",
                 Endpoint = $"{baseUrl}/CMF/",
-                Category = "volume-based",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -509,10 +437,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "CMF",
                         TooltipTemplate = "Chaikin Money Flow",
                         DataName = "cmf",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -520,13 +446,11 @@ public static class Metadata
             },
 
             // Chaikin Oscillator
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Chaikin Oscillator",
                 Uiid = "CHAIKIN",
                 LegendTemplate = "CHAIKIN([P1],[P2])",
                 Endpoint = $"{baseUrl}/CHAIKIN/",
-                Category = "volume-based",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -542,7 +466,6 @@ public static class Metadata
                         DisplayName = "Chaikin Oscillator",
                         TooltipTemplate = "CHAIKIN([P1],[P2])",
                         DataName = "oscillator",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -550,19 +473,15 @@ public static class Metadata
             },
 
             // Chande Momentum Oscillator
-            new IndicatorListing {
-                Name = "Chande Momentum Oscillator",
+            new ChartListing {
                 Uiid = "CMO",
                 LegendTemplate = "CMO([P1])",
                 Endpoint = $"{baseUrl}/CMO/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 Results = [
                     new() {
                         DisplayName = "Chande Momentum Oscillator",
                         TooltipTemplate = "CMO([P1])",
                         DataName = "cmo",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -570,19 +489,15 @@ public static class Metadata
             },
 
             // Chandelier Exit (long)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Chandelier Exit (long)",
                 Uiid = "CHEXIT-LONG",
                 LegendTemplate = "CHANDELIER([P1],[P2],LONG)",
                 Endpoint = $"{baseUrl}/CHEXIT-LONG/",
-                Category = "stop-and-reverse",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "Chandelier Exit",
                         TooltipTemplate = "CHANDELIER([P1],[P2],LONG)",
                         DataName = "chandelierExit",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardOrange
                     }
@@ -590,19 +505,15 @@ public static class Metadata
             },
 
             // Chandelier Exit (short)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Chandelier Exit (short)",
                 Uiid = "CHEXIT-SHORT",
                 LegendTemplate = "CHANDELIER([P1],[P2],SHORT)",
                 Endpoint = $"{baseUrl}/CHEXIT-SHORT/",
-                Category = "stop-and-reverse",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "Chandelier Exit",
                         TooltipTemplate = "CHANDELIER([P1],[P2],SHORT)",
                         DataName = "chandelierExit",
-                        DataType = "number",
                         LineType = "dash",
                         DefaultColor = ChartColors.StandardOrange
                     }
@@ -610,13 +521,10 @@ public static class Metadata
             },
 
             // Choppiness Index
-            new IndicatorListing {
-                Name = "Choppiness Index",
+            new ChartListing {
                 Uiid = "CHOP",
                 LegendTemplate = "CHOP([P1])",
                 Endpoint = $"{baseUrl}/CHOP/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     //MinimumYAxis = 0,
                     //MaximumYAxis = 100,
@@ -650,7 +558,6 @@ public static class Metadata
                         DisplayName = "Choppiness",
                         TooltipTemplate = "Choppiness",
                         DataName = "chop",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -658,13 +565,10 @@ public static class Metadata
             },
 
             // Commodity Channel Index
-            new IndicatorListing {
-                Name = "Commodity Channel Index (CCI)",
+            new ChartListing {
                 Uiid = "CCI",
                 LegendTemplate = "CCI([P1])",
                 Endpoint = $"{baseUrl}/CCI/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -698,10 +602,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "CCI",
                         TooltipTemplate = "CCI([P1])",
                         DataName = "cci",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -709,17 +611,11 @@ public static class Metadata
             },
 
             // ConnorsRSI
-            new IndicatorListing {
-                Name = "ConnorsRSI (CRSI)",
+            new ChartListing {
                 Uiid = "CRSI",
                 LegendTemplate = "CRSI([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/CRSI/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
-                    MinimumYAxis = 0,
-                    MaximumYAxis = 100,
-
                     Thresholds =
                     [
                         new() {
@@ -749,7 +645,6 @@ public static class Metadata
                         DisplayName = "CRSI",
                         TooltipTemplate = "CRSI([P1],[P2],[P3])",
                         DataName = "connorsRsi",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -759,13 +654,12 @@ public static class Metadata
             // Correlation Coefficient
             // Correlation (-1 to 1) and R² (0 to 1) are both dimensionless, so
             // sharing one y-axis does not mislead.
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Correlation Coefficient (vs SPY)",
                 Uiid = "CORRELATION",
                 LegendTemplate = "CORRELATION([P1])",
                 Endpoint = $"{baseUrl}/CORRELATION/",
                 Category = "price-characteristic",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -779,10 +673,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "Correlation",
                         TooltipTemplate = "Correlation",
                         DataName = "correlation",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
@@ -790,7 +682,6 @@ public static class Metadata
                         DisplayName = "R²",
                         TooltipTemplate = "R-Squared",
                         DataName = "rSquared",
-                        DataType = "number",
                         LineType = "dash",
                         DefaultColor = ChartColors.StandardGreen
                     }
@@ -798,13 +689,11 @@ public static class Metadata
             },
 
             // Detrended Price Oscillator (DPO)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Detrended Price Oscillator (DPO)",
                 Uiid = "DPO",
                 LegendTemplate = "DPO([P1])",
                 Endpoint = $"{baseUrl}/DPO/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -817,10 +706,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "DPO",
                         TooltipTemplate = "DPO([P1])",
                         DataName = "dpo",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -828,19 +715,16 @@ public static class Metadata
             },
 
             // Doji
-            new IndicatorListing {
-                Name = "Doji",
+            new ChartListing {
                 Uiid = "DOJI",
                 LegendTemplate = "DOJI([P1]%)",
                 Endpoint = $"{baseUrl}/DOJI/",
-                Category = "candlestick-pattern",
                 ChartType = "overlay",
                 Results = [
                     new() {
                         TooltipTemplate = "DOJI([P1]%)",
                         DisplayName = "Doji",
                         DataName = "price",
-                        DataType = "number",
                         LineType = "pointer",
                         LineWidth = 8,
                         DefaultColor = ChartColors.DarkGray
@@ -849,13 +733,12 @@ public static class Metadata
             },
 
             // Dominant Cycle Period (HT Trendline)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Dominant Cycle Periods",
                 Uiid = "DCPERIOD",
                 LegendTemplate = "DC PERIODS",
                 Endpoint = $"{baseUrl}/HTL/",
                 Category = "price-characteristic",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     MinimumYAxis = 0
                 },
@@ -864,7 +747,6 @@ public static class Metadata
                         DisplayName = "DC PERIODS",
                         TooltipTemplate = "DC PERIODS",
                         DataName = "dcPeriods",
-                        DataType = "number",
                         LineType = "bar",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -872,31 +754,24 @@ public static class Metadata
             },
 
             // Donchian Channels
-            new IndicatorListing {
-                Name = "Donchian Channels",
+            new ChartListing {
                 Uiid = "DONCHIAN",
                 LegendTemplate = "DONCHIAN([P1])",
                 Endpoint = $"{baseUrl}/DONCHIAN/",
-                Category = "price-channel",
-                ChartType = "overlay",
                 Order = Order.BehindPrice,
                 Results = MetadataHelpers.GetPriceBandResults("DONCHIAN", ChartColors.StandardOrange)
             },
 
             // Double Exponential Moving Average (DEMA)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Double Exponential Moving Average (DEMA)",
                 Uiid = "DEMA",
                 LegendTemplate = "DEMA([P1])",
                 Endpoint = $"{baseUrl}/DEMA/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "DEMA",
                         TooltipTemplate = "DEMA([P1])",
                         DataName = "dema",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -904,19 +779,15 @@ public static class Metadata
             },
 
             // Dynamic, McGinley
-            new IndicatorListing {
-                Name = "McGinley Dynamic",
+            new ChartListing {
                 Uiid = "DYN",
                 LegendTemplate = "DYNAMIC([P1])",
                 Endpoint = $"{baseUrl}/DYN/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "Dynamic",
                         TooltipTemplate = "DYNAMIC([P1])",
                         DataName = "dynamic",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -924,28 +795,21 @@ public static class Metadata
             },
 
             // Elder-ray
-            new IndicatorListing {
-                Name = "Elder-ray Index",
+            new ChartListing {
                 Uiid = "ELDER-RAY",
                 LegendTemplate = "ELDER-RAY([P1])",
                 Endpoint = $"{baseUrl}/ELDER-RAY/",
-                Category = "price-trend",
-                ChartType = "oscillator",
                 Results = [
                     new() {
-                        DisplayName = "Bull Power",
                         TooltipTemplate = "Bull Power",
                         DataName = "bullPower",
-                        DataType = "number",
                         LineType = "bar",
                         Stack = "eray",
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
-                        DisplayName = "Bear Power",
                         TooltipTemplate = "Bear Power",
                         DataName = "bearPower",
-                        DataType = "number",
                         LineType = "bar",
                         Stack = "eray",
                         DefaultColor = ChartColors.StandardRed
@@ -954,19 +818,15 @@ public static class Metadata
             },
 
             // Endpoint Moving Average
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Endpoint Moving Average (EPMA)",
                 Uiid = "EPMA",
                 LegendTemplate = "EPMA([P1])",
                 Endpoint = $"{baseUrl}/EPMA/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "EPMA",
                         TooltipTemplate = "EPMA([P1])",
                         DataName = "epma",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -974,19 +834,15 @@ public static class Metadata
             },
 
             // Exponential Moving Average
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Exponential Moving Average (EMA)",
                 Uiid = "EMA",
                 LegendTemplate = "EMA([P1])",
                 Endpoint = $"{baseUrl}/EMA/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "EMA",
                         TooltipTemplate = "EMA([P1])",
                         DataName = "ema",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -994,27 +850,21 @@ public static class Metadata
             },
 
             // Fisher Transform
-            new IndicatorListing {
-                Name = "Ehlers Fisher Transform",
+            new ChartListing {
                 Uiid = "FISHER",
                 LegendTemplate = "FISHER([P1])",
                 Endpoint = $"{baseUrl}/FISHER/",
-                Category = "price-transform",
-                ChartType = "oscillator",
                 Results = [
                     new() {
                         DisplayName = "Fisher Transform",
                         TooltipTemplate = "Fisher Transform",
                         DataName = "fisher",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
-                        DisplayName = "Trigger",
                         TooltipTemplate = "Trigger",
                         DataName = "trigger",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     }
@@ -1022,13 +872,10 @@ public static class Metadata
             },
 
             // Force Index
-            new IndicatorListing {
-                Name = "Force Index",
+            new ChartListing {
                 Uiid = "FORCE",
                 LegendTemplate = "FORCE([P1])",
                 Endpoint = $"{baseUrl}/FORCE/",
-                Category = "volume-based",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -1041,10 +888,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "Force Index",
                         TooltipTemplate = "FORCE([P1])",
                         DataName = "forceIndex",
-                        DataType = "number",
                         LineType = "bar",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1052,19 +897,15 @@ public static class Metadata
             },
 
             // Fractal (Williams)
-            new IndicatorListing {
-                Name = "Williams Fractal (high/low)",
+            new ChartListing {
                 Uiid = "FRACTAL",
                 LegendTemplate = "FRACTAL([P1])",
                 Endpoint = $"{baseUrl}/FRACTAL/",
-                Category = "price-pattern",
-                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "Fractal Bull",
                         TooltipTemplate = "Fractal Bull ([P1])",
                         DataName = "fractalBull",
-                        DataType = "number",
                         LineType = "dots",
                         LineWidth = 3,
                         DefaultColor = ChartColors.StandardRed
@@ -1073,7 +914,6 @@ public static class Metadata
                         DisplayName = "Fractal Bear",
                         TooltipTemplate = "Fractal Bear ([P1])",
                         DataName = "fractalBear",
-                        DataType = "number",
                         LineType = "dots",
                         LineWidth = 3,
                         DefaultColor = ChartColors.StandardGreen
@@ -1082,28 +922,22 @@ public static class Metadata
             },
 
             // Fractal Chaos Bands (FCB)
-            new IndicatorListing {
-                Name = "Fractal Chaos Bands",
+            new ChartListing {
                 Uiid = "FCB",
                 LegendTemplate = "FCB([P1])",
                 Endpoint = $"{baseUrl}/FCB/",
-                Category = "price-channel",
-                ChartType = "overlay",
                 Order = Order.Front,
                 Results = [
                     new() {
                         TooltipTemplate = "Upper Band",
                         DisplayName = "FCB([P1]) Upper Band",
                         DataName = "upperBand",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
-                        DisplayName = "Lower Band",
                         TooltipTemplate = "FCB([P1]) Lower Band",
                         DataName = "lowerBand",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     }
@@ -1111,28 +945,22 @@ public static class Metadata
             },
 
             // Gator Oscillator (derived from Williams Alligator)
-            new IndicatorListing {
-                Name = "Gator Oscillator",
+            new ChartListing {
                 Uiid = "GATOR",
                 LegendTemplate = "GATOR",
                 Endpoint = $"{baseUrl}/GATOR/",
                 Category = "price-trend",
-                ChartType = "oscillator",
                 Results = [
                     new() {
-                        DisplayName = "Upper",
                         TooltipTemplate = "Upper",
                         DataName = "upper",
-                        DataType = "number",
                         LineType = "bar",
                         Stack = "gator",
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
-                        DisplayName = "Lower",
                         TooltipTemplate = "Lower",
                         DataName = "lower",
-                        DataType = "number",
                         LineType = "bar",
                         Stack = "gator",
                         DefaultColor = ChartColors.StandardRed
@@ -1141,18 +969,16 @@ public static class Metadata
             },
 
             // Heikin-Ashi
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Heikin-Ashi",
                 Uiid = "HEIKIN-ASHI",
                 LegendTemplate = "HEIKIN-ASHI",
                 Endpoint = $"{baseUrl}/HEIKIN-ASHI/",
-                Category = "price-transform",
                 // Overlay that REPLACES the raw price candles: the client
                 // hides the main price dataset while a candle-rendered overlay
                 // is displayed (both series sit at nearly the same prices, so
                 // drawing them together occludes each other) and restores it
                 // when the selection is removed.
-                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "Heikin-Ashi",
@@ -1160,7 +986,6 @@ public static class Metadata
                         // LineType "candle" reads open/high/low/close from each
                         // row; dataName anchors tooltips and result identity.
                         DataName = "close",
-                        DataType = "number",
                         LineType = "candle",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1168,19 +993,15 @@ public static class Metadata
             },
 
             // Hilbert Transform Instantaneous Trendline
-            new IndicatorListing {
-                Name = "Hilbert Transform Instantaneous Trendline",
+            new ChartListing {
                 Uiid = "HT Trendline",
                 LegendTemplate = "HT TRENDLINE",
                 Endpoint = $"{baseUrl}/HTL/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "HT Trendline",
                         TooltipTemplate = "HT Trendline",
                         DataName = "trendline",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
@@ -1188,7 +1009,6 @@ public static class Metadata
                         DisplayName = "HT Smoothed Price",
                         TooltipTemplate = "HT Smooth Price",
                         DataName = "smoothPrice",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardOrange
                     }
@@ -1196,19 +1016,15 @@ public static class Metadata
             },
 
             // Hull Moving Average (HMA)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Hull Moving Average (HMA)",
                 Uiid = "HMA",
                 LegendTemplate = "HMA([P1])",
                 Endpoint = $"{baseUrl}/HMA/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "HMA",
                         TooltipTemplate = "HMA([P1])",
                         DataName = "hma",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1216,13 +1032,10 @@ public static class Metadata
             },
 
             // Hurst Exponent
-            new IndicatorListing {
-                Name = "Hurst Exponent",
+            new ChartListing {
                 Uiid = "HURST",
                 LegendTemplate = "HURST([P1])",
                 Endpoint = $"{baseUrl}/HURST/",
-                Category = "price-characteristic",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     MinimumYAxis = 0,
                     MaximumYAxis = 1,
@@ -1238,10 +1051,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "Hurst Exponent",
                         TooltipTemplate = "HURST([P1])",
                         DataName = "hurstExponent",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1249,29 +1060,22 @@ public static class Metadata
             },
 
             // Ichimoku Cloud
-            new IndicatorListing {
-                Name = "Ichimoku Cloud",
+            new ChartListing {
                 Uiid = "ICHIMOKU",
                 LegendTemplate = "ICHIMOKU([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/ICHIMOKU/",
-                Category = "price-trend",
-                ChartType = "overlay",
                 Order = Order.BehindPrice,
                 Results = [
                     new() {
-                        DisplayName = "Tenkan-sen",
                         TooltipTemplate = "ICHIMOKU([P1],[P2],[P3] Tenkan-sen",
                         DataName = "tenkanSen",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 2,
                         DefaultColor = ChartColors.StandardBlue,
                     },
                     new() {
-                        DisplayName = "Kijun-sen",
                         TooltipTemplate = "ICHIMOKU([P1],[P2],[P3] Kijun-sen",
                         DataName = "kijunSen",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 2,
                         DefaultColor = ChartColors.StandardPurple,
@@ -1280,7 +1084,6 @@ public static class Metadata
                         DisplayName = "Chikou span",
                         TooltipTemplate = "ICHIMOKU([P1],[P2],[P3] Chikou span",
                         DataName = "chikouSpan",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 2,
                         DefaultColor = ChartColors.DarkGray,
@@ -1289,7 +1092,6 @@ public static class Metadata
                         DisplayName = "Senkou span A",
                         TooltipTemplate = "ICHIMOKU([P1],[P2],[P3] Senkou span A",
                         DataName = "senkouSpanA",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 1.5f,
                         DefaultColor = ChartColors.ThresholdGreen,
@@ -1298,7 +1100,6 @@ public static class Metadata
                         DisplayName = "Senkou span B",
                         TooltipTemplate = "ICHIMOKU([P1],[P2],[P3] Senkou span B",
                         DataName = "senkouSpanB",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 1.5f,
                         DefaultColor = ChartColors.ThresholdRed,
@@ -1312,19 +1113,15 @@ public static class Metadata
             },
 
             // Kaufman Adaptive Moving Average (KAMA)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Kaufman Adaptive Moving Average (KAMA)",
                 Uiid = "KAMA",
                 LegendTemplate = "KAMA([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/KAMA/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "KAMA",
                         TooltipTemplate = "KAMA([P1],[P2],[P3])",
                         DataName = "kama",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1332,25 +1129,20 @@ public static class Metadata
             },
 
             // Keltner Channels
-            new IndicatorListing {
-                Name = "Keltner Channels",
+            new ChartListing {
                 Uiid = "KELTNER",
                 LegendTemplate = "KELTNER([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/KELTNER/",
-                Category = "price-channel",
-                ChartType = "overlay",
                 Order = Order.BehindPrice,
                 Results = MetadataHelpers.GetPriceBandResults("KELTNER", ChartColors.StandardOrange)
             },
 
             // Klinger Volume Oscillator (KVO)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Klinger Volume Oscillator (KVO)",
                 Uiid = "KVO",
                 LegendTemplate = "KVO([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/KVO/",
-                Category = "volume-based",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -1366,15 +1158,12 @@ public static class Metadata
                         DisplayName = "KVO",
                         TooltipTemplate = "KVO([P1],[P2],[P3])",
                         DataName = "oscillator",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
-                        DisplayName = "Signal",
                         TooltipTemplate = "KVO Signal",
                         DataName = "signal",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     }
@@ -1382,19 +1171,16 @@ public static class Metadata
             },
 
             // Linear Regression
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Linear Regression",
                 Uiid = "LINEAR",
                 LegendTemplate = "LINEAR([P1])",
                 Endpoint = $"{baseUrl}/SLOPE/",
-                Category = "price-characteristic",
-                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "Linear Regression",
                         TooltipTemplate = "LINEAR([P1])",
                         DataName = "line",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1402,19 +1188,16 @@ public static class Metadata
             },
 
             // Marubozu
-            new IndicatorListing {
-                Name = "Marubozu",
+            new ChartListing {
                 Uiid = "MARUBOZU",
                 LegendTemplate = "MARUBOZU([P1]%)",
                 Endpoint = $"{baseUrl}/MARUBOZU/",
-                Category = "candlestick-pattern",
                 ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "Marubozu",
                         TooltipTemplate = "MARUBOZU([P1]%)",
                         DataName = "price",
-                        DataType = "number",
                         LineType = "pointer",
                         LineWidth = 8,
                         DefaultColor = ChartColors.DarkGray
@@ -1423,27 +1206,21 @@ public static class Metadata
             },
 
             // MESA Adaptive Moving Average (MAMA)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "MESA Adaptive Moving Average (MAMA)",
                 Uiid = "MAMA",
                 LegendTemplate = "MAMA([P1],[P2])",
                 Endpoint = $"{baseUrl}/MAMA/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "MAMA",
                         TooltipTemplate = "MAMA([P1],[P2])",
                         DataName = "mama",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
-                        DisplayName = "FAMA",
                         TooltipTemplate = "FAMA([P1],[P2])",
                         DataName = "fama",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     }
@@ -1451,17 +1228,11 @@ public static class Metadata
             },
 
             // Money Flow Index
-            new IndicatorListing {
-                Name = "Money Flow Index (MFI)",
+            new ChartListing {
                 Uiid = "MFI",
                 LegendTemplate = "MFI([P1])",
                 Endpoint = $"{baseUrl}/MFI/",
-                Category = "volume-based",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
-                    MinimumYAxis = 0,
-                    MaximumYAxis = 100,
-
                     Thresholds =
                     [
                         new() {
@@ -1488,10 +1259,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "MFI",
                         TooltipTemplate = "MFI([P1])",
                         DataName = "mfi",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1499,13 +1268,11 @@ public static class Metadata
             },
 
             // Moving Average Convergence/Divergence
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Moving Average Convergence/Divergence (MACD)",
                 Uiid = "MACD",
                 LegendTemplate = "MACD([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/MACD/",
-                Category = "price-trend",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -1518,26 +1285,20 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "MACD",
                         TooltipTemplate = "MACD",
                         DataName = "macd",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
-                        DisplayName = "Signal",
                         TooltipTemplate = "Signal",
                         DataName = "signal",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
-                        DisplayName = "Histogram",
                         TooltipTemplate = "Histogram",
                         DataName = "histogram",
-                        DataType = "number",
                         LineType = "bar",
                         DefaultColor = ChartColors.StandardGrayTransparent
                     }
@@ -1545,20 +1306,15 @@ public static class Metadata
             },
 
             // Moving Average Envelopes
-            new IndicatorListing {
-                Name = "Moving Average Envelopes",
+            new ChartListing {
                 Uiid = "MA-ENV",
                 LegendTemplate = "MA-ENV([P1],[P2]%)",
                 Endpoint = $"{baseUrl}/MA-ENV/",
-                Category = "price-channel",
-                ChartType = "overlay",
                 Order = Order.BehindPrice,
                 Results = [
                     new() {
-                        DisplayName = "Upper Envelope",
                         TooltipTemplate = "MA-ENV([P1],[P2]%) Upper",
                         DataName = "upperEnvelope",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardOrange,
@@ -1569,19 +1325,15 @@ public static class Metadata
                         }
                     },
                     new() {
-                        DisplayName = "Centerline",
                         TooltipTemplate = "MA-ENV([P1],[P2]%) Center",
                         DataName = "centerline",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardOrange
                     },
                     new() {
-                        DisplayName = "Lower Envelope",
                         TooltipTemplate = "MA-ENV([P1],[P2]%) Lower",
                         DataName = "lowerEnvelope",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardOrange
@@ -1590,19 +1342,15 @@ public static class Metadata
             },
 
             // On-Balance Volume (OBV)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "On-Balance Volume (OBV)",
                 Uiid = "OBV",
                 LegendTemplate = "OBV",
                 Endpoint = $"{baseUrl}/OBV/",
-                Category = "volume-based",
-                ChartType = "oscillator",
                 Results = [
                     new() {
-                        DisplayName = "OBV",
                         TooltipTemplate = "OBV",
                         DataName = "obv",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1610,20 +1358,16 @@ public static class Metadata
             },
 
             // Parabolic SAR
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Parabolic Stop and Reverse (SAR)",
                 Uiid = "PSAR",
                 LegendTemplate = "PSAR([P1],[P2])",
                 Endpoint = $"{baseUrl}/PSAR/",
-                Category = "stop-and-reverse",
-                ChartType = "overlay",
 
                 Results = [
                     new() {
-                        DisplayName = "Parabolic SAR",
                         TooltipTemplate = "PSAR([P1],[P2])",
                         DataName = "sar",
-                        DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
                         DefaultColor = ChartColors.StandardPurple
@@ -1632,13 +1376,11 @@ public static class Metadata
             },
 
             // Percentage Volume Oscillator (PVO)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Percentage Volume Oscillator (PVO)",
                 Uiid = "PVO",
                 LegendTemplate = "PVO([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/PVO/",
-                Category = "volume-based",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -1651,26 +1393,20 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "PVO",
                         TooltipTemplate = "PVO([P1],[P2],[P3])",
                         DataName = "pvo",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
-                        DisplayName = "Signal",
                         TooltipTemplate = "PVO Signal",
                         DataName = "signal",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
-                        DisplayName = "Histogram",
                         TooltipTemplate = "PVO Histogram",
                         DataName = "histogram",
-                        DataType = "number",
                         LineType = "bar",
                         DefaultColor = ChartColors.StandardGrayTransparent
                     }
@@ -1678,20 +1414,18 @@ public static class Metadata
             },
 
             // Pivot Points (monthly window)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Pivot Points (month)",
                 Uiid = "PIVOT-POINTS",
                 LegendTemplate = "PIVOT POINTS(MONTH)",
                 Endpoint = $"{baseUrl}/PIVOT-POINTS/",
                 Category = "price-channel",
-                ChartType = "overlay",
                 Order = Order.BehindPrice,
                 Results = [
                     new() {
                         DisplayName = "R3",
                         TooltipTemplate = "Resistance 3",
                         DataName = "r3",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
@@ -1702,7 +1436,6 @@ public static class Metadata
                         DisplayName = "R2",
                         TooltipTemplate = "Resistance 2",
                         DataName = "r2",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
@@ -1713,7 +1446,6 @@ public static class Metadata
                         DisplayName = "R1",
                         TooltipTemplate = "Resistance 1",
                         DataName = "r1",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
@@ -1721,10 +1453,8 @@ public static class Metadata
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
-                        DisplayName = "Pivot Point",
                         TooltipTemplate = "Pivot Point",
                         DataName = "pp",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
                         Segmented = true,
@@ -1735,7 +1465,6 @@ public static class Metadata
                         DisplayName = "S1",
                         TooltipTemplate = "Support 1",
                         DataName = "s1",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
@@ -1746,7 +1475,6 @@ public static class Metadata
                         DisplayName = "S2",
                         TooltipTemplate = "Support 2",
                         DataName = "s2",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
@@ -1757,7 +1485,6 @@ public static class Metadata
                         DisplayName = "S3",
                         TooltipTemplate = "Support 3",
                         DataName = "s3",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
@@ -1768,29 +1495,23 @@ public static class Metadata
             },
 
             // Pivots
-            new IndicatorListing {
-                Name = "Pivots",
+            new ChartListing {
                 Uiid = "PIVOTS",
                 LegendTemplate = "PIVOTS([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/PIVOTS/",
                 Category = "price-pattern",
-                ChartType = "overlay",
                 Order = Order.Front,
                 Results = [
                     new() {
-                        DisplayName = "High Point",
                         TooltipTemplate = "High Point",
                         DataName = "highPoint",
-                        DataType = "number",
                         LineType = "dots",
                         LineWidth = 3,
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
-                        DisplayName = "Low Point",
                         TooltipTemplate = "Low Point",
                         DataName = "lowPoint",
-                        DataType = "number",
                         LineType = "dots",
                         LineWidth = 3,
                         DefaultColor = ChartColors.StandardGreen
@@ -1799,7 +1520,6 @@ public static class Metadata
                         DisplayName = "High Trend Line",
                         TooltipTemplate = "High Trend Line",
                         DataName = "highLine",
-                        DataType = "number",
                         LineType = "dash",
                         DefaultColor = ChartColors.StandardRed
                     },
@@ -1807,7 +1527,6 @@ public static class Metadata
                         DisplayName = "Low Trend Line",
                         TooltipTemplate = "Low Trend Line",
                         DataName = "lowLine",
-                        DataType = "number",
                         LineType = "dash",
                         DefaultColor = ChartColors.StandardGreen
                     }
@@ -1815,13 +1534,11 @@ public static class Metadata
             },
 
             // Price Momentum Oscillator (PMO)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Price Momentum Oscillator (PMO)",
                 Uiid = "PMO",
                 LegendTemplate = "PMO([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/PMO/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -1834,18 +1551,14 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "PMO",
                         TooltipTemplate = "PMO([P1],[P2],[P3])",
                         DataName = "pmo",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
-                        DisplayName = "Signal",
                         TooltipTemplate = "PMO Signal",
                         DataName = "signal",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     }
@@ -1856,13 +1569,11 @@ public static class Metadata
             // Charts prsPercent, not the raw prs ratio: percent change over the
             // lookback is comparable across time, where the ratio's level
             // depends on the two securities' absolute prices.
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Price Relative Strength (vs SPY)",
                 Uiid = "PRS",
                 LegendTemplate = "PRS([P1])",
                 Endpoint = $"{baseUrl}/PRS/",
-                Category = "price-characteristic",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -1876,10 +1587,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "PRS %",
                         TooltipTemplate = "PRS %",
                         DataName = "prsPercent",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1887,19 +1596,16 @@ public static class Metadata
             },
 
             // Bar transform: Median Price (HL2)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Median Price (HL2)",
                 Uiid = "HL2",
                 LegendTemplate = "HL2",
                 Endpoint = $"{baseUrl}/HL2/",
-                Category = "price-transform",
-                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "HL2",
                         TooltipTemplate = "HL2",
                         DataName = "value",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1907,19 +1613,16 @@ public static class Metadata
             },
 
             // Bar transform: Typical Price (HLC3)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Typical Price (HLC3)",
                 Uiid = "HLC3",
                 LegendTemplate = "HLC3",
                 Endpoint = $"{baseUrl}/HLC3/",
-                Category = "price-transform",
-                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "HLC3",
                         TooltipTemplate = "HLC3",
                         DataName = "value",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1927,19 +1630,16 @@ public static class Metadata
             },
 
             // Bar transform: Open-Close Average (OC2)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Open-Close Average (OC2)",
                 Uiid = "OC2",
                 LegendTemplate = "OC2",
                 Endpoint = $"{baseUrl}/OC2/",
-                Category = "price-transform",
-                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "OC2",
                         TooltipTemplate = "OC2",
                         DataName = "value",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1947,19 +1647,16 @@ public static class Metadata
             },
 
             // Bar transform: Open-High-Low Average (OHL3)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Open-High-Low Average (OHL3)",
                 Uiid = "OHL3",
                 LegendTemplate = "OHL3",
                 Endpoint = $"{baseUrl}/OHL3/",
-                Category = "price-transform",
-                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "OHL3",
                         TooltipTemplate = "OHL3",
                         DataName = "value",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1967,19 +1664,16 @@ public static class Metadata
             },
 
             // Bar transform: Average Price (OHLC4)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Average Price (OHLC4)",
                 Uiid = "OHLC4",
                 LegendTemplate = "OHLC4",
                 Endpoint = $"{baseUrl}/OHLC4/",
-                Category = "price-transform",
-                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "OHLC4",
                         TooltipTemplate = "OHLC4",
                         DataName = "value",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -1987,19 +1681,15 @@ public static class Metadata
             },
 
             // Rate of Change
-            new IndicatorListing {
-                Name = "Rate of Change",
+            new ChartListing {
                 Uiid = "ROC",
                 LegendTemplate = "ROC([P1])",
                 Endpoint = $"{baseUrl}/ROC/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 Results = [
                     new() {
                         DisplayName = "Rate of Change",
                         TooltipTemplate = "ROC([P1])",
                         DataName = "roc",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2007,13 +1697,12 @@ public static class Metadata
             },
 
             // Rate of Change with Bands
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Rate of Change with Bands",
                 Uiid = "ROCWB",
                 LegendTemplate = "ROCWB([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/ROCWB/",
                 Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -2026,34 +1715,26 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "ROC",
                         TooltipTemplate = "ROCWB([P1],[P2],[P3])",
                         DataName = "roc",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
-                        DisplayName = "ROC EMA",
                         TooltipTemplate = "ROCWB EMA",
                         DataName = "rocEma",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardOrange
                     },
                     new() {
-                        DisplayName = "Upper Band",
                         TooltipTemplate = "ROCWB Upper Band",
                         DataName = "upperBand",
-                        DataType = "number",
                         LineType = "dash",
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
-                        DisplayName = "Lower Band",
                         TooltipTemplate = "ROCWB Lower Band",
                         DataName = "lowerBand",
-                        DataType = "number",
                         LineType = "dash",
                         DefaultColor = ChartColors.StandardGreen
                     }
@@ -2061,17 +1742,12 @@ public static class Metadata
             },
 
             // Relative Strength Index
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Relative Strength Index (RSI)",
                 Uiid = "RSI",
                 LegendTemplate = "RSI([P1])",
                 Endpoint = $"{baseUrl}/RSI/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
-                    MinimumYAxis = 0,
-                    MaximumYAxis = 100,
-
                     Thresholds =
                     [
                         new() {
@@ -2098,10 +1774,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "RSI",
                         TooltipTemplate = "RSI([P1])",
                         DataName = "rsi",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2109,20 +1783,18 @@ public static class Metadata
             },
 
             // Rolling Pivot Points
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Rolling Pivot Points",
                 Uiid = "ROLLING-PIVOTS",
                 LegendTemplate = "ROLLING PIVOTS([P1],[P2])",
                 Endpoint = $"{baseUrl}/ROLLING-PIVOTS/",
                 Category = "price-channel",
-                ChartType = "overlay",
                 Order = Order.BehindPrice,
                 Results = [
                     new() {
                         DisplayName = "R3",
                         TooltipTemplate = "Resistance 3",
                         DataName = "r3",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardRed
@@ -2131,7 +1803,6 @@ public static class Metadata
                         DisplayName = "R2",
                         TooltipTemplate = "Resistance 2",
                         DataName = "r2",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardRed
@@ -2140,16 +1811,13 @@ public static class Metadata
                         DisplayName = "R1",
                         TooltipTemplate = "Resistance 1",
                         DataName = "r1",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
-                        DisplayName = "Pivot Point",
                         TooltipTemplate = "Pivot Point",
                         DataName = "pp",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardBlue
@@ -2158,7 +1826,6 @@ public static class Metadata
                         DisplayName = "S1",
                         TooltipTemplate = "Support 1",
                         DataName = "s1",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardGreen
@@ -2167,7 +1834,6 @@ public static class Metadata
                         DisplayName = "S2",
                         TooltipTemplate = "Support 2",
                         DataName = "s2",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardGreen
@@ -2176,7 +1842,6 @@ public static class Metadata
                         DisplayName = "S3",
                         TooltipTemplate = "Support 3",
                         DataName = "s3",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         DefaultColor = ChartColors.StandardGreen
@@ -2185,13 +1850,11 @@ public static class Metadata
             },
 
             // Schaff Trend Cycle (STC)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Schaff Trend Cycle (STC)",
                 Uiid = "STC",
                 LegendTemplate = "STC([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/STC/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     MinimumYAxis = 0,
                     MaximumYAxis = 100,
@@ -2225,7 +1888,6 @@ public static class Metadata
                         DisplayName = "Schaff Trend Cycle",
                         TooltipTemplate = "Schaff Trend Cycle",
                         DataName = "stc",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2233,19 +1895,15 @@ public static class Metadata
             },
 
             // Simple Moving Average
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Simple Moving Average (SMA)",
                 Uiid = "SMA",
                 LegendTemplate = "SMA([P1])",
                 Endpoint = $"{baseUrl}/SMA/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "SMA",
                         TooltipTemplate = "SMA([P1])",
                         DataName = "sma",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2257,57 +1915,48 @@ public static class Metadata
             // charting them together flattens the smaller series into
             // unreadable lines (#475). All three share the SMA-ANALYSIS
             // endpoint and select a single metric from its response.
-            new IndicatorListing {
+            new ChartListing {
                 Name = "SMA Error Analysis (MAD)",
                 Uiid = "SMA-MAD",
                 LegendTemplate = "SMA-MAD([P1])",
                 Endpoint = $"{baseUrl}/SMA-ANALYSIS/",
-                Category = "price-characteristic",
-                ChartType = "oscillator",
                 Results = [
                     new() {
                         DisplayName = "Mean Absolute Deviation",
                         TooltipTemplate = "SMA-MAD([P1])",
                         DataName = "mad",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
 
-            new IndicatorListing {
+            new ChartListing {
                 Name = "SMA Error Analysis (MAPE)",
                 Uiid = "SMA-MAPE",
                 LegendTemplate = "SMA-MAPE([P1])",
                 Endpoint = $"{baseUrl}/SMA-ANALYSIS/",
-                Category = "price-characteristic",
-                ChartType = "oscillator",
                 Results = [
                     new() {
                         DisplayName = "Mean Absolute Percentage Error",
                         TooltipTemplate = "SMA-MAPE([P1])",
                         DataName = "mape",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
                 ]
             },
 
-            new IndicatorListing {
+            new ChartListing {
                 Name = "SMA Error Analysis (MSE)",
                 Uiid = "SMA-MSE",
                 LegendTemplate = "SMA-MSE([P1])",
                 Endpoint = $"{baseUrl}/SMA-ANALYSIS/",
-                Category = "price-characteristic",
-                ChartType = "oscillator",
                 Results = [
                     new() {
                         DisplayName = "Mean Squared Error",
                         TooltipTemplate = "SMA-MSE([P1])",
                         DataName = "mse",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2315,19 +1964,14 @@ public static class Metadata
             },
 
             // Slope
-            new IndicatorListing {
-                Name = "Slope",
+            new ChartListing {
                 Uiid = "SLOPE",
                 LegendTemplate = "SLOPE([P1])",
                 Endpoint = $"{baseUrl}/SLOPE/",
-                Category = "price-characteristic",
-                ChartType = "oscillator",
                 Results = [
                     new() {
-                        DisplayName = "Slope",
                         TooltipTemplate = "SLOPE([P1])",
                         DataName = "slope",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2335,19 +1979,15 @@ public static class Metadata
             },
 
             // Smoothed Moving Average (SMMA)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Smoothed Moving Average (SMMA)",
                 Uiid = "SMMA",
                 LegendTemplate = "SMMA([P1])",
                 Endpoint = $"{baseUrl}/SMMA/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "SMMA",
                         TooltipTemplate = "SMMA([P1])",
                         DataName = "smma",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2355,19 +1995,16 @@ public static class Metadata
             },
 
             // Standard Deviation (absolute)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Standard Deviation (absolute)",
                 Uiid = "STDEV",
                 LegendTemplate = "STDEV([P1])",
                 Endpoint = $"{baseUrl}/STDEV/",
-                Category = "price-characteristic",
-                ChartType = "oscillator",
                 Results = [
                     new() {
                         DisplayName = "Standard Deviation",
                         TooltipTemplate = "STDEV([P1])",
                         DataName = "stdDev",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2375,19 +2012,17 @@ public static class Metadata
             },
 
             // Standard Deviation (z-score)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Standard Deviation (Z-Score)",
                 Uiid = "STDEV-ZSCORE",
                 LegendTemplate = "STDEV-ZSCORE([P1])",
                 Endpoint = $"{baseUrl}/STDEV/",
-                Category = "price-characteristic",
                 ChartType = "oscillator",
                 Results = [
                     new() {
                         DisplayName = "Z-Score",
                         TooltipTemplate = "Z-Score([P1])",
                         DataName = "zScore",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2395,20 +2030,15 @@ public static class Metadata
             },
 
             // Standard Deviation Channels
-            new IndicatorListing {
-                Name = "Standard Deviation Channels",
+            new ChartListing {
                 Uiid = "STDEV-CH",
                 LegendTemplate = "STDEV-CH([P1],[P2])",
                 Endpoint = $"{baseUrl}/STDEV-CH/",
-                Category = "price-channel",
-                ChartType = "overlay",
                 Order = Order.BehindPrice,
                 Results = [
                     new() {
-                        DisplayName = "Upper Channel",
                         TooltipTemplate = "STDEV-CH Upper",
                         DataName = "upperChannel",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
                         Segmented = true,
@@ -2421,10 +2051,8 @@ public static class Metadata
                         }
                     },
                     new() {
-                        DisplayName = "Centerline",
                         TooltipTemplate = "STDEV-CH Centerline",
                         DataName = "centerline",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         Segmented = true,
@@ -2432,10 +2060,8 @@ public static class Metadata
                         DefaultColor = ChartColors.StandardOrange
                     },
                     new() {
-                        DisplayName = "Lower Channel",
                         TooltipTemplate = "STDEV-CH Lower",
                         DataName = "lowerChannel",
-                        DataType = "number",
                         LineType = "solid",
                         LineWidth = 1,
                         Segmented = true,
@@ -2446,25 +2072,19 @@ public static class Metadata
             },
 
             // STARC Bands
-            new IndicatorListing {
-                Name = "STARC Bands",
+            new ChartListing {
                 Uiid = "STARC",
                 LegendTemplate = "STARC([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/STARC/",
-                Category = "price-channel",
-                ChartType = "overlay",
                 Order = Order.BehindPrice,
                 Results = MetadataHelpers.GetPriceBandResults("STARC", ChartColors.StandardOrange)
             },
 
             // Stochastic Momentum Index
-            new IndicatorListing {
-                Name = "Stochastic Momentum Index",
+            new ChartListing {
                 Uiid = "SMI",
                 LegendTemplate = "SMI([P1],[P2],[P3],[P4])",
                 Endpoint = $"{baseUrl}/SMI/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -2492,18 +2112,14 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "SMI",
                         TooltipTemplate = "SMI",
                         DataName = "smi",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
-                        DisplayName = "Signal",
                         TooltipTemplate = "Signal",
                         DataName = "signal",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     }
@@ -2511,12 +2127,10 @@ public static class Metadata
             },
 
             // Stochastic Oscillator
-            new IndicatorListing {
-                Name = "Stochastic Oscillator",
+            new ChartListing {
                 Uiid = "STO",
                 LegendTemplate = "STOCH %K([P1]) %D([P2])",
                 Endpoint = $"{baseUrl}/STO/",
-                Category = "oscillator",
                 ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
@@ -2548,7 +2162,6 @@ public static class Metadata
                         DisplayName = "%K",
                         TooltipTemplate = "STO %K([P1])",
                         DataName = "k",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
@@ -2556,7 +2169,6 @@ public static class Metadata
                         DisplayName = "%D",
                         TooltipTemplate = "STO %D([P2])",
                         DataName = "d",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     }
@@ -2564,13 +2176,10 @@ public static class Metadata
             },
 
             // Stochastic RSI
-            new IndicatorListing {
-                Name = "Stochastic RSI",
+            new ChartListing {
                 Uiid = "STOCHRSI",
                 LegendTemplate = "STOCH-RSI ([P1],[P2],[P3],[P4])",
                 Endpoint = $"{baseUrl}/STORSI/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -2601,7 +2210,6 @@ public static class Metadata
                         DisplayName = "Oscillator",
                         TooltipTemplate = "StochRSI Oscillator",
                         DataName = "stochRsi",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
@@ -2609,7 +2217,6 @@ public static class Metadata
                         DisplayName = "Signal line",
                         TooltipTemplate = "Signal line",
                         DataName = "signal",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     }
@@ -2617,28 +2224,21 @@ public static class Metadata
             },
 
             // SuperTrend
-            new IndicatorListing {
-                Name = "SuperTrend",
+            new ChartListing {
                 Uiid = "SUPERTREND",
                 LegendTemplate = "SUPERTREND([P1],[P2])",
                 Endpoint = $"{baseUrl}/SUPERTREND/",
-                Category = "price-trend",
-                ChartType = "overlay",
                 Order = Order.Front,
                 Results = [
                     new() {
-                        DisplayName = "Upper Band",
                         TooltipTemplate = "SUPERTREND([P1],[P2]) Upper Band",
                         DataName = "upperBand",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
-                        DisplayName = "Lower Band",
                         TooltipTemplate = "SUPERTREND([P1],[P2]) Lower Band",
                         DataName = "lowerBand",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardGreen
                     },
@@ -2646,7 +2246,6 @@ public static class Metadata
                         DisplayName = "Transition line",
                         TooltipTemplate = "SUPERTREND([P1],[P2]) Transition Line",
                         DataName = "superTrend",
-                        DataType = "number",
                         LineType = "dash",
                         LineWidth = 1,
                         DefaultColor = ChartColors.DarkGrayTransparent
@@ -2655,19 +2254,15 @@ public static class Metadata
             },
 
             // Tillson T3 Moving Average
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Tillson T3 Moving Average",
                 Uiid = "T3",
                 LegendTemplate = "T3([P1],[P2])",
                 Endpoint = $"{baseUrl}/T3/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "T3",
                         TooltipTemplate = "T3([P1],[P2])",
                         DataName = "t3",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2675,19 +2270,15 @@ public static class Metadata
             },
 
             // Triple Exponential Moving Average (TEMA)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Triple Exponential Moving Average (TEMA)",
                 Uiid = "TEMA",
                 LegendTemplate = "TEMA([P1])",
                 Endpoint = $"{baseUrl}/TEMA/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "TEMA",
                         TooltipTemplate = "TEMA([P1])",
                         DataName = "tema",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2695,13 +2286,11 @@ public static class Metadata
             },
 
             // TRIX Oscillator
-            new IndicatorListing {
+            new ChartListing {
                 Name = "TRIX Oscillator",
                 Uiid = "TRIX",
                 LegendTemplate = "TRIX([P1])",
                 Endpoint = $"{baseUrl}/TRIX/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -2714,10 +2303,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "TRIX",
                         TooltipTemplate = "TRIX([P1])",
                         DataName = "trix",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2725,19 +2312,14 @@ public static class Metadata
             },
 
             // True Range
-            new IndicatorListing {
-                Name = "True Range",
+            new ChartListing {
                 Uiid = "TR",
                 LegendTemplate = "TR",
                 Endpoint = $"{baseUrl}/TR/",
-                Category = "price-characteristic",
-                ChartType = "oscillator",
                 Results = [
                     new() {
-                        DisplayName = "True Range",
                         TooltipTemplate = "TR",
                         DataName = "tr",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2745,13 +2327,11 @@ public static class Metadata
             },
 
             // True Strength Index (TSI)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "True Strength Index (TSI)",
                 Uiid = "TSI",
                 LegendTemplate = "TSI([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/TSI/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -2779,18 +2359,14 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "TSI",
                         TooltipTemplate = "TSI([P1],[P2],[P3])",
                         DataName = "tsi",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
-                        DisplayName = "Signal",
                         TooltipTemplate = "TSI Signal",
                         DataName = "signal",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     }
@@ -2798,19 +2374,17 @@ public static class Metadata
             },
 
             // Ulcer Index
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Ulcer Index (UI)",
                 Uiid = "ULCER",
                 LegendTemplate = "ULCER([P1])",
                 Endpoint = $"{baseUrl}/ULCER/",
-                Category = "price-characteristic",
                 ChartType = "oscillator",
                 Results = [
                     new() {
                         DisplayName = "Ulcer Index",
                         TooltipTemplate = "UI([P1])",
                         DataName = "ui",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2818,17 +2392,11 @@ public static class Metadata
             },
 
             // Ultimate Oscillator
-            new IndicatorListing {
-                Name = "Ultimate Oscillator",
+            new ChartListing {
                 Uiid = "ULTIMATE",
                 LegendTemplate = "ULTIMATE([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/ULTIMATE/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
-                    MinimumYAxis = 0,
-                    MaximumYAxis = 100,
-
                     Thresholds =
                     [
                         new() {
@@ -2855,10 +2423,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "Ultimate Oscillator",
                         TooltipTemplate = "ULTIMATE([P1],[P2],[P3])",
                         DataName = "ultimate",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2866,12 +2432,10 @@ public static class Metadata
             },
 
             // Volatility Stop
-            new IndicatorListing {
-                Name = "Volatility Stop",
+            new ChartListing {
                 Uiid = "VOL-STOP",
                 LegendTemplate = "VOL-STOP([P1],[P2])",
                 Endpoint = $"{baseUrl}/VOL-STOP/",
-                Category = "stop-and-reverse",
                 ChartType = "overlay",
                 Order = Order.Front,
                 Results = [
@@ -2879,7 +2443,6 @@ public static class Metadata
                         DisplayName = "Upper Band",
                         TooltipTemplate = "VOL-STOP([P1],[P2]) Upper Band",
                         DataName = "upperBand",
-                        DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
                         DefaultColor = ChartColors.StandardRed
@@ -2888,7 +2451,6 @@ public static class Metadata
                         DisplayName = "Lower Band",
                         TooltipTemplate = "VOL-STOP([P1],[P2]) Lower Band",
                         DataName = "lowerBand",
-                        DataType = "number",
                         LineType = "dots",
                         LineWidth = 2,
                         DefaultColor = ChartColors.StandardGreen
@@ -2899,19 +2461,17 @@ public static class Metadata
             // VWAP anchored to the first visible bar, not reset per session.
             // The modifier names the anchor so a future session variant can be
             // "VWAP (session)" beside it (#491)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Volume Weighted Average Price (VWAP), visible range",
                 Uiid = "VWAP",
                 LegendTemplate = "VWAP (visible range)",
                 Endpoint = $"{baseUrl}/VWAP/",
                 Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
                         DisplayName = "VWAP (visible range)",
                         TooltipTemplate = "VWAP (visible range)",
                         DataName = "vwap",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2919,19 +2479,15 @@ public static class Metadata
             },
 
             // Volume Weighted Moving Average (VWMA)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Volume Weighted Moving Average (VWMA)",
                 Uiid = "VWMA",
                 LegendTemplate = "VWMA([P1])",
                 Endpoint = $"{baseUrl}/VWMA/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "VWMA",
                         TooltipTemplate = "VWMA([P1])",
                         DataName = "vwma",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2939,27 +2495,20 @@ public static class Metadata
             },
 
             // Vortex Indicator
-            new IndicatorListing {
-                Name = "Vortex Indicator",
+            new ChartListing {
                 Uiid = "VORTEX",
                 LegendTemplate = "VORTEX([P1])",
                 Endpoint = $"{baseUrl}/VORTEX/",
-                Category = "price-trend",
-                ChartType = "oscillator",
                 Results = [
                     new() {
-                        DisplayName = "VI+",
                         TooltipTemplate = "VI+",
                         DataName = "pvi",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardGreen
                     },
                     new() {
-                        DisplayName = "VI-",
                         TooltipTemplate = "VI-",
                         DataName = "nvi",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     }
@@ -2967,19 +2516,15 @@ public static class Metadata
             },
 
             // Weighted Moving Average (WMA)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Weighted Moving Average (WMA)",
                 Uiid = "WMA",
                 LegendTemplate = "WMA([P1])",
                 Endpoint = $"{baseUrl}/WMA/",
-                Category = "moving-average",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "WMA",
                         TooltipTemplate = "WMA([P1])",
                         DataName = "wma",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -2987,17 +2532,11 @@ public static class Metadata
             },
 
             // Williams %R
-            new IndicatorListing {
-                Name = "Williams %R",
+            new ChartListing {
                 Uiid = "WILLIAMSR",
                 LegendTemplate = "Williams %R([P1])",
                 Endpoint = $"{baseUrl}/WILLIAMSR/",
-                Category = "oscillator",
-                ChartType = "oscillator",
                 ChartConfig = new ChartConfig {
-                    MinimumYAxis = -100,
-                    MaximumYAxis = 0,
-
                     Thresholds =
                     [
                         new() {
@@ -3024,10 +2563,8 @@ public static class Metadata
                 },
                 Results = [
                     new() {
-                        DisplayName = "Williams %R",
                         TooltipTemplate = "Williams %R([P1])",
                         DataName = "williamsR",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }
@@ -3035,35 +2572,26 @@ public static class Metadata
             },
 
             // Williams Alligator
-            new IndicatorListing {
-                Name = "Williams Alligator",
+            new ChartListing {
                 Uiid = "ALLIGATOR",
                 LegendTemplate = "ALLIGATOR([P1],[P2],[P3],[P4],[P5],[P6])",
                 Endpoint = $"{baseUrl}/ALLIGATOR/",
-                Category = "price-trend",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "Jaw",
                         TooltipTemplate = "Jaw([P1]/[P2])",
                         DataName = "jaw",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
                     new() {
-                        DisplayName = "Teeth",
                         TooltipTemplate = "Teeth([P3]/[P4])",
                         DataName = "teeth",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
-                        DisplayName = "Lips",
                         TooltipTemplate = "Lips([P4]/[P5])",
                         DataName = "lips",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardGreen
                     }
@@ -3071,19 +2599,15 @@ public static class Metadata
             },
 
             // Zig Zag (close)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Zig Zag (close)",
                 Uiid = "ZIGZAG-CL",
                 LegendTemplate = "ZIGZAG([P1]% CLOSE)",
                 Endpoint = $"{baseUrl}/ZIGZAG-CLOSE/",
-                Category = "price-transform",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "Zig Zag",
                         TooltipTemplate = "ZIGZAG([P1]% CLOSE)",
                         DataName = "zigZag",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
@@ -3091,7 +2615,6 @@ public static class Metadata
                         DisplayName = "Zig Zag Retrace High",
                         TooltipTemplate = "ZIGZAG([P1]% CLOSE) Retrace High",
                         DataName = "retraceHigh",
-                        DataType = "number",
                         LineType = "dash",
                         DefaultColor = ChartColors.ThresholdGrayTransparent
                     },
@@ -3099,7 +2622,6 @@ public static class Metadata
                         DisplayName = "Zig Zag Retrace Low",
                         TooltipTemplate = "ZIGZAG([P1]% CLOSE) Retrace Low",
                         DataName = "retraceLow",
-                        DataType = "number",
                         LineType = "dash",
                         DefaultColor = ChartColors.ThresholdGrayTransparent
                     }
@@ -3107,19 +2629,15 @@ public static class Metadata
             },
 
             // Zig Zag (high/low)
-            new IndicatorListing {
+            new ChartListing {
                 Name = "Zig Zag (high/low)",
                 Uiid = "ZIGZAG-HL",
                 LegendTemplate = "ZIGZAG([P1]% HIGH/LOW)",
                 Endpoint = $"{baseUrl}/ZIGZAG-HIGHLOW/",
-                Category = "price-transform",
-                ChartType = "overlay",
                 Results = [
                     new() {
-                        DisplayName = "Zig Zag",
                         TooltipTemplate = "ZIGZAG([P1]% HIGH/LOW)",
                         DataName = "zigZag",
-                        DataType = "number",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     },
@@ -3127,7 +2645,6 @@ public static class Metadata
                         DisplayName = "Zig Zag Retrace High",
                         TooltipTemplate = "ZIGZAG([P1]% HIGH/LOW) Retrace High",
                         DataName = "retraceHigh",
-                        DataType = "number",
                         LineType = "dash",
                         DefaultColor = ChartColors.ThresholdGrayTransparent
                     },
@@ -3135,7 +2652,6 @@ public static class Metadata
                         DisplayName = "Zig Zag Retrace Low",
                         TooltipTemplate = "ZIGZAG([P1]% HIGH/LOW) Retrace Low",
                         DataName = "retraceLow",
-                        DataType = "number",
                         LineType = "dash",
                         DefaultColor = ChartColors.ThresholdGrayTransparent
                     }
@@ -3143,6 +2659,6 @@ public static class Metadata
             },
         ];
 
-        return [.. listing.Select(LibraryCatalog.WithLibraryParameters).OrderBy(x => x.Name)];
+        return listing;
     }
 }
