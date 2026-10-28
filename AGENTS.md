@@ -405,7 +405,7 @@ PR titles follow Conventional Commits format: `type: Subject` (no scope)
 - `Subject` starts with an uppercase letter; keep total title length ≤ 65 characters
 - Ignore for PRs labeled `bot`, `dependencies`, or `automated`
 
-Pull request screenshots of the React site are opt-in:
+Pull request screenshots of the React site are captured once per pull request:
 
 - `.github/workflows/pr-screenshots.yml` writes before and after images of changed scenes into the description once, when a pull request that changes what the site shows opens ready or is marked ready.
 - Add the `pr-screenshots` label when the review needs current screenshots after later pushes: adding it captures at once, and every push captures again while it stays.
