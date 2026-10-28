@@ -407,8 +407,8 @@ PR titles follow Conventional Commits format: `type: Subject` (no scope)
 
 Pull request screenshots of the React site are opt-in:
 
-- Add the `pr-screenshots` label to a pull request that changes what the site shows.
-- While the label stays, `.github/workflows/pr-screenshots.yml` writes before and after images of changed scenes into the description.
+- `.github/workflows/pr-screenshots.yml` writes before and after images of changed scenes into the description once, when a pull request that changes what the site shows opens ready or is marked ready.
+- Add the `pr-screenshots` label when the review needs current screenshots after later pushes: adding it captures at once, and every push captures again while it stays.
 - The scenes live in `tests/playwright/pr-screenshots.spec.ts`; add one there when a change alters a view no scene shows.
 - CI owns the section between the `pr-screenshots` markers; leave it unedited unless you are fixing that workflow.
 - The full rules are under "Pull request screenshots" in `@facioquo/react-ui`'s `llms.txt`.

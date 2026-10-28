@@ -2,8 +2,10 @@ name: PR screenshots
 
 # Before and after screenshots of the React site's scenes, written into a pull
 # request's description ("Pull request screenshots" in @facioquo/react-ui's
-# llms.txt). Opt-in: a pull request gets them only while it carries the
-# `pr-screenshots` label, and adding the label runs it. The after scenes come
+# llms.txt). Once per pull request, not on every push: it captures when the
+# pull request opens ready, is reopened or is marked ready. A later push
+# captures only while it carries the `pr-screenshots` label, and adding the
+# label captures at once. Any other event skips every job. The after scenes come
 # from the pull request, and the before scenes from its base commit, so
 # nothing runs on main.
 #
@@ -12,14 +14,24 @@ name: PR screenshots
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, labeled]
+    paths:
+      - "web/**"
+      - "libs/**"
+      - "tests/playwright/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".npmrc"
+      - ".github/workflows/pr-screenshots.yml"
 
-# A pull request's run is superseded by its next push. Adding some other label
-# starts a run that does nothing, so it takes a group of its own rather than
-# cancelling a capture.
+# A pull request's capture is superseded by its next capture. An event that
+# captures nothing gets a group of its own, so it never cancels one in flight.
 concurrency:
   group: >-
     ${{ github.workflow }}-${{ github.event.pull_request.number }}${{
-    github.event.action == 'labeled' && github.event.label.name != 'pr-screenshots'
+    !(github.event.action == 'labeled' && github.event.label.name == 'pr-screenshots'
+    || github.event.action != 'labeled' && (github.event.action != 'synchronize'
+    || contains(github.event.pull_request.labels.*.name, 'pr-screenshots')))
     && format('-{0}', github.run_id) || '' }}
   cancel-in-progress: true
 
@@ -47,13 +59,15 @@ jobs:
   # empty, which captures and publishes everything, as before plan existed,
   # and the last step warns that it did.
   plan:
-    # Only while the pull request carries the label, never as a draft, and
-    # not when some other label is added. A fork's pull request is left out,
-    # as its token cannot write the screenshots back.
+    # Opened, reopened or marked ready; the label added; or a push while the
+    # label is on. Never as a draft, and not when some other label is added. A
+    # fork's pull request is left out, as its token cannot write the
+    # screenshots back.
     if: >-
-      ${{ contains(github.event.pull_request.labels.*.name, 'pr-screenshots')
-      && !github.event.pull_request.draft
-      && (github.event.action != 'labeled' || github.event.label.name == 'pr-screenshots')
+      ${{ !github.event.pull_request.draft
+      && (github.event.action == 'labeled' && github.event.label.name == 'pr-screenshots'
+      || github.event.action != 'labeled' && (github.event.action != 'synchronize'
+      || contains(github.event.pull_request.labels.*.name, 'pr-screenshots')))
       && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
