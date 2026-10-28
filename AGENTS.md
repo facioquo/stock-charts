@@ -407,8 +407,9 @@ PR titles follow Conventional Commits format: `type: Subject` (no scope)
 
 Pull request screenshots of the React site are captured once per pull request:
 
-- `.github/workflows/pr-screenshots.yml` writes before and after images of changed scenes into the description once, when a pull request that changes what the site shows opens ready or is marked ready.
-- Add the `pr-screenshots` label when the review needs current screenshots after later pushes; adding it captures at once.
+- `.github/workflows/pr-screenshots.yml` writes before and after images of changed scenes into the description once, when a pull request that changes what the site shows opens ready, is reopened, or is marked ready.
+- A change to only Markdown or unit tests starts no screenshot run.
+- Add the `pr-screenshots` label when the review needs current screenshots after later pushes; adding it captures unless the description already shows the latest commit.
 - While the label stays, every push captures again.
 - The scenes live in `tests/playwright/pr-screenshots.spec.ts`; add one there when a change alters a view no scene shows.
 - CI owns the section between the `pr-screenshots` markers; leave it unedited unless you are fixing that workflow.
