@@ -1,4 +1,4 @@
-name: PR screenshots
+name: Screenshots
 
 # Before and after screenshots of the React site's scenes, written into a pull
 # request's description ("Pull request screenshots" in @facioquo/react-ui's
