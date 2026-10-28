@@ -189,11 +189,11 @@ jobs:
         continue-on-error: ${{ matrix.side == 'before' }}
         run: pnpm --filter @stock-charts/playwright-tests exec playwright install --with-deps --only-shell chromium
 
-      # A base that did not install or build is not captured: its scenes
+      # A base that did not set up is not captured: its scenes
       # would show the failure rather than the base.
       - name: Warn when the base did not set up
         if: ${{ matrix.side == 'before' && contains(steps.*.outcome, 'failure') }}
-        run: echo "::warning title=PR screenshots::The base commit did not install or build, so its scenes were not captured"
+        run: echo "::warning title=PR screenshots::The base commit did not set up, so its scenes were not captured"
 
       # Never a failure: a capture problem leaves the description saying this
       # push has no screenshots. Playwright's global timeout stops it at a
