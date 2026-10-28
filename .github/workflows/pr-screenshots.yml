@@ -4,8 +4,9 @@ name: Screenshots
 # request's description ("Pull request screenshots" in @facioquo/react-ui's
 # llms.txt). Once per pull request, not on every push: it captures when the
 # pull request opens ready, is reopened or is marked ready. A later push
-# captures only while it carries the `pr-screenshots` label, and adding the
-# label captures at once. Any other event skips every job. The after scenes come
+# captures only while it carries the `pr-screenshots` label. Adding the label
+# captures too, unless the description already shows the latest commit. Any
+# other event, or a draft, skips every job. The after scenes come
 # from the pull request, and the before scenes from its base commit, so
 # nothing runs on main.
 #
@@ -23,15 +24,20 @@ on:
       - "pnpm-workspace.yaml"
       - ".npmrc"
       - ".github/workflows/pr-screenshots.yml"
+      - "!web/**/*.spec.ts"
+      - "!web/**/*.spec.tsx"
+      - "!libs/**/*.spec.ts"
+      - "!**/*.md"
 
 # A pull request's capture is superseded by its next capture. An event that
 # captures nothing gets a group of its own, so it never cancels one in flight.
 concurrency:
   group: >-
     ${{ github.workflow }}-${{ github.event.pull_request.number }}${{
-    !(github.event.action == 'labeled' && github.event.label.name == 'pr-screenshots'
+    !(!github.event.pull_request.draft
+    && (github.event.action == 'labeled' && github.event.label.name == 'pr-screenshots'
     || github.event.action != 'labeled' && (github.event.action != 'synchronize'
-    || contains(github.event.pull_request.labels.*.name, 'pr-screenshots')))
+    || contains(github.event.pull_request.labels.*.name, 'pr-screenshots'))))
     && format('-{0}', github.run_id) || '' }}
   cancel-in-progress: true
 
@@ -70,7 +76,8 @@ jobs:
       || contains(github.event.pull_request.labels.*.name, 'pr-screenshots')))
       && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    # Above the sum of its steps' limits.
+    timeout-minutes: 8
     permissions:
       contents: read
       packages: read
@@ -131,7 +138,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     # Each side independent: a base that fails to build must not cancel the
-    # pull request's own capture.
+    # pull request's own capture, and its setup steps continue on error so it
+    # leaves no red check.
     strategy:
       fail-fast: false
       matrix:
@@ -139,17 +147,23 @@ jobs:
 
     steps:
       - name: Checkout repository
+        id: checkout-repository
+        continue-on-error: ${{ matrix.side == 'before' }}
         uses: actions/checkout@v7
         with:
           ref: ${{ matrix.side == 'before' && github.event.pull_request.base.sha || '' }}
           persist-credentials: false
 
       - name: Setup pnpm
+        id: setup-pnpm
+        continue-on-error: ${{ matrix.side == 'before' }}
         uses: pnpm/action-setup@v6
         with:
           run_install: false
 
       - name: Setup Node.js
+        id: setup-node-js
+        continue-on-error: ${{ matrix.side == 'before' }}
         uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -157,23 +171,36 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
+        id: install-dependencies
+        continue-on-error: ${{ matrix.side == 'before' }}
         run: pnpm install --frozen-lockfile --filter "@stock-charts/web..." --filter @stock-charts/playwright-tests
 
       # The dev server runs from source but reads the libraries' dist/ output.
       - name: Build libraries
+        id: build-libraries
+        continue-on-error: ${{ matrix.side == 'before' }}
         run: |
           pnpm --filter @facioquo/chartjs-chart-financial run build
           pnpm --filter @facioquo/indy-charts run build
 
       # Headless capture uses only the headless shell.
       - name: Install Playwright Chromium
+        id: install-playwright-chromium
+        continue-on-error: ${{ matrix.side == 'before' }}
         run: pnpm --filter @stock-charts/playwright-tests exec playwright install --with-deps --only-shell chromium
+
+      # A base that did not set up is not captured: its scenes
+      # would show the failure rather than the base.
+      - name: Warn when the base did not set up
+        if: ${{ matrix.side == 'before' && contains(steps.*.outcome, 'failure') }}
+        run: echo "::warning title=PR screenshots::The base commit did not set up, so its scenes were not captured"
 
       # Never a failure: a capture problem leaves the description saying this
       # push has no screenshots. Playwright's global timeout stops it at a
       # limit, keeping the scenes it took; the step's own is the backstop.
       - name: Capture PR screenshots
         id: capture-screenshots
+        if: ${{ success() && !contains(steps.*.outcome, 'failure') }}
         continue-on-error: true
         timeout-minutes: 5
         working-directory: tests/playwright
@@ -185,6 +212,8 @@ jobs:
       # Whatever the capture took, even when it ran out of time: scenes.txt
       # names the rest, which the description lists as not captured.
       - name: Upload PR screenshots
+        id: upload-pr-screenshots
+        continue-on-error: ${{ matrix.side == 'before' }}
         if: steps.capture-screenshots.outcome != 'skipped'
         uses: actions/upload-artifact@v7
         with:
