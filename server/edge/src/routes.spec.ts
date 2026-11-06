@@ -6,6 +6,10 @@ import { describe, expect, it } from "vitest";
 
 import { isApiRoute } from "./routes";
 
+const webApiPath = resolve(dirname(fileURLToPath(import.meta.url)), "../../WebApi");
+const endpointsPath = resolve(webApiPath, "Endpoints.cs");
+const batchEndpointsPath = resolve(webApiPath, "Endpoints.Batch.cs");
+
 describe("isApiRoute", () => {
   it.each([
     "/",
@@ -47,12 +51,9 @@ describe("isApiRoute", () => {
   it("accepts every route the API controller declares", () => {
     // The controller is the source of truth for what the API serves; any route
     // this check refused would 404 at the edge without reaching it.
-    const controllers = ["Endpoints.cs", "Endpoints.Batch.cs"].map(file =>
-      readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../../WebApi", file), "utf8")
-    );
-    const routes = controllers.flatMap(source =>
-      [...source.matchAll(/\[HttpGet(?:\("([^"]*)"\))?\]/g)].map(match => `/${match[1] ?? ""}`)
-    );
+    const source = readFileSync(endpointsPath, "utf8") + readFileSync(batchEndpointsPath, "utf8");
+    const named = [...source.matchAll(/\[HttpGet\("([^"]*)"\)\]/g)].map(match => `/${match[1]}`);
+    const routes = source.includes("[HttpGet]") ? ["/", ...named] : named;
 
     expect(routes.length).toBeGreaterThan(50);
     expect(routes.filter(route => !isApiRoute(route))).toEqual([]);

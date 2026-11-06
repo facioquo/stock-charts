@@ -14,7 +14,7 @@ const FIXED_ROUTES = new Set(["", "quotes", "indicators", "indicators/batch"]);
  * `ATR-STOP-CLOSE`. Matched by shape rather than by list so a new indicator
  * needs no change here; scanner paths are lowercase and fail it.
  */
-const INDICATOR_ROUTE = /^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*$/;
+const INDICATOR_ROUTE = /^[A-Z](?:[A-Z0-9-]*[A-Z0-9])?$/;
 
 /**
  * True when `pathname` names a route the API serves. A trailing slash is
