@@ -610,14 +610,16 @@ describe("worker.fetch shared cache", () => {
     const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
     const quotes = await bucketWith(5 * 60 * MINUTE, 6 * 60 * MINUTE);
     const [key] = [...quotes.objects.keys()].filter(name => name.startsWith("responses/"));
-    const entry = quotes.objects.get(key)!;
-    entry.customMetadata = {
-      ...entry.customMetadata,
-      headers: JSON.stringify([
-        ["cache-control", "public, max-age=900"],
-        ["x-quotes-as-of", "2026-10-01T04:00:00Z"]
-      ])
-    };
+    quotes.objects.set(key, {
+      ...(quotes.objects.get(key) as StoredObject),
+      customMetadata: {
+        computedAt: String(now - 5 * 60 * MINUTE),
+        headers: JSON.stringify([
+          ["cache-control", "public, max-age=900"],
+          ["x-quotes-as-of", "2026-10-01T04:00:00Z"]
+        ])
+      }
+    });
 
     await worker.fetch(new Request(url), makeEnv({ quotes }), makeCtx());
 
