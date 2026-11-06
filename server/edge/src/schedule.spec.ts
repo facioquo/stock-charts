@@ -27,12 +27,16 @@ function configuredCrons(): string[] {
 /** Matches one cron field: `*`, `*\/n`, `a`, `a-b`, `a-b/n`, or a list of them. */
 function fieldMatches(field: string, value: number): boolean {
   return field.split(",").some(part => {
-    const [range, stepText] = part.split("/");
-    const step = stepText === undefined ? 1 : Number(stepText);
-    const [low, high] = range === "*" ? [0, Number.MAX_SAFE_INTEGER] : range.split("-").map(Number);
-    const top = high ?? (stepText === undefined ? low : Number.MAX_SAFE_INTEGER);
+    const [range, step] = part.includes("/") ? part.split("/") : [part, "1"];
+    const open = part.includes("/") && !range.includes("-");
+    const [low, high] =
+      range === "*"
+        ? [0, Number.MAX_SAFE_INTEGER]
+        : range.includes("-")
+          ? range.split("-").map(Number)
+          : [Number(range), open ? Number.MAX_SAFE_INTEGER : Number(range)];
 
-    return value >= low && value <= top && (value - low) % step === 0;
+    return value >= low && value <= high && (value - low) % Number(step) === 0;
   });
 }
 
