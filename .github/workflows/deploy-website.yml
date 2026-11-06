@@ -23,8 +23,9 @@ env:
   # store, and the prune always changes it, which filled the 10 GB cache limit.
   # The store sits outside the checkout, so tools that scan the repository
   # never walk it, and outside pnpm/setup's install directory, which it
-  # deletes before installing pnpm.
-  pnpm_config_store_dir: ${{ github.workspace }}/../.pnpm-store
+  # deletes before installing pnpm. pnpm and actions/cache both expand the
+  # leading `~`; actions/cache rejects a path containing `..`.
+  pnpm_config_store_dir: ~/.pnpm-store
 
 jobs:
   # Fork PRs get no secrets, so nothing here can deploy for them. Every other
