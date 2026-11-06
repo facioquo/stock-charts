@@ -73,6 +73,12 @@
     }
   ],
 
+  // Shared response cache keys start with the version id, so a deploy never
+  // serves responses computed by the previous API build.
+  "version_metadata": {
+    "binding": "CF_VERSION_METADATA"
+  },
+
   // Daily bars do not justify per-minute polling. Cron runs in UTC only, so the
   // window is wide enough for both offsets: 13:00-23:55 UTC is 09:00-19:55 EDT
   // (UTC-4) and 08:00-18:55 EST (UTC-5). Both cover the 16:00 ET close plus

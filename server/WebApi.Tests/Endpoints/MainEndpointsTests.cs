@@ -96,6 +96,48 @@ public class MainEndpointsTests
     }
 
     [Fact]
+    public async Task GetQuotes_FromFailover_IsNotStored()
+    {
+        // Arrange — the service hands out the failover dataset itself when
+        // stored quotes cannot be read.
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(QuoteBackup.BackupQuotes);
+
+        DefaultHttpContext httpContext = new();
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = httpContext
+        };
+
+        // Act
+        await _controller.GetQuotes();
+
+        // Assert — a public entry would outlive the outage in shared caches.
+        Assert.Equal("no-store", httpContext.Response.Headers.CacheControl.ToString());
+    }
+
+    [Fact]
+    public async Task GetIndicator_FromFailover_IsNotStored()
+    {
+        // Arrange
+        _quoteServiceMock
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(QuoteBackup.BackupQuotes);
+
+        DefaultHttpContext httpContext = new();
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = httpContext
+        };
+
+        // Act
+        IActionResult result = await _controller.GetEma(20);
+
+        // Assert — still served, just never stored.
+        Assert.IsType<OkObjectResult>(result);
+        Assert.Equal("no-store", httpContext.Response.Headers.CacheControl.ToString());
+    }
+
+    [Fact]
     public async Task GetQuotes_SetsAsOfHeaderToNewestBar()
     {
         // Arrange — out of order, so the header must name the newest bar

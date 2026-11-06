@@ -59,6 +59,7 @@ function makeBucket(objects = new Map<string, StoredObject>()) {
 function makeEnv(overrides?: {
   limitSuccess?: boolean;
   quotes?: ReturnType<typeof makeBucket>;
+  version?: string;
 }): Env {
   return {
     API: {},
@@ -68,7 +69,8 @@ function makeEnv(overrides?: {
     },
     ALLOWED_ORIGINS: ALLOWED_ORIGIN,
     QUOTE_SYMBOLS: "SPY,QQQ",
-    QUOTE_HISTORY_DAYS: "800"
+    QUOTE_HISTORY_DAYS: "800",
+    CF_VERSION_METADATA: { id: overrides?.version ?? "v1", tag: "", timestamp: "" }
   } as unknown as Env;
 }
 
@@ -571,7 +573,7 @@ describe("worker.fetch shared cache", () => {
     const uploaded = new Date(now - changedAgo);
     bucket.objects.set("SPY-DAILY.json", { body: "[]", uploaded });
     bucket.objects.set("QQQ-DAILY.json", { body: "[]", uploaded });
-    bucket.objects.set(await sharedKey(new URL(url)), {
+    bucket.objects.set(await sharedKey(new URL(url), "v1"), {
       body: "shared body",
       customMetadata: {
         computedAt: String(now - entryAgo),
@@ -584,6 +586,11 @@ describe("worker.fetch shared cache", () => {
       uploaded: new Date(now - entryAgo)
     });
     return bucket;
+  }
+
+  /** Runs the work the worker handed to waitUntil. */
+  async function settle(ctx: ExecutionContext) {
+    await Promise.all(vi.mocked(ctx.waitUntil).mock.calls.map(([promise]) => promise));
   }
 
   it("serves a current entry to any location without waking the container", async () => {
@@ -649,7 +656,10 @@ describe("worker.fetch shared cache", () => {
         status: 200,
         headers: {
           "cache-control": "public, max-age=900",
-          "access-control-allow-origin": ALLOWED_ORIGIN
+          "content-type": "application/json",
+          vary: "Origin",
+          "access-control-allow-origin": ALLOWED_ORIGIN,
+          "x-internal": "dropped"
         }
       })
     );
@@ -657,12 +667,121 @@ describe("worker.fetch shared cache", () => {
     const ctx = makeCtx();
 
     await worker.fetch(new Request(url), makeEnv({ quotes }), ctx);
-    await Promise.all(vi.mocked(ctx.waitUntil).mock.calls.map(([promise]) => promise));
+    await settle(ctx);
 
-    const [[, , options]] = quotes.put.mock.calls;
+    const [[key, , options]] = quotes.put.mock.calls;
+    expect(key.startsWith("responses/v1/")).toBe(true);
     expect(options?.customMetadata?.computedAt).toBe(String(now));
-    // CORS is applied per request on the way out, never stored.
-    expect(options?.customMetadata?.headers).not.toContain("access-control");
+    // Only the replayable headers are kept. CORS, and the Vary: Origin that
+    // goes with it, is applied per request on the way out, never stored.
+    expect(JSON.parse(options?.customMetadata?.headers ?? "")).toEqual([
+      ["content-type", "application/json"],
+      ["cache-control", "public, max-age=900"]
+    ]);
+  });
+
+  it("serves another location from what one location computed", async () => {
+    fetchMock.mockResolvedValue(
+      new Response("fresh body", {
+        status: 200,
+        headers: { "cache-control": "public, max-age=900" }
+      })
+    );
+    // The quotes changed 10 minutes ago, so the entry lives out its own window.
+    const quotes = makeBucket();
+    const uploaded = new Date(now - 10 * MINUTE);
+    quotes.objects.set("SPY-DAILY.json", { body: "[]", uploaded });
+    quotes.objects.set("QQQ-DAILY.json", { body: "[]", uploaded });
+    const ctx = makeCtx();
+
+    const first = await worker.fetch(new Request(url), makeEnv({ quotes }), ctx);
+    await settle(ctx);
+    vi.setSystemTime(now + 5 * MINUTE);
+    const second = await worker.fetch(new Request(url), makeEnv({ quotes }), makeCtx());
+
+    expect(first.headers.get("x-edge-cache")).toBe("MISS");
+    expect(second.headers.get("x-edge-cache")).toBe("SHARED");
+    expect(second.headers.get("cache-control")).toBe("public, max-age=600");
+    expect(await second.text()).toBe("fresh body");
+    expect(getContainerMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not serve an entry stored by another deployed version", async () => {
+    fetchMock.mockResolvedValue(new Response("fresh body", { status: 200 }));
+    const quotes = await bucketWith(5 * 60 * MINUTE, 6 * 60 * MINUTE);
+
+    const response = await worker.fetch(
+      new Request(url),
+      makeEnv({ quotes, version: "v2" }),
+      makeCtx()
+    );
+
+    expect(response.headers.get("x-edge-cache")).toBe("MISS");
+    expect(getContainerMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("answers a HEAD request from the shared tier without a body or a local copy", async () => {
+    const quotes = await bucketWith(5 * 60 * MINUTE, 6 * 60 * MINUTE);
+
+    const response = await worker.fetch(
+      new Request(url, { method: "HEAD" }),
+      makeEnv({ quotes }),
+      makeCtx()
+    );
+
+    expect(response.headers.get("x-edge-cache")).toBe("SHARED");
+    expect(response.body).toBeNull();
+    expect(cachePut).not.toHaveBeenCalled();
+    expect(getContainerMock).not.toHaveBeenCalled();
+  });
+
+  it("does not store a HEAD response from the container", async () => {
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: 200, headers: { "cache-control": "public, max-age=900" } })
+    );
+    const quotes = makeBucket();
+    const ctx = makeCtx();
+
+    await worker.fetch(new Request(url, { method: "HEAD" }), makeEnv({ quotes }), ctx);
+    await settle(ctx);
+
+    expect(quotes.put).not.toHaveBeenCalled();
+  });
+
+  it("does not store a response the API marks no-store, such as one from failover quotes", async () => {
+    fetchMock.mockResolvedValue(
+      new Response("backup body", { status: 200, headers: { "cache-control": "no-store" } })
+    );
+    const quotes = makeBucket();
+    const ctx = makeCtx();
+
+    const response = await worker.fetch(new Request(url), makeEnv({ quotes }), ctx);
+    await settle(ctx);
+
+    expect(await response.text()).toBe("backup body");
+    expect(quotes.put).not.toHaveBeenCalled();
+    expect(cachePut).not.toHaveBeenCalled();
+  });
+
+  it("still serves the response when the shared write fails", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    fetchMock.mockResolvedValue(
+      new Response("fresh body", {
+        status: 200,
+        headers: { "cache-control": "public, max-age=900" }
+      })
+    );
+    const quotes = makeBucket();
+    quotes.put.mockRejectedValue(new Error("R2 down"));
+    const ctx = makeCtx();
+
+    const response = await worker.fetch(new Request(url), makeEnv({ quotes }), ctx);
+    await settle(ctx);
+
+    expect(await response.text()).toBe("fresh body");
+    expect(cachePut).toHaveBeenCalledTimes(1);
+    expect(logged).toHaveBeenCalledWith("Shared cache write failed", expect.any(Error));
+    logged.mockRestore();
   });
 
   it("falls through to the container when the shared read fails", async () => {
@@ -674,6 +793,18 @@ describe("worker.fetch shared cache", () => {
     const response = await worker.fetch(new Request(url), makeEnv({ quotes }), makeCtx());
 
     expect(response.status).toBe(200);
+    expect(getContainerMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("falls through to the container when the dataset check fails", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    fetchMock.mockResolvedValue(new Response("fresh body", { status: 200 }));
+    const quotes = await bucketWith(5 * 60 * MINUTE, 6 * 60 * MINUTE);
+    quotes.head.mockRejectedValue(new Error("R2 down"));
+
+    const response = await worker.fetch(new Request(url), makeEnv({ quotes }), makeCtx());
+
+    expect(response.headers.get("x-edge-cache")).toBe("MISS");
     expect(getContainerMock).toHaveBeenCalledTimes(1);
   });
 });

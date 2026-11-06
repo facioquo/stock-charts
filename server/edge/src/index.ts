@@ -149,7 +149,7 @@ export default {
     // The shared R2 tier serves every location from one compute, and keeps
     // serving it while the quotes are unchanged. A failed read is not fatal:
     // the request falls through to the container as it would on a miss.
-    const sharedCacheKey = await sharedKey(url);
+    const sharedCacheKey = await sharedKey(url, env.CF_VERSION_METADATA.id);
     const now = Date.now();
     let shared: Response | undefined;
 
@@ -164,8 +164,17 @@ export default {
       // valid and the container is never asked, so a stalled refresh would
       // otherwise go unreported.
       reportStaleQuotes(shared);
-      const response = new Response(request.method === "HEAD" ? null : shared.body, shared);
+      let body = shared.body;
 
+      if (request.method === "HEAD") {
+        await body?.cancel();
+        body = null;
+      }
+
+      const response = new Response(body, shared);
+
+      // The location keeps a copy for the time the entry has left, which
+      // readShared has already written into its max-age.
       if (request.method === "GET") {
         ctx.waitUntil(cache.put(cacheKey, response.clone()));
       }

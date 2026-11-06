@@ -5,8 +5,8 @@
  * `caches.default` is local to each Cloudflare location, so the same chart
  * request from forty locations would otherwise wake the container forty times.
  * One entry here serves every location, and it stays valid for as long as the
- * quote datasets it was computed from stay unchanged: overnight, after the
- * close, and over weekends, repeat requests never reach the container.
+ * quote datasets it was computed from stay unchanged, so overnight, after the
+ * close, and over weekends a repeat request is served without the container.
  */
 
 import type { Env } from "./env";
@@ -25,29 +25,32 @@ export function maxAgeMs(cacheControl: string | null): number | null {
 }
 
 /**
- * Whether an entry computed at `computedAt` may still be served.
+ * How much longer an entry computed at `computedAt` may be served, in
+ * milliseconds; zero or less means it may not.
  *
- * Within `maxAge` it is as fresh as the per-location cache allows today. After
- * that it is served only if it is provably computed from the current data. The
- * API caches quotes in memory, and computed responses in its output cache, for
- * `maxAge` each, so a response can reflect quotes read up to two windows before
- * it was computed. An entry computed at least that long after the newest
- * dataset change therefore carries that change.
+ * An entry computed at least two `maxAge` windows after the newest dataset
+ * change is provably computed from the current data, and gets a full window
+ * each time it is served. The API caches quotes in memory, and computed
+ * responses in its output cache, for `maxAge` each, so a response can reflect
+ * quotes read up to two windows before it was computed. Any other entry is
+ * served only for what remains of its own window, as the per-location cache
+ * would serve it.
  */
-export function isCurrent(
+export function freshFor(
   computedAt: number,
   maxAge: number,
   lastQuoteChange: number,
   now: number
-): boolean {
-  return now - computedAt < maxAge || computedAt >= lastQuoteChange + 2 * maxAge;
+): number {
+  return computedAt >= lastQuoteChange + 2 * maxAge ? maxAge : computedAt + maxAge - now;
 }
 
 /**
  * When any configured quote dataset last changed, in epoch milliseconds. The
  * scheduled refresh writes a dataset only when its content changes, so the
  * object's upload time is that moment. A missing dataset counts as never
- * changed: the API then serves its bundled backup, which does not change.
+ * changed: the API then serves its bundled backup and marks those responses
+ * `no-store`, so none of them reach this cache.
  */
 export async function lastQuoteChange(env: Env): Promise<number> {
   const symbols = env.QUOTE_SYMBOLS.split(",")
@@ -59,17 +62,26 @@ export async function lastQuoteChange(env: Env): Promise<number> {
   return Math.max(0, ...objects.map(object => object?.uploaded.getTime() ?? 0));
 }
 
-/** R2 key for a request URL. Hashed because a batch URL can exceed R2's key limit. */
-export async function sharedKey(url: URL): Promise<string> {
+/**
+ * R2 key for a request URL under the deployed Worker version. Each deploy can
+ * change the API and so the responses, so entries from an earlier version are
+ * never read again; the bucket's lifecycle rule removes them. The URL is hashed
+ * because a batch URL can exceed R2's key limit.
+ */
+export async function sharedKey(url: URL, version: string): Promise<string> {
   const digest = await crypto.subtle.digest(
     "SHA-256",
     new TextEncoder().encode(url.pathname + url.search)
   );
   const hex = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
-  return `${SHARED_PREFIX}${hex}`;
+  return `${SHARED_PREFIX}${version}/${hex}`;
 }
 
-/** Returns the stored response for `key` when it is still current. */
+/**
+ * Returns the stored response for `key` when it may still be served. Its
+ * `max-age` is cut to the time it has left, so neither a browser nor the
+ * location that copies it holds it past that.
+ */
 export async function readShared(
   env: Env,
   key: string,
@@ -85,12 +97,18 @@ export async function readShared(
   const headers = new Headers(
     JSON.parse(object.customMetadata?.headers ?? "[]") as [string, string][]
   );
-  const maxAge = maxAgeMs(headers.get("cache-control"));
+  const cacheControl = headers.get("cache-control");
+  const maxAge = maxAgeMs(cacheControl);
+  const remaining =
+    Number.isNaN(computedAt) || maxAge === null ? 0 : freshFor(computedAt, maxAge, changed, now);
+  const seconds = Math.floor(remaining / 1000);
 
-  if (Number.isNaN(computedAt) || maxAge === null || !isCurrent(computedAt, maxAge, changed, now)) {
+  if (cacheControl === null || seconds <= 0) {
+    await object.body.cancel();
     return undefined;
   }
 
+  headers.set("cache-control", cacheControl.replace(/max-age=\d+/, `max-age=${seconds}`));
   return new Response(object.body, { status: 200, headers });
 }
 
