@@ -98,10 +98,9 @@ jobs:
         uses: pnpm/setup@v3
         with:
           cache: true
-          # pnpm copies packages with install scripts instead of linking them,
-          # so the post-job prune removes them and every job sees a changed
-          # store. Only this job saves, and only on main; every other run
-          # restores the newest main entry.
+          # Each save is a new ~180 MB entry, and parallel jobs that change
+          # the store all save. Only this job saves, and only on main; every
+          # other job and pull request run restores the newest main entry.
           save-cache: ${{ github.event_name == 'push' }}
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
