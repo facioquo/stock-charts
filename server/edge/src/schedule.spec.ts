@@ -40,6 +40,19 @@ function fieldMatches(field: string, value: number): boolean {
   });
 }
 
+const WEEKDAY_NAMES = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+/**
+ * Cloudflare numbers weekdays 1 (Sunday) to 7 (Saturday), unlike the 0-6 of
+ * most cron systems, and accepts three-letter names. Both become 1-7 here.
+ */
+function cloudflareWeekdays(field: string): string {
+  return WEEKDAY_NAMES.reduce(
+    (text, name, index) => text.replaceAll(name, String(index + 1)),
+    field.toUpperCase()
+  );
+}
+
 function cronMatches(cron: string, at: Date): boolean {
   const [minute, hour, day, month, weekday] = cron.trim().split(/\s+/);
 
@@ -48,7 +61,7 @@ function cronMatches(cron: string, at: Date): boolean {
     fieldMatches(hour, at.getUTCHours()) &&
     fieldMatches(day, at.getUTCDate()) &&
     fieldMatches(month, at.getUTCMonth() + 1) &&
-    fieldMatches(weekday, at.getUTCDay())
+    fieldMatches(cloudflareWeekdays(weekday), at.getUTCDay() + 1)
   );
 }
 
@@ -112,12 +125,23 @@ describe("quote refresh schedule", () => {
     ["EDT", 2026, 7, 15],
     ["EST", 2026, 12, 15],
     ["first EST weekday", 2026, 11, 2],
-    ["first EDT weekday", 2026, 3, 9]
+    ["first EDT weekday", 2026, 3, 9],
+    ["a Friday", 2026, 11, 6]
   ])("runs after the close in %s (%i-%i-%i)", (_season, year, month, day) => {
     const close = newYorkTime(year, month, day, Math.floor(closeMinute / 60), closeMinute % 60);
     const endOfDay = newYorkTime(year, month, day, 23, 59);
 
     expect(runsAfter(crons, close, endOfDay)).toBe(true);
+  });
+
+  it.each([
+    ["Saturday", 2026, 11, 7],
+    ["Sunday", 2026, 11, 8]
+  ])("does not run on %s", (_day, year, month, day) => {
+    const start = new Date(Date.UTC(year, month - 1, day));
+    const end = new Date(start.getTime() + 24 * 60 * 60_000 - 60_000);
+
+    expect(runsAfter(crons, start, end)).toBe(false);
   });
 
   it("runs after the close on every weekday of the year", () => {

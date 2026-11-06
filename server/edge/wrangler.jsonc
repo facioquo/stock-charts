@@ -75,9 +75,11 @@
   // window is wide enough for both offsets: 13:00-23:55 UTC is 09:00-19:55 EDT
   // (UTC-4) and 08:00-18:55 EST (UTC-5). Both cover the 16:00 ET close plus
   // the feed delay, so the final daily bar lands in either season.
+  // Weekdays are named, not numbered: Cloudflare counts 1 = Sunday, so the
+  // common `1-5` would mean Sunday-Thursday and skip Fridays.
   // src/schedule.spec.ts checks this for every weekday of the year.
   "triggers": {
-    "crons": ["*/5 13-23 * * 1-5"]
+    "crons": ["*/5 13-23 * * MON-FRI"]
   },
 
   "vars": {
