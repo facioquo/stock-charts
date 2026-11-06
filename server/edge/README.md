@@ -14,7 +14,8 @@ It has two responsibilities:
 
 | File | Purpose |
 | :--- | :--- |
-| [src/index.ts](src/index.ts) | Request pipeline: CORS → cache → container |
+| [src/index.ts](src/index.ts) | Request pipeline: CORS → route check → cache → container |
+| [src/routes.ts](src/routes.ts) | Routes the API serves, and the edge `robots.txt` |
 | [src/container.ts](src/container.ts) | `ApiContainer` config and the R2 outbound handler |
 | [src/cors.ts](src/cors.ts) | Origin allow list and cache-safe CORS rewriting |
 | [src/quotes.ts](src/quotes.ts) | Alpaca → R2 dataset refresh |
@@ -42,6 +43,16 @@ Two checks report it, and both log `Stale quote dataset`:
   symbol behind.
 - **The fetch path** logs when a cache miss serves a stale `/quotes`. That catches a refresh that
   never runs at all, which the first check cannot see.
+
+## Unknown paths and crawlers
+
+The Worker refuses any path the API does not serve with a `404` before the cache, the rate limiter,
+or the container, so scanners probing paths like `/wp-login.php` never wake the container. The API's
+fixed routes match without regard to case; indicator routes must be the catalog's uppercase ids.
+`src/routes.spec.ts` checks every `[HttpGet]` route in the controller passes.
+
+`/robots.txt` is answered at the edge and disallows everything. The API serves chart data, not
+pages, so crawlers have nothing to index there.
 
 ## Rate limiting
 

@@ -4,6 +4,7 @@ import { ApiContainer } from "./container";
 import { applyCors, preflightResponse, resolveAllowedOrigin, stripCors } from "./cors";
 import type { Env } from "./env";
 import { isStale, refreshQuotes } from "./quotes";
+import { isApiRoute, ROBOTS_TXT } from "./routes";
 
 export { ApiContainer };
 // wrangler ≥4.120 wires the container's proxy image through
@@ -106,6 +107,22 @@ export default {
       const rejected = new Response("Method not allowed", { status: 405 });
       applyCors(rejected.headers, allowedOrigin);
       return rejected;
+    }
+
+    const { pathname } = new URL(request.url);
+
+    if (pathname === "/robots.txt") {
+      return new Response(request.method === "HEAD" ? null : ROBOTS_TXT, {
+        headers: { "content-type": "text/plain", "cache-control": "public, max-age=86400" }
+      });
+    }
+
+    // Refused before the cache and the rate limiter: a path the API does not
+    // serve would only reach its 404 by waking the container.
+    if (!isApiRoute(pathname)) {
+      const unknown = new Response("Not found", { status: 404 });
+      applyCors(unknown.headers, allowedOrigin);
+      return unknown;
     }
 
     // Cache key is the URL alone — deliberately not the Origin. Entries are
