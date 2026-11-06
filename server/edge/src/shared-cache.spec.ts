@@ -52,6 +52,7 @@ describe("sharedKey", () => {
 
     expect(a).toBe(b);
     expect(a).not.toBe(c);
-    expect(a).toMatch(new RegExp(`^${SHARED_PREFIX}[0-9a-f]{64}$`));
+    expect(a.startsWith(SHARED_PREFIX)).toBe(true);
+    expect(a.slice(SHARED_PREFIX.length)).toMatch(/^[0-9a-f]{64}$/);
   });
 });
