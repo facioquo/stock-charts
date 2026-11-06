@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { Env } from "./env";
 import {
+  deployedAt,
   freshFor,
   lastQuoteChange,
   maxAgeMs,
@@ -74,7 +75,11 @@ describe("sharedKey", () => {
 const KEY = `${SHARED_PREFIX}v1/entry`;
 
 /** An env whose bucket holds the given datasets (by upload time) and one shared entry. */
-function envWith(uploads: Record<string, number>, entry?: { computedAt: number; maxAge: number }) {
+function envWith(
+  uploads: Record<string, number>,
+  entry?: { computedAt: number; maxAge: number },
+  deployed = "2026-01-01T00:00:00Z"
+) {
   const cancel = vi.fn(() => Promise.resolve());
   const uploadedAt = new Map(Object.entries(uploads));
   const quotes = {
@@ -99,9 +104,22 @@ function envWith(uploads: Record<string, number>, entry?: { computedAt: number; 
       )
     )
   };
-  const env = { QUOTES: quotes, QUOTE_SYMBOLS: "spy, QQQ" } as unknown as Env;
+  const env = {
+    QUOTES: quotes,
+    QUOTE_SYMBOLS: "spy, QQQ",
+    CF_VERSION_METADATA: { id: "v1", tag: "", timestamp: deployed }
+  } as unknown as Env;
   return { env, cancel };
 }
+
+describe("deployedAt", () => {
+  it("reads the version upload time, or 0 when it is unreadable", () => {
+    const env = (timestamp: string) =>
+      ({ CF_VERSION_METADATA: { id: "v1", tag: "", timestamp } }) as unknown as Env;
+    expect(deployedAt(env("2026-11-06T18:00:00Z"))).toBe(Date.parse("2026-11-06T18:00:00Z"));
+    expect(deployedAt(env(""))).toBe(0);
+  });
+});
 
 describe("lastQuoteChange", () => {
   it("takes the newest upload across the configured symbols", async () => {
@@ -142,6 +160,17 @@ describe("readShared", () => {
     const response = await readShared(env, KEY, computedAt + 12 * 60 * MINUTE);
 
     expect(response?.headers.get("cache-control")).toBe("public, max-age=900");
+  });
+
+  it("treats a deploy as a change, since the previous image may still be computing", async () => {
+    // Quotes settled long ago, but the Worker was deployed 5 minutes before
+    // this entry was computed: the container rollout may not have finished.
+    const computedAt = changed + 10 * 60 * MINUTE;
+    const deployed = new Date(computedAt - 5 * MINUTE).toISOString();
+    const { env } = envWith(uploads, { computedAt, maxAge: WINDOW }, deployed);
+
+    expect(await readShared(env, KEY, computedAt + 10 * MINUTE)).toBeDefined();
+    expect(await readShared(env, KEY, computedAt + WINDOW)).toBeUndefined();
   });
 
   it("refuses an entry the newest change may not have reached and releases its body", async () => {

@@ -258,7 +258,7 @@ Layered and built-in (no extra packages), so doc-site traffic doesn't redundantl
 2. **Shared response cache** (`server/edge/src/shared-cache.ts`) — computed responses in R2 under `responses/`, shared by every location and served while the quote datasets are unchanged. Keys are scoped to the deployed Worker version.
 3. **Server-side output cache** (`AddOutputCache`/`UseOutputCache`) — caches each computed indicator response keyed by path + query string, varied by `Origin`.
 4. **In-memory quote cache** (`IMemoryCache` in `QuoteService`) — fetches the shared quote dataset at most once per symbol per window.
-5. **`Cache-Control: public, max-age=...`** — lets browsers and the CDN serve repeats. A response computed from the bundled failover quotes is `no-store` instead, so no tier outlives a storage outage.
+5. **`Cache-Control: public, max-age=...`** — lets browsers and the CDN serve repeats. A response computed from the bundled failover quotes is `no-store` instead, so no edge or browser tier keeps it after a storage outage. The API's in-memory quote cache still holds the failover dataset for one window after storage recovers.
 
 Lifetime for the server-side tiers and `max-age` is one knob, `Caching:DurationMinutes`, in `CacheSettings`.
 

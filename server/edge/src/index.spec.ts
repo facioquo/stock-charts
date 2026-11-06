@@ -70,7 +70,11 @@ function makeEnv(overrides?: {
     ALLOWED_ORIGINS: ALLOWED_ORIGIN,
     QUOTE_SYMBOLS: "SPY,QQQ",
     QUOTE_HISTORY_DAYS: "800",
-    CF_VERSION_METADATA: { id: overrides?.version ?? "v1", tag: "", timestamp: "" }
+    CF_VERSION_METADATA: {
+      id: overrides?.version ?? "v1",
+      tag: "",
+      timestamp: "2026-01-01T00:00:00Z"
+    }
   } as unknown as Env;
 }
 

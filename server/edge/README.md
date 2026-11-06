@@ -42,7 +42,12 @@ A shared hit is served with its `max-age` cut to the time the entry has left, an
 keeps its own copy for that long. An entry that is still unchanged gets a full window each time.
 
 Keys start with the deployed Worker version id (the `CF_VERSION_METADATA` binding), so a deploy
-never serves responses an earlier API build computed. The API marks any response computed from
+does not read entries from the previous version. The container image rolls out after the new Worker
+goes live, so the previous API build can still compute the first entries under the new id. The
+Worker therefore counts its own upload time as a change, like a dataset upload: entries computed
+within two windows of a deploy are served only for their own `max-age`. A rollout that takes longer
+than two windows could still leave older entries behind; delete `responses/<version id>/` if one
+does. The API marks any response computed from
 its bundled backup quotes `no-store`, so a storage outage is never replayed from the shared tier.
 
 Responses carry `x-edge-cache: HIT|SHARED|MISS` so the behaviour is visible in browser devtools.

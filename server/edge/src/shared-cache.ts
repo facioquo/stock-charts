@@ -63,9 +63,21 @@ export async function lastQuoteChange(env: Env): Promise<number> {
 }
 
 /**
+ * When the running Worker version was uploaded, in epoch milliseconds, or 0
+ * when unknown. A deploy counts as a change like a dataset upload: the
+ * container image rolls out after the Worker goes live, so for a while the new
+ * version's entries can still be computed by the previous API build.
+ */
+export function deployedAt(env: Env): number {
+  const uploaded = Date.parse(env.CF_VERSION_METADATA.timestamp);
+  return Number.isNaN(uploaded) ? 0 : uploaded;
+}
+
+/**
  * R2 key for a request URL under the deployed Worker version. Each deploy can
  * change the API and so the responses, so entries from an earlier version are
- * never read again; the bucket's lifecycle rule removes them. The URL is hashed
+ * never read again; the bucket's lifecycle rule removes them. Entries written
+ * while the container rollout is still under way are handled by `deployedAt`. The URL is hashed
  * because a batch URL can exceed R2's key limit.
  */
 export async function sharedKey(url: URL, version: string): Promise<string> {
@@ -100,7 +112,9 @@ export async function readShared(
   const cacheControl = headers.get("cache-control");
   const maxAge = maxAgeMs(cacheControl);
   const remaining =
-    Number.isNaN(computedAt) || maxAge === null ? 0 : freshFor(computedAt, maxAge, changed, now);
+    Number.isNaN(computedAt) || maxAge === null
+      ? 0
+      : freshFor(computedAt, maxAge, Math.max(changed, deployedAt(env)), now);
   const seconds = Math.floor(remaining / 1000);
 
   if (cacheControl === null || seconds <= 0) {
