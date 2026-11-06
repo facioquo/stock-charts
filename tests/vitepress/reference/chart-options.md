@@ -12,7 +12,7 @@ An option marked **required** has no default; leave it out and TypeScript report
 | --- | --- | --- | --- |
 | `isDarkTheme` | `boolean` | required | Picks the dark or light palette for candles, volume, text, gridlines, and backdrops. |
 | `showTooltips` | `boolean` | required | Shows a tooltip on hover that lists every series at the hovered bar, volume included. |
-| `showRightAxisLabels` | `boolean` | `true` | Shows the right-hand value labels: the price scale, each oscillator scale, and the volume scale. Gridlines draw either way. |
+| `showRightAxisLabels` | `boolean` | `true` | Shows the value labels: the price and oscillator scales on the right, and the volume scale on the left. Gridlines draw either way. |
 | `showSeriesLegend` | `boolean` | `false` | Names each line of a multi-line oscillator pane, such as ADX or MACD, in its legend with a swatch in the line's color. A single-line pane shows the indicator label alone either way. |
 | `background` | `string` | `#FAF9FD90` light, `#12131680` dark | Backdrop color behind axis labels and legend annotations. Match it to the page behind the chart. |
 
@@ -27,7 +27,7 @@ const settings: ChartSettings = {
 
 ### Volume scale
 
-The volume bars at the foot of the price chart carry one abbreviated label, such as `5M`, in the right-hand column with the price labels. It marks a round volume level measured from the bars' zero baseline, so any bar's height reads as a quantity. The level is re-chosen as the visible window changes. It hides with the other right-hand labels when `showRightAxisLabels` is `false`.
+The volume bars at the foot of the price chart carry one abbreviated label, such as `5M`, on the left edge, apart from the price labels on the right. It marks a round volume level measured from the bars' zero baseline, so any bar's height reads as a quantity. The level is re-chosen as the visible window changes. It hides with the price and oscillator labels when `showRightAxisLabels` is `false`.
 
 ## Chart manager
 
@@ -59,7 +59,7 @@ The bar window is an argument rather than an option: `manager.initializeOverlay(
 | `barCount` | `number` | `250` | How many of the newest bars each chart shows. |
 | `quoteCount` | `number` | `250` | How many of the newest quotes each chart loads and computes indicators over. |
 | `showTooltips` | `boolean` | `false` | Shows hover tooltips. |
-| `showRightAxisLabels` | `boolean` | `true` | Shows the right-hand price, oscillator, and volume labels. |
+| `showRightAxisLabels` | `boolean` | `true` | Shows the price and oscillator labels on the right and the volume label on the left. |
 | `showSeriesLegend` | `boolean` | `false` | Names each line of a multi-line oscillator pane in its legend. |
 
 ### Theme
