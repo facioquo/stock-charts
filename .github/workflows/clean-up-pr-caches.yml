@@ -1,0 +1,28 @@
+name: Clean up pull request caches
+
+# A pull request's caches are scoped to its merge ref, so nothing reuses them
+# once it closes. Deleting them frees the repository's cache space now rather
+# than when GitHub evicts them after a week unused.
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  actions: write
+
+jobs:
+  delete-caches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # A fork's pull request gets a read-only token, which cannot delete caches.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Delete the pull request's caches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          REF: refs/pull/${{ github.event.pull_request.number }}/merge
+        run: |
+          gh cache list --ref "$REF" --limit 100 --json id --jq '.[].id' |
+            xargs -r -n1 gh cache delete
