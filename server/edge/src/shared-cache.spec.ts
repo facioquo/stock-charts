@@ -76,9 +76,10 @@ const KEY = `${SHARED_PREFIX}v1/entry`;
 /** An env whose bucket holds the given datasets (by upload time) and one shared entry. */
 function envWith(uploads: Record<string, number>, entry?: { computedAt: number; maxAge: number }) {
   const cancel = vi.fn(() => Promise.resolve());
+  const uploadedAt = new Map(Object.entries(uploads));
   const quotes = {
     head: vi.fn((key: string) => {
-      const uploaded = uploads[key];
+      const uploaded = uploadedAt.get(key);
       return Promise.resolve(uploaded === undefined ? null : { uploaded: new Date(uploaded) });
     }),
     get: vi.fn((key: string) =>
