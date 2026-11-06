@@ -11,7 +11,7 @@ import type { Env } from "./env";
 const ALPACA_BARS_URL = "https://data.alpaca.markets/v2/stocks/bars";
 
 /** Alpaca is queried up to this recently; the free feed lags real time. */
-const FEED_DELAY_MINUTES = 16;
+export const FEED_DELAY_MINUTES = 16;
 
 /** Defensive bound on pagination; ~800 daily bars fit in a single page. */
 const MAX_PAGES = 10;
