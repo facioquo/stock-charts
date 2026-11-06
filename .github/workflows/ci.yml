@@ -11,14 +11,6 @@ concurrency:
 
 env:
   NODE_VERSION: 24
-  # The pnpm store is cached under one key per lockfile, saved only on a miss.
-  # pnpm/setup's own cache saves a new entry from every job that prunes the
-  # store, and the prune always changes it, which filled the 10 GB cache limit.
-  # The store sits outside the checkout, so tools that scan the repository
-  # never walk it, and outside pnpm/setup's install directory, which it
-  # deletes before installing pnpm. pnpm and actions/cache both expand the
-  # leading `~`; actions/cache rejects a path containing `..`.
-  pnpm_config_store_dir: ~/.pnpm-store
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   TESTINGPLATFORM_TELEMETRY_OPTOUT: 1
 
@@ -102,15 +94,15 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Cache pnpm store
-        uses: actions/cache@v6
-        with:
-          path: ${{ env.pnpm_config_store_dir }}
-          key: pnpm-store-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
-
       - name: Setup pnpm, Node.js, and dependencies
         uses: pnpm/setup@v3
         with:
+          cache: true
+          # pnpm copies packages with install scripts instead of linking them,
+          # so the post-job prune removes them and every job sees a changed
+          # store. Only this job saves, and only on main; every other run
+          # restores the newest main entry.
+          save-cache: ${{ github.event_name == 'push' }}
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
 
@@ -161,15 +153,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Cache pnpm store
-        uses: actions/cache@v6
-        with:
-          path: ${{ env.pnpm_config_store_dir }}
-          key: pnpm-store-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
-
       - name: Setup pnpm, Node.js, and dependencies
         uses: pnpm/setup@v3
         with:
+          cache: true
+          save-cache: false
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
 
@@ -195,15 +183,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Cache pnpm store
-        uses: actions/cache@v6
-        with:
-          path: ${{ env.pnpm_config_store_dir }}
-          key: pnpm-store-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
-
       - name: Setup pnpm, Node.js, and dependencies
         uses: pnpm/setup@v3
         with:
+          cache: true
+          save-cache: false
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
 
@@ -246,15 +230,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Cache pnpm store
-        uses: actions/cache@v6
-        with:
-          path: ${{ env.pnpm_config_store_dir }}
-          key: pnpm-store-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
-
       - name: Setup pnpm, Node.js, and dependencies
         uses: pnpm/setup@v3
         with:
+          cache: true
+          save-cache: false
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
 
