@@ -63,7 +63,9 @@
   ],
 
   // Quote datasets written by the scheduled refresh and read back by the
-  // container through the outbound handler in src/container.ts.
+  // container through the outbound handler in src/container.ts. Computed
+  // responses shared across locations live under `responses/` (see
+  // src/shared-cache.ts); a bucket lifecycle rule expires them.
   "r2_buckets": [
     {
       "binding": "QUOTES",

@@ -14,7 +14,8 @@ It has two responsibilities:
 
 | File | Purpose |
 | :--- | :--- |
-| [src/index.ts](src/index.ts) | Request pipeline: CORS → route check → cache → container |
+| [src/index.ts](src/index.ts) | Request pipeline: CORS → route check → cache → shared cache → container |
+| [src/shared-cache.ts](src/shared-cache.ts) | Shared R2 response cache and its validity rule |
 | [src/routes.ts](src/routes.ts) | Routes the API serves, and the edge `robots.txt` |
 | [src/container.ts](src/container.ts) | `ApiContainer` config and the R2 outbound handler |
 | [src/cors.ts](src/cors.ts) | Origin allow list and cache-safe CORS rewriting |
@@ -28,7 +29,23 @@ Cache entries are keyed by URL alone and stored with **all** CORS headers stripp
 entry serve the demo site, the docs site, and preview deployments without one origin poisoning
 another's cached copy (facioquo/stock-charts#517).
 
-Responses carry `x-edge-cache: HIT|MISS` so the behaviour is visible in browser devtools.
+The Worker cache is local to each Cloudflare location. Behind it sits a shared tier in R2, under
+the `responses/` prefix of the quotes bucket ([src/shared-cache.ts](src/shared-cache.ts)), so one
+computed response serves every location. A shared entry is served while it is younger than its
+`max-age`, as the Worker cache would, and after that for as long as the quote datasets stay
+unchanged. It counts as unchanged once it was computed at least two `max-age` windows after the
+newest dataset upload, because the API's own quote and output caches can each hold older data for
+one window. Overnight, after the close, and over weekends, repeat requests therefore never reach the
+container, while a new bar still reaches charts as quickly as before.
+
+Responses carry `x-edge-cache: HIT|SHARED|MISS` so the behaviour is visible in browser devtools.
+
+Shared entries are never deleted by the Worker. A bucket lifecycle rule removes them:
+
+```bash
+pnpm --filter @stock-charts/edge exec wrangler r2 bucket lifecycle add stock-charts-quotes \
+  expire-responses responses/ --expire-days 7
+```
 
 ## Dataset freshness
 
