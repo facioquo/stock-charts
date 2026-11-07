@@ -63,13 +63,23 @@
   ],
 
   // Quote datasets written by the scheduled refresh and read back by the
-  // container through the outbound handler in src/container.ts.
+  // container through the outbound handler in src/container.ts. Computed
+  // responses shared across locations live under `responses/` (see
+  // src/shared-cache.ts); a bucket lifecycle rule expires them.
   "r2_buckets": [
     {
       "binding": "QUOTES",
       "bucket_name": "stock-charts-quotes"
     }
   ],
+
+  // Shared response cache keys start with the version id, so a deploy does not
+  // read entries from the previous version. The container image rolls out
+  // after the Worker goes live, so entries computed soon after a deploy are
+  // served only for their own max-age (see deployedAt in src/shared-cache.ts).
+  "version_metadata": {
+    "binding": "CF_VERSION_METADATA"
+  },
 
   // Daily bars do not justify per-minute polling. Cron runs in UTC only, so the
   // window is wide enough for both offsets: 13:00-23:55 UTC is 09:00-19:55 EDT
