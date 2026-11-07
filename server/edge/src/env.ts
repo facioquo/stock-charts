@@ -8,6 +8,9 @@ export interface Env {
   /** Quote datasets written by the scheduled refresh. */
   QUOTES: R2Bucket;
 
+  /** The deployed Worker version; its id scopes the shared response cache. */
+  CF_VERSION_METADATA: WorkerVersionMetadata;
+
   /** Per-IP rate limiter guarding the cache-miss (container-waking) path. */
   RATE_LIMITER: RateLimit;
 

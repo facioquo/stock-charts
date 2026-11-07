@@ -5,7 +5,7 @@
   "author": "facioquo",
   "license": "Apache-2.0",
   "type": "module",
-  "packageManager": "pnpm@12.15.0",
+  "packageManager": "pnpm@12.18.0",
   "engines": {
     "node": ">=24"
   },
@@ -63,8 +63,8 @@
     "@changesets/cli": "^3.0.3",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "1.64.1",
-    "eslint": "^10.13.0",
-    "globals": "^17.13.0",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
     "markdownlint-cli2": "^0.24.0",
     "npm-check-updates": "^23.1.1",
     "postcss-scss": "^4.0.9",

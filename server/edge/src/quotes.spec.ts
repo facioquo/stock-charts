@@ -165,7 +165,12 @@ describe("refreshQuotes", () => {
         get: vi.fn((key: string) => {
           const body = stored.get(key);
           return Promise.resolve(
-            body === undefined ? null : { json: () => Promise.resolve(JSON.parse(body)) }
+            body === undefined
+              ? null
+              : {
+                  json: () => Promise.resolve(JSON.parse(body)),
+                  text: () => Promise.resolve(body)
+                }
           );
         })
       },
@@ -250,7 +255,28 @@ describe("refreshQuotes", () => {
     vi.mocked(env.QUOTES.put).mockRejectedValueOnce(new Error("R2 down"));
 
     await expect(refreshQuotes(env)).rejects.toThrow("Failed to refresh dataset(s) for: SPY");
-    expect(env.QUOTES.get).not.toHaveBeenCalled();
+    // One read per symbol to compare before writing; the freshness check never runs.
+    expect(env.QUOTES.get).toHaveBeenCalledTimes(2);
+  });
+
+  it("rewrites a dataset only when its content changed", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(alpacaBars({ SPY: "2026-10-13T04:00:00Z", QQQ: "2026-10-14T04:00:00Z" }))
+      )
+    );
+    const { env, stored } = makeEnv();
+    stored.set(
+      "SPY-DAILY.json",
+      JSON.stringify([
+        { Timestamp: "2026-10-13T04:00:00Z", Open: 1, High: 1, Low: 1, Close: 1, Volume: 1 }
+      ])
+    );
+
+    await refreshQuotes(env);
+
+    expect(vi.mocked(env.QUOTES.put).mock.calls.map(([key]) => key)).toEqual(["QQQ-DAILY.json"]);
   });
 
   it("skips the run, freshness check included, without credentials", async () => {
