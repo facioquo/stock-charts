@@ -98,7 +98,7 @@ jobs:
         uses: pnpm/setup@v3
         with:
           cache: true
-          save-cache: true  # Only `true` on this primary job
+          save-cache: ${{ github.ref == 'refs/heads/main' }}  # Only this job saves, and only on main
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
 
