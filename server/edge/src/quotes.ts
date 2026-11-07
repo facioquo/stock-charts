@@ -221,7 +221,19 @@ export async function refreshQuotes(env: Env): Promise<void> {
       }
 
       const key = datasetKey(symbol);
-      await env.QUOTES.put(key, JSON.stringify(toStoredBars(bars)), {
+      const body = JSON.stringify(toStoredBars(bars));
+
+      // An unchanged dataset is not rewritten, so the object's upload time is
+      // when its content last changed. The shared response cache relies on
+      // that to keep serving results computed from the current data.
+      const current = await env.QUOTES.get(key);
+
+      if (current !== null && (await current.text()) === body) {
+        console.log(`Unchanged dataset: ${key} (${bars.length} bars)`);
+        return;
+      }
+
+      await env.QUOTES.put(key, body, {
         httpMetadata: { contentType: "application/json" }
       });
       console.log(`Updated dataset: ${key} (${bars.length} bars)`);

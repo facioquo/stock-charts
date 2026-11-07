@@ -44,6 +44,10 @@ Two checks report it, and both log `Stale quote dataset`:
 - **The fetch path** logs when a cache miss serves a stale `/quotes`. That catches a refresh that
   never runs at all, which the first check cannot see.
 
+A run writes a dataset only when its content changed, so an R2 object's upload time is when its
+data last changed, not when the cron last ran. Look for `Unchanged dataset` or `Updated dataset`
+in the scheduled invocation's logs to confirm runs.
+
 ## Unknown paths and crawlers
 
 The Worker refuses any path the API does not serve with a `404` before the cache, the rate limiter,
