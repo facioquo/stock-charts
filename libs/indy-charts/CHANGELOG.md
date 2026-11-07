@@ -1,5 +1,11 @@
 # @facioquo/indy-charts
 
+## 0.18.2
+
+### Patch Changes
+
+- 32880c4: The volume scale label under the price chart moves from the right-hand column to the left edge, so it no longer sits among the price labels. Its formatting is unchanged, and it still follows `showRightAxisLabels`.
+
 ## 0.18.1
 
 ### Patch Changes
