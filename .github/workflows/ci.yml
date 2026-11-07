@@ -78,7 +78,7 @@ jobs:
 
       - name: Publish backend test results
         uses: dorny/test-reporter@v3
-        if: ! cancelled()
+        if: ${{ !cancelled() }}
         with:
           name: xUnit Tests
           path: server/test-results/*.trx
