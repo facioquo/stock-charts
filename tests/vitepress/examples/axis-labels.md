@@ -14,7 +14,7 @@ The same price chart twice: once with the right-hand labels and tooltips this si
   <StaticChart show-right-axis-labels show-tooltips />
 </ClientOnly>
 
-The right-hand column carries the price scale and, at the foot of the chart, the volume scale. The volume label marks one round level, such as `100M`, measured from the bars' zero baseline, so any bar's height reads as a quantity. Hover the chart to see the tooltip list the candle, the volume, and the EMA(20) at that bar.
+The right-hand column carries the price scale, and the left edge carries the volume scale at the foot of the chart. The volume label marks one round level, such as `100M`, measured from the bars' zero baseline, so any bar's height reads as a quantity. Hover the chart to see the tooltip list the candle, the volume, and the EMA(20) at that bar.
 
 ### Labels and tooltips off
 

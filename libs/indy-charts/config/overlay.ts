@@ -77,14 +77,15 @@ export function baseOverlayOptions(volumeAxisSize: number, settings: ChartSettin
     };
   }
 
-  // Secondary y-axis for volume. Its labels sit in the right-hand column with
-  // the price labels, mirrored inside the plot, so the axis takes no width.
+  // Secondary y-axis for volume. Its label sits on the left edge, mirrored
+  // inside the plot so the axis takes no width, apart from the price labels on
+  // the right so the two scales never overlap.
   const colors = getThemeColors(settings);
   options.scales["volumeAxis"] = {
     display: settings.showRightAxisLabels ?? true,
     type: "linear",
     axis: "y",
-    position: "right",
+    position: "left",
     beginAtZero: true,
     padding: 0,
     border: {
@@ -107,9 +108,9 @@ export function baseOverlayOptions(volumeAxisSize: number, settings: ChartSettin
       backdropColor: colors.background,
       backdropPadding: {
         top: 0,
-        left: 5,
+        left: 0,
         bottom: 0,
-        right: 0
+        right: 5
       },
       padding: 0,
       callback: value => formatVolume(Number(value))

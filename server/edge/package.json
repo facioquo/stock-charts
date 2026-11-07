@@ -20,7 +20,7 @@
     "@cloudflare/containers": "^0.3.7"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20261106.1",
+    "@cloudflare/workers-types": "^5.20261107.1",
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.6.6",
     "@vitest/eslint-plugin": "1.6.28",
