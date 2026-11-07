@@ -82,6 +82,7 @@ jobs:
         uses: pnpm/setup@v3
         with:
           cache: true
+          save-cache: false
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
 
@@ -139,6 +140,7 @@ jobs:
         uses: pnpm/setup@v3
         with:
           cache: true
+          save-cache: false
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
 

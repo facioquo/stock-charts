@@ -78,7 +78,7 @@ jobs:
 
       - name: Publish backend test results
         uses: dorny/test-reporter@v3
-        if: success() || failure()
+        if: ${{ !cancelled() }}
         with:
           name: xUnit Tests
           path: server/test-results/*.trx
@@ -98,6 +98,7 @@ jobs:
         uses: pnpm/setup@v3
         with:
           cache: true
+          save-cache: ${{ github.ref == 'refs/heads/main' }}  # Only this job saves, and only on main
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
 
@@ -152,6 +153,7 @@ jobs:
         uses: pnpm/setup@v3
         with:
           cache: true
+          save-cache: false
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
 
@@ -181,6 +183,7 @@ jobs:
         uses: pnpm/setup@v3
         with:
           cache: true
+          save-cache: false
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
 
@@ -227,6 +230,7 @@ jobs:
         uses: pnpm/setup@v3
         with:
           cache: true
+          save-cache: false
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
 
