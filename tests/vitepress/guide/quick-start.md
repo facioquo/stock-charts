@@ -60,7 +60,7 @@ manager.initializeOverlay(overlayCanvas, quotes, 250);
 
 - **`isDarkTheme`**: applies dark or light color palette
 - **`showTooltips`**: enables/disables hover tooltips
-- **`showRightAxisLabels`**: controls the right-hand price, oscillator, and volume labels (defaults to `true`). Set to `false` for cleaner standalone charts or documentation examples. Gridlines remain visible regardless.
+- **`showRightAxisLabels`**: controls the price and oscillator labels on the right and the volume label on the left (defaults to `true`). Set to `false` for cleaner standalone charts or documentation examples. Gridlines remain visible regardless.
 - **`background`** (optional): overrides annotation and axis-label backdrop color
 
 Every option and its default is listed in [chart options](/reference/chart-options).
