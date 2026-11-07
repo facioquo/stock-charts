@@ -78,7 +78,7 @@ jobs:
 
       - name: Publish backend test results
         uses: dorny/test-reporter@v3
-        if: success() || failure()
+        if: ! cancelled()
         with:
           name: xUnit Tests
           path: server/test-results/*.trx
@@ -98,10 +98,7 @@ jobs:
         uses: pnpm/setup@v3
         with:
           cache: true
-          # Each save is a new ~180 MB entry, and parallel jobs that change
-          # the store all save. Only this job saves, and only on main; every
-          # other job and pull request run restores the newest main entry.
-          save-cache: ${{ github.event_name == 'push' }}
+          save-cache: true  # Only `true` on this primary job
           runtime: node@${{ env.NODE_VERSION }}
           require-lockfile: true
 
