@@ -81,6 +81,34 @@ describe("worker.fetch", () => {
     expect(getContainerMock).not.toHaveBeenCalled();
   });
 
+  it("serves robots.txt at the edge without waking the container", async () => {
+    const response = await worker.fetch(
+      new Request("https://api.example/robots.txt"),
+      makeEnv(),
+      makeCtx()
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain("Disallow: /");
+    expect(cacheMatch).not.toHaveBeenCalled();
+    expect(getContainerMock).not.toHaveBeenCalled();
+  });
+
+  it("refuses a path the API does not serve before the cache, limiter, or container", async () => {
+    const env = makeEnv();
+    const response = await worker.fetch(
+      new Request("https://api.example/wp-login.php", { headers: { Origin: ALLOWED_ORIGIN } }),
+      env,
+      makeCtx()
+    );
+
+    expect(response.status).toBe(404);
+    expect(response.headers.get("access-control-allow-origin")).toBe(ALLOWED_ORIGIN);
+    expect(cacheMatch).not.toHaveBeenCalled();
+    expect(env.RATE_LIMITER.limit).not.toHaveBeenCalled();
+    expect(getContainerMock).not.toHaveBeenCalled();
+  });
+
   it("returns 429 with CORS on a rate-limited cache miss, without waking the container", async () => {
     const request = new Request("https://api.example/EMA?lookbackPeriods=99", {
       headers: { Origin: ALLOWED_ORIGIN, "cf-connecting-ip": "203.0.113.7" }
