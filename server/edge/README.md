@@ -14,7 +14,9 @@ It has two responsibilities:
 
 | File | Purpose |
 | :--- | :--- |
-| [src/index.ts](src/index.ts) | Request pipeline: CORS → cache → container |
+| [src/index.ts](src/index.ts) | Request pipeline: CORS → route check → cache → shared cache → container |
+| [src/shared-cache.ts](src/shared-cache.ts) | Shared R2 response cache and its validity rule |
+| [src/routes.ts](src/routes.ts) | Routes the API serves, and the edge `robots.txt` |
 | [src/container.ts](src/container.ts) | `ApiContainer` config and the R2 outbound handler |
 | [src/cors.ts](src/cors.ts) | Origin allow list and cache-safe CORS rewriting |
 | [src/quotes.ts](src/quotes.ts) | Alpaca → R2 dataset refresh |
@@ -27,7 +29,31 @@ Cache entries are keyed by URL alone and stored with **all** CORS headers stripp
 entry serve the demo site, the docs site, and preview deployments without one origin poisoning
 another's cached copy (facioquo/stock-charts#517).
 
-Responses carry `x-edge-cache: HIT|MISS` so the behaviour is visible in browser devtools.
+The Worker cache is local to each Cloudflare location. Behind it sits a shared tier in R2, under
+the `responses/` prefix of the quotes bucket ([src/shared-cache.ts](src/shared-cache.ts)), so one
+computed response serves every location. A shared entry is served while it is younger than its
+`max-age`, as the Worker cache would, and after that for as long as the quote datasets stay
+unchanged. It counts as unchanged once it was computed at least two `max-age` windows after the
+newest dataset upload, because the API's own quote and output caches can each hold older data for
+one window. Overnight, after the close, and over weekends, a repeat request is therefore served
+without the container, while a new bar still reaches charts as quickly as before.
+
+A shared hit is served with its `max-age` cut to the time the entry has left, and the location
+keeps its own copy for that long. An entry that is still unchanged gets a full window each time.
+
+Keys start with the deployed Worker version id (the `CF_VERSION_METADATA` binding), so a deploy
+does not read entries from the previous version. The container image rolls out after the new Worker
+goes live, so the previous API build can still compute the first entries under the new id. The
+Worker therefore counts its own upload time as a change, like a dataset upload: entries computed
+within two windows of a deploy are served only for their own `max-age`. A rollout that takes longer
+than two windows could still leave older entries behind; delete `responses/<version id>/` if one
+does. The API marks any response computed from
+its bundled backup quotes `no-store`, so a storage outage is never replayed from the shared tier.
+
+Responses carry `x-edge-cache: HIT|SHARED|MISS` so the behaviour is visible in browser devtools.
+
+Shared entries are never deleted by the Worker. A bucket lifecycle rule removes them; it is a
+one-time operator step in [First cutover](#first-cutover).
 
 ## Dataset freshness
 
@@ -40,8 +66,23 @@ Two checks report it, and both log `Stale quote dataset`:
 - **The scheduled refresh** reads each stored dataset back after writing and fails the
   invocation when one is stale, missing, or empty. That catches a run that succeeds but leaves a
   symbol behind.
-- **The fetch path** logs when a cache miss serves a stale `/quotes`. That catches a refresh that
-  never runs at all, which the first check cannot see.
+- **The fetch path** logs when a container response or a shared cache hit serves a stale
+  `/quotes`. That catches a refresh that never runs at all, which the first check cannot see.
+  Per-location cache hits are not checked, so each location logs at most once per window.
+
+A run writes a dataset only when its content changed, so an R2 object's upload time is when its
+data last changed, not when the cron last ran. Look for `Unchanged dataset` or `Updated dataset`
+in the scheduled invocation's logs to confirm runs.
+
+## Unknown paths and crawlers
+
+The Worker refuses any path the API does not serve with a `404` before the cache, the rate limiter,
+or the container, so scanners probing paths like `/wp-login.php` never wake the container. The API's
+fixed routes match without regard to case; indicator routes must be the catalog's uppercase ids.
+`src/routes.spec.ts` checks every `[HttpGet]` route in the controller passes.
+
+`/robots.txt` is answered at the edge and disallows everything. The API serves chart data, not
+pages, so crawlers have nothing to index there.
 
 ## Rate limiting
 
@@ -170,13 +211,20 @@ Containers require the **Workers Paid** plan ($5/month minimum).
    `routes` is provisioned automatically — the zone lives in the same account, so the DNS
    record and certificate are created by the deploy (`workers_dev` is off; the custom domain
    is the only public host).
-3. Seed R2 by triggering the cron once (`wrangler dev --test-scheduled`, or wait for the schedule).
+3. Add the lifecycle rule that expires shared response cache entries, once per bucket:
+
+   ```bash
+   pnpm --filter @stock-charts/edge exec wrangler r2 bucket lifecycle add stock-charts-quotes \
+     expire-responses responses/ --expire-days 7
+   ```
+
+4. Seed R2 by triggering the cron once (`wrangler dev --test-scheduled`, or wait for the schedule).
    Until it runs, `/quotes` correctly serves the bundled 2018 backup dataset.
-4. Verify against `https://charts-api.stockindicators.dev` before pointing the site at it:
+5. Verify against `https://charts-api.stockindicators.dev` before pointing the site at it:
    - a repeat request returns `x-edge-cache: HIT` and does not restart the container;
    - load the Pages site and the VitePress demo back to back in one browser and confirm neither
      poisons the other's cached `/quotes` (the failure mode in facioquo/stock-charts#517);
    - `wrangler tail` shows the cron firing and `SPY-DAILY.json` / `QQQ-DAILY.json` landing in R2;
    - the Containers dashboard shows the instance sleeping after ~10 minutes idle.
-5. Deploy the site, then leave the old origin running for about a week — already-loaded browser
+6. Deploy the site, then leave the old origin running for about a week — already-loaded browser
    bundles still point at it — before decommissioning.

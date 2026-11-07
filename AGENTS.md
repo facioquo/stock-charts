@@ -254,12 +254,15 @@ Client-side project dependencies are strictly in this direction only: web → in
 
 Layered and built-in (no extra packages), so doc-site traffic doesn't redundantly recompute indicators:
 
-1. **Worker response cache** (`server/edge/src/index.ts`) — the outermost tier. It keeps the container asleep, and therefore unbilled.
-2. **Server-side output cache** (`AddOutputCache`/`UseOutputCache`) — caches each computed indicator response keyed by path + query string, varied by `Origin`.
-3. **In-memory quote cache** (`IMemoryCache` in `QuoteService`) — fetches the shared quote dataset at most once per symbol per window.
-4. **`Cache-Control: public, max-age=...`** — lets browsers and the CDN serve repeats.
+1. **Worker response cache** (`server/edge/src/index.ts`) — the outermost tier, local to each Cloudflare location. It keeps the container asleep, and therefore unbilled.
+2. **Shared response cache** (`server/edge/src/shared-cache.ts`) — computed responses in R2 under `responses/`, shared by every location and served while the quote datasets are unchanged. Keys are scoped to the deployed Worker version.
+3. **Server-side output cache** (`AddOutputCache`/`UseOutputCache`) — caches each computed indicator response keyed by path + query string, varied by `Origin`.
+4. **In-memory quote cache** (`IMemoryCache` in `QuoteService`) — fetches the shared quote dataset at most once per symbol per window.
+5. **`Cache-Control: public, max-age=...`** — lets browsers and the CDN serve repeats.
 
-Lifetime for tiers 2-4 is one knob, `Caching:DurationMinutes`, in `CacheSettings`.
+Responses computed from the bundled failover quotes are `no-store`. No edge or browser tier keeps them after a storage outage. The in-memory quote cache still holds that dataset for one window after storage recovers.
+
+Lifetime for the server-side tiers and `max-age` is one knob, `Caching:DurationMinutes`, in `CacheSettings`.
 
 Worker cache entries are keyed by URL alone. All CORS headers are stripped before
 storage. The correct `Access-Control-Allow-Origin` is written per request on the
