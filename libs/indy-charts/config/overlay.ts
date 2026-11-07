@@ -97,9 +97,7 @@ export function baseOverlayOptions(volumeAxisSize: number, settings: ChartSettin
       drawTicks: false
     },
     ticks: {
-      // Drawn above the bars and lines, so the semi-transparent backdrop shows
-      // through to them the way the price labels' backdrop does.
-      z: 1,
+      z: 1, // Drawn above the bars and lines
       mirror: true,
       color: colors.text,
       font: {
@@ -109,7 +107,6 @@ export function baseOverlayOptions(volumeAxisSize: number, settings: ChartSettin
       },
       showLabelBackdrop: true,
       backdropColor: colors.background,
-      // Mirrors the price labels' backdrop: the gap faces into the plot.
       backdropPadding: {
         top: 0,
         left: 0,

@@ -49,10 +49,8 @@ describe("baseOverlayOptions volume axis", () => {
   it("shows mirrored left-hand labels without gridlines or tick marks", () => {
     const axis = volumeAxis();
     expect(axis.display).toBe(true);
-    // Left, apart from the price labels on the right, so the scales never overlap.
     expect(axis.position).toBe("left");
     expect(axis.ticks.mirror).toBe(true);
-    // Above the bars, so the semi-transparent backdrop shows over them.
     expect(axis.ticks.z).toBe(1);
     expect(axis.grid.display).toBe(false);
     expect(axis.grid.drawTicks).toBe(false);
