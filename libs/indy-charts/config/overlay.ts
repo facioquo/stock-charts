@@ -97,7 +97,6 @@ export function baseOverlayOptions(volumeAxisSize: number, settings: ChartSettin
       drawTicks: false
     },
     ticks: {
-      z: 1, // Drawn above the bars and lines
       mirror: true,
       color: colors.text,
       font: {

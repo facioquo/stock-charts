@@ -51,7 +51,6 @@ describe("baseOverlayOptions volume axis", () => {
     expect(axis.display).toBe(true);
     expect(axis.position).toBe("left");
     expect(axis.ticks.mirror).toBe(true);
-    expect(axis.ticks.z).toBe(1);
     expect(axis.grid.display).toBe(false);
     expect(axis.grid.drawTicks).toBe(false);
     expect(axis.max).toBe(40_000_000);
