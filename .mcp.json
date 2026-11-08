@@ -1,13 +1,5 @@
 {
   "mcpServers": {
-    "codacy": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["scripts/codacy-mcp.mjs"],
-      "env": {
-        "CODACY_ACCOUNT_TOKEN": "${CODACY_ACCOUNT_TOKEN}"
-      }
-    },
     "playwright": {
       "type": "stdio",
       "command": "npx",
