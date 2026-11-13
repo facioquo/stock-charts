@@ -218,7 +218,7 @@ public class Service
 - **TypeScript 7**: Strict mode enabled, comprehensive type safety
   - `tsc` comes from `@typescript/native`, an alias of `typescript@7`. The `typescript` name is the `@typescript/typescript6` alias, because typescript-eslint still imports the TypeScript 6 API; drop that alias once typescript-eslint supports TypeScript 7.
 - **Chart.js v4+**: Financial chart types in `libs/chartjs-financial/`; bundled into `@facioquo/indy-charts` dist
-- **React Router v7**: Client-side routing
+- **React Router v8**: Client-side routing; import from `react-router`, and `RouterProvider` from `react-router/dom`
 - **Offline snapshot**: `web/public/data/chart-api/` holds every catalog indicator at its default parameters, plus the demo's opening selections. `ApiClient` reads it when the API is unreachable, so a visitor with no cache still gets charts.
   - Regenerate it after the catalog, `DEFAULT_INDICATORS`, or the `@facioquo/indy-charts` version changes.
 - **pnpm workspaces**: Unified dependency management across root and all workspace packages

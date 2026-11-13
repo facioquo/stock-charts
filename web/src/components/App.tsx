@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 
 /**
  * Root shell — header toolbar + routed outlet. Ports `AppComponent`. Saved user
