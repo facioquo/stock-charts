@@ -62,6 +62,7 @@
     "@changesets/cli": "^3.0.3",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "1.64.1",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "eslint": "^10.14.0",
     "globals": "^17.14.0",
     "markdownlint-cli2": "^0.24.0",
@@ -71,6 +72,6 @@
     "stylelint": "^17.16.0",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-scss": "^7.4.0",
-    "typescript": "^6.0.3"
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   }
 }

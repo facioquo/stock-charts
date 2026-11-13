@@ -215,7 +215,8 @@ public class Service
 - **Primer React**: `PrimerRoot` wraps the app in Primer's `ThemeProvider` and `BaseStyles`, following the site's dark/light switch.
   - Controls take Primer's colors as shipped. The site theme (`--bg`, `--text`, …) colors only the page, the title block, the site's own text, and the charts.
   - Only public Primer packages are used, so anyone can contribute.
-- **TypeScript**: Strict mode enabled, comprehensive type safety
+- **TypeScript 7**: Strict mode enabled, comprehensive type safety
+  - `tsc` comes from `@typescript/native`, an alias of `typescript@7`. The `typescript` name is the `@typescript/typescript6` alias, because typescript-eslint still imports the TypeScript 6 API; drop that alias once typescript-eslint supports TypeScript 7.
 - **Chart.js v4+**: Financial chart types in `libs/chartjs-financial/`; bundled into `@facioquo/indy-charts` dist
 - **React Router v7**: Client-side routing
 - **Offline snapshot**: `web/public/data/chart-api/` holds every catalog indicator at its default parameters, plus the demo's opening selections. `ApiClient` reads it when the API is unreachable, so a visitor with no cache still gets charts.
