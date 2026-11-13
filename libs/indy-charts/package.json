@@ -19,7 +19,7 @@
     "access": "restricted"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "type": "module",
   "main": "./dist/index.js",

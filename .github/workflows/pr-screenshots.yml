@@ -45,7 +45,7 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: 24
+  NODE_VERSION: 26
   # The PR screenshot tool (`facioquo-pr-screenshots` in @facioquo/react-ui),
   # installed by both plan and publish. One value, because plan computes the
   # keys that publish records, and two versions must never disagree about
