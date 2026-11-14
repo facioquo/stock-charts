@@ -19,7 +19,7 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
 
 **All platforms:**
 
-- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
+- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v26 LTS or later)
 - [pnpm](https://pnpm.io/) (v12 or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
@@ -47,7 +47,7 @@ Or use VS Code: `Ctrl+Shift+P` → "Tasks: Run Task" → "Setup: Dev environment
 After installation, verify all tools:
 
 ```bash
-node --version    # Should be v24+
+node --version    # Should be v26+
 pnpm --version    # Should be 12+
 dotnet --version  # Should be 10.0+
 ```

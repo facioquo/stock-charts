@@ -17,7 +17,7 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
 **All platforms:**
 
 - [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/) (v24 LTS or later)
+- [Node.js](https://nodejs.org/) (v26 LTS or later)
 - [pnpm](https://pnpm.io/) (v12 or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)

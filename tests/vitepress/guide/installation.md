@@ -4,7 +4,7 @@ Install the library, then verify it works with a minimal chart. The full step-by
 
 ## Prerequisites
 
-- **Node.js 24+** for tooling
+- **Node.js 26+** for tooling
 - A modern browser (ES2022, Canvas API, `fetch`)
 
 ## Install

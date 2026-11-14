@@ -15,7 +15,7 @@ This example shows how to use the indy-charts Vue adapter in a documentation sit
 
 ### Prerequisites
 
-- Node.js 24+
+- Node.js 26+
 - pnpm (recommended)
 
 ### Install dependencies
