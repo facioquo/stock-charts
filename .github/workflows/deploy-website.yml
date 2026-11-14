@@ -20,15 +20,16 @@ env:
   NODE_VERSION: 26
 
 jobs:
-  # Fork PRs get no secrets, so nothing here can deploy for them. Every other
-  # job needs this one, so skipping it skips the whole run; CI verifies forks.
+  # Fork and Dependabot PRs get no secrets, so nothing here can deploy for them.
+  # Every other job needs this one, so skipping it skips the whole run; CI verifies them.
   versioning:
     name: Define version
     runs-on: ubuntu-slim
     timeout-minutes: 5
     if: |
       github.event_name != 'pull_request' ||
-      github.event.pull_request.head.repo.full_name == github.repository
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]')
     outputs:
       version: ${{ steps.marker.outputs.version }}
 
