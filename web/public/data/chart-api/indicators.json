@@ -11,7 +11,7 @@
     "parameters": [],
     "results": [
       {
-        "displayName": "ADL",
+        "displayName": "Accumulation Distribution Line (ADL)",
         "tooltipTemplate": "ADL",
         "dataName": "adl",
         "dataType": "number",
@@ -60,7 +60,7 @@
     ],
     "results": [
       {
-        "displayName": "ALMA",
+        "displayName": "Arnaud Legoux Moving Average (ALMA)",
         "tooltipTemplate": "ALMA([P1],[P2],[P3])",
         "dataName": "alma",
         "dataType": "number",
@@ -336,7 +336,7 @@
         "fill": null
       },
       {
-        "displayName": "DI+",
+        "displayName": "+DI",
         "tooltipTemplate": "DI+([P1])",
         "dataName": "pdi",
         "dataType": "number",
@@ -347,7 +347,7 @@
         "fill": null
       },
       {
-        "displayName": "DI-",
+        "displayName": "-DI",
         "tooltipTemplate": "DI-([P1])",
         "dataName": "mdi",
         "dataType": "number",
@@ -358,7 +358,7 @@
         "fill": null
       },
       {
-        "displayName": "ADX Rating",
+        "displayName": "ADXR",
         "tooltipTemplate": "ADXR([P1])",
         "dataName": "adxr",
         "dataType": "number",
@@ -415,7 +415,7 @@
     ],
     "results": [
       {
-        "displayName": "Average True Range",
+        "displayName": "ATR",
         "tooltipTemplate": "ATR([P1])",
         "dataName": "atr",
         "dataType": "number",
@@ -448,7 +448,7 @@
     ],
     "results": [
       {
-        "displayName": "Average True Range Percent",
+        "displayName": "ATR %",
         "tooltipTemplate": "ATR([P1]) %",
         "dataName": "atrp",
         "dataType": "number",
@@ -461,7 +461,7 @@
     ]
   },
   {
-    "name": "Awesome Oscillator (AO)",
+    "name": "Awesome Oscillator",
     "uiid": "AO",
     "legendTemplate": "AO([P1],[P2])",
     "endpoint": "/AWESOME/",
@@ -500,7 +500,7 @@
     ],
     "results": [
       {
-        "displayName": "Awesome Oscillator",
+        "displayName": "Oscillator",
         "tooltipTemplate": "AO([P1],[P2])",
         "dataName": "oscillator",
         "dataType": "number",
@@ -544,7 +544,7 @@
     ],
     "results": [
       {
-        "displayName": "Balance of Power",
+        "displayName": "BOP",
         "tooltipTemplate": "BOP([P1])",
         "dataName": "bop",
         "dataType": "number",
@@ -599,7 +599,7 @@
         "fill": null
       },
       {
-        "displayName": "Beta+",
+        "displayName": "Beta Up",
         "tooltipTemplate": "Beta+",
         "dataName": "betaUp",
         "dataType": "number",
@@ -610,7 +610,7 @@
         "fill": null
       },
       {
-        "displayName": "Beta-",
+        "displayName": "Beta Down",
         "tooltipTemplate": "Beta-",
         "dataName": "betaDown",
         "dataType": "number",
@@ -666,7 +666,7 @@
         }
       },
       {
-        "displayName": "Centerline",
+        "displayName": "Centerline (SMA)",
         "tooltipTemplate": "BB([P1],[P2]) Centerline",
         "dataName": "sma",
         "dataType": "number",
@@ -839,7 +839,7 @@
     ],
     "results": [
       {
-        "displayName": "Chaikin Oscillator",
+        "displayName": "Oscillator",
         "tooltipTemplate": "CHAIKIN([P1],[P2])",
         "dataName": "oscillator",
         "dataType": "number",
@@ -872,7 +872,7 @@
     ],
     "results": [
       {
-        "displayName": "Chande Momentum Oscillator",
+        "displayName": "CMO",
         "tooltipTemplate": "CMO([P1])",
         "dataName": "cmo",
         "dataType": "number",
@@ -1012,7 +1012,7 @@
     ],
     "results": [
       {
-        "displayName": "Choppiness",
+        "displayName": "CHOP",
         "tooltipTemplate": "Choppiness",
         "dataName": "chop",
         "dataType": "number",
@@ -1150,7 +1150,7 @@
     ],
     "results": [
       {
-        "displayName": "CRSI",
+        "displayName": "ConnorsRSI",
         "tooltipTemplate": "CRSI([P1],[P2],[P3])",
         "dataName": "connorsRsi",
         "dataType": "number",
@@ -1205,7 +1205,7 @@
         "fill": null
       },
       {
-        "displayName": "R²",
+        "displayName": "R-squared",
         "tooltipTemplate": "R-Squared",
         "dataName": "rSquared",
         "dataType": "number",
@@ -1218,7 +1218,7 @@
     ]
   },
   {
-    "name": "Detrended Price Oscillator (DPO)",
+    "name": "Detrended Price Oscillator",
     "uiid": "DPO",
     "legendTemplate": "DPO([P1])",
     "endpoint": "/DPO/",
@@ -1310,7 +1310,7 @@
     "parameters": [],
     "results": [
       {
-        "displayName": "DC PERIODS",
+        "displayName": "Dominant Cycle Periods",
         "tooltipTemplate": "DC PERIODS",
         "dataName": "dcPeriods",
         "dataType": "number",
@@ -1382,7 +1382,7 @@
     ]
   },
   {
-    "name": "Double Exponential Moving Average (DEMA)",
+    "name": "Double Exponential Moving Average",
     "uiid": "DEMA",
     "legendTemplate": "DEMA([P1])",
     "endpoint": "/DEMA/",
@@ -1435,7 +1435,7 @@
     ],
     "results": [
       {
-        "displayName": "Fisher Transform",
+        "displayName": "Fisher",
         "tooltipTemplate": "Fisher Transform",
         "dataName": "fisher",
         "dataType": "number",
@@ -1503,7 +1503,7 @@
     ]
   },
   {
-    "name": "Endpoint Moving Average (EPMA)",
+    "name": "Endpoint Moving Average",
     "uiid": "EPMA",
     "legendTemplate": "EPMA([P1])",
     "endpoint": "/EPMA/",
@@ -1536,7 +1536,7 @@
     ]
   },
   {
-    "name": "Exponential Moving Average (EMA)",
+    "name": "Exponential Moving Average",
     "uiid": "EMA",
     "legendTemplate": "EMA([P1])",
     "endpoint": "/EMA/",
@@ -1633,7 +1633,7 @@
     ],
     "results": [
       {
-        "displayName": "FCB([P1]) Upper Band",
+        "displayName": "Upper Band",
         "tooltipTemplate": "Upper Band",
         "dataName": "upperBand",
         "dataType": "number",
@@ -1661,7 +1661,7 @@
     "uiid": "GATOR",
     "legendTemplate": "GATOR",
     "endpoint": "/GATOR/",
-    "category": "price-trend",
+    "category": "oscillator",
     "chartType": "oscillator",
     "order": 1,
     "chartConfig": null,
@@ -1703,7 +1703,7 @@
     "parameters": [],
     "results": [
       {
-        "displayName": "Heikin-Ashi",
+        "displayName": "Close",
         "tooltipTemplate": "HEIKIN-ASHI",
         "dataName": "close",
         "dataType": "number",
@@ -1727,7 +1727,7 @@
     "parameters": [],
     "results": [
       {
-        "displayName": "HT Trendline",
+        "displayName": "Trendline",
         "tooltipTemplate": "HT Trendline",
         "dataName": "trendline",
         "dataType": "number",
@@ -1738,7 +1738,7 @@
         "fill": null
       },
       {
-        "displayName": "HT Smoothed Price",
+        "displayName": "Smooth Price",
         "tooltipTemplate": "HT Smooth Price",
         "dataName": "smoothPrice",
         "dataType": "number",
@@ -1751,7 +1751,7 @@
     ]
   },
   {
-    "name": "Hull Moving Average (HMA)",
+    "name": "Hull Moving Average",
     "uiid": "HMA",
     "legendTemplate": "HMA([P1])",
     "endpoint": "/HMA/",
@@ -1886,7 +1886,7 @@
         "fill": null
       },
       {
-        "displayName": "Chikou span",
+        "displayName": "Chikou Span",
         "tooltipTemplate": "ICHIMOKU([P1],[P2],[P3] Chikou span",
         "dataName": "chikouSpan",
         "dataType": "number",
@@ -1897,7 +1897,7 @@
         "fill": null
       },
       {
-        "displayName": "Senkou span A",
+        "displayName": "Senkou Span A",
         "tooltipTemplate": "ICHIMOKU([P1],[P2],[P3] Senkou span A",
         "dataName": "senkouSpanA",
         "dataType": "number",
@@ -1908,7 +1908,7 @@
         "fill": null
       },
       {
-        "displayName": "Senkou span B",
+        "displayName": "Senkou Span B",
         "tooltipTemplate": "ICHIMOKU([P1],[P2],[P3] Senkou span B",
         "dataName": "senkouSpanB",
         "dataType": "number",
@@ -1925,7 +1925,7 @@
     ]
   },
   {
-    "name": "Kaufman Adaptive Moving Average (KAMA)",
+    "name": "Kaufman's Adaptive Moving Average",
     "uiid": "KAMA",
     "legendTemplate": "KAMA([P1],[P2],[P3])",
     "endpoint": "/KAMA/",
@@ -2049,7 +2049,7 @@
     ]
   },
   {
-    "name": "Klinger Volume Oscillator (KVO)",
+    "name": "Klinger Volume Oscillator",
     "uiid": "KVO",
     "legendTemplate": "KVO([P1],[P2],[P3])",
     "endpoint": "/KVO/",
@@ -2096,7 +2096,7 @@
     ],
     "results": [
       {
-        "displayName": "KVO",
+        "displayName": "Oscillator",
         "tooltipTemplate": "KVO([P1],[P2],[P3])",
         "dataName": "oscillator",
         "dataType": "number",
@@ -2140,7 +2140,7 @@
     ],
     "results": [
       {
-        "displayName": "Linear Regression",
+        "displayName": "Line",
         "tooltipTemplate": "LINEAR([P1])",
         "dataName": "line",
         "dataType": "number",
@@ -2206,7 +2206,7 @@
     ],
     "results": [
       {
-        "displayName": "Dynamic",
+        "displayName": "McGinley Dynamic",
         "tooltipTemplate": "DYNAMIC([P1])",
         "dataName": "dynamic",
         "dataType": "number",
@@ -2243,7 +2243,7 @@
     ]
   },
   {
-    "name": "MESA Adaptive Moving Average (MAMA)",
+    "name": "MESA Adaptive Moving Average",
     "uiid": "MAMA",
     "legendTemplate": "MAMA([P1],[P2])",
     "endpoint": "/MAMA/",
@@ -2353,7 +2353,7 @@
     ]
   },
   {
-    "name": "Moving Average Convergence/Divergence (MACD)",
+    "name": "Moving Average Convergence/Divergence",
     "uiid": "MACD",
     "legendTemplate": "MACD([P1],[P2],[P3])",
     "endpoint": "/MACD/",
@@ -2502,7 +2502,7 @@
     ]
   },
   {
-    "name": "On-Balance Volume (OBV)",
+    "name": "On-Balance Volume",
     "uiid": "OBV",
     "legendTemplate": "OBV",
     "endpoint": "/OBV/",
@@ -2574,7 +2574,7 @@
     ]
   },
   {
-    "name": "Parabolic Stop and Reverse (SAR)",
+    "name": "Parabolic SAR",
     "uiid": "PSAR",
     "legendTemplate": "PSAR([P1],[P2])",
     "endpoint": "/PSAR/",
@@ -2615,7 +2615,7 @@
     ]
   },
   {
-    "name": "Percentage Volume Oscillator (PVO)",
+    "name": "Percentage Volume Oscillator",
     "uiid": "PVO",
     "legendTemplate": "PVO([P1],[P2],[P3])",
     "endpoint": "/PVO/",
@@ -2701,14 +2701,14 @@
     "uiid": "PIVOT-POINTS",
     "legendTemplate": "PIVOT POINTS(MONTH)",
     "endpoint": "/PIVOT-POINTS/",
-    "category": "price-channel",
+    "category": "price-trend",
     "chartType": "overlay",
     "order": 80,
     "chartConfig": null,
     "parameters": [],
     "results": [
       {
-        "displayName": "R3",
+        "displayName": "Resistance 3",
         "tooltipTemplate": "Resistance 3",
         "dataName": "r3",
         "dataType": "number",
@@ -2721,7 +2721,7 @@
         "fill": null
       },
       {
-        "displayName": "R2",
+        "displayName": "Resistance 2",
         "tooltipTemplate": "Resistance 2",
         "dataName": "r2",
         "dataType": "number",
@@ -2734,7 +2734,7 @@
         "fill": null
       },
       {
-        "displayName": "R1",
+        "displayName": "Resistance 1",
         "tooltipTemplate": "Resistance 1",
         "dataName": "r1",
         "dataType": "number",
@@ -2760,7 +2760,7 @@
         "fill": null
       },
       {
-        "displayName": "S1",
+        "displayName": "Support 1",
         "tooltipTemplate": "Support 1",
         "dataName": "s1",
         "dataType": "number",
@@ -2773,7 +2773,7 @@
         "fill": null
       },
       {
-        "displayName": "S2",
+        "displayName": "Support 2",
         "tooltipTemplate": "Support 2",
         "dataName": "s2",
         "dataType": "number",
@@ -2786,7 +2786,7 @@
         "fill": null
       },
       {
-        "displayName": "S3",
+        "displayName": "Support 3",
         "tooltipTemplate": "Support 3",
         "dataName": "s3",
         "dataType": "number",
@@ -2805,7 +2805,7 @@
     "uiid": "PIVOTS",
     "legendTemplate": "PIVOTS([P1],[P2],[P3])",
     "endpoint": "/PIVOTS/",
-    "category": "price-pattern",
+    "category": "price-trend",
     "chartType": "overlay",
     "order": 1,
     "chartConfig": null,
@@ -2859,7 +2859,7 @@
         "fill": null
       },
       {
-        "displayName": "High Trend Line",
+        "displayName": "High Line",
         "tooltipTemplate": "High Trend Line",
         "dataName": "highLine",
         "dataType": "number",
@@ -2870,7 +2870,7 @@
         "fill": null
       },
       {
-        "displayName": "Low Trend Line",
+        "displayName": "Low Line",
         "tooltipTemplate": "Low Trend Line",
         "dataName": "lowLine",
         "dataType": "number",
@@ -2883,7 +2883,7 @@
     ]
   },
   {
-    "name": "Price Momentum Oscillator (PMO)",
+    "name": "Price Momentum Oscillator",
     "uiid": "PMO",
     "legendTemplate": "PMO([P1],[P2],[P3])",
     "endpoint": "/PMO/",
@@ -3018,7 +3018,7 @@
     ],
     "results": [
       {
-        "displayName": "Rate of Change",
+        "displayName": "ROC",
         "tooltipTemplate": "ROC([P1])",
         "dataName": "roc",
         "dataType": "number",
@@ -3124,7 +3124,7 @@
     ]
   },
   {
-    "name": "Relative Strength Index (RSI)",
+    "name": "Relative Strength Index",
     "uiid": "RSI",
     "legendTemplate": "RSI([P1])",
     "endpoint": "/RSI/",
@@ -3186,7 +3186,7 @@
     "uiid": "ROLLING-PIVOTS",
     "legendTemplate": "ROLLING PIVOTS([P1],[P2])",
     "endpoint": "/ROLLING-PIVOTS/",
-    "category": "price-channel",
+    "category": "price-trend",
     "chartType": "overlay",
     "order": 80,
     "chartConfig": null,
@@ -3210,7 +3210,7 @@
     ],
     "results": [
       {
-        "displayName": "R3",
+        "displayName": "Resistance 3",
         "tooltipTemplate": "Resistance 3",
         "dataName": "r3",
         "dataType": "number",
@@ -3218,11 +3218,10 @@
         "stack": null,
         "lineWidth": 1,
         "defaultColor": "#DD2C00",
-        "fill": null,
-        "segmented": false
+        "fill": null
       },
       {
-        "displayName": "R2",
+        "displayName": "Resistance 2",
         "tooltipTemplate": "Resistance 2",
         "dataName": "r2",
         "dataType": "number",
@@ -3230,11 +3229,10 @@
         "stack": null,
         "lineWidth": 1,
         "defaultColor": "#DD2C00",
-        "fill": null,
-        "segmented": false
+        "fill": null
       },
       {
-        "displayName": "R1",
+        "displayName": "Resistance 1",
         "tooltipTemplate": "Resistance 1",
         "dataName": "r1",
         "dataType": "number",
@@ -3242,8 +3240,7 @@
         "stack": null,
         "lineWidth": 1,
         "defaultColor": "#DD2C00",
-        "fill": null,
-        "segmented": false
+        "fill": null
       },
       {
         "displayName": "Pivot Point",
@@ -3254,11 +3251,10 @@
         "stack": null,
         "lineWidth": 1,
         "defaultColor": "#1E88E5",
-        "fill": null,
-        "segmented": false
+        "fill": null
       },
       {
-        "displayName": "S1",
+        "displayName": "Support 1",
         "tooltipTemplate": "Support 1",
         "dataName": "s1",
         "dataType": "number",
@@ -3266,11 +3262,10 @@
         "stack": null,
         "lineWidth": 1,
         "defaultColor": "#2E7D32",
-        "fill": null,
-        "segmented": false
+        "fill": null
       },
       {
-        "displayName": "S2",
+        "displayName": "Support 2",
         "tooltipTemplate": "Support 2",
         "dataName": "s2",
         "dataType": "number",
@@ -3278,11 +3273,10 @@
         "stack": null,
         "lineWidth": 1,
         "defaultColor": "#2E7D32",
-        "fill": null,
-        "segmented": false
+        "fill": null
       },
       {
-        "displayName": "S3",
+        "displayName": "Support 3",
         "tooltipTemplate": "Support 3",
         "dataName": "s3",
         "dataType": "number",
@@ -3290,13 +3284,12 @@
         "stack": null,
         "lineWidth": 1,
         "defaultColor": "#2E7D32",
-        "fill": null,
-        "segmented": false
+        "fill": null
       }
     ]
   },
   {
-    "name": "Schaff Trend Cycle (STC)",
+    "name": "Schaff Trend Cycle",
     "uiid": "STC",
     "legendTemplate": "STC([P1],[P2],[P3])",
     "endpoint": "/STC/",
@@ -3357,7 +3350,7 @@
     ],
     "results": [
       {
-        "displayName": "Schaff Trend Cycle",
+        "displayName": "STC",
         "tooltipTemplate": "Schaff Trend Cycle",
         "dataName": "stc",
         "dataType": "number",
@@ -3370,7 +3363,7 @@
     ]
   },
   {
-    "name": "Simple Moving Average (SMA)",
+    "name": "Simple Moving Average",
     "uiid": "SMA",
     "legendTemplate": "SMA([P1])",
     "endpoint": "/SMA/",
@@ -3535,7 +3528,7 @@
     ]
   },
   {
-    "name": "Smoothed Moving Average (SMMA)",
+    "name": "Smoothed Moving Average",
     "uiid": "SMMA",
     "legendTemplate": "SMMA([P1])",
     "endpoint": "/SMMA/",
@@ -4021,7 +4014,7 @@
     ],
     "results": [
       {
-        "displayName": "Oscillator",
+        "displayName": "%K",
         "tooltipTemplate": "StochRSI Oscillator",
         "dataName": "stochRsi",
         "dataType": "number",
@@ -4032,7 +4025,7 @@
         "fill": null
       },
       {
-        "displayName": "Signal line",
+        "displayName": "%D",
         "tooltipTemplate": "Signal line",
         "dataName": "signal",
         "dataType": "number",
@@ -4095,7 +4088,7 @@
         "fill": null
       },
       {
-        "displayName": "Transition line",
+        "displayName": "SuperTrend",
         "tooltipTemplate": "SUPERTREND([P1],[P2]) Transition Line",
         "dataName": "superTrend",
         "dataType": "number",
@@ -4149,7 +4142,7 @@
     ]
   },
   {
-    "name": "Triple Exponential Moving Average (TEMA)",
+    "name": "Triple Exponential Moving Average",
     "uiid": "TEMA",
     "legendTemplate": "TEMA([P1])",
     "endpoint": "/TEMA/",
@@ -4182,7 +4175,7 @@
     ]
   },
   {
-    "name": "TRIX Oscillator",
+    "name": "Triple Exponential Moving Average Oscillator",
     "uiid": "TRIX",
     "legendTemplate": "TRIX([P1])",
     "endpoint": "/TRIX/",
@@ -4250,7 +4243,7 @@
     ]
   },
   {
-    "name": "True Strength Index (TSI)",
+    "name": "True Strength Index",
     "uiid": "TSI",
     "legendTemplate": "TSI([P1],[P2],[P3])",
     "endpoint": "/TSI/",
@@ -4359,7 +4352,7 @@
     ]
   },
   {
-    "name": "Ulcer Index (UI)",
+    "name": "Ulcer Index",
     "uiid": "ULCER",
     "legendTemplate": "ULCER([P1])",
     "endpoint": "/ULCER/",
@@ -4542,7 +4535,7 @@
     ]
   },
   {
-    "name": "Volume Weighted Moving Average (VWMA)",
+    "name": "Volume Weighted Moving Average",
     "uiid": "VWMA",
     "legendTemplate": "VWMA([P1])",
     "endpoint": "/VWMA/",
@@ -4619,7 +4612,7 @@
     ]
   },
   {
-    "name": "Weighted Moving Average (WMA)",
+    "name": "Weighted Moving Average",
     "uiid": "WMA",
     "legendTemplate": "WMA([P1])",
     "endpoint": "/WMA/",
@@ -4825,7 +4818,7 @@
     ],
     "results": [
       {
-        "displayName": "Fractal Bull",
+        "displayName": "Bull Fractal",
         "tooltipTemplate": "Fractal Bull ([P1])",
         "dataName": "fractalBull",
         "dataType": "number",
@@ -4836,7 +4829,7 @@
         "fill": null
       },
       {
-        "displayName": "Fractal Bear",
+        "displayName": "Bear Fractal",
         "tooltipTemplate": "Fractal Bear ([P1])",
         "dataName": "fractalBear",
         "dataType": "number",
@@ -4880,7 +4873,7 @@
         "fill": null
       },
       {
-        "displayName": "Zig Zag Retrace High",
+        "displayName": "Retrace High",
         "tooltipTemplate": "ZIGZAG([P1]% CLOSE) Retrace High",
         "dataName": "retraceHigh",
         "dataType": "number",
@@ -4891,7 +4884,7 @@
         "fill": null
       },
       {
-        "displayName": "Zig Zag Retrace Low",
+        "displayName": "Retrace Low",
         "tooltipTemplate": "ZIGZAG([P1]% CLOSE) Retrace Low",
         "dataName": "retraceLow",
         "dataType": "number",
@@ -4935,7 +4928,7 @@
         "fill": null
       },
       {
-        "displayName": "Zig Zag Retrace High",
+        "displayName": "Retrace High",
         "tooltipTemplate": "ZIGZAG([P1]% HIGH/LOW) Retrace High",
         "dataName": "retraceHigh",
         "dataType": "number",
@@ -4946,7 +4939,7 @@
         "fill": null
       },
       {
-        "displayName": "Zig Zag Retrace Low",
+        "displayName": "Retrace Low",
         "tooltipTemplate": "ZIGZAG([P1]% HIGH/LOW) Retrace Low",
         "dataName": "retraceLow",
         "dataType": "number",
