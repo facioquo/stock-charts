@@ -49,7 +49,7 @@ After installation, verify all tools:
 ```bash
 node --version    # Should be v26+
 pnpm --version    # Should be 12+
-dotnet --version  # Should be 10.0+
+dotnet --version  # Should be 11.0+
 ```
 
 ### Quick setup
