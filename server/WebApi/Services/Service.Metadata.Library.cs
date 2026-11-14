@@ -1,13 +1,15 @@
 using System.Globalization;
+using System.Text.Json;
 using LibraryListing = FacioQuo.Stock.Indicators.IndicatorListing;
 
 namespace WebApi.Services;
 
 /// <summary>
-/// Supplies each listing's parameters from the library's own <see cref="Catalog"/>: name,
-/// display name, type, bounds, and default. The demo then offers exactly what
-/// FacioQuo.Stock.Indicators accepts. <see cref="Metadata"/> keeps only the presentation:
-/// names, colors, thresholds, and tooltips.
+/// Builds each listing the API serves from the library's own <see cref="Catalog"/>, extended
+/// with how the demo charts it. The library supplies the name, category, result display names,
+/// chart panes, and every parameter (name, display name, type, bounds, default), so the demo
+/// offers exactly what FacioQuo.Stock.Indicators accepts. <see cref="Metadata"/> keeps only the
+/// presentation: legend and tooltip templates, colors, line styles, and thresholds.
 /// </summary>
 public static class LibraryCatalog
 {
@@ -74,39 +76,122 @@ public static class LibraryCatalog
         = Catalog.Get(Style.Series).ToDictionary(listing => listing.Uiid, StringComparer.Ordinal);
 
     /// <summary>
-    /// Returns the listing with its parameters built from the library listing its route maps to.
+    /// Builds the listing the API serves from the library listing the chart's route maps to.
     /// </summary>
     /// <remarks>
-    /// Every numeric library parameter is served unless <see cref="NotServed"/> names it. The
-    /// rest (enums, price series, dates) are fixed by the route itself, such as a Chandelier
-    /// Exit's long or short variant.
+    /// The name, category, and result display names are the library's unless the chart sets its
+    /// own. The chart type follows the library's chart panes, and an axis bound the chart leaves
+    /// unset comes from the library's pane. Every numeric library parameter is served unless
+    /// <see cref="NotServed"/> names it. The rest (enums, price series, dates) are fixed by the
+    /// route itself, such as a Chandelier Exit's long or short variant.
     /// </remarks>
     /// <exception cref="InvalidOperationException">
-    /// The route has no library listing, or a served parameter has no bounds or default.
+    /// The route has no library listing, a served parameter has no bounds or default, a result the
+    /// library does not list has no display name, or the chart type is unset and no result is one
+    /// the library lists.
     /// </exception>
-    public static IndicatorListing WithLibraryParameters(IndicatorListing listing)
+    public static IndicatorListing Build(ChartListing chart)
     {
-        ArgumentNullException.ThrowIfNull(listing);
+        ArgumentNullException.ThrowIfNull(chart);
 
-        string route = RouteOf(listing.Endpoint);
+        string route = RouteOf(chart.Endpoint);
         string libraryId = LibraryIdOf(route);
 
         if (!LibraryListings.TryGetValue(libraryId, out LibraryListing? source))
         {
             throw new InvalidOperationException(
-                $"{listing.Uiid}: no library catalog listing '{libraryId}'.");
+                $"{chart.Uiid}: no library catalog listing '{libraryId}'.");
         }
 
-        return listing with {
+        IndicatorPane? pane = PaneOf(source, chart.Results);
+
+        return new IndicatorListing {
+            Name = chart.Name ?? source.Name,
+            Uiid = chart.Uiid,
+            LegendTemplate = chart.LegendTemplate,
+            Endpoint = chart.Endpoint,
+            Category = chart.Category ?? CategoryOf(source),
+            ChartType = chart.ChartType ?? ChartTypeOf(source, chart.Results)
+                ?? throw new InvalidOperationException(
+                    $"{chart.Uiid}: no result is one the library lists, so set its chart type."),
+            Order = chart.Order,
+            ChartConfig = chart.ChartConfig is null && pane?.Minimum is null && pane?.Maximum is null
+                ? null
+                : new ChartConfig {
+                    MinimumYAxis = chart.ChartConfig?.MinimumYAxis ?? pane?.Minimum,
+                    MaximumYAxis = chart.ChartConfig?.MaximumYAxis ?? pane?.Maximum,
+                    Thresholds = chart.ChartConfig?.Thresholds
+                },
             Parameters = [.. (source.Parameters ?? [])
                 .Where(param => ApiDataTypes.ContainsKey(param.DataType)
                     && !NotServed.Contains((route, param.ParameterName)))
-                .Select(param => FromLibrary(listing.Uiid, route, param))]
+                .Select(param => FromLibrary(chart.Uiid, route, param))],
+            Results = [.. chart.Results.Select(result => new IndicatorResultConfig {
+                DisplayName = result.DisplayName
+                    ?? ResultOf(source, result.DataName)?.DisplayName
+                    ?? throw new InvalidOperationException(
+                        $"{chart.Uiid}.{result.DataName}: the library lists no such result, so set its display name."),
+                TooltipTemplate = result.TooltipTemplate,
+                DataName = result.DataName,
+                DataType = "number",
+                LineType = result.LineType,
+                Segmented = result.Segmented,
+                SegmentMode = result.SegmentMode,
+                Stack = result.Stack,
+                LineWidth = result.LineWidth,
+                DefaultColor = result.DefaultColor,
+                Fill = result.Fill
+            })]
         };
     }
 
     internal static string LibraryIdOf(string route)
         => LibraryIdByRoute.GetValueOrDefault(route, route);
+
+    /// <summary>
+    /// The library's category as the API names it: <c>VolumeBased</c> → <c>volume-based</c>.
+    /// </summary>
+    internal static string CategoryOf(LibraryListing source)
+        => JsonNamingPolicy.KebabCaseLower.ConvertName(source.Category.ToString());
+
+    /// <summary>
+    /// The library result a chart result draws, matched on its data name as the API serializes it.
+    /// </summary>
+    internal static IndicatorResult? ResultOf(LibraryListing source, string dataName)
+        => source.Results.FirstOrDefault(
+            result => JsonNamingPolicy.CamelCase.ConvertName(result.DataName) == dataName);
+
+    /// <summary>
+    /// <c>overlay</c> when every charted result the library lists draws on price, otherwise
+    /// <c>oscillator</c>; <c>null</c> when the library lists none of them.
+    /// </summary>
+    internal static string? ChartTypeOf(LibraryListing source, IEnumerable<ChartResult> results)
+    {
+        List<string> panes = [.. results
+            .Select(result => ResultOf(source, result.DataName)?.ChartPane)
+            .OfType<string>()];
+
+        return panes.Count == 0 ? null
+            : panes.TrueForAll(pane => pane == IndicatorResult.PricePane) ? "overlay"
+            : "oscillator";
+    }
+
+    /// <summary>
+    /// The library's description of the one pane besides price that the chart's results draw in,
+    /// or <c>null</c> when the library does not list it.
+    /// </summary>
+    internal static IndicatorPane? PaneOf(LibraryListing source, IEnumerable<ChartResult> results)
+    {
+        List<string> panes = [.. results
+            .Select(result => ResultOf(source, result.DataName)?.ChartPane)
+            .OfType<string>()
+            .Where(pane => pane != IndicatorResult.PricePane)
+            .Distinct()];
+
+        return panes.Count == 1
+            ? source.Panes?.FirstOrDefault(pane => pane.Name == panes[0])
+            : null;
+    }
 
     /// <summary>
     /// The route segment of an endpoint, absolute or relative: <c>https://host/SMA/</c> → <c>SMA</c>.
