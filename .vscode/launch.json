@@ -10,7 +10,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "Build: Backend .NET (incremental)",
-      "program": "${workspaceFolder}/server/WebApi/bin/Debug/net10.0/WebApi.dll",
+      "program": "${workspaceFolder}/server/WebApi/bin/Debug/net11.0/WebApi.dll",
       "cwd": "${workspaceFolder}/server/WebApi",
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
