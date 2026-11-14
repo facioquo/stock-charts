@@ -1163,11 +1163,11 @@
     ]
   },
   {
-    "name": "Correlation Coefficient (vs SPY)",
+    "name": "Correlation (vs SPY)",
     "uiid": "CORRELATION",
     "legendTemplate": "CORRELATION([P1])",
     "endpoint": "/CORRELATION/",
-    "category": "price-characteristic",
+    "category": "oscillator",
     "chartType": "oscillator",
     "order": 1,
     "chartConfig": {
@@ -3035,7 +3035,7 @@
     "uiid": "ROCWB",
     "legendTemplate": "ROCWB([P1],[P2],[P3])",
     "endpoint": "/ROCWB/",
-    "category": "oscillator",
+    "category": "price-trend",
     "chartType": "oscillator",
     "order": 1,
     "chartConfig": {
@@ -3449,7 +3449,7 @@
     ],
     "results": [
       {
-        "displayName": "Mean Absolute Deviation",
+        "displayName": "Mean absolute deviation",
         "tooltipTemplate": "SMA-MAD([P1])",
         "dataName": "mad",
         "dataType": "number",
@@ -3482,7 +3482,7 @@
     ],
     "results": [
       {
-        "displayName": "Mean Absolute Percentage Error",
+        "displayName": "Mean absolute percentage error",
         "tooltipTemplate": "SMA-MAPE([P1])",
         "dataName": "mape",
         "dataType": "number",
@@ -3515,7 +3515,7 @@
     ],
     "results": [
       {
-        "displayName": "Mean Squared Error",
+        "displayName": "Mean square error",
         "tooltipTemplate": "SMA-MSE([P1])",
         "dataName": "mse",
         "dataType": "number",
@@ -3581,7 +3581,7 @@
     ],
     "results": [
       {
-        "displayName": "Standard Deviation",
+        "displayName": "Standard deviation",
         "tooltipTemplate": "STDEV([P1])",
         "dataName": "stdDev",
         "dataType": "number",
@@ -4511,11 +4511,11 @@
     ]
   },
   {
-    "name": "Volume Weighted Average Price (VWAP), visible range",
+    "name": "Volume Weighted Average Price (visible range)",
     "uiid": "VWAP",
     "legendTemplate": "VWAP (visible range)",
     "endpoint": "/VWAP/",
-    "category": "moving-average",
+    "category": "price-channel",
     "chartType": "overlay",
     "order": 1,
     "chartConfig": null,

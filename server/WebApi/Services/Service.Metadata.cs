@@ -638,11 +638,10 @@ public static class Metadata
             // Correlation (-1 to 1) and R² (0 to 1) are both dimensionless, so
             // sharing one y-axis does not mislead.
             new ChartListing {
-                Name = "Correlation Coefficient (vs SPY)",
+                Name = "Correlation (vs SPY)",
                 Uiid = "CORRELATION",
                 LegendTemplate = "CORRELATION([P1])",
                 Endpoint = $"{baseUrl}/CORRELATION/",
-                Category = "price-characteristic",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -1646,7 +1645,6 @@ public static class Metadata
                 Uiid = "ROCWB",
                 LegendTemplate = "ROCWB([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/ROCWB/",
-                Category = "oscillator",
                 ChartConfig = new ChartConfig {
                     Thresholds =
                     [
@@ -1855,7 +1853,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/SMA-ANALYSIS/",
                 Results = [
                     new() {
-                        DisplayName = "Mean Absolute Deviation",
                         TooltipTemplate = "SMA-MAD([P1])",
                         DataName = "mad",
                         LineType = "solid",
@@ -1871,7 +1868,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/SMA-ANALYSIS/",
                 Results = [
                     new() {
-                        DisplayName = "Mean Absolute Percentage Error",
                         TooltipTemplate = "SMA-MAPE([P1])",
                         DataName = "mape",
                         LineType = "solid",
@@ -1887,7 +1883,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/SMA-ANALYSIS/",
                 Results = [
                     new() {
-                        DisplayName = "Mean Squared Error",
                         TooltipTemplate = "SMA-MSE([P1])",
                         DataName = "mse",
                         LineType = "solid",
@@ -1934,7 +1929,6 @@ public static class Metadata
                 Endpoint = $"{baseUrl}/STDEV/",
                 Results = [
                     new() {
-                        DisplayName = "Standard Deviation",
                         TooltipTemplate = "STDEV([P1])",
                         DataName = "stdDev",
                         LineType = "solid",
@@ -2385,11 +2379,10 @@ public static class Metadata
             // The modifier names the anchor so a future session variant can be
             // "VWAP (session)" beside it (#491)
             new ChartListing {
-                Name = "Volume Weighted Average Price (VWAP), visible range",
+                Name = "Volume Weighted Average Price (visible range)",
                 Uiid = "VWAP",
                 LegendTemplate = "VWAP (visible range)",
                 Endpoint = $"{baseUrl}/VWAP/",
-                Category = "moving-average",
                 Results = [
                     new() {
                         DisplayName = "VWAP (visible range)",
