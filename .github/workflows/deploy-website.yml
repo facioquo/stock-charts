@@ -20,16 +20,15 @@ env:
   NODE_VERSION: 26
 
 jobs:
-  # Fork and Dependabot PRs get no secrets, so nothing here can deploy for them.
-  # Every other job needs this one, so skipping it skips the whole run; CI verifies them.
+  # Fork PRs get no secrets, so nothing here can deploy for them. Every other
+  # job needs this one, so skipping it skips the whole run; CI verifies forks.
   versioning:
     name: Define version
     runs-on: ubuntu-slim
     timeout-minutes: 5
     if: |
       github.event_name != 'pull_request' ||
-      (github.event.pull_request.head.repo.full_name == github.repository &&
-      github.actor != 'dependabot[bot]')
+      github.event.pull_request.head.repo.full_name == github.repository
     outputs:
       version: ${{ steps.marker.outputs.version }}
 
@@ -174,9 +173,11 @@ jobs:
       - deploy-api
     # deploy-api only runs on main; it is 'skipped' for preview builds, which
     # must still be allowed to publish. On main, a failed API deploy must NOT
-    # be masked by a green Pages deployment.
+    # be masked by a green Pages deployment. Dependabot PRs get no secrets, so
+    # they build and validate but never deploy.
     if: |
       always() &&
+      github.actor != 'dependabot[bot]' &&
       needs.versioning.result == 'success' &&
       needs.build-website.result == 'success' &&
       (needs.deploy-api.result == 'success' || needs.deploy-api.result == 'skipped')
