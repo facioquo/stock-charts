@@ -61,7 +61,7 @@
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "1.64.1",
+    "@playwright/test": "1.65.0",
     "@typescript/native": "npm:typescript@^7.0.2",
     "eslint": "^10.14.0",
     "globals": "^17.14.0",
@@ -69,8 +69,8 @@
     "npm-check-updates": "^23.1.1",
     "postcss-scss": "^4.0.9",
     "prettier": "^3.9.10",
-    "stylelint": "^17.16.0",
-    "stylelint-config-standard": "^40.0.0",
+    "stylelint": "^18.0.0",
+    "stylelint-config-standard": "^41.0.0",
     "stylelint-scss": "^7.4.0",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   }
