@@ -1,0 +1,12 @@
+{
+  "sha": "3fd480fa1842944472fb06bd9e8529eb6ad67600",
+  "key": "a4ccdf8ab60c4c69",
+  "baseKey": "2a1c6dc1fb0d03a0",
+  "storedAt": "2026-11-14T07:48:50.554Z",
+  "scenes": {
+    "chart-settings": "2a4dc91d6dfc6a25",
+    "chart": "0c96e6f61b186030",
+    "indicator-settings": "d311491db76b6758",
+    "indicators-a-to-z": "dd889408fabbc33f"
+  }
+}

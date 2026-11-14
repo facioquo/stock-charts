@@ -1,0 +1,17 @@
+{
+  "sha": "3fcf419afd6b9337343bf44ada417ee4153d4d61",
+  "key": "9df3e7dac4602f50",
+  "storedAt": "2026-11-14T00:57:49.968Z",
+  "scenes": {
+    "chart-settings": "2a4dc91d6dfc6a25",
+    "chart": "0c96e6f61b186030",
+    "indicator-settings": "d311491db76b6758",
+    "indicators-a-to-z": "dd889408fabbc33f"
+  },
+  "planned": [
+    "chart",
+    "chart-settings",
+    "indicators-a-to-z",
+    "indicator-settings"
+  ]
+}
