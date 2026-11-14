@@ -18,13 +18,12 @@
     // ===================================
     {
       "label": "Setup: Dev environment",
-      "detail": "Restore .NET tools and packages, trust the HTTPS dev cert, install the Playwright browser and the Codacy MCP server",
+      "detail": "Restore .NET tools and packages, trust the HTTPS dev cert, and install the Playwright browser",
       "dependsOn": [
         "Install: .NET tools",
         "Install: All package dependencies",
         "Setup: HTTPS dev certificate",
-        "Setup: Playwright browsers",
-        "Setup: Codacy MCP server"
+        "Setup: Playwright browsers"
       ],
       "dependsOrder": "sequence"
     },
@@ -39,17 +38,6 @@
       "detail": "Install the Chromium build the Playwright E2E tests launch",
       "type": "shell",
       "command": "pnpm exec playwright install chromium",
-      "presentation": {
-        "echo": false,
-        "clear": true,
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "Setup: Codacy MCP server",
-      "detail": "Install the pinned Codacy MCP server that .mcp.json starts",
-      "type": "shell",
-      "command": "pnpm run setup:codacy-mcp",
       "presentation": {
         "echo": false,
         "clear": true,

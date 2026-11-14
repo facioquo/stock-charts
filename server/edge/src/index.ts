@@ -4,6 +4,8 @@ import { ApiContainer } from "./container";
 import { applyCors, preflightResponse, resolveAllowedOrigin, stripCors } from "./cors";
 import type { Env } from "./env";
 import { isStale, refreshQuotes } from "./quotes";
+import { isApiRoute, ROBOTS_TXT } from "./routes";
+import { readShared, sharedKey, writeShared } from "./shared-cache";
 
 export { ApiContainer };
 // wrangler ≥4.120 wires the container's proxy image through
@@ -49,8 +51,9 @@ const QUOTES_AS_OF = "x-quotes-as-of";
 /**
  * Logs a `/quotes` response whose dataset has stopped advancing. This is the
  * check that still fires when the scheduled refresh never runs at all, which
- * the refresh's own check cannot see. Runs on cache misses only, so it logs at
- * most once per cache window.
+ * the refresh's own check cannot see. Runs on container responses and shared
+ * cache hits, never on per-location hits, so each location logs at most once
+ * per cache window.
  */
 function reportStaleQuotes(response: Response): void {
   const asOf = response.headers.get(QUOTES_AS_OF);
@@ -108,6 +111,23 @@ export default {
       return rejected;
     }
 
+    const url = new URL(request.url);
+    const { pathname } = url;
+
+    if (pathname === "/robots.txt") {
+      return new Response(request.method === "HEAD" ? null : ROBOTS_TXT, {
+        headers: { "content-type": "text/plain", "cache-control": "public, max-age=86400" }
+      });
+    }
+
+    // Refused before the cache and the rate limiter: a path the API does not
+    // serve would only reach its 404 by waking the container.
+    if (!isApiRoute(pathname)) {
+      const unknown = new Response("Not found", { status: 404 });
+      applyCors(unknown.headers, allowedOrigin);
+      return unknown;
+    }
+
     // Cache key is the URL alone — deliberately not the Origin. Entries are
     // stored with all CORS headers stripped, and the correct
     // Access-Control-Allow-Origin is written per request on the way out, so one
@@ -126,6 +146,44 @@ export default {
       return response;
     }
 
+    // The shared R2 tier serves every location from one compute, and keeps
+    // serving it while the quotes are unchanged. A failed read is not fatal:
+    // the request falls through to the container as it would on a miss.
+    const sharedCacheKey = await sharedKey(url, env.CF_VERSION_METADATA.id);
+    const now = Date.now();
+    let shared: Response | undefined;
+
+    try {
+      shared = await readShared(env, sharedCacheKey, now);
+    } catch (error) {
+      console.error("Shared cache read failed", error);
+    }
+
+    if (shared !== undefined) {
+      // Checked here too: while the quotes stop changing, shared entries stay
+      // valid and the container is never asked, so a stalled refresh would
+      // otherwise go unreported.
+      reportStaleQuotes(shared);
+      let body = shared.body;
+
+      if (request.method === "HEAD") {
+        await body?.cancel();
+        body = null;
+      }
+
+      const response = new Response(body, shared);
+
+      // The location keeps a copy for the time the entry has left, which
+      // readShared has already written into its max-age.
+      if (request.method === "GET") {
+        ctx.waitUntil(cache.put(cacheKey, response.clone()));
+      }
+
+      response.headers.set(CACHE_STATUS, "SHARED");
+      applyCors(response.headers, allowedOrigin);
+      return response;
+    }
+
     // Rate-limit only the cache-miss path: cached serves are effectively free,
     // but every miss below wakes the billable container, and unique query
     // strings can bypass the cache at will. Legitimate chart loads make ~10
@@ -133,7 +191,7 @@ export default {
     // compute time.
     // A batch spends one token per selection, so it costs what the same
     // selections cost as separate requests.
-    const selections = selectionCount(new URL(request.url));
+    const selections = selectionCount(url);
 
     if (selections > MAX_BATCH_SELECTIONS) {
       const refused = new Response(`At most ${MAX_BATCH_SELECTIONS} selections per request.`, {
@@ -181,7 +239,14 @@ export default {
     // GET only. A HEAD response has no body, and storing it under the
     // body-less GET key would starve every subsequent GET of its payload.
     if (request.method === "GET" && isCacheable(response)) {
-      ctx.waitUntil(cache.put(cacheKey, response.clone()));
+      ctx.waitUntil(
+        Promise.all([
+          cache.put(cacheKey, response.clone()),
+          writeShared(env, sharedCacheKey, response.clone(), now).catch((error: unknown) => {
+            console.error("Shared cache write failed", error);
+          })
+        ])
+      );
     }
 
     response.headers.set(CACHE_STATUS, "MISS");

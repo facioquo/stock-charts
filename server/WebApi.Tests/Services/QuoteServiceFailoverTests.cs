@@ -44,6 +44,23 @@ public class QuoteServiceFailoverTests
     }
 
     [Fact]
+    public async Task Get_OnFailover_ReturnsTheBackupInstanceItself()
+    {
+        // Arrange — endpoints recognise failover by identity to mark responses
+        // no-store, so a copy here would make them publicly cacheable again.
+        using MemoryCache cache = new(new MemoryCacheOptions());
+        QuoteService service = ServiceWithNoStoredQuotes(cache);
+
+        // Act — the second call is served from the in-memory cache.
+        IEnumerable<Bar> first = await service.Get(CancellationToken.None);
+        IEnumerable<Bar> cached = await service.Get(CancellationToken.None);
+
+        // Assert
+        Assert.True(QuoteBackup.IsBackup(first));
+        Assert.True(QuoteBackup.IsBackup(cached));
+    }
+
+    [Fact]
     public async Task Get_NonDefaultSymbol_ReturnsNothingRatherThanAnotherSymbolsHistory()
     {
         // Arrange

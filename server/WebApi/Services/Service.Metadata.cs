@@ -2384,7 +2384,7 @@ public static class Metadata
                     new() {
                         DisplayName = "Ulcer Index",
                         TooltipTemplate = "UI([P1])",
-                        DataName = "ui",
+                        DataName = "ulcerIndex",
                         LineType = "solid",
                         DefaultColor = ChartColors.StandardBlue
                     }

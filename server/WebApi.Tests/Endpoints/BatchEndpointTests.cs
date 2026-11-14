@@ -127,6 +127,19 @@ public class BatchEndpointTests
     }
 
     [Fact]
+    public async Task Batch_FromFailover_IsNotStored()
+    {
+        _quoteService
+            .Setup(q => q.Get(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(QuoteBackup.BackupQuotes);
+
+        IActionResult result = await Batch(["ADX?lookbackPeriods=14", "ADL"]);
+
+        Assert.IsType<OkObjectResult>(result);
+        Assert.Equal("no-store", _controller.Response.Headers.CacheControl.ToString());
+    }
+
+    [Fact]
     public async Task Batch_ReportsEachFailureAndReturnsMultiStatusWithoutCaching()
     {
         IActionResult result = await Batch(

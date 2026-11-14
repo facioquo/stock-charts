@@ -5,6 +5,13 @@ internal static class QuoteBackup
 {
     internal static readonly IReadOnlyList<Bar> BackupQuotes = GetBackup().OrderBy(x => x.Timestamp).ToList();
 
+    /// <summary>
+    /// True when <paramref name="quotes"/> is the failover dataset itself.
+    /// <see cref="QuoteService"/> hands out this one instance, cached as is,
+    /// whenever stored quotes cannot be read.
+    /// </summary>
+    internal static bool IsBackup(IEnumerable<Bar> quotes) => ReferenceEquals(quotes, BackupQuotes);
+
     private static List<Bar> GetBackup() =>
     [
         new Bar(DateTime.Parse("2018-12-31"), 244.92m, 245.54m, 242.87m, 245.28m, 147031456),

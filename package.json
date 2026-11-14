@@ -5,9 +5,9 @@
   "author": "facioquo",
   "license": "Apache-2.0",
   "type": "module",
-  "packageManager": "pnpm@12.15.0",
+  "packageManager": "pnpm@12.18.0",
   "engines": {
-    "node": ">=24"
+    "node": ">=26"
   },
   "repository": {
     "type": "git",
@@ -15,8 +15,7 @@
   },
   "scripts": {
     "postinstall": "node scripts/setup-playwright-mcp.cjs",
-    "setup:codacy-mcp": "pnpm install --dir tools/codacy-mcp --frozen-lockfile",
-    "clean": "rm -rf node_modules tools/codacy-mcp/node_modules .codacy && pnpm -r run clean",
+    "clean": "rm -rf node_modules .codacy && pnpm -r run clean",
     "deps:check": "ncu --deep --peer",
     "deps:update": "ncu --deep --peer --target semver --upgrade",
     "build": "pnpm -r --workspace-concurrency=1 run build",
@@ -62,16 +61,17 @@
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "1.64.1",
-    "eslint": "^10.13.0",
-    "globals": "^17.13.0",
+    "@playwright/test": "1.65.1",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
     "markdownlint-cli2": "^0.24.0",
     "npm-check-updates": "^23.1.1",
     "postcss-scss": "^4.0.9",
     "prettier": "^3.9.10",
-    "stylelint": "^17.16.0",
-    "stylelint-config-standard": "^40.0.0",
-    "stylelint-scss": "^7.4.0",
-    "typescript": "^6.0.3"
+    "stylelint": "^18.0.0",
+    "stylelint-config-standard": "^41.0.0",
+    "stylelint-scss": "^7.5.0",
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   }
 }

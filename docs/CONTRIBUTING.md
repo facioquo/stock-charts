@@ -19,12 +19,12 @@ If you're using AI coding agents (GitHub Copilot, Claude, etc.), refer to [AGENT
 
 **All platforms:**
 
-- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v24 LTS or later)
+- [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/) (v26 LTS or later)
 - [pnpm](https://pnpm.io/) (v12 or later) - Installed via platform package managers:
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
   - **Linux**: Corepack (`corepack enable && corepack prepare pnpm --activate`)
-- [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
+- [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v11.0 or later)
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 - [Docker](https://docs.docker.com/get-started/get-docker/) - _optional_, only to run the API in its deployment container via `pnpm run edge:dev`
 
@@ -47,9 +47,9 @@ Or use VS Code: `Ctrl+Shift+P` → "Tasks: Run Task" → "Setup: Dev environment
 After installation, verify all tools:
 
 ```bash
-node --version    # Should be v24+
+node --version    # Should be v26+
 pnpm --version    # Should be 12+
-dotnet --version  # Should be 10.0+
+dotnet --version  # Should be 11.0+
 ```
 
 ### Quick setup
@@ -144,12 +144,12 @@ All contributions must pass these checks (required before PR acceptance):
 
 ### Codacy (optional, local)
 
-Codacy analyzes every pull request as a required check. To see its findings before you push, connect an AI agent to the Codacy MCP server declared in `.mcp.json`:
+Codacy analyzes every pull request as a required check, configured by `.codacy.yml`. To see its findings before you push, set up Codacy's own agent tooling in your user environment; nothing in this repository installs it:
 
-1. Install the pinned server: `pnpm run setup:codacy-mcp` (also part of "Setup: Dev environment"). `pnpm run deps:check` lists newer versions of it. After changing the version in `tools/codacy-mcp/package.json`, re-lock with `pnpm install --dir tools/codacy-mcp`, then re-run setup.
-2. Create an account token under Codacy → My account → Access management, then expose it as `CODACY_ACCOUNT_TOKEN` in your shell or in the `env` block of `~/.claude/settings.json`. Never commit it.
+- **Claude Code**: install the [Codacy Skills](https://docs.codacy.com/codacy-skills/) plugin and the CLIs it drives, then sign in with `codacy login`.
+- **Other agents**: add the [Codacy MCP server](https://github.com/codacy/codacy-mcp-server) to your own MCP configuration, with an account token in `CODACY_ACCOUNT_TOKEN`.
 
-The server starts from that local install rather than `npx`, because a cold `npx` install outlasts the agent's 30-second startup limit and can leave a broken cache behind.
+Create tokens under Codacy → My account → Access management. Never commit one.
 
 ## Guidelines for contributions
 

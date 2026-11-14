@@ -4381,7 +4381,7 @@
       {
         "displayName": "Ulcer Index",
         "tooltipTemplate": "UI([P1])",
-        "dataName": "ui",
+        "dataName": "ulcerIndex",
         "dataType": "number",
         "lineType": "solid",
         "stack": null,

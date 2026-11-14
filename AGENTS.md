@@ -51,8 +51,6 @@ stock-charts/
 │   └── vitepress/            # Docs site (Cloudflare Pages) + indy-charts integration host
 ├── docs/                     # Documentation
 ├── scripts/                  # Setup and utility scripts
-├── tools/
-│   └── codacy-mcp/           # Pinned Codacy Model Context Protocol (MCP) server; its own pnpm workspace, outside the root one
 └── .github/
     └── workflows/            # CI/CD configs
 ```
@@ -63,7 +61,6 @@ stock-charts/
 # Setup (or VS Code task "Setup: Dev environment")
 dotnet tool restore                    # Local .NET tools
 pnpm exec playwright install chromium  # Browser for E2E tests
-pnpm run setup:codacy-mcp              # Codacy MCP server that .mcp.json starts (optional)
 
 # Install dependencies
 pnpm install                   # Install all workspace dependencies
@@ -218,9 +215,10 @@ public class Service
 - **Primer React**: `PrimerRoot` wraps the app in Primer's `ThemeProvider` and `BaseStyles`, following the site's dark/light switch.
   - Controls take Primer's colors as shipped. The site theme (`--bg`, `--text`, …) colors only the page, the title block, the site's own text, and the charts.
   - Only public Primer packages are used, so anyone can contribute.
-- **TypeScript**: Strict mode enabled, comprehensive type safety
+- **TypeScript 7**: Strict mode enabled, comprehensive type safety
+  - `tsc` comes from `@typescript/native`, an alias of `typescript@7`. The `typescript` name is the `@typescript/typescript6` alias, because typescript-eslint still imports the TypeScript 6 API; drop that alias once typescript-eslint supports TypeScript 7.
 - **Chart.js v4+**: Financial chart types in `libs/chartjs-financial/`; bundled into `@facioquo/indy-charts` dist
-- **React Router v7**: Client-side routing
+- **React Router v8**: Client-side routing; import from `react-router`, and `RouterProvider` from `react-router/dom`
 - **Offline snapshot**: `web/public/data/chart-api/` holds every catalog indicator at its default parameters, plus the demo's opening selections. `ApiClient` reads it when the API is unreachable, so a visitor with no cache still gets charts.
   - Regenerate it after the catalog, `DEFAULT_INDICATORS`, or the `@facioquo/indy-charts` version changes.
 - **pnpm workspaces**: Unified dependency management across root and all workspace packages
@@ -229,7 +227,7 @@ Client-side project dependencies are strictly in this direction only: web → in
 
 ### Backend architecture
 
-- **C# / .NET 10**: Latest language features, record types for DTOs
+- **C# / .NET 11**: Latest language features, record types for DTOs
 - **ASP.NET Core Web API**: REST endpoints for chart data, running as a Cloudflare Container built from `server/Dockerfile`
 - **FacioQuo.Stock.Indicators**: NuGet library used in `server/WebApi/Services/` to compute every indicator the API serves
 - **Indicator catalog**: `Service.Metadata.cs` holds presentation only, as a `ChartListing` per indicator (legend and tooltip templates, colors, line styles, thresholds). `LibraryCatalog` extends the library's `Catalog` listing with it. The name, category, result display names, chart type, axis bounds, and every parameter (name, display name, type, bounds, default) come from the library, so the demo offers what the library accepts.
@@ -255,12 +253,15 @@ Client-side project dependencies are strictly in this direction only: web → in
 
 Layered and built-in (no extra packages), so doc-site traffic doesn't redundantly recompute indicators:
 
-1. **Worker response cache** (`server/edge/src/index.ts`) — the outermost tier. It keeps the container asleep, and therefore unbilled.
-2. **Server-side output cache** (`AddOutputCache`/`UseOutputCache`) — caches each computed indicator response keyed by path + query string, varied by `Origin`.
-3. **In-memory quote cache** (`IMemoryCache` in `QuoteService`) — fetches the shared quote dataset at most once per symbol per window.
-4. **`Cache-Control: public, max-age=...`** — lets browsers and the CDN serve repeats.
+1. **Worker response cache** (`server/edge/src/index.ts`) — the outermost tier, local to each Cloudflare location. It keeps the container asleep, and therefore unbilled.
+2. **Shared response cache** (`server/edge/src/shared-cache.ts`) — computed responses in R2 under `responses/`, shared by every location and served while the quote datasets are unchanged. Keys are scoped to the deployed Worker version.
+3. **Server-side output cache** (`AddOutputCache`/`UseOutputCache`) — caches each computed indicator response keyed by path + query string, varied by `Origin`.
+4. **In-memory quote cache** (`IMemoryCache` in `QuoteService`) — fetches the shared quote dataset at most once per symbol per window.
+5. **`Cache-Control: public, max-age=...`** — lets browsers and the CDN serve repeats.
 
-Lifetime for tiers 2-4 is one knob, `Caching:DurationMinutes`, in `CacheSettings`.
+Responses computed from the bundled failover quotes are `no-store`. No edge or browser tier keeps them after a storage outage. The in-memory quote cache still holds that dataset for one window after storage recovers.
+
+Lifetime for the server-side tiers and `max-age` is one knob, `Caching:DurationMinutes`, in `CacheSettings`.
 
 Worker cache entries are keyed by URL alone. All CORS headers are stripped before
 storage. The correct `Access-Control-Allow-Origin` is written per request on the

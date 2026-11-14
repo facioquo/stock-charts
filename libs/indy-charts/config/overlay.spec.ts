@@ -46,10 +46,10 @@ describe("formatVolume", () => {
 });
 
 describe("baseOverlayOptions volume axis", () => {
-  it("shows mirrored right-hand labels without gridlines or tick marks", () => {
+  it("shows mirrored left-hand labels without gridlines or tick marks", () => {
     const axis = volumeAxis();
     expect(axis.display).toBe(true);
-    expect(axis.position).toBe("right");
+    expect(axis.position).toBe("left");
     expect(axis.ticks.mirror).toBe(true);
     expect(axis.grid.display).toBe(false);
     expect(axis.grid.drawTicks).toBe(false);

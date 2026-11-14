@@ -20,6 +20,11 @@ public partial class Main(
     private readonly TimeSpan cacheDuration = cacheSettings.Value.Duration;
     private readonly string? publicBaseUrl = apiSettings.Value.PublicBaseUrl;
 
+    // Set once any quotes behind this response came from the failover dataset.
+    // It stays set for the rest of the request, so one batch selection served
+    // from failover keeps the whole batch out of shared caches.
+    private bool servedFailover;
+
     // GLOBALS
     private const int limitLast = 120;
 
@@ -41,7 +46,7 @@ public partial class Main(
     [HttpGet("quotes")]
     public async Task<IActionResult> GetQuotes()
     {
-        IEnumerable<Bar> quotes = await quoteFeed.Get(HttpContext.RequestAborted);
+        IEnumerable<Bar> quotes = Track(await quoteFeed.Get(HttpContext.RequestAborted));
         List<Bar> served = [.. quotes.TakeLast(limitLast)];
         SetClientCache();
 
@@ -100,7 +105,7 @@ public partial class Main(
     {
         try
         {
-            IReadOnlyList<Bar> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
+            IReadOnlyList<Bar> quotes = Track(await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
             IEnumerable<T> results = indicatorFunc(quotes).TakeLast(limitLast);
             SetClientCache();
             return Ok(results);
@@ -121,7 +126,7 @@ public partial class Main(
         {
             // Sequential, not parallel: both reads normally hit the in-memory
             // quote cache, so concurrency would buy nothing.
-            List<Bar> quotes = (await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
+            List<Bar> quotes = Track(await quoteFeed.Get(HttpContext.RequestAborted)).ToList();
             List<Bar> benchmark
                 = (await quoteFeed.Get(benchmarkSymbol, HttpContext.RequestAborted)).ToList();
 
@@ -160,13 +165,30 @@ public partial class Main(
     // other's cached quotes/indicators for the whole max-age window. The
     // server-side OutputCache already varies by Origin; this mirrors that to the
     // client. See facioquo/stock-charts#517.
+    //
+    // A response computed from the failover dataset is marked `no-store`
+    // instead: it stands in for data the API could not read, and the edge
+    // Worker's shared tier would otherwise keep serving it for as long as the
+    // stored quotes stay unchanged.
     private void SetClientCache()
     {
+        if (servedFailover)
+        {
+            Response.Headers.CacheControl = "no-store";
+            return;
+        }
+
         Response.Headers.CacheControl = $"public, max-age={(int)cacheDuration.TotalSeconds}";
         if (!Response.Headers.Vary.Contains("Origin"))
         {
             Response.Headers.Append("Vary", "Origin");
         }
+    }
+
+    private IEnumerable<Bar> Track(IEnumerable<Bar> quotes)
+    {
+        servedFailover |= QuoteBackup.IsBackup(quotes);
+        return quotes;
     }
 
     //////////////////////////////////////////
