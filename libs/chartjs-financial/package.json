@@ -15,7 +15,7 @@
     "url": "https://github.com/facioquo/stock-charts/issues"
   },
   "engines": {
-    "node": ">=26"
+    "node": ">=22"
   },
   "type": "module",
   "main": "./dist/index.js",
