@@ -173,9 +173,11 @@ jobs:
       - deploy-api
     # deploy-api only runs on main; it is 'skipped' for preview builds, which
     # must still be allowed to publish. On main, a failed API deploy must NOT
-    # be masked by a green Pages deployment.
+    # be masked by a green Pages deployment. Dependabot PRs get no secrets, so
+    # they build and validate but never deploy.
     if: |
       always() &&
+      github.actor != 'dependabot[bot]' &&
       needs.versioning.result == 'success' &&
       needs.build-website.result == 'success' &&
       (needs.deploy-api.result == 'success' || needs.deploy-api.result == 'skipped')
