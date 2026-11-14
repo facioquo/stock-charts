@@ -6,7 +6,7 @@
 # Builds on the host's native architecture: `dotnet publish` without a --runtime
 # emits portable IL, so no emulation is needed here (notably faster on Apple
 # Silicon). Only the runtime stage is pinned to the architecture Cloudflare runs.
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:11.0 AS build
 WORKDIR /src
 
 # Restore first so the layer caches across source-only changes. Both Directory.*
@@ -25,7 +25,7 @@ RUN dotnet publish WebApi/WebApi.csproj \
 # Pinned deliberately: Cloudflare Containers only run linux/amd64. This trips
 # Docker's FromPlatformFlagConstDisallowed advisory, which assumes a portable
 # image; this one is intentionally not portable.
-FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/aspnet:11.0 AS runtime
 WORKDIR /app
 COPY --from=build /app ./
 
