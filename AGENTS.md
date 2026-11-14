@@ -227,7 +227,7 @@ Client-side project dependencies are strictly in this direction only: web → in
 
 ### Backend architecture
 
-- **C# / .NET 10**: Latest language features, record types for DTOs
+- **C# / .NET 11**: Latest language features, record types for DTOs
 - **ASP.NET Core Web API**: REST endpoints for chart data, running as a Cloudflare Container built from `server/Dockerfile`
 - **FacioQuo.Stock.Indicators**: NuGet library used in `server/WebApi/Services/` to compute every indicator the API serves
 - **Indicator catalog**: `Service.Metadata.cs` holds presentation only (names, colors, thresholds, tooltips). `LibraryCatalog` builds every parameter (name, display name, type, bounds, default) from the library's `Catalog`, so the demo offers what the library accepts.

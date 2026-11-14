@@ -8,10 +8,10 @@
     owns it.
   -->
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <!-- net10.0 already defaults to C# 14; stating it makes the org pin visible
+    <TargetFramework>net11.0</TargetFramework>
+    <!-- net11.0 already defaults to C# 15; stating it makes the org pin visible
          and keeps a future SDK from moving the language out from under us. -->
-    <LangVersion>14.0</LangVersion>
+    <LangVersion>15.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>

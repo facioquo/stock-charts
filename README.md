@@ -22,7 +22,7 @@ This repo and charting tool is primarily intended to demonstrate the [Stock Indi
   - **macOS**: Homebrew (`brew install pnpm`)
   - **Windows**: winget (`winget install pnpm.pnpm`)
   - **Linux**: Corepack (`corepack enable && corepack prepare pnpm --activate`)
-- [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v10.0 or later)
+- [.NET SDK](https://dotnet.microsoft.com/download/dotnet) (v11.0 or later)
 - [Visual Studio Code](https://code.visualstudio.com/) (recommended) or [Visual Studio](http://visualstudio.com)
 - [Docker](https://docs.docker.com/get-started/get-docker/) - _optional_, only to run the API in its deployment container via `pnpm run edge:dev`
 
