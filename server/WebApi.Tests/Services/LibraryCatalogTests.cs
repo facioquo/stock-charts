@@ -4,12 +4,18 @@ using Microsoft.AspNetCore.Mvc;
 using WebApi.Controllers;
 using WebApi.Models;
 using ApiListing = WebApi.Models.IndicatorListing;
+using LibraryListing = FacioQuo.Stock.Indicators.IndicatorListing;
 
 namespace WebApi.Tests.Services;
 
 public class LibraryCatalogTests
 {
     private static readonly List<ApiListing> Served = [.. Metadata.IndicatorListing(string.Empty)];
+
+    private static readonly List<ChartListing> Charted = Metadata.ChartListings(string.Empty);
+
+    private static LibraryListing LibraryListingOf(ChartListing chart)
+        => LibraryCatalog.LibraryListings[LibraryCatalog.LibraryIdOf(LibraryCatalog.RouteOf(chart.Endpoint))];
 
     private static readonly HashSet<string> ServedRoutes
         = [.. Served.Select(listing => LibraryCatalog.RouteOf(listing.Endpoint))];
@@ -137,6 +143,140 @@ public class LibraryCatalogTests
         Assert.True(stale.Count == 0, "Stale entries: " + string.Join(", ", stale));
     }
 
+    [Fact]
+    public void EveryChartValue_DiffersFromTheLibrarysOwn()
+    {
+        List<string> redundant = [];
+
+        foreach (ChartListing chart in Charted)
+        {
+            LibraryListing library = LibraryListingOf(chart);
+            IndicatorPane? pane = LibraryCatalog.PaneOf(library, chart.Results);
+
+            if (chart.Name == library.Name)
+            {
+                redundant.Add($"{chart.Uiid} name");
+            }
+
+            if (chart.Category == LibraryCatalog.CategoryOf(library))
+            {
+                redundant.Add($"{chart.Uiid} category");
+            }
+
+            if (chart.ChartType is not null && chart.ChartType == LibraryCatalog.ChartTypeOf(library, chart.Results))
+            {
+                redundant.Add($"{chart.Uiid} chart type");
+            }
+
+            if (chart.ChartConfig?.MinimumYAxis is not null && chart.ChartConfig.MinimumYAxis == pane?.Minimum)
+            {
+                redundant.Add($"{chart.Uiid} axis minimum");
+            }
+
+            if (chart.ChartConfig?.MaximumYAxis is not null && chart.ChartConfig.MaximumYAxis == pane?.Maximum)
+            {
+                redundant.Add($"{chart.Uiid} axis maximum");
+            }
+
+            redundant.AddRange(chart.Results
+                .Where(result => result.DisplayName is not null
+                    && result.DisplayName == LibraryCatalog.ResultOf(library, result.DataName)?.DisplayName)
+                .Select(result => $"{chart.Uiid}.{result.DataName} display name"));
+        }
+
+        Assert.True(redundant.Count == 0, "Set to what the library already gives, so remove: " + string.Join(", ", redundant));
+    }
+
+    [Fact]
+    public void EveryThreshold_IsALevelTheLibraryListsForItsPane()
+    {
+        List<string> drift = [];
+
+        foreach (ChartListing chart in Charted)
+        {
+            IReadOnlyList<double>? levels = LibraryCatalog.PaneOf(LibraryListingOf(chart), chart.Results)?.Thresholds;
+            List<double> drawn = [.. chart.ChartConfig?.Thresholds?.Select(threshold => threshold.Value) ?? []];
+
+            if (levels is not null && !drawn.SequenceEqual(levels))
+            {
+                drift.Add($"{chart.Uiid}: [{string.Join(", ", drawn)}], library [{string.Join(", ", levels)}]");
+            }
+        }
+
+        Assert.True(drift.Count == 0, string.Join('\n', drift));
+    }
+
+    [Fact]
+    public void Build_TakesTheLibrarysNamesCategoryAndPane()
+    {
+        ApiListing rsi = LibraryCatalog.Build(new ChartListing {
+            Uiid = "RSI",
+            LegendTemplate = "RSI([P1])",
+            Endpoint = "/RSI/",
+            Results = [
+                new() {
+                    TooltipTemplate = "RSI([P1])",
+                    DataName = "rsi",
+                    LineType = "solid",
+                    DefaultColor = ChartColors.StandardBlue
+                }
+            ]
+        });
+
+        Assert.Equal("Relative Strength Index", rsi.Name);
+        Assert.Equal("oscillator", rsi.Category);
+        Assert.Equal("oscillator", rsi.ChartType);
+        Assert.Equal(0, rsi.ChartConfig?.MinimumYAxis);
+        Assert.Equal(100, rsi.ChartConfig?.MaximumYAxis);
+        Assert.Equal("RSI", Assert.Single(rsi.Results).DisplayName);
+    }
+
+    [Fact]
+    public void Build_ResultTheLibraryDoesNotList_NeedsADisplayName()
+    {
+        ChartListing unnamed = new() {
+            Uiid = "SMA",
+            LegendTemplate = "SMA([P1])",
+            Endpoint = "/SMA/",
+            ChartType = "overlay",
+            Results = [
+                new() {
+                    TooltipTemplate = "SMA([P1])",
+                    DataName = "unknown",
+                    LineType = "solid",
+                    DefaultColor = ChartColors.StandardBlue
+                }
+            ]
+        };
+
+        Assert.Throws<InvalidOperationException>(() => LibraryCatalog.Build(unnamed));
+        Assert.Equal("Unknown", Assert.Single(LibraryCatalog.Build(unnamed with {
+            Results = [unnamed.Results.Single() with { DisplayName = "Unknown" }]
+        }).Results).DisplayName);
+    }
+
+    [Fact]
+    public void Build_NoResultTheLibraryLists_NeedsAChartType()
+    {
+        ChartListing untyped = new() {
+            Uiid = "SMA",
+            LegendTemplate = "SMA([P1])",
+            Endpoint = "/SMA/",
+            Results = [
+                new() {
+                    DisplayName = "Unknown",
+                    TooltipTemplate = "SMA([P1])",
+                    DataName = "unknown",
+                    LineType = "solid",
+                    DefaultColor = ChartColors.StandardBlue
+                }
+            ]
+        };
+
+        Assert.Throws<InvalidOperationException>(() => LibraryCatalog.Build(untyped));
+        Assert.Equal("overlay", LibraryCatalog.Build(untyped with { ChartType = "overlay" }).ChartType);
+    }
+
     [Theory]
     [InlineData(null, 100d, 14)]
     [InlineData(1d, null, 14)]
@@ -156,18 +296,15 @@ public class LibraryCatalogTests
     }
 
     [Fact]
-    public void WithLibraryParameters_ListingWithoutALibraryCounterpart_Throws()
+    public void Build_ListingWithoutALibraryCounterpart_Throws()
     {
-        ApiListing unknown = new() {
-            Name = "Unknown",
+        ChartListing unknown = new() {
             Uiid = "UNKNOWN",
             LegendTemplate = "UNKNOWN",
             Endpoint = "/UNKNOWN/",
-            Category = "oscillator",
-            ChartType = "oscillator",
             Results = []
         };
 
-        Assert.Throws<InvalidOperationException>(() => LibraryCatalog.WithLibraryParameters(unknown));
+        Assert.Throws<InvalidOperationException>(() => LibraryCatalog.Build(unknown));
     }
 }
