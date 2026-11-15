@@ -434,7 +434,6 @@ public static class Metadata
 
             // Chaikin Oscillator
             new ChartListing {
-                Name = "Chaikin Oscillator",
                 Uiid = "CHAIKIN",
                 LegendTemplate = "CHAIKIN([P1],[P2])",
                 Endpoint = $"{baseUrl}/CHAIKIN/",
@@ -940,7 +939,6 @@ public static class Metadata
 
             // Heikin-Ashi
             new ChartListing {
-                Name = "Heikin-Ashi",
                 Uiid = "HEIKIN-ASHI",
                 LegendTemplate = "HEIKIN-ASHI",
                 Endpoint = $"{baseUrl}/HEIKIN-ASHI/",
@@ -1332,7 +1330,6 @@ public static class Metadata
 
             // Percentage Volume Oscillator (PVO)
             new ChartListing {
-                Name = "Percentage Volume Oscillator",
                 Uiid = "PVO",
                 LegendTemplate = "PVO([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/PVO/",
@@ -1641,7 +1638,6 @@ public static class Metadata
 
             // Rate of Change with Bands
             new ChartListing {
-                Name = "Rate of Change with Bands",
                 Uiid = "ROCWB",
                 LegendTemplate = "ROCWB([P1],[P2],[P3])",
                 Endpoint = $"{baseUrl}/ROCWB/",
@@ -1725,7 +1721,6 @@ public static class Metadata
 
             // Rolling Pivot Points
             new ChartListing {
-                Name = "Rolling Pivot Points",
                 Uiid = "ROLLING-PIVOTS",
                 LegendTemplate = "ROLLING PIVOTS([P1],[P2])",
                 Endpoint = $"{baseUrl}/ROLLING-PIVOTS/",
@@ -1943,10 +1938,8 @@ public static class Metadata
                 Uiid = "STDEV-ZSCORE",
                 LegendTemplate = "STDEV-ZSCORE([P1])",
                 Endpoint = $"{baseUrl}/STDEV/",
-                ChartType = "oscillator",
                 Results = [
                     new() {
-                        DisplayName = "Z-Score",
                         TooltipTemplate = "Z-Score([P1])",
                         DataName = "zScore",
                         LineType = "solid",
@@ -2178,7 +2171,6 @@ public static class Metadata
 
             // Tillson T3 Moving Average
             new ChartListing {
-                Name = "Tillson T3 Moving Average",
                 Uiid = "T3",
                 LegendTemplate = "T3([P1],[P2])",
                 Endpoint = $"{baseUrl}/T3/",
@@ -2353,11 +2345,9 @@ public static class Metadata
                 Uiid = "VOL-STOP",
                 LegendTemplate = "VOL-STOP([P1],[P2])",
                 Endpoint = $"{baseUrl}/VOL-STOP/",
-                ChartType = "overlay",
                 Order = Order.Front,
                 Results = [
                     new() {
-                        DisplayName = "Upper Band",
                         TooltipTemplate = "VOL-STOP([P1],[P2]) Upper Band",
                         DataName = "upperBand",
                         LineType = "dots",
@@ -2365,7 +2355,6 @@ public static class Metadata
                         DefaultColor = ChartColors.StandardRed
                     },
                     new() {
-                        DisplayName = "Lower Band",
                         TooltipTemplate = "VOL-STOP([P1],[P2]) Lower Band",
                         DataName = "lowerBand",
                         LineType = "dots",

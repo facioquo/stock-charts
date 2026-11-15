@@ -11,7 +11,7 @@
     "parameters": [],
     "results": [
       {
-        "displayName": "Accumulation Distribution Line (ADL)",
+        "displayName": "ADL",
         "tooltipTemplate": "ADL",
         "dataName": "adl",
         "dataType": "number",
@@ -60,7 +60,7 @@
     ],
     "results": [
       {
-        "displayName": "Arnaud Legoux Moving Average (ALMA)",
+        "displayName": "ALMA",
         "tooltipTemplate": "ALMA([P1],[P2],[P3])",
         "dataName": "alma",
         "dataType": "number",
@@ -73,51 +73,7 @@
     ]
   },
   {
-    "name": "Aroon Oscillator",
-    "uiid": "AROON OSC",
-    "legendTemplate": "AROON([P1]) Oscillator",
-    "endpoint": "/AROON/",
-    "category": "price-trend",
-    "chartType": "oscillator",
-    "order": 1,
-    "chartConfig": {
-      "minimumYAxis": -100,
-      "maximumYAxis": 100,
-      "thresholds": [
-        {
-          "value": 0,
-          "color": "#42424280",
-          "style": "dash",
-          "fill": null
-        }
-      ]
-    },
-    "parameters": [
-      {
-        "displayName": "Lookback Periods",
-        "paramName": "lookbackPeriods",
-        "dataType": "int",
-        "minimum": 1,
-        "maximum": 250,
-        "defaultValue": 25
-      }
-    ],
-    "results": [
-      {
-        "displayName": "Oscillator",
-        "tooltipTemplate": "AROON([P1]) Oscillator",
-        "dataName": "oscillator",
-        "dataType": "number",
-        "lineType": "solid",
-        "stack": null,
-        "lineWidth": 2,
-        "defaultColor": "#1E88E5",
-        "fill": null
-      }
-    ]
-  },
-  {
-    "name": "Aroon Up/Down",
+    "name": "Aroon",
     "uiid": "AROON UP/DOWN",
     "legendTemplate": "AROON([P1]) Up/Down",
     "endpoint": "/AROON/",
@@ -179,6 +135,50 @@
         "stack": null,
         "lineWidth": 2,
         "defaultColor": "#DD2C00",
+        "fill": null
+      }
+    ]
+  },
+  {
+    "name": "Aroon Oscillator",
+    "uiid": "AROON OSC",
+    "legendTemplate": "AROON([P1]) Oscillator",
+    "endpoint": "/AROON/",
+    "category": "price-trend",
+    "chartType": "oscillator",
+    "order": 1,
+    "chartConfig": {
+      "minimumYAxis": -100,
+      "maximumYAxis": 100,
+      "thresholds": [
+        {
+          "value": 0,
+          "color": "#42424280",
+          "style": "dash",
+          "fill": null
+        }
+      ]
+    },
+    "parameters": [
+      {
+        "displayName": "Lookback Periods",
+        "paramName": "lookbackPeriods",
+        "dataType": "int",
+        "minimum": 1,
+        "maximum": 250,
+        "defaultValue": 25
+      }
+    ],
+    "results": [
+      {
+        "displayName": "Oscillator",
+        "tooltipTemplate": "AROON([P1]) Oscillator",
+        "dataName": "oscillator",
+        "dataType": "number",
+        "lineType": "solid",
+        "stack": null,
+        "lineWidth": 2,
+        "defaultColor": "#1E88E5",
         "fill": null
       }
     ]
@@ -517,7 +517,7 @@
     "uiid": "BOP",
     "legendTemplate": "BOP([P1])",
     "endpoint": "/BOP/",
-    "category": "oscillator",
+    "category": "price-characteristic",
     "chartType": "oscillator",
     "order": 1,
     "chartConfig": {
@@ -557,7 +557,7 @@
     ]
   },
   {
-    "name": "Beta",
+    "name": "Beta Coefficient",
     "uiid": "BETA",
     "legendTemplate": "BETA([P1])",
     "endpoint": "/BETA/",
@@ -971,7 +971,7 @@
     "uiid": "CHOP",
     "legendTemplate": "CHOP([P1])",
     "endpoint": "/CHOP/",
-    "category": "oscillator",
+    "category": "price-characteristic",
     "chartType": "oscillator",
     "order": 1,
     "chartConfig": {
@@ -1167,7 +1167,7 @@
     "uiid": "CORRELATION",
     "legendTemplate": "CORRELATION([P1])",
     "endpoint": "/CORRELATION/",
-    "category": "oscillator",
+    "category": "price-characteristic",
     "chartType": "oscillator",
     "order": 1,
     "chartConfig": {
@@ -1546,7 +1546,7 @@
     "chartConfig": null,
     "parameters": [
       {
-        "displayName": "Lookback Period",
+        "displayName": "Lookback Periods",
         "paramName": "lookbackPeriods",
         "dataType": "int",
         "minimum": 1,
@@ -2163,7 +2163,7 @@
     "chartConfig": null,
     "parameters": [
       {
-        "displayName": "Min Body Percent %",
+        "displayName": "Min Body %",
         "paramName": "minBodyPercent",
         "dataType": "number",
         "minimum": 80,
@@ -2701,7 +2701,7 @@
     "uiid": "PIVOT-POINTS",
     "legendTemplate": "PIVOT POINTS(MONTH)",
     "endpoint": "/PIVOT-POINTS/",
-    "category": "price-trend",
+    "category": "price-channel",
     "chartType": "overlay",
     "order": 80,
     "chartConfig": null,
@@ -2805,7 +2805,7 @@
     "uiid": "PIVOTS",
     "legendTemplate": "PIVOTS([P1],[P2],[P3])",
     "endpoint": "/PIVOTS/",
-    "category": "price-trend",
+    "category": "price-pattern",
     "chartType": "overlay",
     "order": 1,
     "chartConfig": null,
@@ -2912,7 +2912,7 @@
         "defaultValue": 35
       },
       {
-        "displayName": "Smoothing Periods",
+        "displayName": "Smooth Periods",
         "paramName": "smoothPeriods",
         "dataType": "int",
         "minimum": 1,
@@ -3002,7 +3002,7 @@
     "uiid": "ROC",
     "legendTemplate": "ROC([P1])",
     "endpoint": "/ROC/",
-    "category": "oscillator",
+    "category": "price-characteristic",
     "chartType": "oscillator",
     "order": 1,
     "chartConfig": null,
@@ -3035,7 +3035,7 @@
     "uiid": "ROCWB",
     "legendTemplate": "ROCWB([P1],[P2],[P3])",
     "endpoint": "/ROCWB/",
-    "category": "price-trend",
+    "category": "price-characteristic",
     "chartType": "oscillator",
     "order": 1,
     "chartConfig": {
@@ -3068,7 +3068,7 @@
         "defaultValue": 5
       },
       {
-        "displayName": "Standard deviation Periods",
+        "displayName": "Standard Deviation Periods",
         "paramName": "stdDevPeriods",
         "dataType": "int",
         "minimum": 1,
@@ -3186,7 +3186,7 @@
     "uiid": "ROLLING-PIVOTS",
     "legendTemplate": "ROLLING PIVOTS([P1],[P2])",
     "endpoint": "/ROLLING-PIVOTS/",
-    "category": "price-trend",
+    "category": "price-channel",
     "chartType": "overlay",
     "order": 80,
     "chartConfig": null,
@@ -3396,7 +3396,7 @@
     ]
   },
   {
-    "name": "Slope",
+    "name": "Slope and Linear Regression",
     "uiid": "SLOPE",
     "legendTemplate": "SLOPE([P1])",
     "endpoint": "/SLOPE/",
@@ -3449,7 +3449,7 @@
     ],
     "results": [
       {
-        "displayName": "Mean absolute deviation",
+        "displayName": "Mean Absolute Deviation",
         "tooltipTemplate": "SMA-MAD([P1])",
         "dataName": "mad",
         "dataType": "number",
@@ -3482,7 +3482,7 @@
     ],
     "results": [
       {
-        "displayName": "Mean absolute percentage error",
+        "displayName": "Mean Absolute Percentage Error",
         "tooltipTemplate": "SMA-MAPE([P1])",
         "dataName": "mape",
         "dataType": "number",
@@ -3515,7 +3515,7 @@
     ],
     "results": [
       {
-        "displayName": "Mean square error",
+        "displayName": "Mean Square Error",
         "tooltipTemplate": "SMA-MSE([P1])",
         "dataName": "mse",
         "dataType": "number",
@@ -3581,7 +3581,7 @@
     ],
     "results": [
       {
-        "displayName": "Standard deviation",
+        "displayName": "Standard Deviation",
         "tooltipTemplate": "STDEV([P1])",
         "dataName": "stdDev",
         "dataType": "number",
@@ -3903,7 +3903,7 @@
     },
     "parameters": [
       {
-        "displayName": "Lookback Periods",
+        "displayName": "Lookback Periods (%K)",
         "paramName": "lookbackPeriods",
         "dataType": "int",
         "minimum": 1,
@@ -3911,7 +3911,7 @@
         "defaultValue": 14
       },
       {
-        "displayName": "Signal Periods",
+        "displayName": "Signal Periods (%D)",
         "paramName": "signalPeriods",
         "dataType": "int",
         "minimum": 1,
@@ -4515,7 +4515,7 @@
     "uiid": "VWAP",
     "legendTemplate": "VWAP (visible range)",
     "endpoint": "/VWAP/",
-    "category": "price-channel",
+    "category": "moving-average",
     "chartType": "overlay",
     "order": 1,
     "chartConfig": null,
@@ -4798,7 +4798,7 @@
     ]
   },
   {
-    "name": "Williams Fractal (high/low)",
+    "name": "Williams Fractal",
     "uiid": "FRACTAL",
     "legendTemplate": "FRACTAL([P1])",
     "endpoint": "/FRACTAL/",

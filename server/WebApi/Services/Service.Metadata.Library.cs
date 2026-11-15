@@ -59,8 +59,22 @@ public static class LibraryCatalog
     /// Library listings the demo does not chart.
     /// </summary>
     internal static readonly HashSet<string> NotOffered = new(StringComparer.Ordinal) {
+        "DIVIDED-BY",
+        "DIVIDED-BY-SERIES",
+        "MAX-WITH",
+        "MIN-WITH",
+        "MINUS",
+        "MINUS-SERIES",
+        "PLUS",
+        "PLUS-PERCENT",
+        "PLUS-SERIES",
         "RENKO",
-        "RENKO-ATR"
+        "RENKO-ATR",
+        "ROLLING-MAX",
+        "ROLLING-MEDIAN",
+        "ROLLING-MIN",
+        "TIMES",
+        "TIMES-SERIES"
     };
 
     /// <summary>
