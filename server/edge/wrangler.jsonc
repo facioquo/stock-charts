@@ -19,7 +19,8 @@
   // The .NET indicator API. `basic` (1/4 vCPU, 1 GiB, 4 GB disk) is ample for
   // ~800 daily bars, and a single instance keeps the API's in-memory quote
   // cache hot while minimising billable memory-hours. The instance sleeps after
-  // 10 minutes idle; the Worker response cache below is what keeps it asleep.
+  // 3 minutes idle (sleepAfter in src/container.ts); the Worker response cache
+  // below is what keeps it asleep.
   "containers": [
     {
       "class_name": "ApiContainer",

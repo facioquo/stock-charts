@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { isApiRoute } from "./routes";
+import { HEALTH_TEXT, isApiRoute } from "./routes";
 
 const webApiPath = resolve(dirname(fileURLToPath(import.meta.url)), "../../WebApi");
 const endpointsPath = resolve(webApiPath, "Endpoints.cs");
@@ -57,5 +57,9 @@ describe("isApiRoute", () => {
 
     expect(routes.length).toBeGreaterThan(50);
     expect(routes.filter(route => !isApiRoute(route))).toEqual([]);
+  });
+
+  it("answers / with the same health message the API returns", () => {
+    expect(readFileSync(endpointsPath, "utf8")).toContain(`"${HEALTH_TEXT}"`);
   });
 });

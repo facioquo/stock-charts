@@ -15,7 +15,12 @@ export const QUOTES_HOST = "quotes.r2";
  */
 export class ApiContainer extends Container<Env> {
   defaultPort = 8080;
-  sleepAfter = "10m";
+  /**
+   * Each request that reaches the container keeps it billed for this long.
+   * Requests that miss both caches arrive minutes apart, so a short window
+   * lets it sleep between them; the cost is a cold start for the next one.
+   */
+  sleepAfter = "3m";
 
   /**
    * The API needs no general internet access: its only outbound dependency is
