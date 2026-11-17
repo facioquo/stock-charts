@@ -65,7 +65,7 @@
     "@typescript/native": "npm:typescript@^7.0.2",
     "eslint": "^10.14.0",
     "globals": "^17.14.0",
-    "markdownlint-cli2": "^0.24.0",
+    "markdownlint-cli2": "^0.24.1",
     "npm-check-updates": "^23.1.1",
     "postcss-scss": "^4.0.9",
     "prettier": "^3.9.10",
