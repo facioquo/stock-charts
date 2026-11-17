@@ -41,3 +41,10 @@ export function isApiRoute(pathname: string): boolean {
  * and every crawler fetch that misses the cache would wake the container.
  */
 export const ROBOTS_TXT = "User-agent: *\nDisallow: /\n";
+
+/**
+ * The API's root health message, answered at the edge. Uptime monitors poll
+ * `/`, and every poll that reached the container would wake it for its whole
+ * idle window. This reports that the Worker is up, not the container.
+ */
+export const HEALTH_TEXT = "API is functioning nominally.";
