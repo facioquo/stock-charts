@@ -4,7 +4,7 @@ import { ApiContainer } from "./container";
 import { applyCors, preflightResponse, resolveAllowedOrigin, stripCors } from "./cors";
 import type { Env } from "./env";
 import { isStale, refreshQuotes } from "./quotes";
-import { isApiRoute, ROBOTS_TXT } from "./routes";
+import { HEALTH_TEXT, isApiRoute, ROBOTS_TXT } from "./routes";
 import { readShared, sharedKey, writeShared } from "./shared-cache";
 
 export { ApiContainer };
@@ -118,6 +118,14 @@ export default {
       return new Response(request.method === "HEAD" ? null : ROBOTS_TXT, {
         headers: { "content-type": "text/plain", "cache-control": "public, max-age=86400" }
       });
+    }
+
+    if (pathname === "/") {
+      const health = new Response(request.method === "HEAD" ? null : HEALTH_TEXT, {
+        headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" }
+      });
+      applyCors(health.headers, allowedOrigin);
+      return health;
     }
 
     // Refused before the cache and the rate limiter: a path the API does not

@@ -84,6 +84,9 @@ fixed routes match without regard to case; indicator routes must be the catalog'
 `/robots.txt` is answered at the edge and disallows everything. The API serves chart data, not
 pages, so crawlers have nothing to index there.
 
+`/` is answered at the edge too, with the API's health message, so uptime monitors that poll it
+never wake the container. It reports that the Worker is up, not the container.
+
 ## Rate limiting
 
 Cache **misses** are rate limited per client IP (120/minute via the Workers `ratelimits`
@@ -225,6 +228,6 @@ Containers require the **Workers Paid** plan ($5/month minimum).
    - load the Pages site and the VitePress demo back to back in one browser and confirm neither
      poisons the other's cached `/quotes` (the failure mode in facioquo/stock-charts#517);
    - `wrangler tail` shows the cron firing and `SPY-DAILY.json` / `QQQ-DAILY.json` landing in R2;
-   - the Containers dashboard shows the instance sleeping after ~10 minutes idle.
+   - the Containers dashboard shows the instance sleeping after ~3 minutes idle.
 6. Deploy the site, then leave the old origin running for about a week — already-loaded browser
    bundles still point at it — before decommissioning.

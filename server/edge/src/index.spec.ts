@@ -133,6 +133,32 @@ describe("worker.fetch", () => {
     expect(getContainerMock).not.toHaveBeenCalled();
   });
 
+  it("answers the root health check at the edge without waking the container", async () => {
+    const response = await worker.fetch(
+      new Request("https://api.example/", { headers: { Origin: ALLOWED_ORIGIN } }),
+      makeEnv(),
+      makeCtx()
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe("API is functioning nominally.");
+    expect(response.headers.get("access-control-allow-origin")).toBe(ALLOWED_ORIGIN);
+    expect(cacheMatch).not.toHaveBeenCalled();
+    expect(getContainerMock).not.toHaveBeenCalled();
+  });
+
+  it("answers a HEAD health check without a body", async () => {
+    const response = await worker.fetch(
+      new Request("https://api.example/", { method: "HEAD" }),
+      makeEnv(),
+      makeCtx()
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeNull();
+    expect(getContainerMock).not.toHaveBeenCalled();
+  });
+
   it("refuses a path the API does not serve before the cache, limiter, or container", async () => {
     const env = makeEnv();
     const response = await worker.fetch(

@@ -1,7 +1,7 @@
 {
   "version": 2,
   "dependencies": {
-    "net10.0": {
+    "net11.0": {
       "Moq": {
         "type": "Direct",
         "requested": "[4.21.0, )",
@@ -154,14 +154,14 @@
       "webapi": {
         "type": "Project",
         "dependencies": {
-          "FacioQuo.Stock.Indicators": "[3.0.4, )"
+          "FacioQuo.Stock.Indicators": "[3.1.0, )"
         }
       },
       "FacioQuo.Stock.Indicators": {
         "type": "CentralTransitive",
-        "requested": "[3.0.4, )",
-        "resolved": "3.0.4",
-        "contentHash": "I9rJzANvgVxykYoIFvRX5hchmoPUiqgnYzg0KsZqBMIfZAgcKZIUMO/t7dJ9c7aL7QBViwsy70n6k+lWap+ENg=="
+        "requested": "[3.1.0, )",
+        "resolved": "3.1.0",
+        "contentHash": "CjtuWQ0jYcyqu7qRMu8baCUW8CU7OVqz//fCXY8sAupOJmhGf81sUumspXAB8fn6iyZtiERee6R2dgSYTKbLDw=="
       }
     }
   }
