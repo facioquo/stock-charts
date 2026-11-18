@@ -1,7 +1,7 @@
 name: Screenshots
 
 # Before and after screenshots of the React site's scenes, written into a pull
-# request's description ("Pull request screenshots" in @facioquo/react-ui's
+# request's description ("Pull request screenshots" in @facioquo/design-system's
 # llms.txt). Once per pull request, not on every push: it captures when the
 # pull request opens ready, is reopened or is marked ready. A later push
 # captures only while it carries the `pr-screenshots` label. Adding the label
@@ -46,11 +46,11 @@ permissions:
 
 env:
   NODE_VERSION: 26
-  # The PR screenshot tool (`facioquo-pr-screenshots` in @facioquo/react-ui),
+  # The PR screenshot tool (`facioquo-pr-screenshots` in @facioquo/design-system),
   # installed by both plan and publish. One value, because plan computes the
   # keys that publish records, and two versions must never disagree about
   # them. At least 0.33.0, the first with plan.
-  SCREENSHOT_TOOL_VERSION: 0.33.0
+  SCREENSHOT_TOOL_VERSION: 0.42.0
 
 jobs:
   # Decides what this push needs before anything is built. A commit's content
@@ -105,7 +105,7 @@ jobs:
         timeout-minutes: 2
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
-        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" "@facioquo/react-ui@$SCREENSHOT_TOOL_VERSION"
+        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" "@facioquo/design-system@$SCREENSHOT_TOOL_VERSION"
 
       # What the scenes render from: the React site with its bundled snapshot,
       # the chart libraries it builds, the capture spec and its config, the
@@ -264,7 +264,7 @@ jobs:
       - name: Install the screenshot tool
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
-        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" "@facioquo/react-ui@$SCREENSHOT_TOOL_VERSION"
+        run: npm install --ignore-scripts --omit=peer --no-audit --no-fund --prefix "$RUNNER_TEMP/tool" "@facioquo/design-system@$SCREENSHOT_TOOL_VERSION"
 
       # Plan's keys: the base's scenes are stored and read by content key, and
       # both keys are recorded in the description for the next push's plan.
