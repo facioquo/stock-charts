@@ -5,7 +5,7 @@ import { test, expect, type Page } from "@playwright/test";
 
 /**
  * Captures each scene for the pull request screenshot standard ("Pull request
- * screenshots" in @facioquo/react-ui's `llms.txt`): one PNG per scene, named
+ * screenshots" in @facioquo/design-system's `llms.txt`): one PNG per scene, named
  * `<scene>.png`. The live API is refused, so every scene renders from the
  * bundled snapshot, and the clock is held still, so the same code always draws
  * the same pixels. `.github/workflows/pr-screenshots.yml` compares them with

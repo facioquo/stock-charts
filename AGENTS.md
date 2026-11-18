@@ -416,4 +416,4 @@ Pull request screenshots of the React site are captured once per pull request:
 - While the label stays, every push captures again.
 - The scenes live in `tests/playwright/pr-screenshots.spec.ts`; add one there when a change alters a view no scene shows.
 - CI owns the section between the `pr-screenshots` markers; leave it unedited unless you are fixing that workflow.
-- The full rules are under "Pull request screenshots" in `@facioquo/react-ui`'s `llms.txt`.
+- The full rules are under "Pull request screenshots" in `@facioquo/design-system`'s `llms.txt`.
